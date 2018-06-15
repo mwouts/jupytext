@@ -1,0 +1,7 @@
+.idea
+.cache
+nbrmd.egg-info
+.eggs
+.Rhistory
+.Rproj.user
+nbrmd.Rproj
