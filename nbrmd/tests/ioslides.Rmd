@@ -1,0 +1,43 @@
+---
+title: "Quick ioslides"
+subtitle: "Slides generated using R, python and ioslides"
+author: "Marc Wouts"
+date: "June 15, 2018"
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+editor_options:
+  chunk_output_type: console
+---
+
+## What is ioslides?
+
+This is the default format in rstudio for building interactive HTML presentations.
+
+Enjoy the [manual](https://rmarkdown.rstudio.com/ioslides_presentation_format.html)!
+
+These slides can be turned to a single HTML file with either a click on 'knitr' in rstudio, or, command line:
+```bash
+R -e 'rmarkdown::render("simple.Rmd")'
+```
+
+## A sample plot
+
+<div style="float: left; width: 30%;">
+Here we create a sample data set for plotting.
+
+```{python, echo=TRUE}
+import pandas as pd
+x = pd.Series({'A':1, 'B':3, 'C':2})
+```
+
+Then, in another column we plot. The R notebook code chunks have many [options](https://yihui.name/knitr/options/).
+For this plot I chose not to display the source code.
+</div>
+
+<div style="float: right; width: 70%;">
+```{python, echo=FALSE, fig.width=8, fig.height=5}
+x.plot(kind='bar', title='Sample plot')
+```
+<div>
