@@ -23,6 +23,7 @@ Authors:
 # -----------------------------------------------------------------------------
 
 import os
+import nbrmd
 from nbformat.notebooknode import from_dict
 
 # -----------------------------------------------------------------------------
@@ -52,4 +53,4 @@ def pre_save_hook(model, path, **kwargs):
     rmd_file = file + '.Rmd'
 
     with open(rmd_file, 'w') as fp:
-        write(from_dict(nb), fp)
+        nbrmd.write(from_dict(nb), fp)

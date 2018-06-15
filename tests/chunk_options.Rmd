@@ -1,0 +1,19 @@
+---
+title: "Test chunk options in Rmd/Jupyter conversion"
+author: "Marc Wouts"
+date: "June 16, 2018"
+---
+
+```{r knitr_setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.width = 10, fig.height = 5)
+```
+
+```{python, echo=TRUE}
+import pandas as pd
+x = pd.Series({'A':1, 'B':3, 'C':2})
+```
+
+```{python bar_plot, echo=FALSE, fig.width=8, fig.height=5}
+x.plot(kind='bar', title='Sample plot')
+```
+

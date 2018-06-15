@@ -1,14 +1,16 @@
 import nbformat
 import nbrmd
+import pytest
 
-def test_jupyter_write_read(file='jupyter.ipynb'):
+@pytest.mark.parametrize('nb_file', ['jupyter.ipynb'])
+def test_identity_source_write_read(nb_file):
     """
     Test that writing the notebook with rmd, and read again, is the same as removing outputs
     :param file:
     :return:
     """
 
-    with open(file) as fp:
+    with open(nb_file) as fp:
         nb = nbformat.read(fp, as_version=4)
 
     rmd = nbrmd.nbrmd.writes(nb)
