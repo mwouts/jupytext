@@ -24,8 +24,19 @@ Install the package with
 ```python
 pip install nbrmd
 ```
-   
-This provides a `nbrmd` script that converts Jupyter notebooks to R markdown notebooks, and vice-versa. Double conversion of R markdown is identity, however double conversion of Jupyter notebooks only preserves the source (i.e. metadata and outputs are lost).
+  
+This provides a `nbrmd` script that converts Jupyter notebooks to R markdown notebooks, and vice-versa.
+
+Use it as:
+```bash
+nbrmd jupyter.ipynb    # this creates a jupyter.Rmd file
+nbrmd jupyter.Rmd      # and this, a jupyter.ipynb file
+```
+
+## And if I convert twice?
+
+Double conversion of R markdown is identity.  
+Double conversion of Jupyter notebooks only preserves the source (i.e. metadata and outputs are lost, like in most [pre-commit hooks](https://gist.github.com/minrk/6176788).
 
 ## Can I save my Jupyter notebook under this format?
 
