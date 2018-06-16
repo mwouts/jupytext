@@ -1,5 +1,7 @@
 .idea
 .cache
+build
+dist
 nbrmd.egg-info
 .eggs
 .Rhistory
