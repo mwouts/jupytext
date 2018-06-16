@@ -1,5 +1,7 @@
 # From Jupyter notebooks to R markdown, and back
 
+[![Build Status](https://travis-ci.com/mwouts/nbrmd.svg?branch=master)](https://travis-ci.com/mwouts/nbrmd)
+
 This is a converter that creates Jupyter notebooks from R markdown notebooks, and the opposite.
 
 You will be interested in this if
