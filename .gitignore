@@ -1,5 +1,6 @@
 .idea
 .cache
+.pytest_cache
 build
 dist
 nbrmd.egg-info
@@ -7,3 +8,5 @@ nbrmd.egg-info
 .Rhistory
 .Rproj.user
 nbrmd.Rproj
+*.pyc
+
