@@ -21,8 +21,9 @@ Look at [nbrmd/tests/ioslides.Rmd](https://github.com/mwouts/nbrmd/blob/master/t
 ## How do I use the converter
 
 Install the package with
-
-    pip install nbrmd
+```python
+pip install nbrmd
+```
    
 This provides a `nbrmd` script that converts Jupyter notebooks to R markdown notebooks, and vice-versa. Double conversion of R markdown is identity, however double conversion of Jupyter notebooks only preserves the source (i.e. metadata and outputs are lost).
 
@@ -31,11 +32,13 @@ This provides a `nbrmd` script that converts Jupyter notebooks to R markdown not
 The `nbrmd` package offers a `pre_save_hook` for Jupyter notebook server, that will, in addition to your Jupyter notebook, maintain an up-to-date R markdown version. To use it,
 - generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit the config and include this:
+```python
+from nbrmd import pre_save_hook
+c.ContentsManager.pre_save_hook = pre_save_hook
+```    
 
-    from nbrmd import pre_save_hook
-    c.ContentsManager.pre_save_hook = pre_save_hook
-    
 Please note that, however, if you edit the `.Rmd` file, the `.ipynb` will not be updated, unless you re-generate it with:
+```bash
+nbrmd notebook.Rmd
+```
 
-    nbrmd notebook.Rmd
-    
