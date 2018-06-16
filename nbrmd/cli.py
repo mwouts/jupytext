@@ -1,6 +1,5 @@
 import os
-import nbrmd
-import nbformat
+from nbrmd import readf, writef
 import argparse
 
 parser = argparse.ArgumentParser(description='''Jupyter notebook to R markdown converter''')
@@ -8,28 +7,28 @@ parser.add_argument('notebooks',
                     help='Name of one or multiple .ipynb or .Rmd notebook(s) to be converted to the alternate form',
                     nargs='+')
 
-def main():
+
+def convert(nb_files):
     """
     Export R markdown notebooks, or Jupyter notebooks, to the opposite format
+    :param nb_files: list of notebooks
     :return:
     """
-    args = parser.parse_args()
-    for nb_file in args.notebooks:
+    for nb_file in nb_files:
         file, ext = os.path.splitext(nb_file)
-        if ext=='.ipynb':
+        if ext == '.ipynb':
             nb_dest = file + '.Rmd'
             print("Jupyter notebook {} being converted to R markdown {}".format(nb_file, nb_dest))
-            with open(nb_file) as fp:
-                nb = nbformat.read(fp, as_version=4)
-            with open(nb_dest, 'w') as fp:
-                nbrmd.write(nb, fp)
-        elif ext=='.Rmd':
+        elif ext == '.Rmd':
             nb_dest = file + '.ipynb'
             print("R markdown {} being converted to Jupyter notebook {}".format(nb_file, nb_dest))
-            with open(nb_file) as fp:
-                nb = nbrmd.read(fp)
-            with open(nb_dest, 'w') as fp:
-                nbformat.write(nb, fp)
         else:
-            raise nbrmd.nbrmd.RmdReaderError(
+            raise TypeError(
                 "File '{}' is neither a Jupyter (.ipynb) nor a R markdown (.Rmd) notebook".format(nb_file))
+        nb = readf(nb_file)
+        writef(nb, nb_dest)
+
+
+def main():
+    args = parser.parse_args()
+    convert(args.notebooks)

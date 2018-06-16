@@ -1,9 +1,10 @@
 import nbformat
 import nbrmd
 import pytest
-import notebooks
+from tests.utils import list_all_notebooks, filter_output_and_compare_notebooks
 
-@pytest.mark.parametrize('nb_file', notebooks.list_all_notebooks('.ipynb'))
+
+@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_identity_source_write_read(nb_file):
     """
     Test that writing the notebook with rmd, and read again, is the same as removing outputs
@@ -17,9 +18,4 @@ def test_identity_source_write_read(nb_file):
     rmd = nbrmd.nbrmd.writes(nb)
     nb2 = nbrmd.nbrmd.reads(rmd)
 
-    cells_output_removed = nb.cells
-    for cell in cells_output_removed:
-        cell.execution_count = None
-        cell.output = None
-
-    assert nb.cells == cells_output_removed
+    filter_output_and_compare_notebooks(nb, nb2)

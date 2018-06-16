@@ -52,5 +52,4 @@ def pre_save_hook(model, path, **kwargs):
     file, ipynb_ext = os.path.splitext(path)
     rmd_file = file + '.Rmd'
 
-    with open(rmd_file, 'w') as fp:
-        nbrmd.write(from_dict(nb), fp)
+    nbrmd.writef(from_dict(nb), rmd_file)

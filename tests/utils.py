@@ -1,5 +1,6 @@
 import os
 
+
 def list_all_notebooks(ext):
     """
     :ext: desired extension
@@ -12,3 +13,14 @@ def list_all_notebooks(ext):
         if nb_ext.lower() == ext.lower():
             notebooks.append(os.path.join(nb_path, nb_file))
     return notebooks
+
+
+def remove_output_and_metadata(nb):
+    nb.metadata = None
+    for cell in nb.cells:
+        cell.output = None
+
+
+def filter_output_and_compare_notebooks(nb1, nb2):
+    assert remove_output_and_metadata(nb1) == \
+           remove_output_and_metadata(nb2)

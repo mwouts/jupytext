@@ -13,12 +13,14 @@ Authors:
 # Imports
 # -----------------------------------------------------------------------------
 
+import os
 import re
 from enum import Enum
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import (
     new_code_cell, new_markdown_cell, new_raw_cell, new_notebook
 )
+import nbformat
 
 # -----------------------------------------------------------------------------
 # Code
@@ -130,3 +132,37 @@ read = _reader.read
 to_notebook = _reader.to_notebook
 write = _writer.write
 writes = _writer.writes
+
+
+def readf(nb_file):
+    """
+    Load the notebook from the desired file
+    :param nb_file: file with .ipynb or .Rmd extension
+    :return: the notebook
+    """
+    file, ext = os.path.splitext(nb_file)
+    with open(nb_file) as fp:
+        if ext.lower() == '.rmd':
+            return read(fp)
+        elif ext.lower() == '.ipynb':
+            return nbformat.read(fp, as_version=4)
+        else:
+            raise TypeError('File {} has incorrect extension (.Rmd or .ipynb expected)'.format(nb_file))
+
+
+def writef(nb, nb_file):
+    """
+    Save the notebook in the desired file
+    :param nb: notebook
+    :param nb_file: file with .ipynb or .Rmd extension
+    :return:
+    """
+
+    file, ext = os.path.splitext(nb_file)
+    with open(nb_file, 'w') as fp:
+        if ext.lower() == '.rmd':
+            write(nb, fp)
+        elif ext.lower() == '.ipynb':
+            nbformat.write(nb, fp)
+        else:
+            raise TypeError('File {} has incorrect extension (.Rmd or .ipynb expected)'.format(nb_file))

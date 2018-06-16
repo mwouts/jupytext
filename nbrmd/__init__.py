@@ -8,5 +8,5 @@ to the ipynb file.
 Use the 'nbrmd' conversion script to convert Jupyter notebooks from/to R markdown notebooks.
 """
 
-from .nbrmd import read, reads, write, writes
+from .nbrmd import read, reads, readf, write, writes, writef
 from .jupyter_hook import pre_save_hook
