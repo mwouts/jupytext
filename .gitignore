@@ -1,12 +1,13 @@
 .idea
 .cache
+.coverage
 .pytest_cache
-build
-dist
-nbrmd.egg-info
 .eggs
 .Rhistory
 .Rproj.user
+build
+dist
+nbrmd.egg-info
 nbrmd.Rproj
 *.pyc
 
