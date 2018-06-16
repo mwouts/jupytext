@@ -9,7 +9,7 @@ from tests.utils import list_all_notebooks, filter_output_and_compare_notebooks
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb') + list_all_notebooks('.Rmd'))
 def test_convert_single_file(nb_file, tmpdir):
     nb_org = tmpdir.join(os.path.basename(nb_file))
-    base, ext = os.path.splitext(nb_org)
+    base, ext = os.path.splitext(str(nb_org))
     nb_other = base + '.ipynb' if ext == '.Rmd' else base + '.Rmd'
 
     copyfile(nb_file, nb_org)
@@ -28,7 +28,7 @@ def test_convert_multiple_file(nb_files, tmpdir):
 
     for nb_file in nb_files:
         nb_org = tmpdir.join(os.path.basename(nb_file))
-        base, ext = os.path.splitext(nb_org)
+        base, ext = os.path.splitext(str(nb_org))
         nb_other = base + '.ipynb' if ext == '.Rmd' else base + '.Rmd'
         copyfile(nb_file, nb_org)
         nb_orgs.append(nb_org)
