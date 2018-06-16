@@ -4,7 +4,7 @@ import pytest
 @pytest.mark.parametrize('nb_file', ['ioslides.Rmd', 'chunk_options.Rmd'])
 def test_identity_write_read(nb_file):
     """
-    Test that writing the notebook with ipynb, and read again, yields identify
+    Test that writing the notebook with ipynb, and read again, yields identity
     :param file:
     :return:
     """
