@@ -1,4 +1,4 @@
 #!/usr/bin/env python
 
-import nbrmd
-nbrmd.cli.main()
+import nbrmd.cli as cli
+cli.main()

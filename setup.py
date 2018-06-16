@@ -12,7 +12,7 @@ setup(
     long_description_content_type="text/markdown",
     url='https://github.com/mwouts/nbrmd',
     packages=find_packages(),
-    scripts=['nbrmd'],
+    scripts=['bin/nbrmd'],
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
     classifiers=('Development Status :: 2 - Pre-Alpha',
