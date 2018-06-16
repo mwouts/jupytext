@@ -1,7 +1,8 @@
 import nbrmd
 import pytest
+import notebooks
 
-@pytest.mark.parametrize('nb_file', ['ioslides.Rmd', 'chunk_options.Rmd'])
+@pytest.mark.parametrize('nb_file', notebooks.list_all_notebooks('.Rmd'))
 def test_identity_write_read(nb_file):
     """
     Test that writing the notebook with ipynb, and read again, yields identity
