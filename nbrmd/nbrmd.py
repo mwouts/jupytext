@@ -19,7 +19,6 @@ from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import (
     new_code_cell, new_markdown_cell, new_raw_cell, new_notebook
 )
-import yaml
 
 # -----------------------------------------------------------------------------
 # Code
