@@ -1,6 +1,8 @@
 # From Jupyter notebooks to R markdown, and back
 
 [![Build Status](https://travis-ci.com/mwouts/nbrmd.svg?branch=master)](https://travis-ci.com/mwouts/nbrmd)
+[![codecov.io](https://codecov.io/github/mwouts/nbrmd/coverage.svg?branch=master)](https://codecov.io/github/mwouts/nbrmd?branch=master)
+
 
 This is a converter that creates Jupyter notebooks from R markdown notebooks, and the opposite.
 
