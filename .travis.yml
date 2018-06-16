@@ -13,6 +13,7 @@ install:
   - pip install -r requirements.txt
 # command to run tests
 script:
-  - pytest --cov=./
+  - coverage run --source=. -m py.test -s tests/
 after_success:
+  - coverage report
   - codecov
