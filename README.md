@@ -22,7 +22,7 @@ Look at [nbrmd/tests/ioslides.Rmd](https://github.com/mwouts/nbrmd/blob/master/t
 
 Install the package with
 
-   pip install nbrmd
+    pip install nbrmd
    
 This provides a `nbrmd` script that converts Jupyter notebooks to R markdown notebooks, and vice-versa. Double conversion of R markdown is identity, however double conversion of Jupyter notebooks only preserves the source (i.e. metadata and outputs are lost).
 
