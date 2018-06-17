@@ -10,4 +10,5 @@ dist
 nbrmd.egg-info
 nbrmd.Rproj
 *.pyc
-
+gits*
+TODO*
