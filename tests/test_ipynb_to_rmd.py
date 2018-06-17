@@ -1,7 +1,7 @@
 import nbformat
 import nbrmd
 import pytest
-from tests.utils import list_all_notebooks, filter_output_and_compare_notebooks
+from utils import list_all_notebooks, filter_output_and_compare_notebooks
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))

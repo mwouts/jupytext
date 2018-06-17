@@ -1,6 +1,6 @@
 import nbrmd
 import pytest
-from tests.utils import list_all_notebooks
+from utils import list_all_notebooks
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.Rmd'))
