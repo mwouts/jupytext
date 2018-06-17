@@ -18,8 +18,8 @@ def test_cli_multiple_files(nb_files):
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb') + list_all_notebooks('.Rmd'))
 def test_convert_single_file(nb_file, tmpdir):
-    nb_org = tmpdir.join(os.path.basename(nb_file))
-    base, ext = os.path.splitext(str(nb_org))
+    nb_org = str(tmpdir.join(os.path.basename(nb_file)))
+    base, ext = os.path.splitext(nb_org)
     nb_other = base + '.ipynb' if ext == '.Rmd' else base + '.Rmd'
 
     copyfile(nb_file, nb_org)
@@ -37,8 +37,8 @@ def test_convert_multiple_file(nb_files, tmpdir):
     nb_others = []
 
     for nb_file in nb_files:
-        nb_org = tmpdir.join(os.path.basename(nb_file))
-        base, ext = os.path.splitext(str(nb_org))
+        nb_org = str(tmpdir.join(os.path.basename(nb_file)))
+        base, ext = os.path.splitext(nb_org)
         nb_other = base + '.ipynb' if ext == '.Rmd' else base + '.Rmd'
         copyfile(nb_file, nb_org)
         nb_orgs.append(nb_org)
