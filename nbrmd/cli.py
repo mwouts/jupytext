@@ -2,11 +2,6 @@ import os
 from nbrmd import readf, writef
 import argparse
 
-parser = argparse.ArgumentParser(description='''Jupyter notebook to R markdown converter''')
-parser.add_argument('notebooks',
-                    help='Name of one or multiple .ipynb or .Rmd notebook(s) to be converted to the alternate form',
-                    nargs='+')
-
 
 def convert(nb_files):
     """
@@ -29,6 +24,14 @@ def convert(nb_files):
         writef(nb, nb_dest)
 
 
+def cli(args=None):
+    parser = argparse.ArgumentParser(description='''Jupyter notebook to R markdown converter''')
+    parser.add_argument('notebooks',
+                        help='Name of one or multiple .ipynb or .Rmd notebook(s) to be converted to the alternate form',
+                        nargs='+')
+    return parser.parse_args(args)
+
+
 def main():
-    args = parser.parse_args()
+    args = cli()
     convert(args.notebooks)
