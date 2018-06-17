@@ -52,8 +52,24 @@ class RmdReader(NotebookReader):
 
         cells = []
         cell_lines = []
+
+        def add_markdown_cell():
+            if len(cell_lines) == 0:
+                return
+
+            if cell_lines[-1] == '':
+                if len(cell_lines)>1:
+                    cells.append(new_markdown_cell(source=u'\n'.join(cell_lines[:-1])))
+                else:
+                    cells[-1]['metadata']['noskipline'] = True
+                    cells.append(new_markdown_cell(source=u'\n'.join(cell_lines)))
+            else:
+                cells.append(new_markdown_cell(source=u'\n'.join(cell_lines),
+                                               metadata={u'noskipline': True}))
+
         chunk_options = None
         state = State.NONE
+        testblankline = False
 
         for line in lines:
             if state is State.NONE:
@@ -68,14 +84,21 @@ class RmdReader(NotebookReader):
                         cells.append(new_raw_cell(source=u'\n'.join(['---'] + cell_lines + ['---'])))
                     cell_lines = []
                     state = State.MARKDOWN
+                    testblankline = True
                     continue
+
+            if testblankline:
+                # Set 'noskipline' metadata if no blank line is found after cell
+                testblankline = False
+                if len(cells) == 0 or line == u'':
+                    continue
+                else:
+                    cells[-1][u'metadata'][u'noskipline'] = True
 
             if state is State.MARKDOWN:
                 if _start_code_re.match(line):
-                    if len(cell_lines):
-                        cells.append(new_markdown_cell(source=u'\n'.join(cell_lines)))
-
                     chunk_options = _start_code_re.findall(line)[0]
+                    add_markdown_cell()
                     cell_lines = []
                     state = State.CODE
                     continue
@@ -83,21 +106,21 @@ class RmdReader(NotebookReader):
             if state is State.CODE:
                 if _end_code_re.match(line):
                     cells.append(new_code_cell(source=u'\n'.join(cell_lines),
-                                               metadata={'chunk_options': chunk_options}))
+                                               metadata={u'chunk_options': chunk_options}))
                     cell_lines = []
                     state = State.MARKDOWN
+                    testblankline = True
                     continue
 
             cell_lines.append(line)
 
         # Append last cell if not empty
         if state is State.MARKDOWN:
-            if len(cell_lines):
-                cells.append(new_markdown_cell(source=u'\n'.join(cell_lines)))
+            add_markdown_cell()
         elif state is State.CODE:
-            raise RmdReaderError('Unterminated code cell')
+            raise RmdReaderError(u'Unterminated code cell')
         elif state is State.HEADER:
-            raise RmdReaderError('Unterminated YAML header')
+            raise RmdReaderError(u'Unterminated YAML header')
 
         nb = new_notebook(cells=cells)
         return nb
@@ -115,11 +138,14 @@ class RmdWriter(NotebookWriter):
                 if input is not None:
                     lines.extend(input.splitlines())
                 lines.append(u'```')
+                if not cell.get(u'metadata', {}).get(u'noskipline', False):
+                    lines.append(u'')
             elif cell.cell_type == u'markdown' or cell.cell_type == u'raw':
                 lines.append(cell.get(u'source', ''))
+                if not cell.get(u'metadata', {}).get(u'noskipline', False):
+                    lines.append(u'')
 
-        # End file with a line return
-        lines.append('')
+        lines.append(u'')
 
         return u'\n'.join(lines)
 

@@ -8,6 +8,7 @@ date: "June 16, 2018"
 knitr::opts_chunk$set(echo = FALSE, fig.width = 10, fig.height = 5)
 ```
 
+
 ```{python, echo=TRUE}
 import pandas as pd
 x = pd.Series({'A':1, 'B':3, 'C':2})
