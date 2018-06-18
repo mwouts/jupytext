@@ -48,8 +48,9 @@ This provides a `nbrmd` script that converts Jupyter notebooks to R markdown not
 
 Use it as:
 ```bash
-nbrmd jupyter.ipynb    # this creates a jupyter.Rmd file
-nbrmd jupyter.Rmd      # and this, a jupyter.ipynb file
+nbrmd jupyter.ipynb      # this prints the Rmarkdown alternative
+nbrmd jupyter.ipynb -i   # this creates a jupyter.Rmd file
+nbrmd jupyter.Rmd   -i   # and this, a jupyter.ipynb file
 ```
 
 ## And if I convert twice?
