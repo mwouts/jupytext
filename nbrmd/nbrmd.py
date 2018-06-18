@@ -50,6 +50,7 @@ class RmdReader(NotebookReader):
     def to_notebook(self, s, **kwargs):
         lines = s.splitlines()
 
+        language = None
         cells = []
         cell_lines = []
 
@@ -58,7 +59,7 @@ class RmdReader(NotebookReader):
                 return
 
             if cell_lines[-1] == '':
-                if len(cell_lines)>1:
+                if len(cell_lines) > 1:
                     cells.append(new_markdown_cell(source=u'\n'.join(cell_lines[:-1])))
                 else:
                     cells[-1]['metadata']['noskipline'] = True
@@ -98,6 +99,9 @@ class RmdReader(NotebookReader):
             if state is State.MARKDOWN:
                 if _start_code_re.match(line):
                     chunk_options = _start_code_re.findall(line)[0]
+                    chunk_language = chunk_options.split(' ')[0]
+                    if chunk_language == 'python' or language is None:
+                        language = chunk_language
                     add_markdown_cell()
                     cell_lines = []
                     state = State.CODE
@@ -122,17 +126,19 @@ class RmdReader(NotebookReader):
         elif state is State.HEADER:
             raise RmdReaderError(u'Unterminated YAML header')
 
-        nb = new_notebook(cells=cells)
+        nb = new_notebook(cells=cells,
+                          metadata={'language_info': {'name': 'R' if language == 'r' else language}})
         return nb
 
 
 class RmdWriter(NotebookWriter):
 
     def writes(self, nb, **kwargs):
+        default_language = nb.metadata.language_info.name.lower()
         lines = []
         for cell in nb.cells:
             if cell.cell_type == u'code':
-                chunk_options = cell.get(u'metadata', {}).get(u'chunk_options', 'python')
+                chunk_options = cell.get(u'metadata', {}).get(u'chunk_options', default_language)
                 lines.append(u'```{' + chunk_options + '}')
                 input = cell.get(u'source')
                 if input is not None:
