@@ -35,9 +35,9 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
 def test_convert_single_file(nb_file, capsys):
     convert([nb_file], False)
 
-    captured = capsys.readouterr()
-    assert captured.out != ''
-    assert captured.err == ''
+    out, err = capsys.readouterr()
+    assert out != ''
+    assert err == ''
 
 
 @pytest.mark.parametrize('nb_files', [list_all_notebooks('.ipynb') + list_all_notebooks('.Rmd')])
