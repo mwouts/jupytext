@@ -6,6 +6,11 @@ Release History
 dev
 +++
 
+**Improvements**
+- FileContentsManager
+- TODO: preserve notebook + cell metadata
+
+
 0.1.1 (2018-06-19)
 +++++++++++++++++++
 
