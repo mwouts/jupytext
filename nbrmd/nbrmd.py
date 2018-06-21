@@ -21,8 +21,9 @@ from nbformat.v4.nbbase import (
     new_code_cell, new_markdown_cell, new_raw_cell, new_notebook
 )
 import nbformat
-from nbrmd.chunk_options import to_metadata, to_chunk_options
 import yaml
+
+from .chunk_options import to_metadata, to_chunk_options
 
 # -----------------------------------------------------------------------------
 # Code
