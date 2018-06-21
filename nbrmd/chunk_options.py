@@ -18,7 +18,7 @@ def to_chunk_options(metadata):
 def to_metadata(options):
     options = options.split(' ', 1)
     if len(options)==1:
-        language = options
+        language = options[0]
         chunk_options = []
     else:
         language, others = options

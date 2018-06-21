@@ -1,8 +1,9 @@
 from nbrmd.chunk_options import to_metadata, to_chunk_options
 import pytest
 
-samples = [('r plot_1, dpi=72, fig.path="fig_path/"', {
-    'language': 'R', 'name': 'plot_1', 'chunk_options': {'dpi': '72', 'fig.path': '"fig_path/"'}}),
+samples = [('r', {'language': 'R'}),
+           ('r plot_1, dpi=72, fig.path="fig_path/"', {
+               'language': 'R', 'name': 'plot_1', 'chunk_options': {'dpi': '72', 'fig.path': '"fig_path/"'}}),
            ('r echo=FALSE', {
                'language': 'R', 'hide_input': True}),
            ('r plot_1, echo=TRUE', {

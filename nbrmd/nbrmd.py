@@ -68,7 +68,7 @@ class RmdReader(NotebookReader):
                 return
 
             if cell_lines[-1] == '':
-                if len(cell_lines) > 1:
+                if len(cell_lines) > 1 or len(cells) == 0:
                     cells.append(new_markdown_cell(source=u'\n'.join(cell_lines[:-1])))
                 else:
                     cells[-1]['metadata']['noskipline'] = True
@@ -153,6 +153,7 @@ class RmdReader(NotebookReader):
 def _as_dict(metadata):
     if isinstance(metadata, nbformat.NotebookNode):
         return {k: _as_dict(metadata[k]) for k in metadata.keys()}
+    return metadata
 
 
 class RmdWriter(NotebookWriter):
@@ -162,17 +163,17 @@ class RmdWriter(NotebookWriter):
         metadata = _as_dict(nb.metadata)
 
         lines = []
-        header_inserted = False
+        header_inserted = len(metadata) == 0
 
         for cell in nb.cells:
             if cell.cell_type == u'raw':
                 # Is this the Rmd header? Start and end with '---', and can be parsed with yaml
-                if len(lines) == 0:
-                    header = cell.get(u'source', '')
+                if len(lines) == 0 and not header_inserted:
+                    header = cell.get(u'source', '').splitlines()
                     if len(header) >= 2 and _header_re.match(header[0]) and _header_re.match(header[-1]):
                         try:
                             header = header[1:-1]
-                            yaml.load(header)
+                            yaml.load(u'\n'.join(header))
                             header.extend(yaml.dump({u'jupyter': metadata}).splitlines())
                             lines = [u'---'] + header + [u'---']
                             header_inserted = True
