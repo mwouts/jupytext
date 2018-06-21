@@ -6,9 +6,12 @@ Release History
 dev
 +++
 
+0.2.0 (2018-06-21)
++++++++++++++++++++
+
 **Improvements**
-- FileContentsManager
-- TODO: preserve notebook + cell metadata
+- The package provides a ``RmdFileContentsManager`` for direct edit of R markdown files in Jupyter
+- Notebook metadata and cell options are preserved
 
 
 0.1.1 (2018-06-19)
