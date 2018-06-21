@@ -18,3 +18,4 @@ def list_all_notebooks(ext):
 def remove_outputs(nb):
     for cell in nb.cells:
         cell.output = None
+    return nb

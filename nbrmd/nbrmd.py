@@ -25,14 +25,10 @@ import yaml
 
 from .chunk_options import to_metadata, to_chunk_options
 
+
 # -----------------------------------------------------------------------------
 # Code
 # -----------------------------------------------------------------------------
-
-_header_re = re.compile(r"^---\s*")
-_start_code_re = re.compile(r"^```\{(.*)\}\s*")
-_end_code_re = re.compile(r"^```\s*")
-
 
 def _language(metadata):
     try:
@@ -48,11 +44,18 @@ class State(Enum):
     CODE = 3
 
 
+_header_re = re.compile(r"^---\s*")
+_end_code_re = re.compile(r"^```\s*")
+
+
 class RmdReaderError(Exception):
     pass
 
 
 class RmdReader(NotebookReader):
+
+    def __init__(self, markdown=False):
+        self.start_code_re = re.compile(r"^```(.*)\s*") if markdown else re.compile(r"^```\{(.*)\}\s*")
 
     def reads(self, s, **kwargs):
         return self.to_notebook(s, **kwargs)
@@ -120,8 +123,8 @@ class RmdReader(NotebookReader):
                         cells[-1][u'metadata'][u'noskipline'] = True
 
             if state is State.MARKDOWN:
-                if _start_code_re.match(line):
-                    chunk_options = _start_code_re.findall(line)[0]
+                if self.start_code_re.match(line):
+                    chunk_options = self.start_code_re.findall(line)[0]
                     cell_metadata = to_metadata(chunk_options)
                     add_markdown_cell()
                     cell_lines = []
@@ -159,6 +162,9 @@ def _as_dict(metadata):
 
 
 class RmdWriter(NotebookWriter):
+
+    def __init__(self, markdown=False):
+        self.markdown = markdown
 
     def writes(self, nb):
         default_language = _language(nb.metadata)
@@ -200,16 +206,15 @@ class RmdWriter(NotebookWriter):
                     noskipline = False
                 if not 'language' in cell_metadata:
                     cell_metadata['language'] = default_language
-                lines.append(u'```{' + to_chunk_options(cell_metadata) + '}')
+                if self.markdown:
+                    lines.append(u'```' + to_chunk_options(cell_metadata))
+                else:
+                    lines.append(u'```{' + to_chunk_options(cell_metadata) + '}')
                 input = cell.get(u'source')
                 if input is not None:
                     lines.extend(input.splitlines())
                 lines.append(u'```')
                 if not noskipline:
-                    lines.append(u'')
-            elif cell.cell_type == u'markdown':
-                lines.append(cell.get(u'source', ''))
-                if not cell.get(u'metadata', {}).get('noskipline', False):
                     lines.append(u'')
 
         if not header_inserted and len(metadata):
@@ -230,6 +235,15 @@ to_notebook = _reader.to_notebook
 write = _writer.write
 writes = _writer.writes
 
+_md_reader = RmdReader(markdown=True)
+_md_writer = RmdWriter(markdown=True)
+
+md_reads = _md_reader.reads
+md_read = _md_reader.read
+md_to_notebook = _md_reader.to_notebook
+md_write = _md_writer.write
+md_writes = _md_writer.writes
+
 
 def readf(nb_file):
     """
@@ -239,12 +253,14 @@ def readf(nb_file):
     """
     file, ext = os.path.splitext(nb_file)
     with open(nb_file) as fp:
-        if ext.lower() == '.rmd':
+        if ext == '.Rmd':
             return read(fp)
-        elif ext.lower() == '.ipynb':
+        elif ext == '.md':
+            return md_read(fp)
+        elif ext == '.ipynb':
             return nbformat.read(fp, as_version=4)
         else:
-            raise TypeError('File {} has incorrect extension (.Rmd or .ipynb expected)'.format(nb_file))
+            raise TypeError('File {} has incorrect extension (.Rmd or .md or .ipynb expected)'.format(nb_file))
 
 
 def writef(nb, nb_file):
@@ -257,12 +273,14 @@ def writef(nb, nb_file):
 
     file, ext = os.path.splitext(nb_file)
     with open(nb_file, 'w') as fp:
-        if ext.lower() == '.rmd':
+        if ext == '.Rmd':
             write(nb, fp)
-        elif ext.lower() == '.ipynb':
+        elif ext == '.md':
+            md_write(nb, fp)
+        elif ext == '.ipynb':
             nbformat.write(nb, fp)
         else:
-            raise TypeError('File {} has incorrect extension (.Rmd or .ipynb expected)'.format(nb_file))
+            raise TypeError('File {} has incorrect extension (.Rmd or .md or .ipynb expected)'.format(nb_file))
 
 
 def readme():

@@ -3,14 +3,20 @@ Convert between R markdown chunk options and jupyter cell metadata.
 
 metadata.hide_input and metadata.hide_output are documented here:
 http://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html
+
+TODO: Update this if a standard gets defined at https://github.com/jupyter/notebook/issues/3700
 """
 
 _boolean_options_dictionary = [('hide_input', 'echo', True), ('hide_output', 'include', True)]
+
+
 def _r_logical_values(bool):
     return 'TRUE' if bool else 'FALSE'
 
+
 class RLogicalValueError(Exception):
     pass
+
 
 def _py_logical_values(rbool):
     if rbool in ['TRUE', 'T']:
@@ -38,9 +44,20 @@ def to_chunk_options(metadata):
     return options.strip(',')
 
 
+def update_metadata(name, value, metadata):
+    for jo, ro, rev in _boolean_options_dictionary:
+        if name == ro:
+            try:
+                metadata[jo] = _py_logical_values(value) != rev
+                return True
+            except RLogicalValueError:
+                pass
+    return False
+
+
 def to_metadata(options):
     options = options.split(' ', 1)
-    if len(options)==1:
+    if len(options) == 1:
         language = options[0]
         chunk_options = []
     else:
@@ -59,13 +76,8 @@ def to_metadata(options):
         else:
             name, value = co
             name = name.strip()
-            for jo, ro, rev in _boolean_options_dictionary:
-                if name==ro:
-                    try:
-                        metadata[jo] = _py_logical_values(value) != rev
-                        continue
-                    except RLogicalValueError:
-                        pass
+            if update_metadata(name, value, metadata):
+                continue
             metadata['chunk_options'][name] = value
     if len(metadata['chunk_options']) == 0:
         del metadata['chunk_options']

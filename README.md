@@ -42,7 +42,7 @@ The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes
 - generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit the config and include this:
 ```python
-c.NotebookApp.contents_manager_class = 'nbrmd.cm.RmdFileContentsManager'
+c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
 ```
 
 Then, make sure you have the `nbrmd` package installed, and re-start jupyter, i.e. run
@@ -55,7 +55,7 @@ jupyter notebook
 
 Yes. If you edit your config to
  ```python
-c.NotebookApp.contents_manager_class = 'nbrmd.cm.RmdFileContentsManager'
+c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
 c.ContentsManager.pre_save_hook = 'nbrmd.update_rmd_and_ipynb'
 ```
 then you will be able to open both `.Rmd` and `.ipynb` files, and upon saving, both files will be updated.

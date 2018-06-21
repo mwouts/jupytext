@@ -1,11 +1,9 @@
+import notebook.transutils
 from notebook.services.contents.filemanager import FileContentsManager
 
 import os
 import nbrmd
 import nbformat
-
-_nbformat_writes = nbformat.writes
-_nbformat_reads = nbformat.reads
 
 
 def _nbrmd_writes(nb, version=nbformat.NO_CONVERT, **kwargs):
@@ -14,6 +12,20 @@ def _nbrmd_writes(nb, version=nbformat.NO_CONVERT, **kwargs):
 
 def _nbrmd_reads(s, as_version, **kwargs):
     return nbrmd.reads(s, **kwargs)
+
+
+def _nbrmd_md_writes(nb, version=nbformat.NO_CONVERT, **kwargs):
+    return nbrmd.nbrmd.md_writes(nb, **kwargs)
+
+
+def _nbrmd_md_reads(s, as_version, **kwargs):
+    return nbrmd.nbrmd.md_reads(s, **kwargs)
+
+
+_org_writes = nbformat.writes
+_org_reads = nbformat.reads
+_ext_writes = {'.ipynb': _org_writes, '.Rmd': _nbrmd_writes, '.md': _nbrmd_md_writes}
+_ext_reads = {'.ipynb': _org_reads, '.Rmd': _nbrmd_reads, '.md': _nbrmd_md_reads}
 
 
 class RmdFileContentsManager(FileContentsManager):
@@ -25,13 +37,15 @@ class RmdFileContentsManager(FileContentsManager):
 
     def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
-        nbformat.reads = _nbformat_reads if os_path.endswith('.ipynb') else _nbrmd_reads
-        return super()._read_notebook(os_path, as_version)
+        file, ext = os.path.splitext(os_path)
+        nbformat.reads = _ext_reads[ext]
+        return super(FileContentsManager, self)._read_notebook(os_path, as_version)
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
-        nbformat.writes = _nbformat_writes if os_path.endswith('.ipynb') else _nbrmd_writes
-        return super()._save_notebook(os_path, nb)
+        file, ext = os.path.splitext(os_path)
+        nbformat.writes = _ext_writes[ext]
+        return super(FileContentsManager, self)._save_notebook(os_path, nb)
 
     def get(self, path, content=True, type=None, format=None):
         """ Takes a path for an entity and returns its model
@@ -63,7 +77,7 @@ class RmdFileContentsManager(FileContentsManager):
                   any([path.endswith(ext) for ext in self.nb_extensions]))):
             return self._notebook_model(path, content=content)
         else:
-            return super().get(path, content, type, format)
+            return super(FileContentsManager, self).get(path, content, type, format)
 
     def rename_file(self, old_path, new_path):
         old_file, org_ext = os.path.splitext(old_path)
@@ -71,6 +85,6 @@ class RmdFileContentsManager(FileContentsManager):
         if org_ext in self.nb_extensions and org_ext == new_ext:
             for ext in self.nb_extensions:
                 if self.file_exists(old_file + ext):
-                    super().rename_file(old_file + ext, new_file + ext)
+                    super(FileContentsManager, self).rename_file(old_file + ext, new_file + ext)
         else:
-            super().rename_file(old_path, new_path)
+            super(FileContentsManager, self).rename_file(old_path, new_path)
