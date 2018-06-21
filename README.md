@@ -22,19 +22,13 @@ R markdown is almost identical to markdown export of Jupyter notebooks. For refe
 - _Download as Markdown (.md)_ in Jupyter's interface,
 - or `nbconvert notebook.ipynb --to markdown`.
 
-First difference is that code chunks can be evaluated. While markdown's standard syntax for a python code paragraph is
+Major difference is that code chunks can be evaluated. While markdown's standard syntax for a python code paragraph is
 
     ```python
     1+1
     ```
     
-R markdown will also have code chunks like
-
-    ```{python}
-    1+1
-    ```
-
-with this syntax meaning that the code above should be _evaluated_.
+R markdown introduces active code chunks that start with by replacing `python` above with `{python}`.
 
 Second difference is the common presence of a YAML header, that describes the notebook title, author, and desired output (HTML, slides, PDF...).
 
@@ -67,7 +61,7 @@ c.ContentsManager.pre_save_hook = 'nbrmd.update_rmd_and_ipynb'
 then you will be able to open both `.Rmd` and `.ipynb` files, and upon saving, both files will be updated.
 
 Alternatively, if you prefer to update only `.Rmd` or `.ipynb` files when you edit the other, chose either
-`'nbrmd.update_rmd'` or `'nbrmd.update_ipynb'` as the `pre_save_hook` (and yes, you're free to use the `pre_save_hook`
+`nbrmd.update_rmd` or `nbrmd.update_ipynb` as the `pre_save_hook` (and yes, you're free to use the `pre_save_hook`
 with the default `ContentsManager`).
 
 :warning: Be careful not to open twice the same notebook! You should _shutdown_ the notebooks
@@ -92,6 +86,7 @@ nbrmd jupyter.Rmd   -i   # and this, a jupyter.ipynb file
 
 ## And if I convert twice?
 
-Round trip conversion of R markdown is identity.
-Round trip conversion of Jupyter notebooks preserves the source, but outputs are lost, like in most [pre-commit hooks](https://gist.github.com/minrk/6176788).
+Round trip conversion of R markdown is identity.  
+Round trip conversion of Jupyter notebooks preserves the source.
+Outputs are lost, however, like in any good [pre-commit hooks](https://gist.github.com/minrk/6176788).
 
