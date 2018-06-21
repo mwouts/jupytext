@@ -21,6 +21,9 @@ from nbformat.v4.nbbase import (
     new_code_cell, new_markdown_cell, new_raw_cell, new_notebook
 )
 import nbformat
+import yaml
+
+from .chunk_options import to_metadata, to_chunk_options
 
 # -----------------------------------------------------------------------------
 # Code
@@ -29,6 +32,13 @@ import nbformat
 _header_re = re.compile(r"^---\s*")
 _start_code_re = re.compile(r"^```\{(.*)\}\s*")
 _end_code_re = re.compile(r"^```\s*")
+
+
+def _language(metadata):
+    try:
+        return metadata.language_info.name.lower()
+    except AttributeError:
+        return u'python'
 
 
 class State(Enum):
@@ -50,7 +60,7 @@ class RmdReader(NotebookReader):
     def to_notebook(self, s, **kwargs):
         lines = s.splitlines()
 
-        language = None
+        metadata = {}
         cells = []
         cell_lines = []
 
@@ -59,7 +69,7 @@ class RmdReader(NotebookReader):
                 return
 
             if cell_lines[-1] == '':
-                if len(cell_lines) > 1:
+                if len(cell_lines) > 1 or len(cells) == 0:
                     cells.append(new_markdown_cell(source=u'\n'.join(cell_lines[:-1])))
                 else:
                     cells[-1]['metadata']['noskipline'] = True
@@ -68,7 +78,7 @@ class RmdReader(NotebookReader):
                 cells.append(new_markdown_cell(source=u'\n'.join(cell_lines),
                                                metadata={u'noskipline': True}))
 
-        chunk_options = None
+        cell_metadata = {}
         state = State.NONE
         testblankline = False
 
@@ -81,8 +91,20 @@ class RmdReader(NotebookReader):
 
             if state is State.HEADER:
                 if _header_re.match(line):
-                    if len(cell_lines):
-                        cells.append(new_raw_cell(source=u'\n'.join(['---'] + cell_lines + ['---'])))
+                    header = []
+                    jupyter = []
+                    in_header = True
+                    for l in cell_lines:
+                        if l.rstrip() == 'jupyter:':
+                            in_header = False
+                        if in_header:
+                            header.append(l)
+                        else:
+                            jupyter.append(l)
+                    if len(header):
+                        cells.append(new_raw_cell(source=u'\n'.join(['---'] + header + ['---'])))
+                    if len(jupyter):
+                        metadata = yaml.load(u'\n'.join(jupyter))['jupyter']
                     cell_lines = []
                     state = State.MARKDOWN
                     testblankline = True
@@ -91,17 +113,16 @@ class RmdReader(NotebookReader):
             if testblankline:
                 # Set 'noskipline' metadata if no blank line is found after cell
                 testblankline = False
-                if len(cells) == 0 or line == u'':
+                if line == u'':
                     continue
                 else:
-                    cells[-1][u'metadata'][u'noskipline'] = True
+                    if len(cells):
+                        cells[-1][u'metadata'][u'noskipline'] = True
 
             if state is State.MARKDOWN:
                 if _start_code_re.match(line):
                     chunk_options = _start_code_re.findall(line)[0]
-                    chunk_language = chunk_options.split(' ')[0]
-                    if chunk_language == 'python' or language is None:
-                        language = chunk_language
+                    cell_metadata = to_metadata(chunk_options)
                     add_markdown_cell()
                     cell_lines = []
                     state = State.CODE
@@ -110,7 +131,7 @@ class RmdReader(NotebookReader):
             if state is State.CODE:
                 if _end_code_re.match(line):
                     cells.append(new_code_cell(source=u'\n'.join(cell_lines),
-                                               metadata={u'chunk_options': chunk_options}))
+                                               metadata=cell_metadata))
                     cell_lines = []
                     state = State.MARKDOWN
                     testblankline = True
@@ -127,29 +148,73 @@ class RmdReader(NotebookReader):
             raise RmdReaderError(u'Unterminated YAML header')
 
         nb = new_notebook(cells=cells,
-                          metadata={'language_info': {'name': 'R' if language == 'r' else language}})
+                          metadata=metadata)
         return nb
+
+
+def _as_dict(metadata):
+    if isinstance(metadata, nbformat.NotebookNode):
+        return {k: _as_dict(metadata[k]) for k in metadata.keys()}
+    return metadata
 
 
 class RmdWriter(NotebookWriter):
 
-    def writes(self, nb, **kwargs):
-        default_language = nb.metadata.language_info.name.lower()
+    def writes(self, nb):
+        default_language = _language(nb.metadata)
+        metadata = _as_dict(nb.metadata)
+
         lines = []
+        header_inserted = len(metadata) == 0
+
         for cell in nb.cells:
-            if cell.cell_type == u'code':
-                chunk_options = cell.get(u'metadata', {}).get(u'chunk_options', default_language)
-                lines.append(u'```{' + chunk_options + '}')
+            if cell.cell_type == u'raw':
+                # Is this the Rmd header? Start and end with '---', and can be parsed with yaml
+                if len(lines) == 0 and not header_inserted:
+                    header = cell.get(u'source', '').splitlines()
+                    if len(header) >= 2 and _header_re.match(header[0]) and _header_re.match(header[-1]):
+                        try:
+                            header = header[1:-1]
+                            yaml.load(u'\n'.join(header))
+                            header.extend(yaml.dump({u'jupyter': metadata}).splitlines())
+                            lines = [u'---'] + header + [u'---']
+                            header_inserted = True
+                        except yaml.ScannerError:
+                            pass
+                    if not header_inserted:
+                        lines.append(cell.get(u'source', ''))
+                else:
+                    lines.append(cell.get(u'source', ''))
+                if not cell.get(u'metadata', {}).get('noskipline', False):
+                    lines.append(u'')
+            elif cell.cell_type == u'markdown':
+                lines.append(cell.get(u'source', ''))
+                if not cell.get(u'metadata', {}).get('noskipline', False):
+                    lines.append(u'')
+            elif cell.cell_type == u'code':
+                cell_metadata = cell.get(u'metadata', {})
+                if 'noskipline' in cell_metadata:
+                    noskipline = cell_metadata['noskipline']
+                    del cell_metadata['noskipline']
+                else:
+                    noskipline = False
+                if not 'language' in cell_metadata:
+                    cell_metadata['language'] = default_language
+                lines.append(u'```{' + to_chunk_options(cell_metadata) + '}')
                 input = cell.get(u'source')
                 if input is not None:
                     lines.extend(input.splitlines())
                 lines.append(u'```')
-                if not cell.get(u'metadata', {}).get(u'noskipline', False):
+                if not noskipline:
                     lines.append(u'')
-            elif cell.cell_type == u'markdown' or cell.cell_type == u'raw':
+            elif cell.cell_type == u'markdown':
                 lines.append(cell.get(u'source', ''))
-                if not cell.get(u'metadata', {}).get(u'noskipline', False):
+                if not cell.get(u'metadata', {}).get('noskipline', False):
                     lines.append(u'')
+
+        if not header_inserted and len(metadata):
+            header = yaml.dump({u'jupyter': metadata}, default_flow_style=False).splitlines()
+            lines = [u'---'] + header + [u'---'] + lines
 
         lines.append(u'')
 

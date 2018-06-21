@@ -15,12 +15,6 @@ def list_all_notebooks(ext):
     return notebooks
 
 
-def remove_output_and_metadata(nb):
-    nb.metadata = None
+def remove_outputs(nb):
     for cell in nb.cells:
         cell.output = None
-
-
-def filter_output_and_compare_notebooks(nb1, nb2):
-    assert remove_output_and_metadata(nb1) == \
-           remove_output_and_metadata(nb2)

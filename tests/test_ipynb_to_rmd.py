@@ -1,7 +1,7 @@
 import nbformat
 import nbrmd
 import pytest
-from utils import list_all_notebooks, filter_output_and_compare_notebooks
+from utils import list_all_notebooks, remove_outputs
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
@@ -13,9 +13,9 @@ def test_identity_source_write_read(nb_file):
     """
 
     with open(nb_file) as fp:
-        nb = nbformat.read(fp, as_version=4)
+        nb1 = nbformat.read(fp, as_version=4)
 
-    rmd = nbrmd.nbrmd.writes(nb)
+    rmd = nbrmd.nbrmd.writes(nb1)
     nb2 = nbrmd.nbrmd.reads(rmd)
 
-    filter_output_and_compare_notebooks(nb, nb2)
+    assert remove_outputs(nb1) == remove_outputs(nb2)

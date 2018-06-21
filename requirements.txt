@@ -1,3 +1,4 @@
 nbformat>=4.0.0
 argparse
 pytest
+pyyaml
