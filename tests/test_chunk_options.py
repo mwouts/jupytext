@@ -19,4 +19,10 @@ def test_parse_options(options, metadata):
 
 @pytest.mark.parametrize('options,metadata', samples)
 def test_build_options(options, metadata):
-    assert to_chunk_options(metadata) == options
+    # Older python has no respect for order...
+    # assert to_chunk_options(metadata) == options
+
+    def split_and_strip(opt):
+        set([o.strip() for o in opt.split(',')])
+
+    assert split_and_strip(to_chunk_options(metadata)) == split_and_strip(options)
