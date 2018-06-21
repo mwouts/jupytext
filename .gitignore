@@ -7,8 +7,8 @@
 .Rproj.user
 build
 dist
+venv
 nbrmd.egg-info
 nbrmd.Rproj
 *.pyc
 gits*
-TODO*

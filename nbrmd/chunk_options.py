@@ -1,9 +1,32 @@
+"""
+Convert between R markdown chunk options and jupyter cell metadata.
+
+metadata.hide_input and metadata.hide_output are documented here:
+http://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html
+"""
+
+_boolean_options_dictionary = [('hide_input', 'echo', True), ('hide_output', 'include', True)]
+def _r_logical_values(bool):
+    return 'TRUE' if bool else 'FALSE'
+
+class RLogicalValueError(Exception):
+    pass
+
+def _py_logical_values(rbool):
+    if rbool in ['TRUE', 'T']:
+        return True
+    if rbool in ['FALSE', 'F']:
+        return False
+    raise RLogicalValueError
+
+
 def to_chunk_options(metadata):
     options = metadata['language'].lower()
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
-    if 'hide_input' in metadata:
-        options += ' echo=' + ('FALSE' if metadata['hide_input'] else 'TRUE') + ','
+    for jo, ro, rev in _boolean_options_dictionary:
+        if jo in metadata:
+            options += ' {}={},'.format(ro, _r_logical_values(metadata[jo] != rev))
     chunk_options = metadata.get('chunk_options', {})
     for co_name in chunk_options:
         co_value = chunk_options[co_name]
@@ -36,13 +59,13 @@ def to_metadata(options):
         else:
             name, value = co
             name = name.strip()
-            if name == 'echo':
-                if value == 'TRUE':
-                    metadata['hide_input'] = False
-                    continue
-                if value == 'FALSE':
-                    metadata['hide_input'] = True
-                    continue
+            for jo, ro, rev in _boolean_options_dictionary:
+                if name==ro:
+                    try:
+                        metadata[jo] = _py_logical_values(value) != rev
+                        continue
+                    except RLogicalValueError:
+                        pass
             metadata['chunk_options'][name] = value
     if len(metadata['chunk_options']) == 0:
         del metadata['chunk_options']
