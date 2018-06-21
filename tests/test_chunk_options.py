@@ -1,5 +1,6 @@
 from nbrmd.chunk_options import to_metadata, to_chunk_options
 import pytest
+import sys
 
 samples = [('r', {'language': 'R'}),
            ('r plot_1, dpi=72, fig.path="fig_path/"', {
@@ -17,8 +18,14 @@ def test_parse_options(options, metadata):
     assert to_metadata(options) == metadata
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="unordered dict result in changes in chunk options")
 @pytest.mark.parametrize('options,metadata', samples)
 def test_build_options(options, metadata):
+    assert to_chunk_options(metadata) == options
+
+
+@pytest.mark.parametrize('options,metadata', samples)
+def test_build_options_random_order(options, metadata):
     # Older python has no respect for order...
     # assert to_chunk_options(metadata) == options
 
