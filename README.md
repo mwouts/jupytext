@@ -42,7 +42,7 @@ The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes
 - generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit the config and include this:
 ```python
-c.ContentsManager = 'nbrmd.cm.RmdFileContentsManager'
+c.NotebookApp.contents_manager_class = 'nbrmd.cm.RmdFileContentsManager'
 ```
 
 Then, make sure you have the `nbrmd` package installed, and re-start jupyter, i.e. run
