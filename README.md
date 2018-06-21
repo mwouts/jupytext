@@ -22,15 +22,15 @@ R markdown is almost identical to markdown export of Jupyter notebooks. For refe
 - _Download as Markdown (.md)_ in Jupyter's interface,
 - or `nbconvert notebook.ipynb --to markdown`.
 
-Major difference is that code chunks can be evaluated. While markdown's standard syntax for a python code paragraph is
+Major difference is that code chunks can be evaluated. While markdown's standard syntax start a python code paragraph with
 
     ```python
-    1+1
-    ```
     
-R markdown introduces active code chunks that start with by replacing `python` above with `{python}`.
+R markdown starts an active code chunks with
 
-Second difference is the common presence of a YAML header, that describes the notebook title, author, and desired output (HTML, slides, PDF...).
+	```{python}
+
+A smaller difference is the common presence of a YAML header, that describes the notebook title, author, and desired output (HTML, slides, PDF...).
 
 Look at [nbrmd/tests/ioslides.Rmd](https://github.com/mwouts/nbrmd/blob/master/tests/ioslides.Rmd) for a sample R markdown file (that, actually, only includes python cells).
 
