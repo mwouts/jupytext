@@ -113,10 +113,11 @@ class RmdReader(NotebookReader):
             if testblankline:
                 # Set 'noskipline' metadata if no blank line is found after cell
                 testblankline = False
-                if len(cells) == 0 or line == u'':
+                if line == u'':
                     continue
                 else:
-                    cells[-1][u'metadata'][u'noskipline'] = True
+                    if len(cells):
+                        cells[-1][u'metadata'][u'noskipline'] = True
 
             if state is State.MARKDOWN:
                 if _start_code_re.match(line):
@@ -212,7 +213,7 @@ class RmdWriter(NotebookWriter):
                     lines.append(u'')
 
         if not header_inserted and len(metadata):
-            header = yaml.dump({u'jupyter': metadata}).splitlines()
+            header = yaml.dump({u'jupyter': metadata}, default_flow_style=False).splitlines()
             lines = [u'---'] + header + [u'---'] + lines
 
         lines.append(u'')
