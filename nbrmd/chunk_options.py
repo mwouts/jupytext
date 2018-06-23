@@ -26,16 +26,17 @@ def _py_logical_values(rbool):
     raise RLogicalValueError
 
 
-def to_chunk_options(metadata):
-    options = metadata['language'].lower()
+def to_chunk_options(language, metadata):
+    options = language.lower()
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
+        del metadata['name']
     for jo, ro, rev in _boolean_options_dictionary:
         if jo in metadata:
             options += ' {}={},'.format(ro, _r_logical_values(metadata[jo] != rev))
-    chunk_options = metadata.get('chunk_options', {})
-    for co_name in chunk_options:
-        co_value = chunk_options[co_name]
+            del metadata[jo]
+    for co_name in metadata:
+        co_value = metadata[co_name]
         co_name = co_name.strip()
         if co_value is None:
             options += ' {},'.format(co_name)
@@ -63,8 +64,8 @@ def to_metadata(options):
     else:
         language, others = options
         chunk_options = others.split(',')
-    metadata = {'language': 'R' if language == 'r' else language}
-    metadata['chunk_options'] = {}
+    language = 'R' if language == 'r' else language
+    metadata = {}
     for i, co in enumerate(chunk_options):
         co = co.split('=', 1)
         if len(co) == 1:
@@ -72,13 +73,11 @@ def to_metadata(options):
             if i == 0:
                 metadata['name'] = name
                 continue
-            metadata['chunk_options'][name] = None
+            metadata[name] = None
         else:
             name, value = co
             name = name.strip()
             if update_metadata(name, value, metadata):
                 continue
-            metadata['chunk_options'][name] = value
-    if len(metadata['chunk_options']) == 0:
-        del metadata['chunk_options']
-    return metadata
+            metadata[name] = value
+    return language, metadata

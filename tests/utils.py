@@ -1,5 +1,5 @@
 import os
-
+import copy
 
 def list_all_notebooks(ext):
     """
@@ -16,6 +16,10 @@ def list_all_notebooks(ext):
 
 
 def remove_outputs(nb):
+    nb = copy.deepcopy(nb)
     for cell in nb.cells:
-        cell.output = None
+        cell.outputs = None
+        cell.execution_count = None
+        if 'trusted' in cell['metadata']:
+            del cell['metadata']['trusted']
     return nb

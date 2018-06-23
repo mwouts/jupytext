@@ -11,29 +11,29 @@ def test_create_contentsmanager():
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_load_save_rename(nb_file, tmpdir):
-    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
-    tmp_rmd = str(tmpdir.join('notebook.Rmd'))
-    tmp_md = str(tmpdir.join('notebook.md'))
+    tmp_ipynb = 'notebook.ipynb'
+    tmp_rmd = 'notebook.Rmd'
+    tmp_md = 'notebook.md'
 
     cm = RmdFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    # open ipynb, save md, reopen
+    # open ipynb, save Rmd, reopen
     nb = readf(nb_file)
-    cm.save(model=dict(type='notebook', content=nb), path=tmp_md)
-    nb_md = cm.get(tmp_md)
-    assert remove_outputs(nb) == nb_md['content']
-
-    # save Rmd, reopen
     cm.save(model=dict(type='notebook', content=nb), path=tmp_rmd)
     nb_rmd = cm.get(tmp_rmd)
-    assert remove_outputs(nb) == nb_rmd['content']
+    assert remove_outputs(nb) == remove_outputs(nb_rmd['content'])
+
+    # save md, reopen
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_md)
+    nb_md = cm.get(tmp_md)
+    assert remove_outputs(nb) == remove_outputs(nb_md['content'])
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # rename ipynb
-    cm.rename(tmp_ipynb, str(tmpdir.join('new.ipynb')))
+    cm.rename(tmp_ipynb, 'new.ipynb')
     assert not os.path.isfile(tmp_ipynb)
     assert not os.path.isfile(tmp_md)
     assert not os.path.isfile(tmp_rmd)
