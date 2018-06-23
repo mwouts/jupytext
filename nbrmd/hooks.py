@@ -24,12 +24,9 @@ def update_rmd_and_ipynb(model, path, format=['.ipynb', '.Rmd'], **kwargs):
     if nb['nbformat'] != 4:
         return
 
-    if format is None:
-        format = nb.get('metadata', {}).get('nbrmd_formats')
-        if format is None:
-            return
-        if not isinstance(format, list) or not set(format).issubset(['.Rmd', '.md', '.ipynb']):
-            raise TypeError("Notebook metadata 'nbrmd_formats' should be subset of ['.Rmd', '.md', '.ipynb']")
+    format = nb.get('metadata', {}).get('nbrmd_formats', format)
+    if not isinstance(format, list) or not set(format).issubset(['.Rmd', '.md', '.ipynb']):
+        raise TypeError("Notebook metadata 'nbrmd_formats' should be subset of ['.Rmd', '.md', '.ipynb']")
 
     file, ext = os.path.splitext(path)
 
@@ -72,4 +69,4 @@ def update_selected_formats(model, path, **kwargs):
     :return:
     """
 
-    update_rmd_and_ipynb(model, path, format=None, **kwargs)
+    update_rmd_and_ipynb(model, path, format=[], **kwargs)
