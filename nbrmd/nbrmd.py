@@ -212,7 +212,7 @@ class RmdWriter(NotebookWriter):
                             header = header[1:-1]
                             yaml.load(u'\n'.join(header))
                             if not self.markdown:
-                                header.extend(yaml.dump({u'jupyter': metadata}, default_flow_style=False).splitlines())
+                                header.extend(yaml.safe_dump({u'jupyter': metadata}, default_flow_style=False).splitlines())
                             lines = [u'---'] + header + [u'---']
                             header_inserted = True
                         except yaml.ScannerError:
@@ -255,7 +255,7 @@ class RmdWriter(NotebookWriter):
                     lines.append(u'')
 
         if not self.markdown and not header_inserted and len(metadata):
-            header = yaml.dump({u'jupyter': metadata}, default_flow_style=False).splitlines()
+            header = yaml.safe_dump({u'jupyter': metadata}, default_flow_style=False).splitlines()
             lines = [u'---'] + header + [u'---', u''] + lines
 
         lines.append(u'')
