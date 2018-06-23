@@ -23,3 +23,8 @@ def remove_outputs(nb):
         if 'trusted' in cell['metadata']:
             del cell['metadata']['trusted']
     return nb
+
+def remove_outputs_and_header(nb):
+    nb = remove_outputs(nb)
+    nb['metadata'] = {}
+    return nb

@@ -1,7 +1,7 @@
 import pytest
 import os
 import nbrmd
-from utils import list_all_notebooks, remove_outputs
+from utils import list_all_notebooks, remove_outputs, remove_outputs_and_header
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
@@ -41,7 +41,7 @@ def test_all_files_created(nb_file, tmpdir):
     nbrmd.update_selected_formats(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     nb2 = nbrmd.readf(tmp_md)
-    assert remove_outputs(nb) == remove_outputs(nb2)
+    assert remove_outputs_and_header(nb) == remove_outputs_and_header(nb2)
 
     nb3 = nbrmd.readf(tmp_rmd)
     assert remove_outputs(nb) == remove_outputs(nb3)
@@ -64,10 +64,10 @@ def test_raise_on_wrong_format(tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
 
     with pytest.raises(TypeError):
-        nbrmd.update_selected_formats(model=dict(type='notebook',
-                                                 content=dict(nbformat=4,
-                                                              metadata=dict(nbrmd_formats=['.doc']))),
-                                      path=tmp_ipynb)
+        nbrmd.update_selected_formats(
+            model=dict(type='notebook',
+                       content=dict(nbformat=4, metadata=dict(nbrmd_formats=['.doc']))),
+            path=tmp_ipynb)
 
 
 def test_no_rmd_on_not_notebook(tmpdir):
