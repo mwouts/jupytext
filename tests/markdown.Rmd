@@ -1,3 +1,9 @@
+---
+jupyter:
+  language_info:
+    name: python
+---
+
 # This is a plain markdown file
 
 ```python

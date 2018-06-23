@@ -1,6 +1,9 @@
 ---
 title: "R Notebook"
 output: html_notebook
+jupyter:
+  language_info:
+    name: R
 ---
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 

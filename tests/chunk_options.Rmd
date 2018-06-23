@@ -2,6 +2,9 @@
 title: "Test chunk options in Rmd/Jupyter conversion"
 author: "Marc Wouts"
 date: "June 16, 2018"
+jupyter:
+  language_info:
+    name: python
 ---
 
 ```{r knitr_setup, include=FALSE}
@@ -9,7 +12,7 @@ knitr::opts_chunk$set(echo = FALSE, fig.width = 10, fig.height = 5)
 ```
 
 
-```{python, echo=TRUE}
+```{python echo=TRUE}
 import pandas as pd
 x = pd.Series({'A':1, 'B':3, 'C':2})
 ```
