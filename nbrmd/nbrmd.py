@@ -47,9 +47,9 @@ class State(Enum):
 _header_re = re.compile(r"^---\s*")
 _end_code_re = re.compile(r"^```\s*")
 _r_cell_re = re.compile(r"^%%R\s*")
-_python_cell_re = re.compile(r"^%%python\s*")
-_bash_cell_re = re.compile(r"^%%bash\s*")
-_javascript_cell_re = re.compile(r"^%%(js|javascript)\s*")
+
+_jupyter_languages = ['R', 'bash', 'sh', 'python', 'python2', 'python3', 'javascript', 'js', 'perl']
+_jupyter_languages_re = [re.compile(r"^%%{}\s*".format(lang)) for lang in _jupyter_languages]
 
 
 class RmdReaderError(Exception):
@@ -177,7 +177,7 @@ class RmdReader(NotebookReader):
             if c['cell_type'] == 'code':
                 language = c['metadata']['language']
                 del c['metadata']['language']
-                if language != main_language:
+                if language != main_language and language in _jupyter_languages:
                     c['source'] = u'%%{}\n'.format(language) + c['source']
 
         nb = new_notebook(cells=cells, metadata=metadata)
@@ -211,7 +211,8 @@ class RmdWriter(NotebookWriter):
                         try:
                             header = header[1:-1]
                             yaml.load(u'\n'.join(header))
-                            header.extend(yaml.dump({u'jupyter': metadata}, default_flow_style=False).splitlines())
+                            if not self.markdown:
+                                header.extend(yaml.dump({u'jupyter': metadata}, default_flow_style=False).splitlines())
                             lines = [u'---'] + header + [u'---']
                             header_inserted = True
                         except yaml.ScannerError:
@@ -234,22 +235,14 @@ class RmdWriter(NotebookWriter):
                     del cell_metadata['noskipline']
                 else:
                     noskipline = False
+                language = None
                 if len(input):
-                    if _r_cell_re.match(input[0]):
-                        language = 'R'
-                        input = input[1:]
-                    elif _python_cell_re.match(input[0]):
-                        language = 'python'
-                        input = input[1:]
-                    elif _bash_cell_re.match(input[0]):
-                        language = 'bash'
-                        input = input[1:]
-                    elif _javascript_cell_re.match(input[0]):
-                        language = 'javascript'
-                        input = input[1:]
-                    else:
-                        language = default_language
-                else:
+                    for lang, pattern in zip(_jupyter_languages, _jupyter_languages_re):
+                        if pattern.match(input[0]):
+                            language = lang
+                            input = input[1:]
+                            break
+                if language is None:
                     language = default_language
                 if self.markdown:
                     lines.append(u'```' + to_chunk_options(language, cell_metadata))
@@ -261,7 +254,7 @@ class RmdWriter(NotebookWriter):
                 if not noskipline:
                     lines.append(u'')
 
-        if not header_inserted and len(metadata):
+        if not self.markdown and not header_inserted and len(metadata):
             header = yaml.dump({u'jupyter': metadata}, default_flow_style=False).splitlines()
             lines = [u'---'] + header + [u'---', u''] + lines
 
