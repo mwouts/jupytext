@@ -6,9 +6,13 @@ Release History
 dev
 +++
 
+0.2.1 (2018-06-24)
++++++++++++++++++++
+
 **Improvements**
 - Support for editing markdown files in Jupyter
 - New pre-save hook `update_selected_formats` that saves to formats in metadata 'nbrmd_formats'
+- Rmd cell options directly mapped to cell metadata
 
 **BugFixes**
 - ContentManager compatible with Python 2.7
