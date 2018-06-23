@@ -43,7 +43,6 @@ def test_all_files_created(nb_file, tmpdir):
     nb2 = nbrmd.readf(tmp_md)
     assert remove_outputs_and_header(nb) == remove_outputs_and_header(nb2)
 
-    print(open(tmp_rmd).read())
     nb3 = nbrmd.readf(tmp_rmd)
     assert remove_outputs(nb) == remove_outputs(nb3)
 
