@@ -42,7 +42,7 @@ The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes
 - generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit the config and include this:
 ```python
-c.NotebookApp.contents_manager_class = 'nbrmd.cm.RmdFileContentsManager'
+c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
 ```
 
 Then, make sure you have the `nbrmd` package installed, and re-start jupyter, i.e. run
@@ -53,25 +53,46 @@ jupyter notebook
 
 ## Can I save my Jupyter notebook as both R markdown and ipynb ?
 
-Yes. If you edit your config to
+### Per-notebook configuration
+
+The R markdown content manager includes a pre-save hook that will keep up-to date versions of your notebook
+under the file extensions specified in the `nbrmd_formats` metadata. Edit the notebook metadata in Jupyter and
+append a list for the desired format, like this:
+```
+{
+  "kernelspec": {
+    "name": "python3",
+    (...)
+  },
+  "language_info": {
+    (...)
+  },
+  "nbrmd_formats": [".ipynb", ".Rmd"]
+}
+```
+
+Accepted formats are: `.ipynb`, `.Rmd` and `.md`.
+
+### Global configuration
+
+If you want every notebook to be saved as both `.Rmd` and `.ipynb` files, then change your jupyter config to
  ```python
-c.NotebookApp.contents_manager_class = 'nbrmd.cm.RmdFileContentsManager'
+c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
 c.ContentsManager.pre_save_hook = 'nbrmd.update_rmd_and_ipynb'
 ```
-then you will be able to open both `.Rmd` and `.ipynb` files, and upon saving, both files will be updated.
 
-Alternatively, if you prefer to update only `.Rmd` or `.ipynb` files when you edit the other, chose either
+If you prefer to update just one of `.Rmd` or `.ipynb` files, then change the above to
 `nbrmd.update_rmd` or `nbrmd.update_ipynb` as the `pre_save_hook` (and yes, you're free to use the `pre_save_hook`
 with the default `ContentsManager`).
 
-:warning: Be careful not to open twice the same notebook! You should _shutdown_ the notebooks
+:warning: Be careful not to open twice a notebook with two distinct extensions! You should _shutdown_ the notebooks
 with the extension you are not currently editing (list your open notebooks with the _running_ tab in Jupyter).
 
 ## Recommendations for version control
 
 I recommend that you only add the R markdown file to version control. When you integrate a change
 on that file that was not done through your Jupyter editor, you should be careful to re-open the
-`.Rmd` file, not the jupyter one.
+`.Rmd` file, not the `.ipynb` one. 
 
 ## How do I use the converter?
 

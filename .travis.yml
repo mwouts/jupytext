@@ -2,6 +2,7 @@ language: python
 python:
   - "2.7"
   - "3.4"
+  - "3.5"
   - "3.6"
   # PyPy versions
   - "pypy3.5"
@@ -9,6 +10,7 @@ python:
 install:
   - pip install codecov
   - pip install pytest pytest-cov
+  - pip install notebook
   - pip install -r requirements.txt
   - pip install .
 # command to run tests

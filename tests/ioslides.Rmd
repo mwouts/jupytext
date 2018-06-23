@@ -9,6 +9,9 @@ output:
     smaller: true
 editor_options:
   chunk_output_type: console
+jupyter:
+  language_info:
+    name: python
 ---
 
 ## What is ioslides?
@@ -27,7 +30,7 @@ R -e 'rmarkdown::render("simple.Rmd")'
 <div style="float: left; width: 30%;">
 Here we create a sample data set for plotting.
 
-```{python, echo=TRUE}
+```{python echo=TRUE}
 import pandas as pd
 x = pd.Series({'A':1, 'B':3, 'C':2})
 ```
@@ -37,7 +40,7 @@ For this plot I chose not to display the source code.
 </div>
 
 <div style="float: right; width: 70%;">
-```{python, echo=FALSE, fig.width=8, fig.height=5}
+```{python echo=FALSE, fig.width=8, fig.height=5}
 x.plot(kind='bar', title='Sample plot')
 ```
 <div>

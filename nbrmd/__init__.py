@@ -9,4 +9,8 @@ Use the 'nbrmd' conversion script to convert Jupyter notebooks from/to R markdow
 """
 
 from .nbrmd import read, reads, readf, write, writes, writef
-from .hooks import update_rmd, update_ipynb, update_rmd_and_ipynb
+from .hooks import update_rmd, update_ipynb, update_rmd_and_ipynb, update_selected_formats
+try:
+  from .cm import RmdFileContentsManager
+except ImportError as e:
+  RmdFileContentsManager = str(e)
