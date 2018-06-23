@@ -8,6 +8,7 @@ TODO: Update this if a standard gets defined at https://github.com/jupyter/noteb
 """
 
 _boolean_options_dictionary = [('hide_input', 'echo', True), ('hide_output', 'include', True)]
+_ignore_metadata = ['collapsed', 'autoscroll', 'deletable', 'format', 'tags']
 
 
 def _r_logical_values(bool):
