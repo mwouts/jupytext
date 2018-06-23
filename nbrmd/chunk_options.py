@@ -8,7 +8,7 @@ TODO: Update this if a standard gets defined at https://github.com/jupyter/noteb
 """
 
 _boolean_options_dictionary = [('hide_input', 'echo', True), ('hide_output', 'include', True)]
-_ignore_metadata = ['collapsed', 'autoscroll', 'deletable', 'format', 'tags']
+_ignore_metadata = ['collapsed', 'autoscroll', 'deletable', 'format', 'trusted', 'tags']
 
 
 def _r_logical_values(bool):
@@ -39,14 +39,20 @@ def to_chunk_options(language, metadata):
     for co_name in metadata:
         co_value = metadata[co_name]
         co_name = co_name.strip()
+        if co_name in _ignore_metadata:
+            continue
         if co_value is None:
             options += ' {},'.format(co_name)
-        else:
+        elif isinstance(co_value, str):
             options += ' {}={},'.format(co_name, co_value)
+        elif isinstance(co_value, bool):
+            options += ' {}={},'.format(co_name, 'TRUE' if co_value else 'FALSE')
+        else:
+            options += ' {}="{}",'.format(co_name, str(co_value))
     return options.strip(',')
 
 
-def update_metadata(name, value, metadata):
+def update_metadata_using_dictionary(name, value, metadata):
     for jo, ro, rev in _boolean_options_dictionary:
         if name == ro:
             try:
@@ -78,7 +84,12 @@ def to_metadata(options):
         else:
             name, value = co
             name = name.strip()
-            if update_metadata(name, value, metadata):
+
+            if update_metadata_using_dictionary(name, value, metadata):
                 continue
-            metadata[name] = value
+            try:
+                metadata[name] = _py_logical_values(value)
+                continue
+            except RLogicalValueError:
+                metadata[name] = value
     return language, metadata
