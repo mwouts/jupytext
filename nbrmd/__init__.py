@@ -13,4 +13,4 @@ from .hooks import update_rmd, update_ipynb, update_rmd_and_ipynb, update_select
 try:
   from .cm import RmdFileContentsManager
 except ImportError as e:
-  RmdFileContentsManager = e.message
+  RmdFileContentsManager = str(e)
