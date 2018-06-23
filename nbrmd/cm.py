@@ -1,10 +1,12 @@
 import notebook.transutils
 from notebook.services.contents.filemanager import FileContentsManager
+from .hooks import update_selected_formats
 
 import os
 import nbrmd
 import nbformat
 import mock
+
 
 def _nbrmd_writes(nb, version=nbformat.NO_CONVERT, **kwargs):
     return nbrmd.writes(nb, **kwargs)
@@ -28,6 +30,10 @@ class RmdFileContentsManager(FileContentsManager):
     Jupyter notebooks (.ipynb), or in Rmarkdown format (.Rmd), in either .Rmd or .md files
     """
     nb_extensions = ['.ipynb', '.Rmd', '.md']
+
+    def __init__(self, **kwargs):
+        self.pre_save_hook = update_selected_formats
+        super(RmdFileContentsManager, self).__init__(**kwargs)
 
     def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
