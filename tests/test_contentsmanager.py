@@ -1,9 +1,8 @@
-from nbrmd.cm import RmdFileContentsManager
+from nbrmd import RmdFileContentsManager, readf
 from utils import list_all_notebooks, remove_outputs, remove_outputs_and_header
 import os
 import sys
 import pytest
-from nbrmd import readf
 
 
 def test_create_contentsmanager():
@@ -12,6 +11,8 @@ def test_create_contentsmanager():
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
                     reason="unordered dict result in changes in chunk options")
+@pytest.mark.skipif(isinstance(RmdFileContentsManager, str),
+                    reason=RmdFileContentsManager)
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_load_save_rename(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
