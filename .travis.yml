@@ -17,5 +17,5 @@ install:
 script:
   - coverage run --source=. -m py.test -s tests/
 after_success:
-  - coverage report
+  - coverage report -m
   - codecov

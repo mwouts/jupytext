@@ -4,7 +4,8 @@ import sys
 from utils import list_all_notebooks
 
 
-@pytest.mark.skipif(sys.version_info < (3, 6), reason="unordered dict result in changes in chunk options")
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.Rmd'))
 def test_identity_write_read(nb_file):
     """
