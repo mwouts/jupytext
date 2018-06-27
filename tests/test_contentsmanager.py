@@ -5,6 +5,8 @@ import sys
 import pytest
 
 
+@pytest.mark.skipif(isinstance(RmdFileContentsManager, str),
+                    reason=RmdFileContentsManager)
 def test_create_contentsmanager():
     RmdFileContentsManager()
 
