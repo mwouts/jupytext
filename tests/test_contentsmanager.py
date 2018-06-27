@@ -10,7 +10,8 @@ def test_create_contentsmanager():
     RmdFileContentsManager()
 
 
-@pytest.mark.skipif(sys.version_info < (3, 6), reason="unordered dict result in changes in chunk options")
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_load_save_rename(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
@@ -29,7 +30,8 @@ def test_load_save_rename(nb_file, tmpdir):
     # save md, reopen
     cm.save(model=dict(type='notebook', content=nb), path=tmp_md)
     nb_md = cm.get(tmp_md)
-    assert remove_outputs_and_header(nb) == remove_outputs_and_header(nb_md['content'])
+    assert (remove_outputs_and_header(nb) ==
+            remove_outputs_and_header(nb_md['content']))
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)

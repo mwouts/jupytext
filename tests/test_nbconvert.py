@@ -5,7 +5,8 @@ import subprocess
 import os
 
 
-@pytest.mark.skipif(isinstance(nbrmd.RMarkdownExporter, str), reason=nbrmd.RMarkdownExporter)
+@pytest.mark.skipif(isinstance(nbrmd.RMarkdownExporter, str),
+                    reason=nbrmd.RMarkdownExporter)
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_nbconvert_and_read(nb_file):
     # Load notebook
@@ -24,12 +25,14 @@ def test_nbconvert_and_read(nb_file):
 pytest.importorskip('jupyter')
 
 
-@pytest.mark.skipif(isinstance(nbrmd.RMarkdownExporter, str), reason=nbrmd.RMarkdownExporter)
+@pytest.mark.skipif(isinstance(nbrmd.RMarkdownExporter, str),
+                    reason=nbrmd.RMarkdownExporter)
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_nbconvert_cmd_line(nb_file, tmpdir):
     rmd_file = str(tmpdir.join('notebook.Rmd'))
 
-    subprocess.call(['jupyter', 'nbconvert', '--to', 'rmarkdown', nb_file, '--output', rmd_file])
+    subprocess.call(['jupyter', 'nbconvert', '--to', 'rmarkdown',
+                     nb_file, '--output', rmd_file])
 
     assert os.path.isfile(rmd_file)
 
