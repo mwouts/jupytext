@@ -5,6 +5,7 @@ import subprocess
 import os
 
 pytest.importorskip('nbconvert')
+pytest.importorskip('traitlets')
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
