@@ -5,7 +5,8 @@ import nbformat
 
 def update_rmd_and_ipynb(model, path, format=['.ipynb', '.Rmd'], **kwargs):
     """
-    A pre-save hook for jupyter that saves the notebooks under the alternative form.
+    A pre-save hook for jupyter that saves the notebooks
+    under the alternative form.
     When the notebook has extension '.ipynb', this creates a '.Rmd' file
     When the notebook has extension '.Rmd', this creates a '.ipynb' file
     :param model: data model, that may contain the notebook
@@ -25,8 +26,10 @@ def update_rmd_and_ipynb(model, path, format=['.ipynb', '.Rmd'], **kwargs):
         return
 
     format = nb.get('metadata', {}).get('nbrmd_formats', format)
-    if not isinstance(format, list) or not set(format).issubset(['.Rmd', '.md', '.ipynb']):
-        raise TypeError("Notebook metadata 'nbrmd_formats' should be subset of ['.Rmd', '.md', '.ipynb']")
+    if not isinstance(format, list) or not set(format).issubset(
+            ['.Rmd', '.md', '.ipynb']):
+        raise TypeError("Notebook metadata 'nbrmd_formats' "
+                        "should be subset of ['.Rmd', '.md', '.ipynb']")
 
     file, ext = os.path.splitext(path)
 
@@ -61,8 +64,8 @@ def update_ipynb(model, path, **kwargs):
 
 def update_selected_formats(model, path, **kwargs):
     """
-    A pre-save hook for jupyter that saves the notebooks in the formats selected in
-    notebook metadata 'nbrmd_formats', that should be a list
+    A pre-save hook for jupyter that saves the notebooks in the formats
+    selected in notebook metadata 'nbrmd_formats', that should be a list
     :param model: data model, that may contain the notebook
     :param path: full name for ipython notebook
     :param kwargs: not used

@@ -6,17 +6,22 @@ from nbrmd.cli import convert, cli
 from utils import list_all_notebooks, remove_outputs
 
 
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb') + list_all_notebooks('.Rmd'))
+@pytest.mark.parametrize('nb_file',
+                         list_all_notebooks('.ipynb') +
+                         list_all_notebooks('.Rmd'))
 def test_cli_single_file(nb_file):
     assert cli([nb_file]).notebooks == [nb_file]
 
 
-@pytest.mark.parametrize('nb_files', [list_all_notebooks('.ipynb') + list_all_notebooks('.Rmd')])
+@pytest.mark.parametrize('nb_files', [list_all_notebooks('.ipynb') +
+                                      list_all_notebooks('.Rmd')])
 def test_cli_multiple_files(nb_files):
     assert cli(nb_files).notebooks == nb_files
 
 
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb') + list_all_notebooks('.Rmd'))
+@pytest.mark.parametrize('nb_file',
+                         list_all_notebooks('.ipynb') +
+                         list_all_notebooks('.Rmd'))
 def test_convert_single_file_in_place(nb_file, tmpdir):
     nb_org = str(tmpdir.join(os.path.basename(nb_file)))
     base, ext = os.path.splitext(nb_org)
@@ -31,7 +36,9 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     remove_outputs(nb1) == remove_outputs(nb2)
 
 
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb') + list_all_notebooks('.Rmd'))
+@pytest.mark.parametrize('nb_file',
+                         list_all_notebooks('.ipynb') +
+                         list_all_notebooks('.Rmd'))
 def test_convert_single_file(nb_file, capsys):
     convert([nb_file], False)
 
@@ -40,7 +47,9 @@ def test_convert_single_file(nb_file, capsys):
     assert err == ''
 
 
-@pytest.mark.parametrize('nb_files', [list_all_notebooks('.ipynb') + list_all_notebooks('.Rmd')])
+@pytest.mark.parametrize('nb_files',
+                         [list_all_notebooks('.ipynb') +
+                          list_all_notebooks('.Rmd')])
 def test_convert_multiple_file(nb_files, tmpdir):
     nb_orgs = []
     nb_others = []

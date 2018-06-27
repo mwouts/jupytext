@@ -1,10 +1,12 @@
 import os
 import copy
 
+
 def list_all_notebooks(ext):
     """
     :ext: desired extension
-    :return: all notebooks in the directory of this script, with the desired extension
+    :return: all notebooks in the directory of this script,
+     with the desired extension
     """
     nb_path = os.path.dirname(os.path.abspath(__file__))
     notebooks = []
@@ -23,6 +25,7 @@ def remove_outputs(nb):
         if 'trusted' in cell['metadata']:
             del cell['metadata']['trusted']
     return nb
+
 
 def remove_outputs_and_header(nb):
     nb = remove_outputs(nb)

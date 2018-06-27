@@ -6,6 +6,18 @@ Release History
 dev
 +++
 
+
+0.2.2 (2018-06-28)
++++++++++++++++++++
+
+**Improvements**
+- RMarkdown exporter for nbconvert
+- Parsing of R options robust to parenthesis
+- Jupyter cell tags are preserved
+
+**BugFixes**
+- requirements.txt now included in pypi packages
+
 0.2.1 (2018-06-24)
 +++++++++++++++++++
 

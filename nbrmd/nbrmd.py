@@ -1,8 +1,8 @@
 """Read and write notebooks as RStudio notebook files, with .Rmd extension.
 
-Raw and markdown cells are converted to markdown, while code cells are converted
-to code chunks. The transformation is reversible and all inputs are preserved (not
-outputs, though).
+Raw and markdown cells are converted to markdown, while code cells are
+converted to code chunks. The transformation is reversible and all inputs
+are preserved (not outputs, though).
 
 Authors:
 
@@ -46,10 +46,11 @@ class State(Enum):
 
 _header_re = re.compile(r"^---\s*")
 _end_code_re = re.compile(r"^```\s*")
-_r_cell_re = re.compile(r"^%%R\s*")
 
-_jupyter_languages = ['R', 'bash', 'sh', 'python', 'python2', 'python3', 'javascript', 'js', 'perl']
-_jupyter_languages_re = [re.compile(r"^%%{}\s*".format(lang)) for lang in _jupyter_languages]
+_jupyter_languages = ['R', 'bash', 'sh', 'python', 'python2', 'python3',
+                      'javascript', 'js', 'perl']
+_jupyter_languages_re = [re.compile(r"^%%{}\s*".format(lang))
+                         for lang in _jupyter_languages]
 
 
 class RmdReaderError(Exception):
@@ -59,7 +60,8 @@ class RmdReaderError(Exception):
 class RmdReader(NotebookReader):
 
     def __init__(self, markdown=False):
-        self.start_code_re = re.compile(r"^```(.*)\s*") if markdown else re.compile(r"^```\{(.*)\}\s*")
+        self.start_code_re = re.compile(r"^```(.*)\s*") if markdown \
+            else re.compile(r"^```\{(.*)\}\s*")
 
     def reads(self, s, **kwargs):
         return self.to_notebook(s, **kwargs)
@@ -77,10 +79,12 @@ class RmdReader(NotebookReader):
 
             if cell_lines[-1] == '':
                 if len(cell_lines) > 1 or len(cells) == 0:
-                    cells.append(new_markdown_cell(source=u'\n'.join(cell_lines[:-1])))
+                    cells.append(new_markdown_cell(
+                        source=u'\n'.join(cell_lines[:-1])))
                 else:
                     cells[-1]['metadata']['noskipline'] = True
-                    cells.append(new_markdown_cell(source=u'\n'.join(cell_lines)))
+                    cells.append(new_markdown_cell(
+                        source=u'\n'.join(cell_lines)))
             else:
                 cells.append(new_markdown_cell(source=u'\n'.join(cell_lines),
                                                metadata={u'noskipline': True}))
@@ -109,7 +113,8 @@ class RmdReader(NotebookReader):
                         else:
                             jupyter.append(l)
                     if len(header):
-                        cells.append(new_raw_cell(source=u'\n'.join(['---'] + header + ['---'])))
+                        cells.append(new_raw_cell(
+                            source=u'\n'.join(['---'] + header + ['---'])))
                     if len(jupyter):
                         metadata = yaml.load(u'\n'.join(jupyter))['jupyter']
                     cell_lines = []
@@ -118,7 +123,8 @@ class RmdReader(NotebookReader):
                     continue
 
             if testblankline:
-                # Set 'noskipline' metadata if no blank line is found after cell
+                # Set 'noskipline' metadata if
+                # no blank line is found after cell
                 testblankline = False
                 if line == u'':
                     continue
@@ -177,7 +183,8 @@ class RmdReader(NotebookReader):
             if c['cell_type'] == 'code':
                 language = c['metadata']['language']
                 del c['metadata']['language']
-                if language != main_language and language in _jupyter_languages:
+                if language != main_language and \
+                        language in _jupyter_languages:
                     c['source'] = u'%%{}\n'.format(language) + c['source']
 
         nb = new_notebook(cells=cells, metadata=metadata)
@@ -204,15 +211,21 @@ class RmdWriter(NotebookWriter):
 
         for cell in nb.cells:
             if cell.cell_type == u'raw':
-                # Is this the Rmd header? Start and end with '---', and can be parsed with yaml
+                # Is this the Rmd header?
+                # Starts and ends with '---',
+                # and can be parsed with yaml
                 if len(lines) == 0 and not header_inserted:
                     header = cell.get(u'source', '').splitlines()
-                    if len(header) >= 2 and _header_re.match(header[0]) and _header_re.match(header[-1]):
+                    if len(header) >= 2 and _header_re.match(header[0]) \
+                            and _header_re.match(header[-1]):
                         try:
                             header = header[1:-1]
                             yaml.load(u'\n'.join(header))
                             if not self.markdown:
-                                header.extend(yaml.safe_dump({u'jupyter': metadata}, default_flow_style=False).splitlines())
+                                header.extend(
+                                    yaml.safe_dump(
+                                        {u'jupyter': metadata},
+                                        default_flow_style=False).splitlines())
                             lines = [u'---'] + header + [u'---']
                             header_inserted = True
                         except yaml.ScannerError:
@@ -237,7 +250,8 @@ class RmdWriter(NotebookWriter):
                     noskipline = False
                 language = None
                 if len(input):
-                    for lang, pattern in zip(_jupyter_languages, _jupyter_languages_re):
+                    for lang, pattern in zip(_jupyter_languages,
+                                             _jupyter_languages_re):
                         if pattern.match(input[0]):
                             language = lang
                             input = input[1:]
@@ -245,9 +259,12 @@ class RmdWriter(NotebookWriter):
                 if language is None:
                     language = default_language
                 if self.markdown:
-                    lines.append(u'```' + to_chunk_options(language, cell_metadata))
+                    lines.append(
+                        u'```' + to_chunk_options(language, cell_metadata))
                 else:
-                    lines.append(u'```{' + to_chunk_options(language, cell_metadata) + '}')
+                    lines.append(
+                        u'```{' +
+                        to_chunk_options(language, cell_metadata) + '}')
                 if input is not None:
                     lines.extend(input)
                 lines.append(u'```')
@@ -255,7 +272,8 @@ class RmdWriter(NotebookWriter):
                     lines.append(u'')
 
         if not self.markdown and not header_inserted and len(metadata):
-            header = yaml.safe_dump({u'jupyter': metadata}, default_flow_style=False).splitlines()
+            header = yaml.safe_dump({u'jupyter': metadata},
+                                    default_flow_style=False).splitlines()
             lines = [u'---'] + header + [u'---', u''] + lines
 
         lines.append(u'')
@@ -297,7 +315,9 @@ def readf(nb_file):
         elif ext == '.ipynb':
             return nbformat.read(fp, as_version=4)
         else:
-            raise TypeError('File {} has incorrect extension (.Rmd or .md or .ipynb expected)'.format(nb_file))
+            raise TypeError(
+                'File {} has incorrect extension (.Rmd or .md or '
+                '.ipynb expected)'.format(nb_file))
 
 
 def writef(nb, nb_file):
@@ -317,7 +337,9 @@ def writef(nb, nb_file):
         elif ext == '.ipynb':
             nbformat.write(nb, fp)
         else:
-            raise TypeError('File {} has incorrect extension (.Rmd or .md or .ipynb expected)'.format(nb_file))
+            raise TypeError(
+                'File {} has incorrect extension (.Rmd or .md or '
+                '.ipynb expected)'.format(nb_file))
 
 
 def readme():
@@ -325,6 +347,7 @@ def readme():
     Contents of README.md
     :return:
     """
-    readme_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'README.md')
+    readme_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               '..', 'README.md')
     with open(readme_path) as fh:
         return fh.read()

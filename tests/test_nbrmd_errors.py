@@ -4,7 +4,7 @@ import pytest
 
 def test_parse_incomplete_code():
     s = """```{python}
-1+1    
+1+1
 """
     with pytest.raises(nbrmd.nbrmd.RmdReaderError):
         nbrmd.reads(s)
