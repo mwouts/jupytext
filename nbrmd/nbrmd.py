@@ -46,7 +46,6 @@ class State(Enum):
 
 _header_re = re.compile(r"^---\s*")
 _end_code_re = re.compile(r"^```\s*")
-_r_cell_re = re.compile(r"^%%R\s*")
 
 _jupyter_languages = ['R', 'bash', 'sh', 'python', 'python2', 'python3', 'javascript', 'js', 'perl']
 _jupyter_languages_re = [re.compile(r"^%%{}\s*".format(lang)) for lang in _jupyter_languages]
@@ -212,7 +211,8 @@ class RmdWriter(NotebookWriter):
                             header = header[1:-1]
                             yaml.load(u'\n'.join(header))
                             if not self.markdown:
-                                header.extend(yaml.safe_dump({u'jupyter': metadata}, default_flow_style=False).splitlines())
+                                header.extend(
+                                    yaml.safe_dump({u'jupyter': metadata}, default_flow_style=False).splitlines())
                             lines = [u'---'] + header + [u'---']
                             header_inserted = True
                         except yaml.ScannerError:
