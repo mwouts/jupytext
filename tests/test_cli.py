@@ -3,7 +3,7 @@ import os
 from shutil import copyfile
 import nbrmd
 from nbrmd.cli import convert, cli
-from utils import list_all_notebooks, remove_outputs
+from .utils import list_all_notebooks, remove_outputs
 
 
 @pytest.mark.parametrize('nb_file',
