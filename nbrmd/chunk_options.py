@@ -56,7 +56,7 @@ def to_chunk_options(language, metadata):
                 co_name, 'TRUE' if co_value else 'FALSE')
         elif isinstance(co_value, list):
             options += ' {}={},'.format(
-                co_name, 'list({})'.format(
+                co_name, 'c({})'.format(
                     ', '.join(['"{}"'.format(str(v)) for v in co_value])))
         else:
             options += ' {}={},'.format(co_name, str(co_value))
@@ -197,7 +197,9 @@ def to_metadata(options):
             continue
         if value.startswith('"') or value.startswith("'"):
             continue
-        if value.startswith('list(') and value.endswith(')'):
+        if value.startswith('c(') and value.endswith(')'):
+            value = '[' + value[2:-1] + ']'
+        elif value.startswith('list(') and value.endswith(')'):
             value = '[' + value[5:-1] + ']'
         try:
             metadata[m] = ast.literal_eval(value)
