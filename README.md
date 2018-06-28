@@ -51,6 +51,13 @@ pip install nbrmd
 jupyter notebook
 ```
 
+Now you will be able to open your `.md` and `.Rmd` notebooks directly in Jupyter:
+
+Rmd notebook in jupyter     | Rmd notebook as text
+:--------------------------:|:-----------------------:
+![](img/rmd_notebook.png)   | ![](img/rmd_in_text_editor.png)
+
+
 ## Can I save my Jupyter notebook as both R markdown and ipynb ?
 
 ### Per-notebook configuration
@@ -105,9 +112,14 @@ nbrmd jupyter.ipynb -i   # this creates a jupyter.Rmd file
 nbrmd jupyter.Rmd   -i   # and this, a jupyter.ipynb file
 ```
 
+Alternatively, the `nbrmd` package provides a `nbconvert` rmarkdown exporter that you can use with
+```bash
+nbconvert jupyter.ipynb --to rmarkdown
+```
+
 ## And if I convert twice?
 
 Round trip conversion of R markdown is identity.  
 Round trip conversion of Jupyter notebooks preserves the source.
-Outputs are lost, however, like in any good [pre-commit hooks](https://gist.github.com/minrk/6176788).
+Outputs are lost, however, like in any git pre-commit hook for notebooks.
 

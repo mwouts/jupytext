@@ -6,6 +6,19 @@ Release History
 dev
 +++
 
+0.2.3 (2018-06-28)
++++++++++++++++++++
+
+**Improvements**
+
+- Screenshots in README
+
+**BugFixes**
+
+- rmarkdown exporter for nbconvert fixed on non-recent python
+- Tests compatible with other revisions of nbformat >= 4.0
+- Tests compatible with older pytest versions
+
 
 0.2.2 (2018-06-28)
 +++++++++++++++++++

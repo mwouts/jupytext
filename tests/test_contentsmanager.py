@@ -1,5 +1,6 @@
 from nbrmd import RmdFileContentsManager, readf
-from utils import list_all_notebooks, remove_outputs, remove_outputs_and_header
+from .utils import list_all_notebooks, remove_outputs,\
+    remove_outputs_and_header
 import os
 import sys
 import pytest

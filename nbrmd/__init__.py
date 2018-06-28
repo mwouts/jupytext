@@ -16,7 +16,7 @@ from .hooks import update_rmd, update_ipynb, \
     update_rmd_and_ipynb, update_selected_formats
 
 try:
-    from .nbconvert import RMarkdownExporter
+    from .rmarkdownexporter import RMarkdownExporter
 except ImportError as e:
     RMarkdownExporter = str(e)
 

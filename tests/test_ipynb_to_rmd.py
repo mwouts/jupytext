@@ -1,7 +1,8 @@
 import nbformat
 import nbrmd
 import pytest
-from utils import list_all_notebooks, remove_outputs, remove_outputs_and_header
+from .utils import list_all_notebooks, remove_outputs, \
+    remove_outputs_and_header
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
