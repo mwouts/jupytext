@@ -51,8 +51,7 @@ pip install nbrmd
 jupyter notebook
 ```
 
-Now you will be able to open your `.md` and `.Rmd` notebooks as such:
-![Rmd with notebook icon](img/rmd_in_jupyter.png)
+Now you will be able to open your `.md` and `.Rmd` notebooks directly in Jupyter:
 
 Rmd notebook in jupyter     | Rmd notebook as text
 :--------------------------:|:-----------------------:
