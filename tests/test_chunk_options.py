@@ -15,7 +15,7 @@ samples = [('r', ('R', {})),
             ('R', {'name': 'plot_1', 'hide_input': False})),
            ('python echo=if a==5 then TRUE else FALSE',
             ('python', {'echo': 'if a==5 then TRUE else FALSE'})),
-           ('python noname, tags=list("a", "b", "c"), echo={sum(a+c(1,2))>1}',
+           ('python noname, tags=c("a", "b", "c"), echo={sum(a+c(1,2))>1}',
             ('python', {'name': 'noname', 'tags': ['a', 'b', 'c'],
                         'echo': '{sum(a+c(1,2))>1}'}))
            ]
