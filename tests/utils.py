@@ -24,7 +24,7 @@ def remove_outputs(nb):
         cell.execution_count = None
         if 'trusted' in cell['metadata']:
             del cell['metadata']['trusted']
-            
+
     for k in ['nbformat', 'nbformat_minor']:
         if k in nb:
             del nb[k]
