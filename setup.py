@@ -15,6 +15,7 @@ setup(
                   'nbconvert.exporters':
                       ['rmarkdown = nbrmd:RMarkdownExporter']},
     tests_require=['pytest'],
+    install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml'],
     license='MIT',
     classifiers=('Development Status :: 3 - Alpha',
                  'Environment :: Console',
