@@ -83,7 +83,7 @@ Accepted formats are: `.ipynb`, `.Rmd` and `.md`.
 ### Global configuration
 
 If you want every notebook to be saved as both `.Rmd` and `.ipynb` files, then change your jupyter config to
- ```python
+```python
 c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
 c.ContentsManager.pre_save_hook = 'nbrmd.update_rmd_and_ipynb'
 ```
