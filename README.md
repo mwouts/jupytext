@@ -55,7 +55,7 @@ Now you will be able to open your `.md` and `.Rmd` notebooks directly in Jupyter
 
 Rmd notebook in jupyter     | Rmd notebook as text
 :--------------------------:|:-----------------------:
-![](img/rmd_notebook.png)   | ![](img/rmd_in_text_editor.png)
+![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/rmd_notebook.png)   | ![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/rmd_in_text_editor.png)
 
 
 ## Can I save my Jupyter notebook as both R markdown and ipynb ?

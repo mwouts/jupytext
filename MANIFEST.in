@@ -5,6 +5,5 @@ include *.ini
 include *.rst
 exclude .gitignore
 exclude .gitreview
-include img
 
 global-exclude *.pyc
