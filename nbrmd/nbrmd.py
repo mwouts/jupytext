@@ -14,6 +14,7 @@ Authors:
 # -----------------------------------------------------------------------------
 
 import os
+import io
 import re
 from enum import Enum
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
@@ -350,7 +351,7 @@ def readf(nb_file):
     :return: the notebook
     """
     file, ext = os.path.splitext(nb_file)
-    with open(nb_file) as fp:
+    with io.open(nb_file, encoding='utf-8') as fp:
         if ext == '.Rmd':
             return read(fp)
         elif ext == '.md':
@@ -372,7 +373,7 @@ def writef(nb, nb_file):
     """
 
     file, ext = os.path.splitext(nb_file)
-    with open(nb_file, 'w') as fp:
+    with io.open(nb_file, 'w', encoding='utf-8') as fp:
         if ext == '.Rmd':
             write(nb, fp)
         elif ext == '.md':
