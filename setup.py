@@ -3,7 +3,7 @@ from nbrmd.nbrmd import readme
 
 setup(
     name='nbrmd',
-    version='0.2.3',
+    version='0.2.4',
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
     description='Jupyter from/to R markdown notebooks',
@@ -17,7 +17,7 @@ setup(
     tests_require=['pytest'],
     install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml'],
     license='MIT',
-    classifiers=('Development Status :: 3 - Alpha',
+    classifiers=('Development Status :: 4 - Beta',
                  'Environment :: Console',
                  'Framework :: Jupyter',
                  'Intended Audience :: Science/Research',
