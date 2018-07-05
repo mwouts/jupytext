@@ -6,6 +6,20 @@ Release History
 dev
 +++
 
+0.2.4 (2018-07-05)
++++++++++++++++++++
+
+**Improvements**
+
+- nbrmd will always open notebooks, even if header of code cells are not terminated. Merge conflicts can thus be
+solved in Jupyter directly.
+- New metadata 'main language' that preserves the notebook language.
+
+**BugFixes**
+
+- dependencies included in `setup.py`
+- pre_save_hook work with non-empty `notebook_dir` `#9<https://github.com/mwouts/nbrmd/issues/9>`_
+
 0.2.3 (2018-06-28)
 +++++++++++++++++++
 

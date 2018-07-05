@@ -32,7 +32,8 @@ from .chunk_options import to_metadata, to_chunk_options
 
 def _language(metadata):
     try:
-        return metadata.language_info.name.lower()
+        return metadata.get('main_language') or \
+               metadata.language_info.name.lower()
     except AttributeError:
         return u'python'
 
@@ -53,10 +54,6 @@ _jupyter_languages_re = [re.compile(r"^%%{}\s*".format(lang))
                          for lang in _jupyter_languages]
 
 
-class RmdReaderError(Exception):
-    pass
-
-
 class RmdReader(NotebookReader):
 
     def __init__(self, markdown=False):
@@ -73,21 +70,21 @@ class RmdReader(NotebookReader):
         cells = []
         cell_lines = []
 
-        def add_markdown_cell():
+        def add_cell(new_cell=new_markdown_cell):
             if len(cell_lines) == 0:
                 return
 
             if cell_lines[-1] == '':
                 if len(cell_lines) > 1 or len(cells) == 0:
-                    cells.append(new_markdown_cell(
+                    cells.append(new_cell(
                         source=u'\n'.join(cell_lines[:-1])))
                 else:
                     cells[-1]['metadata']['noskipline'] = True
-                    cells.append(new_markdown_cell(
+                    cells.append(new_cell(
                         source=u'\n'.join(cell_lines)))
             else:
-                cells.append(new_markdown_cell(source=u'\n'.join(cell_lines),
-                                               metadata={u'noskipline': True}))
+                cells.append(new_cell(source=u'\n'.join(cell_lines),
+                                      metadata={u'noskipline': True}))
 
         cell_metadata = {}
         state = State.NONE
@@ -101,6 +98,18 @@ class RmdReader(NotebookReader):
                 state = State.MARKDOWN
 
             if state is State.HEADER:
+                # Unterminated header -> treat first lines as raw
+                if self.start_code_re.match(line):
+                    cell_lines = ['---'] + cell_lines
+                    add_cell(new_cell=new_raw_cell)
+                    cell_lines = []
+
+                    chunk_options = self.start_code_re.findall(line)[0]
+                    language, cell_metadata = to_metadata(chunk_options)
+                    cell_metadata['language'] = language
+                    state = State.CODE
+                    continue
+
                 if _header_re.match(line):
                     header = []
                     jupyter = []
@@ -134,7 +143,7 @@ class RmdReader(NotebookReader):
 
             if state is State.MARKDOWN:
                 if self.start_code_re.match(line):
-                    add_markdown_cell()
+                    add_cell()
                     cell_lines = []
 
                     chunk_options = self.start_code_re.findall(line)[0]
@@ -157,26 +166,32 @@ class RmdReader(NotebookReader):
 
         # Append last cell if not empty
         if state is State.MARKDOWN:
-            add_markdown_cell()
+            add_cell()
         elif state is State.CODE:
-            raise RmdReaderError(u'Unterminated code cell')
+            cells.append(new_code_cell(source=u'\n'.join(cell_lines),
+                                       metadata=cell_metadata))
         elif state is State.HEADER:
-            raise RmdReaderError(u'Unterminated YAML header')
+            cell_lines = ['---'] + cell_lines
+            add_cell(new_cell=new_raw_cell)
 
         # Determine main language
-        main_language = metadata.get('language_info', {}).get('name')
+        main_language = (metadata.get('main_language') or
+                         metadata.get('language_info', {}).get('name'))
         if main_language is None:
-            languages = dict(python=0)
+            languages = dict(python=0.5)
             for c in cells:
                 if c['cell_type'] == 'code':
                     language = c['metadata']['language']
                     if language == 'r':
                         language = 'R'
-                    languages[language] = languages.get(language, 0) + 1
+                    languages[language] = languages.get(language, 0.0) + 1
 
             main_language = max(languages, key=languages.get)
-            metadata['language_info'] = metadata.get('language_info', {})
-            metadata['language_info']['name'] = main_language
+
+            # save main language when not given by kernel
+            if main_language is not \
+                    metadata.get('language_info', {}).get('name'):
+                metadata['main_language'] = main_language
 
         # Remove 'language' meta data and add a magic if not main language
         for c in cells:
@@ -205,6 +220,34 @@ class RmdWriter(NotebookWriter):
     def writes(self, nb):
         default_language = _language(nb.metadata)
         metadata = _as_dict(nb.metadata)
+
+        if 'main_language' in metadata:
+            # is 'main language' redundant with kernel info?
+            if metadata['main_language'] is \
+                    metadata.get('language_info', {}).get('name'):
+                del metadata['main_language']
+            # is 'main language' redundant with cell language?
+            elif metadata.get('language_info', {}).get('name') is None:
+                languages = dict(python=0.5)
+                for c in nb.cells:
+                    if c.cell_type == 'code':
+                        input = c.source.splitlines()
+                        language = default_language
+                        if len(input):
+                            for lang, pattern in zip(_jupyter_languages,
+                                                     _jupyter_languages_re):
+                                if pattern.match(input[0]):
+                                    language = lang
+
+                        if language == 'r':
+                            language = 'R'
+
+                        languages[language] = 1 + languages.get(
+                            language, 0.0)
+
+                cell_main_language = max(languages, key=languages.get)
+                if metadata['main_language'] == cell_main_language:
+                    del metadata['main_language']
 
         lines = []
         header_inserted = len(metadata) == 0

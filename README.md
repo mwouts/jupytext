@@ -16,7 +16,7 @@ You will be interested in this if
 
 ## What is R markdown?
 
-As the name states, R markdown (extension `.Rmd`) was designed in the R community. It is the format used by the RStudio IDE for notebooks. It actually support [many languages](https://yihui.name/knitr/demo/engines/). A few months back, the support for python significantly improved with the arrival of the [`reticulate`](https://github.com/rstudio/reticulate) package.
+R markdown (extension `.Rmd`) is a well established markdown [notebook format](https://rmarkdown.rstudio.com/). As the name states, R markdown was designed in the R community, but it actually support [many languages](https://yihui.name/knitr/demo/engines/). A few months back, the support for python significantly improved with the arrival of the [`reticulate`](https://github.com/rstudio/reticulate) package.
 
 R markdown is almost identical to markdown export of Jupyter notebooks. For reference, Jupyter notebooks are exported to markdown using either
 - _Download as Markdown (.md)_ in Jupyter's interface,
@@ -83,7 +83,7 @@ Accepted formats are: `.ipynb`, `.Rmd` and `.md`.
 ### Global configuration
 
 If you want every notebook to be saved as both `.Rmd` and `.ipynb` files, then change your jupyter config to
- ```python
+```python
 c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
 c.ContentsManager.pre_save_hook = 'nbrmd.update_rmd_and_ipynb'
 ```
