@@ -12,3 +12,4 @@ nbrmd.egg-info
 nbrmd.Rproj
 *.pyc
 gits*
+.ipynb_checkpoints
