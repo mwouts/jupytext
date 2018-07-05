@@ -178,13 +178,13 @@ class RmdReader(NotebookReader):
         main_language = (metadata.get('main_language') or
                          metadata.get('language_info', {}).get('name'))
         if main_language is None:
-            languages = dict(python=0)
+            languages = dict(python=0.5)
             for c in cells:
                 if c['cell_type'] == 'code':
                     language = c['metadata']['language']
                     if language == 'r':
                         language = 'R'
-                    languages[language] = languages.get(language, 0) + 1
+                    languages[language] = languages.get(language, 0.0) + 1
 
             main_language = max(languages, key=languages.get)
 
@@ -228,7 +228,7 @@ class RmdWriter(NotebookWriter):
                 del metadata['main_language']
             # is 'main language' redundant with cell language?
             elif metadata.get('language_info', {}).get('name') is None:
-                languages = dict(python=0)
+                languages = dict(python=0.5)
                 for c in nb.cells:
                     if c.cell_type == 'code':
                         input = c.source.splitlines()
@@ -243,7 +243,7 @@ class RmdWriter(NotebookWriter):
                             language = 'R'
 
                         languages[language] = 1 + languages.get(
-                            language, 0)
+                            language, 0.0)
 
                 cell_main_language = max(languages, key=languages.get)
                 if metadata['main_language'] == cell_main_language:
