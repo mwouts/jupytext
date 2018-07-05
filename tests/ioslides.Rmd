@@ -9,9 +9,6 @@ output:
     smaller: true
 editor_options:
   chunk_output_type: console
-jupyter:
-  language_info:
-    name: python
 ---
 
 ## What is ioslides?
@@ -22,7 +19,7 @@ Enjoy the [manual](https://rmarkdown.rstudio.com/ioslides_presentation_format.ht
 
 These slides can be turned to a single HTML file with either a click on 'knitr' in rstudio, or, command line:
 ```bash
-R -e 'rmarkdown::render("simple.Rmd")'
+R -e 'rmarkdown::render("ioslides.Rmd")'
 ```
 
 ## A sample plot
