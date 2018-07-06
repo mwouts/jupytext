@@ -9,7 +9,7 @@ Use the 'nbrmd' conversion script to convert Jupyter notebooks from/to
 R Markdown notebooks.
 """
 
-from .nbrmd import read, reads, readf, write, writes, writef
+from .nbrmd import readf, writef, writes, reads, notebook_extensions, readme
 
 try:
     from .rmarkdownexporter import RMarkdownExporter

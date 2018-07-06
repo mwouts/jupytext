@@ -97,9 +97,10 @@ class RmdFileContentsManager(FileContentsManager):
         file, ext = os.path.splitext(os_path)
         if ext in self.nb_extensions:
             with mock.patch('nbformat.reads', _nbrmd_reads(ext)):
-                nb = super(RmdFileContentsManager, self)
+                nb = super(RmdFileContentsManager, self) \
+                    ._read_notebook(os_path, as_version)
         else:
-        	nb = super(RmdFileContentsManager, self) \
+            nb = super(RmdFileContentsManager, self) \
                 ._read_notebook(os_path, as_version)
 
         if not load_alternative_format:
@@ -175,7 +176,8 @@ class RmdFileContentsManager(FileContentsManager):
         if self.exists(path) and \
                 (type == 'notebook' or
                  (type is None and
-                  any([path.endswith(ext) for ext in self.nb_extensions]))):
+                  any([path.endswith(ext)
+                       for ext in self.all_nb_extensions()]))):
             return self._notebook_model(path, content=content)
         else:
             return super(RmdFileContentsManager, self) \
