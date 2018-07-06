@@ -17,8 +17,8 @@ def test_identity_source_write_read(nb_file):
     with open(nb_file) as fp:
         nb1 = nbformat.read(fp, as_version=4)
 
-    rmd = nbrmd.nbrmd.writes(nb1)
-    nb2 = nbrmd.nbrmd.reads(rmd)
+    rmd = nbrmd.writes(nb1)
+    nb2 = nbrmd.reads(rmd)
 
     assert remove_outputs(nb1) == remove_outputs(nb2)
 
@@ -35,7 +35,7 @@ def test_identity_source_write_read_md(nb_file):
     with open(nb_file) as fp:
         nb1 = nbformat.read(fp, as_version=4)
 
-    md = nbrmd.nbrmd.md_writes(nb1)
-    nb2 = nbrmd.nbrmd.md_reads(md)
+    md = nbrmd.writes(nb1, ext='.md')
+    nb2 = nbrmd.reads(md, ext='.md')
 
     assert remove_outputs_and_header(nb1) == remove_outputs_and_header(nb2)

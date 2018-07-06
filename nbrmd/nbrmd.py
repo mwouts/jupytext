@@ -42,6 +42,8 @@ class State(Enum):
 _header_re = re.compile(r"^---\s*")
 _end_code_re = re.compile(r"^```\s*")
 
+notebook_extensions = ['.ipynb', '.Rmd', '.md', '.py', '.R']
+
 
 class RmdReader(NotebookReader):
 
@@ -175,65 +177,60 @@ class RmdWriter(NotebookWriter):
         return '\n'.join(lines)
 
 
-_reader = RmdReader()
-_writer = RmdWriter()
+_readers = {'.Rmd': RmdReader(), '.md': RmdReader(markdown=True)}
+_writers = {'.Rmd': RmdWriter(), '.md': RmdWriter(markdown=True)}
 
-reads = _reader.reads
-read = _reader.read
-to_notebook = _reader.to_notebook
-write = _writer.write
-writes = _writer.writes
 
-_md_reader = RmdReader(markdown=True)
-_md_writer = RmdWriter(markdown=True)
+def reads(s, as_version=4, ext='.Rmd', **kwargs):
+    if ext == '.ipynb':
+        return nbformat.reads(s, as_version, **kwargs)
+    else:
+        return _readers[ext].reads(s, **kwargs)
 
-md_reads = _md_reader.reads
-md_read = _md_reader.read
-md_to_notebook = _md_reader.to_notebook
-md_write = _md_writer.write
-md_writes = _md_writer.writes
+
+def read(fp, as_version=4, ext='.Rmd', **kwargs):
+    if ext == '.ipynb':
+        return nbformat.read(fp, as_version, **kwargs)
+    else:
+        return _readers[ext].read(fp, **kwargs)
+
+
+def writes(s, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+    if ext == '.ipynb':
+        return nbformat.writes(s, version, **kwargs)
+    else:
+        return _writers[ext].writes(s)
+
+
+def write(np, fp, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+    if ext == '.ipynb':
+        return nbformat.write(np, fp, version, **kwargs)
+    else:
+        return _writers[ext].write(np, fp)
 
 
 def readf(nb_file):
-    """
-    Load the notebook from the desired file
-    :param nb_file: file with .ipynb or .Rmd extension
-    :return: the notebook
-    """
+    """Load the notebook from the desired file"""
     file, ext = os.path.splitext(nb_file)
+    if ext not in notebook_extensions:
+        raise TypeError(
+            'File {} is not a notebook. '
+            'Expected extensions are {}'.format(nb_file,
+                                                notebook_extensions))
     with io.open(nb_file, encoding='utf-8') as fp:
-        if ext == '.Rmd':
-            return read(fp)
-        elif ext == '.md':
-            return md_read(fp)
-        elif ext == '.ipynb':
-            return nbformat.read(fp, as_version=4)
-        else:
-            raise TypeError(
-                'File {} has incorrect extension (.Rmd or .md or '
-                '.ipynb expected)'.format(nb_file))
+        return read(nb_file, as_version=4, ext=ext)
 
 
 def writef(nb, nb_file):
-    """
-    Save the notebook in the desired file
-    :param nb: notebook
-    :param nb_file: file with .ipynb or .Rmd extension
-    :return:
-    """
-
+    """Save the notebook in the desired file"""
     file, ext = os.path.splitext(nb_file)
+    if ext not in notebook_extensions:
+        raise TypeError(
+            'File {} is not a notebook. '
+            'Expected extensions are {}'.format(nb_file,
+                                                notebook_extensions))
     with io.open(nb_file, 'w', encoding='utf-8') as fp:
-        if ext == '.Rmd':
-            write(nb, fp)
-        elif ext == '.md':
-            md_write(nb, fp)
-        elif ext == '.ipynb':
-            nbformat.write(nb, fp)
-        else:
-            raise TypeError(
-                'File {} has incorrect extension (.Rmd or .md or '
-                '.ipynb expected)'.format(nb_file))
+        write(nb, fp, version=nbformat.NO_CONVERT, ext=ext)
 
 
 def readme():

@@ -12,11 +12,9 @@ def get_default_language(nb):
     contents"""
     metadata = nb.metadata
 
-    try:
-        default_language = metadata.get('main_language') or \
-                           metadata.language_info.name.lower()
-    except AttributeError:
-        default_language = 'python'
+    default_language = metadata.get('main_language') or \
+                       metadata.get('language_info', {}).get('name',
+                                                             'python').lower()
 
     if 'main_language' in metadata:
         # is 'main language' redundant with kernel info?
@@ -36,9 +34,6 @@ def get_default_language(nb):
                             if pattern.match(input[0]):
                                 language = lang
 
-                    if language == 'r':
-                        language = 'R'
-
                     languages[language] = 1 + languages.get(
                         language, 0.0)
 
@@ -57,8 +52,6 @@ def find_main_language(metadata, cells):
         for c in cells:
             if c['cell_type'] == 'code':
                 language = c['metadata']['language']
-                if language == 'r':
-                    language = 'R'
                 languages[language] = languages.get(language, 0.0) + 1
 
         main_language = max(languages, key=languages.get)

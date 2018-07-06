@@ -92,7 +92,6 @@ def header_to_metadata_and_cell(lines, prefix=''):
     if ended:
         metadata = {}
         if len(jupyter):
-            print('\n'.join(jupyter))
             metadata = yaml.load('\n'.join(jupyter))['jupyter']
 
         skipline = True
