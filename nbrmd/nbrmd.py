@@ -16,13 +16,13 @@ Authors:
 import os
 import io
 import re
+from copy import copy
 from enum import Enum
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import (
     new_code_cell, new_markdown_cell, new_notebook
 )
 import nbformat
-import yaml
 
 from .chunk_options import to_metadata, to_chunk_options
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header
@@ -170,20 +170,15 @@ class RmdReader(NotebookReader):
         return nb
 
 
-def _as_dict(metadata):
-    if isinstance(metadata, nbformat.NotebookNode):
-        return {k: _as_dict(metadata[k]) for k in metadata.keys()}
-    return metadata
-
-
 class RmdWriter(NotebookWriter):
 
     def __init__(self, markdown=False):
         self.markdown = markdown
 
     def writes(self, nb):
+        nb = copy(nb)
         default_language = _language(nb.metadata)
-        metadata = _as_dict(nb.metadata)
+        metadata = nb.metadata
 
         if 'main_language' in metadata:
             # is 'main language' redundant with kernel info?
@@ -213,37 +208,10 @@ class RmdWriter(NotebookWriter):
                 if metadata['main_language'] == cell_main_language:
                     del metadata['main_language']
 
-        lines = []
-        header_inserted = len(metadata) == 0
+        lines = metadata_and_cell_to_header(nb)
 
         for cell in nb.cells:
-            if cell.cell_type == u'raw':
-                # Is this the Rmd header?
-                # Starts and ends with '---',
-                # and can be parsed with yaml
-                if len(lines) == 0 and not header_inserted:
-                    header = cell.get(u'source', '').splitlines()
-                    if len(header) >= 2 and _header_re.match(header[0]) \
-                            and _header_re.match(header[-1]):
-                        try:
-                            header = header[1:-1]
-                            yaml.load(u'\n'.join(header))
-                            if not self.markdown:
-                                header.extend(
-                                    yaml.safe_dump(
-                                        {u'jupyter': metadata},
-                                        default_flow_style=False).splitlines())
-                            lines = [u'---'] + header + [u'---']
-                            header_inserted = True
-                        except yaml.ScannerError:
-                            pass
-                    if not header_inserted:
-                        lines.append(cell.get(u'source', ''))
-                else:
-                    lines.append(cell.get(u'source', ''))
-                if not cell.get(u'metadata', {}).get('noskipline', False):
-                    lines.append(u'')
-            elif cell.cell_type == u'markdown':
+            if cell.cell_type in ['raw', 'markdown']:
                 lines.append(cell.get(u'source', ''))
                 if not cell.get(u'metadata', {}).get('noskipline', False):
                     lines.append(u'')
@@ -277,11 +245,6 @@ class RmdWriter(NotebookWriter):
                 lines.append(u'```')
                 if not noskipline:
                     lines.append(u'')
-
-        if not self.markdown and not header_inserted and len(metadata):
-            header = yaml.safe_dump({u'jupyter': metadata},
-                                    default_flow_style=False).splitlines()
-            lines = [u'---'] + header + [u'---', u''] + lines
 
         lines.append(u'')
 

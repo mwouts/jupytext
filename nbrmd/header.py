@@ -1,11 +1,18 @@
 import re
 import yaml
+import nbformat
 from nbformat.v4.nbbase import new_raw_cell
 
 _header_re = re.compile(r"^---\s*$")
 _empty_re = re.compile(r"^\s*$")
 _jupyter_re = re.compile(r"^jupyter\s*:\s*$")
 _leftspace_re = re.compile(r"^\s")
+
+
+def _as_dict(metadata):
+    if isinstance(metadata, nbformat.NotebookNode):
+        return {k: _as_dict(metadata[k]) for k in metadata.keys()}
+    return metadata
 
 
 def metadata_and_cell_to_header(nb, prefix=''):
@@ -28,7 +35,8 @@ def metadata_and_cell_to_header(nb, prefix=''):
                 skipline = not c.metadata.get('noskipline', False)
                 nb.cells = nb.cells[1:]
 
-    metadata = nb.get('metadata', {})
+    metadata = _as_dict(nb.get('metadata', {}))
+
     if len(metadata):
         header.extend(yaml.safe_dump({'jupyter': metadata},
                                      default_flow_style=False).splitlines())
@@ -39,7 +47,7 @@ def metadata_and_cell_to_header(nb, prefix=''):
     if len(prefix):
         header = [prefix + h for h in header]
 
-    if skipline:
+    if len(header) and skipline:
         header += ['']
 
     return header
@@ -55,31 +63,31 @@ def header_to_metadata_and_cell(lines, prefix=''):
     injupyter = False
     ended = False
 
-    for i, l in enumerate(lines):
-        if not l.startswith(prefix):
+    for i, line in enumerate(lines):
+        if not line.startswith(prefix):
             break
 
-        l = l[len(prefix):]
+        line = line[len(prefix):]
 
         if i == 0:
-            if _header_re.match(l):
+            if _header_re.match(line):
                 continue
             else:
                 break
 
-        if i > 0 and _header_re.match(l):
+        if i > 0 and _header_re.match(line):
             ended = True
             break
 
-        if _jupyter_re.match(l):
+        if _jupyter_re.match(line):
             injupyter = True
-        elif not _leftspace_re.match(l):
+        elif not _leftspace_re.match(line):
             injupyter = False
 
         if injupyter:
-            jupyter.append(l)
+            jupyter.append(line)
         else:
-            header.append(l)
+            header.append(line)
 
     if ended:
         metadata = {}
@@ -89,8 +97,8 @@ def header_to_metadata_and_cell(lines, prefix=''):
 
         skipline = True
         if len(lines) > i + 1:
-            l = lines[i + 1]
-            if not _empty_re.match(l):
+            line = lines[i + 1]
+            if not _empty_re.match(line):
                 skipline = False
             else:
                 i = i + 1
