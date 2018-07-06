@@ -26,18 +26,12 @@ import nbformat
 
 from .chunk_options import to_metadata, to_chunk_options
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header
+from .languages import get_default_language, find_main_language, cell_language
 
 
 # -----------------------------------------------------------------------------
 # Code
 # -----------------------------------------------------------------------------
-
-def _language(metadata):
-    try:
-        return metadata.get('main_language') or \
-               metadata.language_info.name.lower()
-    except AttributeError:
-        return u'python'
 
 
 class State(Enum):
@@ -47,11 +41,6 @@ class State(Enum):
 
 _header_re = re.compile(r"^---\s*")
 _end_code_re = re.compile(r"^```\s*")
-
-_jupyter_languages = ['R', 'bash', 'sh', 'python', 'python2', 'python3',
-                      'javascript', 'js', 'perl']
-_jupyter_languages_re = [re.compile(r"^%%{}\s*".format(lang))
-                         for lang in _jupyter_languages]
 
 
 class RmdReader(NotebookReader):
@@ -102,11 +91,11 @@ class RmdReader(NotebookReader):
                 # Set 'noskipline' metadata if
                 # no blank line is found after cell
                 testblankline = False
-                if line == u'':
+                if line == '':
                     continue
                 else:
                     if len(cells):
-                        cells[-1][u'metadata'][u'noskipline'] = True
+                        cells[-1]['metadata']['noskipline'] = True
 
             if state is State.MARKDOWN:
                 if self.start_code_re.match(line):
@@ -121,7 +110,7 @@ class RmdReader(NotebookReader):
 
             if state is State.CODE:
                 if _end_code_re.match(line):
-                    cells.append(new_code_cell(source=u'\n'.join(cell_lines),
+                    cells.append(new_code_cell(source='\n'.join(cell_lines),
                                                metadata=cell_metadata))
                     cell_lines = []
                     cell_metadata = {}
@@ -135,36 +124,10 @@ class RmdReader(NotebookReader):
         if state is State.MARKDOWN:
             add_cell()
         elif state is State.CODE:
-            cells.append(new_code_cell(source=u'\n'.join(cell_lines),
+            cells.append(new_code_cell(source='\n'.join(cell_lines),
                                        metadata=cell_metadata))
 
-        # Determine main language
-        main_language = (metadata.get('main_language') or
-                         metadata.get('language_info', {}).get('name'))
-        if main_language is None:
-            languages = dict(python=0.5)
-            for c in cells:
-                if c['cell_type'] == 'code':
-                    language = c['metadata']['language']
-                    if language == 'r':
-                        language = 'R'
-                    languages[language] = languages.get(language, 0.0) + 1
-
-            main_language = max(languages, key=languages.get)
-
-            # save main language when not given by kernel
-            if main_language is not \
-                    metadata.get('language_info', {}).get('name'):
-                metadata['main_language'] = main_language
-
-        # Remove 'language' meta data and add a magic if not main language
-        for c in cells:
-            if c['cell_type'] == 'code':
-                language = c['metadata']['language']
-                del c['metadata']['language']
-                if language != main_language and \
-                        language in _jupyter_languages:
-                    c['source'] = u'%%{}\n'.format(language) + c['source']
+        find_main_language(metadata, cells)
 
         nb = new_notebook(cells=cells, metadata=metadata)
         return nb
@@ -177,62 +140,23 @@ class RmdWriter(NotebookWriter):
 
     def writes(self, nb):
         nb = copy(nb)
-        default_language = _language(nb.metadata)
-        metadata = nb.metadata
-
-        if 'main_language' in metadata:
-            # is 'main language' redundant with kernel info?
-            if metadata['main_language'] is \
-                    metadata.get('language_info', {}).get('name'):
-                del metadata['main_language']
-            # is 'main language' redundant with cell language?
-            elif metadata.get('language_info', {}).get('name') is None:
-                languages = dict(python=0.5)
-                for c in nb.cells:
-                    if c.cell_type == 'code':
-                        input = c.source.splitlines()
-                        language = default_language
-                        if len(input):
-                            for lang, pattern in zip(_jupyter_languages,
-                                                     _jupyter_languages_re):
-                                if pattern.match(input[0]):
-                                    language = lang
-
-                        if language == 'r':
-                            language = 'R'
-
-                        languages[language] = 1 + languages.get(
-                            language, 0.0)
-
-                cell_main_language = max(languages, key=languages.get)
-                if metadata['main_language'] == cell_main_language:
-                    del metadata['main_language']
-
+        default_language = get_default_language(nb)
         lines = metadata_and_cell_to_header(nb)
 
         for cell in nb.cells:
             if cell.cell_type in ['raw', 'markdown']:
-                lines.append(cell.get(u'source', ''))
-                if not cell.get(u'metadata', {}).get('noskipline', False):
-                    lines.append(u'')
-            elif cell.cell_type == u'code':
-                input = cell.get(u'source').splitlines()
-                cell_metadata = cell.get(u'metadata', {})
+                lines.append(cell.get('source', ''))
+                if not cell.get('metadata', {}).get('noskipline', False):
+                    lines.append('')
+            elif cell.cell_type == 'code':
+                input = cell.get('source').splitlines()
+                cell_metadata = cell.get('metadata', {})
                 if 'noskipline' in cell_metadata:
                     noskipline = cell_metadata['noskipline']
                     del cell_metadata['noskipline']
                 else:
                     noskipline = False
-                language = None
-                if len(input):
-                    for lang, pattern in zip(_jupyter_languages,
-                                             _jupyter_languages_re):
-                        if pattern.match(input[0]):
-                            language = lang
-                            input = input[1:]
-                            break
-                if language is None:
-                    language = default_language
+                language = cell_language(input) or default_language
                 if self.markdown:
                     lines.append(
                         u'```' + to_chunk_options(language, cell_metadata))
@@ -244,11 +168,11 @@ class RmdWriter(NotebookWriter):
                     lines.extend(input)
                 lines.append(u'```')
                 if not noskipline:
-                    lines.append(u'')
+                    lines.append('')
 
-        lines.append(u'')
+        lines.append('')
 
-        return u'\n'.join(lines)
+        return '\n'.join(lines)
 
 
 _reader = RmdReader()
