@@ -218,7 +218,7 @@ def readf(nb_file):
             'Expected extensions are {}'.format(nb_file,
                                                 notebook_extensions))
     with io.open(nb_file, encoding='utf-8') as fp:
-        return read(nb_file, as_version=4, ext=ext)
+        return read(fp, as_version=4, ext=ext)
 
 
 def writef(nb, nb_file):
