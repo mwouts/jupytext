@@ -10,7 +10,7 @@ title: Incomplete header
 """):
     nb = nbrmd.reads(rmd)
     assert len(nb.cells) == 2
-    assert nb.cells[0].cell_type == 'raw'
+    assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[0].source == '---\ntitle: Incomplete header'
     assert nb.cells[1].cell_type == 'code'
     assert nb.cells[1].source == '1+1'
@@ -56,7 +56,7 @@ title: Unterminated header
 """):
     nb = nbrmd.reads(rmd)
     assert len(nb.cells) == 5
-    assert nb.cells[0].cell_type == 'raw'
+    assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[0].source == '---\ntitle: Unterminated header'
     assert nb.cells[1].cell_type == 'code'
     assert nb.cells[1].source == '1+3'

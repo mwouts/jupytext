@@ -19,12 +19,13 @@ import re
 from enum import Enum
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import (
-    new_code_cell, new_markdown_cell, new_raw_cell, new_notebook
+    new_code_cell, new_markdown_cell, new_notebook
 )
 import nbformat
 import yaml
 
 from .chunk_options import to_metadata, to_chunk_options
+from .header import header_to_metadata_and_cell, metadata_and_cell_to_header
 
 
 # -----------------------------------------------------------------------------
@@ -40,10 +41,8 @@ def _language(metadata):
 
 
 class State(Enum):
-    NONE = 0
-    HEADER = 1
-    MARKDOWN = 2
-    CODE = 3
+    MARKDOWN = 1
+    CODE = 2
 
 
 _header_re = re.compile(r"^---\s*")
@@ -67,8 +66,15 @@ class RmdReader(NotebookReader):
     def to_notebook(self, s, **kwargs):
         lines = s.splitlines()
 
-        metadata = {}
         cells = []
+        metadata, header_cell, pos = header_to_metadata_and_cell(lines)
+
+        if header_cell:
+            cells.append(header_cell)
+
+        if pos > 0:
+            lines = lines[pos:]
+
         cell_lines = []
 
         def add_cell(new_cell=new_markdown_cell):
@@ -88,50 +94,10 @@ class RmdReader(NotebookReader):
                                       metadata={u'noskipline': True}))
 
         cell_metadata = {}
-        state = State.NONE
+        state = State.MARKDOWN
         testblankline = False
 
         for line in lines:
-            if state is State.NONE:
-                if _header_re.match(line):
-                    state = State.HEADER
-                    continue
-                state = State.MARKDOWN
-
-            if state is State.HEADER:
-                # Unterminated header -> treat first lines as raw
-                if self.start_code_re.match(line):
-                    cell_lines = ['---'] + cell_lines
-                    add_cell(new_cell=new_raw_cell)
-                    cell_lines = []
-
-                    chunk_options = self.start_code_re.findall(line)[0]
-                    language, cell_metadata = to_metadata(chunk_options)
-                    cell_metadata['language'] = language
-                    state = State.CODE
-                    continue
-
-                if _header_re.match(line):
-                    header = []
-                    jupyter = []
-                    in_header = True
-                    for l in cell_lines:
-                        if l.rstrip() == 'jupyter:':
-                            in_header = False
-                        if in_header:
-                            header.append(l)
-                        else:
-                            jupyter.append(l)
-                    if len(header):
-                        cells.append(new_raw_cell(
-                            source=u'\n'.join(['---'] + header + ['---'])))
-                    if len(jupyter):
-                        metadata = yaml.load(u'\n'.join(jupyter))['jupyter']
-                    cell_lines = []
-                    state = State.MARKDOWN
-                    testblankline = True
-                    continue
-
             if testblankline:
                 # Set 'noskipline' metadata if
                 # no blank line is found after cell
@@ -171,9 +137,6 @@ class RmdReader(NotebookReader):
         elif state is State.CODE:
             cells.append(new_code_cell(source=u'\n'.join(cell_lines),
                                        metadata=cell_metadata))
-        elif state is State.HEADER:
-            cell_lines = ['---'] + cell_lines
-            add_cell(new_cell=new_raw_cell)
 
         # Determine main language
         main_language = (metadata.get('main_language') or
