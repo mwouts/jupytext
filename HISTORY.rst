@@ -18,7 +18,8 @@ solved in Jupyter directly.
 **BugFixes**
 
 - dependencies included in `setup.py`
-- pre_save_hook work with non-empty `notebook_dir` `#9<https://github.com/mwouts/nbrmd/issues/9>`_
+- pre_save_hook work with non-empty `notebook_dir` `#9
+<https://github.com/mwouts/nbrmd/issues/9>`_
 
 0.2.3 (2018-06-28)
 +++++++++++++++++++
