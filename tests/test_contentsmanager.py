@@ -42,9 +42,9 @@ def test_load_save_rename(nb_file, tmpdir):
 
     # rename ipynb
     cm.rename(tmp_ipynb, 'new.ipynb')
-    assert not os.path.isfile(tmp_ipynb)
-    assert not os.path.isfile(tmp_md)
-    assert not os.path.isfile(tmp_rmd)
+    assert not os.path.isfile(str(tmpdir.join(tmp_ipynb)))
+    assert not os.path.isfile(str(tmpdir.join(tmp_md)))
+    assert not os.path.isfile(str(tmpdir.join(tmp_rmd)))
 
     assert os.path.isfile(str(tmpdir.join('new.ipynb')))
     assert os.path.isfile(str(tmpdir.join('new.md')))
