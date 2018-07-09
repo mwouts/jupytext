@@ -60,7 +60,7 @@ class RmdFileContentsManager(FileContentsManager):
             return super(RmdFileContentsManager, self) \
                 ._save_notebook(os_path, nb)
 
-    def get(self, path, content=True, type=None, ext=None):
+    def get(self, path, content=True, type=None, format=None):
         """ Takes a path for an entity and returns its model"""
         path = path.strip('/')
 
@@ -72,7 +72,7 @@ class RmdFileContentsManager(FileContentsManager):
             return self._notebook_model(path, content=content)
         else:
             return super(RmdFileContentsManager, self) \
-                .get(path, content, type, ext)
+                .get(path, content, type, format)
 
     def rename_file(self, old_path, new_path):
         old_file, org_ext = os.path.splitext(old_path)

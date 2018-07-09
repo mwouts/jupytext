@@ -12,9 +12,10 @@ def get_default_language(nb):
     contents"""
     metadata = nb.metadata
 
-    default_language = metadata.get('main_language') or \
-                       metadata.get('language_info', {}).get('name',
-                                                             'python').lower()
+    default_language = (
+            metadata.get('main_language') or
+            metadata.get('language_info', {})
+            .get('name', 'python').lower())
 
     if 'main_language' in metadata:
         # is 'main language' redundant with kernel info?

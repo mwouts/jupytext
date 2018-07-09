@@ -2,6 +2,7 @@ import nbrmd
 import pytest
 import sys
 from .utils import list_all_notebooks
+from testfixtures import compare
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
@@ -20,4 +21,4 @@ def test_identity_write_read(nb_file):
     nb = nbrmd.reads(rmd)
     rmd2 = nbrmd.writes(nb)
 
-    assert rmd == rmd2
+    compare(rmd, rmd2)

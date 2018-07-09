@@ -19,14 +19,12 @@ import re
 from copy import copy
 from enum import Enum
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
-from nbformat.v4.nbbase import (
-    new_code_cell, new_markdown_cell, new_notebook
-)
+from nbformat.v4.nbbase import new_notebook
 import nbformat
 
-from .chunk_options import to_metadata, to_chunk_options
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header
-from .languages import get_default_language, find_main_language, cell_language
+from .languages import get_default_language, find_main_language
+from .cells import cell_to_text, text_to_cell
 
 
 # -----------------------------------------------------------------------------
@@ -39,7 +37,6 @@ class State(Enum):
     CODE = 2
 
 
-_header_re = re.compile(r"^---\s*")
 _end_code_re = re.compile(r"^```\s*")
 
 notebook_extensions = ['.ipynb', '.Rmd', '.md', '.py', '.R']
@@ -47,9 +44,8 @@ notebook_extensions = ['.ipynb', '.Rmd', '.md', '.py', '.R']
 
 class RmdReader(NotebookReader):
 
-    def __init__(self, markdown=False):
-        self.start_code_re = re.compile(r"^```(.*)\s*") if markdown \
-            else re.compile(r"^```\{(.*)\}\s*")
+    def __init__(self, ext):
+        self.ext = ext
 
     def reads(self, s, **kwargs):
         return self.to_notebook(s, **kwargs)
@@ -66,70 +62,19 @@ class RmdReader(NotebookReader):
         if pos > 0:
             lines = lines[pos:]
 
-        cell_lines = []
+        while len(lines):
+            prev_pos = pos
+            cell, pos = text_to_cell(lines, self.ext)
+            if cell is None:
+                break
+            if pos <= 0:
+                if pos == prev_pos:
+                    raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
+            cells.append(cell)
+            lines = lines[pos:]
 
-        def add_cell(new_cell=new_markdown_cell):
-            if len(cell_lines) == 0:
-                return
-
-            if cell_lines[-1] == '':
-                if len(cell_lines) > 1 or len(cells) == 0:
-                    cells.append(new_cell(
-                        source=u'\n'.join(cell_lines[:-1])))
-                else:
-                    cells[-1]['metadata']['noskipline'] = True
-                    cells.append(new_cell(
-                        source=u'\n'.join(cell_lines)))
-            else:
-                cells.append(new_cell(source=u'\n'.join(cell_lines),
-                                      metadata={u'noskipline': True}))
-
-        cell_metadata = {}
-        state = State.MARKDOWN
-        testblankline = False
-
-        for line in lines:
-            if testblankline:
-                # Set 'noskipline' metadata if
-                # no blank line is found after cell
-                testblankline = False
-                if line == '':
-                    continue
-                else:
-                    if len(cells):
-                        cells[-1]['metadata']['noskipline'] = True
-
-            if state is State.MARKDOWN:
-                if self.start_code_re.match(line):
-                    add_cell()
-                    cell_lines = []
-
-                    chunk_options = self.start_code_re.findall(line)[0]
-                    language, cell_metadata = to_metadata(chunk_options)
-                    cell_metadata['language'] = language
-                    state = State.CODE
-                    continue
-
-            if state is State.CODE:
-                if _end_code_re.match(line):
-                    cells.append(new_code_cell(source='\n'.join(cell_lines),
-                                               metadata=cell_metadata))
-                    cell_lines = []
-                    cell_metadata = {}
-                    state = State.MARKDOWN
-                    testblankline = True
-                    continue
-
-            cell_lines.append(line)
-
-        # Append last cell if not empty
-        if state is State.MARKDOWN:
-            add_cell()
-        elif state is State.CODE:
-            cells.append(new_code_cell(source='\n'.join(cell_lines),
-                                       metadata=cell_metadata))
-
-        find_main_language(metadata, cells)
+        if self.ext in ['.Rmd', '.md']:
+            find_main_language(metadata, cells)
 
         nb = new_notebook(cells=cells, metadata=metadata)
         return nb
@@ -137,48 +82,37 @@ class RmdReader(NotebookReader):
 
 class RmdWriter(NotebookWriter):
 
-    def __init__(self, markdown=False):
-        self.markdown = markdown
+    def __init__(self, ext='.Rmd'):
+        self.ext = ext
 
     def writes(self, nb):
         nb = copy(nb)
-        default_language = get_default_language(nb)
+        if self.ext == '.py':
+            default_language = 'python'
+        elif self.ext == '.R':
+            default_language = 'R'
+        else:
+            default_language = get_default_language(nb)
+
         lines = metadata_and_cell_to_header(nb)
 
-        for cell in nb.cells:
-            if cell.cell_type in ['raw', 'markdown']:
-                lines.append(cell.get('source', ''))
-                if not cell.get('metadata', {}).get('noskipline', False):
-                    lines.append('')
-            elif cell.cell_type == 'code':
-                input = cell.get('source').splitlines()
-                cell_metadata = cell.get('metadata', {})
-                if 'noskipline' in cell_metadata:
-                    noskipline = cell_metadata['noskipline']
-                    del cell_metadata['noskipline']
-                else:
-                    noskipline = False
-                language = cell_language(input) or default_language
-                if self.markdown:
-                    lines.append(
-                        u'```' + to_chunk_options(language, cell_metadata))
-                else:
-                    lines.append(
-                        u'```{' +
-                        to_chunk_options(language, cell_metadata) + '}')
-                if input is not None:
-                    lines.extend(input)
-                lines.append(u'```')
-                if not noskipline:
-                    lines.append('')
+        for i in range(len(nb.cells)):
+            cell = nb.cells[i]
+            next_cell = nb.cells[i + 1] if i + 1 < len(nb.cells) else None
+            lines.extend(
+                cell_to_text(cell, next_cell,
+                             default_language=default_language,
+                             ext=self.ext))
 
         lines.append('')
 
         return '\n'.join(lines)
 
 
-_readers = {'.Rmd': RmdReader(), '.md': RmdReader(markdown=True)}
-_writers = {'.Rmd': RmdWriter(), '.md': RmdWriter(markdown=True)}
+_readers = {ext: RmdReader(ext) for ext in notebook_extensions if
+            ext != '.ipynb'}
+_writers = {ext: RmdWriter(ext) for ext in notebook_extensions if
+            ext != '.ipynb'}
 
 
 def reads(s, as_version=4, ext='.Rmd', **kwargs):

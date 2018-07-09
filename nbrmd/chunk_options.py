@@ -36,8 +36,16 @@ def _py_logical_values(rbool):
     raise RLogicalValueError
 
 
-def to_chunk_options(language, metadata):
-    options = language.lower()
+def to_chunk_options(metadata):
+    if 'language' in metadata:
+        language = metadata['language']
+        del metadata['language']
+    else:
+        language = None
+    if language:
+        options = language.lower()
+    else:
+        options = ''
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
         del metadata['name']
@@ -60,7 +68,7 @@ def to_chunk_options(language, metadata):
                     ', '.join(['"{}"'.format(str(v)) for v in co_value])))
         else:
             options += ' {}={},'.format(co_name, str(co_value))
-    return options.strip(',')
+    return options.strip(',').strip()
 
 
 def update_metadata_using_dictionary(name, value, metadata):
@@ -141,7 +149,7 @@ def parse_rmd_options(line):
                     if len(result) and name is '':
                         raise RMarkdownOptionParsingError(
                             'Option line "{}" has no name for '
-                            'option value {}' .format(line, value))
+                            'option value {}'.format(line, value))
                     result.append((name.strip(), value.strip()))
                     name = ''
                     value = ''
@@ -206,4 +214,5 @@ def to_metadata(options):
         except (SyntaxError, ValueError):
             continue
 
-    return language, metadata
+    metadata['language'] = language
+    return metadata

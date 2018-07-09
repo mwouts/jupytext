@@ -1,6 +1,7 @@
 import nbformat
 import nbrmd
 import pytest
+from testfixtures import compare
 from .utils import list_all_notebooks, remove_outputs, \
     remove_outputs_and_header
 
@@ -20,7 +21,7 @@ def test_identity_source_write_read(nb_file):
     rmd = nbrmd.writes(nb1)
     nb2 = nbrmd.reads(rmd)
 
-    assert remove_outputs(nb1) == remove_outputs(nb2)
+    compare(remove_outputs(nb1), remove_outputs(nb2))
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
@@ -38,4 +39,4 @@ def test_identity_source_write_read_md(nb_file):
     md = nbrmd.writes(nb1, ext='.md')
     nb2 = nbrmd.reads(md, ext='.md')
 
-    assert remove_outputs_and_header(nb1) == remove_outputs_and_header(nb2)
+    compare(remove_outputs_and_header(nb1), remove_outputs_and_header(nb2))

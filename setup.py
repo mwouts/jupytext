@@ -14,7 +14,7 @@ setup(
     entry_points={'console_scripts': ['nbrmd = nbrmd.cli:main'],
                   'nbconvert.exporters':
                       ['rmarkdown = nbrmd:RMarkdownExporter']},
-    tests_require=['pytest'],
+    tests_require=['pytest', 'testfixtures'],
     install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml'],
     license='MIT',
     classifiers=('Development Status :: 4 - Beta',
