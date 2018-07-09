@@ -1,7 +1,7 @@
 from .languages import cell_language
-from .chunk_options import to_chunk_options, to_metadata, _ignore_metadata
+from .cell_metadata import metadata_to_rmd_options, rmd_options_to_metadata, \
+    json_options_to_metadata, metadata_to_json_options
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell
-import json
 import re
 
 
@@ -19,28 +19,48 @@ def cell_to_text(cell,
 
     lines = []
     if cell.cell_type == 'code':
-        if ext == '.Rmd':
-            metadata['language'] = cell_language(source) or default_language
-            lines.append(u'```{' + to_chunk_options(metadata) + '}')
-        elif ext == '.md':
-            metadata['language'] = cell_language(source) or default_language
-            lines.append(u'```' + to_chunk_options(metadata))
-        elif ext == '.R':
-            lines.append('#+ ' + to_chunk_options(metadata))
-        else:  # ext == '.py':
-            lines.append('#+ ' +
-                         json.dumps({k: v for k, v in metadata.iteritems()
-                                     if k not in _ignore_metadata}))
+        if ext in ['.Rmd', '.md']:
+            language = cell_language(source) or default_language
+            options = metadata_to_rmd_options(language, metadata)
+            if ext == '.Rmd':
+                lines.append(u'```{{{}}}'.format(options))
+            else:
+                lines.append(u'```{}'.format(options))
 
-        if source is not None:
             lines.extend(source)
-        lines.append(u'```')
+            lines.append(u'```')
 
-        if skipline and ext == '.py' and next_cell \
-                and next_cell.cell_type == 'code':
-            lines.append('')
+        elif ext == '.R':
+            language = cell_language(source) or default_language
+            options = metadata_to_rmd_options(language, metadata)
+            if language == 'R':
+                if len(options)>2:
+                    lines.append('#+ ' + options[2:])
+                lines.extend(source)
+            else:
+                lines.append(u"#' ```{{{}}}".format(options))
+                lines.extend(["#' " + s for s in source])
+                lines.append("#' ```")
+        else:  # ext == '.py':
+            language = cell_language(source) or default_language
+            if language == 'python':
+                options = metadata_to_json_options(metadata)
+                if options!= '{}':
+                    lines.append('#+ ' + options)
+                lines.extend(source)
+            else:
+                options = metadata_to_rmd_options(language, metadata)
+                lines.append(u"#' ```{{{}}}".format(options))
+                lines.extend(["#' " + s for s in source])
+                lines.append("#' ```")
+
+            if next_cell and next_cell.cell_type == 'code':
+                lines.append('')
     else:
-        lines.append(cell.get('source', ''))
+        if ext in ['.Rmd', '.md']:
+            lines.extend(source)
+        else:
+            lines.extend(["#' " + s for s in source])
 
     if skipline:
         lines.append('')
@@ -75,21 +95,20 @@ def text_to_cell(lines, ext='.Rmd'):
 
 def parse_code_options(line, ext):
     if ext == '.Rmd':
-        return to_metadata(_start_code_rmd.findall(line)[0])
+        return rmd_options_to_metadata(_start_code_rmd.findall(line)[0])
     elif ext == '.md':
-        return to_metadata(_start_code_md.findall(line)[0])
+        return rmd_options_to_metadata(_start_code_md.findall(line)[0])
     elif ext == '.R':
-        return to_metadata(_option_code_rpy.findall(line)[0])
-    else:
-        try:
-            return json.loads(_option_code_rpy.findall(line)[0])
-        except ValueError:
-            return {}
+        return 'R', rmd_options_to_metadata(_option_code_rpy.findall(line)[0])
+    else:  # ext=='.py'
+        return 'python', \
+               json_options_to_metadata(_option_code_rpy.findall(line)[0])
 
 
 def code_to_cell(lines, ext):
     # Parse options
-    metadata = parse_code_options(lines[0], ext)
+    language, metadata = parse_code_options(lines[0], ext)
+    metadata['language'] = language
 
     # Find end of cell and return
     if ext in ['.Rmd', '.md']:
@@ -147,7 +166,7 @@ def markdown_to_cell(lines, ext):
         if start_code(line, ext):
             if prev_blank and pos > 1:
                 return new_markdown_cell(
-                    source='\n'.join(lines[:(pos-1)])), pos
+                    source='\n'.join(lines[:(pos - 1)])), pos
             else:
                 r = new_markdown_cell(
                     source='\n'.join(lines[:pos]))

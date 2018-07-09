@@ -9,6 +9,7 @@ https://github.com/jupyter/notebook/issues/3700
 """
 
 import ast
+import json
 
 _boolean_options_dictionary = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
@@ -36,16 +37,8 @@ def _py_logical_values(rbool):
     raise RLogicalValueError
 
 
-def to_chunk_options(metadata):
-    if 'language' in metadata:
-        language = metadata['language']
-        del metadata['language']
-    else:
-        language = None
-    if language:
-        options = language.lower()
-    else:
-        options = ''
+def metadata_to_rmd_options(language, metadata):
+    options = language.lower()
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
         del metadata['name']
@@ -174,7 +167,7 @@ def parse_rmd_options(line):
     return result
 
 
-def to_metadata(options):
+def rmd_options_to_metadata(options):
     options = options.split(' ', 1)
     if len(options) == 1:
         language = options[0]
@@ -214,5 +207,15 @@ def to_metadata(options):
         except (SyntaxError, ValueError):
             continue
 
-    metadata['language'] = language
-    return metadata
+    return language, metadata
+
+
+def json_options_to_metadata(options):
+    try:
+        return json.loads(options)
+    except ValueError:
+        return {}
+
+def metadata_to_json_options(metadata):
+    return json.dumps({k: v for k, v in metadata.iteritems()
+                if k not in _ignore_metadata})

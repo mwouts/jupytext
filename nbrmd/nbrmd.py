@@ -26,18 +26,10 @@ from .header import header_to_metadata_and_cell, metadata_and_cell_to_header
 from .languages import get_default_language, find_main_language
 from .cells import cell_to_text, text_to_cell
 
-
 # -----------------------------------------------------------------------------
 # Code
 # -----------------------------------------------------------------------------
 
-
-class State(Enum):
-    MARKDOWN = 1
-    CODE = 2
-
-
-_end_code_re = re.compile(r"^```\s*")
 
 notebook_extensions = ['.ipynb', '.Rmd', '.md', '.py', '.R']
 
@@ -63,14 +55,12 @@ class RmdReader(NotebookReader):
             lines = lines[pos:]
 
         while len(lines):
-            prev_pos = pos
             cell, pos = text_to_cell(lines, self.ext)
             if cell is None:
                 break
-            if pos <= 0:
-                if pos == prev_pos:
-                    raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
             cells.append(cell)
+            if pos <= 0:
+                raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
             lines = lines[pos:]
 
         if self.ext in ['.Rmd', '.md']:
@@ -104,9 +94,7 @@ class RmdWriter(NotebookWriter):
                              default_language=default_language,
                              ext=self.ext))
 
-        lines.append('')
-
-        return '\n'.join(lines)
+        return '\n'.join(lines + [''])
 
 
 _readers = {ext: RmdReader(ext) for ext in notebook_extensions if
