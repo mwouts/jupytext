@@ -6,6 +6,19 @@ Release History
 dev
 +++
 
+0.2.5 (2018-07-11)
++++++++++++++++++++
+
+**Improvements**
+
+- Outputs of existing `.ipynb` versions are combined with matching inputs
+ of R markdown version, as suggested by @grst (#12)
+
+**BugFixes**
+
+- Support for unicode text in python 2.7 (#11)
+
+
 0.2.4 (2018-07-05)
 +++++++++++++++++++
 
@@ -18,7 +31,7 @@ solved in Jupyter directly.
 **BugFixes**
 
 - dependencies included in `setup.py`
-- pre_save_hook work with non-empty `notebook_dir` https://github.com/mwouts/nbrmd/issues/9
+- pre_save_hook work with non-empty `notebook_dir` (#9)
 
 0.2.3 (2018-06-28)
 +++++++++++++++++++
