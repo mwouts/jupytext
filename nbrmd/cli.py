@@ -2,15 +2,20 @@ import os
 from nbformat import writes as ipynb_writes
 from nbrmd import readf, writef
 from nbrmd import writes as rmd_writes
+from nbrmd.combine import combine_inputs_with_outputs
+from json.decoder import JSONDecodeError
+from nbformat.reader import NotJSONError
 import argparse
 
 
-def convert(nb_files, in_place=True):
+def convert(nb_files, in_place=True, combine=True):
     """
     Export R markdown notebooks, or Jupyter notebooks, to the opposite format
     :param nb_files: one or more notebooks
     :param in_place: should result of conversion be stored in file
     with opposite extension?
+    :param combine: should the current outputs of .ipynb file be preserved,
+    when a cell with corresponding input is found in .Rmd?
     :return:
     """
     for nb_file in nb_files:
@@ -28,9 +33,18 @@ def convert(nb_files, in_place=True):
                 print('Jupyter notebook {} being converted to '
                       'R Markdown {}'.format(nb_file, nb_dest))
             else:
+                msg = ''
                 nb_dest = file + '.ipynb'
+                if combine and os.path.isfile(nb_dest):
+                    try:
+                        nb_outputs = readf(nb_dest)
+                        combine_inputs_with_outputs(nb, nb_outputs)
+                        msg = '(outputs were preserved)'
+                    except (IOError, JSONDecodeError, NotJSONError) as e:
+                        msg = '(outputs could not be preserved: {})'.format(e)
                 print('R Markdown {} being converted to '
-                      'Jupyter notebook {}'.format(nb_file, nb_dest))
+                      'Jupyter notebook {} {}'
+                      .format(nb_file, nb_dest, msg))
             writef(nb, nb_dest)
         else:
             if ext == '.ipynb':
@@ -49,9 +63,12 @@ def cli(args=None):
     parser.add_argument('-i', '--in-place', action='store_true',
                         help='Store the result of conversion '
                              'to file with opposite extension')
+    parser.add_argument('-p', '--preserve_outputs', action='store_true',
+                        help='Preserve outputs of .ipynb '
+                             'notebook when file exists and inputs match')
     return parser.parse_args(args)
 
 
 def main():
     args = cli()
-    convert(args.notebooks, args.in_place)
+    convert(args.notebooks, args.in_place, args.preserve_outputs)

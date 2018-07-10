@@ -1,5 +1,7 @@
 import notebook.transutils
 from notebook.services.contents.filemanager import FileContentsManager
+from tornado.web import HTTPError
+from nbrmd.combine import combine_inputs_with_outputs
 from .hooks import update_selected_formats
 
 import os
@@ -41,14 +43,14 @@ class RmdFileContentsManager(FileContentsManager):
         file, ext = os.path.splitext(os_path)
         if ext == '.Rmd':
             with mock.patch('nbformat.reads', _nbrmd_reads):
-                return super(RmdFileContentsManager, self)\
+                return super(RmdFileContentsManager, self) \
                     ._read_notebook(os_path, as_version)
         elif ext == '.md':
             with mock.patch('nbformat.reads', _nbrmd_md_reads):
-                return super(RmdFileContentsManager, self)\
+                return super(RmdFileContentsManager, self) \
                     ._read_notebook(os_path, as_version)
         else:
-            return super(RmdFileContentsManager, self)\
+            return super(RmdFileContentsManager, self) \
                 ._read_notebook(os_path, as_version)
 
     def _save_notebook(self, os_path, nb):
@@ -56,14 +58,14 @@ class RmdFileContentsManager(FileContentsManager):
         file, ext = os.path.splitext(os_path)
         if ext == '.Rmd':
             with mock.patch('nbformat.writes', _nbrmd_writes):
-                return super(RmdFileContentsManager, self)\
+                return super(RmdFileContentsManager, self) \
                     ._save_notebook(os_path, nb)
         elif ext == '.md':
             with mock.patch('nbformat.writes', _nbrmd_md_writes):
-                return super(RmdFileContentsManager, self)\
+                return super(RmdFileContentsManager, self) \
                     ._save_notebook(os_path, nb)
         else:
-            return super(RmdFileContentsManager, self)\
+            return super(RmdFileContentsManager, self) \
                 ._save_notebook(os_path, nb)
 
     def get(self, path, content=True, type=None, format=None):
@@ -94,9 +96,25 @@ class RmdFileContentsManager(FileContentsManager):
                 (type == 'notebook' or
                  (type is None and
                   any([path.endswith(ext) for ext in self.nb_extensions]))):
-            return self._notebook_model(path, content=content)
+            nb = self._notebook_model(path, content=content)
+
+            # Read outputs from .ipynb version if available
+            if content and not path.endswith('.ipynb'):
+                file, ext = os.path.splitext(path)
+                path_ipynb = file + '.ipynb'
+                if self.exists(path_ipynb):
+                    try:
+                        nb_outputs = self._notebook_model(
+                            path_ipynb, content=content)
+                        combine_inputs_with_outputs(nb['content'],
+                                                    nb_outputs['content'])
+                    except HTTPError:
+                        pass
+
+            return nb
+
         else:
-            return super(RmdFileContentsManager, self)\
+            return super(RmdFileContentsManager, self) \
                 .get(path, content, type, format)
 
     def rename_file(self, old_path, new_path):
@@ -105,7 +123,7 @@ class RmdFileContentsManager(FileContentsManager):
         if org_ext in self.nb_extensions and org_ext == new_ext:
             for ext in self.nb_extensions:
                 if self.file_exists(old_file + ext):
-                    super(RmdFileContentsManager, self)\
+                    super(RmdFileContentsManager, self) \
                         .rename_file(old_file + ext, new_file + ext)
         else:
             super(RmdFileContentsManager, self).rename_file(old_path, new_path)
