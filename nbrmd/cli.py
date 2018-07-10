@@ -3,7 +3,6 @@ from nbformat import writes as ipynb_writes
 from nbrmd import readf, writef
 from nbrmd import writes as rmd_writes
 from .combine import combine_inputs_with_outputs
-from json.decoder import JSONDecodeError
 from nbformat.reader import NotJSONError
 import argparse
 
@@ -40,7 +39,7 @@ def convert(nb_files, in_place=True, combine=True):
                         nb_outputs = readf(nb_dest)
                         combine_inputs_with_outputs(nb, nb_outputs)
                         msg = '(outputs were preserved)'
-                    except (IOError, JSONDecodeError, NotJSONError) as e:
+                    except (IOError, NotJSONError) as e:
                         msg = '(outputs could not be preserved: {})'.format(e)
                 print('R Markdown {} being converted to '
                       'Jupyter notebook {} {}'
