@@ -2,7 +2,7 @@ import os
 from nbformat import writes as ipynb_writes
 from nbrmd import readf, writef
 from nbrmd import writes as rmd_writes
-from nbrmd.combine import combine_inputs_with_outputs
+from .combine import combine_inputs_with_outputs
 from json.decoder import JSONDecodeError
 from nbformat.reader import NotJSONError
 import argparse
