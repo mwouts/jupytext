@@ -15,9 +15,7 @@ Authors:
 
 import os
 import io
-import re
 from copy import copy
-from enum import Enum
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook
 import nbformat
@@ -38,6 +36,7 @@ class RmdReader(NotebookReader):
 
     def __init__(self, ext):
         self.ext = ext
+        self.comment = '' if ext in ['.Rmd', '.md'] else "#' "
 
     def reads(self, s, **kwargs):
         return self.to_notebook(s, **kwargs)
@@ -46,7 +45,8 @@ class RmdReader(NotebookReader):
         lines = s.splitlines()
 
         cells = []
-        metadata, header_cell, pos = header_to_metadata_and_cell(lines)
+        metadata, header_cell, pos = \
+            header_to_metadata_and_cell(lines, self.comment)
 
         if header_cell:
             cells.append(header_cell)
@@ -74,6 +74,7 @@ class RmdWriter(NotebookWriter):
 
     def __init__(self, ext='.Rmd'):
         self.ext = ext
+        self.prefix = '' if ext in ['.Rmd', '.md'] else "#' "
 
     def writes(self, nb):
         nb = copy(nb)
@@ -84,7 +85,7 @@ class RmdWriter(NotebookWriter):
         else:
             default_language = get_default_language(nb)
 
-        lines = metadata_and_cell_to_header(nb)
+        lines = metadata_and_cell_to_header(nb, self.prefix)
 
         for i in range(len(nb.cells)):
             cell = nb.cells[i]

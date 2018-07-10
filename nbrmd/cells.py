@@ -34,7 +34,7 @@ def cell_to_text(cell,
             language = cell_language(source) or default_language
             options = metadata_to_rmd_options(language, metadata)
             if language == 'R':
-                if len(options)>2:
+                if len(options) > 2:
                     lines.append('#+ ' + options[2:])
                 lines.extend(source)
             else:
@@ -45,7 +45,7 @@ def cell_to_text(cell,
             language = cell_language(source) or default_language
             if language == 'python':
                 options = metadata_to_json_options(metadata)
-                if options!= '{}':
+                if options != '{}':
                     lines.append('#+ ' + options)
                 lines.extend(source)
             else:
@@ -82,13 +82,14 @@ def start_code(line, ext):
     elif ext == '.md':
         return _start_code_md.match(line)
     else:  # .R or .py
-        return not _markdown_rpy.match(line) or \
-               _option_code_rpy.match(line)
+        return _option_code_rpy.match(line)
 
 
 def text_to_cell(lines, ext='.Rmd'):
     if start_code(lines[0], ext):
-        return code_to_cell(lines, ext)
+        return code_to_cell(lines, ext, True)
+    elif ext in ['.py', '.R'] and not lines[0].startswith("#'"):
+        return code_to_cell(lines, ext, False)
     else:
         return markdown_to_cell(lines, ext)
 
@@ -98,17 +99,28 @@ def parse_code_options(line, ext):
         return rmd_options_to_metadata(_start_code_rmd.findall(line)[0])
     elif ext == '.md':
         return rmd_options_to_metadata(_start_code_md.findall(line)[0])
-    elif ext == '.R':
-        return 'R', rmd_options_to_metadata(_option_code_rpy.findall(line)[0])
-    else:  # ext=='.py'
-        return 'python', \
-               json_options_to_metadata(_option_code_rpy.findall(line)[0])
+    else:
+        if ext == '.R':
+            if _option_code_rpy.match(line):
+                return 'R', rmd_options_to_metadata(
+                    _option_code_rpy.findall(line)[0])
+            else:
+                return 'R', {}
+        else:  # ext=='.py'
+            if _option_code_rpy.match(line):
+                return 'python', json_options_to_metadata(
+                    _option_code_rpy.findall(line)[0])
+            else:
+                return 'python', {}
 
 
-def code_to_cell(lines, ext):
+def code_to_cell(lines, ext, parse_opt):
     # Parse options
-    language, metadata = parse_code_options(lines[0], ext)
-    metadata['language'] = language
+    if parse_opt:
+        language, metadata = parse_code_options(lines[0], ext)
+        metadata['language'] = language
+    else:
+        metadata = {}
 
     # Find end of cell and return
     if ext in ['.Rmd', '.md']:
@@ -124,21 +136,22 @@ def code_to_cell(lines, ext):
                         metadata=metadata)
                     r.metadata['noskipline'] = True
                     return r, pos + 1
+            prev_blank = _blank.match(line)
     else:
         prev_blank = False
         for pos, line in enumerate(lines):
-            if pos == 0:
+            if parse_opt and pos == 0:
                 continue
 
             if _markdown_rpy.match(line):
                 pos -= 1
                 if prev_blank:
                     return new_code_cell(
-                        source='\n'.join(lines[1:(pos - 1)]),
+                        source='\n'.join(lines[parse_opt:(pos - 1)]),
                         metadata=metadata), pos + 1
                 else:
                     r = new_code_cell(
-                        source='\n'.join(lines[1:pos]),
+                        source='\n'.join(lines[parse_opt:pos]),
                         metadata=metadata)
                     r.metadata['noskipline'] = True
                     return r, pos + 1
@@ -146,21 +159,44 @@ def code_to_cell(lines, ext):
             if _blank.match(line):
                 if prev_blank:
                     return new_code_cell(
-                        source='\n'.join(lines[1:pos]),
+                        source='\n'.join(lines[parse_opt:(pos - 1)]),
                         metadata=metadata), pos + 1
                 prev_blank = True
             else:
                 prev_blank = False
 
     # Unterminated cell?
-    r = new_code_cell(
-        source='\n'.join(lines[1:]),
-        metadata=metadata)
+    if prev_blank:
+        r = new_code_cell(
+            source='\n'.join(lines[parse_opt:-1]),
+            metadata=metadata)
+    else:
+        r = new_code_cell(
+            source='\n'.join(lines[parse_opt:]),
+            metadata=metadata)
     return r, len(lines)
 
 
 def markdown_to_cell(lines, ext):
     prev_blank = False
+
+    if ext in ['.py', '.R']:
+        # Markdown stops with the end of comments
+        md = []
+        for pos, line in enumerate(lines):
+            if line.startswith("#' ") or line == "#'":
+                md.append(line[3:])
+            elif _blank.match(line):
+                return new_markdown_cell(source='\n'.join(md)), pos + 1
+            else:
+                r = new_markdown_cell(source='\n'.join(md))
+                r.metadata['noskipline'] = True
+                return r, pos
+
+        # still here=> unterminated markdown
+        r = new_markdown_cell(source='\n'.join(md))
+        r.metadata['noskipline'] = True
+        return r, pos + 1
 
     for pos, line in enumerate(lines):
         if start_code(line, ext):
@@ -168,6 +204,7 @@ def markdown_to_cell(lines, ext):
                 return new_markdown_cell(
                     source='\n'.join(lines[:(pos - 1)])), pos
             else:
+
                 r = new_markdown_cell(
                     source='\n'.join(lines[:pos]))
                 r.metadata['noskipline'] = True

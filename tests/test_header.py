@@ -11,7 +11,7 @@ title: Sample header
 Header is followed by a blank line
 """
     lines = text.splitlines()
-    metadata, cell, pos = header_to_metadata_and_cell(lines)
+    metadata, cell, pos = header_to_metadata_and_cell(lines, '')
 
     assert metadata == {}
     assert cell.cell_type == 'raw'
@@ -29,7 +29,7 @@ title: Sample header
 Header is not followed by a blank line
 """
     lines = text.splitlines()
-    metadata, cell, pos = header_to_metadata_and_cell(lines)
+    metadata, cell, pos = header_to_metadata_and_cell(lines, '')
 
     assert metadata == {}
     assert cell.cell_type == 'raw'
@@ -48,7 +48,7 @@ jupyter:
 ---
 """
     lines = text.splitlines()
-    metadata, cell, pos = header_to_metadata_and_cell(lines)
+    metadata, cell, pos = header_to_metadata_and_cell(lines, '')
 
     assert metadata == {'mainlanguage': 'python'}
     assert cell.cell_type == 'raw'
@@ -66,7 +66,7 @@ title: Sample header
 ---""",
         metadata={'noskipline': True})],
         metadata=dict(mainlanguage='python'))
-    header = metadata_and_cell_to_header(nb)
+    header = metadata_and_cell_to_header(nb, '')
     assert '\n'.join(header) == """---
 title: Sample header
 jupyter:
@@ -77,6 +77,6 @@ jupyter:
 
 def test_metadata_and_cell_to_header():
     nb = new_notebook(cells=[new_markdown_cell(source="Some markdown\ntext")])
-    header = metadata_and_cell_to_header(nb)
+    header = metadata_and_cell_to_header(nb, '')
     assert header == []
     assert len(nb.cells) == 1

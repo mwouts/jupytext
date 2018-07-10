@@ -15,7 +15,7 @@ def _as_dict(metadata):
     return metadata
 
 
-def metadata_and_cell_to_header(nb, prefix=''):
+def metadata_and_cell_to_header(nb, comment):
     '''
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
@@ -44,8 +44,8 @@ def metadata_and_cell_to_header(nb, prefix=''):
     if len(header):
         header = ['---'] + header + ['---']
 
-    if len(prefix):
-        header = [prefix + h for h in header]
+    if len(comment):
+        header = [comment + h for h in header]
 
     if len(header) and skipline:
         header += ['']
@@ -53,7 +53,7 @@ def metadata_and_cell_to_header(nb, prefix=''):
     return header
 
 
-def header_to_metadata_and_cell(lines, prefix=''):
+def header_to_metadata_and_cell(lines, comment):
     '''
     Return the metadata, first cell of notebook, and next loc in text
     '''
@@ -64,10 +64,10 @@ def header_to_metadata_and_cell(lines, prefix=''):
     ended = False
 
     for i, line in enumerate(lines):
-        if not line.startswith(prefix):
+        if not line.startswith(comment):
             break
 
-        line = line[len(prefix):]
+        line = line[len(comment):]
 
         if i == 0:
             if _header_re.match(line):
@@ -97,6 +97,8 @@ def header_to_metadata_and_cell(lines, prefix=''):
         skipline = True
         if len(lines) > i + 1:
             line = lines[i + 1]
+            if line.startswith(comment):
+                line = line[len(comment):]
             if not _empty_re.match(line):
                 skipline = False
             else:

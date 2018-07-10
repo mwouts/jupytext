@@ -216,6 +216,7 @@ def json_options_to_metadata(options):
     except ValueError:
         return {}
 
+
 def metadata_to_json_options(metadata):
-    return json.dumps({k: v for k, v in metadata.iteritems()
-                if k not in _ignore_metadata})
+    return json.dumps({k: metadata[k] for k in metadata
+                       if k not in _ignore_metadata})
