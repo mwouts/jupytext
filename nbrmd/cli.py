@@ -2,6 +2,8 @@ import os
 from nbformat import writes as ipynb_writes
 from nbrmd import readf, writef
 from nbrmd import writes as rmd_writes
+from .combine import combine_inputs_with_outputs
+from nbformat.reader import NotJSONError
 import argparse
 
 
@@ -29,6 +31,13 @@ def convert(nb_files, in_place=True):
                       'R Markdown {}'.format(nb_file, nb_dest))
             else:
                 nb_dest = file + '.ipynb'
+                if combine and os.path.isfile(nb_dest):
+                    try:
+                        nb_outputs = readf(nb_dest)
+                        combine_inputs_with_outputs(nb, nb_outputs)
+                        msg = '(outputs were preserved)'
+                    except (IOError, NotJSONError) as e:
+                        msg = '(outputs could not be preserved: {})'.format(e)
                 print('R Markdown {} being converted to '
                       'Jupyter notebook {}'.format(nb_file, nb_dest))
             writef(nb, nb_dest)
