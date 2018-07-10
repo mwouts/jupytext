@@ -3,7 +3,7 @@ from nbrmd.nbrmd import readme
 
 setup(
     name='nbrmd',
-    version='0.2.4',
+    version='0.2.5',
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
     description='Jupyter from/to R markdown notebooks',
