@@ -1,5 +1,7 @@
 import notebook.transutils
 from notebook.services.contents.filemanager import FileContentsManager
+from tornado.web import HTTPError
+from nbrmd.combine import combine_inputs_with_outputs
 from .hooks import update_selected_formats
 
 import os
@@ -66,10 +68,25 @@ class RmdFileContentsManager(FileContentsManager):
 
         if self.exists(path) and \
                 (type == 'notebook' or
-                 (type is None and
-                  any([path.endswith(ext)
-                       for ext in self.all_nb_extensions()]))):
-            return self._notebook_model(path, content=content)
+                 (type is None and any([path.endswith(ext)
+                                        for ext in
+                                        self.all_nb_extensions()]))):
+            nb = self._notebook_model(path, content=content)
+
+            # Read outputs from .ipynb version if available
+            if content and not path.endswith('.ipynb'):
+                file, ext = os.path.splitext(path)
+                path_ipynb = file + '.ipynb'
+                if self.exists(path_ipynb):
+                    try:
+                        nb_outputs = self._notebook_model(
+                            path_ipynb, content=content)
+                        combine_inputs_with_outputs(nb['content'],
+                                                    nb_outputs['content'])
+                    except HTTPError:
+                        pass
+
+            return nb
         else:
             return super(RmdFileContentsManager, self) \
                 .get(path, content, type, format)
