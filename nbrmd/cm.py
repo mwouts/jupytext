@@ -48,11 +48,25 @@ class RmdFileContentsManager(FileContentsManager):
         file, ext = os.path.splitext(os_path)
         if ext in self.nb_extensions:
             with mock.patch('nbformat.reads', _nbrmd_reads(ext)):
-                return super(RmdFileContentsManager, self) \
-                    ._read_notebook(os_path, as_version)
+                nb = super(RmdFileContentsManager, self)
         else:
-            return super(RmdFileContentsManager, self) \
+        	nb = super(RmdFileContentsManager, self) \
                 ._read_notebook(os_path, as_version)
+                
+        
+        # Read outputs from .ipynb version if available
+        if ext != '.ipynb':
+            os_path_ipynb = file + '.ipynb'
+            try:
+                nb_outputs = self._read_notebook(
+                    os_path_ipynb, as_version=as_version)
+                combine.combine_inputs_with_outputs(nb, nb_outputs)
+                if self.notary.check_signature(nb_outputs):
+                    self.notary.sign(nb)
+            except HTTPError:
+                pass
+
+        return nb
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
@@ -91,9 +105,10 @@ class RmdFileContentsManager(FileContentsManager):
                         pass
 
             return nb
-        else:
-            return super(RmdFileContentsManager, self) \
-                .get(path, content, type, format)
+
+    def trust_notebook(self, path):
+        file, ext = os.path.splitext(path)
+        super(RmdFileContentsManager, self).trust_notebook(file + '.ipynb')
 
     def rename_file(self, old_path, new_path):
         old_file, org_ext = os.path.splitext(old_path)
