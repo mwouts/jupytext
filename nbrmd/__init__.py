@@ -12,7 +12,6 @@ R Markdown notebooks.
 """
 
 from .nbrmd import readf, writef, writes, reads, notebook_extensions, readme
-from .hooks import *
 
 try:
     from .rmarkdownexporter import RMarkdownExporter

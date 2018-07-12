@@ -1,8 +1,8 @@
 import notebook.transutils
 from notebook.services.contents.filemanager import FileContentsManager
 from tornado.web import HTTPError
-from .combine import combine_inputs_with_outputs
-from .hooks import update_selected_formats
+import hooks
+import combine
 
 import os
 import nbrmd
@@ -30,14 +30,17 @@ class RmdFileContentsManager(FileContentsManager):
     Jupyter notebooks (.ipynb), or in R Markdown (.Rmd), plain markdown
     (.md), R scripts (.R) or python scripts (.py)
     """
+
     nb_extensions = [ext for ext in nbrmd.notebook_extensions if
                      ext != '.ipynb']
 
     def all_nb_extensions(self):
         return ['.ipynb'] + self.nb_extensions
 
+    default_nbrmd_formats = ['.ipynb']
+
     def __init__(self, **kwargs):
-        self.pre_save_hook = update_selected_formats
+        self.pre_save_hook = hooks.update_alternative_formats
         super(RmdFileContentsManager, self).__init__(**kwargs)
 
     def _read_notebook(self, os_path, as_version=4):
@@ -81,8 +84,9 @@ class RmdFileContentsManager(FileContentsManager):
                     try:
                         nb_outputs = self._notebook_model(
                             path_ipynb, content=content)
-                        combine_inputs_with_outputs(nb['content'],
-                                                    nb_outputs['content'])
+                        combine.combine_inputs_with_outputs(
+                            nb['content'],
+                            nb_outputs['content'])
                     except HTTPError:
                         pass
 

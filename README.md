@@ -66,7 +66,10 @@ inputs.
 ## Can I save my Jupyter notebook as both R markdown and ipynb?
 
 Yes. That's useful if you want to preserve the outputs locally, or if you want
-to share the `.ipynb` version. We offer both per-notebook, and global configuration.
+to share the `.ipynb` version. By default, the opened notebook in jupyter, plus
+its `.ipynb` version, are updated when a notebook is saved.
+
+If you prefer a different setting, we offer both per-notebook, and global configuration.
 
 ### Per-notebook configuration
 
@@ -93,12 +96,10 @@ Accepted formats are: `.ipynb`, `.Rmd` and `.md`.
 If you want every notebook to be saved as both `.Rmd` and `.ipynb` files, then change your jupyter config to
 ```python
 c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
-c.ContentsManager.pre_save_hook = 'nbrmd.update_rmd_and_ipynb'
+c.ContentsManager.default_nbrmd_formats = ['.ipynb', '.Rmd']
 ```
 
-If you prefer to update just one of `.Rmd` or `.ipynb` files, then change the above to
-`nbrmd.update_rmd` or `nbrmd.update_ipynb` as the `pre_save_hook` (and yes, you're free to use the `pre_save_hook`
-with the default `ContentsManager`).
+If you prefer to update just `.Rmd`, change the above accordingly.
 
 :warning: Be careful not to open twice a notebook with two distinct extensions! You should _shutdown_ the notebooks
 with the extension you are not currently editing (list your open notebooks with the _running_ tab in Jupyter).
