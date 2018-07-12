@@ -42,17 +42,32 @@ class RmdFileContentsManager(FileContentsManager):
     def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
         file, ext = os.path.splitext(os_path)
-        if ext == '.Rmd':
-            with mock.patch('nbformat.reads', _nbrmd_reads):
-                return super(RmdFileContentsManager, self) \
-                    ._read_notebook(os_path, as_version)
-        elif ext == '.md':
-            with mock.patch('nbformat.reads', _nbrmd_md_reads):
-                return super(RmdFileContentsManager, self) \
-                    ._read_notebook(os_path, as_version)
-        else:
+        if ext == '.ipynb':
             return super(RmdFileContentsManager, self) \
                 ._read_notebook(os_path, as_version)
+
+        if ext == '.Rmd':
+            with mock.patch('nbformat.reads', _nbrmd_reads):
+                nb = super(RmdFileContentsManager, self) \
+                    ._read_notebook(os_path, as_version)
+        else:  # ext == '.md':
+            with mock.patch('nbformat.reads', _nbrmd_md_reads):
+                nb = super(RmdFileContentsManager, self) \
+                    ._read_notebook(os_path, as_version)
+
+        # Read outputs from .ipynb version if available
+        if ext != '.ipynb':
+            os_path_ipynb = file + '.ipynb'
+            try:
+                nb_outputs = self._read_notebook(
+                    os_path_ipynb, as_version=as_version)
+                combine.combine_inputs_with_outputs(nb, nb_outputs)
+                if self.notary.check_signature(nb_outputs):
+                    self.notary.sign(nb)
+            except HTTPError:
+                pass
+
+        return nb
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
@@ -97,27 +112,14 @@ class RmdFileContentsManager(FileContentsManager):
                 (type == 'notebook' or
                  (type is None and
                   any([path.endswith(ext) for ext in self.nb_extensions]))):
-            nb = self._notebook_model(path, content=content)
-
-            # Read outputs from .ipynb version if available
-            if content and not path.endswith('.ipynb'):
-                file, ext = os.path.splitext(path)
-                path_ipynb = file + '.ipynb'
-                if self.exists(path_ipynb):
-                    try:
-                        nb_outputs = self._notebook_model(
-                            path_ipynb, content=content)
-                        combine.combine_inputs_with_outputs(
-                            nb['content'],
-                            nb_outputs['content'])
-                    except HTTPError:
-                        pass
-
-            return nb
-
+            return self._notebook_model(path, content=content)
         else:
             return super(RmdFileContentsManager, self) \
                 .get(path, content, type, format)
+
+    def trust_notebook(self, path):
+        file, ext = os.path.splitext(path)
+        super(RmdFileContentsManager, self).trust_notebook(file + '.ipynb')
 
     def rename_file(self, old_path, new_path):
         old_file, org_ext = os.path.splitext(old_path)
