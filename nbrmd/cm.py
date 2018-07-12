@@ -1,7 +1,7 @@
 import notebook.transutils
 from notebook.services.contents.filemanager import FileContentsManager
 from tornado.web import HTTPError
-from nbrmd.combine import combine_inputs_with_outputs
+from .combine import combine_inputs_with_outputs
 from .hooks import update_selected_formats
 
 import os
