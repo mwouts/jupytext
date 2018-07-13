@@ -25,7 +25,7 @@ The format actually supports [many languages](https://yihui
 R markdown is almost like plain markdown. There are only two differences:
 - R markdown has a specific syntax for active code cells, that start with
 
-	```{python}
+    ```{python}
 
 These active cells may optionally contain cell options.
 - a YAML header, that describes the notebook title, author, and desired
