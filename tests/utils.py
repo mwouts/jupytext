@@ -29,6 +29,10 @@ def remove_outputs(nb):
         if k in nb:
             del nb[k]
 
+    for k in ['nbrmd_formats', 'nbrmd_sourceonly_format']:
+        if k in nb.metadata:
+            del nb.metadata[k]
+
     return nb
 
 

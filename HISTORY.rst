@@ -6,6 +6,19 @@ Release History
 dev
 +++
 
+0.2.6 (2018-07-13)
++++++++++++++++++++
+
+**Improvements**
+
+- Introduced `nbrmd_sourceonly_format` metadata
+- Inputs are loaded from `.Rmd` file when a matching `.ipynb` file is
+opened.
+
+**BugFixes**
+
+- Trusted notebooks remain trusted (#12)
+
 0.2.5 (2018-07-11)
 +++++++++++++++++++
 
