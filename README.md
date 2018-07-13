@@ -18,7 +18,9 @@ You will be interested in this if
 
 R markdown (extension `.Rmd`) is a well established markdown [notebook format](https://rmarkdown.rstudio.com/). As the name states, R markdown was designed in the R community, but it actually support [many languages](https://yihui.name/knitr/demo/engines/). A few months back, the support for python significantly improved with the arrival of the [`reticulate`](https://github.com/rstudio/reticulate) package.
 
-R markdown is almost identical to markdown export of Jupyter notebooks. For reference, Jupyter notebooks are exported to markdown using either
+R markdown is a source only format for notebooks. It is almost identical to
+markdown export of Jupyter notebooks with outputs filtered. For
+reference, Jupyter notebooks are exported to markdown using either
 - _Download as Markdown (.md)_ in Jupyter's interface,
 - or `nbconvert notebook.ipynb --to markdown`.
 
@@ -52,30 +54,25 @@ jupyter notebook
 ```
 
 Now you can open your `.md` and `.Rmd` files as notebooks in Jupyter,
-and save your jupyter notebooks in R markdown format.
+and save your jupyter notebooks in R markdown format (see below).
 
 Rmd notebook in jupyter     | Rmd notebook as text
 :--------------------------:|:-----------------------:
 ![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/rmd_notebook.png)   | ![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/rmd_in_text_editor.png)
 
-When a file with an identical name and a `.ipynb` extension is found,
-`nbrmd` loads the outputs from that file. This way, you can put the `.Rmd`
-file under version control, and preserve the outputs that match unchanged
-inputs.
 
 ## Can I save my Jupyter notebook as both R markdown and ipynb?
 
-Yes. That's useful if you want to preserve the outputs locally, or if you want
-to share the `.ipynb` version. By default, the opened notebook in jupyter, plus
-its `.ipynb` version, are updated when a notebook is saved.
+Yes. That's even the recommended setting for the notebooks you want to
+set under *version control*.
 
-If you prefer a different setting, we offer both per-notebook, and global configuration.
+You need to choose whever to configure this per notebook, or globally.
 
 ### Per-notebook configuration
 
 The R markdown content manager includes a pre-save hook that will keep up-to date versions of your notebook
 under the file extensions specified in the `nbrmd_formats` metadata. Edit the notebook metadata in Jupyter and
-append a list for the desired format, like this:
+append a list for the desired formats, like this:
 ```
 {
   "kernelspec": {
@@ -85,11 +82,10 @@ append a list for the desired format, like this:
   "language_info": {
     (...)
   },
-  "nbrmd_formats": [".ipynb", ".Rmd"]
+  "nbrmd_formats": [".ipynb", ".Rmd"],
+  "nbrmd_sourceonly_format": ".Rmd"
 }
 ```
-
-Accepted formats are: `.ipynb`, `.Rmd` and `.md`.
 
 ### Global configuration
 
@@ -99,17 +95,28 @@ c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
 c.ContentsManager.default_nbrmd_formats = ['.ipynb', '.Rmd']
 ```
 
-If you prefer to update just `.Rmd`, change the above accordingly.
-
-:warning: Be careful not to open twice a notebook with two distinct extensions! You should _shutdown_ the notebooks
-with the extension you are not currently editing (list your open notebooks with the _running_ tab in Jupyter).
+If you prefer to update just `.Rmd`, change the above accordingly (you will
+still be able to open regular `.ipynb` notebooks).
 
 ## Recommendations for version control
 
-I recommend that you only add the R markdown file to version control. When you integrate a change
-on that file that was not done through your Jupyter editor, you should be careful to re-open the
-`.Rmd` file, not the `.ipynb` one. As mentionned above, outputs that corresponds to
-unchanged inputs will be loaded from the `.ipynb` file.
+I recommend that you set `nbrmd_formats` to `[".ipynb", ".Rmd"]`, either
+in the default configuration, or in the notebook metadata (see above).
+
+When you save your notebook, two files are generated,
+with `.Rmd` and `.ipynb` extensions. Then, when you reopen
+either one or the other,
+- cell input are taken from the _source only_ format, here `.Rmd` file
+- cell outputs are taken from `.ipynb` file.
+
+This way, you can set the `.Rmd` file under version control, and still have
+the commodity of having cell output stored in the ` .ipynb` file. When
+the `.Rmd` file is updated outside of Jupyter, then you simply reload the
+notebook, and benefit of the updates.
+
+:warning: Be careful not to open twice a notebook with two distinct
+extensions! You should _shutdown_ the notebooks with the extension you are not
+currently editing (list your open notebooks with the _running_ tab in Jupyter).
 
 ## How do I use the converter?
 
