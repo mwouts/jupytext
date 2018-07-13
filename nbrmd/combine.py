@@ -7,10 +7,17 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
 
     remaining_output_cells = nb_outputs.cells
     for cell in nb_source.cells:
+        if cell.cell_type != 'code':
+            continue
+
+        # Remove outputs to warranty that trust of returned
+        # notebook is that of second notebook
+        cell.execution_count = None
+        cell.outputs = []
+
+        # Fill outputs with that of second notebook
         for i, ocell in enumerate(remaining_output_cells):
-            if cell.cell_type == 'code' \
-                    and ocell.cell_type == 'code' \
-                    and cell.source == ocell.source:
+            if ocell.cell_type == 'code' and cell.source == ocell.source:
                 cell.execution_count = ocell.execution_count
                 cell.outputs = ocell.outputs
 

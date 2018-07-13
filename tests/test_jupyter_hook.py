@@ -3,6 +3,7 @@ import os
 import nbrmd
 from .utils import list_all_notebooks, remove_outputs, \
     remove_outputs_and_header
+from nbrmd.cm import update_alternative_formats
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
@@ -12,7 +13,7 @@ def test_rmd_is_ok(nb_file, tmpdir):
     tmp_rmd = str(tmpdir.join('notebook.Rmd'))
 
     nb.metadata['nbrmd_formats'] = ['.Rmd']
-    nbrmd.update_alternative_formats(
+    update_alternative_formats(
         model=dict(type='notebook', content=nb),
         path=tmp_ipynb)
 
@@ -27,7 +28,7 @@ def test_ipynb_is_ok(nb_file, tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_rmd = str(tmpdir.join('notebook.Rmd'))
 
-    nbrmd.update_alternative_formats(
+    update_alternative_formats(
         model=dict(type='notebook', content=nb),
         path=tmp_rmd)
 
@@ -44,7 +45,7 @@ def test_all_files_created(nb_file, tmpdir):
     tmp_rmd = str(tmpdir.join('notebook.Rmd'))
     nb.metadata['nbrmd_formats'] = ['.Rmd', '.ipynb', '.md']
 
-    nbrmd.update_alternative_formats(
+    update_alternative_formats(
         model=dict(type='notebook', content=nb),
         path=tmp_ipynb)
 
@@ -60,7 +61,7 @@ def test_no_files_created_on_no_format(tmpdir):
     tmp_md = str(tmpdir.join('notebook.md'))
     tmp_rmd = str(tmpdir.join('notebook.Rmd'))
 
-    nbrmd.update_alternative_formats(
+    update_alternative_formats(
         model=dict(type='notebook',
                    content=dict(nbformat=4, metadata=dict())),
         path=tmp_ipynb)
@@ -73,7 +74,7 @@ def test_raise_on_wrong_format(tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
 
     with pytest.raises(TypeError):
-        nbrmd.update_alternative_formats(
+        update_alternative_formats(
             model=dict(type='notebook',
                        content=dict(nbformat=4,
                                     metadata=dict(nbrmd_formats=['.doc']))),
@@ -84,7 +85,8 @@ def test_no_rmd_on_not_notebook(tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_rmd = str(tmpdir.join('notebook.Rmd'))
 
-    nbrmd.update_alternative_formats(model=dict(type='not notebook'), path=tmp_ipynb)
+    update_alternative_formats(model=dict(type='not notebook'),
+                               path=tmp_ipynb)
     assert not os.path.isfile(tmp_rmd)
 
 
@@ -92,7 +94,7 @@ def test_no_rmd_on_not_v4(tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_rmd = str(tmpdir.join('notebook.Rmd'))
 
-    nbrmd.update_alternative_formats(
+    update_alternative_formats(
         model=dict(type='notebook', content=dict(nbformat=3)),
         path=tmp_rmd)
 

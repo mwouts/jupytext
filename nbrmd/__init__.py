@@ -3,15 +3,13 @@
 Use this module to read or write Jupyter notebooks as R Markdown documents
 (methods 'read', 'reads', 'write', 'writes')
 
-Use the jupyter pre-save hooks (see the documentation) to automatically
-dump your Jupyter notebooks as a Rmd file, in addition to the ipynb file
-(or the opposite)
+Use the RmdFileContentsManager to open Rmd and Jupyter notebooks in Jupyter
 
 Use the 'nbrmd' conversion script to convert Jupyter notebooks from/to
 R Markdown notebooks.
 """
 
-from .nbrmd import readf, writef, writes, reads, notebook_extensions, readme
+from .nbrmd import read, reads, readf, write, writes, writef
 
 try:
     from .rmarkdownexporter import RMarkdownExporter
