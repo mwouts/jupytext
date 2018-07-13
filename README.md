@@ -16,31 +16,37 @@ You will be interested in this if
 
 ## What is R markdown?
 
-R markdown (extension `.Rmd`) is a well established markdown [notebook format](https://rmarkdown.rstudio.com/). As the name states, R markdown was designed in the R community, but it actually support [many languages](https://yihui.name/knitr/demo/engines/). A few months back, the support for python significantly improved with the arrival of the [`reticulate`](https://github.com/rstudio/reticulate) package.
+R markdown (extension `.Rmd`) is a *source only* format for notebooks.
+As the name states, R markdown was designed in the R community, and is
+the reference [notebook format](https://rmarkdown.rstudio.com/) there.
+The format actually supports [many languages](https://yihui
+.name/knitr/demo/engines/).
 
-R markdown is a source only format for notebooks. It is almost identical to
-markdown export of Jupyter notebooks with outputs filtered. For
-reference, Jupyter notebooks are exported to markdown using either
-- _Download as Markdown (.md)_ in Jupyter's interface,
-- or `nbconvert notebook.ipynb --to markdown`.
-
-Major difference is that code chunks can be evaluated. While markdown's standard syntax start a python code paragraph with
-
-    ```python
-    
-R markdown starts an active code chunks with
+R markdown is almost like plain markdown. There are only two differences:
+- R markdown has a specific syntax for active code cells, that start with
 
 	```{python}
 
-A smaller difference is the common presence of a YAML header, that describes the notebook title, author, and desired output (HTML, slides, PDF...).
+These active cells may optionally contain cell options.
+- a YAML header, that describes the notebook title, author, and desired
+output (HTML, slides, PDF...).
 
 Look at [nbrmd/tests/ioslides.Rmd](https://github.com/mwouts/nbrmd/blob/master/tests/ioslides.Rmd) for a sample R markdown file (that, actually, only includes python cells).
 
+## Why R markdown and not filtered `.ipynb` under version control?
+
+The common practice for having Jupyter notebooks under version control is
+to remove outputs with a pre-commit hook. That works well and this will
+indeed get you a clean commit history.
+
+However, you may run into trouble when you try to *merge* two `.ipynb`
+notebooks in a simple text editor. Merging text notebooks, like the `.Rmd`
+ones that this package provides, is much simpler.
 
 ## How do I open R markdown notebooks in Jupyter?
 
-The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes
- `.md` and `.Rmd` files as notebooks. To use it,
+The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes `
+.Rmd` files as notebooks. To use it,
 - generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit the config and include this:
 ```python
@@ -53,7 +59,7 @@ pip install nbrmd
 jupyter notebook
 ```
 
-Now you can open your `.md` and `.Rmd` files as notebooks in Jupyter,
+Now you can open your `.Rmd` files as notebooks in Jupyter,
 and save your jupyter notebooks in R markdown format (see below).
 
 Rmd notebook in jupyter     | Rmd notebook as text
