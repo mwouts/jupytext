@@ -2,12 +2,12 @@ import nbrmd
 from testfixtures import compare
 
 
-def test_read_simple_file(py="""#' ---
-#' title: Simple file
-#' ---
+def test_read_simple_file(py="""## ---
+## title: Simple file
+## ---
 
-#' Here we have some text
-#' And below we have a some python code
+## Here we have some text
+## And below we have a some python code
 
 def f(x):
     return x+1
@@ -32,13 +32,13 @@ def h(y):
     return y-1''')
 
 
-def test_read_less_simple_file(py="""#' ---
-#' title: Less simple file
-#' ---
+def test_read_less_simple_file(py="""## ---
+## title: Less simple file
+## ---
 
-#' Here we have some text
-#' And below we have a some python code
-#' But no space between markdown and code
+## Here we have some text
+## And below we have a some python code
+## But no space between markdown and code
 # This is a comment about function f
 def f(x):
     return x+1

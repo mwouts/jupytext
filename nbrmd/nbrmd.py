@@ -36,7 +36,8 @@ class RmdReader(NotebookReader):
 
     def __init__(self, ext):
         self.ext = ext
-        self.comment = '' if ext in ['.Rmd', '.md'] else "#' "
+        self.comment = '' if ext in ['.Rmd', '.md'] else "## " \
+            if ext == '.py' else "#' "
 
     def reads(self, s, **kwargs):
         return self.to_notebook(s, **kwargs)
@@ -74,7 +75,8 @@ class RmdWriter(NotebookWriter):
 
     def __init__(self, ext='.Rmd'):
         self.ext = ext
-        self.prefix = '' if ext in ['.Rmd', '.md'] else "#' "
+        self.prefix = '' if ext in ['.Rmd', '.md'] else\
+            "#' " if ext == '.R' else "## "
 
     def writes(self, nb):
         nb = copy(nb)

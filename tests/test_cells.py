@@ -136,7 +136,7 @@ def test_text_to_cell2():
     assert cell.cell_type == 'code'
     assert cell.source == '''def f(x):\n    return x+1'''
     assert cell.metadata == {}
-    assert pos == 1
+    assert pos == 2
 
 
 def test_code_to_cell():
@@ -147,4 +147,4 @@ def test_code_to_cell():
     assert cell.cell_type == 'code'
     assert cell.source == '''def f(x):\n    return x+1'''
     assert cell.metadata == {}
-    assert pos == 1
+    assert pos == 2

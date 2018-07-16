@@ -22,3 +22,19 @@ def test_identity_write_read(nb_file):
     rmd2 = nbrmd.writes(nb)
 
     compare(rmd, rmd2)
+
+
+def test_two_blank_lines_as_cell_separator():
+    rmd = """Some markdown
+text
+
+
+And a new cell
+"""
+
+    nb = nbrmd.reads(rmd)
+    assert len(nb.cells) == 2
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[1].cell_type == 'markdown'
+    assert nb.cells[0].source == 'Some markdown\ntext'
+    assert nb.cells[1].source == 'And a new cell'

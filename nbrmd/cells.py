@@ -50,15 +50,17 @@ def cell_to_text(cell,
                 lines.extend(source)
             else:
                 options = metadata_to_rmd_options(language, metadata)
-                lines.append(u"#' ```{{{}}}".format(options))
-                lines.extend(["#' " + s for s in source])
-                lines.append("#' ```")
+                lines.append(u"## ```{{{}}}".format(options))
+                lines.extend(["## " + s for s in source])
+                lines.append("## ```")
 
             if next_cell and next_cell.cell_type == 'code':
                 lines.append('')
     else:
         if ext in ['.Rmd', '.md']:
             lines.extend(source)
+        elif ext == '.py':
+            lines.extend(["## " + s for s in source])
         else:
             lines.extend(["#' " + s for s in source])
 
@@ -71,8 +73,7 @@ def cell_to_text(cell,
 _start_code_rmd = re.compile(r"^```\{(.*)\}\s*$")
 _start_code_md = re.compile(r"^```(.*)$")
 _end_code_md = re.compile(r"^```\s*$")
-_option_code_rpy = re.compile(r"^#\+(.*)")
-_markdown_rpy = re.compile(r"^#'")
+_option_code_rpy = re.compile(r"^#\+(.*)$")
 _blank = re.compile(r"^\s*$")
 
 
@@ -88,7 +89,9 @@ def start_code(line, ext):
 def text_to_cell(lines, ext='.Rmd'):
     if start_code(lines[0], ext):
         return code_to_cell(lines, ext, True)
-    elif ext in ['.py', '.R'] and not lines[0].startswith("#'"):
+    elif ext == '.R' and not lines[0].startswith("#'"):
+        return code_to_cell(lines, ext, False)
+    elif ext == '.py' and not lines[0].startswith("##"):
         return code_to_cell(lines, ext, False)
     else:
         return markdown_to_cell(lines, ext)
@@ -143,8 +146,11 @@ def code_to_cell(lines, ext, parse_opt):
             if parse_opt and pos == 0:
                 continue
 
-            if _markdown_rpy.match(line):
-                pos -= 1
+            if (ext == '.py' and line.startswith('##')) \
+                    or (ext == '.R' and line.startswith("#'")):
+
+                lines[pos] = line[3:]
+
                 if prev_blank:
                     return new_code_cell(
                         source='\n'.join(lines[parse_opt:(pos - 1)]),
@@ -184,7 +190,8 @@ def markdown_to_cell(lines, ext):
         # Markdown stops with the end of comments
         md = []
         for pos, line in enumerate(lines):
-            if line.startswith("#' ") or line == "#'":
+            if (ext == '.py' and line.startswith("##")) \
+                    or (ext == '.R' and line.startswith("#'")):
                 md.append(line[3:])
             elif _blank.match(line):
                 return new_markdown_cell(source='\n'.join(md)), pos + 1
