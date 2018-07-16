@@ -20,9 +20,9 @@ samples = [('r',  ('R', {})),
              'echo': '{sum(a+c(1,2))>1}'}))]
 
 
-@pytest.mark.parametrize('options,metadata', samples)
-def test_parse_rmd_options(options, metadata):
-    assert rmd_options_to_metadata(options) == metadata
+@pytest.mark.parametrize('options,language_and_metadata', samples)
+def test_parse_rmd_options(options, language_and_metadata):
+    assert rmd_options_to_metadata(options) == language_and_metadata
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
