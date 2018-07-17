@@ -127,13 +127,13 @@ def code_to_cell(self, lines, parse_opt):
                 if prev_blank:
                     return new_code_cell(
                         source='\n'.join(lines[parse_opt:(pos - 1)]),
-                        metadata=metadata), pos + 1
+                        metadata=metadata), pos
                 else:
                     r = new_code_cell(
                         source='\n'.join(lines[parse_opt:pos]),
                         metadata=metadata)
                     r.metadata['noskipline'] = True
-                    return r, pos + 1
+                    return r, pos
 
             if _blank.match(line):
                 if prev_blank:

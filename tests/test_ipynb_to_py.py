@@ -22,6 +22,4 @@ def test_identity_source_write_read(nb_file):
     py = nbrmd.writes(nb1, ext='.py')
     nb2 = nbrmd.reads(py, ext='.py')
 
-    print(py)
-
     compare(remove_outputs(nb1), remove_outputs(nb2))
