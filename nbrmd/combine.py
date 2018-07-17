@@ -1,4 +1,4 @@
-from .chunk_options import _ignore_metadata
+from .cell_metadata import _ignore_metadata
 
 
 def combine_inputs_with_outputs(nb_source, nb_outputs):

@@ -23,11 +23,12 @@ The format actually supports [many languages](https://yihui
 .name/knitr/demo/engines/).
 
 R markdown is almost like plain markdown. There are only two differences:
-- R markdown has a specific syntax for active code cells, that start with
-```
-```{python}
-```
-These active cells may optionally contain cell options.
+- R markdown has a specific syntax for active code cells: language, and
+optional cell options are enclosed into a pair of curly brackets:
+
+    ```
+    ```{python}
+
 - a YAML header, that describes the notebook title, author, and desired
 output (HTML, slides, PDF...).
 

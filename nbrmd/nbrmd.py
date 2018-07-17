@@ -15,51 +15,50 @@ Authors:
 
 import os
 import io
-import re
-from enum import Enum
+from copy import copy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
-from nbformat.v4.nbbase import (
-    new_code_cell, new_markdown_cell, new_raw_cell, new_notebook
-)
+from nbformat.v4.nbbase import new_notebook
 import nbformat
-import yaml
 
-from .chunk_options import to_metadata, to_chunk_options
-
+from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
+    encoding_and_executable
+from .languages import get_default_language, find_main_language
+from .cells import start_code_rmd, start_code_rpy, cell_to_text, text_to_cell
+from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
 
 # -----------------------------------------------------------------------------
 # Code
 # -----------------------------------------------------------------------------
 
-def _language(metadata):
-    try:
-        return metadata.get('main_language') or \
-               metadata.language_info.name.lower()
-    except AttributeError:
-        return u'python'
+
+notebook_extensions = ['.ipynb', '.Rmd', '.py', '.R']
 
 
-class State(Enum):
-    NONE = 0
-    HEADER = 1
-    MARKDOWN = 2
-    CODE = 3
+def markdown_comment(ext):
+    return '' if ext == '.Rmd' else "#'" if ext == '.R' else "##"
 
 
-_header_re = re.compile(r"^---\s*")
-_end_code_re = re.compile(r"^```\s*")
+class TextNotebookReader(NotebookReader):
 
-_jupyter_languages = ['R', 'bash', 'sh', 'python', 'python2', 'python3',
-                      'javascript', 'js', 'perl']
-_jupyter_languages_re = [re.compile(r"^%%{}\s*".format(lang))
-                         for lang in _jupyter_languages]
+    def __init__(self, ext):
+        self.ext = ext
+        self.prefix = markdown_comment(ext)
+        self.start_code = start_code_rmd if ext == '.Rmd' else start_code_rpy
+        if ext == '.Rmd':
+            self.markdown_to_cell = markdown_to_cell_rmd
 
+    header_to_metadata_and_cell = header_to_metadata_and_cell
+    text_to_cell = text_to_cell
+    code_to_cell = code_to_cell
+    markdown_to_cell = markdown_to_cell
 
-class RmdReader(NotebookReader):
-
-    def __init__(self, markdown=False):
-        self.start_code_re = re.compile(r"^```(.*)\s*") if markdown \
-            else re.compile(r"^```\{(.*)\}\s*")
+    def markdown_unescape(self, line):
+        if self.prefix == '':
+            return line
+        line = line[len(self.prefix):]
+        if line.startswith(' '):
+            line = line[1:]
+        return line
 
     def reads(self, s, **kwargs):
         return self.to_notebook(s, **kwargs)
@@ -67,323 +66,125 @@ class RmdReader(NotebookReader):
     def to_notebook(self, s, **kwargs):
         lines = s.splitlines()
 
-        metadata = {}
         cells = []
-        cell_lines = []
+        metadata, header_cell, pos = \
+            self.header_to_metadata_and_cell(lines)
 
-        def add_cell(new_cell=new_markdown_cell):
-            if len(cell_lines) == 0:
-                return
+        if header_cell:
+            cells.append(header_cell)
 
-            if cell_lines[-1] == '':
-                if len(cell_lines) > 1 or len(cells) == 0:
-                    cells.append(new_cell(
-                        source=u'\n'.join(cell_lines[:-1])))
-                else:
-                    cells[-1]['metadata']['noskipline'] = True
-                    cells.append(new_cell(
-                        source=u'\n'.join(cell_lines)))
-            else:
-                cells.append(new_cell(source=u'\n'.join(cell_lines),
-                                      metadata={u'noskipline': True}))
+        if pos > 0:
+            lines = lines[pos:]
 
-        cell_metadata = {}
-        state = State.NONE
-        testblankline = False
+        while len(lines):
+            cell, pos = self.text_to_cell(lines)
+            if cell is None:
+                break
+            cells.append(cell)
+            if pos <= 0:
+                raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
+            lines = lines[pos:]
 
-        for line in lines:
-            if state is State.NONE:
-                if _header_re.match(line):
-                    state = State.HEADER
-                    continue
-                state = State.MARKDOWN
-
-            if state is State.HEADER:
-                # Unterminated header -> treat first lines as raw
-                if self.start_code_re.match(line):
-                    cell_lines = ['---'] + cell_lines
-                    add_cell(new_cell=new_raw_cell)
-                    cell_lines = []
-
-                    chunk_options = self.start_code_re.findall(line)[0]
-                    language, cell_metadata = to_metadata(chunk_options)
-                    cell_metadata['language'] = language
-                    state = State.CODE
-                    continue
-
-                if _header_re.match(line):
-                    header = []
-                    jupyter = []
-                    in_header = True
-                    for l in cell_lines:
-                        if l.rstrip() == 'jupyter:':
-                            in_header = False
-                        if in_header:
-                            header.append(l)
-                        else:
-                            jupyter.append(l)
-                    if len(header):
-                        cells.append(new_raw_cell(
-                            source=u'\n'.join(['---'] + header + ['---'])))
-                    if len(jupyter):
-                        metadata = yaml.load(u'\n'.join(jupyter))['jupyter']
-                    cell_lines = []
-                    state = State.MARKDOWN
-                    testblankline = True
-                    continue
-
-            if testblankline:
-                # Set 'noskipline' metadata if
-                # no blank line is found after cell
-                testblankline = False
-                if line == u'':
-                    continue
-                else:
-                    if len(cells):
-                        cells[-1][u'metadata'][u'noskipline'] = True
-
-            if state is State.MARKDOWN:
-                if self.start_code_re.match(line):
-                    add_cell()
-                    cell_lines = []
-
-                    chunk_options = self.start_code_re.findall(line)[0]
-                    language, cell_metadata = to_metadata(chunk_options)
-                    cell_metadata['language'] = language
-                    state = State.CODE
-                    continue
-
-            if state is State.CODE:
-                if _end_code_re.match(line):
-                    cells.append(new_code_cell(source=u'\n'.join(cell_lines),
-                                               metadata=cell_metadata))
-                    cell_lines = []
-                    cell_metadata = {}
-                    state = State.MARKDOWN
-                    testblankline = True
-                    continue
-
-            cell_lines.append(line)
-
-        # Append last cell if not empty
-        if state is State.MARKDOWN:
-            add_cell()
-        elif state is State.CODE:
-            cells.append(new_code_cell(source=u'\n'.join(cell_lines),
-                                       metadata=cell_metadata))
-        elif state is State.HEADER:
-            cell_lines = ['---'] + cell_lines
-            add_cell(new_cell=new_raw_cell)
-
-        # Determine main language
-        main_language = (metadata.get('main_language') or
-                         metadata.get('language_info', {}).get('name'))
-        if main_language is None:
-            languages = dict(python=0.5)
-            for c in cells:
-                if c['cell_type'] == 'code':
-                    language = c['metadata']['language']
-                    if language == 'r':
-                        language = 'R'
-                    languages[language] = languages.get(language, 0.0) + 1
-
-            main_language = max(languages, key=languages.get)
-
-            # save main language when not given by kernel
-            if main_language is not \
-                    metadata.get('language_info', {}).get('name'):
-                metadata['main_language'] = main_language
-
-        # Remove 'language' meta data and add a magic if not main language
-        for c in cells:
-            if c['cell_type'] == 'code':
-                language = c['metadata']['language']
-                del c['metadata']['language']
-                if language != main_language and \
-                        language in _jupyter_languages:
-                    c['source'] = u'%%{}\n'.format(language) + c['source']
+        if self.ext == '.Rmd':
+            find_main_language(metadata, cells)
 
         nb = new_notebook(cells=cells, metadata=metadata)
         return nb
 
 
-def _as_dict(metadata):
-    if isinstance(metadata, nbformat.NotebookNode):
-        return {k: _as_dict(metadata[k]) for k in metadata.keys()}
-    return metadata
+class TextNotebookWriter(NotebookWriter):
 
+    def __init__(self, ext='.Rmd'):
+        self.ext = ext
+        self.prefix = markdown_comment(ext)
 
-class RmdWriter(NotebookWriter):
+    def markdown_escape(self, lines):
+        if self.prefix == '':
+            return lines
+        return [self.prefix if line == '' else self.prefix + ' ' + line
+                for line in lines]
 
-    def __init__(self, markdown=False):
-        self.markdown = markdown
+    encoding_and_executable = encoding_and_executable
+    metadata_and_cell_to_header = metadata_and_cell_to_header
+    cell_to_text = cell_to_text
 
     def writes(self, nb):
-        default_language = _language(nb.metadata)
-        metadata = _as_dict(nb.metadata)
+        nb = copy(nb)
+        if self.ext == '.py':
+            default_language = 'python'
+        elif self.ext == '.R':
+            default_language = 'R'
+        else:
+            default_language = get_default_language(nb)
 
-        if 'main_language' in metadata:
-            # is 'main language' redundant with kernel info?
-            if metadata['main_language'] is \
-                    metadata.get('language_info', {}).get('name'):
-                del metadata['main_language']
-            # is 'main language' redundant with cell language?
-            elif metadata.get('language_info', {}).get('name') is None:
-                languages = dict(python=0.5)
-                for c in nb.cells:
-                    if c.cell_type == 'code':
-                        input = c.source.splitlines()
-                        language = default_language
-                        if len(input):
-                            for lang, pattern in zip(_jupyter_languages,
-                                                     _jupyter_languages_re):
-                                if pattern.match(input[0]):
-                                    language = lang
+        lines = self.encoding_and_executable(nb)
+        lines.extend(self.metadata_and_cell_to_header(nb))
 
-                        if language == 'r':
-                            language = 'R'
+        for i in range(len(nb.cells)):
+            cell = nb.cells[i]
+            next_cell = nb.cells[i + 1] if i + 1 < len(nb.cells) else None
+            lines.extend(self.cell_to_text(cell, next_cell,
+                                           default_language=default_language))
 
-                        languages[language] = 1 + languages.get(
-                            language, 0.0)
-
-                cell_main_language = max(languages, key=languages.get)
-                if metadata['main_language'] == cell_main_language:
-                    del metadata['main_language']
-
-        lines = []
-        header_inserted = len(metadata) == 0
-
-        for cell in nb.cells:
-            if cell.cell_type == u'raw':
-                # Is this the Rmd header?
-                # Starts and ends with '---',
-                # and can be parsed with yaml
-                if len(lines) == 0 and not header_inserted:
-                    header = cell.get(u'source', '').splitlines()
-                    if len(header) >= 2 and _header_re.match(header[0]) \
-                            and _header_re.match(header[-1]):
-                        try:
-                            header = header[1:-1]
-                            yaml.load(u'\n'.join(header))
-                            if not self.markdown:
-                                header.extend(
-                                    yaml.safe_dump(
-                                        {u'jupyter': metadata},
-                                        default_flow_style=False).splitlines())
-                            lines = [u'---'] + header + [u'---']
-                            header_inserted = True
-                        except yaml.ScannerError:
-                            pass
-                    if not header_inserted:
-                        lines.append(cell.get(u'source', ''))
-                else:
-                    lines.append(cell.get(u'source', ''))
-                if not cell.get(u'metadata', {}).get('noskipline', False):
-                    lines.append(u'')
-            elif cell.cell_type == u'markdown':
-                lines.append(cell.get(u'source', ''))
-                if not cell.get(u'metadata', {}).get('noskipline', False):
-                    lines.append(u'')
-            elif cell.cell_type == u'code':
-                input = cell.get(u'source').splitlines()
-                cell_metadata = cell.get(u'metadata', {})
-                if 'noskipline' in cell_metadata:
-                    noskipline = cell_metadata['noskipline']
-                    del cell_metadata['noskipline']
-                else:
-                    noskipline = False
-                language = None
-                if len(input):
-                    for lang, pattern in zip(_jupyter_languages,
-                                             _jupyter_languages_re):
-                        if pattern.match(input[0]):
-                            language = lang
-                            input = input[1:]
-                            break
-                if language is None:
-                    language = default_language
-                if self.markdown:
-                    lines.append(
-                        u'```' + to_chunk_options(language, cell_metadata))
-                else:
-                    lines.append(
-                        u'```{' +
-                        to_chunk_options(language, cell_metadata) + '}')
-                if input is not None:
-                    lines.extend(input)
-                lines.append(u'```')
-                if not noskipline:
-                    lines.append(u'')
-
-        if not self.markdown and not header_inserted and len(metadata):
-            header = yaml.safe_dump({u'jupyter': metadata},
-                                    default_flow_style=False).splitlines()
-            lines = [u'---'] + header + [u'---', u''] + lines
-
-        lines.append(u'')
-
-        return u'\n'.join(lines)
+        return '\n'.join(lines + [''])
 
 
-_reader = RmdReader()
-_writer = RmdWriter()
+_readers = {ext: TextNotebookReader(ext) for ext in notebook_extensions if
+            ext != '.ipynb'}
+_writers = {ext: TextNotebookWriter(ext) for ext in notebook_extensions if
+            ext != '.ipynb'}
 
-reads = _reader.reads
-read = _reader.read
-to_notebook = _reader.to_notebook
-write = _writer.write
-writes = _writer.writes
 
-_md_reader = RmdReader(markdown=True)
-_md_writer = RmdWriter(markdown=True)
+def reads(s, as_version=4, ext='.Rmd', **kwargs):
+    if ext == '.ipynb':
+        return nbformat.reads(s, as_version, **kwargs)
+    else:
+        return _readers[ext].reads(s, **kwargs)
 
-md_reads = _md_reader.reads
-md_read = _md_reader.read
-md_to_notebook = _md_reader.to_notebook
-md_write = _md_writer.write
-md_writes = _md_writer.writes
+
+def read(fp, as_version=4, ext='.Rmd', **kwargs):
+    if ext == '.ipynb':
+        return nbformat.read(fp, as_version, **kwargs)
+    else:
+        return _readers[ext].read(fp, **kwargs)
+
+
+def writes(s, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+    if ext == '.ipynb':
+        return nbformat.writes(s, version, **kwargs)
+    else:
+        return _writers[ext].writes(s)
+
+
+def write(np, fp, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+    if ext == '.ipynb':
+        return nbformat.write(np, fp, version, **kwargs)
+    else:
+        return _writers[ext].write(np, fp)
 
 
 def readf(nb_file):
-    """
-    Load the notebook from the desired file
-    :param nb_file: file with .ipynb or .Rmd extension
-    :return: the notebook
-    """
+    """Load the notebook from the desired file"""
     file, ext = os.path.splitext(nb_file)
+    if ext not in notebook_extensions:
+        raise TypeError(
+            'File {} is not a notebook. '
+            'Expected extensions are {}'.format(nb_file,
+                                                notebook_extensions))
     with io.open(nb_file, encoding='utf-8') as fp:
-        if ext == '.Rmd':
-            return read(fp)
-        elif ext == '.md':
-            return md_read(fp)
-        elif ext == '.ipynb':
-            return nbformat.read(fp, as_version=4)
-        else:
-            raise TypeError(
-                'File {} has incorrect extension (.Rmd or .md or '
-                '.ipynb expected)'.format(nb_file))
+        return read(fp, as_version=4, ext=ext)
 
 
 def writef(nb, nb_file):
-    """
-    Save the notebook in the desired file
-    :param nb: notebook
-    :param nb_file: file with .ipynb or .Rmd extension
-    :return:
-    """
-
+    """Save the notebook in the desired file"""
     file, ext = os.path.splitext(nb_file)
+    if ext not in notebook_extensions:
+        raise TypeError(
+            'File {} is not a notebook. '
+            'Expected extensions are {}'.format(nb_file,
+                                                notebook_extensions))
     with io.open(nb_file, 'w', encoding='utf-8') as fp:
-        if ext == '.Rmd':
-            write(nb, fp)
-        elif ext == '.md':
-            md_write(nb, fp)
-        elif ext == '.ipynb':
-            nbformat.write(nb, fp)
-        else:
-            raise TypeError(
-                'File {} has incorrect extension (.Rmd or .md or '
-                '.ipynb expected)'.format(nb_file))
+        write(nb, fp, version=nbformat.NO_CONVERT, ext=ext)
 
 
 def readme():

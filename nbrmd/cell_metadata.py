@@ -9,6 +9,7 @@ https://github.com/jupyter/notebook/issues/3700
 """
 
 import ast
+import json
 
 _boolean_options_dictionary = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
@@ -36,7 +37,7 @@ def _py_logical_values(rbool):
     raise RLogicalValueError
 
 
-def to_chunk_options(language, metadata):
+def metadata_to_rmd_options(language, metadata):
     options = language.lower()
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
@@ -60,7 +61,7 @@ def to_chunk_options(language, metadata):
                     ', '.join(['"{}"'.format(str(v)) for v in co_value])))
         else:
             options += ' {}={},'.format(co_name, str(co_value))
-    return options.strip(',')
+    return options.strip(',').strip()
 
 
 def update_metadata_using_dictionary(name, value, metadata):
@@ -141,7 +142,7 @@ def parse_rmd_options(line):
                     if len(result) and name is '':
                         raise RMarkdownOptionParsingError(
                             'Option line "{}" has no name for '
-                            'option value {}' .format(line, value))
+                            'option value {}'.format(line, value))
                     result.append((name.strip(), value.strip()))
                     name = ''
                     value = ''
@@ -166,7 +167,7 @@ def parse_rmd_options(line):
     return result
 
 
-def to_metadata(options):
+def rmd_options_to_metadata(options):
     options = options.split(' ', 1)
     if len(options) == 1:
         language = options[0]
@@ -207,3 +208,15 @@ def to_metadata(options):
             continue
 
     return language, metadata
+
+
+def json_options_to_metadata(options):
+    try:
+        return json.loads(options)
+    except ValueError:
+        return {}
+
+
+def metadata_to_json_options(metadata):
+    return json.dumps({k: metadata[k] for k in metadata
+                       if k not in _ignore_metadata})

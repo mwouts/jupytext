@@ -2,6 +2,7 @@ import nbrmd
 import pytest
 import sys
 from .utils import list_all_notebooks
+from testfixtures import compare
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
@@ -20,4 +21,20 @@ def test_identity_write_read(nb_file):
     nb = nbrmd.reads(rmd)
     rmd2 = nbrmd.writes(nb)
 
-    assert rmd == rmd2
+    compare(rmd, rmd2)
+
+
+def test_two_blank_lines_as_cell_separator():
+    rmd = """Some markdown
+text
+
+
+And a new cell
+"""
+
+    nb = nbrmd.reads(rmd)
+    assert len(nb.cells) == 2
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[1].cell_type == 'markdown'
+    assert nb.cells[0].source == 'Some markdown\ntext'
+    assert nb.cells[1].source == 'And a new cell'
