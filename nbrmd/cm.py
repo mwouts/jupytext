@@ -106,18 +106,17 @@ class RmdFileContentsManager(FileContentsManager):
         if not load_alternative_format:
             return nb
 
-
         # Notebook formats: default, notebook metadata, or current extension
-        nbrmd_formats = nb.metadata.get('nbrmd_formats') or \
-                        self.default_nbrmd_formats
+        nbrmd_formats = (nb.metadata.get('nbrmd_formats') or
+                         self.default_nbrmd_formats)
 
         if ext not in nbrmd_formats:
             nbrmd_formats.append(ext)
 
         # Source format is taken in metadata, contentsmanager, or is current
         # ext, or is first non .ipynb format that is found on disk
-        source_format = nb.metadata.get('nbrmd_sourceonly_format') or \
-                        self.default_nbrmd_sourceonly_format
+        source_format = (nb.metadata.get('nbrmd_sourceonly_format') or
+                         self.default_nbrmd_sourceonly_format)
 
         if source_format is None:
             if ext != '.ipynb':
@@ -130,7 +129,7 @@ class RmdFileContentsManager(FileContentsManager):
 
         nb_outputs = None
         if source_format is not None and ext != source_format:
-            self.log.info('Reading source from {} and outputs from {}' \
+            self.log.info('Reading source from {} and outputs from {}'
                           .format(file + source_format, os_path))
             nb_outputs = nb
             nb = self._read_notebook(file + source_format,
@@ -138,7 +137,7 @@ class RmdFileContentsManager(FileContentsManager):
                                      load_alternative_format=False)
         elif ext != '.ipynb' and '.ipynb' in nbrmd_formats \
                 and os.path.isfile(file + '.ipynb'):
-            self.log.info('Reading source from {} and outputs from {}' \
+            self.log.info('Reading source from {} and outputs from {}'
                           .format(os_path, file + '.ipynb'))
             nb_outputs = self._read_notebook(file + '.ipynb',
                                              as_version=as_version,
@@ -155,7 +154,7 @@ class RmdFileContentsManager(FileContentsManager):
 
         if trusted:
             self.notary.sign(nb)
-            
+
         return nb
 
     def _save_notebook(self, os_path, nb):

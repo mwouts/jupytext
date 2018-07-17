@@ -11,8 +11,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/mwouts/nbrmd',
     packages=find_packages(),
-    entry_points={'console_scripts':
-                      ['nbrmd = nbrmd.cli:main'],
+    entry_points={'console_scripts': ['nbrmd = nbrmd.cli:main'],
                   'nbconvert.exporters':
                       ['rmarkdown = nbrmd:RMarkdownExporter']},
     tests_require=['pytest', 'testfixtures'],
