@@ -79,3 +79,12 @@ def f(x):
     nb = nbrmd.reads(py, ext='.py')
     py2 = nbrmd.writes(nb, ext='.py')
     compare(py, py2)
+
+
+def test_read_write_script(py="""#!/usr/bin/env python
+# coding=utf-8
+print('Hello world')
+"""):
+    nb = nbrmd.reads(py, ext='.py')
+    py2 = nbrmd.writes(nb, ext='.py')
+    compare(py, py2)
