@@ -10,53 +10,6 @@ import mock
 from . import combine
 
 
-def update_alternative_formats(model, path, contents_manager=None, **kwargs):
-    """
-    A pre-save hook for jupyter that saves the notebooks
-    under the alternative form. Target extensions are taken from
-    notebook metadata 'nbrmd_formats', or when not available,
-    from  contents_manager.default_nbrmd_formats
-    :param model: data model, that may contain the notebook
-    :param path: full name for ipython notebook
-    :param contents_manager: ContentsManager instance
-    :param kwargs: not used
-    :return:
-    """
-
-    # only run on notebooks
-    if model['type'] != 'notebook':
-        return
-
-    # only run on nbformat v4
-    nb = model['content']
-    if nb['nbformat'] != 4:
-        return
-
-    if isinstance(contents_manager, RmdFileContentsManager):
-        formats = contents_manager.default_nbrmd_formats
-    else:
-        formats = ['.ipynb']
-
-    formats = nb.get('metadata', {}).get('nbrmd_formats', formats)
-
-    if not isinstance(formats, list) or not set(formats).issubset(
-            ['.Rmd', '.md', '.ipynb']):
-        raise TypeError(u"Notebook metadata 'nbrmd_formats' "
-                        u"should be subset of ['.Rmd', '.md', '.ipynb']")
-
-    os_path = contents_manager._get_os_path(path) if contents_manager else path
-    file, ext = os.path.splitext(path)
-    os_file, ext = os.path.splitext(os_path)
-
-    for alt_ext in formats:
-        if ext != alt_ext:
-            if contents_manager:
-                contents_manager.log.info(
-                    u"Saving file at /%s", file + alt_ext)
-            nbrmd.writef(nbformat.notebooknode.from_dict(nb),
-                         os_file + alt_ext)
-
-
 def _nbrmd_writes(ext):
     def _writes(nb, version=nbformat.NO_CONVERT, **kwargs):
         return nbrmd.writes(nb, version=version, ext=ext, **kwargs)
@@ -71,11 +24,19 @@ def _nbrmd_reads(ext):
     return _reads
 
 
+def check_formats(formats):
+    allowed = nbrmd.notebook_extensions
+    if not isinstance(formats, list) or not set(formats).issubset(allowed):
+        raise TypeError(u"Notebook metadata 'nbrmd_formats' "
+                        u"should be subset of {}".format(str(allowed)))
+    return formats
+
+
 class RmdFileContentsManager(FileContentsManager):
     """
     A FileContentsManager Class that reads and stores notebooks to classical
-    Jupyter notebooks (.ipynb), or in R Markdown (.Rmd), plain markdown
-    (.md), R scripts (.R) or python scripts (.py)
+    Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd),
+    R scripts (.R) and python scripts (.py)
     """
 
     nb_extensions = [ext for ext in nbrmd.notebook_extensions if
@@ -86,10 +47,6 @@ class RmdFileContentsManager(FileContentsManager):
 
     default_nbrmd_formats = ['.ipynb']
     default_nbrmd_sourceonly_format = None
-
-    def __init__(self, **kwargs):
-        self.pre_save_hook = update_alternative_formats
-        super(RmdFileContentsManager, self).__init__(**kwargs)
 
     def _read_notebook(self, os_path, as_version=4,
                        load_alternative_format=True):
@@ -112,6 +69,8 @@ class RmdFileContentsManager(FileContentsManager):
 
         if ext not in nbrmd_formats:
             nbrmd_formats.append(ext)
+
+        nbrmd_formats = check_formats(nbrmd_formats)
 
         # Source format is taken in metadata, contentsmanager, or is current
         # ext, or is first non .ipynb format that is found on disk
@@ -159,14 +118,26 @@ class RmdFileContentsManager(FileContentsManager):
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
-        file, ext = os.path.splitext(os_path)
-        if ext in self.nb_extensions:
-            with mock.patch('nbformat.writes', _nbrmd_writes(ext)):
-                return super(RmdFileContentsManager, self) \
-                    ._save_notebook(os_path, nb)
-        else:
-            return super(RmdFileContentsManager, self) \
-                ._save_notebook(os_path, nb)
+        os_file, org_ext = os.path.splitext(os_path)
+
+        formats = (nb.get('metadata', {}).get('nbrmd_formats') or
+                   self.default_nbrmd_formats)
+
+        if org_ext not in formats:
+            formats.append(org_ext)
+
+        formats = check_formats(formats)
+
+        for ext in formats:
+            os_path_ext = os_file + ext
+            self.log.debug("Saving %s", os_path_ext)
+            if ext in self.nb_extensions:
+                with mock.patch('nbformat.writes', _nbrmd_writes(ext)):
+                    super(RmdFileContentsManager, self) \
+                        ._save_notebook(os_path_ext, nb)
+            else:
+                super(RmdFileContentsManager, self) \
+                    ._save_notebook(os_path_ext, nb)
 
     def get(self, path, content=True, type=None, format=None):
         """ Takes a path for an entity and returns its model"""

@@ -17,6 +17,6 @@ except ImportError as e:
     RMarkdownExporter = str(e)
 
 try:
-    from .cm import RmdFileContentsManager
+    from .contentsmanager import RmdFileContentsManager
 except ImportError as e:
     RmdFileContentsManager = str(e)

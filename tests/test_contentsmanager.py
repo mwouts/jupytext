@@ -20,7 +20,6 @@ def test_create_contentsmanager():
 def test_load_save_rename(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_rmd = 'notebook.Rmd'
-    tmp_md = 'notebook.md'
 
     cm = RmdFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -31,21 +30,13 @@ def test_load_save_rename(nb_file, tmpdir):
     nb_rmd = cm.get(tmp_rmd)
     assert remove_outputs(nb) == remove_outputs(nb_rmd['content'])
 
-    # save md, reopen
-    cm.save(model=dict(type='notebook', content=nb), path=tmp_md)
-    nb_md = cm.get(tmp_md)
-    assert (remove_outputs_and_header(nb) ==
-            remove_outputs_and_header(nb_md['content']))
-
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # rename ipynb
     cm.rename(tmp_ipynb, 'new.ipynb')
     assert not os.path.isfile(str(tmpdir.join(tmp_ipynb)))
-    assert not os.path.isfile(str(tmpdir.join(tmp_md)))
     assert not os.path.isfile(str(tmpdir.join(tmp_rmd)))
 
     assert os.path.isfile(str(tmpdir.join('new.ipynb')))
-    assert os.path.isfile(str(tmpdir.join('new.md')))
     assert os.path.isfile(str(tmpdir.join('new.Rmd')))

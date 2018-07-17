@@ -1,6 +1,7 @@
 import nbrmd
 import pytest
 import os
+import shutil
 
 
 @pytest.fixture()
@@ -9,5 +10,7 @@ def readme():
                         '..', 'README.md')
 
 
-def test_open_readme(readme):
-    nb = nbrmd.readf(readme)
+def test_open_readme(readme, tmpdir):
+    rmd_file = str(tmpdir.join('README.Rmd'))
+    shutil.copyfile(readme, rmd_file)
+    nb = nbrmd.readf(rmd_file)

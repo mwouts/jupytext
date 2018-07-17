@@ -29,14 +29,14 @@ from .cells import cell_to_text, text_to_cell
 # -----------------------------------------------------------------------------
 
 
-notebook_extensions = ['.ipynb', '.Rmd', '.md', '.py', '.R']
+notebook_extensions = ['.ipynb', '.Rmd', '.py', '.R']
 
 
 class RmdReader(NotebookReader):
 
     def __init__(self, ext):
         self.ext = ext
-        self.comment = '' if ext in ['.Rmd', '.md'] else "## " \
+        self.comment = '' if ext == '.Rmd' else "## " \
             if ext == '.py' else "#' "
 
     def reads(self, s, **kwargs):
@@ -64,7 +64,7 @@ class RmdReader(NotebookReader):
                 raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
             lines = lines[pos:]
 
-        if self.ext in ['.Rmd', '.md']:
+        if self.ext == '.Rmd':
             find_main_language(metadata, cells)
 
         nb = new_notebook(cells=cells, metadata=metadata)
@@ -75,7 +75,7 @@ class RmdWriter(NotebookWriter):
 
     def __init__(self, ext='.Rmd'):
         self.ext = ext
-        self.prefix = '' if ext in ['.Rmd', '.md'] else\
+        self.prefix = '' if ext == '.Rmd' else\
             "#' " if ext == '.R' else "## "
 
     def writes(self, nb):

@@ -19,7 +19,7 @@ def cell_to_text(cell,
 
     lines = []
     if cell.cell_type == 'code':
-        if ext in ['.Rmd', '.md']:
+        if ext == '.Rmd':
             language = cell_language(source) or default_language
             options = metadata_to_rmd_options(language, metadata)
             if ext == '.Rmd':
@@ -57,7 +57,7 @@ def cell_to_text(cell,
             if next_cell and next_cell.cell_type == 'code':
                 lines.append('')
     else:
-        if ext in ['.Rmd', '.md']:
+        if ext == '.Rmd':
             lines.extend(source)
         elif ext == '.py':
             lines.extend(["## " + s for s in source])
@@ -80,8 +80,6 @@ _blank = re.compile(r"^\s*$")
 def start_code(line, ext):
     if ext == '.Rmd':
         return _start_code_rmd.match(line)
-    elif ext == '.md':
-        return _start_code_md.match(line)
     else:  # .R or .py
         return _option_code_rpy.match(line)
 
@@ -100,8 +98,6 @@ def text_to_cell(lines, ext='.Rmd'):
 def parse_code_options(line, ext):
     if ext == '.Rmd':
         return rmd_options_to_metadata(_start_code_rmd.findall(line)[0])
-    elif ext == '.md':
-        return rmd_options_to_metadata(_start_code_md.findall(line)[0])
     else:
         if ext == '.R':
             if _option_code_rpy.match(line):
@@ -126,7 +122,7 @@ def code_to_cell(lines, ext, parse_opt):
         metadata = {}
 
     # Find end of cell and return
-    if ext in ['.Rmd', '.md']:
+    if ext == '.Rmd':
         for pos, line in enumerate(lines):
             if pos > 0 and _end_code_md.match(line):
                 if pos + 1 < len(lines) and _blank.match(lines[pos + 1]):
