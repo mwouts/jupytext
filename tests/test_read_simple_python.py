@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import nbrmd
 from testfixtures import compare
 

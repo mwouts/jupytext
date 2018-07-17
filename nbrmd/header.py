@@ -30,7 +30,7 @@ def encoding_and_executable(self, nb):
         for cell in nb.cells:
             try:
                 cell.source.encode('ascii')
-            except UnicodeEncodeError:
+            except UnicodeDecodeError:
                 lines.append(_utf8_header)
                 break
 
@@ -100,7 +100,7 @@ def header_to_metadata_and_cell(self, lines):
             if i == 0 or (i == 1 and not _encoding_re.match(lines[0])):
                 encoding = _encoding_re.match(line)
                 if encoding:
-                    if encoding[1] != 'utf-8':
+                    if encoding.group(1) != 'utf-8':
                         raise ValueError('Encodings other than utf-8 '
                                          'are not supported')
                     if line != _utf8_header:
