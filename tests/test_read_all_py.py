@@ -12,4 +12,4 @@ def test_identity_source_write_read(py_file):
     nb = nbrmd.reads(py, ext='.py')
     py2 = nbrmd.writes(nb, ext='.py')
 
-    compare(py, py2[:-1])
+    compare(py, py2)

@@ -17,7 +17,6 @@ def f(x):
 
 def h(y):
     return y-1
-
 """):
     nb = nbrmd.reads(py, ext='.py')
     assert len(nb.cells) == 4
@@ -32,6 +31,9 @@ def h(y):
     assert nb.cells[3].cell_type == 'code'
     compare(nb.cells[3].source, '''def h(y):
     return y-1''')
+
+    py2 = nbrmd.writes(nb, ext='.py')
+    compare(py, py2)
 
 
 def test_read_less_simple_file(py="""## ---

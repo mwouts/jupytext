@@ -61,7 +61,7 @@ def test_text_to_code_cell_empty_code_no_blank_line():
 
     assert cell.cell_type == 'code'
     assert cell.source == ''
-    assert cell.metadata == {'language': 'python', 'noskipline': True}
+    assert cell.metadata == {'language': 'python'}
     assert lines[pos:] == []
 
 
@@ -72,7 +72,6 @@ a markdown cell
 ```{python}
 1+2+3
 ```
-
 """
     lines = text.splitlines()
     cell, pos = reader().text_to_cell(lines)
@@ -89,7 +88,6 @@ a markdown cell
 ```{python}
 1+2+3
 ```
-
 """
     lines = text.splitlines()
     cell, pos = reader().text_to_cell(lines)
@@ -106,7 +104,6 @@ def test_text_to_markdown_two_blank_line():
 ```{python}
 1+2+3
 ```
-
 """
     lines = text.splitlines()
     cell, pos = reader().text_to_cell(lines)
@@ -122,7 +119,6 @@ def test_text_to_markdown_one_blank_line():
 ```{python}
 1+2+3
 ```
-
 """
     lines = text.splitlines()
     cell, pos = reader().text_to_cell(lines)
@@ -136,7 +132,7 @@ def test_text_to_markdown_one_blank_line():
 def test_empty_markdown_to_text():
     cell = new_markdown_cell(source='')
     text = writer().cell_to_text(cell, None, default_language='python')
-    assert text == ['', '']
+    assert text == ['']
 
 
 def test_text_to_cell_py():

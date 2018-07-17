@@ -59,7 +59,7 @@ def cell_to_text(self,
                 and next_cell.cell_type == 'markdown':
             lines.append('')
 
-    if skipline:
+    if skipline and next_cell:
         lines.append('')
 
     return lines
@@ -113,7 +113,7 @@ def code_to_cell(self, lines, parse_opt):
     if self.ext == '.Rmd':
         for pos, line in enumerate(lines):
             if pos > 0 and _end_code_md.match(line):
-                if pos + 1 < len(lines) and _blank.match(lines[pos + 1]):
+                if pos + 1 == len(lines) or _blank.match(lines[pos + 1]):
                     return new_code_cell(
                         source='\n'.join(lines[1:pos]), metadata=metadata), \
                            pos + 2
@@ -123,7 +123,6 @@ def code_to_cell(self, lines, parse_opt):
                         metadata=metadata)
                     r.metadata['noskipline'] = True
                     return r, pos + 1
-            prev_blank = _blank.match(line)
     else:
         prev_blank = False
         for pos, line in enumerate(lines):
@@ -144,23 +143,18 @@ def code_to_cell(self, lines, parse_opt):
 
             if _blank.match(line):
                 if prev_blank:
+                    # Two blank lines at the end == empty code cell
                     return new_code_cell(
                         source='\n'.join(lines[parse_opt:(pos - 1)]),
-                        metadata=metadata), pos + 1
+                        metadata=metadata), min(pos + 1, len(lines) - 1)
                 prev_blank = True
             else:
                 prev_blank = False
 
     # Unterminated cell?
-    if prev_blank:
-        r = new_code_cell(
-            source='\n'.join(lines[parse_opt:-1]),
-            metadata=metadata)
-    else:
-        r = new_code_cell(
-            source='\n'.join(lines[parse_opt:]),
-            metadata=metadata)
-    return r, len(lines)
+    return new_code_cell(
+        source='\n'.join(lines[parse_opt:]),
+        metadata=metadata), len(lines)
 
 
 def markdown_to_cell(self, lines):
@@ -176,10 +170,8 @@ def markdown_to_cell(self, lines):
             r.metadata['noskipline'] = True
             return r, pos
 
-    # still here=> unterminated markdown
-    r = new_markdown_cell(source='\n'.join(md))
-    r.metadata['noskipline'] = True
-    return r, pos + 1
+    # still here => unterminated markdown
+    return new_markdown_cell(source='\n'.join(md)), len(lines)
 
 
 def markdown_to_cell_rmd(lines):
@@ -202,9 +194,4 @@ def markdown_to_cell_rmd(lines):
         prev_blank = _blank.match(line)
 
     # Unterminated cell?
-    if prev_blank:
-        return new_markdown_cell(source='\n'.join(lines[:-1])), len(lines)
-    else:
-        r = new_markdown_cell(source='\n'.join(lines))
-        r.metadata['noskipline'] = True
-        return r, len(lines)
+    return new_markdown_cell(source='\n'.join(lines)), len(lines)
