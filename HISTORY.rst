@@ -6,6 +6,14 @@ Release History
 dev
 +++
 
+
+0.3.0 (2018-07-17)
++++++++++++++++++++
+
+**Improvements**
+
+- Introducing support for notebooks as python `.py` or R scripts `.R`
+
 0.2.6 (2018-07-13)
 +++++++++++++++++++
 
