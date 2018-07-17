@@ -22,7 +22,8 @@ import nbformat
 
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header
 from .languages import get_default_language, find_main_language
-from .cells import cell_to_text, text_to_cell
+from .cells import start_code_rmd, start_code_rpy, cell_to_text, text_to_cell
+from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
 
 # -----------------------------------------------------------------------------
 # Code
@@ -32,12 +33,31 @@ from .cells import cell_to_text, text_to_cell
 notebook_extensions = ['.ipynb', '.Rmd', '.py', '.R']
 
 
-class RmdReader(NotebookReader):
+def markdown_comment(ext):
+    return '' if ext == '.Rmd' else "#'" if ext == '.R' else "##"
+
+
+class TextNotebookReader(NotebookReader):
 
     def __init__(self, ext):
         self.ext = ext
-        self.comment = '' if ext == '.Rmd' else "## " \
-            if ext == '.py' else "#' "
+        self.prefix = markdown_comment(ext)
+        self.start_code = start_code_rmd if ext == '.Rmd' else start_code_rpy
+        if ext=='.Rmd':
+            self.markdown_to_cell = markdown_to_cell_rmd
+
+    header_to_metadata_and_cell = header_to_metadata_and_cell
+    text_to_cell = text_to_cell
+    code_to_cell = code_to_cell
+    markdown_to_cell = markdown_to_cell
+
+    def markdown_unescape(self, line):
+        if self.prefix == '':
+            return line
+        line = line[len(self.prefix):]
+        if line.startswith(' '):
+            line = line[1:]
+        return line
 
     def reads(self, s, **kwargs):
         return self.to_notebook(s, **kwargs)
@@ -47,7 +67,7 @@ class RmdReader(NotebookReader):
 
         cells = []
         metadata, header_cell, pos = \
-            header_to_metadata_and_cell(lines, self.comment)
+            self.header_to_metadata_and_cell(lines)
 
         if header_cell:
             cells.append(header_cell)
@@ -56,7 +76,7 @@ class RmdReader(NotebookReader):
             lines = lines[pos:]
 
         while len(lines):
-            cell, pos = text_to_cell(lines, self.ext)
+            cell, pos = self.text_to_cell(lines)
             if cell is None:
                 break
             cells.append(cell)
@@ -71,12 +91,20 @@ class RmdReader(NotebookReader):
         return nb
 
 
-class RmdWriter(NotebookWriter):
+class TextNotebookWriter(NotebookWriter):
 
     def __init__(self, ext='.Rmd'):
         self.ext = ext
-        self.prefix = '' if ext == '.Rmd' else\
-            "#' " if ext == '.R' else "## "
+        self.prefix = markdown_comment(ext)
+
+    def markdown_escape(self, lines):
+        if self.prefix == '':
+            return lines
+        return [self.prefix if l == '' else self.prefix + ' ' + l
+                for l in lines]
+
+    metadata_and_cell_to_header = metadata_and_cell_to_header
+    cell_to_text = cell_to_text
 
     def writes(self, nb):
         nb = copy(nb)
@@ -87,22 +115,21 @@ class RmdWriter(NotebookWriter):
         else:
             default_language = get_default_language(nb)
 
-        lines = metadata_and_cell_to_header(nb, self.prefix)
+        lines = self.metadata_and_cell_to_header(nb)
 
         for i in range(len(nb.cells)):
             cell = nb.cells[i]
             next_cell = nb.cells[i + 1] if i + 1 < len(nb.cells) else None
             lines.extend(
-                cell_to_text(cell, next_cell,
-                             default_language=default_language,
-                             ext=self.ext))
+                self.cell_to_text(cell, next_cell,
+                             default_language=default_language))
 
         return '\n'.join(lines + [''])
 
 
-_readers = {ext: RmdReader(ext) for ext in notebook_extensions if
+_readers = {ext: TextNotebookReader(ext) for ext in notebook_extensions if
             ext != '.ipynb'}
-_writers = {ext: RmdWriter(ext) for ext in notebook_extensions if
+_writers = {ext: TextNotebookWriter(ext) for ext in notebook_extensions if
             ext != '.ipynb'}
 
 
