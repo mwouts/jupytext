@@ -17,7 +17,7 @@ def _as_dict(metadata):
 
 def encoding_and_executable(self, nb):
     lines = []
-    metadata = _as_dict(nb.get('metadata', {}))
+    metadata = nb.get('metadata', {})
 
     if self.ext != '.Rmd' and 'executable' in metadata:
         lines.append('#!' + metadata['executable'])
@@ -30,7 +30,7 @@ def encoding_and_executable(self, nb):
         for cell in nb.cells:
             try:
                 cell.source.encode('ascii')
-            except UnicodeDecodeError:
+            except (UnicodeEncodeError, UnicodeDecodeError):
                 lines.append(_utf8_header)
                 break
 
@@ -93,7 +93,7 @@ def header_to_metadata_and_cell(self, lines):
 
     for i, line in enumerate(lines):
         if not line.startswith(self.prefix):
-            if i == 0 and line.startswith('"!'):
+            if i == 0 and line.startswith('#!'):
                 metadata['executable'] = line[2:]
                 start = i + 1
                 continue
@@ -154,4 +154,4 @@ def header_to_metadata_and_cell(self, lines):
 
         return metadata, cell, i + 1
 
-    return {}, None, start
+    return metadata, None, start

@@ -92,20 +92,19 @@ def text_to_cell(self, lines):
 def parse_code_options(line, ext):
     if ext == '.Rmd':
         return rmd_options_to_metadata(_start_code_rmd.findall(line)[0])
-    else:
-        language = 'R' if ext == '.R' else 'python'
-        if _option_code_rpy.match(line):
-            return language, rmd_options_to_metadata(
-                _option_code_rpy.findall(line)[0])
-        else:
-            return language, {}
+    elif ext == '.R':
+        return rmd_options_to_metadata(_option_code_rpy.findall(line)[0])
+    else:  # .py
+        return 'python', json_options_to_metadata(_option_code_rpy.findall(
+            line)[0])
 
 
 def code_to_cell(self, lines, parse_opt):
     # Parse options
     if parse_opt:
         language, metadata = parse_code_options(lines[0], self.ext)
-        metadata['language'] = language
+        if self.ext == '.Rmd':
+            metadata['language'] = language
     else:
         metadata = {}
 
