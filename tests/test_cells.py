@@ -136,7 +136,7 @@ def test_text_to_markdown_one_blank_line():
 def test_empty_markdown_to_text():
     cell = new_markdown_cell(source='')
     text = writer().cell_to_text(cell, None, default_language='python')
-    assert text == ['']
+    assert text == ['', '']
 
 
 def test_text_to_cell_py():

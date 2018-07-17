@@ -50,7 +50,14 @@ def cell_to_text(self,
             if next_cell and next_cell.cell_type == 'code':
                 lines.append('')
     else:
+        if source == []:
+            source = ['']
         lines.extend(self.markdown_escape(source))
+
+        # Two blank lines between consecutive markdown cells
+        if self.ext == '.Rmd' and next_cell \
+                and next_cell.cell_type == 'markdown':
+            lines.append('')
 
     if skipline:
         lines.append('')
@@ -188,6 +195,10 @@ def markdown_to_cell_rmd(lines):
                     source='\n'.join(lines[:pos]))
                 r.metadata['noskipline'] = True
                 return r, pos
+
+        if _blank.match(line) and prev_blank:
+            return new_markdown_cell(
+                source='\n'.join(lines[:(pos - 1)])), pos + 1
         prev_blank = _blank.match(line)
 
     # Unterminated cell?

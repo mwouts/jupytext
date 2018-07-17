@@ -43,7 +43,7 @@ class TextNotebookReader(NotebookReader):
         self.ext = ext
         self.prefix = markdown_comment(ext)
         self.start_code = start_code_rmd if ext == '.Rmd' else start_code_rpy
-        if ext=='.Rmd':
+        if ext == '.Rmd':
             self.markdown_to_cell = markdown_to_cell_rmd
 
     header_to_metadata_and_cell = header_to_metadata_and_cell
@@ -100,8 +100,8 @@ class TextNotebookWriter(NotebookWriter):
     def markdown_escape(self, lines):
         if self.prefix == '':
             return lines
-        return [self.prefix if l == '' else self.prefix + ' ' + l
-                for l in lines]
+        return [self.prefix if line == '' else self.prefix + ' ' + line
+                for line in lines]
 
     metadata_and_cell_to_header = metadata_and_cell_to_header
     cell_to_text = cell_to_text
@@ -120,9 +120,8 @@ class TextNotebookWriter(NotebookWriter):
         for i in range(len(nb.cells)):
             cell = nb.cells[i]
             next_cell = nb.cells[i + 1] if i + 1 < len(nb.cells) else None
-            lines.extend(
-                self.cell_to_text(cell, next_cell,
-                             default_language=default_language))
+            lines.extend(self.cell_to_text(cell, next_cell,
+                                           default_language=default_language))
 
         return '\n'.join(lines + [''])
 
