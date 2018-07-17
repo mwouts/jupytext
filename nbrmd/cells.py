@@ -112,7 +112,9 @@ def code_to_cell(self, lines, parse_opt):
     if self.ext == '.Rmd':
         for pos, line in enumerate(lines):
             if pos > 0 and _end_code_md.match(line):
-                if pos + 1 == len(lines) or _blank.match(lines[pos + 1]):
+                next_line_blank = pos + 1 == len(lines) or \
+                                  _blank.match(lines[pos + 1])
+                if next_line_blank and pos + 2 != len(lines):
                     return new_code_cell(
                         source='\n'.join(lines[1:pos]), metadata=metadata), \
                            pos + 2

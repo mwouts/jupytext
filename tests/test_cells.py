@@ -18,16 +18,10 @@ def writer():
     return TextNotebookWriter(ext='.Rmd')
 
 
-@pytest.fixture
-def py_writer():
-    return TextNotebookWriter(ext='.py')
-
-
 def test_text_to_code_cell():
     text = """```{python}
 1+2+3
 ```
-
 """
     lines = text.splitlines()
     cell, pos = reader().text_to_cell(lines)
@@ -41,7 +35,6 @@ def test_text_to_code_cell():
 def test_text_to_code_cell_empty_code():
     text = """```{python}
 ```
-
 """
     lines = text.splitlines()
     cell, pos = reader().text_to_cell(lines)
