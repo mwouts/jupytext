@@ -85,7 +85,7 @@ jupyter:
     assert nb.cells == []
 
 
-def test_metadata_and_cell_to_header():
+def test_metadata_and_cell_to_header2():
     nb = new_notebook(cells=[new_markdown_cell(source="Some markdown\ntext")])
     header = writer().metadata_and_cell_to_header(nb)
     assert header == []

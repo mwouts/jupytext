@@ -64,3 +64,14 @@ def h(y):
     assert nb.cells[3].cell_type == 'code'
     compare(nb.cells[3].source,
             '''# And a comment on h\ndef h(y):\n    return y-1''')
+
+
+def test_no_space_after_code(py="""# -*- coding: utf-8 -*-
+## Markdown cell
+def f(x):
+    return x+1
+## And a new cell, and non ascii contênt
+"""):
+    nb = nbrmd.reads(py, ext='.py')
+    py2 = nbrmd.writes(nb, ext='.py')
+    compare(py, py2)

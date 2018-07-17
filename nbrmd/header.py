@@ -15,6 +15,28 @@ def _as_dict(metadata):
     return metadata
 
 
+def encoding_and_executable(self, nb):
+    lines = []
+    metadata = _as_dict(nb.get('metadata', {}))
+
+    if self.ext != '.Rmd' and 'executable' in metadata:
+        lines.append('#!' + metadata['executable'])
+        del metadata['executable']
+
+    if 'encoding' in metadata:
+        lines.append(metadata['encoding'])
+        del metadata['encoding']
+    elif self.ext == '.py':
+        for cell in nb.cells:
+            try:
+                cell.source.encode('ascii')
+            except UnicodeEncodeError:
+                lines.append(_utf8_header)
+                break
+
+    return lines
+
+
 def metadata_and_cell_to_header(self, nb):
     '''
     Return the text header corresponding to a notebook, and remove the
@@ -52,6 +74,11 @@ def metadata_and_cell_to_header(self, nb):
     return header
 
 
+# https://www.python.org/dev/peps/pep-0263/
+_encoding_re = re.compile('^[ \t\f]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)')
+_utf8_header = '# -*- coding: utf-8 -*-'
+
+
 def header_to_metadata_and_cell(self, lines):
     '''
     Return the metadata, first cell of notebook, and next loc in text
@@ -61,20 +88,36 @@ def header_to_metadata_and_cell(self, lines):
     jupyter = []
     injupyter = False
     ended = False
+    metadata = {}
+    start = 0
 
     for i, line in enumerate(lines):
         if not line.startswith(self.prefix):
+            if i == 0 and line.startswith('"!'):
+                metadata['executable'] = line[2:]
+                start = i + 1
+                continue
+            if i == 0 or (i == 1 and not _encoding_re.match(lines[0])):
+                encoding = _encoding_re.match(line)
+                if encoding:
+                    if encoding[1] != 'utf-8':
+                        raise ValueError('Encodings other than utf-8 '
+                                         'are not supported')
+                    if line != _utf8_header:
+                        metadata['encoding'] = line
+                    start = i + 1
+                    continue
             break
 
         line = self.markdown_unescape(line)
 
-        if i == 0:
+        if i == start:
             if _header_re.match(line):
                 continue
             else:
                 break
 
-        if i > 0 and _header_re.match(line):
+        if i > start and _header_re.match(line):
             ended = True
             break
 
@@ -89,9 +132,8 @@ def header_to_metadata_and_cell(self, lines):
             header.append(line)
 
     if ended:
-        metadata = {}
         if len(jupyter):
-            metadata = yaml.load('\n'.join(jupyter))['jupyter']
+            metadata.update(yaml.load('\n'.join(jupyter))['jupyter'])
 
         skipline = True
         if len(lines) > i + 1:
@@ -112,4 +154,4 @@ def header_to_metadata_and_cell(self, lines):
 
         return metadata, cell, i + 1
 
-    return {}, None, 0
+    return {}, None, start

@@ -20,7 +20,8 @@ from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook
 import nbformat
 
-from .header import header_to_metadata_and_cell, metadata_and_cell_to_header
+from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
+    encoding_and_executable
 from .languages import get_default_language, find_main_language
 from .cells import start_code_rmd, start_code_rpy, cell_to_text, text_to_cell
 from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
@@ -103,6 +104,7 @@ class TextNotebookWriter(NotebookWriter):
         return [self.prefix if line == '' else self.prefix + ' ' + line
                 for line in lines]
 
+    encoding_and_executable = encoding_and_executable
     metadata_and_cell_to_header = metadata_and_cell_to_header
     cell_to_text = cell_to_text
 
@@ -115,7 +117,8 @@ class TextNotebookWriter(NotebookWriter):
         else:
             default_language = get_default_language(nb)
 
-        lines = self.metadata_and_cell_to_header(nb)
+        lines = self.encoding_and_executable(nb)
+        lines.extend(self.metadata_and_cell_to_header(nb))
 
         for i in range(len(nb.cells)):
             cell = nb.cells[i]
