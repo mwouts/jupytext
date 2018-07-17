@@ -89,16 +89,19 @@ class RmdFileContentsManager(FileContentsManager):
         nb_outputs = None
         if source_format is not None and ext != source_format:
             self.log.info('Reading SOURCE from {}'
-                          .format(file + source_format))
-            self.log.info('Reading OUTPUTS from {}'.format(os_path))
+                          .format(os.path.basename(file + source_format)))
+            self.log.info('Reading OUTPUTS from {}'
+                          .format(os.path.basename(os_path)))
             nb_outputs = nb
             nb = self._read_notebook(file + source_format,
                                      as_version=as_version,
                                      load_alternative_format=False)
         elif ext != '.ipynb' and '.ipynb' in nbrmd_formats \
                 and os.path.isfile(file + '.ipynb'):
-            self.log.info('Reading SOURCE from {}'.format(os_path))
-            self.log.info('Reading OUTPUTS from {}'.format(file + '.ipynb'))
+            self.log.info('Reading SOURCE from {}'
+                          .format(os.path.basename(os_path)))
+            self.log.info('Reading OUTPUTS from {}'
+                          .format(os.path.basename(file + '.ipynb')))
             nb_outputs = self._read_notebook(file + '.ipynb',
                                              as_version=as_version,
                                              load_alternative_format=False)
@@ -131,7 +134,7 @@ class RmdFileContentsManager(FileContentsManager):
 
         for ext in formats:
             os_path_ext = os_file + ext
-            self.log.info("Saving %s", os_path_ext)
+            self.log.info("Saving %s", os.path.basename(os_path_ext))
             if ext in self.nb_extensions:
                 with mock.patch('nbformat.writes', _nbrmd_writes(ext)):
                     super(RmdFileContentsManager, self) \
