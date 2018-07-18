@@ -79,7 +79,7 @@ You need to choose whever to configure this per notebook, or globally.
 
 The R markdown content manager includes a pre-save hook that will keep up-to date versions of your notebook
 under the file extensions specified in the `nbrmd_formats` metadata. Edit the notebook metadata in Jupyter and
-append a list for the desired formats, like this:
+select the desired formats, like this:
 ```
 {
   "kernelspec": {
@@ -98,7 +98,7 @@ append a list for the desired formats, like this:
 If you want every notebook to be saved as both `.Rmd` and `.ipynb` files, then change your jupyter config to
 ```python
 c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
-c.ContentsManager.default_nbrmd_formats = ['.ipynb', '.Rmd']
+c.ContentsManager.default_nbrmd_formats = 'ipynb,Rmd'
 ```
 
 If you prefer to update just `.Rmd`, change the above accordingly (you will
@@ -106,7 +106,7 @@ still be able to open regular `.ipynb` notebooks).
 
 ## Recommendations for version control
 
-I recommend that you set `nbrmd_formats` to `[".ipynb", ".Rmd"]`, either
+I recommend that you set `nbrmd_formats` to `"ipynb,Rmd"`, either
 in the default configuration, or in the notebook metadata (see above).
 
 When you save your notebook, two files are generated,
