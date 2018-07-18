@@ -73,7 +73,7 @@ def h(y):
     compare(py, py2)
 
 
-def test_no_space_after_code(py="""# -*- coding: utf-8 -*-
+def test_no_space_after_code(py=u"""# -*- coding: utf-8 -*-
 # Markdown cell
 
 def f(x):
