@@ -106,17 +106,10 @@ class RmdFileContentsManager(FileContentsManager):
                                              as_version=as_version,
                                              load_alternative_format=False)
 
-        # We store in the metadata the alternative and sourceonly formats
-        trusted = self.notary.check_signature(nb)
-        nb.metadata['nbrmd_formats'] = nbrmd_formats
-        nb.metadata['nbrmd_sourceonly_format'] = source_format
-
         if nb_outputs is not None:
             combine.combine_inputs_with_outputs(nb, nb_outputs)
-            trusted = self.notary.check_signature(nb_outputs)
-
-        if trusted:
-            self.notary.sign(nb)
+            if self.notary.check_signature(nb_outputs):
+                self.notary.sign(nb)
 
         return nb
 
