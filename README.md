@@ -7,12 +7,12 @@
 [![pyversions](https://img.shields.io/pypi/pyversions/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
 
 
-This is a utility that allows to open and run R markdown notebooks in Jupyter, and save Jupyter notebooks as R markdown.
-
-You will be interested in this if
+This is a utility that allows to open and run R markdown notebooks in Jupyter, and save Jupyter notebooks as R markdown. You will be interested in this if
 - you want to version your notebooks and occasionally have to merge versions
 - you want to use RStudio's advanced rendering of notebooks to PDF, HTML or [HTML slides](https://rmarkdown.rstudio.com/ioslides_presentation_format.html)
 - or, you have a collection of markdown or R markdown notebooks and you want to open them in Jupyter
+
+Note that if you prefer to save notebooks as python scripts, this is also possible. In that case, have a look at the [nbsrc](https://github.com/mwouts/nbsrc) package.
 
 ## What is R markdown?
 
@@ -79,7 +79,7 @@ You need to choose whever to configure this per notebook, or globally.
 
 The R markdown content manager includes a pre-save hook that will keep up-to date versions of your notebook
 under the file extensions specified in the `nbrmd_formats` metadata. Edit the notebook metadata in Jupyter and
-append a list for the desired formats, like this:
+select the desired formats, like this:
 ```
 {
   "kernelspec": {
@@ -89,8 +89,7 @@ append a list for the desired formats, like this:
   "language_info": {
     (...)
   },
-  "nbrmd_formats": [".ipynb", ".Rmd"],
-  "nbrmd_sourceonly_format": ".Rmd"
+  "nbrmd_formats": "ipynb,Rmd"
 }
 ```
 
@@ -99,7 +98,7 @@ append a list for the desired formats, like this:
 If you want every notebook to be saved as both `.Rmd` and `.ipynb` files, then change your jupyter config to
 ```python
 c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
-c.ContentsManager.default_nbrmd_formats = ['.ipynb', '.Rmd']
+c.ContentsManager.default_nbrmd_formats = 'ipynb,Rmd'
 ```
 
 If you prefer to update just `.Rmd`, change the above accordingly (you will
@@ -107,7 +106,7 @@ still be able to open regular `.ipynb` notebooks).
 
 ## Recommendations for version control
 
-I recommend that you set `nbrmd_formats` to `[".ipynb", ".Rmd"]`, either
+I recommend that you set `nbrmd_formats` to `"ipynb,Rmd"`, either
 in the default configuration, or in the notebook metadata (see above).
 
 When you save your notebook, two files are generated,

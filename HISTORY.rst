@@ -6,6 +6,20 @@ Release History
 dev
 +++
 
+0.4.0 (2018-07-18)
++++++++++++++++++++
+
+**Improvements**
+
+- `.py` format for notebooks is lighter and pep8 compliant
+
+**BugFixes**
+
+- Default nbrmd config not added to notebooks (#17)
+- `nbrmd_formats` becomes a configurable traits (#16)
+- Removed `nbrmd_sourceonly_format` metadata. Source notebook is current notebook
+when not `.ipynb`, otherwise the first notebook format in `nbrmd_formats` (not
+`.ipynb`) that is found on disk
 
 0.3.0 (2018-07-17)
 +++++++++++++++++++

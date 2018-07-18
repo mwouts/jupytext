@@ -1,6 +1,8 @@
 import notebook.transutils
 from notebook.services.contents.filemanager import FileContentsManager
 from tornado.web import HTTPError
+from traitlets import Unicode
+from traitlets.config import Configurable
 
 import os
 import nbrmd
@@ -25,14 +27,21 @@ def _nbrmd_reads(ext):
 
 
 def check_formats(formats):
+    if not isinstance(formats, list):
+        formats = formats.split(',')
+
+    formats = [fmt if fmt.startswith('.') else '.' + fmt
+               for fmt in formats if fmt != '']
+
     allowed = nbrmd.notebook_extensions
     if not isinstance(formats, list) or not set(formats).issubset(allowed):
-        raise TypeError(u"Notebook metadata 'nbrmd_formats' "
-                        u"should be subset of {}".format(str(allowed)))
+        raise TypeError("Notebook metadata 'nbrmd_formats' "
+                        "should be subset of {}, but was {}"
+                        "".format(str(allowed), str(formats)))
     return formats
 
 
-class RmdFileContentsManager(FileContentsManager):
+class RmdFileContentsManager(FileContentsManager, Configurable):
     """
     A FileContentsManager Class that reads and stores notebooks to classical
     Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd),
@@ -45,8 +54,11 @@ class RmdFileContentsManager(FileContentsManager):
     def all_nb_extensions(self):
         return ['.ipynb'] + self.nb_extensions
 
-    default_nbrmd_formats = ['.ipynb']
-    default_nbrmd_sourceonly_format = None
+    default_nbrmd_formats = Unicode(
+        u'ipynb',
+        help='Save notebooks to these file extensions. '
+             'Can be any of ipynb,Rmd,py,R, comma separated',
+        config=True)
 
     def _read_notebook(self, os_path, as_version=4,
                        load_alternative_format=True):
@@ -67,24 +79,23 @@ class RmdFileContentsManager(FileContentsManager):
         nbrmd_formats = (nb.metadata.get('nbrmd_formats') or
                          self.default_nbrmd_formats)
 
+        nbrmd_formats = check_formats(nbrmd_formats)
+
         if ext not in nbrmd_formats:
             nbrmd_formats.append(ext)
 
         nbrmd_formats = check_formats(nbrmd_formats)
 
-        # Source format is taken in metadata, contentsmanager, or is current
-        # ext, or is first non .ipynb format that is found on disk
-        source_format = (nb.metadata.get('nbrmd_sourceonly_format') or
-                         self.default_nbrmd_sourceonly_format)
-
-        if source_format is None:
-            if ext != '.ipynb':
-                source_format = ext
-            else:
-                for fmt in nbrmd_formats:
-                    if fmt != '.ipynb' and os.path.isfile(file + fmt):
-                        source_format = fmt
-                        break
+        # Source format is current ext, or is first non .ipynb format
+        # that is found on disk
+        source_format = None
+        if ext != '.ipynb':
+            source_format = ext
+        else:
+            for fmt in nbrmd_formats:
+                if fmt != '.ipynb' and os.path.isfile(file + fmt):
+                    source_format = fmt
+                    break
 
         nb_outputs = None
         if source_format is not None and ext != source_format:
@@ -106,17 +117,10 @@ class RmdFileContentsManager(FileContentsManager):
                                              as_version=as_version,
                                              load_alternative_format=False)
 
-        # We store in the metadata the alternative and sourceonly formats
-        trusted = self.notary.check_signature(nb)
-        nb.metadata['nbrmd_formats'] = nbrmd_formats
-        nb.metadata['nbrmd_sourceonly_format'] = source_format
-
         if nb_outputs is not None:
             combine.combine_inputs_with_outputs(nb, nb_outputs)
-            trusted = self.notary.check_signature(nb_outputs)
-
-        if trusted:
-            self.notary.sign(nb)
+            if self.notary.check_signature(nb_outputs):
+                self.notary.sign(nb)
 
         return nb
 
@@ -126,6 +130,8 @@ class RmdFileContentsManager(FileContentsManager):
 
         formats = (nb.get('metadata', {}).get('nbrmd_formats') or
                    self.default_nbrmd_formats)
+
+        formats = check_formats(formats)
 
         if org_ext not in formats:
             formats.append(org_ext)

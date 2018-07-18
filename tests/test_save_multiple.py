@@ -76,7 +76,7 @@ def test_no_files_created_on_no_format(tmpdir):
 
     cm = RmdFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_nbrmd_formats = []
+    cm.default_nbrmd_formats = ''
 
     cm.save(
         model=dict(type='notebook',
@@ -109,7 +109,7 @@ def test_no_rmd_on_not_notebook(tmpdir):
 
     cm = RmdFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_nbrmd_formats = ['.Rmd']
+    cm.default_nbrmd_formats = '.Rmd'
 
     with pytest.raises(HTTPError):
         cm.save(model=dict(type='not notebook',
@@ -124,7 +124,7 @@ def test_no_rmd_on_not_v4(tmpdir):
 
     cm = RmdFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_nbrmd_formats = ['.Rmd']
+    cm.default_nbrmd_formats = '.Rmd'
 
     with pytest.raises(NotebookValidationError):
         cm.save(model=dict(type='notebook',

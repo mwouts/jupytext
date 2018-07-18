@@ -40,7 +40,7 @@ def cell_to_text(self,
                 else:
                     options = metadata_to_json_options(metadata)
                     if options != '{}':
-                        lines.append('#+ ' + options)
+                        lines.append('# + ' + options)
                 lines.extend(source)
             else:
                 lines.extend(self.markdown_escape(
@@ -54,7 +54,7 @@ def cell_to_text(self,
             source = ['']
         lines.extend(self.markdown_escape(source))
 
-        # Two blank lines between consecutive markdown cells
+        # Two blank lines between consecutive markdown cells in Rmd
         if self.ext == '.Rmd' and next_cell \
                 and next_cell.cell_type == 'markdown':
             lines.append('')
@@ -68,7 +68,7 @@ def cell_to_text(self,
 _start_code_rmd = re.compile(r"^```\{(.*)\}\s*$")
 _start_code_md = re.compile(r"^```(.*)$")
 _end_code_md = re.compile(r"^```\s*$")
-_option_code_rpy = re.compile(r"^#\+(.*)$")
+_option_code_rpy = re.compile(r"^(#|# )\+(.*)$")
 _blank = re.compile(r"^\s*$")
 
 
@@ -80,10 +80,21 @@ def start_code_rpy(line):
     return _option_code_rpy.match(line)
 
 
+def next_uncommented_is_code(lines):
+    for line in lines:
+        if line.startswith('#'):
+            continue
+        return not _blank.match(line)
+
+    return False
+
+
 def text_to_cell(self, lines):
     if self.start_code(lines[0]):
         return self.code_to_cell(lines, parse_opt=True)
     elif self.prefix != '' and not lines[0].startswith(self.prefix):
+        return self.code_to_cell(lines, parse_opt=False)
+    elif self.ext == '.py' and next_uncommented_is_code(lines):
         return self.code_to_cell(lines, parse_opt=False)
     else:
         return self.markdown_to_cell(lines)
@@ -95,8 +106,8 @@ def parse_code_options(line, ext):
     elif ext == '.R':
         return rmd_options_to_metadata(_option_code_rpy.findall(line)[0])
     else:  # .py
-        return 'python', json_options_to_metadata(_option_code_rpy.findall(
-            line)[0])
+        return 'python', json_options_to_metadata(_option_code_rpy.match(
+            line).group(2))
 
 
 def code_to_cell(self, lines, parse_opt):
@@ -130,7 +141,7 @@ def code_to_cell(self, lines, parse_opt):
             if parse_opt and pos == 0:
                 continue
 
-            if self.prefix != '' and line.startswith(self.prefix):
+            if self.ext == '.R' and line.startswith(self.prefix):
                 if prev_blank:
                     return new_code_cell(
                         source='\n'.join(lines[parse_opt:(pos - 1)]),
@@ -142,15 +153,30 @@ def code_to_cell(self, lines, parse_opt):
                     r.metadata['noskipline'] = True
                     return r, pos
 
-            if _blank.match(line):
-                if prev_blank:
+            if prev_blank:
+                if _blank.match(line):
+                    # Two blank lines => end of cell
                     # Two blank lines at the end == empty code cell
                     return new_code_cell(
                         source='\n'.join(lines[parse_opt:(pos - 1)]),
                         metadata=metadata), min(pos + 1, len(lines) - 1)
-                prev_blank = True
-            else:
-                prev_blank = False
+
+                # are all the lines from here to next blank
+                # escaped with the prefix?
+                if self.prefix == '#':
+                    found_code = False
+                    for next in lines[pos:]:
+                        if next.startswith('#'):
+                            continue
+                        found_code = not _blank.match(next)
+                        break
+
+                    if not found_code:
+                        return new_code_cell(
+                            source='\n'.join(lines[parse_opt:(pos - 1)]),
+                            metadata=metadata), pos
+
+            prev_blank = _blank.match(line)
 
     # Unterminated cell?
     return new_code_cell(

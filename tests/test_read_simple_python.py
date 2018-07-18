@@ -4,12 +4,12 @@ import nbrmd
 from testfixtures import compare
 
 
-def test_read_simple_file(py="""## ---
-## title: Simple file
-## ---
+def test_read_simple_file(py="""# ---
+# title: Simple file
+# ---
 
-## Here we have some text
-## And below we have a some python code
+# Here we have some text
+# And below we have a some python code
 
 def f(x):
     return x+1
@@ -36,13 +36,13 @@ def h(y):
     compare(py, py2)
 
 
-def test_read_less_simple_file(py="""## ---
-## title: Less simple file
-## ---
+def test_read_less_simple_file(py="""# ---
+# title: Less simple file
+# ---
 
-## Here we have some text
-## And below we have a some python code
-## But no space between markdown and code
+# Here we have some text
+# And below we have a some python code
+
 # This is a comment about function f
 def f(x):
     return x+1
@@ -53,13 +53,13 @@ def h(y):
     return y-1
 """):
     nb = nbrmd.reads(py, ext='.py')
+
     assert len(nb.cells) == 4
     assert nb.cells[0].cell_type == 'raw'
     assert nb.cells[0].source == '---\ntitle: Less simple file\n---'
     assert nb.cells[1].cell_type == 'markdown'
     assert nb.cells[1].source == 'Here we have some text\n' \
-                                 'And below we have a some python code\n' \
-                                 'But no space between markdown and code'
+                                 'And below we have a some python code'
     assert nb.cells[2].cell_type == 'code'
     compare(nb.cells[2].source,
             '# This is a comment about function f\n'
@@ -69,14 +69,28 @@ def h(y):
     compare(nb.cells[3].source,
             '''# And a comment on h\ndef h(y):\n    return y-1''')
 
+    py2 = nbrmd.writes(nb, ext='.py')
+    compare(py, py2)
 
-def test_no_space_after_code(py="""# -*- coding: utf-8 -*-
-## Markdown cell
+
+def test_no_space_after_code(py=u"""# -*- coding: utf-8 -*-
+# Markdown cell
+
 def f(x):
     return x+1
-## And a new cell, and non ascii contênt
+
+# And a new cell, and non ascii contênt
 """):
     nb = nbrmd.reads(py, ext='.py')
+
+    assert len(nb.cells) == 3
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[0].source == 'Markdown cell'
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[1].source == 'def f(x):\n    return x+1'
+    assert nb.cells[2].cell_type == 'markdown'
+    assert nb.cells[2].source == u'And a new cell, and non ascii contênt'
+
     py2 = nbrmd.writes(nb, ext='.py')
     compare(py, py2)
 
