@@ -35,7 +35,7 @@ notebook_extensions = ['.ipynb', '.Rmd', '.py', '.R']
 
 
 def markdown_comment(ext):
-    return '' if ext == '.Rmd' else "#'" if ext == '.R' else "##"
+    return '' if ext == '.Rmd' else "#'" if ext == '.R' else "#"
 
 
 class TextNotebookReader(NotebookReader):

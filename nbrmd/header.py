@@ -92,21 +92,22 @@ def header_to_metadata_and_cell(self, lines):
     start = 0
 
     for i, line in enumerate(lines):
-        if not line.startswith(self.prefix):
-            if i == 0 and line.startswith('#!'):
-                metadata['executable'] = line[2:]
+        if i == 0 and line.startswith('#!'):
+            metadata['executable'] = line[2:]
+            start = i + 1
+            continue
+        if i == 0 or (i == 1 and not _encoding_re.match(lines[0])):
+            encoding = _encoding_re.match(line)
+            if encoding:
+                if encoding.group(1) != 'utf-8':
+                    raise ValueError('Encodings other than utf-8 '
+                                     'are not supported')
+                if line != _utf8_header:
+                    metadata['encoding'] = line
                 start = i + 1
                 continue
-            if i == 0 or (i == 1 and not _encoding_re.match(lines[0])):
-                encoding = _encoding_re.match(line)
-                if encoding:
-                    if encoding.group(1) != 'utf-8':
-                        raise ValueError('Encodings other than utf-8 '
-                                         'are not supported')
-                    if line != _utf8_header:
-                        metadata['encoding'] = line
-                    start = i + 1
-                    continue
+
+        if not line.startswith(self.prefix):
             break
 
         line = self.markdown_unescape(line)
