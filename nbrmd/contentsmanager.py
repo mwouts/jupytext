@@ -27,7 +27,7 @@ def _nbrmd_reads(ext):
 
 
 def check_formats(formats):
-    if isinstance(formats, str):
+    if not isinstance(formats, list):
         formats = formats.split(',')
 
     formats = [fmt if fmt.startswith('.') else '.' + fmt
