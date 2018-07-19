@@ -5,6 +5,7 @@
 [![Build Status](https://travis-ci.com/mwouts/nbrmd.svg?branch=master)](https://travis-ci.com/mwouts/nbrmd)
 [![codecov.io](https://codecov.io/github/mwouts/nbrmd/coverage.svg?branch=master)](https://codecov.io/github/mwouts/nbrmd?branch=master)
 [![pyversions](https://img.shields.io/pypi/pyversions/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/nbrmd/master)
 
 
 This is a utility that allows to open and run R markdown notebooks in Jupyter, and save Jupyter notebooks as R markdown. You will be interested in this if
