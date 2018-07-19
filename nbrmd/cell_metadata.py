@@ -10,6 +10,7 @@ https://github.com/jupyter/notebook/issues/3700
 
 import ast
 import json
+import re
 
 _boolean_options_dictionary = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
@@ -168,12 +169,14 @@ def parse_rmd_options(line):
 
 
 def rmd_options_to_metadata(options):
-    options = options.split(' ', 1)
+    options = re.split('\s|,', options, 1)
     if len(options) == 1:
         language = options[0]
         chunk_options = []
     else:
         language, others = options
+        language = language.rstrip(' ,')
+        others = others.lstrip(' ,')
         chunk_options = parse_rmd_options(others)
 
     language = 'R' if language == 'r' else language
