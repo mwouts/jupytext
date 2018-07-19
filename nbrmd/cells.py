@@ -110,6 +110,26 @@ def parse_code_options(line, ext):
             line).group(2))
 
 
+def next_code_is_indented(lines):
+    for next in lines:
+        if next.startswith('#'):
+            continue
+        if _blank.match(next):
+            continue
+        return next.startswith(' ')
+
+    return False
+
+
+def no_code_before_next_blank_line(lines):
+    for next in lines:
+        if next.startswith('#'):
+            continue
+        return _blank.match(next)
+
+    return True
+
+
 def code_to_cell(self, lines, parse_opt):
     # Parse options
     if parse_opt:
@@ -156,7 +176,13 @@ def code_to_cell(self, lines, parse_opt):
             if prev_blank:
                 if _blank.match(line):
                     # Two blank lines => end of cell
+                    # (py: unless next code is indented)
                     # Two blank lines at the end == empty code cell
+
+                    if self.ext == '.py':
+                        if next_code_is_indented(lines[pos:]):
+                            continue
+
                     return new_code_cell(
                         source='\n'.join(lines[parse_opt:(pos - 1)]),
                         metadata=metadata), min(pos + 1, len(lines) - 1)
@@ -164,14 +190,7 @@ def code_to_cell(self, lines, parse_opt):
                 # are all the lines from here to next blank
                 # escaped with the prefix?
                 if self.prefix == '#':
-                    found_code = False
-                    for next in lines[pos:]:
-                        if next.startswith('#'):
-                            continue
-                        found_code = not _blank.match(next)
-                        break
-
-                    if not found_code:
+                    if no_code_before_next_blank_line(lines[pos:]):
                         return new_code_cell(
                             source='\n'.join(lines[parse_opt:(pos - 1)]),
                             metadata=metadata), pos

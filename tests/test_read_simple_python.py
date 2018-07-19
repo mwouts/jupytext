@@ -73,6 +73,37 @@ def h(y):
     compare(py, py2)
 
 
+def test_read_non_pep8_file(py="""# ---
+# title: Non-pep8 file
+# ---
+
+# This file is non-pep8 as the function below has
+# two consecutive blank lines in its body
+
+def f(x):
+
+
+    return x+1
+"""):
+    nb = nbrmd.reads(py, ext='.py')
+
+    assert len(nb.cells) == 3
+    assert nb.cells[0].cell_type == 'raw'
+    assert nb.cells[0].source == '---\ntitle: Non-pep8 file\n---'
+    assert nb.cells[1].cell_type == 'markdown'
+    assert nb.cells[1].source == 'This file is non-pep8 as ' \
+                                 'the function below has\n' \
+                                 'two consecutive blank lines ' \
+                                 'in its body'
+    assert nb.cells[2].cell_type == 'code'
+    compare(nb.cells[2].source,
+            'def f(x):\n\n\n'
+            '    return x+1')
+
+    py2 = nbrmd.writes(nb, ext='.py')
+    compare(py, py2)
+
+
 def test_no_space_after_code(py=u"""# -*- coding: utf-8 -*-
 # Markdown cell
 
