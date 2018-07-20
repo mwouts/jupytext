@@ -1,5 +1,0 @@
-install.packages('knitr')
-install.packages('ggplot2')
-install.packages('reticulate')
-install.packages('jsonlite')
-install.packages('plotly')
