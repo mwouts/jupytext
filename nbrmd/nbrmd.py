@@ -31,14 +31,16 @@ from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
 # -----------------------------------------------------------------------------
 
 
-notebook_extensions = ['.ipynb', '.Rmd', '.py', '.R']
+NOTEBOOK_EXTENSIONS = ['.ipynb', '.Rmd', '.py', '.R']
 
 
 def markdown_comment(ext):
+    """Markdown escape for given notebook extension"""
     return '' if ext == '.Rmd' else "#'" if ext == '.R' else "#"
 
 
 class TextNotebookReader(NotebookReader):
+    """Text notebook reader"""
 
     def __init__(self, ext):
         self.ext = ext
@@ -53,6 +55,7 @@ class TextNotebookReader(NotebookReader):
     markdown_to_cell = markdown_to_cell
 
     def markdown_unescape(self, line):
+        """Remove markdown escape, if any"""
         if self.prefix == '':
             return line
         line = line[len(self.prefix):]
@@ -61,10 +64,22 @@ class TextNotebookReader(NotebookReader):
         return line
 
     def reads(self, s, **kwargs):
+        """
+        Read a notebook from a given string
+        :param s:
+        :param kwargs:
+        :return:
+        """
         return self.to_notebook(s, **kwargs)
 
-    def to_notebook(self, s, **kwargs):
-        lines = s.splitlines()
+    def to_notebook(self, text, **kwargs):
+        """
+        Read a notebook from its text representation
+        :param text:
+        :param kwargs:
+        :return:
+        """
+        lines = text.splitlines()
 
         cells = []
         metadata, header_cell, pos = \
@@ -76,7 +91,7 @@ class TextNotebookReader(NotebookReader):
         if pos > 0:
             lines = lines[pos:]
 
-        while len(lines):
+        while lines:
             cell, pos = self.text_to_cell(lines)
             if cell is None:
                 break
@@ -93,12 +108,18 @@ class TextNotebookReader(NotebookReader):
 
 
 class TextNotebookWriter(NotebookWriter):
+    """Write notebook to their text representations"""
 
     def __init__(self, ext='.Rmd'):
         self.ext = ext
         self.prefix = markdown_comment(ext)
 
     def markdown_escape(self, lines):
+        """
+        Escape markdown text
+        :param lines:
+        :return:
+        """
         if self.prefix == '':
             return lines
         return [self.prefix if line == '' else self.prefix + ' ' + line
@@ -108,7 +129,8 @@ class TextNotebookWriter(NotebookWriter):
     metadata_and_cell_to_header = metadata_and_cell_to_header
     cell_to_text = cell_to_text
 
-    def writes(self, nb):
+    def writes(self, nb, **kwargs):
+        """Write the text representation of a notebook to a string"""
         nb = copy(nb)
         if self.ext == '.py':
             default_language = 'python'
@@ -129,70 +151,71 @@ class TextNotebookWriter(NotebookWriter):
         return '\n'.join(lines + [''])
 
 
-_readers = {ext: TextNotebookReader(ext) for ext in notebook_extensions if
-            ext != '.ipynb'}
-_writers = {ext: TextNotebookWriter(ext) for ext in notebook_extensions if
-            ext != '.ipynb'}
+_NOTEBOOK_READERS = {ext: TextNotebookReader(ext)
+                     for ext in NOTEBOOK_EXTENSIONS if ext != '.ipynb'}
+_NOTEBOOK_WRITERS = {ext: TextNotebookWriter(ext)
+                     for ext in NOTEBOOK_EXTENSIONS if ext != '.ipynb'}
 
 
-def reads(s, as_version=4, ext='.Rmd', **kwargs):
+def reads(text, as_version=4, ext='.Rmd', **kwargs):
+    """Read a notebook from a string"""
     if ext == '.ipynb':
-        return nbformat.reads(s, as_version, **kwargs)
-    else:
-        return _readers[ext].reads(s, **kwargs)
+        return nbformat.reads(text, as_version, **kwargs)
+
+    return _NOTEBOOK_READERS[ext].reads(text, **kwargs)
 
 
 def read(fp, as_version=4, ext='.Rmd', **kwargs):
+    """Read a notebook from a file"""
     if ext == '.ipynb':
         return nbformat.read(fp, as_version, **kwargs)
-    else:
-        return _readers[ext].read(fp, **kwargs)
+
+    return _NOTEBOOK_READERS[ext].read(fp, **kwargs)
 
 
-def writes(s, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+def writes(nb, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+    """Write a notebook to a string"""
     if ext == '.ipynb':
-        return nbformat.writes(s, version, **kwargs)
-    else:
-        return _writers[ext].writes(s)
+        return nbformat.writes(nb, version, **kwargs)
+
+    return _NOTEBOOK_WRITERS[ext].writes(nb)
 
 
 def write(np, fp, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+    """Write a notebook to a file"""
     if ext == '.ipynb':
         return nbformat.write(np, fp, version, **kwargs)
-    else:
-        return _writers[ext].write(np, fp)
+
+    return _NOTEBOOK_WRITERS[ext].write(np, fp)
 
 
 def readf(nb_file):
-    """Load the notebook from the desired file"""
-    file, ext = os.path.splitext(nb_file)
-    if ext not in notebook_extensions:
+    """Read a notebook from the file with given name"""
+    _, ext = os.path.splitext(nb_file)
+    if ext not in NOTEBOOK_EXTENSIONS:
         raise TypeError(
             'File {} is not a notebook. '
             'Expected extensions are {}'.format(nb_file,
-                                                notebook_extensions))
+                                                NOTEBOOK_EXTENSIONS))
     with io.open(nb_file, encoding='utf-8') as fp:
         return read(fp, as_version=4, ext=ext)
 
 
 def writef(nb, nb_file):
-    """Save the notebook in the desired file"""
-    file, ext = os.path.splitext(nb_file)
-    if ext not in notebook_extensions:
+    """Write a notebook to the file with given name"""
+    _, ext = os.path.splitext(nb_file)
+    if ext not in NOTEBOOK_EXTENSIONS:
         raise TypeError(
             'File {} is not a notebook. '
             'Expected extensions are {}'.format(nb_file,
-                                                notebook_extensions))
+                                                NOTEBOOK_EXTENSIONS))
     with io.open(nb_file, 'w', encoding='utf-8') as fp:
         write(nb, fp, version=nbformat.NO_CONVERT, ext=ext)
 
 
 def readme():
-    """
-    Contents of README.md
-    :return:
-    """
+    """Contents of README.md"""
     readme_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                '..', 'README.md')
-    with open(readme_path) as fh:
-        return fh.read()
+    with open(readme_path) as readme_file:
+        return readme_file.read()

@@ -1,6 +1,10 @@
-import nbrmd
+"""
+R markdown exporter for nbconvert
+"""
+
 from traitlets import default
 from nbconvert.exporters import Exporter
+import nbrmd
 
 
 class RMarkdownExporter(Exporter):

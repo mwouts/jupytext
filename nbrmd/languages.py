@@ -1,9 +1,11 @@
+"""Determine notebook or cell language"""
+
 import re
 
-_jupyter_languages = ['R', 'bash', 'sh', 'python', 'python2', 'python3',
+_JUPYTER_LANGUAGES = ['R', 'bash', 'sh', 'python', 'python2', 'python3',
                       'javascript', 'js', 'perl']
-_jupyter_languages_re = [re.compile(r"^%%{}\s*".format(lang))
-                         for lang in _jupyter_languages]
+_JUPYTER_LANGUAGES_RE = [re.compile(r"^%%{}\s*".format(lang))
+                         for lang in _JUPYTER_LANGUAGES]
 
 
 def get_default_language(nb):
@@ -12,10 +14,9 @@ def get_default_language(nb):
     contents"""
     metadata = nb.metadata
 
-    default_language = (
-            metadata.get('main_language') or
-            metadata.get('language_info', {})
-            .get('name', 'python').lower())
+    default_language = (metadata.get('main_language') or
+                        metadata.get('language_info', {})
+                        .get('name', 'python').lower())
 
     if 'main_language' in metadata:
         # is 'main language' redundant with kernel info?
@@ -25,14 +26,14 @@ def get_default_language(nb):
         # is 'main language' redundant with cell language?
         elif metadata.get('language_info', {}).get('name') is None:
             languages = dict(python=0.5)
-            for c in nb.cells:
-                if c.cell_type == 'code':
-                    input = c.source.splitlines()
+            for cell in nb.cells:
+                if cell.cell_type == 'code':
+                    source = cell.source.splitlines()
                     language = default_language
-                    if len(input):
-                        for lang, pattern in zip(_jupyter_languages,
-                                                 _jupyter_languages_re):
-                            if pattern.match(input[0]):
+                    if source:
+                        for lang, pattern in zip(_JUPYTER_LANGUAGES,
+                                                 _JUPYTER_LANGUAGES_RE):
+                            if pattern.match(source[0]):
                                 language = lang
 
                     languages[language] = 1 + languages.get(
@@ -46,13 +47,19 @@ def get_default_language(nb):
 
 
 def find_main_language(metadata, cells):
+    """
+    Main language for the given collection of cells
+    :param metadata:
+    :param cells:
+    :return:
+    """
     main_language = (metadata.get('main_language') or
                      metadata.get('language_info', {}).get('name'))
     if main_language is None:
         languages = dict(python=0.5)
-        for c in cells:
-            if c['cell_type'] == 'code':
-                language = c['metadata']['language']
+        for cell in cells:
+            if cell['cell_type'] == 'code':
+                language = cell['metadata']['language']
                 languages[language] = languages.get(language, 0.0) + 1
 
         main_language = max(languages, key=languages.get)
@@ -63,18 +70,25 @@ def find_main_language(metadata, cells):
             metadata['main_language'] = main_language
 
     # Remove 'language' meta data and add a magic if not main language
-    for c in cells:
-        if c['cell_type'] == 'code':
-            language = c['metadata']['language']
-            del c['metadata']['language']
+    for cell in cells:
+        if cell['cell_type'] == 'code':
+            language = cell['metadata']['language']
+            del cell['metadata']['language']
             if language != main_language and \
-                    language in _jupyter_languages:
-                c['source'] = u'%%{}\n'.format(language) + c['source']
+                    language in _JUPYTER_LANGUAGES:
+                cell['source'] = u'%%{}\n'.format(language) + cell['source']
 
 
 def cell_language(source):
-    if len(source):
-        for lang, pattern in zip(_jupyter_languages, _jupyter_languages_re):
+    """
+    Return cell language
+    :param source:
+    :return:
+    """
+    if source:
+        for lang, pattern in zip(_JUPYTER_LANGUAGES, _JUPYTER_LANGUAGES_RE):
             if pattern.match(source[0]):
                 source.pop(0)
                 return lang
+
+    return None

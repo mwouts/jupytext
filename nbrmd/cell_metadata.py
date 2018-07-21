@@ -12,21 +12,23 @@ import ast
 import json
 import re
 
-_boolean_options_dictionary = [('hide_input', 'echo', True),
+_BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
-_ignore_metadata = ['collapsed', 'autoscroll', 'deletable',
+_IGNORE_METADATA = ['collapsed', 'autoscroll', 'deletable',
                     'format', 'trusted']
 
 
-def _r_logical_values(bool):
-    return 'TRUE' if bool else 'FALSE'
+def _r_logical_values(pybool):
+    return 'TRUE' if pybool else 'FALSE'
 
 
 class RLogicalValueError(Exception):
+    """Incorrect value for R boolean"""
     pass
 
 
 class RMarkdownOptionParsingError(Exception):
+    """Error when parsing Rmd cell options"""
     pass
 
 
@@ -39,37 +41,50 @@ def _py_logical_values(rbool):
 
 
 def metadata_to_rmd_options(language, metadata):
+    """
+    Convert language and metadata information to their rmd representation
+    :param language:
+    :param metadata:
+    :return:
+    """
     options = language.lower()
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
         del metadata['name']
-    for jo, ro, rev in _boolean_options_dictionary:
-        if jo in metadata:
+    for jupyter_option, rmd_option, rev in _BOOLEAN_OPTIONS_DICTIONARY:
+        if jupyter_option in metadata:
             options += ' {}={},'.format(
-                ro, _r_logical_values(metadata[jo] != rev))
-            del metadata[jo]
-    for co_name in metadata:
-        co_value = metadata[co_name]
-        co_name = co_name.strip()
-        if co_name in _ignore_metadata:
+                rmd_option, _r_logical_values(metadata[jupyter_option] != rev))
+            del metadata[jupyter_option]
+    for opt_name in metadata:
+        opt_value = metadata[opt_name]
+        opt_name = opt_name.strip()
+        if opt_name in _IGNORE_METADATA:
             continue
-        elif isinstance(co_value, bool):
+        elif isinstance(opt_value, bool):
             options += ' {}={},'.format(
-                co_name, 'TRUE' if co_value else 'FALSE')
-        elif isinstance(co_value, list):
+                opt_name, 'TRUE' if opt_value else 'FALSE')
+        elif isinstance(opt_value, list):
             options += ' {}={},'.format(
-                co_name, 'c({})'.format(
-                    ', '.join(['"{}"'.format(str(v)) for v in co_value])))
+                opt_name, 'c({})'.format(
+                    ', '.join(['"{}"'.format(str(v)) for v in opt_value])))
         else:
-            options += ' {}={},'.format(co_name, str(co_value))
+            options += ' {}={},'.format(opt_name, str(opt_value))
     return options.strip(',').strip()
 
 
-def update_metadata_using_dictionary(name, value, metadata):
-    for jo, ro, rev in _boolean_options_dictionary:
-        if name == ro:
+def update_md_from_rmd_options(name, value, metadata):
+    """
+    Update metadata using the _BOOLEAN_OPTIONS_DICTIONARY mapping
+    :param name: option name
+    :param value: option value
+    :param metadata:
+    :return:
+    """
+    for jupyter_option, rmd_option, rev in _BOOLEAN_OPTIONS_DICTIONARY:
+        if name == rmd_option:
             try:
-                metadata[jo] = _py_logical_values(value) != rev
+                metadata[jupyter_option] = _py_logical_values(value) != rev
                 return True
             except RLogicalValueError:
                 pass
@@ -77,6 +92,9 @@ def update_metadata_using_dictionary(name, value, metadata):
 
 
 class ParsingContext():
+    """
+    Class for determining where to split rmd options
+    """
     parenthesis_count = 0
     curly_bracket_count = 0
     square_bracket_count = 0
@@ -87,11 +105,13 @@ class ParsingContext():
         self.line = line
 
     def in_global_expression(self):
+        """Currently inside an expression"""
         return (self.parenthesis_count == 0 and self.curly_bracket_count == 0
                 and self.square_bracket_count == 0
                 and not self.in_single_quote and not self.in_double_quote)
 
     def count_special_chars(self, char, prev_char):
+        """Update parenthesis counters"""
         if char == '(':
             self.parenthesis_count += 1
         elif char == ')':
@@ -128,7 +148,7 @@ def parse_rmd_options(line):
     :param line:
     :return:
     """
-    c = ParsingContext(line)
+    parsing_context = ParsingContext(line)
 
     result = []
     prev_char = ''
@@ -137,10 +157,10 @@ def parse_rmd_options(line):
     value = ''
 
     for char in ',' + line + ',':
-        if c.in_global_expression():
+        if parsing_context.in_global_expression():
             if char == ',':
-                if name is not '' or value is not '':
-                    if len(result) and name is '':
+                if name != '' or value != '':
+                    if result and name == '':
                         raise RMarkdownOptionParsingError(
                             'Option line "{}" has no name for '
                             'option value {}'.format(line, value))
@@ -148,20 +168,20 @@ def parse_rmd_options(line):
                     name = ''
                     value = ''
             elif char == '=':
-                if name is '':
+                if name == '':
                     name = value
                     value = ''
                 else:
                     value += char
             else:
-                c.count_special_chars(char, prev_char)
+                parsing_context.count_special_chars(char, prev_char)
                 value += char
         else:
-            c.count_special_chars(char, prev_char)
+            parsing_context.count_special_chars(char, prev_char)
             value += char
         prev_char = char
 
-    if not c.in_global_expression():
+    if not parsing_context.in_global_expression():
         raise RMarkdownOptionParsingError(
             'Option line "{}" is not properly terminated'.format(line))
 
@@ -169,7 +189,12 @@ def parse_rmd_options(line):
 
 
 def rmd_options_to_metadata(options):
-    options = re.split('\s|,', options, 1)
+    """
+    Parse rmd options and return a metadata dictionary
+    :param options:
+    :return:
+    """
+    options = re.split(r'\s|,', options, 1)
     if len(options) == 1:
         language = options[0]
         chunk_options = []
@@ -183,11 +208,11 @@ def rmd_options_to_metadata(options):
     metadata = {}
     for i, opt in enumerate(chunk_options):
         name, value = opt
-        if i == 0 and name is '':
+        if i == 0 and name == '':
             metadata['name'] = value
             continue
         else:
-            if update_metadata_using_dictionary(name, value, metadata):
+            if update_md_from_rmd_options(name, value, metadata):
                 continue
             try:
                 metadata[name] = _py_logical_values(value)
@@ -195,8 +220,8 @@ def rmd_options_to_metadata(options):
             except RLogicalValueError:
                 metadata[name] = value
 
-    for m in metadata:
-        value = metadata[m]
+    for name in metadata:
+        value = metadata[name]
         if not isinstance(value, str):
             continue
         if value.startswith('"') or value.startswith("'"):
@@ -206,7 +231,7 @@ def rmd_options_to_metadata(options):
         elif value.startswith('list(') and value.endswith(')'):
             value = '[' + value[5:-1] + ']'
         try:
-            metadata[m] = ast.literal_eval(value)
+            metadata[name] = ast.literal_eval(value)
         except (SyntaxError, ValueError):
             continue
 
@@ -214,6 +239,11 @@ def rmd_options_to_metadata(options):
 
 
 def json_options_to_metadata(options):
+    """
+    Read metadata from its json representation
+    :param options:
+    :return:
+    """
     try:
         return json.loads(options)
     except ValueError:
@@ -221,5 +251,10 @@ def json_options_to_metadata(options):
 
 
 def metadata_to_json_options(metadata):
+    """
+    Represent metadata as json text
+    :param metadata:
+    :return:
+    """
     return json.dumps({k: metadata[k] for k in metadata
-                       if k not in _ignore_metadata})
+                       if k not in _IGNORE_METADATA})

@@ -1,4 +1,6 @@
-from .cell_metadata import _ignore_metadata
+"""Combine source and outputs from two notebooks
+"""
+from .cell_metadata import _IGNORE_METADATA
 
 
 def combine_inputs_with_outputs(nb_source, nb_outputs):
@@ -21,8 +23,8 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
                 cell.execution_count = ocell.execution_count
                 cell.outputs = ocell.outputs
 
-                m = ocell.metadata
-                cell.metadata.update({k: m[k] for k in m
-                                      if m in _ignore_metadata})
+                metadata = ocell.metadata
+                cell.metadata.update({k: metadata[k] for k in metadata
+                                      if metadata in _IGNORE_METADATA})
                 remaining_output_cells = remaining_output_cells[(i + 1):]
                 break
