@@ -12,11 +12,11 @@ def test_read_simple_file(rnb="""#' ---
 #' And below we have some R code
 
 f <- function(x) {
-    x + 1 
+    x + 1
     }
 
 
-h <- function(y) 
+h <- function(y)
     y + 1
 """):
     nb = nbrmd.reads(rnb, ext='.R')
@@ -28,10 +28,10 @@ h <- function(y)
                                  'And below we have some R code'
     assert nb.cells[2].cell_type == 'code'
     compare(nb.cells[2].source, '''f <- function(x) {
-    x + 1 
+    x + 1
     }''')
     assert nb.cells[3].cell_type == 'code'
-    compare(nb.cells[3].source, '''h <- function(y) 
+    compare(nb.cells[3].source, '''h <- function(y)
     y + 1''')
 
     rnb2 = nbrmd.writes(nb, ext='.R')
@@ -75,8 +75,6 @@ def h(y):
 
     rnb2 = nbrmd.writes(nb, ext='.R')
     compare(rnb, rnb2)
-
-
 
 
 def test_no_space_after_code(rnb=u"""# -*- coding: utf-8 -*-
