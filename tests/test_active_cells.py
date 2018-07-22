@@ -1,3 +1,4 @@
+import sys
 import pytest
 import nbrmd
 from testfixtures import compare
@@ -46,6 +47,8 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
                               'outputs': []}}
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.parametrize('ext', ['.Rmd', '.py'])  # TODO: add R
 def test_active_py_ipynb(ext):
     nb = nbrmd.reads(ACTIVE_PY_IPYNB[ext], ext=ext)
