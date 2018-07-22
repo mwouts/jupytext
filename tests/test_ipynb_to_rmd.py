@@ -1,7 +1,7 @@
 import nbformat
-import nbrmd
 import pytest
 from testfixtures import compare
+import nbrmd
 from .utils import list_all_notebooks, remove_outputs, \
     remove_outputs_and_header
 

@@ -1,7 +1,7 @@
-import nbrmd
-import pytest
 import os
 import shutil
+import pytest
+import nbrmd
 
 
 @pytest.fixture()

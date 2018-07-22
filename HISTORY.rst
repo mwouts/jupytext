@@ -6,6 +6,15 @@ Release History
 dev
 +++
 
+
+0.4.2 (2018-07-??)
++++++++++++++++++++
+
+**Improvements**
+
+- Added pylint badge and improved code
+- Added test for R notebooks
+
 0.4.1 (2018-07-20)
 +++++++++++++++++++
 

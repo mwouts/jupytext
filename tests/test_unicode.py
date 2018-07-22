@@ -1,8 +1,8 @@
 # coding: utf-8
-import nbrmd
-import pytest
-from .utils import list_all_notebooks
 import sys
+import pytest
+import nbrmd
+from .utils import list_all_notebooks
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb') +
@@ -21,10 +21,3 @@ def test_write_non_ascii(tmpdir):
     nb = nbrmd.reads(u'Non-ascii contênt')
     nbrmd.writef(nb, str(tmpdir.join('notebook.Rmd')))
     nbrmd.writef(nb, str(tmpdir.join('notebook.ipynb')))
-
-
-def test_raise_on_non_unicode():
-    py = u"""# No mention of utf8 encoding
-# here, but then
-s = u'Non-ascii contênt'
-"""
