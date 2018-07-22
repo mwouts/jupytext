@@ -1,6 +1,6 @@
-import nbrmd
 import re
 from testfixtures import compare
+import nbrmd
 
 
 def test_read_mostly_py_rmd_file(rmd="""# ---

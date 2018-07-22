@@ -1,12 +1,17 @@
+"""Parse header of text notebooks
+"""
+
 import re
 import yaml
 import nbformat
 from nbformat.v4.nbbase import new_raw_cell
 
-_header_re = re.compile(r"^---\s*$")
-_empty_re = re.compile(r"^\s*$")
-_jupyter_re = re.compile(r"^jupyter\s*:\s*$")
-_leftspace_re = re.compile(r"^\s")
+_HEADER_RE = re.compile(r"^---\s*$")
+_BLANK_RE = re.compile(r"^\s*$")
+_JUPYTER_RE = re.compile(r"^jupyter\s*:\s*$")
+_LEFTSPACE_RE = re.compile(r"^\s")
+_ENCODING_RE = re.compile('^[ \t\f]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)')
+_UTF8_HEADER = '# -*- coding: utf-8 -*-'
 
 
 def _as_dict(metadata):
@@ -15,9 +20,15 @@ def _as_dict(metadata):
     return metadata
 
 
-def encoding_and_executable(self, nb):
+def encoding_and_executable(self, notebook):
+    """
+    Return encoding and executable lines for a notebook, if applicable
+    :param self:
+    :param notebook:
+    :return:
+    """
     lines = []
-    metadata = nb.get('metadata', {})
+    metadata = notebook.get('metadata', {})
 
     if self.ext != '.Rmd' and 'executable' in metadata:
         lines.append('#!' + metadata['executable'])
@@ -26,12 +37,12 @@ def encoding_and_executable(self, nb):
     if 'encoding' in metadata:
         lines.append(metadata['encoding'])
         del metadata['encoding']
-    elif self.ext == '.py':
-        for cell in nb.cells:
+    elif self.ext != '.Rmd':
+        for cell in notebook.cells:
             try:
                 cell.source.encode('ascii')
             except (UnicodeEncodeError, UnicodeDecodeError):
-                lines.append(_utf8_header)
+                lines.append(_UTF8_HEADER)
                 break
 
     return lines
@@ -46,37 +57,32 @@ def metadata_and_cell_to_header(self, nb):
     header = []
     skipline = True
 
-    if len(nb.cells):
-        c = nb.cells[0]
-        if c.cell_type == 'raw':
-            lines = c.source.strip('\n\t ').splitlines()
+    if nb.cells:
+        cell = nb.cells[0]
+        if cell.cell_type == 'raw':
+            lines = cell.source.strip('\n\t ').splitlines()
             if len(lines) >= 2 \
-                    and _header_re.match(lines[0]) \
-                    and _header_re.match(lines[-1]):
+                    and _HEADER_RE.match(lines[0]) \
+                    and _HEADER_RE.match(lines[-1]):
                 header = lines[1:-1]
-                skipline = not c.metadata.get('noskipline', False)
+                skipline = not cell.metadata.get('noskipline', False)
                 nb.cells = nb.cells[1:]
 
     metadata = _as_dict(nb.get('metadata', {}))
 
-    if len(metadata):
+    if metadata:
         header.extend(yaml.safe_dump({'jupyter': metadata},
                                      default_flow_style=False).splitlines())
 
-    if len(header):
+    if header:
         header = ['---'] + header + ['---']
 
     header = self.markdown_escape(header)
 
-    if len(header) and skipline:
+    if header and skipline:
         header += ['']
 
     return header
-
-
-# https://www.python.org/dev/peps/pep-0263/
-_encoding_re = re.compile('^[ \t\f]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)')
-_utf8_header = '# -*- coding: utf-8 -*-'
 
 
 def header_to_metadata_and_cell(self, lines):
@@ -90,19 +96,20 @@ def header_to_metadata_and_cell(self, lines):
     ended = False
     metadata = {}
     start = 0
+    i = -1
 
     for i, line in enumerate(lines):
         if i == 0 and line.startswith('#!'):
             metadata['executable'] = line[2:]
             start = i + 1
             continue
-        if i == 0 or (i == 1 and not _encoding_re.match(lines[0])):
-            encoding = _encoding_re.match(line)
+        if i == 0 or (i == 1 and not _ENCODING_RE.match(lines[0])):
+            encoding = _ENCODING_RE.match(line)
             if encoding:
                 if encoding.group(1) != 'utf-8':
                     raise ValueError('Encodings other than utf-8 '
                                      'are not supported')
-                if line != _utf8_header:
+                if line != _UTF8_HEADER:
                     metadata['encoding'] = line
                 start = i + 1
                 continue
@@ -110,21 +117,24 @@ def header_to_metadata_and_cell(self, lines):
         if not line.startswith(self.prefix):
             break
 
+        if self.prefix == '#' and line.startswith("#'"):
+            break
+
         line = self.markdown_unescape(line)
 
         if i == start:
-            if _header_re.match(line):
+            if _HEADER_RE.match(line):
                 continue
             else:
                 break
 
-        if i > start and _header_re.match(line):
+        if i > start and _HEADER_RE.match(line):
             ended = True
             break
 
-        if _jupyter_re.match(line):
+        if _JUPYTER_RE.match(line):
             injupyter = True
-        elif not _leftspace_re.match(line):
+        elif not _LEFTSPACE_RE.match(line):
             injupyter = False
 
         if injupyter:
@@ -133,20 +143,20 @@ def header_to_metadata_and_cell(self, lines):
             header.append(line)
 
     if ended:
-        if len(jupyter):
+        if jupyter:
             metadata.update(yaml.load('\n'.join(jupyter))['jupyter'])
 
         skipline = True
         if len(lines) > i + 1:
             line = self.markdown_unescape(lines[i + 1])
-            if not _empty_re.match(line):
+            if not _BLANK_RE.match(line):
                 skipline = False
             else:
                 i = i + 1
         else:
             skipline = False
 
-        if len(header):
+        if header:
             cell = new_raw_cell(source='\n'.join(['---'] + header + ['---']),
                                 metadata={} if skipline else
                                 {'noskipline': True})

@@ -1,6 +1,6 @@
 import pytest
-from nbrmd.nbrmd import TextNotebookReader, TextNotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_raw_cell, new_markdown_cell
+from nbrmd.nbrmd import TextNotebookReader, TextNotebookWriter
 
 
 @pytest.fixture
@@ -70,12 +70,11 @@ title: Sample header
 
 
 def test_metadata_and_cell_to_header():
-    nb = new_notebook(cells=[new_raw_cell(
-        source="""---
-title: Sample header
----""",
-        metadata={'noskipline': True})],
-        metadata=dict(mainlanguage='python'))
+    nb = new_notebook(
+        metadata=dict(mainlanguage='python'),
+        cells=[new_raw_cell(
+            source="---\ntitle: Sample header\n---",
+            metadata={'noskipline': True})])
     header = writer().metadata_and_cell_to_header(nb)
     assert '\n'.join(header) == """---
 title: Sample header

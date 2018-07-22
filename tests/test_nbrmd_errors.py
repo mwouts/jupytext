@@ -1,5 +1,5 @@
-import nbrmd
 import pytest
+import nbrmd
 
 
 def test_read_wrong_ext(tmpdir, nb_file='notebook.ext'):

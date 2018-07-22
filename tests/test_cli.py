@@ -1,6 +1,6 @@
-import pytest
 import os
 from shutil import copyfile
+import pytest
 import nbrmd
 from nbrmd.cli import convert, cli
 from .utils import list_all_notebooks, remove_outputs
