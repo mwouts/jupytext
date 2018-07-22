@@ -8,6 +8,15 @@ _JUPYTER_LANGUAGES_RE = [re.compile(r"^%%{}\s*".format(lang))
                          for lang in _JUPYTER_LANGUAGES]
 
 
+def is_code(cell):
+    """Is the current code a code cell?"""
+    if cell.cell_type == 'code':
+        return True
+    if cell.cell_type == 'raw' and 'active' in cell.metadata:
+        return True
+    return False
+
+
 def get_default_language(nb):
     """Return the default language of a notebook, and remove metadata
     'main_language' if that information is clear from notebook
@@ -58,7 +67,7 @@ def find_main_language(metadata, cells):
     if main_language is None:
         languages = dict(python=0.5)
         for cell in cells:
-            if cell['cell_type'] == 'code':
+            if cell.cell_type == 'code':
                 language = cell['metadata']['language']
                 languages[language] = languages.get(language, 0.0) + 1
 
@@ -71,7 +80,7 @@ def find_main_language(metadata, cells):
 
     # Remove 'language' meta data and add a magic if not main language
     for cell in cells:
-        if cell['cell_type'] == 'code':
+        if is_code(cell):
             language = cell['metadata']['language']
             del cell['metadata']['language']
             if language != main_language and \

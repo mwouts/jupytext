@@ -4,8 +4,8 @@ Convert/read notebook cells to/from python, R and Rmd cells
 """
 
 import re
-from nbformat.v4.nbbase import new_code_cell, new_markdown_cell
-from .languages import cell_language
+from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
+from .languages import cell_language, is_code
 from .cell_metadata import metadata_to_rmd_options, rmd_options_to_metadata, \
     json_options_to_metadata, metadata_to_json_options
 
@@ -20,6 +20,8 @@ def code_to_rmd(source, metadata, default_language):
     """
     lines = []
     language = cell_language(source) or default_language
+    if 'Rmd' not in re.split('\\.|,', metadata.get('active', 'Rmd')):
+        metadata['eval'] = False
     options = metadata_to_rmd_options(language, metadata)
     lines.append(u'```{{{}}}'.format(options))
     lines.extend(source)
@@ -72,7 +74,7 @@ def cell_to_text(self,
                  next_cell=None,
                  default_language='python'):
     """
-    Represent a markdown or raw cell as a text cell, in either
+    Represent a notebook cell as a text cell, in either
     py, R or rmd format
     :param self: TextNotebookWriter object
     :param cell: current cell
@@ -88,9 +90,9 @@ def cell_to_text(self,
         del metadata['noskipline']
 
     lines = []
-    if cell.cell_type == 'code':
+    if is_code(cell):
         lines.extend(code_to_text(self, source, metadata, default_language,
-                                  next_cell and next_cell.cell_type == 'code'))
+                                  next_cell and is_code(next_cell)))
     else:
         if source == []:
             source = ['']
@@ -208,6 +210,12 @@ def no_code_before_next_blank_line(lines):
     return True
 
 
+def code_or_raw_cell(source, metadata):
+    if 'ipynb' not in re.split('\\.|,', metadata.get('active', 'ipynb')):
+        return new_raw_cell(source=source, metadata=metadata)
+    return new_code_cell(source=source, metadata=metadata)
+
+
 def code_to_cell(self, lines, parse_opt):
     """
     Parse code to a notebook cell
@@ -231,10 +239,10 @@ def code_to_cell(self, lines, parse_opt):
                 next_line_blank = pos + 1 == len(lines) or \
                                   _BLANK_LINE.match(lines[pos + 1])
                 if next_line_blank and pos + 2 != len(lines):
-                    return new_code_cell(
+                    return code_or_raw_cell(
                         source='\n'.join(lines[1:pos]), metadata=metadata), \
                            pos + 2
-                cell = new_code_cell(
+                cell = code_or_raw_cell(
                     source='\n'.join(lines[1:pos]),
                     metadata=metadata)
                 cell.metadata['noskipline'] = True
@@ -247,10 +255,10 @@ def code_to_cell(self, lines, parse_opt):
 
             if self.ext == '.R' and line.startswith(self.prefix):
                 if prev_blank:
-                    return new_code_cell(
+                    return code_or_raw_cell(
                         source='\n'.join(lines[parse_opt:(pos - 1)]),
                         metadata=metadata), pos
-                cell = new_code_cell(
+                cell = code_or_raw_cell(
                     source='\n'.join(lines[parse_opt:pos]),
                     metadata=metadata)
                 cell.metadata['noskipline'] = True
@@ -266,7 +274,7 @@ def code_to_cell(self, lines, parse_opt):
                         if next_code_is_indented(lines[pos:]):
                             continue
 
-                    return new_code_cell(
+                    return code_or_raw_cell(
                         source='\n'.join(lines[parse_opt:(pos - 1)]),
                         metadata=metadata), min(pos + 1, len(lines) - 1)
 
@@ -274,14 +282,14 @@ def code_to_cell(self, lines, parse_opt):
                 # escaped with the prefix?
                 if self.prefix == '#':
                     if no_code_before_next_blank_line(lines[pos:]):
-                        return new_code_cell(
+                        return code_or_raw_cell(
                             source='\n'.join(lines[parse_opt:(pos - 1)]),
                             metadata=metadata), pos
 
             prev_blank = _BLANK_LINE.match(line)
 
     # Unterminated cell?
-    return new_code_cell(
+    return code_or_raw_cell(
         source='\n'.join(lines[parse_opt:]),
         metadata=metadata), len(lines)
 

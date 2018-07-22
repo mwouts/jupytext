@@ -240,6 +240,9 @@ def rmd_options_to_metadata(options):
         except (SyntaxError, ValueError):
             continue
 
+    if 'active' in metadata and 'eval' in metadata:
+        del metadata['eval']
+
     return language, metadata
 
 

@@ -7,13 +7,15 @@ dev
 +++
 
 
-0.4.2 (2018-07-??)
+0.4.2 (2018-07-23)
 +++++++++++++++++++
 
 **Improvements**
 
-- Added pylint badge and improved code
 - Added test for R notebooks
+- Added pylint badge, imports now in correct order
+- New `active` cell metadata that allows cell activation only for desired
+extensions (currently available for Rmd and ipynb extensions only)
 
 0.4.1 (2018-07-20)
 +++++++++++++++++++
