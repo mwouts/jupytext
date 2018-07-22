@@ -17,7 +17,9 @@ SAMPLES = [('r', ('R', {})),
             ('python', {'echo': 'if a==5 then TRUE else FALSE'})),
            ('python noname, tags=c("a", "b", "c"), echo={sum(a+c(1,2))>1}',
             ('python', {'name': 'noname', 'tags': ['a', 'b', 'c'],
-                        'echo': '{sum(a+c(1,2))>1}'}))]
+                        'echo': '{sum(a+c(1,2))>1}'})),
+           ('python active="ipynb,py"',
+            ('python', {'active': 'ipynb,py'}))]
 
 
 @pytest.mark.parametrize('options,language_and_metadata', SAMPLES)

@@ -172,7 +172,7 @@ def parse_code_options(line, ext):
     if ext == '.Rmd':
         return rmd_options_to_metadata(_START_CODE_RMD.findall(line)[0])
     elif ext == '.R':
-        return rmd_options_to_metadata(_CODE_OPTION_RPY.findall(line)[0])
+        return rmd_options_to_metadata(_CODE_OPTION_RPY.match(line).group(2))
 
     return 'python', json_options_to_metadata(
         _CODE_OPTION_RPY.match(line).group(2))
