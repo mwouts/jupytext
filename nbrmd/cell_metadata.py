@@ -47,6 +47,9 @@ def metadata_to_rmd_options(language, metadata):
     :param metadata:
     :return:
     """
+    if metadata.get('py_in_jupyter', False):
+        language = 'R'
+
     options = language.lower()
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
@@ -234,6 +237,9 @@ def rmd_options_to_metadata(options):
             metadata[name] = ast.literal_eval(value)
         except (SyntaxError, ValueError):
             continue
+
+    if metadata.get('py_in_jupyter', False):
+        language = 'python'
 
     return language, metadata
 

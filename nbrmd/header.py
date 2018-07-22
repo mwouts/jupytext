@@ -37,7 +37,7 @@ def encoding_and_executable(self, notebook):
     if 'encoding' in metadata:
         lines.append(metadata['encoding'])
         del metadata['encoding']
-    elif self.ext == '.py':
+    elif self.ext != '.Rmd':
         for cell in notebook.cells:
             try:
                 cell.source.encode('ascii')
@@ -115,6 +115,9 @@ def header_to_metadata_and_cell(self, lines):
                 continue
 
         if not line.startswith(self.prefix):
+            break
+
+        if self.prefix == '#' and line.startswith("#'"):
             break
 
         line = self.markdown_unescape(line)

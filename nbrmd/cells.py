@@ -185,7 +185,7 @@ def next_code_is_indented(lines):
     :return:
     """
     for line in lines:
-        if line.startswith('#'):
+        if line.startswith('#') and not line.startswith("#'"):
             continue
         if _BLANK_LINE.match(line):
             continue
@@ -201,7 +201,7 @@ def no_code_before_next_blank_line(lines):
     :return:
     """
     for line in lines:
-        if line.startswith('#'):
+        if line.startswith('#') and not line.startswith("#'"):
             continue
         return _BLANK_LINE.match(line)
 
@@ -296,7 +296,8 @@ def markdown_to_cell(self, lines):
     markdown = []
     for pos, line in enumerate(lines):
         # Markdown stops with the end of comments
-        if line.startswith(self.prefix):
+        if line.startswith(self.prefix) and \
+                (self.prefix != "#" or not line.startswith("#'")):
             markdown.append(self.markdown_unescape(line))
         elif _BLANK_LINE.match(line):
             return new_markdown_cell(source='\n'.join(markdown)), pos + 1
