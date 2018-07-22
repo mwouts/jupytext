@@ -1,13 +1,13 @@
-import notebook.transutils
-from notebook.services.contents.filemanager import FileContentsManager
-from tornado.web import HTTPError
-from traitlets import Unicode
-from traitlets.config import Configurable
-
+"""ContentsManager that allows to open Rmd, py, R and ipynb files as notebooks
+"""
 import os
-import nbrmd
 import nbformat
 import mock
+import notebook.transutils  # noqa
+from notebook.services.contents.filemanager import FileContentsManager
+from traitlets import Unicode
+from traitlets.config import Configurable
+import nbrmd
 
 from . import combine
 
@@ -20,20 +20,25 @@ def _nbrmd_writes(ext):
 
 
 def _nbrmd_reads(ext):
-    def _reads(s, as_version, **kwargs):
-        return nbrmd.reads(s, as_version, ext=ext, **kwargs)
+    def _reads(text, as_version, **kwargs):
+        return nbrmd.reads(text, as_version, ext=ext, **kwargs)
 
     return _reads
 
 
 def check_formats(formats):
+    """
+    Parse, validate and return notebooks extensions
+    :param formats: a list of notebook extensions, or a comma separated string
+    :return: list of extensions
+    """
     if not isinstance(formats, list):
         formats = formats.split(',')
 
     formats = [fmt if fmt.startswith('.') else '.' + fmt
                for fmt in formats if fmt != '']
 
-    allowed = nbrmd.notebook_extensions
+    allowed = nbrmd.NOTEBOOK_EXTENSIONS
     if not isinstance(formats, list) or not set(formats).issubset(allowed):
         raise TypeError("Notebook metadata 'nbrmd_formats' "
                         "should be subset of {}, but was {}"
@@ -48,10 +53,14 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
     R scripts (.R) and python scripts (.py)
     """
 
-    nb_extensions = [ext for ext in nbrmd.notebook_extensions if
+    nb_extensions = [ext for ext in nbrmd.NOTEBOOK_EXTENSIONS if
                      ext != '.ipynb']
 
     def all_nb_extensions(self):
+        """
+        Notebook extensions, including ipynb
+        :return:
+        """
         return ['.ipynb'] + self.nb_extensions
 
     default_nbrmd_formats = Unicode(
@@ -159,15 +168,18 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
                   any([path.endswith(ext)
                        for ext in self.all_nb_extensions()]))):
             return self._notebook_model(path, content=content)
-        else:
-            return super(RmdFileContentsManager, self) \
-                .get(path, content, type, format)
+
+        return super(RmdFileContentsManager, self) \
+            .get(path, content, type, format)
 
     def trust_notebook(self, path):
-        file, ext = os.path.splitext(path)
+        """Trust the current notebook"""
+        file, _ = os.path.splitext(path)
         super(RmdFileContentsManager, self).trust_notebook(file + '.ipynb')
 
     def rename_file(self, old_path, new_path):
+        """Rename the current notebook, as well as its
+         alternative representations"""
         old_file, org_ext = os.path.splitext(old_path)
         new_file, new_ext = os.path.splitext(new_path)
         if org_ext in self.all_nb_extensions() and org_ext == new_ext:

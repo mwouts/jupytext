@@ -1,6 +1,6 @@
-import nbrmd
 import pytest
 from testfixtures import compare
+import nbrmd
 from .utils import list_all_notebooks
 
 

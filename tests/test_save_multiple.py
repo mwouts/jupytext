@@ -1,12 +1,12 @@
-import pytest
 import os
+import pytest
+from nbformat.v4.nbbase import new_notebook
+from nbformat.validator import NotebookValidationError
+from tornado.web import HTTPError
 import nbrmd
+from nbrmd.contentsmanager import RmdFileContentsManager
 from .utils import list_all_notebooks, remove_outputs, \
     remove_outputs_and_header
-from nbrmd.contentsmanager import RmdFileContentsManager
-from nbformat.v4.nbbase import new_notebook
-from tornado.web import HTTPError
-from nbformat.validator import NotebookValidationError
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))

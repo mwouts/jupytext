@@ -1,6 +1,6 @@
 import pytest
-from nbrmd.nbrmd import TextNotebookReader, TextNotebookWriter
 from nbformat.v4.nbbase import new_markdown_cell
+from nbrmd.nbrmd import TextNotebookReader, TextNotebookWriter
 
 
 @pytest.fixture

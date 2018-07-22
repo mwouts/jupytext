@@ -1,8 +1,8 @@
-import nbrmd
-import pytest
 import sys
-from .utils import list_all_notebooks
+import pytest
 from testfixtures import compare
+import nbrmd
+from .utils import list_all_notebooks
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6),

@@ -1,10 +1,13 @@
+"""Command line conversion tool `nbrmd`
+"""
+
 import os
+import argparse
 from nbformat import writes as ipynb_writes
+from nbformat.reader import NotJSONError
 from nbrmd import readf, writef
 from nbrmd import writes as rmd_writes
 from .combine import combine_inputs_with_outputs
-from nbformat.reader import NotJSONError
-import argparse
 
 
 def convert(nb_files, in_place=True, combine=True):
@@ -39,8 +42,8 @@ def convert(nb_files, in_place=True, combine=True):
                         nb_outputs = readf(nb_dest)
                         combine_inputs_with_outputs(nb, nb_outputs)
                         msg = '(outputs were preserved)'
-                    except (IOError, NotJSONError) as e:
-                        msg = '(outputs could not be preserved: {})'.format(e)
+                    except (IOError, NotJSONError) as err:
+                        msg = '(outputs were not preserved: {})'.format(err)
                 print('R Markdown {} being converted to '
                       'Jupyter notebook {} {}'
                       .format(nb_file, nb_dest, msg))
@@ -53,6 +56,11 @@ def convert(nb_files, in_place=True, combine=True):
 
 
 def cli(args=None):
+    """
+    Command line parser
+    :param args:
+    :return:
+    """
     parser = argparse.ArgumentParser(description='Jupyter notebook '
                                                  'from/to R Markdown')
     parser.add_argument('notebooks',
@@ -69,5 +77,9 @@ def cli(args=None):
 
 
 def main():
+    """
+    Entry point for the nbrmd script
+    :return:
+    """
     args = cli()
     convert(args.notebooks, args.in_place, args.preserve_outputs)
