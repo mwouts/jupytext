@@ -19,7 +19,10 @@ SAMPLES = [('r', ('R', {})),
             ('python', {'name': 'noname', 'tags': ['a', 'b', 'c'],
                         'echo': '{sum(a+c(1,2))>1}'})),
            ('python active="ipynb,py"',
-            ('python', {'active': 'ipynb,py'}))]
+            ('python', {'active': 'ipynb,py'})),
+           ('python include=FALSE, active="Rmd"',
+            ('python', {'active': 'Rmd', 'hide_output': True}))
+           ]
 
 
 @pytest.mark.parametrize('options,language_and_metadata', SAMPLES)

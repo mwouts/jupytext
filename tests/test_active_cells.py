@@ -79,3 +79,29 @@ def test_active_rmd(ext):
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_RMD['.ipynb'])
     compare(ACTIVE_RMD[ext], nbrmd.writes(nb, ext=ext))
+
+
+ACTIVE_NOT_INCLUDE_RMD = {'.py': """# # + {"hide_output": true, "active": "Rmd"}
+# # This cell is active in Rmd only
+""",
+                          '.Rmd': """```{python include=FALSE, active="Rmd"}
+# This cell is active in Rmd only
+```
+""",
+                          '.R': """#' ```{python include=FALSE, active="Rmd", eval=FALSE}
+#' # This cell is active in Rmd only
+#' ```
+""",
+                          '.ipynb':
+                              {'cell_type': 'raw',
+                               'source': '# This cell is active in Rmd only',
+                               'metadata': {'active': 'Rmd',
+                                            'hide_output': True}}}
+
+
+@pytest.mark.parametrize('ext', ['.Rmd'])  # TODO: add R and py
+def test_active_not_include_rmd(ext):
+    nb = nbrmd.reads(ACTIVE_NOT_INCLUDE_RMD[ext], ext=ext)
+    assert len(nb.cells) == 1
+    compare(nb.cells[0], ACTIVE_NOT_INCLUDE_RMD['.ipynb'])
+    compare(ACTIVE_NOT_INCLUDE_RMD[ext], nbrmd.writes(nb, ext=ext))
