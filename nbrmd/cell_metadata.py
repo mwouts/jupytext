@@ -11,6 +11,7 @@ https://github.com/jupyter/notebook/issues/3700
 import ast
 import json
 import re
+from copy import copy
 
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
@@ -48,6 +49,7 @@ def metadata_to_rmd_options(language, metadata):
     :return:
     """
     options = language.lower()
+    metadata = copy(metadata)
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
         del metadata['name']
