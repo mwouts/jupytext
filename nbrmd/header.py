@@ -117,9 +117,6 @@ def header_to_metadata_and_cell(self, lines):
         if not line.startswith(self.prefix):
             break
 
-        if self.prefix == '#' and line.startswith("#'"):
-            break
-
         line = self.markdown_unescape(line)
 
         if i == start:
