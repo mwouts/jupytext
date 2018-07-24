@@ -6,6 +6,17 @@ Release History
 dev
 +++
 
+0.4.3 (2018-07-24)
++++++++++++++++++++
+
+**Improvements**
+
+- Multiline comments now supported #25
+
+**BugFixes**
+
+- ContentsManager can be imported even if `notebook.transutils` is not
+available, for compatibility with older python distributions.
 
 0.4.2 (2018-07-23)
 +++++++++++++++++++
