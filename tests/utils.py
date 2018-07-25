@@ -13,7 +13,7 @@ def list_all_notebooks(ext, path=None):
         nb_path = os.path.join(nb_path, path)
     notebooks = []
     for nb_file in os.listdir(nb_path):
-        file, nb_ext = os.path.splitext(nb_file)
+        _, nb_ext = os.path.splitext(nb_file)
         if nb_ext.lower() == ext.lower():
             notebooks.append(os.path.join(nb_path, nb_file))
     return notebooks
