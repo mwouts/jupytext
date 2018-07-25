@@ -68,11 +68,21 @@ pip install nbrmd --upgrade
 jupyter notebook
 ```
 
+With the above configuration, every Jupyter notebook will have a companion `.Rmd` notebook.
+And every `.Rmd` notebook will have a companion `.ipynb` notebook.
+
+If you prefer the `.ipynb` notebook not to be created by Jupyter when a `.Rmd`
+notebook is edited, set
+```
+c.ContentsManager.default_nbrmd_formats = ''
+```
+(as the default value is `ipynb`). Outputs for R markdown notebooks, however,
+will not be saved any more.
+
 ## Per notebook configuration
 
-With the above configuration, every notebook will have a companion `.Rmd` notebook.
-
-If you prefer that the companion script be generated only for a few notebooks,
+If you prefer that the companion R markdown notebook be generated only for
+ selected notebooks,
 remove the `c.ContentsManager.default_nbrmd_formats` line from Jupyter's
 configuration, and instead edit the notebook metadata as follows:
 ```
