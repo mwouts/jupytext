@@ -20,10 +20,17 @@
 # This is a notebook that you can use to test the nbrmd/nbsrc packages.
 #
 # Proposed experimentations are
-# 1. Open the Jupyter notebook (extension .ipynb) in Jupyter
-# 2. Edit the corresponding '.py' file. That is, copy the url, and change '/notebook/' for '/edit/', and change the extension from 'ipynb' to 'py'
+# 1. Open this Jupyter notebook (extension .ipynb) in Jupyter
+# 2. Open the corresponding '.py' file. That is, copy the url for the notebook, that looks like
+# ```
+# https://hub.mybinder.org/user/mwouts-nbrmd-g7315gce/notebooks/demo/Sample%20notebook%20with%20python%20representation.ipynb
+# ```
+# replace `/notebooks/` with `/edit/`, and change the extension from `ipynb` to `py`, to get an url like
+# ```
+# https://hub.mybinder.org/user/mwouts-nbrmd-g7315gce/edit/demo/Sample%20notebook%20with%20python%20representation.py
+# ```
 # 3. Modify the notebook in Jupyter. Save. Refresh the python file in the editor, and observe the changes
-# 4. Now, modify the python file, save, and refresh the Jupyter notebook. Observe how inputs were updated, outputs preserved when possible, and kernel left unchanged.
+# 4. Now, modify the python file, save, and refresh the Jupyter notebook. Observe how inputs were updated, outputs preserved when possible, and kernel was left unchanged.
 # 5. Browse the github repo using Jupyter in binder, and open arbitrary python files as notebooks. Run some of them when applicable (test `filled_step.py` for instance).
 
 %matplotlib inline
