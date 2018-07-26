@@ -13,7 +13,3 @@ def test_write_wrong_ext(tmpdir, nb_file='notebook.ext'):
     nb_file = str(tmpdir.join('nb_file'))
     with pytest.raises(TypeError):
         nbrmd.writef(dict(), nb_file)
-
-
-def test_readme():
-    nbrmd.nbrmd.readme()
