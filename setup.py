@@ -1,13 +1,17 @@
+from os import path
 from setuptools import setup, find_packages
-from nbrmd.nbrmd import readme
+
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md')) as f:
+    long_description = f.read()
 
 setup(
     name='nbrmd',
-    version='0.4.4',
+    version='0.4.5',
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
     description='Jupyter from/to R markdown notebooks',
-    long_description=readme(),
+    long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/mwouts/nbrmd',
     packages=find_packages(),

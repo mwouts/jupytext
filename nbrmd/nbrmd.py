@@ -211,11 +211,3 @@ def writef(nb, nb_file):
                                                 NOTEBOOK_EXTENSIONS))
     with io.open(nb_file, 'w', encoding='utf-8') as fp:
         write(nb, fp, version=nbformat.NO_CONVERT, ext=ext)
-
-
-def readme():
-    """Contents of README.md"""
-    readme_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                               '..', 'README.md')
-    with open(readme_path) as readme_file:
-        return readme_file.read()

@@ -6,6 +6,13 @@ Release History
 dev
 +++
 
+0.4.5 (2018-07-26)
++++++++++++++++++++
+
+**BugFixes**
+
+- Removed dependency of `setup.py` on `yaml`s
+
 0.4.4 (2018-07-26)
 +++++++++++++++++++
 
