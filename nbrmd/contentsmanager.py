@@ -3,7 +3,11 @@
 import os
 import nbformat
 import mock
-import notebook.transutils  # noqa
+
+try:
+    import notebook.transutils  # noqa
+except ImportError:
+    pass
 from notebook.services.contents.filemanager import FileContentsManager
 from traitlets import Unicode
 from traitlets.config import Configurable

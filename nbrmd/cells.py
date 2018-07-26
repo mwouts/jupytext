@@ -187,7 +187,7 @@ def next_code_is_indented(lines):
     :return:
     """
     for line in lines:
-        if line.startswith('#') and not line.startswith("#'"):
+        if line.startswith('#'):
             continue
         if _BLANK_LINE.match(line):
             continue
@@ -203,7 +203,7 @@ def no_code_before_next_blank_line(lines):
     :return:
     """
     for line in lines:
-        if line.startswith('#') and not line.startswith("#'"):
+        if line.startswith('#'):
             continue
         return _BLANK_LINE.match(line)
 
@@ -249,6 +249,7 @@ def code_to_cell(self, lines, parse_opt):
                 return cell, pos + 1
     else:
         prev_blank = False
+        triple = None
         for pos, line in enumerate(lines):
             if parse_opt and pos == 0:
                 continue
@@ -264,10 +265,33 @@ def code_to_cell(self, lines, parse_opt):
                 cell.metadata['noskipline'] = True
                 return cell, pos
 
+            if self.ext == '.py':
+                single = None
+                for i, char in enumerate(line):
+                    if char not in ['"', "'"]:
+                        continue
+
+                    if single == char:
+                        single = None
+                        continue
+                    if single is not None:
+                        continue
+                    if triple == char:
+                        if line[i - 2:i + 1] == 3 * char:
+                            triple = None
+                            continue
+                    if triple is not None:
+                        continue
+                    if line[i - 2:i + 1] == 3 * char:
+                        triple = char
+
+                if triple:
+                    continue
+
             if prev_blank:
                 if _BLANK_LINE.match(line):
                     # Two blank lines => end of cell
-                    # (py: unless next code is indented)
+                    # (unless next code is indented)
                     # Two blank lines at the end == empty code cell
 
                     if self.ext == '.py':
@@ -276,11 +300,12 @@ def code_to_cell(self, lines, parse_opt):
 
                     return code_or_raw_cell(
                         source='\n'.join(lines[parse_opt:(pos - 1)]),
-                        metadata=metadata), min(pos + 1, len(lines) - 1)
+                        metadata=metadata), min(pos + 1,
+                                                len(lines) - 1)
 
                 # are all the lines from here to next blank
                 # escaped with the prefix?
-                if self.prefix == '#':
+                if self.ext == '.py':
                     if no_code_before_next_blank_line(lines[pos:]):
                         return code_or_raw_cell(
                             source='\n'.join(lines[parse_opt:(pos - 1)]),
@@ -304,8 +329,7 @@ def markdown_to_cell(self, lines):
     markdown = []
     for pos, line in enumerate(lines):
         # Markdown stops with the end of comments
-        if line.startswith(self.prefix) and \
-                (self.prefix != "#" or not line.startswith("#'")):
+        if line.startswith(self.prefix):
             markdown.append(self.markdown_unescape(line))
         elif _BLANK_LINE.match(line):
             return new_markdown_cell(source='\n'.join(markdown)), pos + 1

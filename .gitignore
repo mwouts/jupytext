@@ -10,6 +10,7 @@ dist
 venv
 nbrmd.egg-info
 nbrmd.Rproj
+future
 *.pyc
 gits*
 .ipynb_checkpoints

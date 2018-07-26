@@ -21,7 +21,10 @@ SAMPLES = [('r', ('R', {})),
            ('python active="ipynb,py"',
             ('python', {'active': 'ipynb,py'})),
            ('python include=FALSE, active="Rmd"',
-            ('python', {'active': 'Rmd', 'hide_output': True}))
+            ('python', {'active': 'Rmd', 'hide_output': True})),
+           ('r chunk_name, include=FALSE, active="Rmd"',
+            ('R',
+             {'name': 'chunk_name', 'active': 'Rmd', 'hide_output': True}))
            ]
 
 

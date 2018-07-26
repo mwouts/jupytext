@@ -6,6 +6,20 @@ Release History
 dev
 +++
 
+0.4.3 (2018-07-24)
++++++++++++++++++++
+
+**Improvements**
+
+- Multiline comments now supported #25
+- Readme refactored, notebook demos available on binder #23
+
+**BugFixes**
+
+- ContentsManager can be imported even if `notebook.transutils` is not
+available, for compatibility with older python distributions.
+- Fixed missing cell metadata #27
+- Documentation tells how to avoid creating `.ipynb` files #16
 
 0.4.2 (2018-07-23)
 +++++++++++++++++++

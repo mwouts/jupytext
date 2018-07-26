@@ -1,4 +1,4 @@
-# From Jupyter notebooks to R markdown, and back
+# From Jupyter notebooks from/to R markdown
 
 [![Pypi](https://img.shields.io/pypi/v/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
 [![Pypi](https://img.shields.io/pypi/l/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
@@ -8,80 +8,83 @@
 [![pyversions](https://img.shields.io/pypi/pyversions/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/nbrmd/master)
 
+This package is an implementation of the standard
+[R markdown](https://rmarkdown.rstudio.com/) notebook format for Jupyter.
+R markdown notebooks are source only notebooks, and they
+are great companion files for the standard `.ipynb` notebooks.
 
-This is a utility that allows to open and run R markdown notebooks in Jupyter, and save Jupyter notebooks as R markdown. You will be interested in this if
-- you want to version your notebooks and occasionally have to merge versions
-- you want to use RStudio's advanced rendering of notebooks to PDF, HTML or [HTML slides](https://rmarkdown.rstudio.com/ioslides_presentation_format.html)
-- or, you have a collection of markdown or R markdown notebooks and you want to open them in Jupyter
+Use the `nbrmd` package if
+- you prefer to have simple text files under version control
+- if you want to use RStudio's advanced rendering of notebooks to PDF, HTML or [HTML slides](https://rmarkdown.rstudio.com/ioslides_presentation_format.html)
+- or, you have a collection of markdown or R markdown notebooks and you want to open them in Jupyter.
 
-Note that if you prefer to save notebooks as python scripts, this is also possible. In that case, have a look at the [nbsrc](https://github.com/mwouts/nbsrc) package.
+Only the source of your notebook is represented in R markdown.
+When a pair of `.Rmd`, ``.ipynb` notebooks with identical names are opened
+in Jupyter, inputs
+are taken from the `.Rmd` file, and outputs, when they match the input,
+are taken from the `.ipynb` file. This allows you to edit the R markdown
+version in your favorite text editor, and reload the notebook in Jupyter with the
+convenience of preserving outputs when possible.
 
-## What is R markdown?
+## Can I have a demo?
 
-R markdown (extension `.Rmd`) is a *source only* format for notebooks.
-As the name states, R markdown was designed in the R community, and is
-the reference [notebook format](https://rmarkdown.rstudio.com/) there.
-The format actually supports [many languages](https://yihui
-.name/knitr/demo/engines/).
+Sure. Try our package on [binder](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo)
+and open our python-oriented R markdown notebook!
 
-R markdown is almost like plain markdown. There are only two differences:
-- R markdown has a specific syntax for active code cells: language, and
-optional cell options are enclosed into a pair of curly brackets:
+As you will see there, the package also offers opening and saving
+notebooks as python or R scripts. Go to
+[nbsrc](https://github.com/mwouts/nbsrc) for a specific documentation on this.
 
-    ```
-    ```{python}
-
-- a YAML header, that describes the notebook title, author, and desired
-output (HTML, slides, PDF...).
-
-Look at [nbrmd/tests/ioslides.Rmd](https://github.com/mwouts/nbrmd/blob/master/tests/ioslides.Rmd) for a sample R markdown file (that, actually, only includes python cells).
-
-## Why R markdown and not filtered `.ipynb` under version control?
-
-The common practice for having Jupyter notebooks under version control is
-to remove outputs with a pre-commit hook. That works well and this will
-indeed get you a clean commit history.
-
-However, you may run into trouble when you try to *merge* two `.ipynb`
-notebooks in a simple text editor. Merging text notebooks, like the `.Rmd`
-ones that this package provides, is much simpler.
-
-## How do I open R markdown notebooks in Jupyter?
-
-The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes `
-.Rmd` files as notebooks. To use it,
-- generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
-- edit the config and include this:
-```python
-c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
-```
-
-Then, make sure you have the `nbrmd` package installed, and re-start jupyter, i.e. run
-```bash
-pip install nbrmd
-jupyter notebook
-```
-
-Now you can open your `.Rmd` files as notebooks in Jupyter,
-and save your jupyter notebooks in R markdown format (see below).
+## How does R markdown look like?
 
 Rmd notebook in jupyter     | Rmd notebook as text
 :--------------------------:|:-----------------------:
 ![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/rmd_notebook.png)   | ![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/rmd_in_text_editor.png)
 
+## Have you tested round-trip conversion?
 
-## Can I save my Jupyter notebook as both R markdown and ipynb?
+Round trip conversion is safe! And backed by hundreds of tests.
+- R markdown to Jupyter notebook, to R markdown again is identity. If you
+associate a Jupyter kernel to your notebook, that information will go to
+the yaml header of your notebook.
+- Jupyter to R markdown, and Jupyter again preserves source and metadata.
+In some occasions (consecutive blank lines in
+markdown cells), cells may be splitted into smaller ones.
 
-Yes. That's even the recommended setting for the notebooks you want to
-set under *version control*.
+## How do I activate R markdown notebooks in Jupyter?
 
-You need to choose whever to configure this per notebook, or globally.
+The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes
+`.Rmd` files as notebooks. To use it,
+- generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
+- edit the config and include the below:
+```python
+c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
+c.ContentsManager.default_nbrmd_formats = 'ipynb,Rmd'
+```
 
-### Per-notebook configuration
+Then, make sure you have the `nbrmd` package up-to-date, and re-start jupyter, i.e. run
+```bash
+pip install nbrmd --upgrade
+jupyter notebook
+```
 
-The R markdown content manager includes a pre-save hook that will keep up-to date versions of your notebook
-under the file extensions specified in the `nbrmd_formats` metadata. Edit the notebook metadata in Jupyter and
-select the desired formats, like this:
+With the above configuration, every Jupyter notebook will have a companion `.Rmd` notebook.
+And every `.Rmd` notebook will have a companion `.ipynb` notebook.
+
+If you prefer the `.ipynb` notebook not to be created by Jupyter when a `.Rmd`
+notebook is edited, set
+```
+c.ContentsManager.default_nbrmd_formats = ''
+```
+(as the default value is `ipynb`). Outputs for R markdown notebooks, however,
+will not be saved any more.
+
+## Per notebook configuration
+
+If you prefer that the companion R markdown notebook be generated only for
+ selected notebooks,
+remove the `c.ContentsManager.default_nbrmd_formats` line from Jupyter's
+configuration, and instead edit the notebook metadata as follows:
 ```
 {
   "kernelspec": {
@@ -95,38 +98,13 @@ select the desired formats, like this:
 }
 ```
 
-### Global configuration
+Accepted formats are: `ipynb`, `Rmd`, `py` and `R`.
 
-If you want every notebook to be saved as both `.Rmd` and `.ipynb` files, then change your jupyter config to
-```python
-c.NotebookApp.contents_manager_class = 'nbrmd.RmdFileContentsManager'
-c.ContentsManager.default_nbrmd_formats = 'ipynb,Rmd'
-```
+In case you want both `py` and `Rmd`, please note that the
+order matters: the first non-`ipynb` extension
+is the one used as the reference source for notebook inputs.
 
-If you prefer to update just `.Rmd`, change the above accordingly (you will
-still be able to open regular `.ipynb` notebooks).
-
-## Recommendations for version control
-
-I recommend that you set `nbrmd_formats` to `"ipynb,Rmd"`, either
-in the default configuration, or in the notebook metadata (see above).
-
-When you save your notebook, two files are generated,
-with `.Rmd` and `.ipynb` extensions. Then, when you reopen
-either one or the other,
-- cell input are taken from the _source only_ format, here `.Rmd` file
-- cell outputs are taken from `.ipynb` file.
-
-This way, you can set the `.Rmd` file under version control, and still have
-the commodity of having cell output stored in the ` .ipynb` file. When
-the `.Rmd` file is updated outside of Jupyter, then you simply reload the
-notebook, and benefit of the updates.
-
-:warning: Be careful not to open twice a notebook with two distinct
-extensions! You should _shutdown_ the notebooks with the extension you are not
-currently editing (list your open notebooks with the _running_ tab in Jupyter).
-
-## How do I use the converter?
+## Command line conversion
 
 The package also provides a `nbrmd` script that converts Jupyter notebooks to R markdown notebooks, and vice-versa.
 
@@ -142,9 +120,4 @@ Alternatively, the `nbrmd` package provides a `nbconvert` rmarkdown exporter tha
 ```bash
 nbconvert jupyter.ipynb --to rmarkdown
 ```
-
-## And if I convert twice?
-
-Round trip conversion of R markdown is identity.  
-Round trip conversion of Jupyter notebooks preserves the source, not outputs.
 
