@@ -11,7 +11,7 @@ dev
 
 **BugFixes**
 
-- Removed dependency of `setup.py` on `yaml`s
+- Removed dependency of `setup.py` on `yaml`
 
 0.4.4 (2018-07-26)
 +++++++++++++++++++
