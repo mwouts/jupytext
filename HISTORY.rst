@@ -6,7 +6,15 @@ Release History
 dev
 +++
 
-0.4.3 (2018-07-24)
+0.4.4 (2018-07-26)
++++++++++++++++++++
+
+**BugFixes**
+
+- Package republished with `python setup.py sdist bdist_wheel` to fix missing
+dependencies
+
+0.4.3 (2018-07-26)
 +++++++++++++++++++
 
 **Improvements**
