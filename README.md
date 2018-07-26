@@ -1,4 +1,4 @@
-# From Jupyter notebooks from/to R markdown
+# Jupyter notebooks from/to R markdown
 
 [![Pypi](https://img.shields.io/pypi/v/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
 [![Pypi](https://img.shields.io/pypi/l/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
@@ -29,7 +29,6 @@ convenience of preserving outputs when possible.
 
 Sure. Try our package on [binder](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo)
 and open our python-oriented R markdown notebook!
-
 As you will see there, the package also offers opening and saving
 notebooks as python or R scripts. Go to
 [nbsrc](https://github.com/mwouts/nbsrc) for a specific documentation on this.
@@ -101,7 +100,7 @@ Accepted formats are: `ipynb`, `Rmd`, `py` and `R`.
 
 In case you want both `py` and `Rmd`, please note that the
 order matters: the first non-`ipynb` extension
-is the one used as the reference source for notebook inputs.
+is the one used as the reference source for notebook inputs when you open the `ipynb` file.
 
 ## Command line conversion
 
