@@ -19,9 +19,8 @@ Use the `nbrmd` package if
 - or, you have a collection of markdown or R markdown notebooks and you want to open them in Jupyter.
 
 Only the source of your notebook is represented in R markdown.
-When a pair of `.Rmd`, ``.ipynb` notebooks with identical names are opened
-in Jupyter, inputs
-are taken from the `.Rmd` file, and outputs, when they match the input,
+When a pair of `.Rmd`, `.ipynb` notebooks with identical names are opened
+in Jupyter, inputs are taken from the `.Rmd` file, and outputs, when they match the input,
 are taken from the `.ipynb` file. This allows you to edit the R markdown
 version in your favorite text editor, and reload the notebook in Jupyter with the
 convenience of preserving outputs when possible.
