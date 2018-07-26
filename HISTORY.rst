@@ -6,6 +6,12 @@ Release History
 dev
 +++
 
+0.4.6 (2018-07-26)
++++++++++++++++++++
+
+- Ping pypi - previous version still not available
+
+
 0.4.5 (2018-07-26)
 +++++++++++++++++++
 
