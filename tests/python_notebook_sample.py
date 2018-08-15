@@ -21,17 +21,24 @@
 # - two blank lines if followed by an other code cell
 # - one blank line if followed by a markdown cell
 
-# Code cells can have blank lines, but no two consecutive blank lines (that's
-# a cell break!). Below we have a cell with multiple instructions:
+# Code cells can have blank lines, but no two consecutive blank lines (unless
+# a specific cell end is specified in the cell options, see below).
+# Now we have a cell with multiple instructions
 
 a = 3
 
 a + 1
 
-# ## Metadata in code cells
+# And a cell with an arbitrary count of blank lines. This last example
+# is also an instance of a cell with metadata information in json format,
+# escaped with '#+' or '# +'
 
-# In case a code cell has metadata information, it
-# is represented in json format, escaped with '#+' or '# +'
+# + {"endcell": "-"}
+def f(x):
+    return x + 1
 
-# + {"scrolled": true}
-a + 2
+
+def g(x):
+    return x + 2
+
+# -

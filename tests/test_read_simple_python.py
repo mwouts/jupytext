@@ -104,6 +104,30 @@ def f(x):
     compare(pynb, pynb2)
 
 
+def test_read_cell_two_blank_lines(pynb="""# ---
+# title: cell with two consecutive blank lines
+# ---
+
+# + {"cellend": "-"}
+a = 1
+
+
+a + 2
+# -
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+
+    assert len(nb.cells) == 2
+    assert nb.cells[0].cell_type == 'raw'
+    assert nb.cells[0].source == '---\ntitle: cell with two ' \
+                                 'consecutive blank lines\n---'
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[1].source == 'a = 1\n\n\na + 2'
+
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
 def test_read_multiline_comment(pynb="""'''This is a multiline
 comment with "quotes", 'single quotes'
 # and comments
