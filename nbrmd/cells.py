@@ -43,6 +43,10 @@ def code_to_text(self,
     :param next_cell_is_code:
     :return:
     """
+
+    # Escape jupyter magics
+    source = ['# ' + s if _MAGIC.match(s) else s for s in source]
+
     if self.ext == '.Rmd':
         return code_to_rmd(source, metadata, default_language)
     else:
@@ -129,6 +133,7 @@ _START_CODE_RMD = re.compile(r"^```\{(.*)\}\s*$")
 _END_CODE_MD = re.compile(r"^```\s*$")
 _CODE_OPTION_RPY = re.compile(r"^(#|# )\+(.*)$")
 _BLANK_LINE = re.compile(r"^\s*$")
+_MAGIC = re.compile(r"^(# |#)*%")
 
 
 def start_code_rmd(line):
@@ -161,6 +166,20 @@ def next_uncommented_is_code(lines):
         return not _BLANK_LINE.match(line)
 
     return False
+
+
+# Unescape jupyter magics
+def uncomment(line):
+    if line.startswith('# '):
+        return line[2:]
+    elif line.startswith('#'):
+        return line[1:]
+    else:
+        return line
+
+
+def unescape_magic(source):
+    return [uncomment(s) if _MAGIC.match(s) else s for s in source]
 
 
 def text_to_cell(self, lines):
@@ -227,6 +246,9 @@ def no_code_before_next_blank_line(lines):
 
 
 def code_or_raw_cell(source, metadata):
+    source = unescape_magic(source)
+    source = '\n'.join(source)
+
     if 'ipynb' not in re.split('\\.|,', metadata.get('active', 'ipynb')):
         return new_raw_cell(source=source, metadata=metadata)
     return new_code_cell(source=source, metadata=metadata)
@@ -264,11 +286,9 @@ def code_to_cell(self, lines, parse_opt):
                                   _BLANK_LINE.match(lines[pos + 1])
                 if next_line_blank and pos + 2 != len(lines):
                     return code_or_raw_cell(
-                        source='\n'.join(lines[1:pos]), metadata=metadata), \
-                           pos + 2
+                        source=lines[1:pos], metadata=metadata), pos + 2
                 cell = code_or_raw_cell(
-                    source='\n'.join(lines[1:pos]),
-                    metadata=metadata)
+                    source=lines[1:pos], metadata=metadata)
                 cell.metadata['noskipline'] = True
                 return cell, pos + 1
     else:
@@ -281,11 +301,10 @@ def code_to_cell(self, lines, parse_opt):
             if self.ext == '.R' and line.startswith(self.prefix):
                 if prev_blank:
                     return code_or_raw_cell(
-                        source='\n'.join(lines[parse_opt:(pos - 1)]),
+                        source=lines[parse_opt:(pos - 1)],
                         metadata=metadata), pos
                 cell = code_or_raw_cell(
-                    source='\n'.join(lines[parse_opt:pos]),
-                    metadata=metadata)
+                    source=lines[parse_opt:pos], metadata=metadata)
                 cell.metadata['noskipline'] = True
                 return cell, pos
 
@@ -323,7 +342,7 @@ def code_to_cell(self, lines, parse_opt):
                             continue
 
                     return code_or_raw_cell(
-                        source='\n'.join(lines[parse_opt:(pos - 1)]),
+                        source=lines[parse_opt:(pos - 1)],
                         metadata=metadata), min(pos + 1,
                                                 len(lines) - 1)
 
@@ -332,14 +351,14 @@ def code_to_cell(self, lines, parse_opt):
                 if self.ext == '.py':
                     if no_code_before_next_blank_line(lines[pos:]):
                         return code_or_raw_cell(
-                            source='\n'.join(lines[parse_opt:(pos - 1)]),
+                            source=lines[parse_opt:(pos - 1)],
                             metadata=metadata), pos
 
             prev_blank = _BLANK_LINE.match(line)
 
     # Unterminated cell?
     return code_or_raw_cell(
-        source='\n'.join(lines[parse_opt:]),
+        source=lines[parse_opt:],
         metadata=metadata), len(lines)
 
 
