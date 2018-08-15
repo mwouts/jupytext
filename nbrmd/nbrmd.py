@@ -25,6 +25,7 @@ from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
 from .languages import get_default_language, find_main_language
 from .cells import start_code_rmd, start_code_rpy, cell_to_text, text_to_cell
 from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
+from .cells import unescape_magic
 
 # -----------------------------------------------------------------------------
 # Code
@@ -90,6 +91,8 @@ class TextNotebookReader(NotebookReader):
 
         if pos > 0:
             lines = lines[pos:]
+
+        lines = unescape_magic(lines)
 
         while lines:
             cell, pos = self.text_to_cell(lines)

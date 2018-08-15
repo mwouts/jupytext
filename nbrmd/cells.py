@@ -246,7 +246,6 @@ def no_code_before_next_blank_line(lines):
 
 
 def code_or_raw_cell(source, metadata):
-    source = unescape_magic(source)
     source = '\n'.join(source)
 
     if 'ipynb' not in re.split('\\.|,', metadata.get('active', 'ipynb')):

@@ -147,6 +147,31 @@ def test_read_cell_with_magic(pynb="""# ---
     compare(pynb, pynb2)
 
 
+def test_isolated_cell_with_magic(pynb="""# ---
+# title: cell with isolated jupyter magic
+# ---
+
+# %matplotlib inline
+
+
+1 + 1
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+
+    assert len(nb.cells) == 3
+    assert nb.cells[0].cell_type == 'raw'
+    assert nb.cells[0].source == '---\ntitle: cell with isolated jupyter ' \
+                                 'magic\n---'
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[1].source == '%matplotlib inline'
+
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[2].source == '1 + 1'
+
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
 def test_read_multiline_comment(pynb="""'''This is a multiline
 comment with "quotes", 'single quotes'
 # and comments
