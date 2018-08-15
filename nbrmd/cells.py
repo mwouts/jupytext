@@ -61,12 +61,12 @@ def code_to_text(self,
                 # Issue #31:  does the cell ends with a blank line?
                 # Do we find two blank lines in the cell? In that case
                 # we add an end-of-cell marker
-                if (len(source) and _BLANK_LINE.match(source[-1])) or \
+                if (source and _BLANK_LINE.match(source[-1])) or \
                         code_to_cell(self, source, False)[1] != len(source):
                     cellend = '-'
                     while True:
-                        cellend_re = re.compile('^#( )' + cellend + '\s*$')
-                        if len(list(filter(cellend_re.match, source))):
+                        cellend_re = re.compile(r'^#( )' + cellend + r'\s*$')
+                        if list(filter(cellend_re.match, source)):
                             cellend = cellend + '-'
                         else:
                             break
@@ -273,7 +273,7 @@ def code_to_cell(self, lines, parse_opt):
     if self.ext == '.Rmd':
         end_cell_re = _END_CODE_MD
     elif 'cellend' in metadata:
-        end_cell_re = re.compile('^#( )' + metadata['cellend'] + '\s*$')
+        end_cell_re = re.compile(r'^#( )' + metadata['cellend'] + r'\s*$')
         del metadata['cellend']
     else:
         end_cell_re = None
