@@ -42,12 +42,24 @@ def check_formats(formats):
     formats = [fmt if fmt.startswith('.') else '.' + fmt
                for fmt in formats if fmt != '']
 
-    allowed = nbrmd.NOTEBOOK_EXTENSIONS
+    allowed = nbrmd.NOTEBOOK_EXTENSIONS + ['.nb.py', '.nb.R']
     if not isinstance(formats, list) or not set(formats).issubset(allowed):
         raise TypeError("Notebook metadata 'nbrmd_formats' "
                         "should be subset of {}, but was {}"
                         "".format(str(allowed), str(formats)))
     return formats
+
+
+def file_fmt_ext(path):
+    """
+    Return file name, format (possibly .nb.py) and extension (.py)
+    """
+    file, ext = os.path.splitext(path)
+    for fmt in ['.nb.py', '.nb.R']:
+        if path.endswith(fmt):
+            return path[:-len(fmt)], fmt, ext
+
+    return file, ext, ext
 
 
 class RmdFileContentsManager(FileContentsManager, Configurable):
@@ -70,13 +82,13 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
     default_nbrmd_formats = Unicode(
         u'ipynb',
         help='Save notebooks to these file extensions. '
-             'Can be any of ipynb,Rmd,py,R, comma separated',
+             'Can be any of ipynb,Rmd,py,R,nb.py,nb.R comma separated',
         config=True)
 
     def _read_notebook(self, os_path, as_version=4,
                        load_alternative_format=True):
         """Read a notebook from an os path."""
-        file, ext = os.path.splitext(os_path)
+        file, fmt, ext = file_fmt_ext(os_path)
         if ext in self.nb_extensions:
             with mock.patch('nbformat.reads', _nbrmd_reads(ext)):
                 nb = super(RmdFileContentsManager, self) \
@@ -87,6 +99,8 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
 
         if not load_alternative_format:
             return nb
+
+        ext = fmt
 
         # Notebook formats: default, notebook metadata, or current extension
         nbrmd_formats = (nb.metadata.get('nbrmd_formats') or
@@ -139,28 +153,29 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
-        os_file, org_ext = os.path.splitext(os_path)
+        os_file, org_fmt, org_ext = file_fmt_ext(os_path)
 
         formats = (nb.get('metadata', {}).get('nbrmd_formats') or
                    self.default_nbrmd_formats)
 
         formats = check_formats(formats)
 
-        if org_ext not in formats:
-            formats.append(org_ext)
+        if org_fmt not in formats:
+            formats.append(org_fmt)
 
         formats = check_formats(formats)
 
-        for ext in formats:
-            os_path_ext = os_file + ext
-            self.log.info("Saving %s", os.path.basename(os_path_ext))
+        for fmt in formats:
+            os_path_fmt = os_file + fmt
+            self.log.info("Saving %s", os.path.basename(os_path_fmt))
+            ext = fmt.replace('.nb.', '.')
             if ext in self.nb_extensions:
                 with mock.patch('nbformat.writes', _nbrmd_writes(ext)):
                     super(RmdFileContentsManager, self) \
-                        ._save_notebook(os_path_ext, nb)
+                        ._save_notebook(os_path_fmt, nb)
             else:
                 super(RmdFileContentsManager, self) \
-                    ._save_notebook(os_path_ext, nb)
+                    ._save_notebook(os_path_fmt, nb)
 
     def get(self, path, content=True, type=None, format=None):
         """ Takes a path for an entity and returns its model"""
@@ -184,12 +199,12 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
     def rename_file(self, old_path, new_path):
         """Rename the current notebook, as well as its
          alternative representations"""
-        old_file, org_ext = os.path.splitext(old_path)
-        new_file, new_ext = os.path.splitext(new_path)
+        old_file, org_fmt, org_ext = file_fmt_ext(old_path)
+        new_file, new_fmt, new_ext = file_fmt_ext(new_path)
         if org_ext in self.all_nb_extensions() and org_ext == new_ext:
-            for ext in self.all_nb_extensions():
-                if self.file_exists(old_file + ext):
+            for fmt in self.all_nb_extensions() + ['.nb.py', '.nb.R']:
+                if self.file_exists(old_file + fmt):
                     super(RmdFileContentsManager, self) \
-                        .rename_file(old_file + ext, new_file + ext)
+                        .rename_file(old_file + fmt, new_file + fmt)
         else:
             super(RmdFileContentsManager, self).rename_file(old_path, new_path)
