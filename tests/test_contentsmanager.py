@@ -63,7 +63,7 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # rename nbpy
-    cm.rename(tmp_ipynb, 'new.nb.py')
+    cm.rename(tmp_nbpy, 'new.nb.py')
     assert not os.path.isfile(str(tmpdir.join(tmp_ipynb)))
     assert not os.path.isfile(str(tmpdir.join(tmp_nbpy)))
 
