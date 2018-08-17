@@ -139,7 +139,7 @@ def cell_to_text(self,
 _START_CODE_RMD = re.compile(r"^```\{(.*)\}\s*$")
 _END_CODE_MD = re.compile(r"^```\s*$")
 _CODE_OPTION_R = re.compile(r"^#\+(.*)\s*$")
-_CODE_OPTION_PY = re.compile(r"^(#|# )\+(| )\{(.*)\}\s*$")
+_CODE_OPTION_PY = re.compile(r"^(#|# )\+(\s*)\{(.*)\}\s*$")
 _BLANK_LINE = re.compile(r"^\s*$")
 _MAGIC = re.compile(r"^(# |#)*%")
 
