@@ -8,6 +8,7 @@ from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from .languages import cell_language, is_code
 from .cell_metadata import metadata_to_rmd_options, rmd_options_to_metadata, \
     json_options_to_metadata, metadata_to_json_options
+from .magics import escape_magic
 
 
 def code_to_rmd(source, metadata, default_language):
@@ -45,7 +46,7 @@ def code_to_text(self,
     """
 
     # Escape jupyter magics
-    source = ['# ' + s if _MAGIC.match(s) else s for s in source]
+    source = escape_magic(source)
 
     if self.ext == '.Rmd':
         return code_to_rmd(source, metadata, default_language)
@@ -141,7 +142,6 @@ _END_CODE_MD = re.compile(r"^```\s*$")
 _CODE_OPTION_R = re.compile(r"^#\+(.*)\s*$")
 _CODE_OPTION_PY = re.compile(r"^(#|# )\+(\s*)\{(.*)\}\s*$")
 _BLANK_LINE = re.compile(r"^\s*$")
-_MAGIC = re.compile(r"^(# |#)*%")
 
 
 def start_code_rmd(line):
@@ -198,18 +198,6 @@ def next_uncommented_is_code(lines):
     return False
 
 
-# Unescape jupyter magics
-def uncomment(line):
-    if line.startswith('# '):
-        return line[2:]
-    elif line.startswith('#'):
-        return line[1:]
-    else:
-        return line
-
-
-def unescape_magic(source):
-    return [uncomment(s) if _MAGIC.match(s) else s for s in source]
 
 
 def text_to_cell(self, lines):

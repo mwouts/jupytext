@@ -26,7 +26,7 @@ from .languages import get_default_language, find_main_language
 from .cells import start_code_rmd, start_code_r, start_code_py
 from .cells import cell_to_text, text_to_cell
 from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
-from .cells import unescape_magic
+from .magics import unescape_magic
 
 # -----------------------------------------------------------------------------
 # Code
