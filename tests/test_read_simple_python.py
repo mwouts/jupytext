@@ -128,21 +128,37 @@ a + 2
     compare(pynb, pynb2)
 
 
-def test_read_cell_with_magic(pynb="""# ---
-# title: cell with jupyter magic
-# ---
+def test_read_cell_explicit_start_end(pynb='''
+import pandas as pd
+# + {"cellend": "-"}
+def data():
+    return pd.DataFrame({'A': [0, 1]})
 
-# %%time
-1 + 1
+
+data()
+# -
+'''):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_read_prev_function(pynb=
+                            """def test_read_cell_explicit_start_end(pynb='''
+import pandas as pd
+# + {"cellend": "-"}
+def data():
+    return pd.DataFrame({'A': [0, 1]})
+
+
+data()
+# -
+'''):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
 """):
     nb = nbrmd.reads(pynb, ext='.py')
-
-    assert len(nb.cells) == 2
-    assert nb.cells[0].cell_type == 'raw'
-    assert nb.cells[0].source == '---\ntitle: cell with jupyter magic\n---'
-    assert nb.cells[1].cell_type == 'code'
-    assert nb.cells[1].source == '%%time\n1 + 1'
-
     pynb2 = nbrmd.writes(nb, ext='.py')
     compare(pynb, pynb2)
 

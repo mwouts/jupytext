@@ -58,11 +58,7 @@ def code_to_text(self,
                 if options != '':
                     lines.append('#+ ' + options)
             else:
-                # Issue #31:  does the cell ends with a blank line?
-                # Do we find two blank lines in the cell? In that case
-                # we add an end-of-cell marker
-                if (source and _BLANK_LINE.match(source[-1])) or \
-                        code_to_cell(self, source, False)[1] != len(source):
+                if need_end_cell_marker(self, source):
                     cellend = '-'
                     while True:
                         cellend_re = re.compile(r'^#( )' + cellend + r'\s*$')
@@ -89,6 +85,14 @@ def code_to_text(self,
         return lines
 
 
+def need_end_cell_marker(self, source):
+    """Issue #31:  does the cell ends with a blank line?
+Do we find two blank lines in the cell? In that case
+we add an end-of-cell marker"""
+    return (source and _BLANK_LINE.match(source[-1])) or \
+           code_to_cell(self, source, False)[1] != len(source)
+
+
 def cell_to_text(self,
                  cell,
                  next_cell=None,
@@ -111,8 +115,11 @@ def cell_to_text(self,
 
     lines = []
     if is_code(cell):
-        lines.extend(code_to_text(self, source, metadata, default_language,
-                                  next_cell and is_code(next_cell)))
+        lines.extend(code_to_text(
+            self, source, metadata, default_language,
+            next_cell and is_code(next_cell) and
+            (not need_end_cell_marker(
+                self, next_cell.get('source').splitlines()))))
     else:
         if source == []:
             source = ['']
@@ -131,7 +138,8 @@ def cell_to_text(self,
 
 _START_CODE_RMD = re.compile(r"^```\{(.*)\}\s*$")
 _END_CODE_MD = re.compile(r"^```\s*$")
-_CODE_OPTION_RPY = re.compile(r"^(#|# )\+(.*)$")
+_CODE_OPTION_R = re.compile(r"^#\+(.*)\s*$")
+_CODE_OPTION_PY = re.compile(r"^(#|# )\+(| )\{(.*)\}\s*$")
 _BLANK_LINE = re.compile(r"^\s*$")
 _MAGIC = re.compile(r"^(# |#)*%")
 
@@ -145,13 +153,35 @@ def start_code_rmd(line):
     return _START_CODE_RMD.match(line)
 
 
-def start_code_rpy(line):
+def start_code_r(line):
+    """
+    A code cell starts here, in a R file
+    :param line:
+    :return:
+    """
+    return _CODE_OPTION_R.match(line)
+
+
+def start_code_py(line):
+    """
+    A code cell starts here, in a R file
+    :param line:
+    :return:
+    """
+    return _CODE_OPTION_PY.match(line)
+
+
+def start_code_rpy(line, ext):
     """
     A code cell starts here, in a py or R file
     :param line:
     :return:
     """
-    return _CODE_OPTION_RPY.match(line)
+    if ext == '.R':
+        return start_code_r(line)
+    if ext == '.py':
+        return start_code_py(line)
+    raise ValueError('Unexpected extension {}'.format(ext))
 
 
 def next_uncommented_is_code(lines):
@@ -209,10 +239,10 @@ def parse_code_options(line, ext):
     if ext == '.Rmd':
         return rmd_options_to_metadata(_START_CODE_RMD.findall(line)[0])
     elif ext == '.R':
-        return rmd_options_to_metadata(_CODE_OPTION_RPY.match(line).group(2))
+        return rmd_options_to_metadata(_CODE_OPTION_R.findall(line)[0])
 
     return 'python', json_options_to_metadata(
-        _CODE_OPTION_RPY.match(line).group(2))
+        _CODE_OPTION_PY.match(line).group(3))
 
 
 def next_code_is_indented(lines):
@@ -294,18 +324,9 @@ def code_to_cell(self, lines, parse_opt):
         prev_blank = False
         triple = None
         for pos, line in enumerate(lines):
+
             if parse_opt and pos == 0:
                 continue
-
-            if self.ext == '.R' and line.startswith(self.prefix):
-                if prev_blank:
-                    return code_or_raw_cell(
-                        source=lines[parse_opt:(pos - 1)],
-                        metadata=metadata), pos
-                cell = code_or_raw_cell(
-                    source=lines[parse_opt:pos], metadata=metadata)
-                cell.metadata['noskipline'] = True
-                return cell, pos
 
             if self.ext == '.py':
                 single = None
@@ -326,9 +347,22 @@ def code_to_cell(self, lines, parse_opt):
                         continue
                     if line[i - 2:i + 1] == 3 * char:
                         triple = char
+                        continue
+                    single = char
 
                 if triple:
                     continue
+
+            if start_code_rpy(line, self.ext) or (
+                    self.ext == '.R' and line.startswith(self.prefix)):
+                if prev_blank:
+                    return code_or_raw_cell(
+                        source=lines[parse_opt:(pos - 1)],
+                        metadata=metadata), pos
+                cell = code_or_raw_cell(
+                    source=lines[parse_opt:pos], metadata=metadata)
+                cell.metadata['noskipline'] = True
+                return cell, pos
 
             if prev_blank:
                 if _BLANK_LINE.match(line):

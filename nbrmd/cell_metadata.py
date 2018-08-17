@@ -255,7 +255,7 @@ def json_options_to_metadata(options):
     :return:
     """
     try:
-        return json.loads(options)
+        return json.loads('{' + options + '}')
     except ValueError:
         return {}
 

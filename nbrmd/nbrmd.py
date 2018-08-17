@@ -23,7 +23,8 @@ import nbformat
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable
 from .languages import get_default_language, find_main_language
-from .cells import start_code_rmd, start_code_rpy, cell_to_text, text_to_cell
+from .cells import start_code_rmd, start_code_r, start_code_py
+from .cells import cell_to_text, text_to_cell
 from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
 from .cells import unescape_magic
 
@@ -46,7 +47,8 @@ class TextNotebookReader(NotebookReader):
     def __init__(self, ext):
         self.ext = ext
         self.prefix = markdown_comment(ext)
-        self.start_code = start_code_rmd if ext == '.Rmd' else start_code_rpy
+        self.start_code = start_code_rmd if ext == '.Rmd' else \
+            start_code_py if ext == '.py' else start_code_r
         if ext == '.Rmd':
             self.markdown_to_cell = markdown_to_cell_rmd
 
