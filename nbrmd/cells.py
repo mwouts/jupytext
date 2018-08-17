@@ -279,6 +279,8 @@ def code_or_raw_cell(source, metadata):
     source = '\n'.join(source)
 
     if 'ipynb' not in re.split('\\.|,', metadata.get('active', 'ipynb')):
+        if metadata.get('active') == '':
+            del metadata['active']
         return new_raw_cell(source=source, metadata=metadata)
     return new_code_cell(source=source, metadata=metadata)
 
@@ -294,7 +296,7 @@ def code_to_cell(self, lines, parse_opt):
     # Parse options
     if parse_opt:
         language, metadata = parse_code_options(lines[0], self.ext)
-        if self.ext == '.Rmd':
+        if self.ext == '.Rmd' and metadata.get('active') != '':
             metadata['language'] = language
     else:
         metadata = {}
