@@ -143,8 +143,7 @@ data()
     compare(pynb, pynb2)
 
 
-def test_read_prev_function(pynb=
-                            """def test_read_cell_explicit_start_end(pynb='''
+def test_read_prev_function(pynb="""def test_read_cell_explicit_start_end(pynb='''
 import pandas as pd
 # + {"cellend": "-"}
 def data():
