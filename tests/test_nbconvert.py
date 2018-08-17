@@ -1,10 +1,13 @@
 import os
+import sys
 import subprocess
 import pytest
 import nbrmd
 from .utils import list_all_notebooks
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.skipif(isinstance(nbrmd.RMarkdownExporter, str),
                     reason=nbrmd.RMarkdownExporter)
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
@@ -24,7 +27,8 @@ def test_nbconvert_and_read(nb_file):
 
 pytest.importorskip('jupyter')
 
-
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.skipif(isinstance(nbrmd.RMarkdownExporter, str),
                     reason=nbrmd.RMarkdownExporter)
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
