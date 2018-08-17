@@ -89,8 +89,8 @@ def need_end_cell_marker(self, source):
     """Issue #31:  does the cell ends with a blank line?
 Do we find two blank lines in the cell? In that case
 we add an end-of-cell marker"""
-    return (source and _BLANK_LINE.match(source[-1])) or \
-           code_to_cell(self, source, False)[1] != len(source)
+    return ((source and _BLANK_LINE.match(source[-1])) or
+            code_to_cell(self, source, False)[1] != len(source))
 
 
 def cell_to_text(self,
@@ -276,6 +276,7 @@ def no_code_before_next_blank_line(lines):
 
 
 def code_or_raw_cell(source, metadata):
+    """Return a code, or raw cell from given source and metadata"""
     source = '\n'.join(source)
 
     if 'ipynb' not in re.split('\\.|,', metadata.get('active', 'ipynb')):
