@@ -106,6 +106,8 @@ ACTIVE_RMD = {'.py': """# + {"active": "Rmd", "cellend": "-"}
                          'metadata': {'active': 'Rmd'}}}
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_rmd(ext):
     nb = nbrmd.reads(ACTIVE_RMD[ext], ext=ext)
