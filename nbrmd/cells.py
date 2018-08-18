@@ -8,7 +8,8 @@ from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from .languages import cell_language, is_code
 from .cell_metadata import metadata_to_rmd_options, rmd_options_to_metadata, \
     json_options_to_metadata, metadata_to_json_options
-from .magics import escape_magic
+from .magics import is_magic, escape_magic, unescape_magic
+from .stringparser import StringParser
 
 
 def code_to_rmd(source, metadata, default_language):
@@ -21,7 +22,7 @@ def code_to_rmd(source, metadata, default_language):
     """
     lines = []
     language = cell_language(source) or default_language
-    if 'Rmd' not in re.split('\\.|,', metadata.get('active', 'Rmd')):
+    if not is_active('Rmd', metadata):
         metadata['eval'] = False
     options = metadata_to_rmd_options(language, metadata)
     lines.append(u'```{{{}}}'.format(options))
@@ -46,38 +47,51 @@ def code_to_text(self,
     """
 
     # Escape jupyter magics
-    source = escape_magic(source)
+    language = cell_language(source) or default_language
+    active = is_active(self.ext, metadata)
+    if self.ext in ['.R', '.py']:
+        if language != default_language and active:
+            active = False
+            metadata['active'] = 'ipynb'
+
+    if active:
+        source = escape_magic(source, language)
 
     if self.ext == '.Rmd':
         return code_to_rmd(source, metadata, default_language)
     else:
         lines = []
-        language = cell_language(source) or default_language
-        if language == default_language:
-            if self.ext == '.R':
-                options = metadata_to_rmd_options(language, metadata)[2:]
+        if self.ext == '.R':
+            if not active:
+                metadata['eval'] = False
+                options = metadata_to_rmd_options(None, metadata)
+                if language != 'R':
+                    options = 'language="{}" {}'.format(language, options)
+                source = ['#+ ' + options] + ["#' " + s for s in source]
+            else:
+                options = metadata_to_rmd_options(None, metadata)
                 if options != '':
                     lines.append('#+ ' + options)
-            else:
-                if need_end_cell_marker(self, source):
-                    cellend = '-'
-                    while True:
-                        cellend_re = re.compile(r'^#( )' + cellend + r'\s*$')
-                        if list(filter(cellend_re.match, source)):
-                            cellend = cellend + '-'
-                        else:
-                            break
-                    metadata['cellend'] = cellend
+        else:  # py
+            # end of cell marker
+            if not active or need_end_cell_marker(self, source):
+                cellend = '-'
+                while True:
+                    cellend_re = re.compile(r'^#( )' + cellend + r'\s*$')
+                    if list(filter(cellend_re.match, source)):
+                        cellend = cellend + '-'
+                    else:
+                        break
+                metadata['cellend'] = cellend
 
-                options = metadata_to_json_options(metadata)
-                if options != '{}':
-                    lines.append('# + ' + options)
-            lines.extend(source)
-            if 'cellend' in metadata:
-                lines.append('# ' + metadata['cellend'])
-        else:
-            lines.extend(self.markdown_escape(
-                code_to_rmd(source, metadata, default_language)))
+            options = metadata_to_json_options(metadata)
+            if options != '{}':
+                lines.append('# + ' + options)
+            if not active:
+                source = ['# ' + line for line in source]
+        lines.extend(source)
+        if 'cellend' in metadata:
+            lines.append('# ' + metadata['cellend'])
 
         # Two blank lines before next code cell
         if next_cell_is_code:
@@ -198,8 +212,6 @@ def next_uncommented_is_code(lines):
     return False
 
 
-
-
 def text_to_cell(self, lines):
     """
     Parse text to a cell
@@ -211,7 +223,8 @@ def text_to_cell(self, lines):
         return self.code_to_cell(lines, parse_opt=True)
     elif self.prefix != '' and not lines[0].startswith(self.prefix):
         return self.code_to_cell(lines, parse_opt=False)
-    elif self.ext == '.py' and next_uncommented_is_code(lines):
+    elif self.ext == '.py' and (next_uncommented_is_code(lines)
+                                or is_magic(lines[0])):
         return self.code_to_cell(lines, parse_opt=False)
 
     return self.markdown_to_cell(lines)
@@ -227,7 +240,12 @@ def parse_code_options(line, ext):
     if ext == '.Rmd':
         return rmd_options_to_metadata(_START_CODE_RMD.findall(line)[0])
     elif ext == '.R':
-        return rmd_options_to_metadata(_CODE_OPTION_R.findall(line)[0])
+        language, metadata = \
+            rmd_options_to_metadata(_CODE_OPTION_R.findall(line)[0])
+        if 'language' in metadata:
+            language = metadata['language']
+            del metadata['language']
+        return language, metadata
 
     return 'python', json_options_to_metadata(
         _CODE_OPTION_PY.match(line).group(3))
@@ -265,13 +283,11 @@ def no_code_before_next_blank_line(lines):
 
 def code_or_raw_cell(source, metadata):
     """Return a code, or raw cell from given source and metadata"""
-    source = '\n'.join(source)
-
-    if 'ipynb' not in re.split('\\.|,', metadata.get('active', 'ipynb')):
+    if not is_active('ipynb', metadata):
         if metadata.get('active') == '':
             del metadata['active']
-        return new_raw_cell(source=source, metadata=metadata)
-    return new_code_cell(source=source, metadata=metadata)
+        return new_raw_cell(source='\n'.join(source), metadata=metadata)
+    return new_code_cell(source='\n'.join(source), metadata=metadata)
 
 
 def code_to_cell(self, lines, parse_opt):
@@ -288,13 +304,16 @@ def code_to_cell(self, lines, parse_opt):
         if self.ext == '.Rmd' and metadata.get('active') != '':
             metadata['language'] = language
     else:
+        language = 'python' if self.ext == '.py' else 'R'
         metadata = {}
 
     if self.ext == '.Rmd':
         end_cell_re = _END_CODE_MD
-    elif 'cellend' in metadata:
+    elif self.ext == '.py' and 'cellend' in metadata:
         end_cell_re = re.compile(r'^#( )' + metadata['cellend'] + r'\s*$')
         del metadata['cellend']
+    elif self.ext == '.R' and not is_active('.R', metadata):
+        end_cell_re = _BLANK_LINE
     else:
         end_cell_re = None
 
@@ -304,54 +323,43 @@ def code_to_cell(self, lines, parse_opt):
             if pos > 0 and end_cell_re.match(line):
                 next_line_blank = pos + 1 == len(lines) or \
                                   _BLANK_LINE.match(lines[pos + 1])
+                source = lines[1:pos]
+                if is_active(self.ext, metadata):
+                    source = unescape_magic(source, language)
+                elif self.ext in ['.py', '.R']:
+                    source = [self.markdown_unescape(s) for s in source]
+                if end_cell_re == _BLANK_LINE:
+                    return code_or_raw_cell(
+                        source=source, metadata=metadata), pos + 1
                 if next_line_blank and pos + 2 != len(lines):
                     return code_or_raw_cell(
-                        source=lines[1:pos], metadata=metadata), pos + 2
-                cell = code_or_raw_cell(
-                    source=lines[1:pos], metadata=metadata)
+                        source=source, metadata=metadata), pos + 2
+                cell = code_or_raw_cell(source=source, metadata=metadata)
                 cell.metadata['noskipline'] = True
                 return cell, pos + 1
     else:
         prev_blank = False
-        triple = None
+        sp = StringParser(language)
         for pos, line in enumerate(lines):
-
             if parse_opt and pos == 0:
                 continue
 
-            if self.ext == '.py':
-                single = None
-                for i, char in enumerate(line):
-                    if char not in ['"', "'"]:
-                        continue
+            if sp.is_quoted():
+                sp.read_line(line)
+                continue
 
-                    if single == char:
-                        single = None
-                        continue
-                    if single is not None:
-                        continue
-                    if triple == char:
-                        if line[i - 2:i + 1] == 3 * char:
-                            triple = None
-                            continue
-                    if triple is not None:
-                        continue
-                    if line[i - 2:i + 1] == 3 * char:
-                        triple = char
-                        continue
-                    single = char
-
-                if triple:
-                    continue
+            sp.read_line(line)
 
             if start_code_rpy(line, self.ext) or (
                     self.ext == '.R' and line.startswith(self.prefix)):
+                source = lines[parse_opt:pos]
+                if is_active(self.ext, metadata):
+                    source = unescape_magic(source, language)
                 if prev_blank:
                     return code_or_raw_cell(
-                        source=lines[parse_opt:(pos - 1)],
-                        metadata=metadata), pos
+                        source=source[:-1], metadata=metadata), pos
                 cell = code_or_raw_cell(
-                    source=lines[parse_opt:pos], metadata=metadata)
+                    source=source, metadata=metadata)
                 cell.metadata['noskipline'] = True
                 return cell, pos
 
@@ -365,25 +373,36 @@ def code_to_cell(self, lines, parse_opt):
                         if next_code_is_indented(lines[pos:]):
                             continue
 
+                    source = lines[parse_opt:(pos - 1)]
+                    if is_active(self.ext, metadata):
+                        source = unescape_magic(source, language)
+
                     return code_or_raw_cell(
-                        source=lines[parse_opt:(pos - 1)],
-                        metadata=metadata), min(pos + 1,
-                                                len(lines) - 1)
+                        source=source,
+                        metadata=metadata), min(pos + 1, len(lines) - 1)
 
                 # are all the lines from here to next blank
                 # escaped with the prefix?
                 if self.ext == '.py':
                     if no_code_before_next_blank_line(lines[pos:]):
+
+                        source = lines[parse_opt:(pos - 1)]
+                        if is_active(self.ext, metadata):
+                            source = unescape_magic(source, language)
+
                         return code_or_raw_cell(
-                            source=lines[parse_opt:(pos - 1)],
-                            metadata=metadata), pos
+                            source=source, metadata=metadata), pos
 
             prev_blank = _BLANK_LINE.match(line)
 
     # Unterminated cell?
-    return code_or_raw_cell(
-        source=lines[parse_opt:],
-        metadata=metadata), len(lines)
+    source = lines[parse_opt:]
+    if is_active(self.ext, metadata):
+        source = unescape_magic(source, language)
+    elif self.ext in ['.py', '.R']:
+        source = [self.markdown_unescape(s) for s in source]
+
+    return code_or_raw_cell(source=source, metadata=metadata), len(lines)
 
 
 def markdown_to_cell(self, lines):
@@ -433,3 +452,9 @@ def markdown_to_cell_rmd(lines):
 
     # Unterminated cell?
     return new_markdown_cell(source='\n'.join(lines)), len(lines)
+
+
+def is_active(ext, metadata):
+    if not 'active' in metadata:
+        return True
+    return ext.replace('.', '') in re.split('\\.|,', metadata['active'])

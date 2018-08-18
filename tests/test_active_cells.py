@@ -28,6 +28,39 @@ def test_active_all(ext):
     compare(ACTIVE_ALL[ext], nbrmd.writes(nb, ext=ext))
 
 
+ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb", "cellend": "-"}
+# # This cell is active only in ipynb
+# %matplotlib inline
+# -
+""",
+                '.Rmd': """```{python active="ipynb", eval=FALSE}
+# This cell is active only in ipynb
+%matplotlib inline
+```
+""",
+                '.R': """#+ language="python", active="ipynb", eval=FALSE
+#' # This cell is active only in ipynb
+#' %matplotlib inline
+""",
+                '.ipynb': {'cell_type': 'code',
+                           'source': '# This cell is active only in ipynb\n'
+                                     '%matplotlib inline',
+                           'metadata': {'active': 'ipynb'},
+                           'execution_count': None,
+                           'outputs': []}}
+
+
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
+@pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
+def test_active_ipynb(ext):
+    nb = nbrmd.reads(ACTIVE_IPYNB[ext], ext=ext)
+    assert len(nb.cells) == 1
+    compare(nb.cells[0], ACTIVE_IPYNB['.ipynb'])
+    if ext != '.R':
+        compare(ACTIVE_IPYNB[ext], nbrmd.writes(nb, ext=ext))
+
+
 ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 # This cell is active in py and ipynb extensions
 """,
@@ -35,9 +68,8 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 # This cell is active in py and ipynb extensions
 ```
 """,
-                   '.R': """#' ```{python active="ipynb,py", eval=FALSE}
+                   '.R': """#+ language="python", active="ipynb,py", eval=FALSE
 #' # This cell is active in py and ipynb extensions
-#' ```
 """,
                    '.ipynb': {'cell_type': 'code',
                               'source': '# This cell is active in py and '
@@ -49,36 +81,38 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
                     reason="unordered dict result in changes in chunk options")
-@pytest.mark.parametrize('ext', ['.Rmd', '.py'])  # TODO: add R
+@pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_py_ipynb(ext):
     nb = nbrmd.reads(ACTIVE_PY_IPYNB[ext], ext=ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_PY_IPYNB['.ipynb'])
-    compare(ACTIVE_PY_IPYNB[ext], nbrmd.writes(nb, ext=ext))
+    if ext != '.R':
+        compare(ACTIVE_PY_IPYNB[ext], nbrmd.writes(nb, ext=ext))
 
 
-ACTIVE_RMD = {'.py': """# # + {"active": "Rmd"}
+ACTIVE_RMD = {'.py': """# + {"active": "Rmd", "cellend": "-"}
 # # This cell is active in Rmd only
+# -
 """,
               '.Rmd': """```{python active="Rmd"}
 # This cell is active in Rmd only
 ```
 """,
-              '.R': """#' ```{python active="Rmd", eval=FALSE}
+              '.R': """#+ language="python", active="Rmd", eval=FALSE
 #' # This cell is active in Rmd only
-#' ```
 """,
               '.ipynb': {'cell_type': 'raw',
                          'source': '# This cell is active in Rmd only',
                          'metadata': {'active': 'Rmd'}}}
 
 
-@pytest.mark.parametrize('ext', ['.Rmd'])  # TODO: add R and py
+@pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_rmd(ext):
     nb = nbrmd.reads(ACTIVE_RMD[ext], ext=ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_RMD['.ipynb'])
-    compare(ACTIVE_RMD[ext], nbrmd.writes(nb, ext=ext))
+    if ext != '.R':
+        compare(ACTIVE_RMD[ext], nbrmd.writes(nb, ext=ext))
 
 
 ACTIVE_NOT_INCLUDE_RMD = {'.py': """# # + {"hide_output": true, "active": "Rmd"}

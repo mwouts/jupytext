@@ -94,8 +94,6 @@ class TextNotebookReader(NotebookReader):
         if pos > 0:
             lines = lines[pos:]
 
-        lines = unescape_magic(lines)
-
         while lines:
             cell, pos = self.text_to_cell(lines)
             if cell is None:

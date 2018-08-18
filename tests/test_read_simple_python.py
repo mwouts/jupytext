@@ -166,6 +166,14 @@ def test_isolated_cell_with_magic(pynb="""# ---
 # title: cell with isolated jupyter magic
 # ---
 
+# A magic command included in a markdown
+# paragraph is not code, like the one below:
+#
+# %matplotlib inline
+
+# However, a code block may start with
+# a magic command, like this one:
+
 # %matplotlib inline
 
 
@@ -173,15 +181,17 @@ def test_isolated_cell_with_magic(pynb="""# ---
 """):
     nb = nbrmd.reads(pynb, ext='.py')
 
-    assert len(nb.cells) == 3
+    assert len(nb.cells) == 5
     assert nb.cells[0].cell_type == 'raw'
     assert nb.cells[0].source == '---\ntitle: cell with isolated jupyter ' \
                                  'magic\n---'
-    assert nb.cells[1].cell_type == 'code'
-    assert nb.cells[1].source == '%matplotlib inline'
+    assert nb.cells[1].cell_type == 'markdown'
+    assert nb.cells[2].cell_type == 'markdown'
+    assert nb.cells[3].cell_type == 'code'
+    assert nb.cells[3].source == '%matplotlib inline'
 
-    assert nb.cells[2].cell_type == 'code'
-    assert nb.cells[2].source == '1 + 1'
+    assert nb.cells[4].cell_type == 'code'
+    assert nb.cells[4].source == '1 + 1'
 
     pynb2 = nbrmd.writes(nb, ext='.py')
     compare(pynb, pynb2)

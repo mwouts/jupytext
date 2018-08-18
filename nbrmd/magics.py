@@ -1,6 +1,7 @@
 """Escape Jupyter magics when converting to other formats"""
 
 import re
+from .stringparser import StringParser
 
 # Line magics retrieved manually (Aug 18) with %lsmagic
 _LINE_MAGICS = '%alias  %alias_magic  %autocall  %automagic  %autosave  ' \
@@ -26,11 +27,20 @@ _FORCE_NOT_ESC_RE = re.compile(r"^(# |#)*%(.*)noescape")
 _MAGIC_RE = re.compile(r"^(# |#)*(%%|{})".format('|'.join(_LINE_MAGICS)))
 
 
-def escape_magic(source):
+def is_magic(line):
+    """Is the current line a (possibly escaped) Jupyter magic?"""
+    return (_FORCE_ESC_RE.match(line) or (not _FORCE_NOT_ESC_RE.match(line)
+                                          and _MAGIC_RE.match(line)))
+
+
+def escape_magic(source, language='python'):
     """Escape Jupyter magics with '# '"""
-    return ['# ' + s if _FORCE_ESC_RE.match(s) or
-                        (not _FORCE_NOT_ESC_RE.match(s) and _MAGIC_RE.match(s))
-            else s for s in source]
+    sc = StringParser(language)
+    for pos, line in enumerate(source):
+        if not sc.is_quoted() and is_magic(line):
+            source[pos] = '# ' + line
+        sc.read_line(line)
+    return source
 
 
 def unesc(line):
@@ -43,8 +53,11 @@ def unesc(line):
         return line
 
 
-def unescape_magic(source):
+def unescape_magic(source, language='python'):
     """Unescape Jupyter magics"""
-    return [unesc(s) if _FORCE_ESC_RE.match(s) or
-                        (not _FORCE_NOT_ESC_RE.match(s) and _MAGIC_RE.match(s))
-            else s for s in source]
+    sc = StringParser(language)
+    for pos, line in enumerate(source):
+        if not sc.is_quoted() and is_magic(line):
+            source[pos] = unesc(line)
+        sc.read_line(line)
+    return source
