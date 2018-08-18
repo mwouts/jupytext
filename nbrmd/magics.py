@@ -35,11 +35,11 @@ def is_magic(line):
 
 def escape_magic(source, language='python'):
     """Escape Jupyter magics with '# '"""
-    sc = StringParser(language)
+    parser = StringParser(language)
     for pos, line in enumerate(source):
-        if not sc.is_quoted() and is_magic(line):
+        if not parser.is_quoted() and is_magic(line):
             source[pos] = '# ' + line
-        sc.read_line(line)
+        parser.read_line(line)
     return source
 
 
@@ -47,17 +47,16 @@ def unesc(line):
     """Uncomment once a commented line"""
     if line.startswith('# '):
         return line[2:]
-    elif line.startswith('#'):
+    if line.startswith('#'):
         return line[1:]
-    else:
-        return line
+    return line
 
 
 def unescape_magic(source, language='python'):
     """Unescape Jupyter magics"""
-    sc = StringParser(language)
+    parser = StringParser(language)
     for pos, line in enumerate(source):
-        if not sc.is_quoted() and is_magic(line):
+        if not parser.is_quoted() and is_magic(line):
             source[pos] = unesc(line)
-        sc.read_line(line)
+        parser.read_line(line)
     return source

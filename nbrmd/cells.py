@@ -339,16 +339,16 @@ def code_to_cell(self, lines, parse_opt):
                 return cell, pos + 1
     else:
         prev_blank = False
-        sp = StringParser(language)
+        parser = StringParser(language)
         for pos, line in enumerate(lines):
             if parse_opt and pos == 0:
                 continue
 
-            if sp.is_quoted():
-                sp.read_line(line)
+            if parser.is_quoted():
+                parser.read_line(line)
                 continue
 
-            sp.read_line(line)
+            parser.read_line(line)
 
             if start_code_rpy(line, self.ext) or (
                     self.ext == '.R' and line.startswith(self.prefix)):
@@ -455,6 +455,7 @@ def markdown_to_cell_rmd(lines):
 
 
 def is_active(ext, metadata):
+    """Is the cell active for the given file extension?"""
     if not 'active' in metadata:
         return True
     return ext.replace('.', '') in re.split('\\.|,', metadata['active'])
