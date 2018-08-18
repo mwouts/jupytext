@@ -86,6 +86,8 @@ def test_nbconvert_and_read_r(nb_file):
 pytest.importorskip('jupyter')
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.skipif(isinstance(nbrmd.PyNotebookExporter, str),
                     reason=nbrmd.PyNotebookExporter)
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
@@ -105,6 +107,8 @@ def test_nbconvert_cmd_line_py(nb_file, tmpdir):
     assert py1 == py2
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.skipif(isinstance(nbrmd.RNotebookExporter, str),
                     reason=nbrmd.RNotebookExporter)
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
