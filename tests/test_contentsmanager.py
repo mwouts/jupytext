@@ -21,6 +21,7 @@ def test_load_save_rename(nb_file, tmpdir):
     tmp_rmd = 'notebook.Rmd'
 
     cm = RmdFileContentsManager()
+    cm.default_nbrmd_formats = 'ipynb,Rmd'
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save Rmd, reopen
@@ -51,6 +52,7 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_nbpy = 'notebook.nb.py'
 
     cm = RmdFileContentsManager()
+    cm.default_nbrmd_formats = 'ipynb,nb.py'
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
