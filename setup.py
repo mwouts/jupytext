@@ -19,8 +19,8 @@ setup(
                                       'nbsrc = nbrmd.cli:nbsrc'],
                   'nbconvert.exporters':
                       ['rmarkdown = nbrmd:RMarkdownExporter',
-                       'pynotebook = nbsrc:PyNotebookExporter',
-                       'rnotebook = nbsrc:RNotebookExporter']},
+                       'pynotebook = nbrmd:PyNotebookExporter',
+                       'rnotebook = nbrmd:RNotebookExporter']},
     tests_require=['pytest', 'testfixtures'],
     install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml'],
     license='MIT',
