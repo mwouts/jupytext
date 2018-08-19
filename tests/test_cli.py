@@ -13,12 +13,6 @@ def test_cli_single_file(nb_file):
     assert cli([nb_file]).notebooks == [nb_file]
 
 
-@pytest.mark.parametrize('nb_file',
-                         list_all_notebooks('.ipynb') +
-                         list_all_notebooks('.Rmd'))
-def test_cli_single_file(nb_file):
-    assert cli([nb_file]).notebooks == [nb_file]
-
 @pytest.mark.parametrize('nb_files', [list_all_notebooks('.ipynb') +
                                       list_all_notebooks('.Rmd')])
 def test_cli_multiple_files(nb_files):
