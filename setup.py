@@ -22,7 +22,7 @@ setup(
                        'pynotebook = nbrmd:PyNotebookExporter',
                        'rnotebook = nbrmd:RNotebookExporter']},
     tests_require=['pytest', 'testfixtures'],
-    install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml'],
+    install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml', 'six'],
     license='MIT',
     classifiers=('Development Status :: 4 - Beta',
                  'Environment :: Console',

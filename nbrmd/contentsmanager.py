@@ -3,6 +3,7 @@
 import os
 import nbformat
 import mock
+import six
 
 try:
     import notebook.transutils  # noqa
@@ -55,7 +56,7 @@ def check_formats(formats):
             return check_formats([formats])
         validated_group = []
         for fmt in group:
-            if not isinstance(fmt, str):
+            if not isinstance(fmt, six.string_types):
                 raise ValueError('Extensions should be strings, not {}.\n{}'
                                  .format(str(fmt),
                                          str(nbrmd.NOTEBOOK_EXTENSIONS),
