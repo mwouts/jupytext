@@ -231,17 +231,9 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
          alternative representations"""
         old_file, org_fmt, _ = file_fmt_ext(old_path)
         new_file, new_fmt, _ = file_fmt_ext(new_path)
-        nbrmd_formats = check_formats(self.default_nbrmd_formats)
 
         if org_fmt == new_fmt:
-            # Find group that contains the current format
-            fmt_group = []
-            for group in nbrmd_formats:
-                if org_fmt in group:
-                    fmt_group = group
-                    break
-
-            for alt_fmt in fmt_group:
+            for alt_fmt in self.format_group(org_fmt):
                 if self.file_exists(old_file + alt_fmt):
                     super(RmdFileContentsManager, self) \
                         .rename_file(old_file + alt_fmt, new_file + alt_fmt)
