@@ -28,7 +28,7 @@ def test_active_all(ext):
     compare(ACTIVE_ALL[ext], nbrmd.writes(nb, ext=ext))
 
 
-ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb", "cellend": "-"}
+ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb", "endofcell": "-"}
 # # This cell is active only in ipynb
 # %matplotlib inline
 # -
@@ -90,7 +90,7 @@ def test_active_py_ipynb(ext):
         compare(ACTIVE_PY_IPYNB[ext], nbrmd.writes(nb, ext=ext))
 
 
-ACTIVE_RMD = {'.py': """# + {"active": "Rmd", "cellend": "-"}
+ACTIVE_RMD = {'.py': """# + {"active": "Rmd", "endofcell": "-"}
 # # This cell is active in Rmd only
 # -
 """,

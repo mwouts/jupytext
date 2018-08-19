@@ -75,14 +75,14 @@ def code_to_text(self,
         else:  # py
             # end of cell marker
             if not active or need_end_cell_marker(self, source):
-                cellend = '-'
+                endofcell = '-'
                 while True:
-                    cellend_re = re.compile(r'^#( )' + cellend + r'\s*$')
-                    if list(filter(cellend_re.match, source)):
-                        cellend = cellend + '-'
+                    endofcell_re = re.compile(r'^#( )' + endofcell + r'\s*$')
+                    if list(filter(endofcell_re.match, source)):
+                        endofcell = endofcell + '-'
                     else:
                         break
-                metadata['cellend'] = cellend
+                metadata['endofcell'] = endofcell
 
             options = metadata_to_json_options(metadata)
             if options != '{}':
@@ -90,8 +90,8 @@ def code_to_text(self,
             if not active:
                 source = ['# ' + line for line in source]
         lines.extend(source)
-        if 'cellend' in metadata:
-            lines.append('# ' + metadata['cellend'])
+        if 'endofcell' in metadata:
+            lines.append('# ' + metadata['endofcell'])
 
         # Two blank lines before next code cell
         if next_cell_is_code:
@@ -309,9 +309,9 @@ def code_to_cell(self, lines, parse_opt):
 
     if self.ext == '.Rmd':
         end_cell_re = _END_CODE_MD
-    elif self.ext == '.py' and 'cellend' in metadata:
-        end_cell_re = re.compile(r'^#( )' + metadata['cellend'] + r'\s*$')
-        del metadata['cellend']
+    elif self.ext == '.py' and 'endofcell' in metadata:
+        end_cell_re = re.compile(r'^#( )' + metadata['endofcell'] + r'\s*$')
+        del metadata['endofcell']
     elif self.ext == '.R' and not is_active('.R', metadata):
         end_cell_re = _BLANK_LINE
     else:

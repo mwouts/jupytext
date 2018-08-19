@@ -114,7 +114,7 @@ def test_read_cell_two_blank_lines(pynb="""# ---
 # title: cell with two consecutive blank lines
 # ---
 
-# + {"cellend": "-"}
+# + {"endofcell": "-"}
 a = 1
 
 
@@ -136,7 +136,7 @@ a + 2
 
 def test_read_cell_explicit_start_end(pynb='''
 import pandas as pd
-# + {"cellend": "-"}
+# + {"endofcell": "-"}
 def data():
     return pd.DataFrame({'A': [0, 1]})
 
@@ -151,7 +151,7 @@ data()
 
 def test_read_prev_function(pynb="""def test_read_cell_explicit_start_end(pynb='''
 import pandas as pd
-# + {"cellend": "-"}
+# + {"endofcell": "-"}
 def data():
     return pd.DataFrame({'A': [0, 1]})
 
