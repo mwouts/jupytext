@@ -213,7 +213,7 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
 
     def trust_notebook(self, path):
         """Trust the current notebook"""
-        file, fmt, ext = file_fmt_ext(path)
+        file, fmt, _ = file_fmt_ext(path)
         for alt_fmt in self.format_group(fmt):
             if alt_fmt.endswith('.ipynb'):
                 super(RmdFileContentsManager, self).trust_notebook(file +
