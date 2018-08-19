@@ -50,10 +50,16 @@ def check_formats(formats):
     validated_formats = []
     for group in formats:
         if not isinstance(group, list):
-            raise TypeError('Group extension should be a list, but was {}.\n{}'
-                            .format(str(group), expected_format))
+            # In early versions (0.4 and below), formats could be a list of
+            # extensions. We understand this as a single group
+            return check_formats([formats])
         validated_group = []
         for fmt in group:
+            if not isinstance(fmt, str):
+                raise ValueError('Extensions should be strings, not {}.\n{}'
+                                 .format(str(fmt),
+                                         str(nbrmd.NOTEBOOK_EXTENSIONS),
+                                         expected_format))
             if fmt == '':
                 continue
             if not fmt.startswith('.'):
