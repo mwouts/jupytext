@@ -86,7 +86,6 @@ def nbrmd():
     convert_nbrmd(args.notebooks, args.in_place, args.preserve_outputs)
 
 
-
 def convert_nbsrc(nb_files, in_place=True, combine=True):
     """
     Export python or R scripts, or Jupyter notebooks, to the opposite format
