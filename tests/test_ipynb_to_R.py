@@ -2,10 +2,10 @@ import nbformat
 import pytest
 from testfixtures import compare
 import nbrmd
-from .utils import list_all_notebooks, remove_outputs
+from .utils import list_r_notebooks, remove_outputs
 
 
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_r_notebooks('.ipynb'))
 def test_identity_source_write_read(nb_file):
     """
     Test that writing the notebook with R, and read again,

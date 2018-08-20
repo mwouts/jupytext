@@ -50,7 +50,7 @@ def code_to_text(self,
     language = cell_language(source) or default_language
     active = is_active(self.ext, metadata)
     if self.ext in ['.R', '.py']:
-        if language != default_language and active:
+        if language != ('R' if self.ext == '.R' else 'python') and active:
             active = False
             metadata['active'] = 'ipynb'
 
