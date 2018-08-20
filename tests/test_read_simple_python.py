@@ -168,6 +168,37 @@ data()
     compare(pynb, pynb2)
 
 
+def test_read_cell_with_one_blank_line_end(pynb="""import pandas
+
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_file_with_two_blank_line_end(pynb="""import pandas
+
+
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_one_blank_line_after_endofcell(pynb="""# + {"endofcell": "-"}
+# This is a cell with explicit end of cell
+
+
+# -
+
+# This cell is a cell with implicit start/end
+1 + 1
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
 def test_isolated_cell_with_magic(pynb="""# ---
 # title: cell with isolated jupyter magic
 # ---

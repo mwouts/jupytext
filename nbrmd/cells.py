@@ -94,7 +94,7 @@ def code_to_text(self,
             lines.append('# ' + metadata['endofcell'])
 
         # Two blank lines before next code cell
-        if next_cell_is_code:
+        if next_cell_is_code and 'endofcell' not in metadata:
             lines.append('')
 
         return lines
@@ -122,6 +122,8 @@ def cell_to_text(self,
     :return:
     """
     source = cell.get('source').splitlines()
+    if cell.get('source').endswith('\n'):
+        source.append('')
     metadata = cell.get('metadata', {})
     skipline = True
     if 'noskipline' in metadata:
@@ -402,6 +404,12 @@ def code_to_cell(self, lines, parse_opt):
     elif self.ext in ['.py', '.R']:
         source = [self.markdown_unescape(s) for s in source]
 
+    if len(lines) >= 2 and _BLANK_LINE.match(lines[-1]) \
+            and not _BLANK_LINE.match(lines[-2]):
+        cell = code_or_raw_cell(source=source[:-1], metadata=metadata)
+        cell.metadata['noskipline'] = True
+        return cell, len(lines) - 1
+
     return code_or_raw_cell(source=source, metadata=metadata), len(lines)
 
 
@@ -456,6 +464,6 @@ def markdown_to_cell_rmd(lines):
 
 def is_active(ext, metadata):
     """Is the cell active for the given file extension?"""
-    if not 'active' in metadata:
+    if 'active' not in metadata:
         return True
     return ext.replace('.', '') in re.split('\\.|,', metadata['active'])

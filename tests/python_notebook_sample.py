@@ -33,12 +33,15 @@ a + 1
 # is also an instance of a cell with metadata information in json format,
 # escaped with '#+' or '# +'
 
-# + {"endcell": "-"}
+# + {"endofcell": "-"}
 def f(x):
     return x + 1
 
 
 def g(x):
     return x + 2
-
 # -
+
+# Cells after a cell with and explicit end-of-cell are just separated by one
+# blank line
+a + 2
