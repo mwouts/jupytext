@@ -159,30 +159,32 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
                         os.path.isfile(file + alt_fmt):
                     source_format = alt_fmt
                     break
-        # Outputs taken from ipynb if in group
+        # Outputs taken from ipynb if in group, if file exists
         else:
             for alt_fmt in fmt_group:
-                if alt_fmt.endswith('.ipynb'):
+                if alt_fmt.endswith('.ipynb') and \
+                        os.path.isfile(file + alt_fmt):
                     outputs_format = alt_fmt
                     break
 
-        if source_format == outputs_format:
-            self.log.info('Reading {}'.format(os.path.basename(os_path)))
-            nb = self._read_notebook(file + source_format,
-                                     as_version=as_version,
-                                     load_alternative_format=False)
-        else:
+        if source_format != fmt:
             self.log.info('Reading SOURCE from {}'
                           .format(os.path.basename(file + source_format)))
+            nb_outputs = nb
             nb = self._read_notebook(file + source_format,
                                      as_version=as_version,
                                      load_alternative_format=False)
+        elif outputs_format != fmt:
             self.log.info('Reading OUTPUTS from {}'
                           .format(os.path.basename(file + outputs_format)))
-            nb_outputs = self._read_notebook(file + outputs_format,
-                                             as_version=as_version,
-                                             load_alternative_format=False)
+            if outputs_format != fmt:
+                nb_outputs = self._read_notebook(file + outputs_format,
+                                                 as_version=as_version,
+                                                 load_alternative_format=False)
+        else:
+            nb_outputs = None
 
+        if nb_outputs:
             combine.combine_inputs_with_outputs(nb, nb_outputs)
             if self.notary.check_signature(nb_outputs):
                 self.notary.sign(nb)
