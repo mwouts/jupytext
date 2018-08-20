@@ -6,6 +6,26 @@ Release History
 dev
 +++
 
+0.5.0 (2018-08-21)
++++++++++++++++++++
+
+**Improvements**
+
+- Jupyter magic commands escaped when exported (#29)
+- 'endofcell' option for explicit (optional) end-of-cell marker (#31)
+- 'active' cell option now supported for .py and .R export (#30)
+- Raw cells now preserved when exported to .py or .R (#32)
+- Extensions can be prefixed, like `.nb.py`, (mwouts/nbsrc#5)
+- When a file with an extension not associated to 'ipynb' is opened and saved,
+no 'ipynb' file is created (mwouts/nbsrc#5)
+- Extensions can now be a sequence of groups. For instance,
+`nbrmd_formats="ipynb,nb.py;script.ipynb,py"` will create an `ipynb` file
+when a `nb.py` is opened (and conversely), and a `script.ipynb` file when a
+`py` file is opened (mwouts/nbsrc#5)
+- `nbsrc` script was moved to the `nbrmd` package. The `nbsrc` package now only
+contains the documentation (mwouts/nbsrc#3)
+
+
 0.4.6 (2018-07-26)
 +++++++++++++++++++
 
