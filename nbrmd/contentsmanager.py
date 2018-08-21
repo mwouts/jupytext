@@ -188,6 +188,8 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
             combine.combine_inputs_with_outputs(nb, nb_outputs)
             if self.notary.check_signature(nb_outputs):
                 self.notary.sign(nb)
+        elif not fmt.endswith('.ipynb'):
+            self.notary.sign(nb)
 
         return nb
 
