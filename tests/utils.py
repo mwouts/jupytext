@@ -20,6 +20,7 @@ def list_all_notebooks(ext, path=None):
             notebooks.append(os.path.join(nb_path, nb_file))
     return notebooks
 
+
 def list_r_notebooks(ext, path=None):
     """
     :ext: desired extension

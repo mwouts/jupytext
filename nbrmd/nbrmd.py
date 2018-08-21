@@ -135,13 +135,13 @@ class TextNotebookWriter(NotebookWriter):
         """Write the text representation of a notebook to a string"""
         nb = deepcopy(nb)
         if self.ext == '.py':
-            default_language = nb.metadata.get('main_language') or \
-                       nb.metadata.get('language_info', {})\
-                           .get('name', 'python')
+            default_language = (nb.metadata.get('main_language') or
+                                nb.metadata.get('language_info', {})
+                                .get('name', 'python'))
         elif self.ext == '.R':
-            default_language = nb.metadata.get('main_language') or \
-                       nb.metadata.get('language_info', {})\
-                           .get('name', 'R')
+            default_language = (nb.metadata.get('main_language') or
+                                nb.metadata.get('language_info', {})
+                                .get('name', 'R'))
         else:
             default_language = get_default_language(nb)
 
