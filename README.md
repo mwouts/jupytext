@@ -1,4 +1,4 @@
-# Jupyter notebooks from/to R markdown, Python and R scripts
+# Jupyter notebooks as R markdown, Python or R scripts
 
 [![Pypi](https://img.shields.io/pypi/v/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
 [![Pypi](https://img.shields.io/pypi/l/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
@@ -11,16 +11,16 @@
 This package offers a representation of Jupyter notebooks as Python scripts, R scripts, or [R markdown](https://rmarkdown.rstudio.com/) notebooks. 
 
 These alternative representations allow to
-- edit notebooks as scripts in your favorite editor or IDE, and refactor them
+- edit notebooks in both Jupyter and your favorite IDE, and refactor them
 - extract executable scripts from your notebooks
 - get meaningfull diffs for notebooks under version control, and easily merge contributions
 - edit the same notebook in both Jupyter and Rstudio, for instance if you want to use RStudio's advanced rendering of notebooks to PDF, HTML or [HTML slides](https://rmarkdown.rstudio.com/ioslides_presentation_format.html).
 
-Scripts and R markdown notebooks only store the source and metadata of the notebook, and work in pair with the original `.ipynb` file. Jupyter saves notebooks to either form. When such a notebook is loaded in Jupyter, inputs are taken from the script of R markdown form, and outputs are taken from the `.ipynb` file, if present.
+Scripts and R markdown notebooks only store the source of the notebook, and work in pair with the original `.ipynb` file. Jupyter saves notebooks to both the classical `.ipynb` form, and to the text-only representation. When a text-only notebook is loaded in Jupyter, inputs are taken there, and outputs are taken from the `.ipynb` file, if present.
 
 ## Can I have a demo?
 
-Sure. Try our package on [binder](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo). Notice that every `.py`, `.R` and `.Rmd` file now opens as a Jupyter notebook. I suggest you open the matplotlib demo there (`filled_steps.py`), run it and save it, close notebook and reopen, to observe persistence of outputs. 
+Sure. Try our package on [binder](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo). Notice that every `.py`, `.R` and `.Rmd` file now opens as a Jupyter notebook. I suggest you open the matplotlib demo there (`filled_step.py`), run it and save it, close notebook and reopen, to observe persistence of outputs. 
 
 The other examples demo how to *edit* the script and reload the notebook (preserving the kernel variables), and how to edit in Jupyter an interactive ioslide presentation.
 
@@ -48,7 +48,7 @@ a yaml header at the top of your script.
 In some occasions (consecutive blank lines in markdown cells), markdown cells may
 be splitted into smaller ones.
 
-## How do I activate text notebooks in Jupyter?
+## How do I activate the companion scripts or R markdown notebooks in Jupyter?
 
 The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes
 `.py`, `.R` and `.Rmd` files as notebooks. To use it,
@@ -56,7 +56,7 @@ The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes
 - edit the config and include the below:
 ```python
 c.NotebookApp.contents_manager_class = "nbrmd.RmdFileContentsManager"
-c.ContentsManager.default_nbrmd_formats = "ipynb,py" # "ipynb,nb.py" # or "ipynb,Rmd"
+c.ContentsManager.default_nbrmd_formats = "ipynb,py" # or "ipynb,nb.py" # or "ipynb,Rmd"
 ```
 
 Then, make sure you have the `nbrmd` package up-to-date, and re-start jupyter, i.e. run
@@ -121,9 +121,9 @@ nbconvert jupyter.ipynb --to rnotebook
 ## Usefull cell metadata
 
 - Set `"active": "ipynb,py"` if you want that cell to be active only in the Jupyter notebook, and the Python script representation. Use `"active": "ipynb"` if you want that cell to be active only in Jupyter.
-- Code cells that contain two consecutive blank lines use an explicit end-of-cell marker that appear as `"endofcell": "-"` in the python file.
-- R markdown's cell options `echo` and `include` are mapped to the opposite of Jupyter cell metadata `hide_input` and `hide_output`
+- Code cells that contain two consecutive blank lines use an explicit end-of-cell marker `"endofcell"` in the script representation.
+- R markdown's cell options `echo` and `include` are mapped to the opposite of Jupyter cell metadata `hide_input` and `hide_output`.
 
 ## Jupyter magics
 
-Jupyter magics are escaped in the text representations so that scripts can actually be executed. Comment a magic with `#noescape` on the same line to avoid escaping. Non-standard magics can be escaped with `#escape`.
+Jupyter magics are escaped in the script and R markdown representations so that scripts can actually be executed. Comment a magic with `#noescape` on the same line to avoid escaping. Non-standard magics can be escaped with `#escape`.
