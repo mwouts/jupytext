@@ -14,13 +14,13 @@ These alternative representations allow to
 - edit notebooks in both Jupyter and your favorite IDE, and refactor them
 - extract executable scripts from your notebooks
 - get meaningfull diffs for notebooks under version control, and easily merge contributions
-- edit the same notebook in both Jupyter and Rstudio, for instance if you want to use RStudio's advanced rendering of notebooks to PDF, HTML or [HTML slides](https://rmarkdown.rstudio.com/ioslides_presentation_format.html).
+- edit the same notebook in both Jupyter and Rstudio, and use RStudio's advanced rendering of notebooks to PDF, HTML or [HTML slides](https://rmarkdown.rstudio.com/ioslides_presentation_format.html).
 
 Scripts and R markdown notebooks only store the source of the notebook, and work in pair with the original `.ipynb` file. Jupyter saves notebooks to both the classical `.ipynb` form, and to the text-only representation. When a text-only notebook is loaded in Jupyter, inputs are taken there, and outputs are taken from the `.ipynb` file, if present.
 
 ## Can I have a demo?
 
-Sure. Try our package on [binder](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo). Notice that every `.py`, `.R` and `.Rmd` file now opens as a Jupyter notebook. I suggest you open the matplotlib demo there (`filled_step.py`), run it and save it, close notebook and reopen, to observe persistence of outputs. 
+Sure. Try our package on [binder](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo). Notice that every `.py`, `.R` and `.Rmd` file now opens as a Jupyter notebook. I suggest you open the matplotlib demo there: `filled_step.py`, run it and save it, close notebook and reopen, to observe persistence of outputs. 
 
 The other examples demo how to *edit* the script and reload the notebook (preserving the kernel variables), and how to edit in Jupyter an interactive ioslide presentation.
 
@@ -111,7 +111,7 @@ nbsrc jupyter.py    -i      # and this, a jupyter.ipynb file
 nbsrc jupyter.py    -i -p   # update the jupyter.ipynb file and preserve outputs that correspond to unchanged inputs
 ```
 
-Alternatively, the `nbrmd` package provides a few `nbconvert` rmarkdown exporters that you can use with
+Alternatively, the `nbrmd` package provides a few `nbconvert` exporters:
 ```bash
 nbconvert jupyter.ipynb --to rmarkdown
 nbconvert jupyter.ipynb --to pynotebook
