@@ -7,7 +7,7 @@ with open(path.join(this_directory, 'README.md')) as f:
 
 setup(
     name='nbrmd',
-    version='0.4.6',
+    version='0.5.0',
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
     description='Jupyter from/to R markdown notebooks',
@@ -15,11 +15,14 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/mwouts/nbrmd',
     packages=find_packages(),
-    entry_points={'console_scripts': ['nbrmd = nbrmd.cli:main'],
+    entry_points={'console_scripts': ['nbrmd = nbrmd.cli:nbrmd',
+                                      'nbsrc = nbrmd.cli:nbsrc'],
                   'nbconvert.exporters':
-                      ['rmarkdown = nbrmd:RMarkdownExporter']},
+                      ['rmarkdown = nbrmd:RMarkdownExporter',
+                       'pynotebook = nbrmd:PyNotebookExporter',
+                       'rnotebook = nbrmd:RNotebookExporter']},
     tests_require=['pytest', 'testfixtures'],
-    install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml'],
+    install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml', 'six'],
     license='MIT',
     classifiers=('Development Status :: 4 - Beta',
                  'Environment :: Console',

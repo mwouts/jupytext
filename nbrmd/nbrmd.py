@@ -15,7 +15,7 @@ Authors:
 
 import os
 import io
-from copy import copy
+from copy import deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook
 import nbformat
@@ -23,7 +23,8 @@ import nbformat
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable
 from .languages import get_default_language, find_main_language
-from .cells import start_code_rmd, start_code_rpy, cell_to_text, text_to_cell
+from .cells import start_code_rmd, start_code_r, start_code_py
+from .cells import cell_to_text, text_to_cell
 from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
 
 # -----------------------------------------------------------------------------
@@ -45,7 +46,8 @@ class TextNotebookReader(NotebookReader):
     def __init__(self, ext):
         self.ext = ext
         self.prefix = markdown_comment(ext)
-        self.start_code = start_code_rmd if ext == '.Rmd' else start_code_rpy
+        self.start_code = start_code_rmd if ext == '.Rmd' else \
+            start_code_py if ext == '.py' else start_code_r
         if ext == '.Rmd':
             self.markdown_to_cell = markdown_to_cell_rmd
 
@@ -131,11 +133,15 @@ class TextNotebookWriter(NotebookWriter):
 
     def writes(self, nb, **kwargs):
         """Write the text representation of a notebook to a string"""
-        nb = copy(nb)
+        nb = deepcopy(nb)
         if self.ext == '.py':
-            default_language = 'python'
+            default_language = (nb.metadata.get('main_language') or
+                                nb.metadata.get('language_info', {})
+                                .get('name', 'python'))
         elif self.ext == '.R':
-            default_language = 'R'
+            default_language = (nb.metadata.get('main_language') or
+                                nb.metadata.get('language_info', {})
+                                .get('name', 'R'))
         else:
             default_language = get_default_language(nb)
 
@@ -145,6 +151,9 @@ class TextNotebookWriter(NotebookWriter):
         for i in range(len(nb.cells)):
             cell = nb.cells[i]
             next_cell = nb.cells[i + 1] if i + 1 < len(nb.cells) else None
+            if cell.cell_type == 'raw' and 'active' not in cell.metadata:
+                cell.metadata['active'] = ''
+
             lines.extend(self.cell_to_text(cell, next_cell,
                                            default_language=default_language))
 

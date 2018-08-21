@@ -48,7 +48,7 @@ def metadata_to_rmd_options(language, metadata):
     :param metadata:
     :return:
     """
-    options = language.lower()
+    options = (language or 'R').lower()
     metadata = copy(metadata)
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
@@ -74,6 +74,8 @@ def metadata_to_rmd_options(language, metadata):
                     ', '.join(['"{}"'.format(str(v)) for v in opt_value])))
         else:
             options += ' {}={},'.format(opt_name, str(opt_value))
+    if not language:
+        options = options[2:]
     return options.strip(',').strip()
 
 
@@ -255,7 +257,7 @@ def json_options_to_metadata(options):
     :return:
     """
     try:
-        return json.loads(options)
+        return json.loads('{' + options + '}')
     except ValueError:
         return {}
 

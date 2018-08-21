@@ -15,7 +15,7 @@ def test_rmd_is_ok(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_rmd = 'notebook.Rmd'
 
-    nb.metadata['nbrmd_formats'] = ['.Rmd']
+    nb.metadata['nbrmd_formats'] = 'ipynb,Rmd'
 
     cm = RmdFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -53,7 +53,7 @@ def test_all_files_created(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_rmd = 'notebook.Rmd'
     tmp_py = 'notebook.py'
-    nb.metadata['nbrmd_formats'] = ['.ipynb', '.Rmd', '.py']
+    nb.metadata['nbrmd_formats'] = 'ipynb,Rmd,py'
 
     cm = RmdFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -109,7 +109,7 @@ def test_no_rmd_on_not_notebook(tmpdir):
 
     cm = RmdFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_nbrmd_formats = '.Rmd'
+    cm.default_nbrmd_formats = 'ipynb,Rmd'
 
     with pytest.raises(HTTPError):
         cm.save(model=dict(type='not notebook',
@@ -124,7 +124,7 @@ def test_no_rmd_on_not_v4(tmpdir):
 
     cm = RmdFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_nbrmd_formats = '.Rmd'
+    cm.default_nbrmd_formats = 'ipynb,Rmd'
 
     with pytest.raises(NotebookValidationError):
         cm.save(model=dict(type='notebook',

@@ -37,7 +37,7 @@ For this plot I chose not to display the source code.
 </div>
 
 <div style="float: right; width: 70%;">
-```{python echo=FALSE, fig.width=8, fig.height=5}
+```{python echo=FALSE, fig.height=5, fig.width=8}
 x.plot(kind='bar', title='Sample plot')
 ```
 <div>

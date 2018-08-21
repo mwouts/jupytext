@@ -2,6 +2,12 @@
 
 import nbrmd
 from testfixtures import compare
+from .python_notebook_sample import f, g
+
+
+def test_python_notebook_sample():
+    assert f(1) == 2
+    assert g(2) == 4
 
 
 def test_read_simple_file(pynb="""# ---
@@ -99,6 +105,130 @@ def f(x):
     compare(nb.cells[2].source,
             'def f(x):\n\n\n'
             '    return x+1')
+
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_read_cell_two_blank_lines(pynb="""# ---
+# title: cell with two consecutive blank lines
+# ---
+
+# + {"endofcell": "-"}
+a = 1
+
+
+a + 2
+# -
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+
+    assert len(nb.cells) == 2
+    assert nb.cells[0].cell_type == 'raw'
+    assert nb.cells[0].source == '---\ntitle: cell with two ' \
+                                 'consecutive blank lines\n---'
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[1].source == 'a = 1\n\n\na + 2'
+
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_read_cell_explicit_start_end(pynb='''
+import pandas as pd
+# + {"endofcell": "-"}
+def data():
+    return pd.DataFrame({'A': [0, 1]})
+
+
+data()
+# -
+'''):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_read_prev_function(pynb="""def test_read_cell_explicit_start_end(pynb='''
+import pandas as pd
+# + {"endofcell": "-"}
+def data():
+    return pd.DataFrame({'A': [0, 1]})
+
+
+data()
+# -
+'''):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_read_cell_with_one_blank_line_end(pynb="""import pandas
+
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_file_with_two_blank_line_end(pynb="""import pandas
+
+
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_one_blank_line_after_endofcell(pynb="""# + {"endofcell": "-"}
+# This is a cell with explicit end of cell
+
+
+# -
+
+# This cell is a cell with implicit start/end
+1 + 1
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_isolated_cell_with_magic(pynb="""# ---
+# title: cell with isolated jupyter magic
+# ---
+
+# A magic command included in a markdown
+# paragraph is not code, like the one below:
+#
+# %matplotlib inline
+
+# However, a code block may start with
+# a magic command, like this one:
+
+# %matplotlib inline
+
+
+1 + 1
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+
+    assert len(nb.cells) == 5
+    assert nb.cells[0].cell_type == 'raw'
+    assert nb.cells[0].source == '---\ntitle: cell with isolated jupyter ' \
+                                 'magic\n---'
+    assert nb.cells[1].cell_type == 'markdown'
+    assert nb.cells[2].cell_type == 'markdown'
+    assert nb.cells[3].cell_type == 'code'
+    assert nb.cells[3].source == '%matplotlib inline'
+
+    assert nb.cells[4].cell_type == 'code'
+    assert nb.cells[4].source == '1 + 1'
 
     pynb2 = nbrmd.writes(nb, ext='.py')
     compare(pynb, pynb2)
