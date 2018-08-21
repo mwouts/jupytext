@@ -65,12 +65,12 @@ jupyter notebook
 
 With the above configuration, every Jupyter notebook will have a companion `.py` (`.nb.py`, or `.Rmd`) notebook. And every `.py` (`.nb.py`, or `.Rmd`) notebook will have a companion `.ipynb` notebook.
 
-The default configuration can also contain multiple groups. Use
+The default configuration can also contain multiple extension groups. Use
 ```python
 c.NotebookApp.contents_manager_class = "nbrmd.RmdFileContentsManager"
 c.ContentsManager.default_nbrmd_formats = "ipynb,nb.py;py.ipynb,py"
 ```
-if you want `.ipynb` notebooks to have `.nb.py` companion scripts, and `.py` files to have `.py.ipynb` companion notebooks (Learn more on the possible values for `nbrmd_formats` [here](https://github.com/mwouts/nbsrc/issues/5#issuecomment-414093471)).
+if you want `.ipynb` notebooks to have `.nb.py` companion scripts, and `.py` files to have `.py.ipynb` companion notebooks (learn more on the possible values for `nbrmd_formats` [here](https://github.com/mwouts/nbsrc/issues/5#issuecomment-414093471)).
 
 ## Per notebook configuration
 
