@@ -6,6 +6,13 @@ Release History
 dev
 +++
 
+0.5.1 (2018-08-21)
++++++++++++++++++++
+
+**BugFixes**
+
+- Source only notebooks can be trusted.
+
 0.5.0 (2018-08-21)
 +++++++++++++++++++
 
