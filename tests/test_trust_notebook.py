@@ -11,7 +11,8 @@ def test_py_notebooks_are_trusted(nb_file):
     root, file = os.path.split(nb_file)
     cm.root_dir = root
     nb = cm.get(file)
-    assert cm.notary.check_cells(nb['content'])
+    for cell in nb['content'].cells:
+        assert cell.metadata.get('trusted', True)
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.Rmd'))
@@ -20,7 +21,8 @@ def test_rmd_notebooks_are_trusted(nb_file):
     root, file = os.path.split(nb_file)
     cm.root_dir = root
     nb = cm.get(file)
-    assert cm.notary.check_cells(nb['content'])
+    for cell in nb['content'].cells:
+        assert cell.metadata.get('trusted', True)
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
@@ -43,11 +45,13 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
     cm.notary.sign(nb)
 
     nb = cm.get(file)
-    assert cm.notary.check_cells(nb['content'])
+    for cell in nb['content'].cells:
+        assert cell.metadata.get('trusted', True)
 
     # Remove py file, content should be the same
     os.remove(tmp_py)
     nb2 = cm.get(file)
-    assert cm.notary.check_cells(nb2['content'])
+    for cell in nb2['content'].cells:
+        assert cell.metadata.get('trusted', True)
 
     assert nb['content'] == nb2['content']
