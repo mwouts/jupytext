@@ -21,15 +21,13 @@ def list_all_notebooks(ext, path=None):
     return notebooks
 
 
-def list_r_notebooks(ext, path=None):
+def list_r_notebooks(ext):
     """
     :ext: desired extension
     :return: all notebooks in the directory of this script,
      with the desired extension
     """
     nb_path = os.path.dirname(os.path.abspath(__file__))
-    if path:
-        nb_path = os.path.join(nb_path, path)
     notebooks = []
     for nb_file in os.listdir(nb_path):
         _, nb_ext = os.path.splitext(nb_file)
