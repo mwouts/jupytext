@@ -16,6 +16,8 @@ FILE_FORMAT_VERSION = {
     # Version 1.0 on 2018-08-22 - nbrmd v0.5.2 : Initial version
 }
 
+FILE_FORMAT_VERSION_ORG = FILE_FORMAT_VERSION
+
 
 def file_format_version(ext):
     """Return file format version for given ext"""
