@@ -36,8 +36,4 @@ def test_single_chars(text="""'This is a single line comment'''
     quoted = []
     sp = StringParser('python')
     for i, line in enumerate(text.splitlines()):
-        if sp.is_quoted():
-            quoted.append(i)
-        sp.read_line(line)
-
-    assert quoted == []
+        assert not sp.is_quoted()
