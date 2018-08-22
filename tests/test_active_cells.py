@@ -135,6 +135,8 @@ ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd", "
                                             'hide_output': True}}}
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_not_include_rmd(ext):
     nb = nbrmd.reads(ACTIVE_NOT_INCLUDE_RMD[ext], ext=ext)
