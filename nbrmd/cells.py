@@ -67,7 +67,7 @@ def code_to_text(self,
                 options = metadata_to_rmd_options(None, metadata)
                 if language != 'R':
                     options = 'language="{}" {}'.format(language, options)
-                source = ['#+ ' + options] + ["#' " + s for s in source]
+                source = ['#+ ' + options] + ["# " + s for s in source]
             else:
                 options = metadata_to_rmd_options(None, metadata)
                 if options != '':
