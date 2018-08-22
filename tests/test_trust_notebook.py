@@ -41,8 +41,7 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
     # Sign notebook explicitely (save it, and reload without
     # validating to remove 'trusted' metadata in cells)
     cm.save(nb, py_file)
-    nb = cm._read_notebook(tmp_py)
-    cm.notary.sign(nb)
+    cm.trust_notebook(py_file)
 
     nb = cm.get(file)
     for cell in nb['content'].cells:
