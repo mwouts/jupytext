@@ -3,7 +3,8 @@ from nbrmd.magics import escape_magic, unescape_magic
 
 
 @pytest.mark.parametrize('line', ['%matplotlib inline', '#%matplotlib inline',
-                                  '##%matplotlib inline', '%%HTML'])
+                                  '##%matplotlib inline', '%%HTML',
+                                  '%autoreload', '%store'])
 def test_escape(line):
     assert escape_magic([line]) == ['# ' + line]
     assert unescape_magic(escape_magic([line])) == [line]
