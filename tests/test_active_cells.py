@@ -3,6 +3,8 @@ import pytest
 import nbrmd
 from testfixtures import compare
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
 # This cell is active in all extensions
 """,

@@ -8,6 +8,8 @@ from nbrmd.contentsmanager import RmdFileContentsManager
 from .utils import list_all_notebooks, remove_outputs, \
     remove_outputs_and_header
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_rmd_is_ok(nb_file, tmpdir):

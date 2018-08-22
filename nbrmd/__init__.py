@@ -10,18 +10,21 @@ R Markdown notebooks.
 """
 
 from .nbrmd import readf, writef, writes, reads, NOTEBOOK_EXTENSIONS
+from .file_format_version import FILE_FORMAT_VERSION
 
 try:
     from .rmarkdownexporter import RMarkdownExporter
     from .srcexporter import PyNotebookExporter
     from .srcexporter import RNotebookExporter
 except ImportError as err:
-    RMarkdownExporter = str(err)
+    RMarkdownExporter = PyNotebookExporter = RNotebookExporter = str(err)
 
 try:
     from .contentsmanager import RmdFileContentsManager
 except ImportError as err:
     RmdFileContentsManager = str(err)
 
-__all__ = ['readf', 'writef', 'writes', 'reads', 'NOTEBOOK_EXTENSIONS',
-           'RMarkdownExporter', 'RmdFileContentsManager']
+__all__ = ['readf', 'writef', 'writes', 'reads',
+           'NOTEBOOK_EXTENSIONS', 'FILE_FORMAT_VERSION',
+           'RMarkdownExporter', 'PyNotebookExporter', 'RNotebookExporter',
+           'RmdFileContentsManager']

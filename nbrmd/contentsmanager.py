@@ -10,11 +10,13 @@ try:
 except ImportError:
     pass
 from notebook.services.contents.filemanager import FileContentsManager
+from tornado.web import HTTPError
 from traitlets import Unicode
 from traitlets.config import Configurable
 import nbrmd
 
 from . import combine
+from .file_format_version import check_file_version
 
 
 def _nbrmd_writes(ext):
@@ -44,7 +46,7 @@ def check_formats(formats):
         formats = [group.split(',') for group in formats.split(';')]
 
     expected_format = ("Notebook metadata 'nbrmd_formats' should "
-                       "be a list of extension groups, like 'ipynb,Rmd'. "
+                       "be a list of extension groups, like 'ipynb,Rmd'.\n"
                        "Groups can be separated with colon, for instance: "
                        "'ipynb,nb.py;script.ipynb,py'")
 
@@ -120,7 +122,10 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
         nbrmd_formats = ((nb.metadata.get('nbrmd_formats') if nb else None)
                          or self.default_nbrmd_formats)
 
-        nbrmd_formats = check_formats(nbrmd_formats)
+        try:
+            nbrmd_formats = check_formats(nbrmd_formats)
+        except ValueError as err:
+            raise HTTPError(400, str(err))
 
         # Find group that contains the current format
         for group in nbrmd_formats:
@@ -183,6 +188,11 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
                                                  load_alternative_format=False)
         else:
             nb_outputs = None
+
+        try:
+            check_file_version(nb, file + source_format, file + outputs_format)
+        except ValueError as err:
+            raise HTTPError(400, str(err))
 
         if nb_outputs:
             combine.combine_inputs_with_outputs(nb, nb_outputs)

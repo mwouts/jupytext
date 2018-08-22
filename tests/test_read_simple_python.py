@@ -4,6 +4,8 @@ import nbrmd
 from testfixtures import compare
 from .python_notebook_sample import f, g
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 
 def test_python_notebook_sample():
     assert f(1) == 2

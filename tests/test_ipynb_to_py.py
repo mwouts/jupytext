@@ -4,6 +4,8 @@ from testfixtures import compare
 import nbrmd
 from .utils import list_all_notebooks, remove_outputs
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_identity_source_write_read(nb_file):

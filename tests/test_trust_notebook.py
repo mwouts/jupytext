@@ -1,8 +1,11 @@
 import os
 import shutil
 import pytest
+import nbrmd
 from nbrmd.contentsmanager import RmdFileContentsManager
 from .utils import list_all_notebooks
+
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.py'))

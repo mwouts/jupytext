@@ -1,8 +1,11 @@
 import os
 import sys
 import pytest
+import nbrmd
 from nbrmd import RmdFileContentsManager, readf
 from .utils import list_all_notebooks, remove_outputs
+
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
 
 
 @pytest.mark.skipif(isinstance(RmdFileContentsManager, str),
