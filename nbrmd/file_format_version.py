@@ -44,9 +44,9 @@ def check_file_version(nb, source_path, outputs_path):
 
     raise ValueError("File {} has nbrmd_file_format_version={}, but "
                      "current version for that extension is {}.\n"
-                     "It would not be safe to override the contents of {} "
+                     "It would not be safe to override the source of {} "
                      "with that file.\n"
-                     "Please remove one or the other file"
+                     "Please remove one or the other file."
                      .format(os.path.basename(source_path),
                              version, current,
                              os.path.basename(outputs_path)))
