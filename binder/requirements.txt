@@ -1,4 +1,4 @@
-nbrmd>=0.5.2
+nbrmd>=0.5.3
 plotly
 matplotlib
 pandas
