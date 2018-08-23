@@ -14,7 +14,7 @@ def test_combine_save_version_ok(tmpdir):
         fp.write("""# ---
 # jupyter:
 #   nbrmd_formats: ipynb,py
-#   nbrmd_file_format_version: '1.0'
+#   nbrmd_format_version: '1.0'
 # ---
 
 # New cell
@@ -44,7 +44,7 @@ def test_combine_lower_version_raises(tmpdir):
         fp.write("""# ---
 # jupyter:
 #   nbrmd_formats: ipynb,py
-#   nbrmd_file_format_version: '0.0'
+#   nbrmd_format_version: '0.0'
 # ---
 
 # New cell
