@@ -10,7 +10,7 @@ setup(
     version='0.5.2',
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
-    description='Jupyter from/to R markdown notebooks',
+    description='Jupyter notebooks as R markdown, Python or R scripts',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/mwouts/nbrmd',
