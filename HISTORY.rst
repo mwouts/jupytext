@@ -6,6 +6,14 @@ Release History
 dev
 +++
 
+0.5.3 (2018-08-22)
++++++++++++++++++++
+
+**BugFixes**
+
+- Read and write version to the same metadata (#36)
+
+
 0.5.2 (2018-08-22)
 +++++++++++++++++++
 
