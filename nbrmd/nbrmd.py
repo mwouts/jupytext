@@ -102,6 +102,10 @@ class TextNotebookReader(NotebookReader):
 
         if self.ext == '.Rmd':
             find_main_language(metadata, cells)
+        elif self.ext == '.R':
+            if not (metadata.get('main_language') or
+                    metadata.get('language_info', {})):
+                metadata['main_language'] = 'R'
 
         nb = new_notebook(cells=cells, metadata=metadata)
         return nb
@@ -140,6 +144,8 @@ class TextNotebookWriter(NotebookWriter):
             default_language = (nb.metadata.get('main_language') or
                                 nb.metadata.get('language_info', {})
                                 .get('name', 'R'))
+            if nb.metadata.get('main_language') == 'R':
+                del nb.metadata['main_language']
         else:
             default_language = get_default_language(nb)
 
