@@ -7,7 +7,7 @@ with open(path.join(this_directory, 'README.md')) as f:
 
 setup(
     name='nbrmd',
-    version='0.5.1',
+    version='0.5.2',
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
     description='Jupyter from/to R markdown notebooks',

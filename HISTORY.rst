@@ -6,6 +6,16 @@ Release History
 dev
 +++
 
+0.5.2 (2018-08-22)
++++++++++++++++++++
+
+**Improvements**
+
+- Classical jupyter extensions (autoreload, rmagics) are also escaped (#35)
+- Explicit file format version, set at 1.0, to avoid overriding ipynb
+files by accident (#36)
+
+
 0.5.1 (2018-08-21)
 +++++++++++++++++++
 

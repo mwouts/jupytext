@@ -95,8 +95,6 @@ class TextNotebookReader(NotebookReader):
 
         while lines:
             cell, pos = self.text_to_cell(lines)
-            if cell is None:
-                break
             cells.append(cell)
             if pos <= 0:
                 raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))

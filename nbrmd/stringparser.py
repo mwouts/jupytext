@@ -43,6 +43,7 @@ class StringParser:
             if line[i - 2:i + 1] == 3 * char:
                 self.triple = char
                 continue
+            self.single = char
 
         # Line ended
         if self.python:

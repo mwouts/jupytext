@@ -20,6 +20,15 @@ _LINE_MAGICS = '%alias  %alias_magic  %autocall  %automagic  %autosave  ' \
                '%timeit  %unalias  %unload_ext  %who  %who_ls  %whos  ' \
                '%xdel  %xmode'.split('  ')
 
+# Add classical line magics
+_LINE_MAGICS += ('%autoreload %aimport '  # autoreload
+                 '%R %Rpush %Rpull %Rget '  # rmagic
+                 '%store '  # storemagic
+                 ).split(' ')
+
+# Remove any blank line
+_LINE_MAGICS = [magic for magic in _LINE_MAGICS if magic.startswith('%')]
+
 # A magic expression is a line or cell magic escaped zero, or multiple times
 _PERCENT_RE = re.compile(r"^(# |#)*%")
 _FORCE_ESC_RE = re.compile(r"^(# |#)*%(.*)(#| )escape")

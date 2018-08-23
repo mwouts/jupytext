@@ -2,6 +2,8 @@ import re
 from testfixtures import compare
 import nbrmd
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 
 def test_read_mostly_py_rmd_file(rmd="""# ---
 # title: Simple file

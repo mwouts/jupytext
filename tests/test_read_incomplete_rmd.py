@@ -1,5 +1,7 @@
 import nbrmd
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 
 def test_incomplete_header(rmd="""---
 title: Incomplete header

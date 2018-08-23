@@ -3,6 +3,8 @@ import pytest
 import nbrmd
 from testfixtures import compare
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
 # This cell is active in all extensions
 """,
@@ -117,16 +119,16 @@ def test_active_rmd(ext):
         compare(ACTIVE_RMD[ext], nbrmd.writes(nb, ext=ext))
 
 
-ACTIVE_NOT_INCLUDE_RMD = {'.py': """# # + {"hide_output": true, "active": "Rmd"}
+ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd", "endofcell": "-"}
 # # This cell is active in Rmd only
+# -
 """,
                           '.Rmd': """```{python include=FALSE, active="Rmd"}
 # This cell is active in Rmd only
 ```
 """,
-                          '.R': """#' ```{python include=FALSE, active="Rmd", eval=FALSE}
-#' # This cell is active in Rmd only
-#' ```
+                          '.R': """#+ include=FALSE, active="Rmd", eval=FALSE
+# # This cell is active in Rmd only
 """,
                           '.ipynb':
                               {'cell_type': 'raw',
@@ -135,7 +137,9 @@ ACTIVE_NOT_INCLUDE_RMD = {'.py': """# # + {"hide_output": true, "active": "Rmd"}
                                             'hide_output': True}}}
 
 
-@pytest.mark.parametrize('ext', ['.Rmd'])  # TODO: add R and py
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
+@pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_not_include_rmd(ext):
     nb = nbrmd.reads(ACTIVE_NOT_INCLUDE_RMD[ext], ext=ext)
     assert len(nb.cells) == 1

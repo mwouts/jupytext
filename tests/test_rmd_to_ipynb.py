@@ -4,6 +4,8 @@ from testfixtures import compare
 import nbrmd
 from .utils import list_all_notebooks
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
                     reason="unordered dict result in changes in chunk options")

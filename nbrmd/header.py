@@ -5,6 +5,7 @@ import re
 import yaml
 import nbformat
 from nbformat.v4.nbbase import new_raw_cell
+from .file_format_version import file_format_version
 
 _HEADER_RE = re.compile(r"^---\s*$")
 _BLANK_RE = re.compile(r"^\s*$")
@@ -69,6 +70,9 @@ def metadata_and_cell_to_header(self, nb):
                 nb.cells = nb.cells[1:]
 
     metadata = _as_dict(nb.get('metadata', {}))
+
+    if file_format_version(self.ext):
+        metadata['nbrmd_format_version'] = file_format_version(self.ext)
 
     if metadata:
         header.extend(yaml.safe_dump({'jupyter': metadata},

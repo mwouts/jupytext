@@ -3,6 +3,8 @@ from testfixtures import compare
 import nbrmd
 from .utils import list_all_notebooks
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 
 @pytest.mark.parametrize('py_file', list_all_notebooks('.py', '../nbrmd') +
                          list_all_notebooks('.py'))

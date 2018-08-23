@@ -3,6 +3,8 @@
 import nbrmd
 from testfixtures import compare
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 
 def test_read_simple_file(rnb="""#' ---
 #' title: Simple file

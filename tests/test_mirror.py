@@ -10,6 +10,8 @@ from testfixtures import compare
 import nbrmd
 from .utils import list_all_notebooks, list_r_notebooks
 
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
 
 def mirror_file(nb_file):
     dir, file = os.path.split(nb_file)

@@ -2,8 +2,14 @@ import os
 from shutil import copyfile
 import pytest
 import nbrmd
-from nbrmd.cli import convert_nbsrc as convert, cli_nbsrc as cli
+from nbrmd.cli import convert as convert_, cli_nbsrc as cli
 from .utils import list_all_notebooks, remove_outputs
+
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+
+
+def convert(*args):
+    return convert_(*args, markdown=False)
 
 
 @pytest.mark.parametrize('nb_file',
