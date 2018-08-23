@@ -1,8 +1,10 @@
 import os
 from shutil import copyfile
 import pytest
+import mock
+from nbformat.v4.nbbase import new_notebook
 import nbrmd
-from nbrmd.cli import convert as convert_, cli_nbrmd as cli
+from nbrmd.cli import convert as convert_, cli_nbrmd as cli, cli_nbsrc, nbsrc
 from .utils import list_all_notebooks, remove_outputs
 
 nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
@@ -79,3 +81,54 @@ def test_convert_multiple_file(nb_files, tmpdir):
 def test_error_not_notebook(nb_file='notebook.ext'):
     with pytest.raises(TypeError):
         convert([nb_file])
+
+
+def test_combine_same_version_ok(tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_nbpy = str(tmpdir.join('notebook.py'))
+
+    with open(tmp_nbpy, 'w') as fp:
+        fp.write("""# ---
+# jupyter:
+#   nbrmd_formats: ipynb,py
+#   nbrmd_format_version: '1.0'
+# ---
+
+# New cell
+""")
+
+    nb = new_notebook(metadata={'nbrmd_formats': 'ipynb,py'})
+    nbrmd.writef(nb, tmp_ipynb)
+
+    with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',
+                    {'.py': '1.0'}):
+        nbsrc(args=[tmp_nbpy, '-i', '-p'])
+
+    nb = nbrmd.readf(tmp_ipynb)
+    cells = nb['cells']
+    assert len(cells) == 1
+    assert cells[0].cell_type == 'markdown'
+    assert cells[0].source == 'New cell'
+
+
+def test_combine_lower_version_raises(tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_nbpy = str(tmpdir.join('notebook.py'))
+
+    with open(tmp_nbpy, 'w') as fp:
+        fp.write("""# ---
+# jupyter:
+#   nbrmd_formats: ipynb,py
+#   nbrmd_format_version: '0.0'
+# ---
+
+# New cell
+""")
+
+    nb = new_notebook(metadata={'nbrmd_formats': 'ipynb,py'})
+    nbrmd.writef(nb, tmp_ipynb)
+
+    with pytest.raises(ValueError):
+        with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',
+                        {'.py': '1.0'}):
+            nbsrc(args=[tmp_nbpy, '-i', '-p'])
