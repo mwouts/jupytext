@@ -65,7 +65,7 @@ pytest.importorskip('jupyter')
 
 def is_jupyter_nbconvert_available():
     try:
-        subprocess.call(['jupyter', 'nbconvert', '-h'])
+        subprocess.call(['jupyter', 'nbconvert'])
         return True
     except FileNotFoundError:
         return False
