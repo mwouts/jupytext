@@ -34,15 +34,13 @@ def code_to_rmd(source, metadata, default_language):
 def code_to_text(self,
                  source,
                  metadata,
-                 default_language,
-                 next_cell_is_code):
+                 default_language):
     """
     Represent a code cell with given source and metadata as text
     :param self:
     :param source:
     :param metadata:
     :param default_language:
-    :param next_cell_is_code:
     :return:
     """
 
@@ -74,7 +72,7 @@ def code_to_text(self,
                     lines.append('#+ ' + options)
         else:  # py
             # end of cell marker
-            if not active or need_end_cell_marker(self, source):
+            if active and need_end_cell_marker(self, source):
                 endofcell = '-'
                 while True:
                     endofcell_re = re.compile(r'^#( )' + endofcell + r'\s*$')
@@ -93,19 +91,13 @@ def code_to_text(self,
         if 'endofcell' in metadata:
             lines.append('# ' + metadata['endofcell'])
 
-        # Two blank lines before next code cell
-        if next_cell_is_code and 'endofcell' not in metadata:
-            lines.append('')
-
         return lines
 
 
 def need_end_cell_marker(self, source):
-    """Issue #31:  does the cell ends with a blank line?
-Do we find two blank lines in the cell? In that case
+    """Issues #31 #38:  does the cell contain a blank line? In that case
 we add an end-of-cell marker"""
-    return ((source and _BLANK_LINE.match(source[-1])) or
-            code_to_cell(self, source, False)[1] != len(source))
+    return code_to_cell(self, source, False)[1] != len(source)
 
 
 def cell_to_text(self,
@@ -122,24 +114,23 @@ def cell_to_text(self,
     :return:
     """
     source = cell.get('source').splitlines()
-    if cell.get('source').endswith('\n'):
+    if not source or cell.get('source').endswith('\n'):
         source.append('')
     metadata = cell.get('metadata', {})
     skipline = True
     if 'noskipline' in metadata:
         skipline = not metadata['noskipline']
         del metadata['noskipline']
+    additionalline = False
+    if 'skipline' in metadata:
+        additionalline = metadata['skipline']
+        del metadata['skipline']
 
     lines = []
     if is_code(cell):
         lines.extend(code_to_text(
-            self, source, metadata, default_language,
-            next_cell and is_code(next_cell) and
-            (not need_end_cell_marker(
-                self, next_cell.get('source').splitlines()))))
+            self, source, metadata, default_language))
     else:
-        if source == []:
-            source = ['']
         lines.extend(self.markdown_escape(source))
 
         # Two blank lines between consecutive markdown cells in Rmd
@@ -148,6 +139,9 @@ def cell_to_text(self,
             lines.append('')
 
     if skipline and next_cell:
+        lines.append('')
+
+    if additionalline:
         lines.append('')
 
     return lines
@@ -195,9 +189,8 @@ def start_code_rpy(line, ext):
     """
     if ext == '.R':
         return start_code_r(line)
-    if ext == '.py':
+    else:
         return start_code_py(line)
-    raise ValueError('Unexpected extension {}'.format(ext))
 
 
 def next_uncommented_is_code(lines):
@@ -269,20 +262,6 @@ def next_code_is_indented(lines):
     return False
 
 
-def no_code_before_next_blank_line(lines):
-    """
-    Do we find code before next blank line?
-    :param lines:
-    :return:
-    """
-    for line in lines:
-        if line.startswith('#'):
-            continue
-        return _BLANK_LINE.match(line)
-
-    return True
-
-
 def code_or_raw_cell(source, metadata):
     """Return a code, or raw cell from given source and metadata"""
     if not is_active('ipynb', metadata):
@@ -314,7 +293,7 @@ def code_to_cell(self, lines, parse_opt):
     elif self.ext == '.py' and 'endofcell' in metadata:
         end_cell_re = re.compile(r'^#( )' + metadata['endofcell'] + r'\s*$')
         del metadata['endofcell']
-    elif self.ext == '.R' and not is_active('.R', metadata):
+    elif not is_active(self.ext, metadata):
         end_cell_re = _BLANK_LINE
     else:
         end_cell_re = None
@@ -340,6 +319,7 @@ def code_to_cell(self, lines, parse_opt):
                 cell.metadata['noskipline'] = True
                 return cell, pos + 1
     else:
+        # self.ext is .py or .R
         prev_blank = False
         parser = StringParser(language)
         for pos, line in enumerate(lines):
@@ -365,35 +345,30 @@ def code_to_cell(self, lines, parse_opt):
                 cell.metadata['noskipline'] = True
                 return cell, pos
 
-            if prev_blank:
-                if _BLANK_LINE.match(line):
-                    # Two blank lines => end of cell
-                    # (unless next code is indented)
-                    # Two blank lines at the end == empty code cell
+            if _BLANK_LINE.match(line):
+                if pos == 0:
+                    continue
+                # This line blank and next one blank => two lines before and
+                # after classes and functions. Three blank lines or more? May
+                # be multiple cells
+                if pos + 1 == len(lines) or _BLANK_LINE.match(lines[pos + 1]):
+                    if (pos + 2 < len(lines) and
+                            not _BLANK_LINE.match(lines[pos + 2])):
+                        prev_blank = True
+                        continue
 
-                    if self.ext == '.py':
-                        if next_code_is_indented(lines[pos:]):
-                            continue
+                if next_code_is_indented(lines[pos:]):
+                    continue
 
-                    source = lines[parse_opt:(pos - 1)]
-                    if is_active(self.ext, metadata):
-                        source = unescape_magic(source, language)
+                source = lines[parse_opt:(pos - (1 if prev_blank else 0))]
+                if is_active(self.ext, metadata):
+                    source = unescape_magic(source, language)
 
-                    return code_or_raw_cell(
-                        source=source,
-                        metadata=metadata), min(pos + 1, len(lines) - 1)
+                cell = code_or_raw_cell(source=source, metadata=metadata)
+                if prev_blank or pos + 1 == len(lines):
+                    cell['metadata']['skipline'] = True
 
-                # are all the lines from here to next blank
-                # escaped with the prefix?
-                if self.ext == '.py':
-                    if no_code_before_next_blank_line(lines[pos:]):
-
-                        source = lines[parse_opt:(pos - 1)]
-                        if is_active(self.ext, metadata):
-                            source = unescape_magic(source, language)
-
-                        return code_or_raw_cell(
-                            source=source, metadata=metadata), pos
+                return cell, pos + 1
 
             prev_blank = _BLANK_LINE.match(line)
 
@@ -403,12 +378,6 @@ def code_to_cell(self, lines, parse_opt):
         source = unescape_magic(source, language)
     elif self.ext in ['.py', '.R']:
         source = [self.markdown_unescape(s) for s in source]
-
-    if len(lines) >= 2 and _BLANK_LINE.match(lines[-1]) \
-            and not _BLANK_LINE.match(lines[-2]):
-        cell = code_or_raw_cell(source=source[:-1], metadata=metadata)
-        cell.metadata['noskipline'] = True
-        return cell, len(lines) - 1
 
     return code_or_raw_cell(source=source, metadata=metadata), len(lines)
 

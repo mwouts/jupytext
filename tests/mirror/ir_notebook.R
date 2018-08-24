@@ -17,7 +17,6 @@
 
 sum(1:10)
 
-
 plot(cars)
 
 

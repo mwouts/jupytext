@@ -5,3 +5,14 @@
 ```
 
 And more comments
+
+Another comment separated by one line
+
+
+This is another cell, separated by two or more lines from the previous one.
+
+
+And a last markdown cell, followed by a code cell
+```python
+1+1
+```

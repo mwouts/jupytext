@@ -6,6 +6,17 @@ Release History
 dev
 +++
 
+0.6.0 (2018-08-??)
++++++++++++++++++++
+
+**Improvements**
+
+- Default end of cell for python scripts is one blank space. Two blank
+spaces are allowed as well. Now you can reformating code in Python IDE
+without breaking notebook cells (#38)
+- Python file format updated to 1.1
+
+
 0.5.4 (2018-08-24)
 +++++++++++++++++++
 

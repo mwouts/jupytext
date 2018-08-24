@@ -60,6 +60,8 @@ lovely purse.
 # is optional)
 Sys.sleep(60)
 # */
+```
 
+```{r}
 # /* there is no inline comment; you have to write block comments */
 ```

@@ -8,7 +8,9 @@ FILE_FORMAT_VERSION = {
     # Version 1.0 on 2018-08-22 - nbrmd v0.5.2 : Initial version
 
     # Python scripts
-    '.py': '1.0',
+    '.py': '1.1',
+    # Version 1.1 on 2018-08-25 - nbrmd v0.6.0 : Cells separated with one
+    # blank line #38
     # Version 1.0 on 2018-08-22 - nbrmd v0.5.2 : Initial version
 
     # Python scripts

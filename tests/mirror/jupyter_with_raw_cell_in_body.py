@@ -19,8 +19,7 @@
 
 1+2+3
 
-# + {"active": "", "endofcell": "-"}
+# + {"active": ""}
 # This is a raw cell
-# -
 
 # This is a markdown cell
