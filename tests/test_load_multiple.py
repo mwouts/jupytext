@@ -6,7 +6,7 @@ import nbrmd
 from nbrmd import RmdFileContentsManager
 
 
-def test_combine_save_version_ok(tmpdir):
+def test_combine_same_version_ok(tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_nbpy = 'notebook.py'
 

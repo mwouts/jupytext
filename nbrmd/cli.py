@@ -33,12 +33,12 @@ def cli_nbrmd(args=None):
     return parser.parse_args(args)
 
 
-def nbrmd():
+def nbrmd(args=None):
     """
     Entry point for the nbrmd script
     :return:
     """
-    args = cli_nbrmd()
+    args = cli_nbrmd(args)
     convert(args.notebooks, args.in_place, args.preserve_outputs, True)
 
 
@@ -122,10 +122,10 @@ def cli_nbsrc(args=None):
     return parser.parse_args(args)
 
 
-def nbsrc():
+def nbsrc(args=None):
     """
     Entry point for the nbsrc script
     :return:
     """
-    args = cli_nbsrc()
+    args = cli_nbsrc(args)
     convert(args.notebooks, args.in_place, args.preserve_outputs, False)

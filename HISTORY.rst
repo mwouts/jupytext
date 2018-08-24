@@ -6,6 +6,15 @@ Release History
 dev
 +++
 
+0.5.4 (2018-08-24)
++++++++++++++++++++
+
+**Improvements**
+
+- R to Rmd conversion compares well to knitr::spin (#26)
+- Increased coverage to 98%
+
+
 0.5.3 (2018-08-22)
 +++++++++++++++++++
 
