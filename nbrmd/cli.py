@@ -57,13 +57,13 @@ def convert(nb_files, in_place=True, combine=True, markdown=False):
     for nb_file in nb_files:
         file, ext = os.path.splitext(nb_file)
         if markdown:
-            format = 'R Markdown'
+            fmt = 'R Markdown'
             if ext not in ['.ipynb', '.Rmd']:
                 raise TypeError(
                     'File {} is neither a Jupyter (.ipynb) nor a '
                     'R Markdown (.Rmd) notebook'.format(nb_file))
         else:
-            format = 'source'
+            fmt = 'source'
             if ext not in ['.ipynb', '.py', '.R']:
                 raise TypeError(
                     'File {} is neither a Jupyter (.ipynb) nor a '
@@ -78,7 +78,7 @@ def convert(nb_files, in_place=True, combine=True, markdown=False):
             if ext == '.ipynb':
                 nb_dest = file + ext_dest
                 print('Jupyter notebook {} being converted to '
-                      '{} {}'.format(nb_file, format, nb_dest))
+                      '{} {}'.format(nb_file, fmt, nb_dest))
             else:
                 msg = ''
                 nb_dest = file + '.ipynb'
@@ -92,7 +92,7 @@ def convert(nb_files, in_place=True, combine=True, markdown=False):
                         msg = '(outputs were not preserved: {})'.format(error)
                 print('{} {} being converted to '
                       'Jupyter notebook {} {}'
-                      .format(format, nb_file, nb_dest, msg))
+                      .format(fmt, nb_file, nb_dest, msg))
             writef(nb, nb_dest)
         else:
             if ext == '.ipynb':

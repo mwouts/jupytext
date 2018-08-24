@@ -24,7 +24,7 @@ _LINE_MAGICS = '%alias  %alias_magic  %autocall  %automagic  %autosave  ' \
 _LINE_MAGICS += ('%autoreload %aimport '  # autoreload
                  '%R %Rpush %Rpull %Rget '  # rmagic
                  '%store '  # storemagic
-                 ).split(' ')
+                ).split(' ')
 
 # Remove any blank line
 _LINE_MAGICS = [magic for magic in _LINE_MAGICS if magic.startswith('%')]
