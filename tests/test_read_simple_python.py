@@ -187,11 +187,13 @@ def test_file_with_two_blank_line_end(pynb="""import pandas
     compare(pynb, pynb2)
 
 
-def test_one_blank_line_after_endofcell(pynb="""# + {"endofcell": "-"}
-# This is a cell with explicit end of cell
+def test_two_blank_lines_after_endofcell(pynb="""# + {"endofcell": "-"}
+# This is a code cell with explicit end of cell
+1 + 1
 
-
+2 + 2
 # -
+
 
 # This cell is a cell with implicit start/end
 1 + 1

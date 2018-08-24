@@ -28,7 +28,6 @@ a + b
 
 a, b
 
-
 a, b, a+b
 
 # And this is already the end of the notebook
