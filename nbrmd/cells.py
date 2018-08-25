@@ -7,7 +7,7 @@ import re
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from .languages import cell_language, is_code
 from .cell_metadata import metadata_to_rmd_options, rmd_options_to_metadata, \
-    json_options_to_metadata, metadata_to_json_options
+    json_options_to_metadata, filter_metadata, metadata_to_json_options
 from .magics import is_magic, escape_magic, unescape_magic
 from .stringparser import StringParser
 
@@ -31,15 +31,32 @@ def code_to_rmd(source, metadata, default_language):
     return lines
 
 
+def py_endofcell_marker(self, source):
+    """Issues #31 #38:  does the cell contain a blank line? In that case
+    we add an end-of-cell marker"""
+    if code_to_cell(self, source, False)[1] != len(source):
+        endofcell = '-'
+        while True:
+            endofcell_re = re.compile(r'^#( )' + endofcell + r'\s*$')
+            if list(filter(endofcell_re.match, source)):
+                endofcell = endofcell + '-'
+            else:
+                return endofcell
+
+    return None
+
+
 def code_to_text(self,
                  source,
                  metadata,
+                 next_cell,
                  default_language):
     """
     Represent a code cell with given source and metadata as text
     :param self:
     :param source:
     :param metadata:
+    :param next_cell:
     :param default_language:
     :return:
     """
@@ -57,47 +74,61 @@ def code_to_text(self,
 
     if self.ext == '.Rmd':
         return code_to_rmd(source, metadata, default_language)
-    else:
-        lines = []
-        if self.ext == '.R':
-            if not active:
-                metadata['eval'] = False
-                options = metadata_to_rmd_options(None, metadata)
-                if language != 'R':
-                    options = 'language="{}" {}'.format(language, options)
-                source = ['#+ ' + options] + ["# " + s for s in source]
-            else:
-                options = metadata_to_rmd_options(None, metadata)
-                if options != '':
-                    lines.append('#+ ' + options)
-        else:  # py
-            # end of cell marker
-            if active and need_end_cell_marker(self, source):
-                endofcell = '-'
-                while True:
-                    endofcell_re = re.compile(r'^#( )' + endofcell + r'\s*$')
-                    if list(filter(endofcell_re.match, source)):
-                        endofcell = endofcell + '-'
-                    else:
-                        break
-                metadata['endofcell'] = endofcell
 
+    lines = []
+    if self.ext == '.R':
+        if not active:
+            metadata['eval'] = False
+            options = metadata_to_rmd_options(None, metadata)
+            if language != 'R':
+                options = 'language="{}" {}'.format(language, options)
+            source = ['#+ ' + options] + ["# " + s for s in source]
+        else:
+            options = metadata_to_rmd_options(None, metadata)
+            if options != '':
+                lines.append('#+ ' + options)
+    else:  # py
+        # Do we need a cell start marker?
+        # - any metadata?
+        # - cell would need an end of cell marker?
+        endofcell = py_endofcell_marker(self, source) if active else None
+
+        next_cell_has_explicit_start = \
+            not next_cell or \
+            (next_cell.cell_type == 'code' and
+             (metadata_to_json_options(next_cell.metadata) != '{}' or
+              py_endofcell_marker(self, cell_source(next_cell))))
+
+        metadata = filter_metadata(metadata)
+        # Is explicit start required?
+        if metadata or endofcell:
+            if endofcell:
+                if next_cell_has_explicit_start:
+                    endofcell = None
+                elif metadata or (endofcell != '-'):
+                    # '# + {}' is the default for endofcell=='-'
+                    metadata['endofcell'] = endofcell
             options = metadata_to_json_options(metadata)
-            if options != '{}':
-                lines.append('# + ' + options)
-            if not active:
-                source = ['# ' + line for line in source]
-        lines.extend(source)
-        if 'endofcell' in metadata:
-            lines.append('# ' + metadata['endofcell'])
+            lines.append('# + ' + options)
+        if not active:
+            source = ['# ' + line for line in source]
+    lines.extend(source)
+    if self.ext == '.py' and endofcell:
+        lines.append('# ' + endofcell)
 
-        return lines
+    return lines
 
 
-def need_end_cell_marker(self, source):
-    """Issues #31 #38:  does the cell contain a blank line? In that case
-we add an end-of-cell marker"""
-    return code_to_cell(self, source, False)[1] != len(source)
+def cell_source(cell):
+    """
+    Return the source of the current cell, as an array of lines
+    :param cell:
+    :return:
+    """
+    source = cell.get('source').splitlines()
+    if not source or cell.get('source').endswith('\n'):
+        source.append('')
+    return source
 
 
 def cell_to_text(self,
@@ -113,9 +144,7 @@ def cell_to_text(self,
     :param default_language: default language for the current notebook
     :return:
     """
-    source = cell.get('source').splitlines()
-    if not source or cell.get('source').endswith('\n'):
-        source.append('')
+    source = cell_source(cell)
     metadata = cell.get('metadata', {})
     skipline = True
     if 'noskipline' in metadata:
@@ -129,7 +158,7 @@ def cell_to_text(self,
     lines = []
     if is_code(cell):
         lines.extend(code_to_text(
-            self, source, metadata, default_language))
+            self, source, metadata, next_cell, default_language))
     else:
         lines.extend(self.markdown_escape(source))
 
@@ -185,12 +214,12 @@ def start_code_rpy(line, ext):
     """
     A code cell starts here, in a py or R file
     :param line:
+    :param ext:
     :return:
     """
     if ext == '.R':
         return start_code_r(line)
-    else:
-        return start_code_py(line)
+    return start_code_py(line)
 
 
 def next_uncommented_is_code(lines):
@@ -216,10 +245,10 @@ def text_to_cell(self, lines):
     """
     if self.start_code(lines[0]):
         return self.code_to_cell(lines, parse_opt=True)
-    elif self.prefix != '' and not lines[0].startswith(self.prefix):
+    if self.prefix != '' and not lines[0].startswith(self.prefix):
         return self.code_to_cell(lines, parse_opt=False)
-    elif self.ext == '.py' and (next_uncommented_is_code(lines)
-                                or is_magic(lines[0])):
+    if self.ext == '.py' and (next_uncommented_is_code(lines)
+                              or is_magic(lines[0])):
         return self.code_to_cell(lines, parse_opt=False)
 
     return self.markdown_to_cell(lines)
@@ -234,7 +263,7 @@ def parse_code_options(line, ext):
     """
     if ext == '.Rmd':
         return rmd_options_to_metadata(_START_CODE_RMD.findall(line)[0])
-    elif ext == '.R':
+    if ext == '.R':
         language, metadata = \
             rmd_options_to_metadata(_CODE_OPTION_R.findall(line)[0])
         if 'language' in metadata:

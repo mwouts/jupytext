@@ -116,12 +116,11 @@ def test_read_cell_two_blank_lines(pynb="""# ---
 # title: cell with two consecutive blank lines
 # ---
 
-# + {"endofcell": "-"}
+# + {}
 a = 1
 
 
 a + 2
-# -
 """):
     nb = nbrmd.reads(pynb, ext='.py')
 
@@ -136,15 +135,48 @@ a + 2
     compare(pynb, pynb2)
 
 
-def test_read_cell_explicit_start_end(pynb='''
+def test_read_cell_explicit_start(pynb='''
 import pandas as pd
-# + {"endofcell": "-"}
+# + {}
 def data():
     return pd.DataFrame({'A': [0, 1]})
 
 
 data()
+'''):
+    nb = nbrmd.reads(pynb, ext='.py')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_read_complex_cells(pynb='''import pandas as pd
+
+# + {}
+def data():
+    return pd.DataFrame({'A': [0, 1]})
+
+
+data()
+
+# + {}
+def data2():
+    return pd.DataFrame({'B': [0, 1]})
+
+
+data2()
+
+# + {}
+# Finally we have a cell with only comments
+# This cell should remain a code cell and not been converted
+# to markdown
+
+# + {"endofcell":"--"}
+# This cell has an enumeration in it that should not
+# match the endofcell marker!
+# - item 1
+# - item 2
 # -
+# --
 '''):
     nb = nbrmd.reads(pynb, ext='.py')
     pynb2 = nbrmd.writes(nb, ext='.py')
@@ -153,13 +185,12 @@ data()
 
 def test_read_prev_function(pynb="""def test_read_cell_explicit_start_end(pynb='''
 import pandas as pd
-# + {"endofcell": "-"}
+# + {}
 def data():
     return pd.DataFrame({'A': [0, 1]})
 
 
 data()
-# -
 '''):
     nb = nbrmd.reads(pynb, ext='.py')
     pynb2 = nbrmd.writes(nb, ext='.py')
@@ -187,7 +218,7 @@ def test_file_with_two_blank_line_end(pynb="""import pandas
     compare(pynb, pynb2)
 
 
-def test_two_blank_lines_after_endofcell(pynb="""# + {"endofcell": "-"}
+def test_two_blank_lines_after_endofcell(pynb="""# + {}
 # This is a code cell with explicit end of cell
 1 + 1
 
