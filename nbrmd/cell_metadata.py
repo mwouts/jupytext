@@ -257,9 +257,19 @@ def json_options_to_metadata(options):
     :return:
     """
     try:
-        return json.loads('{' + options + '}')
+        options = json.loads('{' + options + '}')
+        return options or {'endofcell': '-'}
     except ValueError:
         return {}
+
+
+def filter_metadata(metadata):
+    """
+    Filter technical metadata
+    :param metadata:
+    :return:
+    """
+    return {k: metadata[k] for k in metadata if k not in _IGNORE_METADATA}
 
 
 def metadata_to_json_options(metadata):
@@ -268,5 +278,4 @@ def metadata_to_json_options(metadata):
     :param metadata:
     :return:
     """
-    return json.dumps({k: metadata[k] for k in metadata
-                       if k not in _IGNORE_METADATA})
+    return json.dumps(metadata)
