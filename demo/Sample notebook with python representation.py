@@ -13,7 +13,8 @@
 #     name: python
 #     nbconvert_exporter: python
 #     pygments_lexer: ipython3
-#     version: 3.6.6
+#     version: 3.6.5
+#   nbrmd_format_version: '1.1'
 #   nbrmd_formats: ipynb,py
 # ---
 
@@ -35,7 +36,7 @@
 
 # %matplotlib inline
 
-
+# + {}
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -46,7 +47,7 @@ plt.plot(t, s)
 plt.xlabel('time (s)')
 plt.ylabel('voltage (mV)')
 plt.title('About as simple as it gets, folks')
-
+# -
 
 plt.show()
 
