@@ -24,13 +24,12 @@ _LINE_MAGICS = '%alias  %alias_magic  %autocall  %automagic  %autosave  ' \
 _LINE_MAGICS += ('%autoreload %aimport '  # autoreload
                  '%R %Rpush %Rpull %Rget '  # rmagic
                  '%store '  # storemagic
-                ).split(' ')
+                 ).split(' ')
 
 # Remove any blank line
 _LINE_MAGICS = [magic for magic in _LINE_MAGICS if magic.startswith('%')]
 
 # A magic expression is a line or cell magic escaped zero, or multiple times
-_PERCENT_RE = re.compile(r"^(# |#)*%")
 _FORCE_ESC_RE = re.compile(r"^(# |#)*%(.*)(#| )escape")
 _FORCE_NOT_ESC_RE = re.compile(r"^(# |#)*%(.*)noescape")
 _MAGIC_RE = re.compile(r"^(# |#)*(%%|{})".format('|'.join(_LINE_MAGICS)))
