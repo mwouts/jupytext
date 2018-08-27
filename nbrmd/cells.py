@@ -31,10 +31,10 @@ def code_to_rmd(source, metadata, default_language):
     return lines
 
 
-def py_endofcell_marker(self, source):
+def py_endofcell_marker(self, source, force_marker):
     """Issues #31 #38:  does the cell contain a blank line? In that case
     we add an end-of-cell marker"""
-    if code_to_cell(self, source, False)[1] != len(source):
+    if force_marker or code_to_cell(self, source, False)[1] != len(source):
         endofcell = '-'
         while True:
             endofcell_re = re.compile(r'^#( )' + endofcell + r'\s*$')
@@ -69,6 +69,9 @@ def code_to_text(self,
             active = False
             metadata['active'] = 'ipynb'
 
+    all_commented_code = self.ext == '.py' and all(
+        [line.startswith('#') for line in source])
+
     if active:
         source = escape_magic(source, language)
 
@@ -88,26 +91,33 @@ def code_to_text(self,
             if options != '':
                 lines.append('#+ ' + options)
     else:  # py
-        # Do we need a cell start marker?
-        # - any metadata?
-        # - cell would need an end of cell marker?
-        endofcell = py_endofcell_marker(self, source) if active else None
-
-        next_cell_has_explicit_start = \
-            not next_cell or \
-            (next_cell.cell_type == 'code' and
-             (metadata_to_json_options(next_cell.metadata) != '{}' or
-              py_endofcell_marker(self, cell_source(next_cell))))
-
+        # Cell start marker if
+        # - any metadata
+        # - or blank line in code
+        # - or fully commented code cell
         metadata = filter_metadata(metadata)
+        endofcell = py_endofcell_marker(self, source, metadata or
+                                        all_commented_code)
+
+        if not next_cell:
+            next_cell_has_explicit_start = True
+        elif is_code(next_cell):
+            next_cell_source = cell_source(next_cell)
+            next_all_commented_code = all([line.startswith('#') for line
+                                           in next_cell_source])
+            next_cell_end_marker = py_endofcell_marker(
+                self, next_cell_source,
+                filter_metadata(next_cell.metadata) or next_all_commented_code)
+            next_cell_has_explicit_start = next_cell_end_marker is not None
+        else:
+            next_cell_has_explicit_start = False
+
         # Is explicit start required?
-        if metadata or endofcell:
-            if endofcell:
-                if next_cell_has_explicit_start:
-                    endofcell = None
-                elif metadata or (endofcell != '-'):
-                    # '# + {}' is the default for endofcell=='-'
-                    metadata['endofcell'] = endofcell
+        if endofcell:
+            if endofcell != '-':
+                metadata['endofcell'] = endofcell
+            elif next_cell_has_explicit_start:
+                endofcell = None
             options = metadata_to_json_options(metadata)
             lines.append('# + ' + options)
         if not active:
@@ -219,7 +229,9 @@ def start_code_rpy(line, ext):
     """
     if ext == '.R':
         return start_code_r(line)
-    return start_code_py(line)
+    if ext == '.py':
+        return start_code_py(line)
+    return False
 
 
 def next_uncommented_is_code(lines):
@@ -330,7 +342,9 @@ def code_to_cell(self, lines, parse_opt):
     # Find end of cell and return
     if end_cell_re:
         for pos, line in enumerate(lines):
-            if pos > 0 and end_cell_re.match(line):
+            if not pos:
+                continue
+            if end_cell_re.match(line):
                 next_line_blank = pos + 1 == len(lines) or \
                                   _BLANK_LINE.match(lines[pos + 1])
                 source = lines[1:pos]
@@ -347,6 +361,17 @@ def code_to_cell(self, lines, parse_opt):
                 cell = code_or_raw_cell(source=source, metadata=metadata)
                 cell.metadata['noskipline'] = True
                 return cell, pos + 1
+            if start_code_rpy(line, self.ext):
+                prev_blank = _BLANK_LINE.match(lines[pos - 1])
+                source = lines[1:(pos - 1 if prev_blank else pos)]
+                if is_active(self.ext, metadata):
+                    source = unescape_magic(source, language)
+                elif self.ext in ['.py', '.R']:
+                    source = [self.markdown_unescape(s) for s in source]
+                cell = code_or_raw_cell(source=source, metadata=metadata)
+                if not prev_blank:
+                    cell.metadata['noskipline'] = True
+                return cell, pos
     else:
         # self.ext is .py or .R
         prev_blank = False
