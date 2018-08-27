@@ -112,7 +112,7 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
         return ['.ipynb'] + self.nb_extensions
 
     default_nbrmd_formats = Unicode(
-        u'ipynb',
+        u'',
         help='Save notebooks to these file extensions. '
              'Can be any of ipynb,Rmd,py,R,nb.py,nb.R comma separated',
         config=True)
