@@ -39,6 +39,7 @@ def test_ipynb_is_ok(nb_file, tmpdir):
 
     cm = RmdFileContentsManager()
     cm.root_dir = str(tmpdir)
+    cm.default_nbrmd_formats = 'ipynb,Rmd'
 
     cm.save(
         model=dict(type='notebook', content=nb),
