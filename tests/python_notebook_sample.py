@@ -48,6 +48,7 @@ a * b + g(c) + d
 
 # + {"active": ""}
 # This is a raw cell
+# -
 
 # Actually, using the "active" key you can have cells active in Jupyter
 # and inactive in python scripts

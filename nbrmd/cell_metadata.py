@@ -16,7 +16,7 @@ from copy import copy
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
 _IGNORE_METADATA = ['collapsed', 'autoscroll', 'deletable',
-                    'format', 'trusted']
+                    'format', 'trusted', 'skipline', 'noskipline']
 
 
 def _r_logical_values(pybool):
@@ -258,7 +258,9 @@ def json_options_to_metadata(options):
     """
     try:
         options = json.loads('{' + options + '}')
-        return options or {'endofcell': '-'}
+        if 'endofcell' not in options:
+            options['endofcell'] = '-'
+        return options
     except ValueError:
         return {}
 

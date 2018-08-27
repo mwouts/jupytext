@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import pytest
 import nbrmd
 from testfixtures import compare
 from .python_notebook_sample import f, g
@@ -167,10 +168,10 @@ data2()
 
 # + {}
 # Finally we have a cell with only comments
-# This cell should remain a code cell and not been converted
+# This cell should remain a code cell and not get converted
 # to markdown
 
-# + {"endofcell":"--"}
+# + {"endofcell": "--"}
 # This cell has an enumeration in it that should not
 # match the endofcell marker!
 # - item 1
@@ -179,6 +180,21 @@ data2()
 # --
 '''):
     nb = nbrmd.reads(pynb, ext='.py')
+    assert len(nb.cells) == 5
+    assert nb.cells[0].cell_type == 'code'
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[3].cell_type == 'code'
+    assert nb.cells[4].cell_type == 'code'
+    assert nb.cells[3].source == '''# Finally we have a cell with only comments
+# This cell should remain a code cell and not get converted
+# to markdown'''
+    assert nb.cells[4].source == '''# This cell has an enumeration in it that should not
+# match the endofcell marker!
+# - item 1
+# - item 2
+# -'''
+
     pynb2 = nbrmd.writes(nb, ext='.py')
     compare(pynb, pynb2)
 
@@ -205,6 +221,20 @@ def test_read_cell_with_one_blank_line_end(pynb="""import pandas
 
 """):
     nb = nbrmd.reads(pynb, ext='.py')
+    assert len(nb.cells) == 1
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_read_code_cell_fully_commented(pynb="""# + {}
+# This is a code cell that
+# only contains comments
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == 'code'
+    assert nb.cells[0].source == """# This is a code cell that
+# only contains comments"""
     pynb2 = nbrmd.writes(nb, ext='.py')
     compare(pynb, pynb2)
 
@@ -218,18 +248,79 @@ def test_file_with_two_blank_line_end(pynb="""import pandas
     compare(pynb, pynb2)
 
 
-def test_two_blank_lines_after_endofcell(pynb="""# + {}
+def test_one_blank_lines_after_endofcell(pynb="""# + {}
 # This is a code cell with explicit end of cell
 1 + 1
 
 2 + 2
 # -
 
-
-# This cell is a cell with implicit start/end
+# This cell is a cell with implicit start
 1 + 1
 """):
     nb = nbrmd.reads(pynb, ext='.py')
+    assert len(nb.cells) == 2
+    assert nb.cells[0].cell_type == 'code'
+    assert nb.cells[0].source == '''# This is a code cell with explicit end of cell
+1 + 1
+
+2 + 2'''
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[1].source == '''# This cell is a cell with implicit start
+1 + 1'''
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_two_cells_with_explicit_start(pynb="""# + {}
+# Cell one
+1 + 1
+
+1 + 1
+
+# + {}
+# Cell two
+2 + 2
+
+2 + 2
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    assert len(nb.cells) == 2
+    assert nb.cells[0].cell_type == 'code'
+    assert nb.cells[0].source == '''# Cell one
+1 + 1
+
+1 + 1'''
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[1].source == '''# Cell two
+2 + 2
+
+2 + 2'''
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+@pytest.mark.skip(True, reason="Code start pattern cannot appear in code cells")
+def test_escape_start_pattern(pynb="""# The code start pattern '# + {}' can
+# appear in code and markdown cells.
+
+# In markdown cells it is escaped like here:
+# # + {"sample_metadata": "value"}
+
+# In code cells like this one, it is also escaped
+# # + {"sample_metadata": "value"}
+1 + 1
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    assert len(nb.cells) == 3
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[1].cell_type == 'markdown'
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[1].source == '''In markdown cells it is escaped like here:
+# + {"sample_metadata": "value"}'''
+    assert nb.cells[2].source == '''# In code cells like this one, it is also escaped
+# + {"sample_metadata": "value"}
+1 + 1'''
     pynb2 = nbrmd.writes(nb, ext='.py')
     compare(pynb, pynb2)
 
@@ -248,12 +339,14 @@ def test_isolated_cell_with_magic(pynb="""# ---
 
 # %matplotlib inline
 
+# or that one
 
+# %matplotlib inline
 1 + 1
 """):
     nb = nbrmd.reads(pynb, ext='.py')
 
-    assert len(nb.cells) == 5
+    assert len(nb.cells) == 6
     assert nb.cells[0].cell_type == 'raw'
     assert nb.cells[0].source == '---\ntitle: cell with isolated jupyter ' \
                                  'magic\n---'
@@ -261,9 +354,9 @@ def test_isolated_cell_with_magic(pynb="""# ---
     assert nb.cells[2].cell_type == 'markdown'
     assert nb.cells[3].cell_type == 'code'
     assert nb.cells[3].source == '%matplotlib inline'
-
-    assert nb.cells[4].cell_type == 'code'
-    assert nb.cells[4].source == '1 + 1'
+    assert nb.cells[4].cell_type == 'markdown'
+    assert nb.cells[5].cell_type == 'code'
+    assert nb.cells[5].source == '%matplotlib inline\n1 + 1'
 
     pynb2 = nbrmd.writes(nb, ext='.py')
     compare(pynb, pynb2)
