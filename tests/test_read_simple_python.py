@@ -186,20 +186,23 @@ data2()
     assert nb.cells[2].cell_type == 'code'
     assert nb.cells[3].cell_type == 'code'
     assert nb.cells[4].cell_type == 'code'
-    assert nb.cells[3].source == '''# Finally we have a cell with only comments
+    assert (nb.cells[3].source ==
+            '''# Finally we have a cell with only comments
 # This cell should remain a code cell and not get converted
-# to markdown'''
-    assert nb.cells[4].source == '''# This cell has an enumeration in it that should not
+# to markdown''')
+    assert (nb.cells[4].source ==
+            '''# This cell has an enumeration in it that should not
 # match the endofcell marker!
 # - item 1
 # - item 2
-# -'''
+# -''')
 
     pynb2 = nbrmd.writes(nb, ext='.py')
     compare(pynb, pynb2)
 
 
-def test_read_prev_function(pynb="""def test_read_cell_explicit_start_end(pynb='''
+def test_read_prev_function(
+        pynb="""def test_read_cell_explicit_start_end(pynb='''
 import pandas as pd
 # + {}
 def data():
@@ -261,10 +264,11 @@ def test_one_blank_lines_after_endofcell(pynb="""# + {}
     nb = nbrmd.reads(pynb, ext='.py')
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == 'code'
-    assert nb.cells[0].source == '''# This is a code cell with explicit end of cell
+    assert (nb.cells[0].source ==
+            '''# This is a code cell with explicit end of cell
 1 + 1
 
-2 + 2'''
+2 + 2''')
     assert nb.cells[1].cell_type == 'code'
     assert nb.cells[1].source == '''# This cell is a cell with implicit start
 1 + 1'''
@@ -300,7 +304,8 @@ def test_two_cells_with_explicit_start(pynb="""# + {}
     compare(pynb, pynb2)
 
 
-@pytest.mark.skip(True, reason="Code start pattern cannot appear in code cells")
+@pytest.mark.skip(True,
+                  reason="Code start pattern cannot appear in code cells")
 def test_escape_start_pattern(pynb="""# The code start pattern '# + {}' can
 # appear in code and markdown cells.
 
@@ -318,9 +323,39 @@ def test_escape_start_pattern(pynb="""# The code start pattern '# + {}' can
     assert nb.cells[2].cell_type == 'code'
     assert nb.cells[1].source == '''In markdown cells it is escaped like here:
 # + {"sample_metadata": "value"}'''
-    assert nb.cells[2].source == '''# In code cells like this one, it is also escaped
+    assert (nb.cells[2].source ==
+            '''# In code cells like this one, it is also escaped
 # + {"sample_metadata": "value"}
-1 + 1'''
+1 + 1''')
+    pynb2 = nbrmd.writes(nb, ext='.py')
+    compare(pynb, pynb2)
+
+
+def test_dictionary_with_blank_lines_not_broken(
+        pynb="""# This is a markdown cell, and below
+# we have a long dictionary with blank lines
+# inside it
+
+dictionary = {
+    'a': 'A',
+    'b': 'B',
+
+    # and the end
+    'z': 'Z'}
+"""):
+    nb = nbrmd.reads(pynb, ext='.py')
+    assert len(nb.cells) == 2
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[0].source == '''This is a markdown cell, and below
+we have a long dictionary with blank lines
+inside it'''
+    assert nb.cells[1].source == '''dictionary = {
+    'a': 'A',
+    'b': 'B',
+
+    # and the end
+    'z': 'Z'}'''
     pynb2 = nbrmd.writes(nb, ext='.py')
     compare(pynb, pynb2)
 
