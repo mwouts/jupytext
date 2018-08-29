@@ -1,6 +1,9 @@
 import pytest
 from nbformat.v4.nbbase import new_notebook, new_raw_cell, new_markdown_cell
+import nbrmd
 from nbrmd.nbrmd import TextNotebookReader, TextNotebookWriter
+
+nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
 
 
 @pytest.fixture
@@ -46,7 +49,7 @@ Header is not followed by a blank line
     assert cell.source == """---
 title: Sample header
 ---"""
-    assert cell.metadata == {'noskipline': True}
+    assert cell.metadata == {'skiplines': 0}
     assert lines[pos].startswith('Header is')
 
 
@@ -65,7 +68,7 @@ jupyter:
     assert cell.source == """---
 title: Sample header
 ---"""
-    assert cell.metadata == {'noskipline': True}
+    assert cell.metadata == {'skiplines': 0}
     assert pos == len(lines)
 
 
