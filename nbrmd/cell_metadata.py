@@ -16,7 +16,8 @@ from copy import copy
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
 _IGNORE_METADATA = ['collapsed', 'autoscroll', 'deletable',
-                    'format', 'trusted', 'skipline', 'noskipline']
+                    'format', 'trusted', 'skipline', 'noskipline',
+                    'padlines', 'skiplines']
 
 
 def _r_logical_values(pybool):
@@ -281,3 +282,10 @@ def metadata_to_json_options(metadata):
     :return:
     """
     return json.dumps(metadata)
+
+
+def is_active(ext, metadata):
+    """Is the cell active for the given file extension?"""
+    if 'active' not in metadata:
+        return True
+    return ext.replace('.', '') in re.split('\\.|,', metadata['active'])

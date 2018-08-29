@@ -4,7 +4,7 @@ import re
 
 _JUPYTER_LANGUAGES = ['R', 'bash', 'sh', 'python', 'python2', 'python3',
                       'javascript', 'js', 'perl']
-_JUPYTER_LANGUAGES_RE = [re.compile(r"^# %%{}\s*".format(lang))
+_JUPYTER_LANGUAGES_RE = [re.compile(r"^%%{}\s*".format(lang))
                          for lang in _JUPYTER_LANGUAGES]
 
 

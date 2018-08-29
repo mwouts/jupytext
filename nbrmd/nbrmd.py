@@ -24,8 +24,9 @@ from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable
 from .languages import get_default_language, find_main_language
 from .cells import start_code_rmd, start_code_r, start_code_py
-from .cells import cell_to_text, text_to_cell
+from .cells import text_to_cell
 from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
+from .cell_to_text import CellExporter
 
 # -----------------------------------------------------------------------------
 # Code
@@ -131,7 +132,6 @@ class TextNotebookWriter(NotebookWriter):
 
     encoding_and_executable = encoding_and_executable
     metadata_and_cell_to_header = metadata_and_cell_to_header
-    cell_to_text = cell_to_text
 
     def writes(self, nb, **kwargs):
         """Write the text representation of a notebook to a string"""
@@ -152,16 +152,30 @@ class TextNotebookWriter(NotebookWriter):
         lines = self.encoding_and_executable(nb)
         lines.extend(self.metadata_and_cell_to_header(nb))
 
-        for i in range(len(nb.cells)):
-            cell = nb.cells[i]
-            next_cell = nb.cells[i + 1] if i + 1 < len(nb.cells) else None
-            if cell.cell_type == 'raw' and 'active' not in cell.metadata:
-                cell.metadata['active'] = ''
+        cells = [CellExporter(cell, default_language, self.ext)
+                 for cell in nb.cells]
 
-            lines.extend(self.cell_to_text(cell, next_cell,
-                                           default_language=default_language))
+        texts = [cell.cell_to_text() for cell in cells]
 
-        return '\n'.join(lines + [''])
+        for i, cell in enumerate(cells):
+            text = texts[i]
+
+            # remove end of cell marker when redundant
+            # with next explicit marker
+            if self.ext == '.py' and cell.is_code() and text[-1] == '# -':
+                if i + 1 >= len(texts) or \
+                        (texts[i + 1][0].startswith('# + {')):
+                    text = text[:-1]
+
+            lines.extend(text)
+            lines.extend([''] * cell.skiplines)
+
+            # two blank lines between markdown cells in Rmd
+            if self.ext == '.Rmd' and not cell.is_code():
+                if i + 1 < len(cells) and not cells[i + 1].is_code():
+                    lines.append('')
+
+        return '\n'.join(lines)
 
 
 _NOTEBOOK_READERS = {ext: TextNotebookReader(ext)

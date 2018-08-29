@@ -1,6 +1,7 @@
 import pytest
 from nbformat.v4.nbbase import new_markdown_cell
-from nbrmd.nbrmd import TextNotebookReader, TextNotebookWriter
+from nbrmd.nbrmd import TextNotebookReader
+from nbrmd.cell_to_text import CellExporter
 
 
 @pytest.fixture
@@ -124,7 +125,7 @@ def test_text_to_markdown_one_blank_line():
 
 def test_empty_markdown_to_text():
     cell = new_markdown_cell(source='')
-    text = writer().cell_to_text(cell, None, default_language='python')
+    text = CellExporter(cell, 'python', '.Rmd').cell_to_text()
     assert text == ['']
 
 
