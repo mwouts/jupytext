@@ -75,7 +75,7 @@ class TextNotebookReader(NotebookReader):
         """
         return self.to_notebook(s, **kwargs)
 
-    def to_notebook(self, text, **kwargs):
+    def to_notebook(self, text):
         """
         Read a notebook from its text representation
         :param text:
@@ -108,8 +108,8 @@ class TextNotebookReader(NotebookReader):
                     metadata.get('language_info', {})):
                 metadata['main_language'] = 'R'
 
-        nb = new_notebook(cells=cells, metadata=metadata)
-        return nb
+        nbk = new_notebook(cells=cells, metadata=metadata)
+        return nbk
 
 
 class TextNotebookWriter(NotebookWriter):
@@ -192,28 +192,29 @@ def reads(text, as_version=4, ext='.Rmd', **kwargs):
     return _NOTEBOOK_READERS[ext].reads(text, **kwargs)
 
 
-def read(fp, as_version=4, ext='.Rmd', **kwargs):
+def read(file_or_stream, as_version=4, ext='.Rmd', **kwargs):
     """Read a notebook from a file"""
     if ext == '.ipynb':
-        return nbformat.read(fp, as_version, **kwargs)
+        return nbformat.read(file_or_stream, as_version, **kwargs)
 
-    return _NOTEBOOK_READERS[ext].read(fp, **kwargs)
+    return _NOTEBOOK_READERS[ext].read(file_or_stream, **kwargs)
 
 
-def writes(nb, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+def writes(notebook, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
     """Write a notebook to a string"""
     if ext == '.ipynb':
-        return nbformat.writes(nb, version, **kwargs)
+        return nbformat.writes(notebook, version, **kwargs)
 
-    return _NOTEBOOK_WRITERS[ext].writes(nb)
+    return _NOTEBOOK_WRITERS[ext].writes(notebook)
 
 
-def write(np, fp, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+def write(notebook, file_or_stream, version=nbformat.NO_CONVERT, ext='.Rmd',
+          **kwargs):
     """Write a notebook to a file"""
     if ext == '.ipynb':
-        return nbformat.write(np, fp, version, **kwargs)
+        return nbformat.write(notebook, file_or_stream, version, **kwargs)
 
-    return _NOTEBOOK_WRITERS[ext].write(np, fp)
+    return _NOTEBOOK_WRITERS[ext].write(notebook, file_or_stream)
 
 
 def readf(nb_file):
@@ -224,11 +225,11 @@ def readf(nb_file):
             'File {} is not a notebook. '
             'Expected extensions are {}'.format(nb_file,
                                                 NOTEBOOK_EXTENSIONS))
-    with io.open(nb_file, encoding='utf-8') as fp:
-        return read(fp, as_version=4, ext=ext)
+    with io.open(nb_file, encoding='utf-8') as stream:
+        return read(stream, as_version=4, ext=ext)
 
 
-def writef(nb, nb_file):
+def writef(notebook, nb_file):
     """Write a notebook to the file with given name"""
     _, ext = os.path.splitext(nb_file)
     if ext not in NOTEBOOK_EXTENSIONS:
@@ -236,5 +237,5 @@ def writef(nb, nb_file):
             'File {} is not a notebook. '
             'Expected extensions are {}'.format(nb_file,
                                                 NOTEBOOK_EXTENSIONS))
-    with io.open(nb_file, 'w', encoding='utf-8') as fp:
-        write(nb, fp, version=nbformat.NO_CONVERT, ext=ext)
+    with io.open(nb_file, 'w', encoding='utf-8') as stream:
+        write(notebook, stream, version=nbformat.NO_CONVERT, ext=ext)

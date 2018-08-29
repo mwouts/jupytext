@@ -69,8 +69,8 @@ def convert(nb_files, in_place=True, combine=True, markdown=False):
                     'File {} is neither a Jupyter (.ipynb) nor a '
                     'python script (.py), nor a R script (.R)'.format(nb_file))
 
-        nb = readf(nb_file)
-        main_language = get_default_language(nb)
+        nbk = readf(nb_file)
+        main_language = get_default_language(nbk)
         ext_dest = '.Rmd' if markdown else '.R' \
             if main_language == 'R' else '.py'
 
@@ -83,22 +83,22 @@ def convert(nb_files, in_place=True, combine=True, markdown=False):
                 msg = ''
                 nb_dest = file + '.ipynb'
                 if combine and os.path.isfile(nb_dest):
-                    check_file_version(nb, nb_file, nb_dest)
+                    check_file_version(nbk, nb_file, nb_dest)
                     try:
                         nb_outputs = readf(nb_dest)
-                        combine_inputs_with_outputs(nb, nb_outputs)
+                        combine_inputs_with_outputs(nbk, nb_outputs)
                         msg = '(outputs were preserved)'
                     except (IOError, NotJSONError) as error:
                         msg = '(outputs were not preserved: {})'.format(error)
                 print('{} {} being converted to '
                       'Jupyter notebook {} {}'
                       .format(fmt, nb_file, nb_dest, msg))
-            writef(nb, nb_dest)
+            writef(nbk, nb_dest)
         else:
             if ext == '.ipynb':
-                print(writes(nb, ext_dest))
+                print(writes(nbk, ext_dest))
             else:
-                print(ipynb_writes(nb))
+                print(ipynb_writes(nbk))
 
 
 def cli_nbsrc(args=None):
