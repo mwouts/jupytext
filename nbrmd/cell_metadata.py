@@ -231,24 +231,29 @@ def rmd_options_to_metadata(options):
                 metadata[name] = value
 
     for name in metadata:
-        value = metadata[name]
-        if not isinstance(value, str):
-            continue
-        if value.startswith('"') or value.startswith("'"):
-            continue
-        if value.startswith('c(') and value.endswith(')'):
-            value = '[' + value[2:-1] + ']'
-        elif value.startswith('list(') and value.endswith(')'):
-            value = '[' + value[5:-1] + ']'
-        try:
-            metadata[name] = ast.literal_eval(value)
-        except (SyntaxError, ValueError):
-            continue
+        try_eval_metadata(metadata, name)
 
     if 'active' in metadata and 'eval' in metadata:
         del metadata['eval']
 
     return language, metadata
+
+
+def try_eval_metadata(metadata, name):
+    """Evaluate given metadata to a python object, if possible"""
+    value = metadata[name]
+    if not isinstance(value, str):
+        return
+    if value.startswith('"') or value.startswith("'"):
+        return
+    if value.startswith('c(') and value.endswith(')'):
+        value = '[' + value[2:-1] + ']'
+    elif value.startswith('list(') and value.endswith(')'):
+        value = '[' + value[5:-1] + ']'
+    try:
+        metadata[name] = ast.literal_eval(value)
+    except (SyntaxError, ValueError):
+        return
 
 
 def json_options_to_metadata(options):

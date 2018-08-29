@@ -17,11 +17,11 @@ def is_code(cell):
     return False
 
 
-def get_default_language(nb):
+def get_default_language(nbk):
     """Return the default language of a notebook, and remove metadata
     'main_language' if that information is clear from notebook
     contents"""
-    metadata = nb.metadata
+    metadata = nbk.metadata
 
     default_language = (metadata.get('main_language') or
                         metadata.get('language_info', {})
@@ -35,7 +35,7 @@ def get_default_language(nb):
         # is 'main language' redundant with cell language?
         elif metadata.get('language_info', {}).get('name') is None:
             languages = dict(python=0.5)
-            for cell in nb.cells:
+            for cell in nbk.cells:
                 if cell.cell_type == 'code':
                     source = cell.source.splitlines()
                     language = default_language
@@ -45,8 +45,7 @@ def get_default_language(nb):
                             if pattern.match(source[0]):
                                 language = lang
 
-                    languages[language] = 1 + languages.get(
-                        language, 0.0)
+                    languages[language] = 1 + languages.get(language, 0.0)
 
             cell_main_language = max(languages, key=languages.get)
             if metadata['main_language'] == cell_main_language:
