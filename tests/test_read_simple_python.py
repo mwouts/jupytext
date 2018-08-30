@@ -304,8 +304,6 @@ def test_two_cells_with_explicit_start(pynb="""# + {}
     compare(pynb, pynb2)
 
 
-@pytest.mark.skip(True,
-                  reason="Code start pattern cannot appear in code cells")
 def test_escape_start_pattern(pynb="""# The code start pattern '# + {}' can
 # appear in code and markdown cells.
 
