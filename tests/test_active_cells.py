@@ -40,8 +40,8 @@ ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
 ```
 """,
                 '.R': """#+ language="python", active="ipynb", eval=FALSE
-#' # This cell is active only in ipynb
-#' %matplotlib inline
+# # This cell is active only in ipynb
+# %matplotlib inline
 """,
                 '.ipynb': {'cell_type': 'code',
                            'source': '# This cell is active only in ipynb\n'
@@ -70,7 +70,7 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 ```
 """,
                    '.R': """#+ language="python", active="ipynb,py", eval=FALSE
-#' # This cell is active in py and ipynb extensions
+# # This cell is active in py and ipynb extensions
 """,
                    '.ipynb': {'cell_type': 'code',
                               'source': '# This cell is active in py and '
@@ -99,7 +99,7 @@ ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
 ```
 """,
               '.R': """#+ language="python", active="Rmd", eval=FALSE
-#' # This cell is active in Rmd only
+# # This cell is active in Rmd only
 """,
               '.ipynb': {'cell_type': 'raw',
                          'source': '# This cell is active in Rmd only',

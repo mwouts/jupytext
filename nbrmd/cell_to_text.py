@@ -3,7 +3,7 @@
 import re
 from copy import copy
 from .languages import cell_language
-from .cells import code_to_cell
+from .cell_reader import CellReader
 from .cell_metadata import filter_metadata, is_active, \
     metadata_to_rmd_options, metadata_to_json_options
 from .magics import escape_magic
@@ -58,7 +58,7 @@ def code_to_r(source, metadata):
     return lines
 
 
-def code_to_py(source, metadata, padlines):
+def code_to_py(source, metadata):
     """
     Represent a code cell with given source and metadata as a python cell
     """
@@ -72,7 +72,6 @@ def code_to_py(source, metadata, padlines):
     options = metadata_to_json_options(metadata)
     lines.append('# + {}'.format(options))
     lines.extend(source)
-    lines.extend([''] * padlines)
     lines.append('# {}'.format(endofcell))
     return lines
 
@@ -91,24 +90,23 @@ def py_endofcell_marker(source):
 
 class CellExporter():
     """A class that represent a notebook cell as text"""
+
     def __init__(self, cell, default_language, ext):
         self.ext = ext
+        self.prefix = '' if ext == '.Rmd' else "#'" if ext == '.R' else '#'
         self.cell_type = cell.cell_type
         self.source = cell_source(cell)
         self.metadata = filter_metadata(cell.metadata)
         self.language = cell_language(self.source) or default_language
 
-        # how many blank lines before end of cell marker
-        self.padlines = cell.metadata.get('padlines', 0)
-
         # how many blank lines before next cell
-        self.skiplines = cell.metadata.get('skiplines', 1)
+        self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', 1)
 
         # for compatibility with v0.5.4 and lower (to be removed)
         if 'skipline' in cell.metadata:
-            self.skiplines += 1
+            self.lines_to_next_cell += 1
         if 'noskipline' in cell.metadata:
-            self.skiplines -= 1
+            self.lines_to_next_cell -= 1
 
         if cell.cell_type == 'raw' and 'active' not in self.metadata:
             self.metadata['active'] = ''
@@ -132,9 +130,8 @@ class CellExporter():
         """Escape the given source, for a markdown cell"""
         if self.ext == '.Rmd':
             return source
-        if self.ext == '.R':
-            return ["#' " + line if line else "#'" for line in source]
-        return ['# ' + line if line else '#' for line in source]
+        return [self.prefix + ' ' + line if line else self.prefix
+                for line in source]
 
     def explicit_start_marker(self, source):
         """Does the python representation of this cell requires an explicit
@@ -143,7 +140,7 @@ class CellExporter():
             return True
         if all([line.startswith('#') for line in self.source]):
             return True
-        if code_to_cell(self, source, False)[1] != len(source):
+        if CellReader(self.ext).read(source)[1] != len(source):
             return True
 
         return False
@@ -175,4 +172,4 @@ class CellExporter():
         if self.explicit_start_marker(source):
             self.metadata['endofcell'] = py_endofcell_marker(source)
 
-        return code_to_py(source, self.metadata, self.padlines)
+        return code_to_py(source, self.metadata)

@@ -9,10 +9,6 @@ Authors:
 * Marc Wouts
 """
 
-# -----------------------------------------------------------------------------
-# Imports
-# -----------------------------------------------------------------------------
-
 import os
 import io
 from copy import deepcopy
@@ -22,16 +18,10 @@ import nbformat
 
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable
-from .languages import get_default_language, find_main_language
-from .cells import start_code_rmd, start_code_r, start_code_py
-from .cells import text_to_cell
-from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
+from .languages import default_language_from_metadata_and_ext, \
+    set_main_and_cell_language
 from .cell_to_text import CellExporter
-
-# -----------------------------------------------------------------------------
-# Code
-# -----------------------------------------------------------------------------
-
+from .cell_reader import CellReader
 
 NOTEBOOK_EXTENSIONS = ['.ipynb', '.Rmd', '.py', '.R']
 
@@ -47,15 +37,8 @@ class TextNotebookReader(NotebookReader):
     def __init__(self, ext):
         self.ext = ext
         self.prefix = markdown_comment(ext)
-        self.start_code = start_code_rmd if ext == '.Rmd' else \
-            start_code_py if ext == '.py' else start_code_r
-        if ext == '.Rmd':
-            self.markdown_to_cell = markdown_to_cell_rmd
 
     header_to_metadata_and_cell = header_to_metadata_and_cell
-    text_to_cell = text_to_cell
-    code_to_cell = code_to_cell
-    markdown_to_cell = markdown_to_cell
 
     def markdown_unescape(self, line):
         """Remove markdown escape, if any"""
@@ -67,21 +50,11 @@ class TextNotebookReader(NotebookReader):
         return line
 
     def reads(self, s, **kwargs):
-        """
-        Read a notebook from a given string
-        :param s:
-        :param kwargs:
-        :return:
-        """
-        return self.to_notebook(s, **kwargs)
+        """Read a notebook from text"""
+        return self.to_notebook(s)
 
     def to_notebook(self, text):
-        """
-        Read a notebook from its text representation
-        :param text:
-        :param kwargs:
-        :return:
-        """
+        """Read a notebook from text"""
         lines = text.splitlines()
 
         cells = []
@@ -95,21 +68,17 @@ class TextNotebookReader(NotebookReader):
             lines = lines[pos:]
 
         while lines:
-            cell, pos = self.text_to_cell(lines)
+            reader = CellReader(self.ext)
+            cell, pos = reader.read(lines)
             cells.append(cell)
             if pos <= 0:
                 raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
             lines = lines[pos:]
 
-        if self.ext == '.Rmd':
-            find_main_language(metadata, cells)
-        elif self.ext == '.R':
-            if not (metadata.get('main_language') or
-                    metadata.get('language_info', {})):
-                metadata['main_language'] = 'R'
+        set_main_and_cell_language(metadata, cells, self.ext)
 
-        nbk = new_notebook(cells=cells, metadata=metadata)
-        return nbk
+        notebook = new_notebook(cells=cells, metadata=metadata)
+        return notebook
 
 
 class TextNotebookWriter(NotebookWriter):
@@ -136,18 +105,9 @@ class TextNotebookWriter(NotebookWriter):
     def writes(self, nb, **kwargs):
         """Write the text representation of a notebook to a string"""
         nb = deepcopy(nb)
-        if self.ext == '.py':
-            default_language = (nb.metadata.get('main_language') or
-                                nb.metadata.get('language_info', {})
-                                .get('name', 'python'))
-        elif self.ext == '.R':
-            default_language = (nb.metadata.get('main_language') or
-                                nb.metadata.get('language_info', {})
-                                .get('name', 'R'))
-            if nb.metadata.get('main_language') == 'R':
-                del nb.metadata['main_language']
-        else:
-            default_language = get_default_language(nb)
+        default_language = default_language_from_metadata_and_ext(nb, self.ext)
+        if 'main_language' in nb.metadata:
+            del nb.metadata['main_language']
 
         lines = self.encoding_and_executable(nb)
         lines.extend(self.metadata_and_cell_to_header(nb))
@@ -168,7 +128,7 @@ class TextNotebookWriter(NotebookWriter):
                     text = text[:-1]
 
             lines.extend(text)
-            lines.extend([''] * cell.skiplines)
+            lines.extend([''] * cell.lines_to_next_cell)
 
             # two blank lines between markdown cells in Rmd
             if self.ext == '.Rmd' and not cell.is_code():
