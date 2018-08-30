@@ -57,3 +57,31 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
     rmd2 = re.sub(r'```{r ', '```{r, ', rmd2)
     rmd2 = re.sub(r'```{python ', '```{python, ', rmd2)
     compare(rmd, rmd2)
+
+
+def test_escape_start_pattern(rmd="""The code start pattern '```{}' can
+appear in code and markdown cells.
+
+
+In markdown cells it is escaped like here:
+# ```{r fig.width=12}
+
+```{python}
+# In code cells like this one, it is also escaped
+# ```{python cell_name}
+1 + 1
+```
+"""):
+    nb = nbrmd.reads(rmd, ext='.Rmd')
+    assert len(nb.cells) == 3
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[1].cell_type == 'markdown'
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[1].source == '''In markdown cells it is escaped like here:
+```{r fig.width=12}'''
+    assert (nb.cells[2].source ==
+            '''# In code cells like this one, it is also escaped
+```{python cell_name}
+1 + 1''')
+    rmd2 = nbrmd.writes(nb, ext='.Rmd')
+    compare(rmd, rmd2)
