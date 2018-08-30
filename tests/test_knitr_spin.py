@@ -20,4 +20,4 @@ def test_nbrmd_same_as_knitr_spin(r_file, tmpdir):
     with open(rmd_file) as fp:
         rmd_spin = fp.read()
 
-    assert rmd_nbrmd == rmd_spin
+    assert rmd_spin == rmd_nbrmd
