@@ -7,7 +7,7 @@ from nbformat import writes as ipynb_writes
 from nbformat.reader import NotJSONError
 from nbrmd import readf, writef
 from nbrmd import writes
-from .languages import get_default_language
+from .languages import default_language_from_metadata_and_ext
 from .combine import combine_inputs_with_outputs
 from .file_format_version import check_file_version
 
@@ -69,8 +69,8 @@ def convert(nb_files, in_place=True, combine=True, markdown=False):
                     'File {} is neither a Jupyter (.ipynb) nor a '
                     'python script (.py), nor a R script (.R)'.format(nb_file))
 
-        nbk = readf(nb_file)
-        main_language = get_default_language(nbk)
+        notebook = readf(nb_file)
+        main_language = default_language_from_metadata_and_ext(notebook, ext)
         ext_dest = '.Rmd' if markdown else '.R' \
             if main_language == 'R' else '.py'
 
@@ -83,22 +83,22 @@ def convert(nb_files, in_place=True, combine=True, markdown=False):
                 msg = ''
                 nb_dest = file + '.ipynb'
                 if combine and os.path.isfile(nb_dest):
-                    check_file_version(nbk, nb_file, nb_dest)
+                    check_file_version(notebook, nb_file, nb_dest)
                     try:
                         nb_outputs = readf(nb_dest)
-                        combine_inputs_with_outputs(nbk, nb_outputs)
+                        combine_inputs_with_outputs(notebook, nb_outputs)
                         msg = '(outputs were preserved)'
                     except (IOError, NotJSONError) as error:
                         msg = '(outputs were not preserved: {})'.format(error)
                 print('{} {} being converted to '
                       'Jupyter notebook {} {}'
                       .format(fmt, nb_file, nb_dest, msg))
-            writef(nbk, nb_dest)
+            writef(notebook, nb_dest)
         else:
             if ext == '.ipynb':
-                print(writes(nbk, ext_dest))
+                print(writes(notebook, ext_dest))
             else:
-                print(ipynb_writes(nbk))
+                print(ipynb_writes(notebook))
 
 
 def cli_nbsrc(args=None):

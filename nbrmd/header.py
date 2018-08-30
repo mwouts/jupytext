@@ -160,7 +160,7 @@ def header_to_metadata_and_cell(self, lines):
         if header:
             cell = new_raw_cell(source='\n'.join(['---'] + header + ['---']),
                                 metadata={} if skipline else
-                                {'skiplines': 0})
+                                {'lines_to_next_cell': 0})
         else:
             cell = None
 

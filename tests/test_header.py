@@ -49,7 +49,7 @@ Header is not followed by a blank line
     assert cell.source == """---
 title: Sample header
 ---"""
-    assert cell.metadata == {'skiplines': 0}
+    assert cell.metadata == {'lines_to_next_cell': 0}
     assert lines[pos].startswith('Header is')
 
 
@@ -68,7 +68,7 @@ jupyter:
     assert cell.source == """---
 title: Sample header
 ---"""
-    assert cell.metadata == {'skiplines': 0}
+    assert cell.metadata == {'lines_to_next_cell': 0}
     assert pos == len(lines)
 
 
