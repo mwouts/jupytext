@@ -8,15 +8,6 @@ _JUPYTER_LANGUAGES_RE = [re.compile(r"^%%{}\s*".format(lang))
                          for lang in _JUPYTER_LANGUAGES]
 
 
-def is_code(cell):
-    """Is the current code a code cell?"""
-    if cell.cell_type == 'code':
-        return True
-    if cell.cell_type == 'raw' and 'active' in cell.metadata:
-        return True
-    return False
-
-
 def default_language_from_metadata_and_ext(notebook, ext):
     """Return the default language for a notebook that was read
     from the given file extension"""
