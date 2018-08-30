@@ -5,19 +5,24 @@ is quoted or not"""
 class StringParser:
     """A simple file parser that can tell whether the first character of a line
     is quoted or not"""
-    python = True
     single = None
     triple = None
 
     def __init__(self, language):
+        self.ignore = language is None
         self.python = language != 'R'
 
     def is_quoted(self):
         """Is the next line quoted?"""
+        if self.ignore:
+            return False
         return self.single or self.triple
 
     def read_line(self, line):
         """Read a new line"""
+        if self.ignore:
+            return
+
         for i, char in enumerate(line):
             if char not in ['"', "'"]:
                 continue

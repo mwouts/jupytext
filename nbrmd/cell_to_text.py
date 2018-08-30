@@ -6,7 +6,7 @@ from .languages import cell_language
 from .cell_reader import CellReader
 from .cell_metadata import filter_metadata, is_active, \
     metadata_to_rmd_options, metadata_to_json_options
-from .magics import escape_magic
+from .magics import escape_magic, escape_code_start
 
 
 def cell_source(cell):
@@ -124,7 +124,10 @@ class CellExporter():
         if self.is_code():
             return self.code_to_text()
 
-        return self.markdown_escape(self.source)
+        source = copy(self.source)
+        if self.ext == '.Rmd':
+            escape_code_start(source, self.ext, None)
+        return self.markdown_escape(source)
 
     def markdown_escape(self, source):
         """Escape the given source, for a markdown cell"""
@@ -156,6 +159,8 @@ class CellExporter():
                 self.metadata['language'] = self.language
 
         source = copy(self.source)
+        escape_code_start(source, self.ext, self.language)
+
         if active:
             escape_magic(source, self.language)
 

@@ -5,7 +5,7 @@ from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from nbrmd.cell_metadata import is_active, rmd_options_to_metadata, \
     json_options_to_metadata
 from nbrmd.stringparser import StringParser
-from nbrmd.magics import unescape_magic, is_magic
+from nbrmd.magics import unescape_magic, is_magic, unescape_code_start
 
 _START_CODE_RMD = re.compile(r"^```{(.*)}\s*$")
 _END_CODE_MD = re.compile(r"^```\s*$")
@@ -253,9 +253,13 @@ class CellReader():
 
         if self.cell_type == 'code':
             if is_active(self.ext, self.metadata):
-                source = unescape_magic(source, self.language)
+                unescape_magic(source, self.language or 'python')
             elif self.ext in ['.py', '.R']:
                 source = uncomment(source)
+
+        if self.cell_type == 'code' or self.ext == '.Rmd':
+            unescape_code_start(source, self.ext, self.language or
+                                ('python' if self.ext != '.Rmd' else None))
 
         if self.cell_type == 'markdown' and self.ext in ['.py', '.R']:
             source = self.markdown_unescape(source)
