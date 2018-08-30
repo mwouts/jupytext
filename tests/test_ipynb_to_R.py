@@ -12,8 +12,6 @@ def test_identity_source_write_read(nb_file):
     """
     Test that writing the notebook with R, and read again,
     is the same as removing outputs
-    :param file:
-    :return:
     """
 
     with open(nb_file) as fp:
