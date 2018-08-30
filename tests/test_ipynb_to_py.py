@@ -10,7 +10,7 @@ nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_identity_source_write_read(nb_file):
     """
-    Test that writing the notebook with rmd, and read again,
+    Test that writing the notebook with nbrmd, and read again,
     is the same as removing outputs
     :param file:
     :return:
