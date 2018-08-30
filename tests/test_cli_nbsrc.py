@@ -8,8 +8,8 @@ from .utils import list_all_notebooks, remove_outputs
 nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
 
 
-def convert(*args):
-    return convert_(*args, markdown=False)
+def convert(*args, **kwargs):
+    return convert_(*args, markdown=False, **kwargs)
 
 
 @pytest.mark.parametrize('nb_file',
@@ -46,7 +46,7 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
                          list_all_notebooks('.ipynb') +
                          list_all_notebooks('.py'))
 def test_convert_single_file(nb_file, capsys):
-    convert([nb_file], False)
+    convert([nb_file], in_place=False)
 
     out, err = capsys.readouterr()
     assert out != ''

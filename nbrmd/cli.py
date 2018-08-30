@@ -39,10 +39,10 @@ def nbrmd(args=None):
     :return:
     """
     args = cli_nbrmd(args)
-    convert(args.notebooks, args.in_place, args.preserve_outputs, True)
+    convert(args.notebooks, True, args.in_place, args.preserve_outputs)
 
 
-def convert(nb_files, in_place=True, combine=True, markdown=False):
+def convert(nb_files, markdown, in_place=True, combine=True):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
@@ -77,8 +77,8 @@ def convert(nb_files, in_place=True, combine=True, markdown=False):
         if in_place:
             if ext == '.ipynb':
                 nb_dest = file + ext_dest
-                print('Jupyter notebook {} being converted to '
-                      '{} {}'.format(nb_file, fmt, nb_dest))
+                print('Jupyter notebook "{}" being converted to '
+                      '{} "{}"'.format(nb_file, fmt, nb_dest))
             else:
                 msg = ''
                 nb_dest = file + '.ipynb'
@@ -90,13 +90,13 @@ def convert(nb_files, in_place=True, combine=True, markdown=False):
                         msg = '(outputs were preserved)'
                     except (IOError, NotJSONError) as error:
                         msg = '(outputs were not preserved: {})'.format(error)
-                print('{} {} being converted to '
-                      'Jupyter notebook {} {}'
-                      .format(fmt, nb_file, nb_dest, msg))
+                print('{} "{}" being converted to '
+                      'Jupyter notebook "{}" {}'
+                      .format(fmt.title(), nb_file, nb_dest, msg))
             writef(notebook, nb_dest)
         else:
             if ext == '.ipynb':
-                print(writes(notebook, ext_dest))
+                print(writes(notebook, ext=ext_dest))
             else:
                 print(ipynb_writes(notebook))
 
@@ -128,4 +128,4 @@ def nbsrc(args=None):
     :return:
     """
     args = cli_nbsrc(args)
-    convert(args.notebooks, args.in_place, args.preserve_outputs, False)
+    convert(args.notebooks, False, args.in_place, args.preserve_outputs)
