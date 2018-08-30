@@ -365,11 +365,11 @@ def test_isolated_cell_with_magic(pynb="""# ---
 # ---
 
 # A magic command included in a markdown
-# paragraph is not code, like the one below:
+# paragraph is code
 #
 # %matplotlib inline
 
-# However, a code block may start with
+# a code block may start with
 # a magic command, like this one:
 
 # %matplotlib inline
@@ -385,7 +385,7 @@ def test_isolated_cell_with_magic(pynb="""# ---
     assert nb.cells[0].cell_type == 'raw'
     assert nb.cells[0].source == '---\ntitle: cell with isolated jupyter ' \
                                  'magic\n---'
-    assert nb.cells[1].cell_type == 'markdown'
+    assert nb.cells[1].cell_type == 'code'
     assert nb.cells[2].cell_type == 'markdown'
     assert nb.cells[3].cell_type == 'code'
     assert nb.cells[3].source == '%matplotlib inline'
