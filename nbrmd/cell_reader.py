@@ -2,10 +2,10 @@
 
 import re
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
-from nbrmd.cell_metadata import is_active, rmd_options_to_metadata, \
+from .cell_metadata import is_active, rmd_options_to_metadata, \
     json_options_to_metadata
-from nbrmd.stringparser import StringParser
-from nbrmd.magics import unescape_magic, is_magic, unescape_code_start
+from .stringparser import StringParser
+from .magics import unescape_magic, is_magic, unescape_code_start
 
 _START_CODE_RMD = re.compile(r"^```{(.*)}\s*$")
 _END_CODE_MD = re.compile(r"^```\s*$")
