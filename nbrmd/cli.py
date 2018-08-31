@@ -82,7 +82,7 @@ def cli_nbrmd(args=None):
                         help="Destination notebook 'notebook.md', "
                              "extension '.md', "
                              "or format 'md' (for on screen display)")
-    parser.add_argument('-p', '--preserve_outputs', action='store_true',
+    parser.add_argument('--update', action='store_true',
                         help='Preserve outputs of .ipynb destination '
                              '(when file exists and inputs match)')
     parser.add_argument('--test', dest='test', action='store_true',
@@ -96,4 +96,4 @@ def nbrmd(args=None):
     args = cli_nbrmd(args)
     convert_notebook_files(nb_files=args.notebooks, nb_dest=args.to,
                            test_round_trip=args.test,
-                           preserve_outputs=args.preserve_outputs)
+                           preserve_outputs=args.update)

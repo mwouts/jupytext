@@ -102,7 +102,7 @@ def test_combine_same_version_ok(tmpdir):
     with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',
                     {'.py': '1.0'}):
         # to jupyter notebook
-        nbrmd(args=[tmp_nbpy, '.ipynb', '-p'])
+        nbrmd(args=[tmp_nbpy, '.ipynb', '--update'])
         # test round trip
         nbrmd(args=[tmp_nbpy, '.ipynb', '--test'])
         # test ipynb to rmd
@@ -141,4 +141,4 @@ def test_combine_lower_version_raises(tmpdir):
     with pytest.raises(ValueError):
         with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',
                         {'.py': '1.0'}):
-            nbrmd(args=[tmp_nbpy, '.ipynb', '-p'])
+            nbrmd(args=[tmp_nbpy, '.ipynb', '--update'])
