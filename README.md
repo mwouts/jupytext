@@ -1,4 +1,4 @@
-# Jupyter notebooks as R markdown, Python or R scripts
+# Jupyter notebooks as markdown documents, Python or R scripts
 
 [![Pypi](https://img.shields.io/pypi/v/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
 [![Pypi](https://img.shields.io/pypi/l/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
@@ -8,7 +8,7 @@
 [![pyversions](https://img.shields.io/pypi/pyversions/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo)
 
-This package offers a representation of Jupyter notebooks as Python scripts, R scripts, or [R markdown](https://rmarkdown.rstudio.com/) notebooks. 
+This package offers a representation of Jupyter notebooks as Python scripts, R scripts, plain markdown or [R markdown](https://rmarkdown.rstudio.com/) notebooks. 
 
 These alternative representations allow to
 - edit notebooks in both Jupyter and your favorite IDE, and refactor them
@@ -20,7 +20,7 @@ Scripts and R markdown notebooks only store the source of the notebook, and work
 
 ## Can I have a demo?
 
-Sure. Try our package on [binder](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo). Notice that every `.py`, `.R` and `.Rmd` file opens as a Jupyter notebook. I suggest you open the matplotlib demo `filled_step.py`, run it and save it, close notebook and reopen, to observe persistence of outputs. 
+Sure. Try our package on [binder](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo). Notice that every `.py`, `.R`, `.md` and `.Rmd` file opens as a Jupyter notebook. I suggest you open the matplotlib demo `filled_step.py`, run it and save it, close notebook and reopen, to observe persistence of outputs. 
 
 The other examples demo how to *edit* the script and reload the notebook (preserving the kernel variables), and how to edit in Jupyter an interactive ioslide presentation.
 
@@ -49,12 +49,12 @@ a yaml header at the top of your script.
 ## How do I activate the companion scripts or R markdown notebooks in Jupyter?
 
 The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes
-`.py`, `.R` and `.Rmd` files as notebooks. To use it,
+`.py`, `.R`, `.md` and `.Rmd` files as notebooks. To use it,
 - generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit the config and include the below:
 ```python
 c.NotebookApp.contents_manager_class = "nbrmd.RmdFileContentsManager"
-c.ContentsManager.default_nbrmd_formats = "ipynb,py" # or "ipynb,nb.py" # or "ipynb,Rmd"
+c.ContentsManager.default_nbrmd_formats = "ipynb,py" # or "ipynb,nb.py" # or "ipynb,md" # or "ipynb,Rmd"
 ```
 
 Then, make sure you have the `nbrmd` package up-to-date, and re-start jupyter, i.e. run
@@ -63,7 +63,7 @@ pip install nbrmd --upgrade
 jupyter notebook
 ```
 
-With the above configuration, every Jupyter notebook will have a companion `.py` (`.nb.py`, or `.Rmd`) notebook. And every `.py` (`.nb.py`, or `.Rmd`) notebook will have a companion `.ipynb` notebook.
+With the above configuration, every Jupyter notebook will have a companion `.py` (`.nb.py`, `.md`, or `.Rmd`) notebook. And every `.py` (`.nb.py`, `.md`, or `.Rmd`) notebook will have a companion `.ipynb` notebook.
 
 The default configuration can also contain multiple extension groups. Use
 ```python
@@ -90,7 +90,7 @@ configuration, and instead edit the notebook metadata as follows:
 }
 ```
 
-Accepted formats should have these extensions: `ipynb`, `Rmd`, `py` and `R`.
+Accepted formats should have these extensions: `ipynb`, `md`, Rmd`, `py` and `R`.
 
 In case you want both `py` and `Rmd`, please note that the
 order matters: the first non-`ipynb` extension

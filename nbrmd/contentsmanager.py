@@ -28,7 +28,7 @@ def _nbrmd_writes(ext):
 
 def _nbrmd_reads(ext):
     def _reads(text, as_version, **kwargs):
-        return nbrmd.reads(text, as_version, ext=ext, **kwargs)
+        return nbrmd.reads(text, ext, as_version, **kwargs)
 
     return _reads
 
@@ -115,7 +115,7 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
     default_nbrmd_formats = Unicode(
         u'',
         help='Save notebooks to these file extensions. '
-             'Can be any of ipynb,Rmd,py,R,nb.py,nb.R comma separated',
+             'Can be any of ipynb,Rmd,md,py,R,nb.py,nb.R comma separated',
         config=True)
 
     def format_group(self, fmt, nbk=None):

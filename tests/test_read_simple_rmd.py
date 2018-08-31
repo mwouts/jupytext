@@ -5,11 +5,12 @@ import nbrmd
 nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
 
 
-def test_read_mostly_py_rmd_file(rmd="""# ---
-# title: Simple file
-# ---
+def test_read_mostly_py_rmd_file(rmd="""---
+title: Simple file
+---
 
 ```{python, echo=TRUE}
+import numpy as np
 x = np.arange(0, 2*math.pi, eps)
 ```
 
@@ -28,13 +29,14 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 """):
     nb = nbrmd.reads(rmd, ext='.Rmd')
     assert nb.metadata == {'main_language': 'python'}
-    assert nb.cells == [{'cell_type': 'markdown',
-                         'source': '# ---\n# title: Simple file\n# ---',
+    assert nb.cells == [{'cell_type': 'raw',
+                         'source': '---\ntitle: Simple file\n---',
                          'metadata': {}},
                         {'cell_type': 'code',
                          'metadata': {'hide_input': False},
                          'execution_count': None,
-                         'source': 'x = np.arange(0, 2*math.pi, eps)',
+                         'source': 'import numpy as np\n'
+                                   'x = np.arange(0, 2*math.pi, eps)',
                          'outputs': []},
                         {'cell_type': 'code',
                          'metadata': {'hide_input': False},

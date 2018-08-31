@@ -35,10 +35,27 @@ def code_to_rmd(source, metadata, language):
     if not is_active('Rmd', metadata):
         metadata['eval'] = False
     options = metadata_to_rmd_options(language, metadata)
-    lines.append(u'```{{{}}}'.format(options))
+    lines.append('```{{{}}}'.format(options))
     lines.extend(source)
-    lines.append(u'```')
+    lines.append('```')
     return lines
+
+
+def code_to_md(source, metadata, language):
+    """
+    Represent a code cell with given source and metadata as a md cell
+    :param source:
+    :param metadata:
+    :param language:
+    :return:
+    """
+    options = []
+    if language:
+        options.append(language)
+    if 'name' in metadata:
+        options.append(metadata['name'])
+
+    return ['```{}'.format(' '.join(options))] + source + ['```']
 
 
 def code_to_r(source, metadata):
@@ -53,7 +70,7 @@ def code_to_r(source, metadata):
         metadata['eval'] = False
     options = metadata_to_rmd_options(None, metadata)
     if options:
-        lines.append(u'#+ {}'.format(options))
+        lines.append('#+ {}'.format(options))
     lines.extend(source)
     return lines
 
@@ -93,7 +110,8 @@ class CellExporter():
 
     def __init__(self, cell, default_language, ext):
         self.ext = ext
-        self.prefix = '' if ext == '.Rmd' else "#'" if ext == '.R' else '#'
+        self.prefix = '' if ext in ['.Rmd', '.md'] \
+            else "#'" if ext == '.R' else '#'
         self.cell_type = cell.cell_type
         self.source = cell_source(cell)
         self.metadata = filter_metadata(cell.metadata)
@@ -125,13 +143,13 @@ class CellExporter():
             return self.code_to_text()
 
         source = copy(self.source)
-        if self.ext == '.Rmd':
+        if self.ext in ['.Rmd', '.md']:
             escape_code_start(source, self.ext, None)
         return self.markdown_escape(source)
 
     def markdown_escape(self, source):
         """Escape the given source, for a markdown cell"""
-        if self.ext == '.Rmd':
+        if self.ext in ['.Rmd', '.md']:
             return source
         return [self.prefix + ' ' + line if line else self.prefix
                 for line in source]
@@ -161,11 +179,16 @@ class CellExporter():
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
 
-        if active:
+        if active and self.ext != '.md':
             escape_magic(source, self.language)
 
         if self.ext == '.Rmd':
             return code_to_rmd(source, self.metadata, self.language)
+
+        if self.ext == '.md':
+            return code_to_md(
+                source, self.metadata,
+                self.language if self.cell_type == 'code' else None)
 
         if not active:
             source = ['# ' + line if line else '#' for line in source]
