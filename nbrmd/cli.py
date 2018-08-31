@@ -3,73 +3,62 @@
 
 import os
 import argparse
-from nbformat import writes as ipynb_writes
-from nbrmd import readf, writef
-from nbrmd import writes
-from .languages import default_language_from_metadata_and_ext
+from nbrmd import readf, writef, writes
+from nbrmd import NOTEBOOK_EXTENSIONS
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion
 from .file_format_version import check_file_version
 
 
-def convert(nb_files, markdown, in_place=True,
-            test_round_trip=False, combine=True):
+def convert_notebook_files(nb_files, nb_dest,
+                           test_round_trip=False, preserve_outputs=True):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
-    :param nb_files: one or more notebooks
-    :param markdown: R markdown to Jupyter, or scripts to Jupyter?
-    :param in_place: should result of conversion be stored in file
-    with opposite extension?
+    :param nb_files: one or more notebooks files
+    :param nb_dest: destination file, extension ('.py') or format ('py')
     :param test_round_trip: should round trip conversion be tested?
-    :param combine: should the current outputs of .ipynb file be preserved,
-    when a cell with corresponding input is found in .Rmd/.py or .R file?
+    :param preserve_outputs: preserve the current outputs of .ipynb file
+    when possible
     :return:
     """
+
+    if len(nb_files) > 1 and nb_dest not in NOTEBOOK_EXTENSIONS:
+        raise ValueError(
+            "Converting multiple files requires "
+            "that destination be one of '{}'".format(
+                "', '".join(NOTEBOOK_EXTENSIONS)))
+
     for nb_file in nb_files:
-        file, ext = os.path.splitext(nb_file)
-        if markdown:
-            fmt = 'R Markdown'
-            if ext not in ['.ipynb', '.Rmd']:
-                raise TypeError(
-                    'File {} is neither a Jupyter (.ipynb) nor a '
-                    'R Markdown (.Rmd) notebook'.format(nb_file))
-        else:
-            fmt = 'source'
-            if ext not in ['.ipynb', '.py', '.R']:
-                raise TypeError(
-                    'File {} is neither a Jupyter (.ipynb) nor a '
-                    'python script (.py), nor a R script (.R)'.format(nb_file))
+        file, current_ext = os.path.splitext(nb_file)
+        if current_ext not in NOTEBOOK_EXTENSIONS:
+            raise TypeError('File {} is not a notebook'.format(nb_file))
 
         notebook = readf(nb_file)
-        main_language = default_language_from_metadata_and_ext(notebook, ext)
-        ext_dest = '.Rmd' if markdown else '.R' \
-            if main_language == 'R' else '.py'
+        dest, dest_ext = os.path.splitext(nb_dest)
+        if not dest_ext:
+            dest = file
+            if nb_dest in NOTEBOOK_EXTENSIONS:
+                dest_ext = nb_dest
+            else:
+                dest_ext = '.' + nb_dest
+
+        if dest_ext not in NOTEBOOK_EXTENSIONS:
+            raise TypeError('Destination extension {} is not a notebook'
+                            .format(dest_ext))
 
         if test_round_trip:
-            test_round_trip_conversion(notebook, ext_dest, combine)
+            test_round_trip_conversion(notebook, dest_ext, preserve_outputs)
 
-        if in_place:
-            if ext == '.ipynb':
-                nb_dest = file + ext_dest
-                print('Jupyter notebook "{}" being converted to '
-                      '{} "{}"'.format(nb_file, fmt, nb_dest))
-            else:
-                nb_dest = file + '.ipynb'
-                print('{} "{}" being converted to '
-                      'Jupyter notebook "{}"'
-                      .format(fmt.title(), nb_file, nb_dest))
-
-            convert_notebook_in_place(notebook, nb_file, nb_dest, combine)
+        if '.' in nb_dest:
+            save_notebook_as(notebook, nb_file, dest + dest_ext,
+                             preserve_outputs)
         elif not test_round_trip:
-            if ext == '.ipynb':
-                print(writes(notebook, ext=ext_dest))
-            else:
-                print(ipynb_writes(notebook))
+            print(writes(notebook, ext=dest_ext))
 
 
-def convert_notebook_in_place(notebook, nb_file, nb_dest, combine):
-    """File to file notebook conversion"""
+def save_notebook_as(notebook, nb_file, nb_dest, combine):
+    """Save notebook to file, in desired format"""
     if combine and os.path.isfile(nb_dest) and \
             os.path.splitext(nb_dest)[1] == '.ipynb':
         check_file_version(notebook, nb_file, nb_dest)
@@ -79,53 +68,32 @@ def convert_notebook_in_place(notebook, nb_file, nb_dest, combine):
     writef(notebook, nb_dest)
 
 
-def add_common_arguments(parser):
-    """Add the common nbrmd and nbsrc arguments"""
-    parser.add_argument('-p', '--preserve_outputs', action='store_true',
-                        help='Preserve outputs of .ipynb '
-                             'notebook when file exists and inputs match')
-    group = parser.add_mutually_exclusive_group()
-    parser.add_argument('-i', '--in-place', action='store_true',
-                        help='Store the result of conversion '
-                             'to file with opposite extension')
-    group.add_argument('-t', '--test', action='store_true',
-                       help='Test whether the notebook or script is '
-                            'preserved in a round trip conversion')
-
-
 def cli_nbrmd(args=None):
     """Command line parser for nbrmd"""
-    parser = argparse.ArgumentParser(description='Jupyter notebook '
-                                                 'from/to R Markdown')
+    parser = argparse.ArgumentParser(
+        description='Jupyter notebooks as markdown documents, '
+                    'Python or R scripts')
     parser.add_argument('notebooks',
-                        help='One or more .ipynb or .Rmd notebook(s) '
-                             'to be converted to the alternate form',
+                        help='One or more notebook(s) '
+                             'to be converted, with extension among'
+                             "'{}'".format("', '".join(NOTEBOOK_EXTENSIONS)),
                         nargs='+')
-    add_common_arguments(parser)
+    parser.add_argument('to',
+                        help="Destination notebook 'notebook.md', "
+                             "extension '.md', "
+                             "or format 'md' (for on screen display)")
+    parser.add_argument('-p', '--preserve_outputs', action='store_true',
+                        help='Preserve outputs of .ipynb destination '
+                             '(when file exists and inputs match)')
+    parser.add_argument('--test', dest='test', action='store_true',
+                        help='Test that notebook is stable under '
+                             'round trip conversion')
     return parser.parse_args(args)
-
-
-def cli_nbsrc(args=None):
-    """Command line parser for nbsrc"""
-    parser = argparse.ArgumentParser(description='Jupyter notebook '
-                                                 'from/to R or Python script')
-    parser.add_argument('notebooks',
-                        help='One or more .ipynb or .R or .py script(s) '
-                             'to be converted to the alternate form',
-                        nargs='+')
-    add_common_arguments(parser)
-    return parser.parse_args(args)
-
-
-def nbsrc(args=None):
-    """Entry point for the nbsrc script"""
-    args = cli_nbsrc(args)
-    convert(args.notebooks, False, args.in_place,
-            args.test, args.preserve_outputs)
 
 
 def nbrmd(args=None):
     """Entry point for the nbrmd script"""
     args = cli_nbrmd(args)
-    convert(args.notebooks, True, args.in_place, args.test,
-            args.preserve_outputs)
+    convert_notebook_files(nb_files=args.notebooks, nb_dest=args.to,
+                           test_round_trip=args.test,
+                           preserve_outputs=args.preserve_outputs)

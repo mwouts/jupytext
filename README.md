@@ -90,7 +90,7 @@ configuration, and instead edit the notebook metadata as follows:
 }
 ```
 
-Accepted formats should have these extensions: `ipynb`, `md`, Rmd`, `py` and `R`.
+Accepted formats should have these extensions: `ipynb`, `md`, `Rmd`, `py` and `R`.
 
 In case you want both `py` and `Rmd`, please note that the
 order matters: the first non-`ipynb` extension
@@ -98,26 +98,28 @@ is the one used as the reference source for notebook inputs when you open the `i
 
 ## Command line conversion
 
-The package provides two `nbrmd` and `nbsrc` scripts that convert Jupyter notebooks to R markdown notebooks and scripts, and vice-versa.
+The package provides a `nbrmd` script for command line conversion between the various notebook extensions.
 
 Use them as:
 ```bash
-nbrmd jupyter.ipynb         # this prints the Rmarkdown alternative
-nbrmd jupyter.ipynb -i      # this creates a jupyter.Rmd file
-nbrmd jupyter.Rmd   -i      # and this, a jupyter.ipynb file
-nbrmd jupyter.Rmd   -i -p   # update the jupyter.ipynb file and preserve outputs that correspond to unchanged inputs
+nbrmd notebook.ipynb md --test          # Test round trip conversion
+nbrmd notebook.ipynb md                 # display the markdown version on screen
 
-nbsrc jupyter.ipynb         # this prints the `.py` or `.R` alternative
-nbsrc jupyter.ipynb -i      # this creates a jupyter.py or jupyter.R file
-nbsrc jupyter.py    -i      # and this, a jupyter.ipynb file
-nbsrc jupyter.py    -i -p   # update the jupyter.ipynb file and preserve outputs that correspond to unchanged inputs
+nbrmd notebook.ipynb .md                # create a notebook.md file
+nbrmd notebook.ipynb .py                # create a notebook.py file
+nbrmd notebook.ipynb notebook.py        # create a notebook.py file
+
+nbrmd notebook.md .ipynb                # overwrite notebook.ipynb (remove outputs)
+nbrmd notebook.md .ipynb --update       # update notebook.ipynb (preserve outputs)
+
+nbrmd notebook1.md notebook2.py .ipynb  # overwrite notebook1.ipynb notebook2.ipynb
 ```
 
 Alternatively, the `nbrmd` package provides a few `nbconvert` exporters:
 ```bash
-nbconvert jupyter.ipynb --to rmarkdown
-nbconvert jupyter.ipynb --to pynotebook
-nbconvert jupyter.ipynb --to rnotebook
+nbconvert notebook.ipynb --to rmarkdown
+nbconvert notebook.ipynb --to pynotebook
+nbconvert notebook.ipynb --to rnotebook
 ```
 
 ## Usefull cell metadata
@@ -128,4 +130,4 @@ nbconvert jupyter.ipynb --to rnotebook
 
 ## Jupyter magics
 
-Jupyter magics are escaped in the script and R markdown representations so that scripts can actually be executed. Comment a magic with `#noescape` on the same line to avoid escaping. User defined magics can be escaped with `#escape`.
+Jupyter magics are escaped in the script and R markdown representations so that scripts can actually be executed. Comment a magic with `#noescape` on the same line to avoid escaping. User defined magics can be escaped with `#escape`. Magics are not escaped in the plain markdown representation.
