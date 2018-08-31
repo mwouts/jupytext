@@ -14,8 +14,8 @@ jupyter:
     nbconvert_exporter: python
     pygments_lexer: ipython3
     version: 3.6.6
-  nbrmd_format_version: '1.0'
-  nbrmd_formats: ipynb,py,md
+  jupytext_format_version: '1.0'
+  jupytext_formats: ipynb,py,md
 ---
 
 # A quick insight at world population

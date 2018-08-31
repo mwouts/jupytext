@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import nbrmd
+import jupytext
 from testfixtures import compare
 
-nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
 
 def test_read_simple_file(rnb="""#' ---
@@ -21,7 +21,7 @@ f <- function(x) {
 h <- function(y)
     y + 1
 """):
-    nb = nbrmd.reads(rnb, ext='.R')
+    nb = jupytext.reads(rnb, ext='.R')
     assert len(nb.cells) == 4
     assert nb.cells[0].cell_type == 'raw'
     assert nb.cells[0].source == '---\ntitle: Simple file\n---'
@@ -36,7 +36,7 @@ h <- function(y)
     compare(nb.cells[3].source, '''h <- function(y)
     y + 1''')
 
-    rnb2 = nbrmd.writes(nb, ext='.R')
+    rnb2 = jupytext.writes(nb, ext='.R')
     compare(rnb, rnb2)
 
 
@@ -58,7 +58,7 @@ h <- function(y) {
     return(y-1)
 }
 """):
-    nb = nbrmd.reads(rnb, ext='.R')
+    nb = jupytext.reads(rnb, ext='.R')
 
     assert len(nb.cells) == 4
     assert nb.cells[0].cell_type == 'raw'
@@ -79,7 +79,7 @@ h <- function(y) {
     return(y-1)
 }''')
 
-    rnb2 = nbrmd.writes(nb, ext='.R')
+    rnb2 = jupytext.writes(nb, ext='.R')
     compare(rnb, rnb2)
 
 
@@ -93,7 +93,7 @@ f <- function(x)
 
 #' And a new cell, and non ascii contênt
 """):
-    nb = nbrmd.reads(rnb, ext='.R')
+    nb = jupytext.reads(rnb, ext='.R')
 
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'markdown'
@@ -106,7 +106,7 @@ f <- function(x)
     assert nb.cells[2].cell_type == 'markdown'
     assert nb.cells[2].source == u'And a new cell, and non ascii contênt'
 
-    rnb2 = nbrmd.writes(nb, ext='.R')
+    rnb2 = jupytext.writes(nb, ext='.R')
     compare(rnb, rnb2)
 
 
@@ -114,8 +114,8 @@ def test_read_write_script(rnb="""#!/usr/bin/env Rscript
 # coding=utf-8
 print('Hello world')
 """):
-    nb = nbrmd.reads(rnb, ext='.R')
-    rnb2 = nbrmd.writes(nb, ext='.R')
+    nb = jupytext.reads(rnb, ext='.R')
+    rnb2 = jupytext.writes(nb, ext='.R')
     compare(rnb, rnb2)
 
 
@@ -129,7 +129,7 @@ def test_escape_start_pattern(rnb="""#' The code start pattern '#+' can
 # #+ cell_name language="python"
 1 + 1
 """):
-    nb = nbrmd.reads(rnb, ext='.R')
+    nb = jupytext.reads(rnb, ext='.R')
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[1].cell_type == 'markdown'
@@ -140,5 +140,5 @@ def test_escape_start_pattern(rnb="""#' The code start pattern '#+' can
             '''# In code cells like this one, it is also escaped
 #+ cell_name language="python"
 1 + 1''')
-    rnb2 = nbrmd.writes(nb, ext='.R')
+    rnb2 = jupytext.writes(nb, ext='.R')
     compare(rnb, rnb2)

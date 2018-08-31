@@ -1,5 +1,5 @@
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
-from nbrmd.combine import combine_inputs_with_outputs
+from jupytext.combine import combine_inputs_with_outputs
 
 
 def test_combine():

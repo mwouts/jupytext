@@ -72,7 +72,7 @@ def metadata_and_cell_to_header(self, notebook):
     metadata = _as_dict(notebook.get('metadata', {}))
 
     if file_format_version(self.ext):
-        metadata['nbrmd_format_version'] = file_format_version(self.ext)
+        metadata['jupytext_format_version'] = file_format_version(self.ext)
 
     if metadata:
         header.extend(yaml.safe_dump({'jupyter': metadata},

@@ -1,5 +1,5 @@
 import pytest
-from nbrmd.magics import escape_magic, unescape_magic, unesc
+from jupytext.magics import escape_magic, unescape_magic, unesc
 
 
 def test_unesc():

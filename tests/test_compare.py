@@ -1,11 +1,11 @@
 import pytest
 from nbformat.v4.nbbase import new_notebook, \
     new_markdown_cell, new_code_cell, new_raw_cell
-import nbrmd
-from nbrmd.compare import compare_notebooks, \
+import jupytext
+from jupytext.compare import compare_notebooks, \
     test_round_trip_conversion as round_trip_conversion
 
-nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
 
 def test_raise_on_different_metadata():

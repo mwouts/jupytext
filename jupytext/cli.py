@@ -1,10 +1,10 @@
-"""Command line conversion tools `nbrmd` and `nbsrc`
+"""Command line conversion tools `jupytext` and `nbsrc`
 """
 
 import os
 import argparse
-from nbrmd import readf, writef, writes
-from nbrmd import NOTEBOOK_EXTENSIONS
+from jupytext import readf, writef, writes
+from jupytext import NOTEBOOK_EXTENSIONS
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion
 from .file_format_version import check_file_version
@@ -68,8 +68,8 @@ def save_notebook_as(notebook, nb_file, nb_dest, combine):
     writef(notebook, nb_dest)
 
 
-def cli_nbrmd(args=None):
-    """Command line parser for nbrmd"""
+def cli_jupytext(args=None):
+    """Command line parser for jupytext"""
     parser = argparse.ArgumentParser(
         description='Jupyter notebooks as markdown documents, '
                     'Python or R scripts')
@@ -91,9 +91,9 @@ def cli_nbrmd(args=None):
     return parser.parse_args(args)
 
 
-def nbrmd(args=None):
-    """Entry point for the nbrmd script"""
-    args = cli_nbrmd(args)
+def jupytext(args=None):
+    """Entry point for the jupytext script"""
+    args = cli_jupytext(args)
     convert_notebook_files(nb_files=args.notebooks, nb_dest=args.to,
                            test_round_trip=args.test,
                            preserve_outputs=args.update)

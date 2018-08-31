@@ -1,8 +1,8 @@
 import re
 from testfixtures import compare
-import nbrmd
+import jupytext
 
-nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
 
 def test_read_mostly_py_markdown_file(markdown="""---
@@ -31,7 +31,7 @@ ls()
 cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 ```
 """):
-    nb = nbrmd.reads(markdown, ext='.md')
+    nb = jupytext.reads(markdown, ext='.md')
     assert nb.metadata == {'main_language': 'python'}
     compare(nb.cells, [{'cell_type': 'raw',
                         'source': '---\ntitle: Simple file\n---',
@@ -62,7 +62,7 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
                                   "stri_rand_lipsum(3), sep='\n\n')",
                         'outputs': []}])
 
-    markdown2 = nbrmd.writes(nb, ext='.md')
+    markdown2 = jupytext.writes(nb, ext='.md')
     compare(markdown, markdown2)
 
 
@@ -80,7 +80,7 @@ In markdown cells it is escaped like here:
 %matplotlib inline
 ```
 """):
-    nb = nbrmd.reads(markdown, ext='.md')
+    nb = jupytext.reads(markdown, ext='.md')
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[1].cell_type == 'markdown'
@@ -92,5 +92,5 @@ In markdown cells it is escaped like here:
 ```python cell_name
 1 + 1
 %matplotlib inline''')
-    markdown2 = nbrmd.writes(nb, ext='.md')
+    markdown2 = jupytext.writes(nb, ext='.md')
     compare(markdown, markdown2)

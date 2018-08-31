@@ -4,7 +4,7 @@ R markdown exporter for nbconvert
 
 from traitlets import default
 from nbconvert.exporters import Exporter
-import nbrmd
+import jupytext
 
 
 class RMarkdownExporter(Exporter):
@@ -19,4 +19,4 @@ class RMarkdownExporter(Exporter):
     def from_notebook_node(self, nb, resources=None, **kw):
         resources = resources or {}
         resources['output_extension'] = self.file_extension
-        return nbrmd.writes(nb, ext='.Rmd'), resources
+        return jupytext.writes(nb, ext='.Rmd'), resources

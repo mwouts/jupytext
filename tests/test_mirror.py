@@ -7,10 +7,10 @@ import os
 import sys
 import pytest
 from testfixtures import compare
-import nbrmd
+import jupytext
 from .utils import list_all_notebooks, list_r_notebooks
 
-nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
 
 def mirror_file(nb_file):
@@ -24,8 +24,8 @@ def mirror_file(nb_file):
 
 def create_if_missing(mirror_file, org_file):
     if not os.path.isfile(mirror_file):
-        nb = nbrmd.readf(org_file)
-        nbrmd.writef(nb, mirror_file)
+        nb = jupytext.readf(org_file)
+        jupytext.writef(nb, mirror_file)
 
 
 def test_create_if_missing(tmpdir):
@@ -50,7 +50,7 @@ def test_py_unchanged_py(py_file):
     ipynb_file = mirror_file(py_file)
     create_if_missing(ipynb_file, py_file)
 
-    py_ref = nbrmd.writes(nbrmd.readf(ipynb_file), ext='.py')
+    py_ref = jupytext.writes(jupytext.readf(ipynb_file), ext='.py')
     compare(py, py_ref)
 
 
@@ -64,7 +64,7 @@ def test_rmd_unchanged(rmd_file):
     ipynb_file = mirror_file(rmd_file)
     create_if_missing(ipynb_file, rmd_file)
 
-    rmd_ref = nbrmd.writes(nbrmd.readf(ipynb_file), ext='.Rmd')
+    rmd_ref = jupytext.writes(jupytext.readf(ipynb_file), ext='.Rmd')
     compare(rmd, rmd_ref)
 
 
@@ -78,7 +78,7 @@ def test_py_unchanged_ipynb(nb_file):
     with open(py_file, encoding='utf-8') as fp:
         py_ref = fp.read()
 
-    py = nbrmd.writes(nbrmd.readf(nb_file), ext='.py')
+    py = jupytext.writes(jupytext.readf(nb_file), ext='.py')
     compare(py, py_ref)
 
 
@@ -91,5 +91,5 @@ def test_R_unchanged_ipynb(nb_file):
     with open(r_file, encoding='utf-8') as fp:
         r_ref = fp.read()
 
-    r = nbrmd.writes(nbrmd.readf(nb_file), ext='.R')
+    r = jupytext.writes(jupytext.readf(nb_file), ext='.R')
     compare(r, r_ref)

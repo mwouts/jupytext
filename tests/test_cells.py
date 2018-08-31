@@ -1,6 +1,6 @@
 from nbformat.v4.nbbase import new_markdown_cell
-from nbrmd.cell_to_text import CellExporter
-from nbrmd.cell_reader import CellReader
+from jupytext.cell_to_text import CellExporter
+from jupytext.cell_reader import CellReader
 
 
 def test_text_to_code_cell():

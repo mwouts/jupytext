@@ -6,20 +6,20 @@ with open(path.join(this_directory, 'README.md')) as f:
     long_description = f.read()
 
 setup(
-    name='nbrmd',
+    name='jupytext',
     version='0.6.0',
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
     description='Jupyter notebooks as markdown documents, Python or R scripts',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/mwouts/nbrmd',
+    url='https://github.com/mwouts/jupytext',
     packages=find_packages(),
-    entry_points={'console_scripts': ['nbrmd = nbrmd.cli:nbrmd'],
+    entry_points={'console_scripts': ['jupytext = jupytext.cli:jupytext'],
                   'nbconvert.exporters':
-                      ['rmarkdown = nbrmd:RMarkdownExporter',
-                       'pynotebook = nbrmd:PyNotebookExporter',
-                       'rnotebook = nbrmd:RNotebookExporter']},
+                      ['rmarkdown = jupytext:RMarkdownExporter',
+                       'pynotebook = jupytext:PyNotebookExporter',
+                       'rnotebook = jupytext:RNotebookExporter']},
     tests_require=['pytest', 'testfixtures'],
     install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml', 'six'],
     license='MIT',
