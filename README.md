@@ -81,7 +81,7 @@ order matters: the first non-`ipynb` extension
 is the one used as the reference source for notebook inputs when you open the `ipynb` file.
 
 Finally, it is also possible to pair every notebook with a text representation. If you add
-```
+```python
 c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 c.ContentsManager.default_jupytext_formats = "ipynb,py" # or "ipynb,nb.py" # or "ipynb,md" # or "ipynb,Rmd"
 ```
