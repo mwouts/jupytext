@@ -31,14 +31,14 @@ def encoding_and_executable(self, notebook):
     lines = []
     metadata = notebook.get('metadata', {})
 
-    if self.ext != '.Rmd' and 'executable' in metadata:
+    if self.ext not in ['.Rmd', '.md'] and 'executable' in metadata:
         lines.append('#!' + metadata['executable'])
         del metadata['executable']
 
     if 'encoding' in metadata:
         lines.append(metadata['encoding'])
         del metadata['encoding']
-    elif self.ext != '.Rmd':
+    elif self.ext not in ['.Rmd', '.md']:
         for cell in notebook.cells:
             try:
                 cell.source.encode('ascii')
@@ -49,7 +49,7 @@ def encoding_and_executable(self, notebook):
     return lines
 
 
-def metadata_and_cell_to_header(self, nb):
+def metadata_and_cell_to_header(self, notebook):
     '''
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
@@ -58,8 +58,8 @@ def metadata_and_cell_to_header(self, nb):
     header = []
     skipline = True
 
-    if nb.cells:
-        cell = nb.cells[0]
+    if notebook.cells:
+        cell = notebook.cells[0]
         if cell.cell_type == 'raw':
             lines = cell.source.strip('\n\t ').splitlines()
             if len(lines) >= 2 \
@@ -67,9 +67,9 @@ def metadata_and_cell_to_header(self, nb):
                     and _HEADER_RE.match(lines[-1]):
                 header = lines[1:-1]
                 skipline = not cell.metadata.get('noskipline', False)
-                nb.cells = nb.cells[1:]
+                notebook.cells = notebook.cells[1:]
 
-    metadata = _as_dict(nb.get('metadata', {}))
+    metadata = _as_dict(notebook.get('metadata', {}))
 
     if file_format_version(self.ext):
         metadata['nbrmd_format_version'] = file_format_version(self.ext)
@@ -160,7 +160,7 @@ def header_to_metadata_and_cell(self, lines):
         if header:
             cell = new_raw_cell(source='\n'.join(['---'] + header + ['---']),
                                 metadata={} if skipline else
-                                {'noskipline': True})
+                                {'lines_to_next_cell': 0})
         else:
             cell = None
 

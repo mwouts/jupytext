@@ -9,10 +9,6 @@ Authors:
 * Marc Wouts
 """
 
-# -----------------------------------------------------------------------------
-# Imports
-# -----------------------------------------------------------------------------
-
 import os
 import io
 from copy import deepcopy
@@ -22,22 +18,17 @@ import nbformat
 
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable
-from .languages import get_default_language, find_main_language
-from .cells import start_code_rmd, start_code_r, start_code_py
-from .cells import cell_to_text, text_to_cell
-from .cells import markdown_to_cell_rmd, markdown_to_cell, code_to_cell
+from .languages import default_language_from_metadata_and_ext, \
+    set_main_and_cell_language
+from .cell_to_text import CellExporter
+from .cell_reader import CellReader
 
-# -----------------------------------------------------------------------------
-# Code
-# -----------------------------------------------------------------------------
-
-
-NOTEBOOK_EXTENSIONS = ['.ipynb', '.Rmd', '.py', '.R']
+NOTEBOOK_EXTENSIONS = ['.ipynb', '.Rmd', '.md', '.py', '.R']
 
 
 def markdown_comment(ext):
     """Markdown escape for given notebook extension"""
-    return '' if ext == '.Rmd' else "#'" if ext == '.R' else "#"
+    return '' if ext in ['.Rmd', '.md'] else "#'" if ext == '.R' else "#"
 
 
 class TextNotebookReader(NotebookReader):
@@ -46,15 +37,8 @@ class TextNotebookReader(NotebookReader):
     def __init__(self, ext):
         self.ext = ext
         self.prefix = markdown_comment(ext)
-        self.start_code = start_code_rmd if ext == '.Rmd' else \
-            start_code_py if ext == '.py' else start_code_r
-        if ext == '.Rmd':
-            self.markdown_to_cell = markdown_to_cell_rmd
 
     header_to_metadata_and_cell = header_to_metadata_and_cell
-    text_to_cell = text_to_cell
-    code_to_cell = code_to_cell
-    markdown_to_cell = markdown_to_cell
 
     def markdown_unescape(self, line):
         """Remove markdown escape, if any"""
@@ -66,21 +50,11 @@ class TextNotebookReader(NotebookReader):
         return line
 
     def reads(self, s, **kwargs):
-        """
-        Read a notebook from a given string
-        :param s:
-        :param kwargs:
-        :return:
-        """
-        return self.to_notebook(s, **kwargs)
+        """Read a notebook from text"""
+        return self.to_notebook(s)
 
-    def to_notebook(self, text, **kwargs):
-        """
-        Read a notebook from its text representation
-        :param text:
-        :param kwargs:
-        :return:
-        """
+    def to_notebook(self, text):
+        """Read a notebook from text"""
         lines = text.splitlines()
 
         cells = []
@@ -94,27 +68,23 @@ class TextNotebookReader(NotebookReader):
             lines = lines[pos:]
 
         while lines:
-            cell, pos = self.text_to_cell(lines)
+            reader = CellReader(self.ext)
+            cell, pos = reader.read(lines)
             cells.append(cell)
             if pos <= 0:
                 raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
             lines = lines[pos:]
 
-        if self.ext == '.Rmd':
-            find_main_language(metadata, cells)
-        elif self.ext == '.R':
-            if not (metadata.get('main_language') or
-                    metadata.get('language_info', {})):
-                metadata['main_language'] = 'R'
+        set_main_and_cell_language(metadata, cells, self.ext)
 
-        nb = new_notebook(cells=cells, metadata=metadata)
-        return nb
+        notebook = new_notebook(cells=cells, metadata=metadata)
+        return notebook
 
 
 class TextNotebookWriter(NotebookWriter):
     """Write notebook to their text representations"""
 
-    def __init__(self, ext='.Rmd'):
+    def __init__(self, ext):
         self.ext = ext
         self.prefix = markdown_comment(ext)
 
@@ -131,37 +101,41 @@ class TextNotebookWriter(NotebookWriter):
 
     encoding_and_executable = encoding_and_executable
     metadata_and_cell_to_header = metadata_and_cell_to_header
-    cell_to_text = cell_to_text
 
     def writes(self, nb, **kwargs):
         """Write the text representation of a notebook to a string"""
         nb = deepcopy(nb)
-        if self.ext == '.py':
-            default_language = (nb.metadata.get('main_language') or
-                                nb.metadata.get('language_info', {})
-                                .get('name', 'python'))
-        elif self.ext == '.R':
-            default_language = (nb.metadata.get('main_language') or
-                                nb.metadata.get('language_info', {})
-                                .get('name', 'R'))
-            if nb.metadata.get('main_language') == 'R':
-                del nb.metadata['main_language']
-        else:
-            default_language = get_default_language(nb)
+        default_language = default_language_from_metadata_and_ext(nb, self.ext)
+        if 'main_language' in nb.metadata:
+            del nb.metadata['main_language']
 
         lines = self.encoding_and_executable(nb)
         lines.extend(self.metadata_and_cell_to_header(nb))
 
-        for i in range(len(nb.cells)):
-            cell = nb.cells[i]
-            next_cell = nb.cells[i + 1] if i + 1 < len(nb.cells) else None
-            if cell.cell_type == 'raw' and 'active' not in cell.metadata:
-                cell.metadata['active'] = ''
+        cells = [CellExporter(cell, default_language, self.ext)
+                 for cell in nb.cells]
 
-            lines.extend(self.cell_to_text(cell, next_cell,
-                                           default_language=default_language))
+        texts = [cell.cell_to_text() for cell in cells]
 
-        return '\n'.join(lines + [''])
+        for i, cell in enumerate(cells):
+            text = texts[i]
+
+            # remove end of cell marker when redundant
+            # with next explicit marker
+            if self.ext == '.py' and cell.is_code() and text[-1] == '# -':
+                if i + 1 >= len(texts) or \
+                        (texts[i + 1][0].startswith('# + {')):
+                    text = text[:-1]
+
+            lines.extend(text)
+            lines.extend([''] * cell.lines_to_next_cell)
+
+            # two blank lines between markdown cells in Rmd
+            if self.ext in ['.Rmd', '.md'] and not cell.is_code():
+                if i + 1 < len(cells) and not cells[i + 1].is_code():
+                    lines.append('')
+
+        return '\n'.join(lines)
 
 
 _NOTEBOOK_READERS = {ext: TextNotebookReader(ext)
@@ -170,7 +144,7 @@ _NOTEBOOK_WRITERS = {ext: TextNotebookWriter(ext)
                      for ext in NOTEBOOK_EXTENSIONS if ext != '.ipynb'}
 
 
-def reads(text, as_version=4, ext='.Rmd', **kwargs):
+def reads(text, ext, as_version=4, **kwargs):
     """Read a notebook from a string"""
     if ext == '.ipynb':
         return nbformat.reads(text, as_version, **kwargs)
@@ -178,28 +152,29 @@ def reads(text, as_version=4, ext='.Rmd', **kwargs):
     return _NOTEBOOK_READERS[ext].reads(text, **kwargs)
 
 
-def read(fp, as_version=4, ext='.Rmd', **kwargs):
+def read(file_or_stream, ext, as_version=4, **kwargs):
     """Read a notebook from a file"""
     if ext == '.ipynb':
-        return nbformat.read(fp, as_version, **kwargs)
+        return nbformat.read(file_or_stream, as_version, **kwargs)
 
-    return _NOTEBOOK_READERS[ext].read(fp, **kwargs)
+    return _NOTEBOOK_READERS[ext].read(file_or_stream, **kwargs)
 
 
-def writes(nb, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+def writes(notebook, ext, version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a string"""
     if ext == '.ipynb':
-        return nbformat.writes(nb, version, **kwargs)
+        return nbformat.writes(notebook, version, **kwargs)
 
-    return _NOTEBOOK_WRITERS[ext].writes(nb)
+    return _NOTEBOOK_WRITERS[ext].writes(notebook)
 
 
-def write(np, fp, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+def write(notebook, file_or_stream, ext, version=nbformat.NO_CONVERT,
+          **kwargs):
     """Write a notebook to a file"""
     if ext == '.ipynb':
-        return nbformat.write(np, fp, version, **kwargs)
+        return nbformat.write(notebook, file_or_stream, version, **kwargs)
 
-    return _NOTEBOOK_WRITERS[ext].write(np, fp)
+    return _NOTEBOOK_WRITERS[ext].write(notebook, file_or_stream)
 
 
 def readf(nb_file):
@@ -210,11 +185,11 @@ def readf(nb_file):
             'File {} is not a notebook. '
             'Expected extensions are {}'.format(nb_file,
                                                 NOTEBOOK_EXTENSIONS))
-    with io.open(nb_file, encoding='utf-8') as fp:
-        return read(fp, as_version=4, ext=ext)
+    with io.open(nb_file, encoding='utf-8') as stream:
+        return read(stream, as_version=4, ext=ext)
 
 
-def writef(nb, nb_file):
+def writef(notebook, nb_file):
     """Write a notebook to the file with given name"""
     _, ext = os.path.splitext(nb_file)
     if ext not in NOTEBOOK_EXTENSIONS:
@@ -222,5 +197,5 @@ def writef(nb, nb_file):
             'File {} is not a notebook. '
             'Expected extensions are {}'.format(nb_file,
                                                 NOTEBOOK_EXTENSIONS))
-    with io.open(nb_file, 'w', encoding='utf-8') as fp:
-        write(nb, fp, version=nbformat.NO_CONVERT, ext=ext)
+    with io.open(nb_file, 'w', encoding='utf-8') as stream:
+        write(notebook, stream, version=nbformat.NO_CONVERT, ext=ext)

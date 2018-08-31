@@ -20,15 +20,15 @@ from .file_format_version import check_file_version
 
 
 def _nbrmd_writes(ext):
-    def _writes(nb, version=nbformat.NO_CONVERT, **kwargs):
-        return nbrmd.writes(nb, version=version, ext=ext, **kwargs)
+    def _writes(nbk, version=nbformat.NO_CONVERT, **kwargs):
+        return nbrmd.writes(nbk, version=version, ext=ext, **kwargs)
 
     return _writes
 
 
 def _nbrmd_reads(ext):
     def _reads(text, as_version, **kwargs):
-        return nbrmd.reads(text, as_version, ext=ext, **kwargs)
+        return nbrmd.reads(text, ext, as_version, **kwargs)
 
     return _reads
 
@@ -59,9 +59,10 @@ def check_formats(formats):
         validated_group = []
         for fmt in group:
             if not isinstance(fmt, six.string_types):
-                raise ValueError('Extensions should be strings, not {}.\n{}'
-                                 .format(str(fmt),
-                                         str(nbrmd.NOTEBOOK_EXTENSIONS),
+                raise ValueError('Extensions should be strings among {}'
+                                 ', not {}.\n{}'
+                                 .format(str(nbrmd.NOTEBOOK_EXTENSIONS),
+                                         str(fmt),
                                          expected_format))
             if fmt == '':
                 continue
@@ -112,14 +113,14 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
         return ['.ipynb'] + self.nb_extensions
 
     default_nbrmd_formats = Unicode(
-        u'ipynb',
+        u'',
         help='Save notebooks to these file extensions. '
-             'Can be any of ipynb,Rmd,py,R,nb.py,nb.R comma separated',
+             'Can be any of ipynb,Rmd,md,py,R,nb.py,nb.R comma separated',
         config=True)
 
-    def format_group(self, fmt, nb=None):
+    def format_group(self, fmt, nbk=None):
         """Return the group of extensions that contains 'fmt'"""
-        nbrmd_formats = ((nb.metadata.get('nbrmd_formats') if nb else None)
+        nbrmd_formats = ((nbk.metadata.get('nbrmd_formats') if nbk else None)
                          or self.default_nbrmd_formats)
 
         try:
@@ -143,16 +144,16 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
         file, fmt, ext = file_fmt_ext(os_path)
         if ext in self.nb_extensions:
             with mock.patch('nbformat.reads', _nbrmd_reads(ext)):
-                nb = super(RmdFileContentsManager, self) \
+                nbk = super(RmdFileContentsManager, self) \
                     ._read_notebook(os_path, as_version)
         else:
-            nb = super(RmdFileContentsManager, self) \
+            nbk = super(RmdFileContentsManager, self) \
                 ._read_notebook(os_path, as_version)
 
         if not load_alternative_format:
-            return nb
+            return nbk
 
-        fmt_group = self.format_group(fmt, nb)
+        fmt_group = self.format_group(fmt, nbk)
 
         source_format = fmt
         outputs_format = fmt
@@ -175,10 +176,10 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
         if source_format != fmt:
             self.log.info('Reading SOURCE from {}'
                           .format(os.path.basename(file + source_format)))
-            nb_outputs = nb
-            nb = self._read_notebook(file + source_format,
-                                     as_version=as_version,
-                                     load_alternative_format=False)
+            nb_outputs = nbk
+            nbk = self._read_notebook(file + source_format,
+                                      as_version=as_version,
+                                      load_alternative_format=False)
         elif outputs_format != fmt:
             self.log.info('Reading OUTPUTS from {}'
                           .format(os.path.basename(file + outputs_format)))
@@ -190,18 +191,19 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
             nb_outputs = None
 
         try:
-            check_file_version(nb, file + source_format, file + outputs_format)
+            check_file_version(nbk, file + source_format,
+                               file + outputs_format)
         except ValueError as err:
             raise HTTPError(400, str(err))
 
         if nb_outputs:
-            combine.combine_inputs_with_outputs(nb, nb_outputs)
+            combine.combine_inputs_with_outputs(nbk, nb_outputs)
             if self.notary.check_signature(nb_outputs):
-                self.notary.sign(nb)
+                self.notary.sign(nbk)
         elif not fmt.endswith('.ipynb'):
-            self.notary.sign(nb)
+            self.notary.sign(nbk)
 
-        return nb
+        return nbk
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""

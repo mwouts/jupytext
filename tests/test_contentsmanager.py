@@ -3,7 +3,8 @@ import sys
 import pytest
 import nbrmd
 from nbrmd import RmdFileContentsManager, readf
-from .utils import list_all_notebooks, remove_outputs
+from nbrmd.compare import compare_notebooks
+from .utils import list_all_notebooks
 
 nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
 
@@ -31,7 +32,7 @@ def test_load_save_rename(nb_file, tmpdir):
     nb = readf(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_rmd)
     nb_rmd = cm.get(tmp_rmd)
-    assert remove_outputs(nb) == remove_outputs(nb_rmd['content'])
+    compare_notebooks(nb, nb_rmd['content'])
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
@@ -62,7 +63,7 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
     nb = readf(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
-    assert remove_outputs(nb) == remove_outputs(nbpy['content'])
+    compare_notebooks(nb, nbpy['content'])
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
@@ -93,11 +94,11 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     nb = readf(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
-    assert remove_outputs(nb) == remove_outputs(nbpy['content'])
+    compare_notebooks(nb, nbpy['content'])
 
     # open ipynb
     nbipynb = cm.get(tmp_ipynb)
-    assert remove_outputs(nb) == remove_outputs(nbipynb['content'])
+    compare_notebooks(nb, nbipynb['content'])
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)

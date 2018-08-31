@@ -30,7 +30,6 @@ _LINE_MAGICS += ('%autoreload %aimport '  # autoreload
 _LINE_MAGICS = [magic for magic in _LINE_MAGICS if magic.startswith('%')]
 
 # A magic expression is a line or cell magic escaped zero, or multiple times
-_PERCENT_RE = re.compile(r"^(# |#)*%")
 _FORCE_ESC_RE = re.compile(r"^(# |#)*%(.*)(#| )escape")
 _FORCE_NOT_ESC_RE = re.compile(r"^(# |#)*%(.*)noescape")
 _MAGIC_RE = re.compile(r"^(# |#)*(%%|{})".format('|'.join(_LINE_MAGICS)))
@@ -67,5 +66,39 @@ def unescape_magic(source, language='python'):
     for pos, line in enumerate(source):
         if not parser.is_quoted() and is_magic(line):
             source[pos] = unesc(line)
+        parser.read_line(line)
+    return source
+
+
+_ESCAPED_CODE_START = {'.R': re.compile(r"^(# |#)*#\+"),
+                       '.Rmd': re.compile(r"^(# |#)*```{.*}"),
+                       '.md': re.compile(r"^(# |#)*```"),
+                       '.py': re.compile(r"^(# |#)*(#|# )\+(\s*){.*}")}
+
+
+def is_escaped_code_start(line, ext):
+    """Is the current line a possibly commented code start marker?"""
+    return _ESCAPED_CODE_START[ext].match(line)
+
+
+def escape_code_start(source, ext, language='python'):
+    """Escape code start with '# '"""
+    parser = StringParser(language)
+    for pos, line in enumerate(source):
+        if not parser.is_quoted() and is_escaped_code_start(line, ext):
+            source[pos] = '# ' + line
+        parser.read_line(line)
+    return source
+
+
+def unescape_code_start(source, ext, language='python'):
+    """Unescape code start"""
+    parser = StringParser(language)
+    for pos, line in enumerate(source):
+        if not parser.is_quoted() and is_escaped_code_start(line, ext):
+            unescaped = unesc(line)
+            # don't remove comment char if we break the code start...
+            if is_escaped_code_start(unescaped, ext):
+                source[pos] = unescaped
         parser.read_line(line)
     return source

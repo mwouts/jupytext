@@ -48,13 +48,15 @@ def test_read_less_simple_file(rnb="""#' ---
 #' And below we have some R code
 
 # This is a comment about function f
-def f(x):
-    return x+1
+f <- function(x) {
+
+    return(x+1)}
 
 
 # And a comment on h
-def h(y):
-    return y-1
+h <- function(y) {
+    return(y-1)
+}
 """):
     nb = nbrmd.reads(rnb, ext='.R')
 
@@ -67,13 +69,15 @@ def h(y):
     assert nb.cells[2].cell_type == 'code'
     compare(nb.cells[2].source,
             """# This is a comment about function f
-def f(x):
-    return x+1""")
+f <- function(x) {
+
+    return(x+1)}""")
     assert nb.cells[3].cell_type == 'code'
     compare(nb.cells[3].source,
             '''# And a comment on h
-def h(y):
-    return y-1''')
+h <- function(y) {
+    return(y-1)
+}''')
 
     rnb2 = nbrmd.writes(nb, ext='.R')
     compare(rnb, rnb2)
@@ -111,5 +115,30 @@ def test_read_write_script(rnb="""#!/usr/bin/env Rscript
 print('Hello world')
 """):
     nb = nbrmd.reads(rnb, ext='.R')
+    rnb2 = nbrmd.writes(nb, ext='.R')
+    compare(rnb, rnb2)
+
+
+def test_escape_start_pattern(rnb="""#' The code start pattern '#+' can
+#' appear in code and markdown cells.
+
+#' In markdown cells it is escaped like here:
+#' #+ fig.width=12
+
+# In code cells like this one, it is also escaped
+# #+ cell_name language="python"
+1 + 1
+"""):
+    nb = nbrmd.reads(rnb, ext='.R')
+    assert len(nb.cells) == 3
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[1].cell_type == 'markdown'
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[1].source == '''In markdown cells it is escaped like here:
+#+ fig.width=12'''
+    assert (nb.cells[2].source ==
+            '''# In code cells like this one, it is also escaped
+#+ cell_name language="python"
+1 + 1''')
     rnb2 = nbrmd.writes(nb, ext='.R')
     compare(rnb, rnb2)

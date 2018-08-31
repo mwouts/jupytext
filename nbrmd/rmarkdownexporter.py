@@ -19,4 +19,4 @@ class RMarkdownExporter(Exporter):
     def from_notebook_node(self, nb, resources=None, **kw):
         resources = resources or {}
         resources['output_extension'] = self.file_extension
-        return nbrmd.writes(nb), resources
+        return nbrmd.writes(nb, ext='.Rmd'), resources

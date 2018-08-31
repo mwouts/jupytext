@@ -1,4 +1,5 @@
-nbrmd>=0.5.4
+nbrmd>=0.6.0
 plotly
 matplotlib
 pandas
+wbdata

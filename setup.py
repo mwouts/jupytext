@@ -7,16 +7,15 @@ with open(path.join(this_directory, 'README.md')) as f:
 
 setup(
     name='nbrmd',
-    version='0.5.4',
+    version='0.6.0',
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
-    description='Jupyter notebooks as R markdown, Python or R scripts',
+    description='Jupyter notebooks as markdown documents, Python or R scripts',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/mwouts/nbrmd',
     packages=find_packages(),
-    entry_points={'console_scripts': ['nbrmd = nbrmd.cli:nbrmd',
-                                      'nbsrc = nbrmd.cli:nbsrc'],
+    entry_points={'console_scripts': ['nbrmd = nbrmd.cli:nbrmd'],
                   'nbconvert.exporters':
                       ['rmarkdown = nbrmd:RMarkdownExporter',
                        'pynotebook = nbrmd:PyNotebookExporter',

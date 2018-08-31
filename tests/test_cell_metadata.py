@@ -1,7 +1,8 @@
 import sys
 import pytest
 from nbrmd.cell_metadata import rmd_options_to_metadata, \
-    metadata_to_rmd_options, parse_rmd_options, RMarkdownOptionParsingError
+    metadata_to_rmd_options, parse_rmd_options, RMarkdownOptionParsingError, \
+    try_eval_metadata, json_options_to_metadata
 
 SAMPLES = [('r', ('R', {})),
            ('r plot_1, dpi=72, fig.path="fig_path/"',
@@ -57,3 +58,20 @@ def test_build_options_random_order(options, language_and_metadata):
 def test_parsing_error(options):
     with pytest.raises(RMarkdownOptionParsingError):
         parse_rmd_options(options)
+
+
+def test_ignore_metadata():
+    metadata = {'trusted': True, 'hide_input': True}
+    assert metadata_to_rmd_options('R', metadata) == 'r echo=FALSE'
+
+
+def test_try_eval_metadata():
+    metadata = {'list': 'list("a",5)',
+                'c': 'c(1,2,3)'}
+    try_eval_metadata(metadata, 'list')
+    try_eval_metadata(metadata, 'c')
+    assert metadata == {'list': ['a', 5], 'c': [1, 2, 3]}
+
+
+def test_parse_wrong_json():
+    assert json_options_to_metadata("""{"key":'incorrect value'}""") == {}

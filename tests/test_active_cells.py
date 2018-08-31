@@ -30,10 +30,9 @@ def test_active_all(ext):
     compare(ACTIVE_ALL[ext], nbrmd.writes(nb, ext=ext))
 
 
-ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb", "endofcell": "-"}
+ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
 # # This cell is active only in ipynb
 # %matplotlib inline
-# -
 """,
                 '.Rmd': """```{python active="ipynb", eval=FALSE}
 # This cell is active only in ipynb
@@ -41,8 +40,8 @@ ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb", "endofcell": "-"}
 ```
 """,
                 '.R': """#+ language="python", active="ipynb", eval=FALSE
-#' # This cell is active only in ipynb
-#' %matplotlib inline
+# # This cell is active only in ipynb
+# %matplotlib inline
 """,
                 '.ipynb': {'cell_type': 'code',
                            'source': '# This cell is active only in ipynb\n'
@@ -71,7 +70,7 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 ```
 """,
                    '.R': """#+ language="python", active="ipynb,py", eval=FALSE
-#' # This cell is active in py and ipynb extensions
+# # This cell is active in py and ipynb extensions
 """,
                    '.ipynb': {'cell_type': 'code',
                               'source': '# This cell is active in py and '
@@ -92,16 +91,15 @@ def test_active_py_ipynb(ext):
         compare(ACTIVE_PY_IPYNB[ext], nbrmd.writes(nb, ext=ext))
 
 
-ACTIVE_RMD = {'.py': """# + {"active": "Rmd", "endofcell": "-"}
+ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
 # # This cell is active in Rmd only
-# -
 """,
               '.Rmd': """```{python active="Rmd"}
 # This cell is active in Rmd only
 ```
 """,
               '.R': """#+ language="python", active="Rmd", eval=FALSE
-#' # This cell is active in Rmd only
+# # This cell is active in Rmd only
 """,
               '.ipynb': {'cell_type': 'raw',
                          'source': '# This cell is active in Rmd only',
@@ -119,9 +117,8 @@ def test_active_rmd(ext):
         compare(ACTIVE_RMD[ext], nbrmd.writes(nb, ext=ext))
 
 
-ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd", "endofcell": "-"}
+ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd"}
 # # This cell is active in Rmd only
-# -
 """,
                           '.Rmd': """```{python include=FALSE, active="Rmd"}
 # This cell is active in Rmd only
