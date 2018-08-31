@@ -76,9 +76,19 @@ def test_convert_multiple_file(nb_files, tmpdir):
         compare_notebooks(nb1, nb2)
 
 
-def test_error_not_notebook(nb_file='notebook.ext'):
+def test_error_not_notebook_ext_input(nb_file='notebook.ext'):
     with pytest.raises(TypeError):
         convert_notebook_files([nb_file], '.py')
+
+
+def test_error_not_notebook_ext_dest(nb_file=[list_all_notebooks('.ipynb')][0]):
+    with pytest.raises(TypeError):
+        convert_notebook_files([nb_file], '.ext')
+
+
+def test_error_not_notebook_ext_dest(nb_files=list_all_notebooks('.ipynb')):
+    with pytest.raises(ValueError):
+        convert_notebook_files(nb_files, 'notebook.py')
 
 
 def test_combine_same_version_ok(tmpdir):
