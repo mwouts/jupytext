@@ -1,3 +1,5 @@
+# From https://matplotlib.org/examples/api/filled_step.html
+
 """
 =========================
 Hatch-filled histograms
