@@ -8,7 +8,16 @@
 [![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)
 
-You've always wanted to edit Jupyter notebooks in your favorite editor? To have Jupyter notebooks under version control? Or to *collaborate* on Jupyter notebooks using standard (text-only) merge tools?
+You've always wanted to 
+* edit Jupyter notebooks in your favorite editor? 
+* have Jupyter notebooks under version control? 
+* *collaborate* on Jupyter notebooks using standard (text-only) merge tools?
+
+| Format       | Extension          | text editor | git | preserve output |
+| ------------ | ------------------ | ----------- | --- | --------------- |
+| jupyter notebook | `.ipynb`       |             |     | ✔               | 
+| script/markdown  | `.py`/`.R`/`.Rmd` | ✔  | ✔   |       |
+| [paired notebook](#paired-notebooks)  | (`.py`/`.R`/`.Rmd`) + `.ipynb` | ✔  | ✔ | ✔       |
 
 ## Supported formats
 
@@ -21,12 +30,28 @@ Obviously these documents can also be edited outside of Jupyter. You will find u
 
 Reloading the updated document in Jupyter is just a matter of refreshing the browser. Refreshing preserves the python variables. Outputs are also preserved when you use the text notebooks *in pair* with classical notebooks.
 
+## Try it!
 Try our package on [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)! Recommended experiments are
 - Have a look at the sample text notebooks in the [demo](https://github.com/mwouts/jupytext/tree/master/demo) folder. See how notebook are represented as text
 - Go to [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo) and open these notebooks
 - You may also open arbitrary python scripts like `matplotlib example.py` (run it)
 - Feel free to explore the package files with Jupyter (open `README.md` at the project root)
 - Check by yourself that outputs and variables are preserved, and inputs are updated, when the text notebook is modified outside of Jupyter (this is `Paired Jupyter notebook and python script.ipynb`).
+
+## Installation
+
+To open `.py`, `.R`, `.md` and `.Rmd` files as notebooks in Jupyter, use our `ContentsManager`. To do so:
+- generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
+- edit the config and include the below:
+```python
+c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
+```
+
+Then, make sure you have the `jupytext` package up-to-date, and re-start jupyter, i.e. run
+```bash
+pip install jupytext --upgrade
+jupyter notebook
+```
 
 ## Screenshots
 
@@ -42,24 +67,12 @@ a yaml header at the top of your script.
 - Jupyter to script, and Jupyter again preserves source and metadata.
 - Jupyter to markdown, and Jupyter again preserves source and metadata (cell metadata available only for R markdown). Note that markdown cells with two consecutive blank lines will be splitted into multiple cells (as the two blank line pattern is used to separate cells).
 
-## Jupyter setup
-
-To open `.py`, `.R`, `.md` and `.Rmd` files as notebooks in Jupyter, use our `ContentsManager`. That is:
-- generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
-- edit the config and include the below:
-```python
-c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
-```
-
-Then, make sure you have the `jupytext` package up-to-date, and re-start jupyter, i.e. run
-```bash
-pip install jupytext --upgrade
-jupyter notebook
-```
 
 ## Paired notebooks
 
-If you want to preserve inputs and outputs, while being able to edit the text format, then add an `jupytext_formats` entry to the notebook metadata, in Jupyter, as follows:
+The idea of paired notebooks is to store a `.ipynb` file alongside the text-only version. Like this we get the best of two worlds: a text-only document to put under version control, and an easily sharable notebook which stores the outputs. 
+
+To enable paired notebooks, add a `jupytext_formats` entry to the notebook metadata, in Jupyter, as follows:
 ```
 {
   "kernelspec": {
