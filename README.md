@@ -30,9 +30,9 @@ Try our package on [![Binder](https://mybinder.org/badge.svg)](https://mybinder.
 
 ## Screenshots
 
-![](https://raw.githubusercontent.com/mwouts/nbrmd/v0.6.0/img/jupyter_python_markdown.gif)
+![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/jupyter_python_markdown.gif)
 
-## Have you tested round-trip conversion?
+## Round-trip conversion
 
 Round trip conversion is safe! A few hundred of tests help to guarantee this.
 - Script to Jupyter notebook, to script again is identity. If you
