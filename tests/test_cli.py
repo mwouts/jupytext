@@ -81,7 +81,7 @@ def test_error_not_notebook_ext_input(nb_file='notebook.ext'):
         convert_notebook_files([nb_file], '.py')
 
 
-def test_error_not_notebook_ext_dest(nb_file=[list_all_notebooks('.ipynb')][0]):
+def test_error_not_notebook_ext_dest(nb_file=list_all_notebooks('.ipynb')[0]):
     with pytest.raises(TypeError):
         convert_notebook_files([nb_file], '.ext')
 
