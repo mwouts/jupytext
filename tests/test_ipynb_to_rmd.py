@@ -19,7 +19,7 @@ def test_identity_source_write_read(nb_file):
     with open(nb_file) as fp:
         nb1 = nbformat.read(fp, as_version=4)
 
-    rmd = nbrmd.writes(nb1)
-    nb2 = nbrmd.reads(rmd)
+    rmd = nbrmd.writes(nb1, ext='.Rmd')
+    nb2 = nbrmd.reads(rmd, ext='.Rmd')
 
     compare_notebooks(nb1, nb2)

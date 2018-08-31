@@ -23,12 +23,12 @@ from .languages import default_language_from_metadata_and_ext, \
 from .cell_to_text import CellExporter
 from .cell_reader import CellReader
 
-NOTEBOOK_EXTENSIONS = ['.ipynb', '.Rmd', '.py', '.R']
+NOTEBOOK_EXTENSIONS = ['.ipynb', '.Rmd', '.md', '.py', '.R']
 
 
 def markdown_comment(ext):
     """Markdown escape for given notebook extension"""
-    return '' if ext == '.Rmd' else "#'" if ext == '.R' else "#"
+    return '' if ext in ['.Rmd', '.md'] else "#'" if ext == '.R' else "#"
 
 
 class TextNotebookReader(NotebookReader):
@@ -84,7 +84,7 @@ class TextNotebookReader(NotebookReader):
 class TextNotebookWriter(NotebookWriter):
     """Write notebook to their text representations"""
 
-    def __init__(self, ext='.Rmd'):
+    def __init__(self, ext):
         self.ext = ext
         self.prefix = markdown_comment(ext)
 
@@ -131,7 +131,7 @@ class TextNotebookWriter(NotebookWriter):
             lines.extend([''] * cell.lines_to_next_cell)
 
             # two blank lines between markdown cells in Rmd
-            if self.ext == '.Rmd' and not cell.is_code():
+            if self.ext in ['.Rmd', '.md'] and not cell.is_code():
                 if i + 1 < len(cells) and not cells[i + 1].is_code():
                     lines.append('')
 
@@ -144,7 +144,7 @@ _NOTEBOOK_WRITERS = {ext: TextNotebookWriter(ext)
                      for ext in NOTEBOOK_EXTENSIONS if ext != '.ipynb'}
 
 
-def reads(text, as_version=4, ext='.Rmd', **kwargs):
+def reads(text, ext, as_version=4, **kwargs):
     """Read a notebook from a string"""
     if ext == '.ipynb':
         return nbformat.reads(text, as_version, **kwargs)
@@ -152,7 +152,7 @@ def reads(text, as_version=4, ext='.Rmd', **kwargs):
     return _NOTEBOOK_READERS[ext].reads(text, **kwargs)
 
 
-def read(file_or_stream, as_version=4, ext='.Rmd', **kwargs):
+def read(file_or_stream, ext, as_version=4, **kwargs):
     """Read a notebook from a file"""
     if ext == '.ipynb':
         return nbformat.read(file_or_stream, as_version, **kwargs)
@@ -160,7 +160,7 @@ def read(file_or_stream, as_version=4, ext='.Rmd', **kwargs):
     return _NOTEBOOK_READERS[ext].read(file_or_stream, **kwargs)
 
 
-def writes(notebook, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
+def writes(notebook, ext, version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a string"""
     if ext == '.ipynb':
         return nbformat.writes(notebook, version, **kwargs)
@@ -168,7 +168,7 @@ def writes(notebook, version=nbformat.NO_CONVERT, ext='.Rmd', **kwargs):
     return _NOTEBOOK_WRITERS[ext].writes(notebook)
 
 
-def write(notebook, file_or_stream, version=nbformat.NO_CONVERT, ext='.Rmd',
+def write(notebook, file_or_stream, ext, version=nbformat.NO_CONVERT,
           **kwargs):
     """Write a notebook to a file"""
     if ext == '.ipynb':

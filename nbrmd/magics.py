@@ -72,6 +72,7 @@ def unescape_magic(source, language='python'):
 
 _ESCAPED_CODE_START = {'.R': re.compile(r"^(# |#)*#\+"),
                        '.Rmd': re.compile(r"^(# |#)*```{.*}"),
+                       '.md': re.compile(r"^(# |#)*```"),
                        '.py': re.compile(r"^(# |#)*(#|# )\+(\s*){.*}")}
 
 

@@ -2,12 +2,13 @@
 
 import re
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
-from .cell_metadata import is_active, rmd_options_to_metadata, \
-    json_options_to_metadata
+from .cell_metadata import is_active, json_options_to_metadata, \
+    md_options_to_metadata, rmd_options_to_metadata
 from .stringparser import StringParser
 from .magics import unescape_magic, is_magic, unescape_code_start
 
 _START_CODE_RMD = re.compile(r"^```{(.*)}\s*$")
+_START_CODE_MD = re.compile(r"^```(.*)")
 _END_CODE_MD = re.compile(r"^```\s*$")
 _CODE_OPTION_R = re.compile(r"^#\+(.*)\s*$")
 _CODE_OPTION_PY = re.compile(r"^(#|# )\+(\s*){(.*)}\s*$")
@@ -63,7 +64,7 @@ class CellReader():
     def __init__(self, ext):
         """Create a cell reader with empty content"""
         self.ext = ext
-        self.markdown_prefix = ('' if ext == '.Rmd' else
+        self.markdown_prefix = ('' if ext in ['.Rmd', '.md'] else
                                 "#'" if ext == '.R' else '#')
         self.cell_type = None
         self.language = None
@@ -105,6 +106,10 @@ class CellReader():
             self.language, self.metadata = \
                 rmd_options_to_metadata(_START_CODE_RMD.findall(line)[0])
 
+        if self.ext == '.md' and _START_CODE_MD.match(line):
+            self.language, self.metadata = \
+                md_options_to_metadata(_START_CODE_MD.findall(line)[0])
+
         if self.ext == '.R' and _CODE_OPTION_R.match(line):
             self.language, self.metadata = \
                 rmd_options_to_metadata('r ' + _CODE_OPTION_R.findall(line)[0])
@@ -131,7 +136,8 @@ class CellReader():
             self.cell_type = 'markdown'
             prev_blank = 0
             for i, line in enumerate(lines):
-                if _START_CODE_RMD.match(line):
+                if (self.ext == '.Rmd' and _START_CODE_RMD.match(line)) or \
+                        (self.ext == '.md' and _START_CODE_MD.match(line)):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False
@@ -231,7 +237,7 @@ class CellReader():
         of first line after cell"""
         if self.ext == '.py':
             return self.find_cell_end_py(lines)
-        if self.ext == '.Rmd':
+        if self.ext in ['.Rmd', '.md']:
             return self.find_cell_end_rmd(lines)
         return self.find_cell_end_r(lines)
 
@@ -252,12 +258,12 @@ class CellReader():
         source = lines[cell_start:cell_end_marker]
 
         if self.cell_type == 'code':
-            if is_active(self.ext, self.metadata):
+            if self.ext != '.md' and is_active(self.ext, self.metadata):
                 unescape_magic(source, self.language or 'python')
             elif self.ext in ['.py', '.R']:
                 source = uncomment(source)
 
-        if self.cell_type == 'code' or self.ext == '.Rmd':
+        if self.cell_type == 'code' or self.ext in ['.Rmd', '.md']:
             unescape_code_start(source, self.ext, self.language or
                                 ('python' if self.ext != '.Rmd' else None))
 
@@ -267,7 +273,9 @@ class CellReader():
         self.content = source
 
         # Is this a raw cell?
-        if not is_active('ipynb', self.metadata):
+        if not is_active('ipynb', self.metadata) or (
+                self.ext == '.md' and self.cell_type == 'code'
+                and self.language is None):
             if self.metadata.get('active') == '':
                 del self.metadata['active']
             self.cell_type = 'raw'

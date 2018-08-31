@@ -31,14 +31,14 @@ def encoding_and_executable(self, notebook):
     lines = []
     metadata = notebook.get('metadata', {})
 
-    if self.ext != '.Rmd' and 'executable' in metadata:
+    if self.ext not in ['.Rmd', '.md'] and 'executable' in metadata:
         lines.append('#!' + metadata['executable'])
         del metadata['executable']
 
     if 'encoding' in metadata:
         lines.append(metadata['encoding'])
         del metadata['encoding']
-    elif self.ext != '.Rmd':
+    elif self.ext not in ['.Rmd', '.md']:
         for cell in notebook.cells:
             try:
                 cell.source.encode('ascii')

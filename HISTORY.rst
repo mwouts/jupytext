@@ -16,6 +16,7 @@ easier to read. Pylint score at 9.9 !
 - Python file format updated to 1.1: default end of cell for python scripts is
 one blank space. Two blank spaces are allowed as well. Now you can reformat
 code in Python IDE without breaking notebook cells (#38).
+- Added support for plain markdown files (#40, #44).
 - Start code patterns present in Jupyter cells are escaped.
 - Default `nbrmd_format` is empty (mwouts/nbsrc/#5): no Jupyter notebook
 is created on disk when the user opens a Python or R file and saves it from

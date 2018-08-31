@@ -17,7 +17,7 @@ def test_nbconvert_and_read(nb_file):
     nb = nbrmd.readf(nb_file)
 
     # Export to Rmd using nbrmd package
-    rmd1 = nbrmd.writes(nb)
+    rmd1 = nbrmd.writes(nb, ext='.Rmd')
 
     # Export to Rmd using nbconvert exporter
     rmd_exporter = nbrmd.RMarkdownExporter()
@@ -79,7 +79,7 @@ def test_nbconvert_cmd_line(nb_file, tmpdir):
     nb = nbrmd.readf(nb_file)
     with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',
                     nbrmd.file_format_version.FILE_FORMAT_VERSION_ORG):
-        rmd1 = nbrmd.writes(nb)
+        rmd1 = nbrmd.writes(nb, ext='.Rmd')
     with open(rmd_file) as fp:
         rmd2 = fp.read()
 

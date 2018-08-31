@@ -12,6 +12,7 @@ import ast
 import json
 import re
 from copy import copy
+from .languages import _JUPYTER_LANGUAGES
 
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
@@ -79,7 +80,7 @@ def metadata_to_rmd_options(language, metadata):
     return options.strip(',').strip()
 
 
-def update_md_from_rmd_options(name, value, metadata):
+def update_metadata_from_rmd_options(name, value, metadata):
     """
     Update metadata using the _BOOLEAN_OPTIONS_DICTIONARY mapping
     :param name: option name
@@ -218,7 +219,7 @@ def rmd_options_to_metadata(options):
             metadata['name'] = value
             continue
         else:
-            if update_md_from_rmd_options(name, value, metadata):
+            if update_metadata_from_rmd_options(name, value, metadata):
                 continue
             if name == 'active':
                 metadata[name] = value.replace('"', '').replace("'", '')
@@ -236,6 +237,19 @@ def rmd_options_to_metadata(options):
         del metadata['eval']
 
     return language, metadata
+
+
+def md_options_to_metadata(options):
+    """Parse markdown options and return language and metadata (cell name)"""
+    language, metadata = rmd_options_to_metadata(options)
+    for lang in _JUPYTER_LANGUAGES:
+        if language.lower() == lang.lower():
+            if 'name' in metadata:
+                return lang, {'name': metadata['name']}
+            return lang, {}
+    if language:
+        return None, {'name': language}
+    return None, {}
 
 
 def try_eval_metadata(metadata, name):

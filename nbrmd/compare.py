@@ -70,11 +70,11 @@ def test_round_trip_conversion(notebook, ext, test_outputs):
     round_trip = reads(text, ext=ext)
 
     compare_notebooks(notebook, round_trip,
-                      allow_split_markdown=(ext == '.Rmd'),
+                      allow_split_markdown=(ext in ['.Rmd', '.md']),
                       test_outputs=False)
 
     if test_outputs:
         combine_inputs_with_outputs(round_trip, notebook)
         compare_notebooks(notebook, round_trip,
-                          allow_split_markdown=(ext == '.Rmd'),
+                          allow_split_markdown=(ext in ['.Rmd', '.md']),
                           test_outputs=True)

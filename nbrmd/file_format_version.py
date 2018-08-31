@@ -7,6 +7,10 @@ FILE_FORMAT_VERSION = {
     '.Rmd': '1.0',
     # Version 1.0 on 2018-08-22 - nbrmd v0.5.2 : Initial version
 
+    # Markdown format
+    '.md': '1.0',
+    # Version 1.0 on 2018-08-31 - nbrmd v0.6.0 : Initial version
+
     # Python scripts
     '.py': '1.1',
     # Version 1.1 on 2018-08-25 - nbrmd v0.6.0 : Cells separated with one
