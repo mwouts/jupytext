@@ -1,5 +1,11 @@
 import pytest
-from nbrmd.magics import escape_magic, unescape_magic
+from nbrmd.magics import escape_magic, unescape_magic, unesc
+
+
+def test_unesc():
+    assert unesc('# comment') == 'comment'
+    assert unesc('#comment') == 'comment'
+    assert unesc('comment') == 'comment'
 
 
 @pytest.mark.parametrize('line', ['%matplotlib inline', '#%matplotlib inline',
