@@ -48,7 +48,7 @@ To open `.py`, `.R`, `.md` and `.Rmd` files as notebooks in Jupyter, use our `Co
 - generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit the config and include the below:
 ```python
-c.NotebookApp.contents_manager_class = jupytext
+c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 ```
 
 Then, make sure you have the `jupytext` package up-to-date, and re-start jupyter, i.e. run
