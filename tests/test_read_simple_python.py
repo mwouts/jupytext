@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import pytest
 import nbrmd
 from testfixtures import compare
 from .python_notebook_sample import f, g
