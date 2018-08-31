@@ -49,7 +49,7 @@ def encoding_and_executable(self, notebook):
     return lines
 
 
-def metadata_and_cell_to_header(self, nbk):
+def metadata_and_cell_to_header(self, notebook):
     '''
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
@@ -58,8 +58,8 @@ def metadata_and_cell_to_header(self, nbk):
     header = []
     skipline = True
 
-    if nbk.cells:
-        cell = nbk.cells[0]
+    if notebook.cells:
+        cell = notebook.cells[0]
         if cell.cell_type == 'raw':
             lines = cell.source.strip('\n\t ').splitlines()
             if len(lines) >= 2 \
@@ -67,9 +67,9 @@ def metadata_and_cell_to_header(self, nbk):
                     and _HEADER_RE.match(lines[-1]):
                 header = lines[1:-1]
                 skipline = not cell.metadata.get('noskipline', False)
-                nbk.cells = nbk.cells[1:]
+                notebook.cells = notebook.cells[1:]
 
-    metadata = _as_dict(nbk.get('metadata', {}))
+    metadata = _as_dict(notebook.get('metadata', {}))
 
     if file_format_version(self.ext):
         metadata['nbrmd_format_version'] = file_format_version(self.ext)
