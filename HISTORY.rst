@@ -6,7 +6,7 @@ Release History
 dev
 +++
 
-0.6.0 (2018-08-??)
+0.6.0 (2018-08-31)
 +++++++++++++++++++
 
 **Improvements**
@@ -17,6 +17,7 @@ easier to read. Pylint score at 9.9 !
 one blank space. Two blank spaces are allowed as well. Now you can reformat
 code in Python IDE without breaking notebook cells (#38).
 - Added support for plain markdown files (#40, #44).
+- Demonstration notebooks more user friendly (#45).
 - Command line tool simpler to use (#46).
 - Start code patterns present in Jupyter cells are escaped.
 - Default `nbrmd_format` is empty (mwouts/nbsrc/#5): no Jupyter notebook
@@ -26,7 +27,8 @@ Jupyter, unless the users asks for it by setting `nbrmd_format`.
 **BugFixes**
 
 - Fixed message in the `nbsrc` script (#43)
-
+- Technical metadata don't appear any more in scripts unless required (#42)
+- Code cells that are fully commented remain code cells after round trip (#41)
 
 0.5.4 (2018-08-24)
 +++++++++++++++++++
