@@ -16,8 +16,8 @@ You've always wanted to
 | Format       | Extension          | text editor | git | preserve output |
 | ------------ | ------------------ | ----------- | --- | --------------- |
 | jupyter notebook | `.ipynb`       |             |     | ✔               | 
-| script/markdown  | `.py`/`.R`/`.Rmd` | ✔  | ✔   |       |
-| [paired notebook](#paired-notebooks)  | (`.py`/`.R`/`.Rmd`) + `.ipynb` | ✔  | ✔ | ✔       |
+| script/markdown  | `.py`/`.R`/`.md`/`.Rmd` | ✔  | ✔   |       |
+| [paired notebook](#paired-notebooks)  | (`.py`/`.R`/`.md`/`.Rmd`) + `.ipynb` | ✔  | ✔ | ✔       |
 
 ## Supported formats
 
@@ -28,13 +28,13 @@ The `jupytext` package allows to open and edit, in Jupyter,
 
 Obviously these documents can also be edited outside of Jupyter. You will find useful to refactor your notebook as a mere python script in a real IDE. If you are working on a documentation and you prefer the markdown format, you will be able to use both Jupyter and your specialized markdown editor.
 
-Reloading the updated document in Jupyter is just a matter of refreshing the browser. Refreshing preserves the python variables. Outputs are also preserved when you use the text notebooks *in pair* with classical notebooks.
+Reloading the updated document in Jupyter is just a matter of reloading the corresponding page in the browser. Refreshing preserves the python variables. Outputs are also preserved when you use the text notebooks *in pair* with classical notebooks.
 
 ## Try it!
 Try our package on [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)! Recommended experiments are
 - Have a look at the sample text notebooks in the [demo](https://github.com/mwouts/jupytext/tree/master/demo) folder. See how notebook are represented as text
 - Go to [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo) and open these notebooks
-- You may also open arbitrary python scripts like `matplotlib example.py` (run it)
+- You may also open arbitrary python scripts like `Matplotlib example.py` (run it)
 - Feel free to explore the package files with Jupyter (open `README.md` at the project root)
 - Check by yourself that outputs and variables are preserved, and inputs are updated, when the text notebook is modified outside of Jupyter (this is `Paired Jupyter notebook and python script.ipynb`).
 
@@ -99,13 +99,6 @@ c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 c.ContentsManager.default_jupytext_formats = "ipynb,py" # or "ipynb,nb.py" # or "ipynb,md" # or "ipynb,Rmd"
 ```
 to your Jupyter configuration file, then *every* Jupyter notebook that you save will have a companion `.py` (`.nb.py`, `.md`, or `.Rmd`) notebook. And every `.py` (`.nb.py`, `.md`, or `.Rmd`) notebook will have a companion `.ipynb` notebook.
-
-The default configuration can also contain multiple extension groups. Use
-```python
-c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
-c.ContentsManager.default_jupytext_formats = "ipynb,nb.py;py.ipynb,py"
-```
-if you want `.ipynb` notebooks to have `.nb.py` companion scripts, and `.py` files to have `.py.ipynb` companion notebooks (learn more on the possible values for `jupytext_formats` [here](https://github.com/mwouts/nbsrc/issues/5#issuecomment-414093471)).
 
 ## Command line conversion
 
