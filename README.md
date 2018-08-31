@@ -19,12 +19,12 @@ The `jupytext` package allows to open and edit, in Jupyter,
 
 Obviously these documents can also be edited outside of Jupyter. You will find useful to refactor your notebook as a mere python script in a real IDE. If you are working on a documentation and you prefer the markdown format, you will be able to use both Jupyter and your specialized markdown editor.
 
-Reloading the updated document in Jupyter is just a matter of refreshing the browser. Refreshing preserves the python variables. Outputs are also preserved when you use the text notebooks *in pair* with classical notebooks.
+Reloading the updated document in Jupyter is just a matter of reloading the corresponding page in the browser. Refreshing preserves the python variables. Outputs are also preserved when you use the text notebooks *in pair* with classical notebooks.
 
 Try our package on [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)! Recommended experiments are
 - Have a look at the sample text notebooks in the [demo](https://github.com/mwouts/jupytext/tree/master/demo) folder. See how notebook are represented as text
 - Go to [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo) and open these notebooks
-- You may also open arbitrary python scripts like `matplotlib example.py` (run it)
+- You may also open arbitrary python scripts like `Matplotlib example.py` (run it)
 - Feel free to explore the package files with Jupyter (open `README.md` at the project root)
 - Check by yourself that outputs and variables are preserved, and inputs are updated, when the text notebook is modified outside of Jupyter (this is `Paired Jupyter notebook and python script.ipynb`).
 
@@ -59,7 +59,7 @@ jupyter notebook
 
 ## Paired notebooks
 
-If you want to preserve inputs and outputs, while being able to edit the text format, then add an `jupytext_formats` entry to the notebook metadata, in Jupyter, as follows:
+If you want to preserve inputs and outputs, while being able to edit the text format, then add a `jupytext_formats` entry to the notebook metadata, in Jupyter, as follows:
 ```
 {
   "kernelspec": {
