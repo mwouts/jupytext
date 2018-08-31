@@ -8,33 +8,29 @@
 [![pyversions](https://img.shields.io/pypi/pyversions/nbrmd.svg)](https://pypi.python.org/pypi/nbrmd)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo)
 
-This package offers a representation of Jupyter notebooks as Python scripts, R scripts, plain markdown or [R markdown](https://rmarkdown.rstudio.com/) notebooks. 
+You've always wanted to edit Jupyter notebooks in your favorite editor? To have Jupyter notebooks under version control? Or to *collaborate* on Jupyter notebooks using standard (text-only) merge tools?
 
-These alternative representations allow to
-- edit notebooks in both Jupyter and your favorite IDE, and refactor them
-- extract executable scripts from your notebooks
-- get meaningfull diffs for notebooks under version control, and easily merge contributions
-- edit the same notebook in both Jupyter and RStudio, and use RStudio's advanced rendering of notebooks to PDF, HTML or [HTML slides](https://rmarkdown.rstudio.com/ioslides_presentation_format.html).
+## Supported formats
 
-Scripts and R markdown notebooks only store the source of the notebook, and work in pair with the original `.ipynb` file. With our plugin, Jupyter saves notebooks to both the classical `.ipynb` form, and to the text-only representation. When a text-only notebook is loaded in Jupyter, inputs are taken there, and outputs are taken from the `.ipynb` file, if present.
+The `nbrmd` package allows to open and edit, in Jupyter,
+- Python and R scripts ( extensions `.py` and `.R`)
+- Markdown documents (extension `.md`)
+- R Markdown documents (extension `.Rmd`).
 
-## Can I have a demo?
+Obviously these documents can also be edited outside of Jupyter. You will find useful to refactor your notebook as a mere python script in a real IDE. If you are working on a documentation and you prefer the markdown format, you will be able to use both Jupyter and your specialized markdown editor.
 
-Sure. Try our package on [binder](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo). Notice that every `.py`, `.R`, `.md` and `.Rmd` file opens as a Jupyter notebook. I suggest you open the matplotlib demo `filled_step.py`, run it and save it, close notebook and reopen, to observe persistence of outputs. 
+Reloading the updated document in Jupyter is just a matter of refreshing the browser. Refreshing preserves the python variables. Outputs are also preserved when you use the text notebooks *in pair* with classical notebooks.
 
-The other examples demo how to *edit* the script and reload the notebook (preserving the kernel variables), and how to edit in Jupyter an interactive ioslide presentation.
+Try our package on [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo)! Recommended experiments are
+- Have a look at the sample text notebooks in the [demo](https://github.com/mwouts/nbrmd/tree/master/demo) folder. See how notebook are represented as text
+- Go to [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=demo) and open these notebooks
+- You may also open arbitrary python scripts like `matplotlib example.py` (run it)
+- Feel free to explore the package files with Jupyter (open `README.md` at the project root)
+- Check by yourself that outputs and variables are preserved, and inputs are updated, when the text notebook is modified outside of Jupyter (this is `Paired Jupyter notebook and python script.ipynb`).
 
-## How does the Python script look like?
+## Screenshots
 
-Python [notebook](https://mybinder.org/v2/gh/mwouts/nbrmd/master?filepath=tests/python_notebook_sample.py) in Jupyter  | Python [script](https://github.com/mwouts/nbrmd/blob/master/tests/python_notebook_sample.py)
-:--------------------------:|:-----------------------:
-![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/python_notebook.png)   | ![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/python_source.png)
-
-## How does R markdown look like?
-
-Rmd notebook in jupyter     | Rmd notebook as text
-:--------------------------:|:-----------------------:
-![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/rmd_notebook.png)   | ![](https://raw.githubusercontent.com/mwouts/nbrmd/master/img/rmd_in_text_editor.png)
+![](https://raw.githubusercontent.com/mwouts/nbrmd/v0.6.0/img/jupyter_python_markdown.gif)
 
 ## Have you tested round-trip conversion?
 
@@ -42,19 +38,17 @@ Round trip conversion is safe! A few hundred of tests help to guarantee this.
 - Script to Jupyter notebook, to script again is identity. If you
 associate a Jupyter kernel to your notebook, that information will go to
 a yaml header at the top of your script.
-- R markdown to Jupyter notebook, to R markdown again is identity. 
+- Markdown to Jupyter notebook, to markdown again is identity. 
 - Jupyter to script, and Jupyter again preserves source and metadata.
-- Jupyter to R markdown, and Jupyter again preserves source and metadata (only, markdown cells with two consecutive blank lines will be splitted into multiple cells, as the two blank line pattern is used to separate cells).
+- Jupyter to markdown, and Jupyter again preserves source and metadata (cell metadata available only for R markdown). Note that markdown cells with two consecutive blank lines will be splitted into multiple cells (as the two blank line pattern is used to separate cells).
 
-## How do I activate the companion scripts or R markdown notebooks in Jupyter?
+## Jupyter setup
 
-The `nbrmd` package offers a `ContentsManager` for Jupyter that recognizes
-`.py`, `.R`, `.md` and `.Rmd` files as notebooks. To use it,
+To open `.py`, `.R`, `.md` and `.Rmd` files as notebooks in Jupyter, use our `ContentsManager`. That is:
 - generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit the config and include the below:
 ```python
 c.NotebookApp.contents_manager_class = "nbrmd.RmdFileContentsManager"
-c.ContentsManager.default_nbrmd_formats = "ipynb,py" # or "ipynb,nb.py" # or "ipynb,md" # or "ipynb,Rmd"
 ```
 
 Then, make sure you have the `nbrmd` package up-to-date, and re-start jupyter, i.e. run
@@ -63,20 +57,9 @@ pip install nbrmd --upgrade
 jupyter notebook
 ```
 
-With the above configuration, every Jupyter notebook will have a companion `.py` (`.nb.py`, `.md`, or `.Rmd`) notebook. And every `.py` (`.nb.py`, `.md`, or `.Rmd`) notebook will have a companion `.ipynb` notebook.
+## Paired notebooks
 
-The default configuration can also contain multiple extension groups. Use
-```python
-c.NotebookApp.contents_manager_class = "nbrmd.RmdFileContentsManager"
-c.ContentsManager.default_nbrmd_formats = "ipynb,nb.py;py.ipynb,py"
-```
-if you want `.ipynb` notebooks to have `.nb.py` companion scripts, and `.py` files to have `.py.ipynb` companion notebooks (learn more on the possible values for `nbrmd_formats` [here](https://github.com/mwouts/nbsrc/issues/5#issuecomment-414093471)).
-
-## Per notebook configuration
-
-If you prefer that the companion notebook be generated only for selected notebooks,
-remove the `c.ContentsManager.default_nbrmd_formats` line from Jupyter's
-configuration, and instead edit the notebook metadata as follows:
+If you want to preserve inputs and outputs, while being able to edit the text format, then add an `nbrmd_formats` entry to the notebook metadata, in Jupyter, as follows:
 ```
 {
   "kernelspec": {
@@ -90,17 +73,31 @@ configuration, and instead edit the notebook metadata as follows:
 }
 ```
 
-Accepted formats should have these extensions: `ipynb`, `md`, `Rmd`, `py` and `R`.
+When you save the notebook, both the Jupyter notebook and the python scripts are updated. You can edit the text version
+and then get the updated version in Jupyter by refreshing your browser (you may want to deactivate Jupyter's autosave with `%autosave 0`).
 
-In case you want both `py` and `Rmd`, please note that the
+Accepted formats are: `ipynb`, `md`, `Rmd`, `py` and `R`. In case you want multiple text extensions, please note that the
 order matters: the first non-`ipynb` extension
 is the one used as the reference source for notebook inputs when you open the `ipynb` file.
 
+Finally, it is also possible to pair every notebook with a text representation. If you add
+```
+c.NotebookApp.contents_manager_class = "nbrmd.RmdFileContentsManager"
+c.ContentsManager.default_nbrmd_formats = "ipynb,py" # or "ipynb,nb.py" # or "ipynb,md" # or "ipynb,Rmd"
+```
+to your Jupyter configuration file, then *every* Jupyter notebook that you save will have a companion `.py` (`.nb.py`, `.md`, or `.Rmd`) notebook. And every `.py` (`.nb.py`, `.md`, or `.Rmd`) notebook will have a companion `.ipynb` notebook.
+
+The default configuration can also contain multiple extension groups. Use
+```python
+c.NotebookApp.contents_manager_class = "nbrmd.RmdFileContentsManager"
+c.ContentsManager.default_nbrmd_formats = "ipynb,nb.py;py.ipynb,py"
+```
+if you want `.ipynb` notebooks to have `.nb.py` companion scripts, and `.py` files to have `.py.ipynb` companion notebooks (learn more on the possible values for `nbrmd_formats` [here](https://github.com/mwouts/nbsrc/issues/5#issuecomment-414093471)).
+
 ## Command line conversion
 
-The package provides a `nbrmd` script for command line conversion between the various notebook extensions.
+The package provides a `nbrmd` script for command line conversion between the various notebook extensions:
 
-Use them as:
 ```bash
 nbrmd notebook.ipynb md --test          # Test round trip conversion
 nbrmd notebook.ipynb md                 # display the markdown version on screen
@@ -115,13 +112,6 @@ nbrmd notebook.md .ipynb --update       # update notebook.ipynb (preserve output
 nbrmd notebook1.md notebook2.py .ipynb  # overwrite notebook1.ipynb notebook2.ipynb
 ```
 
-Alternatively, the `nbrmd` package provides a few `nbconvert` exporters:
-```bash
-nbconvert notebook.ipynb --to rmarkdown
-nbconvert notebook.ipynb --to pynotebook
-nbconvert notebook.ipynb --to rnotebook
-```
-
 ## Usefull cell metadata
 
 - Set `"active": "ipynb,py"` if you want that cell to be active only in the Jupyter notebook, and the Python script representation. Use `"active": "ipynb"` if you want that cell to be active only in Jupyter.
@@ -130,4 +120,4 @@ nbconvert notebook.ipynb --to rnotebook
 
 ## Jupyter magics
 
-Jupyter magics are escaped in the script and R markdown representations so that scripts can actually be executed. Comment a magic with `#noescape` on the same line to avoid escaping. User defined magics can be escaped with `#escape`. Magics are not escaped in the plain markdown representation.
+Jupyter magics are escaped in scripts and R markdown to allow code to be executed. Comment a magic with `#noescape` on the same line to avoid escaping. User defined magics can be escaped with `#escape`. Magics are not escaped in the plain markdown representation.
