@@ -36,24 +36,3 @@ def list_r_notebooks(ext):
                  or nb_file.startswith('R_sample')):
             notebooks.append(os.path.join(nb_path, nb_file))
     return notebooks
-
-
-def remove_outputs(nb):
-    nb = copy.deepcopy(nb)
-    for cell in nb.cells:
-        cell.outputs = None
-        cell.execution_count = None
-        if 'trusted' in cell['metadata']:
-            del cell['metadata']['trusted']
-
-    for k in ['nbformat', 'nbformat_minor']:
-        if k in nb:
-            del nb[k]
-
-    return nb
-
-
-def remove_outputs_and_header(nb):
-    nb = remove_outputs(nb)
-    nb['metadata'] = {}
-    return nb

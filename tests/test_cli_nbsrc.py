@@ -3,7 +3,8 @@ from shutil import copyfile
 import pytest
 import nbrmd
 from nbrmd.cli import convert as convert_, cli_nbsrc as cli
-from .utils import list_all_notebooks, remove_outputs
+from nbrmd.compare import compare_notebooks
+from .utils import list_all_notebooks
 
 nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
 
@@ -39,7 +40,7 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     nb1 = nbrmd.readf(nb_org)
     nb2 = nbrmd.readf(nb_other)
 
-    remove_outputs(nb1) == remove_outputs(nb2)
+    compare_notebooks(nb1, nb2)
 
 
 @pytest.mark.parametrize('nb_file',
@@ -73,7 +74,7 @@ def test_convert_multiple_file(nb_files, tmpdir):
     for nb_org, nb_other in zip(nb_orgs, nb_others):
         nb1 = nbrmd.readf(nb_org)
         nb2 = nbrmd.readf(nb_other)
-        remove_outputs(nb1) == remove_outputs(nb2)
+        compare_notebooks(nb1, nb2)
 
 
 def test_error_not_notebook(nb_file='notebook.ext'):
