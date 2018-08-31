@@ -32,7 +32,7 @@
 # ```
 # 3. Modify the notebook in Jupyter. Save. Refresh the python file in the editor, and observe the changes
 # 4. Now, modify the python file, save, and refresh the Jupyter notebook. Observe how inputs were updated, outputs preserved when possible, and kernel was left unchanged.
-# 5. Browse the github repo using Jupyter in binder, and open arbitrary python files as notebooks. Run some of them when applicable (test `filled_step.py` for instance).
+# 5. Browse the github repo using Jupyter in binder, and open arbitrary python files as notebooks. Run some of them when applicable (test `Matplotlib example.py` for instance).
 
 # %matplotlib inline
 
