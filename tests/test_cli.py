@@ -3,11 +3,12 @@ from shutil import copyfile
 import pytest
 import mock
 from nbformat.v4.nbbase import new_notebook
-import nbrmd
-from nbrmd.cli import convert as convert_, cli_nbrmd as cli, cli_nbsrc, nbsrc
-from .utils import list_all_notebooks, remove_outputs
+from nbrmd import readf, writef, file_format_version
+from nbrmd.cli import convert as convert_, cli_nbrmd as cli, nbsrc, nbrmd
+from nbrmd.compare import compare_notebooks
+from .utils import list_all_notebooks
 
-nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+file_format_version.FILE_FORMAT_VERSION = {}
 
 
 def convert(*args, **kwargs):
@@ -38,10 +39,10 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     copyfile(nb_file, nb_org)
     convert([nb_org])
 
-    nb1 = nbrmd.readf(nb_org)
-    nb2 = nbrmd.readf(nb_other)
+    nb1 = readf(nb_org)
+    nb2 = readf(nb_other)
 
-    remove_outputs(nb1) == remove_outputs(nb2)
+    compare_notebooks(nb1, nb2)
 
 
 @pytest.mark.parametrize('nb_file',
@@ -73,9 +74,9 @@ def test_convert_multiple_file(nb_files, tmpdir):
     convert(nb_orgs)
 
     for nb_org, nb_other in zip(nb_orgs, nb_others):
-        nb1 = nbrmd.readf(nb_org)
-        nb2 = nbrmd.readf(nb_other)
-        remove_outputs(nb1) == remove_outputs(nb2)
+        nb1 = readf(nb_org)
+        nb2 = readf(nb_other)
+        compare_notebooks(nb1, nb2)
 
 
 def test_error_not_notebook(nb_file='notebook.ext'):
@@ -86,6 +87,7 @@ def test_error_not_notebook(nb_file='notebook.ext'):
 def test_combine_same_version_ok(tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_nbpy = str(tmpdir.join('notebook.py'))
+    tmp_rmd = str(tmpdir.join('notebook.Rmd'))
 
     with open(tmp_nbpy, 'w') as fp:
         fp.write("""# ---
@@ -98,13 +100,23 @@ def test_combine_same_version_ok(tmpdir):
 """)
 
     nb = new_notebook(metadata={'nbrmd_formats': 'ipynb,py'})
-    nbrmd.writef(nb, tmp_ipynb)
+    writef(nb, tmp_ipynb)
 
     with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',
                     {'.py': '1.0'}):
         nbsrc(args=[tmp_nbpy, '-i', '-p'])
+        # test round trip
+        nbsrc(args=[tmp_nbpy, '-t'])
+        # test ipynb to rmd
+        nbrmd(args=[tmp_ipynb, '-i'])
 
-    nb = nbrmd.readf(tmp_ipynb)
+    nb = readf(tmp_ipynb)
+    cells = nb['cells']
+    assert len(cells) == 1
+    assert cells[0].cell_type == 'markdown'
+    assert cells[0].source == 'New cell'
+
+    nb = readf(tmp_rmd)
     cells = nb['cells']
     assert len(cells) == 1
     assert cells[0].cell_type == 'markdown'
@@ -126,7 +138,7 @@ def test_combine_lower_version_raises(tmpdir):
 """)
 
     nb = new_notebook(metadata={'nbrmd_formats': 'ipynb,py'})
-    nbrmd.writef(nb, tmp_ipynb)
+    writef(nb, tmp_ipynb)
 
     with pytest.raises(ValueError):
         with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',

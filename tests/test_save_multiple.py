@@ -5,8 +5,8 @@ from nbformat.validator import NotebookValidationError
 from tornado.web import HTTPError
 import nbrmd
 from nbrmd.contentsmanager import RmdFileContentsManager
-from .utils import list_all_notebooks, remove_outputs, \
-    remove_outputs_and_header
+from nbrmd.compare import compare_notebooks
+from .utils import list_all_notebooks
 
 nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
 
@@ -28,7 +28,7 @@ def test_rmd_is_ok(nb_file, tmpdir):
 
     nb2 = nbrmd.readf(str(tmpdir.join(tmp_rmd)))
 
-    assert remove_outputs(nb) == remove_outputs(nb2)
+    compare_notebooks(nb, nb2)
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.Rmd'))
@@ -47,7 +47,7 @@ def test_ipynb_is_ok(nb_file, tmpdir):
 
     nb2 = nbrmd.readf(str(tmpdir.join(tmp_ipynb)))
 
-    assert remove_outputs(nb) == remove_outputs(nb2)
+    compare_notebooks(nb, nb2)
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
@@ -66,10 +66,10 @@ def test_all_files_created(nb_file, tmpdir):
         path=tmp_ipynb)
 
     nb2 = nbrmd.readf(str(tmpdir.join(tmp_py)))
-    assert remove_outputs_and_header(nb) == remove_outputs_and_header(nb2)
+    compare_notebooks(nb, nb2)
 
     nb3 = nbrmd.readf(str(tmpdir.join(tmp_rmd)))
-    assert remove_outputs(nb) == remove_outputs(nb3)
+    compare_notebooks(nb, nb3)
 
 
 def test_no_files_created_on_no_format(tmpdir):

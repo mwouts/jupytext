@@ -1,8 +1,8 @@
 import nbformat
 import pytest
-from testfixtures import compare
 import nbrmd
-from .utils import list_r_notebooks, remove_outputs
+from nbrmd.compare import compare_notebooks
+from .utils import list_r_notebooks
 
 nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
 
@@ -20,4 +20,4 @@ def test_identity_source_write_read(nb_file):
     R = nbrmd.writes(nb1, ext='.R')
     nb2 = nbrmd.reads(R, ext='.R')
 
-    compare(remove_outputs(nb1), remove_outputs(nb2))
+    compare_notebooks(nb1, nb2)
