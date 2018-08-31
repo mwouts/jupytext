@@ -1,4 +1,4 @@
-from nbrmd.stringparser import StringParser
+from jupytext.stringparser import StringParser
 
 
 def test_long_string(text="""'''This is a multiline

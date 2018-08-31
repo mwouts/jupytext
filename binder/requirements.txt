@@ -1,4 +1,4 @@
-nbrmd>=0.6.0
+jupytext>=0.6.1
 plotly
 matplotlib
 pandas

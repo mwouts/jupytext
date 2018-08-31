@@ -241,14 +241,24 @@ def rmd_options_to_metadata(options):
 
 def md_options_to_metadata(options):
     """Parse markdown options and return language and metadata (cell name)"""
-    language, metadata = rmd_options_to_metadata(options)
-    for lang in _JUPYTER_LANGUAGES:
-        if language.lower() == lang.lower():
-            if 'name' in metadata:
-                return lang, {'name': metadata['name']}
-            return lang, {}
+    language = None
+    name = None
+
+    options = [opt for opt in options.split(' ') if opt != '']
+    if len(options) >= 2:
+        language, name = options[:2]
+    elif options:
+        language = options[0]
+
     if language:
+        for lang in _JUPYTER_LANGUAGES:
+            if language.lower() == lang.lower():
+                if name:
+                    return lang, {'name': name}
+                return lang, {}
+
         return None, {'name': language}
+
     return None, {}
 
 

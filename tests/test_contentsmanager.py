@@ -1,31 +1,31 @@
 import os
 import sys
 import pytest
-import nbrmd
-from nbrmd import RmdFileContentsManager, readf
-from nbrmd.compare import compare_notebooks
+import jupytext
+from jupytext import TextFileContentsManager, readf
+from jupytext.compare import compare_notebooks
 from .utils import list_all_notebooks
 
-nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
 
-@pytest.mark.skipif(isinstance(RmdFileContentsManager, str),
-                    reason=RmdFileContentsManager)
+@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
+                    reason=TextFileContentsManager)
 def test_create_contentsmanager():
-    RmdFileContentsManager()
+    TextFileContentsManager()
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
                     reason="unordered dict result in changes in chunk options")
-@pytest.mark.skipif(isinstance(RmdFileContentsManager, str),
-                    reason=RmdFileContentsManager)
+@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
+                    reason=TextFileContentsManager)
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_load_save_rename(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_rmd = 'notebook.Rmd'
 
-    cm = RmdFileContentsManager()
-    cm.default_nbrmd_formats = 'ipynb,Rmd'
+    cm = TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb,Rmd'
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save Rmd, reopen
@@ -48,15 +48,15 @@ def test_load_save_rename(nb_file, tmpdir):
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
                     reason="unordered dict result in changes in chunk options")
-@pytest.mark.skipif(isinstance(RmdFileContentsManager, str),
-                    reason=RmdFileContentsManager)
+@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
+                    reason=TextFileContentsManager)
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_nbpy = 'notebook.nb.py'
 
-    cm = RmdFileContentsManager()
-    cm.default_nbrmd_formats = 'ipynb,nb.py'
+    cm = TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb,nb.py'
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
@@ -79,15 +79,15 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
                     reason="unordered dict result in changes in chunk options")
-@pytest.mark.skipif(isinstance(RmdFileContentsManager, str),
-                    reason=RmdFileContentsManager)
+@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
+                    reason=TextFileContentsManager)
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_nbpy = 'notebook.nb.py'
 
-    cm = RmdFileContentsManager()
-    cm.default_nbrmd_formats = 'ipynb'
+    cm = TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb'
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen

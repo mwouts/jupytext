@@ -1,9 +1,9 @@
 import pytest
 from nbformat.v4.nbbase import new_notebook, new_raw_cell, new_markdown_cell
-import nbrmd
-from nbrmd.nbrmd import TextNotebookReader, TextNotebookWriter
+import jupytext
+from jupytext.jupytext import TextNotebookReader, TextNotebookWriter
 
-nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
 
 @pytest.fixture

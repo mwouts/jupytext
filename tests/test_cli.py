@@ -4,9 +4,9 @@ import pytest
 from testfixtures import compare
 import mock
 from nbformat.v4.nbbase import new_notebook
-from nbrmd import readf, writef, writes, file_format_version
-from nbrmd.cli import convert_notebook_files, cli_nbrmd, nbrmd
-from nbrmd.compare import compare_notebooks
+from jupytext import readf, writef, writes, file_format_version
+from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext
+from jupytext.compare import compare_notebooks
 from .utils import list_all_notebooks
 
 file_format_version.FILE_FORMAT_VERSION = {}
@@ -16,13 +16,13 @@ file_format_version.FILE_FORMAT_VERSION = {}
                          list_all_notebooks('.ipynb') +
                          list_all_notebooks('.Rmd'))
 def test_cli_single_file(nb_file):
-    assert cli_nbrmd([nb_file] + ['py']).notebooks == [nb_file]
+    assert cli_jupytext([nb_file] + ['py']).notebooks == [nb_file]
 
 
 @pytest.mark.parametrize('nb_files', [list_all_notebooks('.ipynb') +
                                       list_all_notebooks('.Rmd')])
 def test_cli_multiple_files(nb_files):
-    assert cli_nbrmd(nb_files + ['py']).notebooks == nb_files
+    assert cli_jupytext(nb_files + ['py']).notebooks == nb_files
 
 
 @pytest.mark.parametrize('nb_file',
@@ -99,24 +99,24 @@ def test_combine_same_version_ok(tmpdir):
     with open(tmp_nbpy, 'w') as fp:
         fp.write("""# ---
 # jupyter:
-#   nbrmd_formats: ipynb,py
-#   nbrmd_format_version: '1.0'
+#   jupytext_formats: ipynb,py
+#   jupytext_format_version: '1.0'
 # ---
 
 # New cell
 """)
 
-    nb = new_notebook(metadata={'nbrmd_formats': 'ipynb,py'})
+    nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
     writef(nb, tmp_ipynb)
 
-    with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',
+    with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
                     {'.py': '1.0'}):
         # to jupyter notebook
-        nbrmd(args=[tmp_nbpy, '.ipynb', '--update'])
+        jupytext(args=[tmp_nbpy, '.ipynb', '--update'])
         # test round trip
-        nbrmd(args=[tmp_nbpy, '.ipynb', '--test'])
+        jupytext(args=[tmp_nbpy, '.ipynb', '--test'])
         # test ipynb to rmd
-        nbrmd(args=[tmp_ipynb, '.Rmd'])
+        jupytext(args=[tmp_ipynb, '.Rmd'])
 
     nb = readf(tmp_ipynb)
     cells = nb['cells']
@@ -138,17 +138,17 @@ def test_combine_lower_version_raises(tmpdir):
     with open(tmp_nbpy, 'w') as fp:
         fp.write("""# ---
 # jupyter:
-#   nbrmd_formats: ipynb,py
-#   nbrmd_format_version: '0.0'
+#   jupytext_formats: ipynb,py
+#   jupytext_format_version: '0.0'
 # ---
 
 # New cell
 """)
 
-    nb = new_notebook(metadata={'nbrmd_formats': 'ipynb,py'})
+    nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
     writef(nb, tmp_ipynb)
 
     with pytest.raises(ValueError):
-        with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',
+        with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
                         {'.py': '1.0'}):
-            nbrmd(args=[tmp_nbpy, '.ipynb', '--update'])
+            jupytext(args=[tmp_nbpy, '.ipynb', '--update'])

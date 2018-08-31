@@ -1,16 +1,16 @@
 import os
 import shutil
 import pytest
-import nbrmd
-from nbrmd.contentsmanager import RmdFileContentsManager
+import jupytext
+from jupytext.contentsmanager import TextFileContentsManager
 from .utils import list_all_notebooks
 
-nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.py'))
 def test_py_notebooks_are_trusted(nb_file):
-    cm = RmdFileContentsManager()
+    cm = TextFileContentsManager()
     root, file = os.path.split(nb_file)
     cm.root_dir = root
     nb = cm.get(file)
@@ -20,7 +20,7 @@ def test_py_notebooks_are_trusted(nb_file):
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.Rmd'))
 def test_rmd_notebooks_are_trusted(nb_file):
-    cm = RmdFileContentsManager()
+    cm = TextFileContentsManager()
     root, file = os.path.split(nb_file)
     cm.root_dir = root
     nb = cm.get(file)
@@ -30,14 +30,14 @@ def test_rmd_notebooks_are_trusted(nb_file):
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
 def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
-    cm = RmdFileContentsManager()
+    cm = TextFileContentsManager()
     root, file = os.path.split(nb_file)
     tmp_ipynb = str(tmpdir.join(file))
     py_file = file.replace('.ipynb', '.py')
     tmp_py = str(tmpdir.join(py_file))
     shutil.copy(nb_file, tmp_ipynb)
 
-    cm.default_nbrmd_formats = 'ipynb,py'
+    cm.default_jupytext_formats = 'ipynb,py'
     cm.root_dir = str(tmpdir)
     nb = cm.get(file)
 

@@ -13,22 +13,22 @@ from notebook.services.contents.filemanager import FileContentsManager
 from tornado.web import HTTPError
 from traitlets import Unicode
 from traitlets.config import Configurable
-import nbrmd
+import jupytext
 
 from . import combine
 from .file_format_version import check_file_version
 
 
-def _nbrmd_writes(ext):
+def _jupytext_writes(ext):
     def _writes(nbk, version=nbformat.NO_CONVERT, **kwargs):
-        return nbrmd.writes(nbk, version=version, ext=ext, **kwargs)
+        return jupytext.writes(nbk, version=version, ext=ext, **kwargs)
 
     return _writes
 
 
-def _nbrmd_reads(ext):
+def _jupytext_reads(ext):
     def _reads(text, as_version, **kwargs):
-        return nbrmd.reads(text, ext, as_version, **kwargs)
+        return jupytext.reads(text, ext, as_version, **kwargs)
 
     return _reads
 
@@ -45,7 +45,7 @@ def check_formats(formats):
     if not isinstance(formats, list):
         formats = [group.split(',') for group in formats.split(';')]
 
-    expected_format = ("Notebook metadata 'nbrmd_formats' should "
+    expected_format = ("Notebook metadata 'jupytext_formats' should "
                        "be a list of extension groups, like 'ipynb,Rmd'.\n"
                        "Groups can be separated with colon, for instance: "
                        "'ipynb,nb.py;script.ipynb,py'")
@@ -61,7 +61,7 @@ def check_formats(formats):
             if not isinstance(fmt, six.string_types):
                 raise ValueError('Extensions should be strings among {}'
                                  ', not {}.\n{}'
-                                 .format(str(nbrmd.NOTEBOOK_EXTENSIONS),
+                                 .format(str(jupytext.NOTEBOOK_EXTENSIONS),
                                          str(fmt),
                                          expected_format))
             if fmt == '':
@@ -69,11 +69,11 @@ def check_formats(formats):
             if not fmt.startswith('.'):
                 fmt = '.' + fmt
             if not any([fmt.endswith(ext)
-                        for ext in nbrmd.NOTEBOOK_EXTENSIONS]):
+                        for ext in jupytext.NOTEBOOK_EXTENSIONS]):
                 raise ValueError('Group extension {} contains {}, '
                                  'which does not end with either {}.\n{}'
                                  .format(str(group), fmt,
-                                         str(nbrmd.NOTEBOOK_EXTENSIONS),
+                                         str(jupytext.NOTEBOOK_EXTENSIONS),
                                          expected_format))
             validated_group.append(fmt)
 
@@ -95,14 +95,14 @@ def file_fmt_ext(path):
     return file, ext, ext
 
 
-class RmdFileContentsManager(FileContentsManager, Configurable):
+class TextFileContentsManager(FileContentsManager, Configurable):
     """
     A FileContentsManager Class that reads and stores notebooks to classical
     Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd),
     R scripts (.R) and python scripts (.py)
     """
 
-    nb_extensions = [ext for ext in nbrmd.NOTEBOOK_EXTENSIONS if
+    nb_extensions = [ext for ext in jupytext.NOTEBOOK_EXTENSIONS if
                      ext != '.ipynb']
 
     def all_nb_extensions(self):
@@ -112,7 +112,7 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
         """
         return ['.ipynb'] + self.nb_extensions
 
-    default_nbrmd_formats = Unicode(
+    default_jupytext_formats = Unicode(
         u'',
         help='Save notebooks to these file extensions. '
              'Can be any of ipynb,Rmd,md,py,R,nb.py,nb.R comma separated',
@@ -120,20 +120,21 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
 
     def format_group(self, fmt, nbk=None):
         """Return the group of extensions that contains 'fmt'"""
-        nbrmd_formats = ((nbk.metadata.get('nbrmd_formats') if nbk else None)
-                         or self.default_nbrmd_formats)
+        jupytext_formats = ((nbk.metadata.get('jupytext_formats')
+                             if nbk else None) or
+                            self.default_jupytext_formats)
 
         try:
-            nbrmd_formats = check_formats(nbrmd_formats)
+            jupytext_formats = check_formats(jupytext_formats)
         except ValueError as err:
             raise HTTPError(400, str(err))
 
         # Find group that contains the current format
-        for group in nbrmd_formats:
+        for group in jupytext_formats:
             if fmt in group:
                 return group
 
-        if ['.ipynb'] in nbrmd_formats:
+        if ['.ipynb'] in jupytext_formats:
             return [fmt, '.ipynb']
 
         return [fmt]
@@ -143,11 +144,11 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
         """Read a notebook from an os path."""
         file, fmt, ext = file_fmt_ext(os_path)
         if ext in self.nb_extensions:
-            with mock.patch('nbformat.reads', _nbrmd_reads(ext)):
-                nbk = super(RmdFileContentsManager, self) \
+            with mock.patch('nbformat.reads', _jupytext_reads(ext)):
+                nbk = super(TextFileContentsManager, self) \
                     ._read_notebook(os_path, as_version)
         else:
-            nbk = super(RmdFileContentsManager, self) \
+            nbk = super(TextFileContentsManager, self) \
                 ._read_notebook(os_path, as_version)
 
         if not load_alternative_format:
@@ -213,11 +214,11 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
             self.log.info("Saving %s", os.path.basename(os_path_fmt))
             alt_ext = '.' + alt_fmt.split('.')[-1]
             if alt_ext in self.nb_extensions:
-                with mock.patch('nbformat.writes', _nbrmd_writes(alt_ext)):
-                    super(RmdFileContentsManager, self) \
+                with mock.patch('nbformat.writes', _jupytext_writes(alt_ext)):
+                    super(TextFileContentsManager, self) \
                         ._save_notebook(os_path_fmt, nb)
             else:
-                super(RmdFileContentsManager, self) \
+                super(TextFileContentsManager, self) \
                     ._save_notebook(os_path_fmt, nb)
 
     def get(self, path, content=True, type=None, format=None):
@@ -231,7 +232,7 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
                        for ext in self.all_nb_extensions()]))):
             return self._notebook_model(path, content=content)
 
-        return super(RmdFileContentsManager, self) \
+        return super(TextFileContentsManager, self) \
             .get(path, content, type, format)
 
     def trust_notebook(self, path):
@@ -239,8 +240,8 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
         file, fmt, _ = file_fmt_ext(path)
         for alt_fmt in self.format_group(fmt):
             if alt_fmt.endswith('.ipynb'):
-                super(RmdFileContentsManager, self).trust_notebook(file +
-                                                                   alt_fmt)
+                super(TextFileContentsManager, self).trust_notebook(file +
+                                                                    alt_fmt)
 
     def rename_file(self, old_path, new_path):
         """Rename the current notebook, as well as its
@@ -251,7 +252,7 @@ class RmdFileContentsManager(FileContentsManager, Configurable):
         if org_fmt == new_fmt:
             for alt_fmt in self.format_group(org_fmt):
                 if self.file_exists(old_file + alt_fmt):
-                    super(RmdFileContentsManager, self) \
+                    super(TextFileContentsManager, self) \
                         .rename_file(old_file + alt_fmt, new_file + alt_fmt)
         else:
-            super(RmdFileContentsManager, self).rename_file(old_path, new_path)
+            super(TextFileContentsManager, self).rename_file(old_path, new_path)

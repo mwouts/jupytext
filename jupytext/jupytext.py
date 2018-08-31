@@ -77,6 +77,9 @@ class TextNotebookReader(NotebookReader):
 
         set_main_and_cell_language(metadata, cells, self.ext)
 
+        if 'nbrmd_formats' in metadata:
+            metadata['jupytext_formats'] = metadata.pop('nbrmd_formats')
+
         notebook = new_notebook(cells=cells, metadata=metadata)
         return notebook
 

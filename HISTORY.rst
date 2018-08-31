@@ -6,6 +6,13 @@ Release History
 dev
 +++
 
+0.6.1 (2018-08-31)
++++++++++++++++++++
+
+**Improvements**
+
+- Package and conversion script renamed from `nbrmd` to `jupytext`.
+
 0.6.0 (2018-08-31)
 +++++++++++++++++++
 

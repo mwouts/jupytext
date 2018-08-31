@@ -1,10 +1,10 @@
 import nbformat
 import pytest
-import nbrmd
-from nbrmd.compare import compare_notebooks
+import jupytext
+from jupytext.compare import compare_notebooks
 from .utils import list_r_notebooks
 
-nbrmd.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
 
 @pytest.mark.parametrize('nb_file', list_r_notebooks('.ipynb'))
@@ -17,7 +17,7 @@ def test_identity_source_write_read(nb_file):
     with open(nb_file) as fp:
         nb1 = nbformat.read(fp, as_version=4)
 
-    R = nbrmd.writes(nb1, ext='.R')
-    nb2 = nbrmd.reads(R, ext='.R')
+    R = jupytext.writes(nb1, ext='.R')
+    nb2 = jupytext.reads(R, ext='.R')
 
     compare_notebooks(nb1, nb2)

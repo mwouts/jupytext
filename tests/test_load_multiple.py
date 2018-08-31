@@ -2,8 +2,8 @@ import pytest
 import mock
 from tornado.web import HTTPError
 from nbformat.v4.nbbase import new_notebook
-import nbrmd
-from nbrmd import RmdFileContentsManager
+import jupytext
+from jupytext import TextFileContentsManager
 
 
 def test_combine_same_version_ok(tmpdir):
@@ -13,21 +13,21 @@ def test_combine_same_version_ok(tmpdir):
     with open(str(tmpdir.join(tmp_nbpy)), 'w') as fp:
         fp.write("""# ---
 # jupyter:
-#   nbrmd_formats: ipynb,py
-#   nbrmd_format_version: '1.0'
+#   jupytext_formats: ipynb,py
+#   jupytext_format_version: '1.0'
 # ---
 
 # New cell
 """)
 
-    nb = new_notebook(metadata={'nbrmd_formats': 'ipynb,py'})
-    nbrmd.writef(nb, str(tmpdir.join(tmp_ipynb)))
+    nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
+    jupytext.writef(nb, str(tmpdir.join(tmp_ipynb)))
 
-    cm = RmdFileContentsManager()
-    cm.default_nbrmd_formats = 'ipynb,py'
+    cm = TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb,py'
     cm.root_dir = str(tmpdir)
 
-    with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',
+    with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
                     {'.py': '1.0'}):
         nb = cm.get(tmp_ipynb)
     cells = nb['content']['cells']
@@ -43,21 +43,21 @@ def test_combine_lower_version_raises(tmpdir):
     with open(str(tmpdir.join(tmp_nbpy)), 'w') as fp:
         fp.write("""# ---
 # jupyter:
-#   nbrmd_formats: ipynb,py
-#   nbrmd_format_version: '0.0'
+#   jupytext_formats: ipynb,py
+#   jupytext_format_version: '0.0'
 # ---
 
 # New cell
 """)
 
-    nb = new_notebook(metadata={'nbrmd_formats': 'ipynb,py'})
-    nbrmd.writef(nb, str(tmpdir.join(tmp_ipynb)))
+    nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
+    jupytext.writef(nb, str(tmpdir.join(tmp_ipynb)))
 
-    cm = RmdFileContentsManager()
-    cm.default_nbrmd_formats = 'ipynb,py'
+    cm = TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb,py'
     cm.root_dir = str(tmpdir)
 
     with pytest.raises(HTTPError):
-        with mock.patch('nbrmd.file_format_version.FILE_FORMAT_VERSION',
+        with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
                         {'.py': '1.0'}):
             cm.get(tmp_ipynb)

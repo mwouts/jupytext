@@ -2,7 +2,7 @@
 
 from testfixtures import compare
 from .cell_metadata import _IGNORE_METADATA
-from .nbrmd import reads, writes
+from .jupytext import reads, writes
 from .combine import combine_inputs_with_outputs
 
 

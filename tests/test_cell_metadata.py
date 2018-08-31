@@ -1,6 +1,6 @@
 import sys
 import pytest
-from nbrmd.cell_metadata import rmd_options_to_metadata, \
+from jupytext.cell_metadata import rmd_options_to_metadata, \
     metadata_to_rmd_options, parse_rmd_options, RMarkdownOptionParsingError, \
     try_eval_metadata, json_options_to_metadata
 

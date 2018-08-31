@@ -3,13 +3,10 @@
 .coverage
 .pytest_cache
 .eggs
-.Rhistory
-.Rproj.user
 build
 dist
 venv
-nbrmd.egg-info
-nbrmd.Rproj
+jupytext.egg-info
 future
 *.pyc
 gits*
