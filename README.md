@@ -67,7 +67,6 @@ a yaml header at the top of your script.
 - Jupyter to script, and Jupyter again preserves source and metadata.
 - Jupyter to markdown, and Jupyter again preserves source and metadata (cell metadata available only for R markdown). Note that markdown cells with two consecutive blank lines will be splitted into multiple cells (as the two blank line pattern is used to separate cells).
 
-
 ## Paired notebooks
 
 The idea of paired notebooks is to store a `.ipynb` file alongside the text-only version. Like this we get the best of two worlds: a text-only document to put under version control, and an easily sharable notebook which stores the outputs. 
@@ -117,6 +116,29 @@ jupytext notebook.md .ipynb --update       # update notebook.ipynb (preserve out
 
 jupytext notebook1.md notebook2.py .ipynb  # overwrite notebook1.ipynb notebook2.ipynb
 ```
+
+## Format specifications
+
+### Markdown and R markdown
+
+Our implementation for Jupyter notebooks as Markdown or R markdown documents is unsurprizing:
+- A YAML header contains the notebook metadata (Jupyter kernel, etc)
+- Markdown cells are inserted verbatim, and separated with two blank lines
+- Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are available in the [R markdown format](https://rmarkdown.rstudio.com/authoring_quick_tour.html).
+
+### R scripts
+
+Implement these [specifications](https://rmarkdown.rstudio.com/articles_report_from_r_script.html):
+- Jupyter metadata in YAML format, in a `#' `-escaped header
+- Markdown cells are commented with `#' `
+- Code cells are exported verbatim. Cell metadata are signalled with `#+`. Cells end with a blank line, an explicit start of cell marker, or a markdown comment.
+
+### Python scripts
+
+We wanted to represent Jupyter notebooks with the least explicit markers possible. The rationale for that is to allow **arbitrary** python files to open as Jupyter notebooks, even files which were never prepared to become a notebook. Precisely:
+- Jupyter metadata go to an escaped YAML header
+- Markdown cells are commented with `# `, and separated with a blank line
+- Code cells are exported verbatim (except for Jupyter magics, which are escaped), and separated with a blank lines. Code cells are reconstructed from consistent python paragraphs (no function, class or multiline comment will be broken). A start-of-cell delimiter `# + {}` is used for cells that have explicit metadata (inside the curly bracket, in JSON format), and for cells that include blank lines (outside of functions, classes, etc). The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
 ## Usefull cell metadata
 
