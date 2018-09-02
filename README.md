@@ -13,14 +13,6 @@ You've always wanted to
 * have Jupyter notebooks under version control? 
 * *collaborate* on Jupyter notebooks using standard (text-only) merge tools?
 
-## Format comparison
-
-| Format       | Extension          | text editor | git friendly | preserve output |
-| ------------ | ------------------ | ----------- | ------------ | --------------- |
-| jupyter notebook | `.ipynb`       |             |              | ✔               | 
-| script/markdown  | `.py`/`.R`/`.md`/`.Rmd` | ✔  | ✔            |                 |
-| [paired notebook](#paired-notebooks)  | (`.py`/`.R`/`.md`/`.Rmd`) + `.ipynb` | ✔ | ✔ | ✔ |
-
 ## Supported formats
 
 The `jupytext` package allows you to open and edit, in Jupyter,
@@ -28,9 +20,15 @@ The `jupytext` package allows you to open and edit, in Jupyter,
 - Markdown documents (extension `.md`)
 - R Markdown documents (extension `.Rmd`).
 
-Obviously these documents can also be edited outside of Jupyter. You will find it useful to refactor your notebook as a mere python script in a real IDE. If you are working on a documentation and you prefer the Markdown format, you will be able to use both Jupyter and your specialized Markdown editor.
+Obviously these documents can also be edited outside of Jupyter. You will find it useful to refactor your notebook as a mere python script in a real IDE. If you are working on a documentation and you prefer the Markdown format, you will be able to use both Jupyter and your specialized Markdown editor. Also, any of these text format is very convenient for versioning the notebook!
 
-Reloading the updated document in Jupyter is just a matter of reloading the corresponding page in the browser. Refreshing preserves the python variables. Outputs are also preserved when you use the text notebooks *in pair* with classical notebooks.
+Reloading the updated document in Jupyter is just a matter of reloading the corresponding page in the browser. Refreshing preserves the python variables. Outputs are not stored in the text representation, so we recommend using [paired notebooks](#paired-notebooks) to also preserve the outputs.
+
+| Format       | Extension          | text editor | git friendly | preserve output |
+| ------------ | ------------------ | ----------- | ------------ | --------------- |
+| jupyter notebook | `.ipynb`       |             |              | ✔               | 
+| script/markdown  | `.py`/`.R`/`.md`/`.Rmd` | ✔  | ✔            |                 |
+| [paired notebook](#paired-notebooks)  | (`.py`/`.R`/`.md`/`.Rmd`) + `.ipynb` | ✔ | ✔ | ✔ |
 
 ## Try it!
 
@@ -59,7 +57,7 @@ jupyter notebook
 
 The animated GIF below demonstrates the same notebook with three different extensions
 - Original `.ipynb` file, in JSON format (5.5MB). Not adapted to text editors, but great for use in Jupyter, and also a perfect support for sharing your work. GitHub has full support for displaying notebooks and their outputs.
-- Paired python script (`.py`, 2.2KB). An excellent format for developing Jupyter notebooks with complex code: code is easily **refactored**. **Navigating** through **code** and **documentation** is easier than in Jupyter. Step by step execution and breakpoints are accessible. Notebooks as python scripts are, in our opinion, the best candidate for **versioning** and **collaborating** on Jupyter notebooks - for sure you already have lots of practice on collaborating on simple scripts with Git, right? And when you're done with developping, you just need to refresh the notebook in Jupyter, run it all, save and share!
+- Paired python script (`.py`, 2.2KB). An excellent format for developing Jupyter notebooks with complex code: code is easily refactored. Navigating through code and documentation is easier than in Jupyter. Step by step execution and breakpoints are accessible. Notebooks as python scripts are, in our opinion, the best candidate for versioning and collaborating on Jupyter notebooks - for sure you already have lots of practice on collaborating on simple scripts with Git, right? And when you're done with developping, you just need to refresh the notebook in Jupyter, run it all, save and share!
 - Paired markdown document (`.md`, 2.2KB). An excellent format for developing documentation with few code samples.
 
 ![](https://raw.githubusercontent.com/mwouts/jupytext/master/img/jupyter_python_markdown.gif)
