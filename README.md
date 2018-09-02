@@ -79,14 +79,14 @@ The idea of paired notebooks is to store a `.ipynb` file alongside the text-only
 To enable paired notebooks, add a `jupytext_formats` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
 ```
 {
+  "jupytext_formats": "ipynb,py",
   "kernelspec": {
     "name": "python3",
     (...)
   },
   "language_info": {
     (...)
-  },
-  "jupytext_formats": "ipynb,py"
+  }  
 }
 ```
 
