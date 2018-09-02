@@ -80,6 +80,7 @@ And extract population information (and check total is right)
 
 ```python
 population = data.loc[zones]['Population, total'].swaplevel().unstack()
+population = population[zones]
 assert all(data.loc['World']['Population, total'] == population.sum(axis=1))
 ```
 
