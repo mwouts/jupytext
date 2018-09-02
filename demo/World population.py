@@ -69,6 +69,7 @@ zones = ['North America', 'Middle East & North Africa',
 # And extract population information (and check total is right)
 
 population = data.loc[zones]['Population, total'].swaplevel().unstack()
+population = population[zones]
 assert all(data.loc['World']['Population, total'] == population.sum(axis=1))
 
 # ## Stacked area plot with matplotlib
