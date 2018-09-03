@@ -98,6 +98,8 @@ def test_R_unchanged_ipynb(nb_file):
     compare(r, r_ref)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.parametrize('nb_file', list_julia_notebooks('.ipynb'))
 def test_julia_unchanged_ipynb(nb_file):
     julia_file = mirror_file(nb_file).replace('.py', '.jl')
@@ -109,6 +111,8 @@ def test_julia_unchanged_ipynb(nb_file):
     compare(julia, julia_ref)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.parametrize('script_file', list_all_notebooks('.jl'))
 def test_julia_unchanged(script_file):
     with open(script_file, encoding='utf-8') as fp:
