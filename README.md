@@ -1,4 +1,4 @@
-# Jupyter notebooks as markdown documents, Python or R scripts
+# Jupyter notebooks as markdown documents, Julia, Python or R scripts
 
 [![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Pypi](https://img.shields.io/pypi/l/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
@@ -16,13 +16,13 @@ You've always wanted to
 | Format       | Extension          | text editor | git | preserve output |
 | ------------ | ------------------ | ----------- | --- | --------------- |
 | jupyter notebook | `.ipynb`       |             |     | ✔               | 
-| script/markdown  | `.py`/`.R`/`.md`/`.Rmd` | ✔  | ✔   |       |
-| [paired notebook](#paired-notebooks)  | (`.py`/`.R`/`.md`/`.Rmd`) + `.ipynb` | ✔  | ✔ | ✔       |
+| script/markdown  | `.jl`/`.py`/`.R`/`.md`/`.Rmd` | ✔  | ✔   |       |
+| [paired notebook](#paired-notebooks)  | (`.jl`/`.py`/`.R`/`.md`/`.Rmd`) + `.ipynb` | ✔  | ✔ | ✔       |
 
 ## Supported formats
 
 The `jupytext` package allows to open and edit, in Jupyter,
-- Python and R scripts ( extensions `.py` and `.R`)
+- Julia, Python and R scripts ( extensions `.jl`, `.py` and `.R`)
 - Markdown documents (extension `.md`)
 - R Markdown documents (extension `.Rmd`).
 
@@ -40,7 +40,7 @@ Try our package on [![Binder](https://mybinder.org/badge.svg)](https://mybinder.
 
 ## Installation
 
-To open `.py`, `.R`, `.md` and `.Rmd` files as notebooks in Jupyter, use our `ContentsManager`. To do so:
+To open `.jl`, `.py`, `.R`, `.md` and `.Rmd` files as notebooks in Jupyter, use our `ContentsManager`. To do so:
 - generate a jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit the config and include the below:
 ```python
@@ -133,7 +133,7 @@ Implement these [specifications](https://rmarkdown.rstudio.com/articles_report_f
 - Markdown cells are commented with `#' `
 - Code cells are exported verbatim. Cell metadata are signalled with `#+`. Cells end with a blank line, an explicit start of cell marker, or a markdown comment.
 
-### Python scripts
+### Python and Julia scripts
 
 We wanted to represent Jupyter notebooks with the least explicit markers possible. The rationale for that is to allow **arbitrary** python files to open as Jupyter notebooks, even files which were never prepared to become a notebook. Precisely:
 - Jupyter metadata go to an escaped YAML header

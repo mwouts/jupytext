@@ -7,7 +7,7 @@ from nbformat.v4.nbbase import new_notebook
 from jupytext import readf, writef, writes, file_format_version
 from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext
 from jupytext.compare import compare_notebooks
-from .utils import list_all_notebooks
+from .utils import list_all_notebooks, list_py_notebooks
 
 file_format_version.FILE_FORMAT_VERSION = {}
 
@@ -26,7 +26,7 @@ def test_cli_multiple_files(nb_files):
 
 
 @pytest.mark.parametrize('nb_file',
-                         list_all_notebooks('.ipynb'))
+                         list_py_notebooks('.ipynb'))
 def test_convert_single_file_in_place(nb_file, tmpdir):
     nb_org = str(tmpdir.join(os.path.basename(nb_file)))
     base, ext = os.path.splitext(nb_org)
@@ -55,7 +55,7 @@ def test_convert_single_file(nb_file, capsys):
 
 
 @pytest.mark.parametrize('nb_files',
-                         [list_all_notebooks('.ipynb')])
+                         [list_py_notebooks('.ipynb')])
 def test_convert_multiple_file(nb_files, tmpdir):
     nb_orgs = []
     nb_others = []

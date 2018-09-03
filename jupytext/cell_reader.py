@@ -114,8 +114,8 @@ class CellReader():
             self.language, self.metadata = \
                 rmd_options_to_metadata('r ' + _CODE_OPTION_R.findall(line)[0])
 
-        if self.ext == '.py' and _CODE_OPTION_PY.match(line):
-            self.language = 'python'
+        if self.ext in ['.py', '.jl'] and _CODE_OPTION_PY.match(line):
+            self.language = 'python' if self.ext == '.py' else 'julia'
             self.metadata = json_options_to_metadata(
                 _CODE_OPTION_PY.match(line).group(3))
 
@@ -198,7 +198,7 @@ class CellReader():
         """Given that this is a code cell, return position of
         end of cell marker, and position of next cell start"""
         self.cell_type = 'code'
-        parser = StringParser('python' if self.ext == '.py' else 'R')
+        parser = StringParser('python' if self.ext in ['.py', '.jl'] else 'R')
         empty = True
         for i, line in enumerate(lines):
             # skip cell header
@@ -235,7 +235,7 @@ class CellReader():
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position
         of first line after cell"""
-        if self.ext == '.py':
+        if self.ext in ['.py', '.jl']:
             return self.find_cell_end_py(lines)
         if self.ext in ['.Rmd', '.md']:
             return self.find_cell_end_rmd(lines)
@@ -260,14 +260,14 @@ class CellReader():
         if self.cell_type == 'code':
             if self.ext != '.md' and is_active(self.ext, self.metadata):
                 unescape_magic(source, self.language or 'python')
-            elif self.ext in ['.py', '.R']:
+            elif self.ext in ['.py', '.jl', '.R']:
                 source = uncomment(source)
 
         if self.cell_type == 'code' or self.ext in ['.Rmd', '.md']:
             unescape_code_start(source, self.ext, self.language or
                                 ('python' if self.ext != '.Rmd' else None))
 
-        if self.cell_type == 'markdown' and self.ext in ['.py', '.R']:
+        if self.cell_type == 'markdown' and self.ext in ['.py', '.jl', '.R']:
             source = self.markdown_unescape(source)
 
         self.content = source

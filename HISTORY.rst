@@ -6,6 +6,19 @@ Release History
 dev
 +++
 
+0.6.2 (2018-09-??)
++++++++++++++++++++
+
+**Improvements**
+
+- Initial support for Jupyter notebooks as Julia scripts (#56)
+- round trip test with `jupytext --test` improved (#54)
+
+**BugFixes**
+
+- testfixtures now in requirements (#55)
+- TODO: empty code cells are now preserved (#53)
+
 0.6.1 (2018-08-31)
 +++++++++++++++++++
 

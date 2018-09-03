@@ -169,9 +169,10 @@ class CellExporter():
     def code_to_text(self):
         """Return the text representation of a code cell"""
         active = is_active(self.ext, self.metadata)
-        if self.ext in ['.R', '.py']:
+        if self.ext in ['.R', '.py', '.jl']:
             if active and self.language != (
-                    'R' if self.ext == '.R' else 'python'):
+                    'R' if self.ext == '.R' else
+                    'python' if self.ext == '.py' else 'julia'):
                 active = False
                 self.metadata['active'] = 'ipynb'
                 self.metadata['language'] = self.language
@@ -196,7 +197,7 @@ class CellExporter():
         if self.ext == '.R':
             return code_to_r(source, self.metadata)
 
-        # py
+        # py, jl
         if self.explicit_start_marker(source):
             self.metadata['endofcell'] = py_endofcell_marker(source)
 
