@@ -88,11 +88,8 @@ def file_fmt_ext(path):
     Return file name, format (possibly .nb.py) and extension (.py)
     """
     file, ext = os.path.splitext(path)
-    for fmt in ['.nb.py', '.nb.R']:
-        if path.endswith(fmt):
-            return path[:-len(fmt)], fmt, ext
-
-    return file, ext, ext
+    file, intermediate_ext = os.path.splitext(file)
+    return file, intermediate_ext + ext, ext
 
 
 class TextFileContentsManager(FileContentsManager, Configurable):
