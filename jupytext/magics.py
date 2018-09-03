@@ -74,6 +74,7 @@ _ESCAPED_CODE_START = {'.R': re.compile(r"^(# |#)*#\+"),
                        '.Rmd': re.compile(r"^(# |#)*```{.*}"),
                        '.md': re.compile(r"^(# |#)*```"),
                        '.py': re.compile(r"^(# |#)*(#|# )\+(\s*){.*}")}
+_ESCAPED_CODE_START['.jl'] = _ESCAPED_CODE_START['.py']
 
 
 def is_escaped_code_start(line, ext):

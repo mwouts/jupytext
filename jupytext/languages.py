@@ -11,7 +11,8 @@ _JUPYTER_LANGUAGES_RE = [re.compile(r"^%%{}\s*".format(lang))
 def default_language_from_metadata_and_ext(notebook, ext):
     """Return the default language for a notebook that was read
     from the given file extension"""
-    default_from_ext = 'R' if ext == '.R' else 'python'
+    default_from_ext = 'R' if ext == '.R' \
+        else 'python' if ext == '.py' else 'julia'
 
     return (notebook.metadata.get('language_info', {}).get('name')
             or notebook.metadata.get('main_language') or default_from_ext)
@@ -20,7 +21,8 @@ def default_language_from_metadata_and_ext(notebook, ext):
 def set_main_and_cell_language(metadata, cells, ext):
     """Set main language for the given collection of cells, and
     use magics for cells that use other languages"""
-    default_from_ext = 'R' if ext == '.R' else 'python'
+    default_from_ext = 'R' if ext == '.R' \
+        else 'python' if ext == '.py' else 'julia'
     main_language = (metadata.get('language_info', {}).get('name') or
                      metadata.get('main_language'))
     if main_language is None:

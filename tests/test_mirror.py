@@ -8,7 +8,8 @@ import sys
 import pytest
 from testfixtures import compare
 import jupytext
-from .utils import list_all_notebooks, list_r_notebooks
+from .utils import list_all_notebooks, list_r_notebooks, \
+    list_julia_notebooks, list_py_notebooks
 
 jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
@@ -17,6 +18,8 @@ def mirror_file(nb_file):
     dir, file = os.path.split(nb_file)
     if nb_file.endswith('.py'):
         return os.path.join(dir, 'mirror', file.replace('.py', '.ipynb'))
+    if nb_file.endswith('.jl'):
+        return os.path.join(dir, 'mirror', file.replace('.jl', '.ipynb'))
     if nb_file.endswith('.Rmd'):
         return os.path.join(dir, 'mirror', file.replace('.Rmd', '.ipynb'))
     return os.path.join(dir, 'mirror', file.replace('.ipynb', '.py'))
@@ -70,7 +73,7 @@ def test_rmd_unchanged(rmd_file):
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
                     reason="unordered dict result in changes in chunk options")
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
 def test_py_unchanged_ipynb(nb_file):
     py_file = mirror_file(nb_file)
     create_if_missing(py_file, nb_file)
@@ -93,3 +96,26 @@ def test_R_unchanged_ipynb(nb_file):
 
     r = jupytext.writes(jupytext.readf(nb_file), ext='.R')
     compare(r, r_ref)
+
+
+@pytest.mark.parametrize('nb_file', list_julia_notebooks('.ipynb'))
+def test_julia_unchanged_ipynb(nb_file):
+    julia_file = mirror_file(nb_file).replace('.py', '.jl')
+    create_if_missing(julia_file, nb_file)
+    with open(julia_file, encoding='utf-8') as fp:
+        julia_ref = fp.read()
+
+    julia = jupytext.writes(jupytext.readf(nb_file), ext='.jl')
+    compare(julia, julia_ref)
+
+
+@pytest.mark.parametrize('script_file', list_all_notebooks('.jl'))
+def test_julia_unchanged(script_file):
+    with open(script_file, encoding='utf-8') as fp:
+        julia = fp.read()
+
+    ipynb_file = mirror_file(script_file)
+    create_if_missing(ipynb_file, script_file)
+
+    julia_ref = jupytext.writes(jupytext.readf(ipynb_file), ext='.jl')
+    compare(julia, julia_ref)

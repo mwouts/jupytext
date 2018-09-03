@@ -11,8 +11,9 @@ FILE_FORMAT_VERSION = {
     '.md': '1.0',
     # Version 1.0 on 2018-08-31 - jupytext v0.6.0 : Initial version
 
-    # Python scripts
+    # Python and Julia scripts
     '.py': '1.1',
+    '.jl': '1.1',
     # Version 1.1 on 2018-08-25 - jupytext v0.6.0 : Cells separated with one
     # blank line #38
     # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version

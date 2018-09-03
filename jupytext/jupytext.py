@@ -23,7 +23,7 @@ from .languages import default_language_from_metadata_and_ext, \
 from .cell_to_text import CellExporter
 from .cell_reader import CellReader
 
-NOTEBOOK_EXTENSIONS = ['.ipynb', '.Rmd', '.md', '.py', '.R']
+NOTEBOOK_EXTENSIONS = ['.ipynb', '.Rmd', '.md', '.jl', '.py', '.R']
 
 
 def markdown_comment(ext):
@@ -127,7 +127,8 @@ class TextNotebookWriter(NotebookWriter):
 
             # remove end of cell marker when redundant
             # with next explicit marker
-            if self.ext == '.py' and cell.is_code() and text[-1] == '# -':
+            if self.ext in ['.py', '.jl'] and cell.is_code() \
+                    and text[-1] == '# -':
                 if i + 1 >= len(texts) or \
                         (texts[i + 1][0].startswith('# + {')):
                     text = text[:-1]

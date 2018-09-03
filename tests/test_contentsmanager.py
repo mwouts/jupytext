@@ -4,7 +4,7 @@ import pytest
 import jupytext
 from jupytext import TextFileContentsManager, readf
 from jupytext.compare import compare_notebooks
-from .utils import list_all_notebooks
+from .utils import list_all_notebooks, list_py_notebooks
 
 jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
@@ -50,7 +50,7 @@ def test_load_save_rename(nb_file, tmpdir):
                     reason="unordered dict result in changes in chunk options")
 @pytest.mark.skipif(isinstance(TextFileContentsManager, str),
                     reason=TextFileContentsManager)
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
 def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_nbpy = 'notebook.nb.py'
@@ -81,7 +81,7 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
                     reason="unordered dict result in changes in chunk options")
 @pytest.mark.skipif(isinstance(TextFileContentsManager, str),
                     reason=TextFileContentsManager)
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
 def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_nbpy = 'notebook.nb.py'

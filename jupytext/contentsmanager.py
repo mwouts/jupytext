@@ -95,8 +95,8 @@ def file_fmt_ext(path):
 class TextFileContentsManager(FileContentsManager, Configurable):
     """
     A FileContentsManager Class that reads and stores notebooks to classical
-    Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd),
-    R scripts (.R) and python scripts (.py)
+    Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd), Julia (.jl),
+    Python (.py) or R scripts (.R)
     """
 
     nb_extensions = [ext for ext in jupytext.NOTEBOOK_EXTENSIONS if
@@ -112,7 +112,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
     default_jupytext_formats = Unicode(
         u'',
         help='Save notebooks to these file extensions. '
-             'Can be any of ipynb,Rmd,md,py,R,nb.py,nb.R comma separated',
+             'Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R '
+             'comma separated',
         config=True)
 
     def format_group(self, fmt, nbk=None):
@@ -237,8 +238,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         file, fmt, _ = file_fmt_ext(path)
         for alt_fmt in self.format_group(fmt):
             if alt_fmt.endswith('.ipynb'):
-                super(TextFileContentsManager, self).trust_notebook(file +
-                                                                    alt_fmt)
+                super(TextFileContentsManager, self) \
+                    .trust_notebook(file + alt_fmt)
 
     def rename_file(self, old_path, new_path):
         """Rename the current notebook, as well as its
@@ -252,4 +253,5 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                     super(TextFileContentsManager, self) \
                         .rename_file(old_file + alt_fmt, new_file + alt_fmt)
         else:
-            super(TextFileContentsManager, self).rename_file(old_path, new_path)
+            super(TextFileContentsManager, self) \
+                .rename_file(old_path, new_path)

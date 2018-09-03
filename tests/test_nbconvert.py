@@ -4,7 +4,8 @@ import subprocess
 import pytest
 import mock
 import jupytext
-from .utils import list_all_notebooks
+from .utils import list_all_notebooks, list_r_notebooks, \
+    list_py_notebooks, list_julia_notebooks
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
@@ -28,7 +29,7 @@ def test_nbconvert_and_read(nb_file):
 
 @pytest.mark.skipif(isinstance(jupytext.PyNotebookExporter, str),
                     reason=jupytext.PyNotebookExporter)
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
 def test_nbconvert_and_read_py(nb_file):
     # Load notebook
     nb = jupytext.readf(nb_file)
@@ -43,9 +44,26 @@ def test_nbconvert_and_read_py(nb_file):
     assert py1 == py2
 
 
-@pytest.mark.skipif(isinstance(jupytext.PyNotebookExporter, str),
-                    reason=jupytext.PyNotebookExporter)
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@pytest.mark.skipif(isinstance(jupytext.JlNotebookExporter, str),
+                    reason=jupytext.JlNotebookExporter)
+@pytest.mark.parametrize('nb_file', list_julia_notebooks('.ipynb'))
+def test_nbconvert_and_read_julia(nb_file):
+    # Load notebook
+    nb = jupytext.readf(nb_file)
+
+    # Export to py using jupytext package
+    julia = jupytext.writes(nb, ext='.jl')
+
+    # Export to py using nbconvert exporter
+    julia_exporter = jupytext.JlNotebookExporter()
+    (julia2, resources) = julia_exporter.from_notebook_node(nb)
+
+    assert julia == julia2
+
+
+@pytest.mark.skipif(isinstance(jupytext.RNotebookExporter, str),
+                    reason=jupytext.RNotebookExporter)
+@pytest.mark.parametrize('nb_file', list_r_notebooks('.ipynb'))
 def test_nbconvert_and_read_r(nb_file):
     # Load notebook
     nb = jupytext.readf(nb_file)
@@ -67,7 +85,7 @@ pytest.importorskip('jupyter')
                     reason="unordered dict result in changes in chunk options")
 @pytest.mark.skipif(isinstance(jupytext.RMarkdownExporter, str),
                     reason=jupytext.RMarkdownExporter)
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
 def test_nbconvert_cmd_line(nb_file, tmpdir):
     rmd_file = str(tmpdir.join('notebook.Rmd'))
 
@@ -90,7 +108,7 @@ def test_nbconvert_cmd_line(nb_file, tmpdir):
                     reason="unordered dict result in changes in chunk options")
 @pytest.mark.skipif(isinstance(jupytext.PyNotebookExporter, str),
                     reason=jupytext.PyNotebookExporter)
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
 def test_nbconvert_cmd_line_py(nb_file, tmpdir):
     py_file = str(tmpdir.join('notebook.py'))
 
@@ -113,7 +131,7 @@ def test_nbconvert_cmd_line_py(nb_file, tmpdir):
                     reason="unordered dict result in changes in chunk options")
 @pytest.mark.skipif(isinstance(jupytext.RNotebookExporter, str),
                     reason=jupytext.RNotebookExporter)
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_r_notebooks('.ipynb'))
 def test_nbconvert_cmd_line_R(nb_file, tmpdir):
     r_file = str(tmpdir.join('notebook.R'))
 
