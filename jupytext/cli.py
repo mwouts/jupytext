@@ -127,6 +127,6 @@ def jupytext(args=None):
                                output=args.output,
                                test_round_trip=args.test,
                                preserve_outputs=args.update)
-    except (ValueError, TypeError, FileNotFoundError) as err:
+    except (ValueError, TypeError, IOError) as err:
         print('jupytext: error: ' + str(err))
         exit(1)
