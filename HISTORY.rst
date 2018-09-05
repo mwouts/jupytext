@@ -6,18 +6,22 @@ Release History
 dev
 +++
 
-0.6.2 (2018-09-??)
+0.6.2 (2018-09-05)
 +++++++++++++++++++
 
 **Improvements**
 
 - Initial support for Jupyter notebooks as Julia scripts (#56)
-- round trip test with `jupytext --test` improved (#54)
+- Command line conversion tool `jupytext` has explicit `to` and `output`
+options (#46)
+- Round trip test with `jupytext --test` improved (#54)
+- Improved README (#51)
+
 
 **BugFixes**
 
 - testfixtures now in requirements (#55)
-- TODO: empty code cells are now preserved (#53)
+- Empty code cells are now preserved (#53)
 
 0.6.1 (2018-08-31)
 +++++++++++++++++++
