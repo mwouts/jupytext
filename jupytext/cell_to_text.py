@@ -163,7 +163,7 @@ class CellExporter():
             return True
         if all([line.startswith('#') for line in self.source]):
             return True
-        if CellReader(self.ext).read(source)[1] != len(source):
+        if CellReader(self.ext).read(source)[1] < len(source):
             return True
 
         return False
