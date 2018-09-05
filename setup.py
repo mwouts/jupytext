@@ -10,7 +10,8 @@ setup(
     version='0.6.2',
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
-    description='Jupyter notebooks as markdown documents, Python or R scripts',
+    description='Jupyter notebooks as Markdown documents, '
+                'Julia, Python or R scripts',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/mwouts/jupytext',
