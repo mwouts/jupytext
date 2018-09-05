@@ -109,17 +109,17 @@ to your Jupyter configuration file, then *every* Jupyter notebook that you save 
 The package provides a `jupytext` script for command line conversion between the various notebook extensions:
 
 ```bash
-jupytext notebook.ipynb md --test          # Test round trip conversion
-jupytext notebook.ipynb md                 # display the markdown version on screen
+jupytext notebook.ipynb --to md --test          # Test round trip conversion
+jupytext notebook.ipynb --to md --output -      # display the markdown version on screen
 
-jupytext notebook.ipynb .md                # create a notebook.md file
-jupytext notebook.ipynb .py                # create a notebook.py file
-jupytext notebook.ipynb notebook.py        # create a notebook.py file
+jupytext notebook.ipynb --to markdown           # create a notebook.md file
+jupytext notebook.ipynb --to python             # create a notebook.py file
+jupytext notebook.ipynb --output script.py      # create a notebook.py file
 
-jupytext notebook.md .ipynb                # overwrite notebook.ipynb (remove outputs)
-jupytext notebook.md .ipynb --update       # update notebook.ipynb (preserve outputs)
+jupytext notebook.md --to notebook              # overwrite notebook.ipynb (remove outputs)
+jupytext notebook.md --to notebook --update     # update notebook.ipynb (preserve outputs)
 
-jupytext notebook1.md notebook2.py .ipynb  # overwrite notebook1.ipynb notebook2.ipynb
+jupytext notebook1.md notebook2.py --to ipynb   # overwrite notebook1.ipynb notebook2.ipynb
 ```
 
 ## Format specifications
