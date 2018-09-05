@@ -22,6 +22,21 @@ class PyNotebookExporter(Exporter):
         return jupytext.writes(nb, ext='.py'), resources
 
 
+class JlNotebookExporter(Exporter):
+    """
+    Exports to a julia notebook (.jl)
+    """
+
+    @default('file_extension')
+    def _file_extension_default(self):
+        return '.jl'
+
+    def from_notebook_node(self, nb, resources=None, **kw):
+        resources = resources or {}
+        resources['output_extension'] = self.file_extension
+        return jupytext.writes(nb, ext='.jl'), resources
+
+
 class RNotebookExporter(Exporter):
     """
     Exports to a R notebook (.R)

@@ -119,6 +119,8 @@ class CellExporter():
 
         # how many blank lines before next cell
         self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', 1)
+        self.lines_to_end_of_cell_marker = \
+            cell.metadata.get('lines_to_end_of_cell_marker', 0)
 
         # for compatibility with v0.5.4 and lower (to be removed)
         if 'skipline' in cell.metadata:
@@ -161,7 +163,7 @@ class CellExporter():
             return True
         if all([line.startswith('#') for line in self.source]):
             return True
-        if CellReader(self.ext).read(source)[1] != len(source):
+        if CellReader(self.ext).read(source)[1] < len(source):
             return True
 
         return False
@@ -169,9 +171,10 @@ class CellExporter():
     def code_to_text(self):
         """Return the text representation of a code cell"""
         active = is_active(self.ext, self.metadata)
-        if self.ext in ['.R', '.py']:
+        if self.ext in ['.R', '.py', '.jl']:
             if active and self.language != (
-                    'R' if self.ext == '.R' else 'python'):
+                    'R' if self.ext == '.R' else
+                    'python' if self.ext == '.py' else 'julia'):
                 active = False
                 self.metadata['active'] = 'ipynb'
                 self.metadata['language'] = self.language
@@ -196,7 +199,7 @@ class CellExporter():
         if self.ext == '.R':
             return code_to_r(source, self.metadata)
 
-        # py
+        # py, jl
         if self.explicit_start_marker(source):
             self.metadata['endofcell'] = py_endofcell_marker(source)
 

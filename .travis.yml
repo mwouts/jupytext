@@ -9,7 +9,7 @@ python:
 # command to install dependencies
 install:
   - pip install codecov
-  - pip install pytest pytest-cov testfixtures
+  - pip install pytest pytest-cov
   - pip install notebook
   - pip install -r requirements.txt
   - pip install .

@@ -1,4 +1,4 @@
-# Jupyter notebooks as Markdown documents, Python or R scripts
+# Jupyter notebooks as Markdown documents, Julia, Python or R scripts
 
 [![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Pypi](https://img.shields.io/pypi/l/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
@@ -16,7 +16,7 @@ You've always wanted to
 ## Supported formats
 
 The `jupytext` package allows you to open and edit, in Jupyter,
-- Python and R scripts ( extensions `.py` and `.R`)
+- Julia, Python and R scripts (extensions `.jl`, `.py` and `.R`)
 - Markdown documents (extension `.md`)
 - R Markdown documents (extension `.Rmd`).
 
@@ -26,11 +26,11 @@ Reloading the updated document in Jupyter is just a matter of reloading the corr
 
 | Format       | Extension          | text editor | git friendly | preserve output |
 | ------------ | ------------------ | ----------- | ------------ | --------------- |
-| jupyter notebook | `.ipynb`       |             |              | ✔               | 
-| script/markdown  | `.py`/`.R`/`.md`/`.Rmd` | ✔  | ✔            |                 |
-| [paired notebook](#paired-notebooks)  | (`.py`/`.R`/`.md`/`.Rmd`) + `.ipynb` | ✔ | ✔ | ✔ |
+| jupyter notebook | `.ipynb`       |             |              | ✔               |
+| script/markdown  | `.jl`/`.py`/`.R`/`.md`/`.Rmd` | ✔  | ✔            |                 |
+| [paired notebook](#paired-notebooks)  | (`.jl`/`.py`/`.R`/`.md`/`.Rmd`) + `.ipynb` | ✔ | ✔ | ✔ |
 
-## Try it!
+## Try Jupytext!
 
 - See how notebooks are represented as text in our [demo](https://github.com/mwouts/jupytext/tree/master/demo) folder.
 - Open these text notebooks in Jupyter on [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)! And run then like you would do for any classical notebook.
@@ -40,7 +40,7 @@ Reloading the updated document in Jupyter is just a matter of reloading the corr
 
 ## Installation
 
-To open `.py`, `.R`, `.md` and `.Rmd` files as notebooks in Jupyter, use our `ContentsManager`. To do so:
+To open `.jl`, `.py`, `.R`, `.md` and `.Rmd` files as notebooks in Jupyter, use our `ContentsManager`. To do so:
 - generate a Jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit the config and include the following:
 ```python
@@ -68,13 +68,13 @@ Round-trip conversion is safe! A few hundred tests help guarantee this.
 - Script to Jupyter notebook, to script again is identity. If you
 associate a Jupyter kernel with your notebook, that information will go to
 a yaml header at the top of your script.
-- Markdown to Jupyter notebook, to Markdown again is identity. 
+- Markdown to Jupyter notebook, to Markdown again is identity.
 - Jupyter to script, then back to Jupyter again preserves source and metadata.
 - Jupyter to Markdown, and Jupyter again preserves source and metadata (cell metadata available only for R Markdown). Note that Markdown cells with two consecutive blank lines will be split into multiple cells (as the two blank line pattern is used to separate cells).
 
 ## Paired notebooks
 
-The idea of paired notebooks is to store a `.ipynb` file alongside the text-only version. This lets us get the best of both worlds: a text-only document to put under version control, and an easily sharable notebook which stores the outputs. 
+The idea of paired notebooks is to store a `.ipynb` file alongside the text-only version. This lets us get the best of both worlds: a text-only document to put under version control, and an easily sharable notebook which stores the outputs.
 
 To enable paired notebooks, add a `jupytext_formats` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
 ```
@@ -86,7 +86,7 @@ To enable paired notebooks, add a `jupytext_formats` entry to the notebook metad
   },
   "language_info": {
     (...)
-  }  
+  }
 }
 ```
 
@@ -109,17 +109,17 @@ to your Jupyter configuration file, then *every* Jupyter notebook that you save 
 The package provides a `jupytext` script for command line conversion between the various notebook extensions:
 
 ```bash
-jupytext notebook.ipynb md --test          # Test round trip conversion
-jupytext notebook.ipynb md                 # display the markdown version on screen
+jupytext notebook.ipynb --to md --test          # Test round trip conversion
+jupytext notebook.ipynb --to md --output -      # display the markdown version on screen
 
-jupytext notebook.ipynb .md                # create a notebook.md file
-jupytext notebook.ipynb .py                # create a notebook.py file
-jupytext notebook.ipynb notebook.py        # create a notebook.py file
+jupytext notebook.ipynb --to markdown           # create a notebook.md file
+jupytext notebook.ipynb --to python             # create a notebook.py file
+jupytext notebook.ipynb --output script.py      # create a notebook.py file
 
-jupytext notebook.md .ipynb                # overwrite notebook.ipynb (remove outputs)
-jupytext notebook.md .ipynb --update       # update notebook.ipynb (preserve outputs)
+jupytext notebook.md --to notebook              # overwrite notebook.ipynb (remove outputs)
+jupytext notebook.md --to notebook --update     # update notebook.ipynb (preserve outputs)
 
-jupytext notebook1.md notebook2.py .ipynb  # overwrite notebook1.ipynb notebook2.ipynb
+jupytext notebook1.md notebook2.py --to ipynb   # overwrite notebook1.ipynb notebook2.ipynb
 ```
 
 ## Format specifications
@@ -138,7 +138,7 @@ Implement these [specifications](https://rmarkdown.rstudio.com/articles_report_f
 - Markdown cells are commented with `#' `
 - Code cells are exported verbatim. Cell metadata are signalled with `#+`. Cells end with a blank line, an explicit start of cell marker, or a Markdown comment.
 
-### Python scripts
+### Python and Julia scripts
 
 We wanted to represent Jupyter notebooks with the least explicit markers possible. The rationale for that is to allow **arbitrary** python files to open as Jupyter notebooks, even files which were never prepared to become a notebook. Precisely:
 - Jupyter metadata go to an escaped YAML header

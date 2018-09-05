@@ -17,8 +17,10 @@ try:
     from .rmarkdownexporter import RMarkdownExporter
     from .srcexporter import PyNotebookExporter
     from .srcexporter import RNotebookExporter
+    from .srcexporter import JlNotebookExporter
 except ImportError as err:
-    RMarkdownExporter = PyNotebookExporter = RNotebookExporter = str(err)
+    RMarkdownExporter = PyNotebookExporter = JlNotebookExporter =\
+        RNotebookExporter = str(err)
 
 try:
     from .contentsmanager import TextFileContentsManager

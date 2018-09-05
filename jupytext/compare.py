@@ -6,7 +6,7 @@ from .jupytext import reads, writes
 from .combine import combine_inputs_with_outputs
 
 
-def filter_cell(cell, preserve_outputs):
+def filtered_cell(cell, preserve_outputs):
     """Cell type, metadata and source from given cell"""
     filtered = {'cell_type': cell.cell_type,
                 'source': cell.source,
@@ -18,21 +18,25 @@ def filter_cell(cell, preserve_outputs):
     return filtered
 
 
+def filtered_notebook_metadata(notebook):
+    """Notebook metadata, filtered for metadata added by Jupytext itself"""
+    return {key: notebook.metadata[key] for key
+            in notebook.metadata if not key.startswith('jupytext_')}
+
+
 def compare_notebooks(notebook_expected, notebook_actual,
                       allow_split_markdown=False, test_outputs=False):
     """Compare the two notebooks, and raise with a meaningful message
     that explains one difference, if any"""
 
-    # Compare notebook metadata
-    compare(notebook_expected.metadata, notebook_actual.metadata)
-
-    # Compare cells
+    # Compare cells type and content
     test_cell_iter = iter(notebook_actual.cells)
     for ref_cell in notebook_expected.cells:
         try:
             test_cell = next(test_cell_iter)
         except StopIteration:
-            compare(filter_cell(ref_cell, preserve_outputs=test_outputs), None)
+            compare(filtered_cell(ref_cell,
+                                  preserve_outputs=test_outputs), None)
 
         if allow_split_markdown and ref_cell.cell_type == 'markdown':
             ref_lines = [line for line in ref_cell.source.splitlines()
@@ -58,10 +62,14 @@ def compare_notebooks(notebook_expected, notebook_actual,
             compare(ref_lines, test_lines)
             continue
 
-        ref_cell = filter_cell(ref_cell, preserve_outputs=test_outputs)
-        test_cell = filter_cell(test_cell, preserve_outputs=test_outputs)
+        ref_cell = filtered_cell(ref_cell, preserve_outputs=test_outputs)
+        test_cell = filtered_cell(test_cell, preserve_outputs=test_outputs)
 
         compare(ref_cell, test_cell)
+
+    # Compare notebook metadata
+    compare(filtered_notebook_metadata(notebook_expected),
+            filtered_notebook_metadata(notebook_actual))
 
 
 def test_round_trip_conversion(notebook, ext, test_outputs):
