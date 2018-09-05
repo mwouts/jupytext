@@ -119,6 +119,8 @@ class CellExporter():
 
         # how many blank lines before next cell
         self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', 1)
+        self.lines_to_end_of_cell_marker = \
+            cell.metadata.get('lines_to_end_of_cell_marker', 0)
 
         # for compatibility with v0.5.4 and lower (to be removed)
         if 'skipline' in cell.metadata:

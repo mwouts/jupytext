@@ -17,7 +17,8 @@ from .languages import _JUPYTER_LANGUAGES
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
 _IGNORE_METADATA = ['collapsed', 'autoscroll', 'deletable', 'format',
-                    'trusted', 'skipline', 'noskipline', 'lines_to_next_cell']
+                    'trusted', 'skipline', 'noskipline', 'lines_to_next_cell',
+                    'lines_to_end_of_cell_marker']
 
 
 def _r_logical_values(pybool):

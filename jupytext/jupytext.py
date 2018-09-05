@@ -129,7 +129,10 @@ class TextNotebookWriter(NotebookWriter):
             # with next explicit marker
             if self.ext in ['.py', '.jl'] and cell.is_code() \
                     and text[-1] == '# -':
-                if i + 1 >= len(texts) or \
+                if cell.lines_to_end_of_cell_marker:
+                    text = text[:-1] + \
+                           [''] * cell.lines_to_end_of_cell_marker + ['# -']
+                elif i + 1 >= len(texts) or \
                         (texts[i + 1][0].startswith('# + {')):
                     text = text[:-1]
 
