@@ -122,11 +122,11 @@ def jupytext(args=None):
     """Entry point for the jupytext script"""
     try:
         args = cli_jupytext(args)
-    except (ValueError, TypeError) as err:
+        convert_notebook_files(nb_files=args.notebooks,
+                               ext=args.to,
+                               output=args.output,
+                               test_round_trip=args.test,
+                               preserve_outputs=args.update)
+    except (ValueError, TypeError, FileNotFoundError) as err:
         print('jupytext: error: ' + str(err))
         exit(1)
-    convert_notebook_files(nb_files=args.notebooks,
-                           ext=args.to,
-                           output=args.output,
-                           test_round_trip=args.test,
-                           preserve_outputs=args.update)

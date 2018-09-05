@@ -169,7 +169,7 @@ def test_combine_lower_version_raises(tmpdir):
     nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
     writef(nb, tmp_ipynb)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(SystemExit):
         with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
                         {'.py': '1.0'}):
             jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
