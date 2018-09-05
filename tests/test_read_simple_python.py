@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import pytest
 import jupytext
 from testfixtures import compare
 from .python_notebook_sample import f, g
@@ -495,10 +494,9 @@ d = 6
     assert len(notebook.cells) >= 6
     for cell in notebook.cells:
         lines = cell.source.splitlines()
-        if len(lines) == 1:
-            continue
-        assert lines[0]
-        assert lines[-1]
+        if len(lines) != 1:
+            assert lines[0]
+            assert lines[-1]
 
     script2 = jupytext.writes(notebook, ext='.py')
 

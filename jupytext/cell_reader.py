@@ -58,6 +58,15 @@ def count_lines_to_next_cell(cell_end_marker, next_cell_start,
     return 1
 
 
+def last_two_lines_blank(source):
+    """Are the two last lines blank, and not the third last one?"""
+    if len(source) < 3:
+        return False
+    return (not _BLANK_LINE.match(source[-3]) and
+            _BLANK_LINE.match(source[-2]) and
+            _BLANK_LINE.match(source[-1]))
+
+
 class CellReader():
     """A class that can read notebook cells from their text representation"""
 
@@ -199,16 +208,9 @@ class CellReader():
         end of cell marker, and position of next cell start"""
         self.cell_type = 'code'
         parser = StringParser('python' if self.ext in ['.py', '.jl'] else 'R')
-        empty = True
         for i, line in enumerate(lines):
             # skip cell header
             if self.metadata is not None and i == 0:
-                continue
-
-            # Read something!
-            if not _BLANK_LINE.match(line):
-                empty = False
-            elif empty:
                 continue
 
             if parser.is_quoted():
@@ -228,7 +230,10 @@ class CellReader():
                     return i, i + 1, True
             elif _BLANK_LINE.match(line):
                 if not next_code_is_indented(lines[i:]):
-                    return i, i + 1, False
+                    if i > 0:
+                        return i, i + 1, False
+                    if len(lines) == 1 or _BLANK_LINE.match(lines[1]):
+                        return 1, 2, False
 
         return len(lines), len(lines), False
 
@@ -273,10 +278,8 @@ class CellReader():
         self.content = source
 
         # Exactly two empty lines at the end?
-        if (self.ext == '.py' and explicit_eoc and len(source) > 2 and
-                not _BLANK_LINE.match(source[-3]) and
-                _BLANK_LINE.match(source[-2]) and
-                _BLANK_LINE.match(source[-1])):
+        if (self.ext == '.py' and explicit_eoc and
+                last_two_lines_blank(source)):
             self.content = source[:-2]
             self.metadata['lines_to_end_of_cell_marker'] = 2
 
@@ -288,16 +291,16 @@ class CellReader():
                 del self.metadata['active']
             self.cell_type = 'raw'
 
-        # Does the next cell start one/two lines later?
-        if (next_cell_start + 2 < len(lines) and
+        # Explicit end of cell marker?
+        if (next_cell_start + 1 < len(lines) and
                 _BLANK_LINE.match(lines[next_cell_start]) and
-                _BLANK_LINE.match(lines[next_cell_start + 1]) and
-                not _BLANK_LINE.match(lines[next_cell_start + 2])):
-            next_cell_start += 2
-        elif (next_cell_start + 1 < len(lines) and
-              _BLANK_LINE.match(lines[next_cell_start]) and
-              not _BLANK_LINE.match(lines[next_cell_start + 1])):
+                not _BLANK_LINE.match(lines[next_cell_start + 1])):
             next_cell_start += 1
+        elif (explicit_eoc and next_cell_start + 2 < len(lines) and
+              _BLANK_LINE.match(lines[next_cell_start]) and
+              _BLANK_LINE.match(lines[next_cell_start + 1]) and
+              not _BLANK_LINE.match(lines[next_cell_start + 2])):
+            next_cell_start += 2
 
         self.lines_to_next_cell = count_lines_to_next_cell(
             cell_end_marker,

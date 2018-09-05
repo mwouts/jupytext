@@ -17,7 +17,6 @@ def test_file_with_blank_lines(blank_lines):
     compare(py_script, py_script2)
 
 
-@pytest.mark.skip(reason='#53')
 @pytest.mark.parametrize('blank_cells', range(1, 3))
 def test_notebook_with_empty_cells(blank_cells):
     notebook = new_notebook(cells=[new_markdown_cell('markdown cell one')] +
