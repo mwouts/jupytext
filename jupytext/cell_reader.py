@@ -272,6 +272,14 @@ class CellReader():
 
         self.content = source
 
+        # Exactly two empty lines at the end?
+        if (self.ext == '.py' and explicit_eoc and len(source) > 2 and
+                not _BLANK_LINE.match(source[-3]) and
+                _BLANK_LINE.match(source[-2]) and
+                _BLANK_LINE.match(source[-1])):
+            self.content = source[:-2]
+            self.metadata['lines_to_end_of_cell_marker'] = 2
+
         # Is this a raw cell?
         if not is_active('ipynb', self.metadata) or (
                 self.ext == '.md' and self.cell_type == 'code'
@@ -280,10 +288,15 @@ class CellReader():
                 del self.metadata['active']
             self.cell_type = 'raw'
 
-        # Does the next cell start one line later?
-        if (next_cell_start + 1 < len(lines) and
+        # Does the next cell start one/two lines later?
+        if (next_cell_start + 2 < len(lines) and
                 _BLANK_LINE.match(lines[next_cell_start]) and
-                not _BLANK_LINE.match(lines[next_cell_start + 1])):
+                _BLANK_LINE.match(lines[next_cell_start + 1]) and
+                not _BLANK_LINE.match(lines[next_cell_start + 2])):
+            next_cell_start += 2
+        elif (next_cell_start + 1 < len(lines) and
+              _BLANK_LINE.match(lines[next_cell_start]) and
+              not _BLANK_LINE.match(lines[next_cell_start + 1])):
             next_cell_start += 1
 
         self.lines_to_next_cell = count_lines_to_next_cell(

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import pytest
 import jupytext
 from testfixtures import compare
 from .python_notebook_sample import f, g
@@ -452,3 +453,53 @@ print('Hello world')
     nb = jupytext.reads(pynb, ext='.py')
     pynb2 = jupytext.writes(nb, ext='.py')
     compare(pynb, pynb2)
+
+
+def test_notebook_blank_lines(script="""# + {}
+# This is a comment
+# followed by two variables
+a = 3
+
+b = 4
+# -
+
+# New cell is a variable
+c = 5
+
+
+# + {}
+# Now we have two functions
+def f(x):
+    return x + x
+
+
+def g(x):
+    return x + x + x
+
+
+# -
+
+
+# A commented block that is two lines away
+# from previous cell
+
+# A function again
+def h(x):
+    return x + 1
+
+
+# variable
+d = 6
+"""):
+    notebook = jupytext.reads(script, ext='.py')
+    assert len(notebook.cells) >= 6
+    for cell in notebook.cells:
+        lines = cell.source.splitlines()
+        if len(lines) == 1:
+            continue
+        assert lines[0]
+        assert lines[-1]
+
+    script2 = jupytext.writes(notebook, ext='.py')
+
+    compare(script, script2)
