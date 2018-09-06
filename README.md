@@ -8,9 +8,9 @@
 [![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)
 
-You've always wanted to 
-* edit Jupyter notebooks in your favorite editor? 
-* have Jupyter notebooks under version control? 
+You've always wanted to
+* edit Jupyter notebooks in your favorite editor?
+* have Jupyter notebooks under version control?
 * *collaborate* on Jupyter notebooks using standard (text-only) merge tools?
 
 ## Supported formats
@@ -38,6 +38,18 @@ Reloading the updated document in Jupyter is just a matter of reloading the corr
 - Feel free to explore the package files with Jupyter (open `README.md` at the project root).
 - Check by yourself that outputs and variables are preserved, and inputs are updated, when a [paired notebook](#paired-notebooks) is modified outside of Jupyter (this is `Paired Jupyter notebook and python script.ipynb`).
 
+## A quick demo
+
+- We start with a Jupyter notebook. The notebook includes a plot of world population.
+- Plot legend is not in order of decreasing population, we'll fix this.
+- We edit the notebook metadata and add a `jupytext_formats` entry.
+- Notebook is saved as both `.ipynb` and `.py` files.
+- Python script opened with PyCharm is modified and tested. Circulating in code and documentation is easier than in Jupyter.
+- Plot in PyCharm has the legend in the correct order.
+- Jupyter notebook is refreshed. Modified inputs are loaded from python script. Outputs and variables are preserved. We finally rerun the code and get the correct plot.
+
+![](https://raw.githubusercontent.com/mwouts/jupytext/master/img/JupyterPyCharm.gif)
+
 ## Installation
 
 To open `.jl`, `.py`, `.R`, `.md` and `.Rmd` files as notebooks in Jupyter, use our `ContentsManager`. To do so:
@@ -52,15 +64,6 @@ Then, make sure you have the `jupytext` package up-to-date and restart jupyter, 
 pip install jupytext --upgrade
 jupyter notebook
 ```
-
-## Screenshots
-
-The animated GIF below demonstrates the same notebook with three different extensions
-- Original `.ipynb` file, in JSON format (5.5MB). Not adapted to text editors, but great for use in Jupyter, and also a perfect support for sharing your work. GitHub has full support for displaying notebooks and their outputs.
-- Paired python script (`.py`, 2.2KB). An excellent format for developing Jupyter notebooks with complex code: code is easily refactored. Navigating through code and documentation is easier than in Jupyter. Step by step execution and breakpoints are accessible. Notebooks as python scripts are, in our opinion, the best candidate for versioning and collaborating on Jupyter notebooks - for sure you already have lots of practice on collaborating on simple scripts with Git, right? And when you're done with developping, you just need to refresh the notebook in Jupyter, run it all, save and share!
-- Paired markdown document (`.md`, 2.2KB). An excellent format for developing documentation with few code samples.
-
-![](https://raw.githubusercontent.com/mwouts/jupytext/master/img/jupyter_python_markdown.gif)
 
 ## Round-trip conversion
 
