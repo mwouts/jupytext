@@ -10,6 +10,7 @@ from jupytext.compare import compare_notebooks
 from .utils import list_all_notebooks, list_py_notebooks
 
 file_format_version.FILE_FORMAT_VERSION = {}
+file_format_version.MIN_FILE_FORMAT_VERSION = {}
 
 
 @pytest.mark.parametrize('nb_file',

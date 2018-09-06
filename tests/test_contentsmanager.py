@@ -7,6 +7,7 @@ from jupytext.compare import compare_notebooks
 from .utils import list_all_notebooks, list_py_notebooks
 
 jupytext.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.file_format_version.MIN_FILE_FORMAT_VERSION = {}
 
 
 @pytest.mark.skipif(isinstance(TextFileContentsManager, str),

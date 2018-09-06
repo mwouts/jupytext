@@ -146,7 +146,7 @@ Implement these [specifications](https://rmarkdown.rstudio.com/articles_report_f
 We wanted to represent Jupyter notebooks with the least explicit markers possible. The rationale for that is to allow **arbitrary** python files to open as Jupyter notebooks, even files which were never prepared to become a notebook. Precisely:
 - Jupyter metadata go to an escaped YAML header
 - Markdown cells are commented with `# `, and separated with a blank line
-- Code cells are exported verbatim (except for Jupyter magics, which are escaped), and separated with blank lines. Code cells are reconstructed from consistent python paragraphs (no function, class or multiline comment will be broken). A start-of-cell delimiter `# + {}` is used for cells that have explicit metadata (inside the curly bracket, in JSON format), and for cells that include blank lines (outside of functions, classes, etc). The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
+- Code cells are exported verbatim (except for Jupyter magics, which are escaped), and separated with blank lines. Code cells are reconstructed from consistent python paragraphs (no function, class or multiline comment will be broken). A start-of-cell delimiter `# + {}` is used for cells that have explicit metadata (inside the curly bracket, in JSON format), and `# +` is used for cells that include blank lines (outside of functions, classes, etc). The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
 ## Will my notebook really run in an IDE?
 

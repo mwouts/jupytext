@@ -31,7 +31,7 @@ a * b + c
 # metadata and an end-of-cell marker. Metadata information in json format,
 # escaped with '#+' or '# +'
 
-# + {}
+# +
 def g(x):
     return x + 2
 
