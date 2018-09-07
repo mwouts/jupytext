@@ -6,6 +6,19 @@ Release History
 dev
 +++
 
+0.6.3 (2018-09-07)
++++++++++++++++++++
+
+**Improvements**
+
+- Lighter cell markers for Python and Julia scripts (#57). Corresponding file
+format version at 1.2. Scripts in previous version 1.1 can still be opened.
+- New screenshots for the README.
+
+**BugFixes**
+
+- Command line conversion tool `jupytext` fixed on Python 2.7 (#46)
+
 0.6.2 (2018-09-05)
 +++++++++++++++++++
 
