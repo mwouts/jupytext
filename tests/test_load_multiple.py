@@ -60,4 +60,7 @@ def test_combine_lower_version_raises(tmpdir):
     with pytest.raises(HTTPError):
         with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
                         {'.py': '1.0'}):
-            cm.get(tmp_ipynb)
+            with mock.patch(
+                    'jupytext.file_format_version.MIN_FILE_FORMAT_VERSION',
+                            {'.py': '1.0'}):
+                cm.get(tmp_ipynb)

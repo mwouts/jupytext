@@ -10,6 +10,7 @@ from jupytext.compare import compare_notebooks
 from .utils import list_all_notebooks, list_py_notebooks
 
 file_format_version.FILE_FORMAT_VERSION = {}
+file_format_version.MIN_FILE_FORMAT_VERSION = {}
 
 
 @pytest.mark.parametrize('nb_file',
@@ -172,4 +173,7 @@ def test_combine_lower_version_raises(tmpdir):
     with pytest.raises(SystemExit):
         with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
                         {'.py': '1.0'}):
-            jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
+            with mock.patch(
+                    'jupytext.file_format_version.MIN_FILE_FORMAT_VERSION',
+                            {'.py': '1.0'}):
+                jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])

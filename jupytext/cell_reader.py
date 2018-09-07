@@ -12,6 +12,7 @@ _START_CODE_MD = re.compile(r"^```(.*)")
 _END_CODE_MD = re.compile(r"^```\s*$")
 _CODE_OPTION_R = re.compile(r"^#\+(.*)\s*$")
 _CODE_OPTION_PY = re.compile(r"^(#|# )\+(\s*){(.*)}\s*$")
+_SIMPLE_START_CODE_PY = re.compile(r"^(#|# )\+(\s*)$")
 _BLANK_LINE = re.compile(r"^\s*$")
 _PY_COMMENT = re.compile(r"^\s*#")
 _PY_INDENTED = re.compile(r"^\s")
@@ -123,10 +124,14 @@ class CellReader():
             self.language, self.metadata = \
                 rmd_options_to_metadata('r ' + _CODE_OPTION_R.findall(line)[0])
 
-        if self.ext in ['.py', '.jl'] and _CODE_OPTION_PY.match(line):
-            self.language = 'python' if self.ext == '.py' else 'julia'
-            self.metadata = json_options_to_metadata(
-                _CODE_OPTION_PY.match(line).group(3))
+        if self.ext in ['.py', '.jl']:
+            if _CODE_OPTION_PY.match(line):
+                self.language = 'python' if self.ext == '.py' else 'julia'
+                self.metadata = json_options_to_metadata(
+                    _CODE_OPTION_PY.match(line).group(3))
+            if _SIMPLE_START_CODE_PY.match(line):
+                self.language = 'python' if self.ext == '.py' else 'julia'
+                self.metadata = {}
 
         if self.metadata and 'language' in self.metadata:
             self.language = self.metadata['language']
@@ -224,6 +229,11 @@ class CellReader():
                 if i > 1 and _BLANK_LINE.match(lines[i - 1]):
                     return i - 1, i, False
                 return i, i, False
+
+            if i > 0 and cell_start_re == _CODE_OPTION_PY and \
+                    _BLANK_LINE.match(lines[i - 1]) and \
+                    _SIMPLE_START_CODE_PY.match(line):
+                return i - 1, i, False
 
             if cell_end_re:
                 if cell_end_re.match(line):

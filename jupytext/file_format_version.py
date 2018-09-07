@@ -12,8 +12,10 @@ FILE_FORMAT_VERSION = {
     # Version 1.0 on 2018-08-31 - jupytext v0.6.0 : Initial version
 
     # Python and Julia scripts
-    '.py': '1.1',
-    '.jl': '1.1',
+    '.py': '1.2',
+    '.jl': '1.2',
+    # Version 1.2 on 2018-09-05 - jupytext v0.6.3 : Metadata bracket can be
+    # omitted when empty, if previous line is empty #57
     # Version 1.1 on 2018-08-25 - jupytext v0.6.0 : Cells separated with one
     # blank line #38
     # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
@@ -23,12 +25,20 @@ FILE_FORMAT_VERSION = {
     # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
 }
 
+MIN_FILE_FORMAT_VERSION = {'.Rmd': '1.0', '.md': '1.0', '.py': '1.1',
+                           '.jl': '1.1', '.R': '1.0'}
+
 FILE_FORMAT_VERSION_ORG = FILE_FORMAT_VERSION
 
 
 def file_format_version(ext):
     """Return file format version for given ext"""
     return FILE_FORMAT_VERSION.get(ext)
+
+
+def min_file_format_version(ext):
+    """Return minimum file format version for given ext"""
+    return MIN_FILE_FORMAT_VERSION.get(ext)
 
 
 def check_file_version(notebook, source_path, outputs_path):
@@ -47,7 +57,11 @@ def check_file_version(notebook, source_path, outputs_path):
     if version == current:
         return
 
-    # Not merging? OK
+    # Version larger than minimum readable version
+    if version <= current and version >= min_file_format_version(ext):
+        return
+
+        # Not merging? OK
     if source_path == outputs_path:
         return
 

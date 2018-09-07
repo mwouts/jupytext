@@ -125,6 +125,10 @@ class TextNotebookWriter(NotebookWriter):
         for i, cell in enumerate(cells):
             text = texts[i]
 
+            # Simplify cell marker when previous line is blank
+            if text[0] == '# + {}' and (not lines or not lines[-1]):
+                text[0] = '# +'
+
             # remove end of cell marker when redundant
             # with next explicit marker
             if self.ext in ['.py', '.jl'] and cell.is_code() \

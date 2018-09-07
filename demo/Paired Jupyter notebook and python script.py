@@ -14,7 +14,7 @@
 #     nbconvert_exporter: python
 #     pygments_lexer: ipython3
 #     version: 3.6.5
-#   jupytext_format_version: '1.1'
+#   jupytext_format_version: '1.2'
 #   jupytext_formats: ipynb,py
 # ---
 
@@ -36,7 +36,7 @@
 
 # %matplotlib inline
 
-# + {}
+# +
 import matplotlib.pyplot as plt
 import numpy as np
 

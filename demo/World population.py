@@ -1,6 +1,6 @@
 # ---
 # jupyter:
-#   jupytext_format_version: '1.1'
+#   jupytext_format_version: '1.2'
 #   jupytext_formats: ipynb,py,md
 #   kernelspec:
 #     display_name: Python 3
@@ -26,7 +26,7 @@
 # [World Bank](http://www.worldbank.org/)
 # using the [wbdata](https://github.com/OliverSherouse/wbdata) python package
 
-# + {}
+# +
 import pandas as pd
 import wbdata as wb
 
@@ -90,7 +90,7 @@ plt.show()
 # [on their way](https://github.com/plotly/plotly.js/pull/2960) at Plotly. For
 # now we just do a stacked bar plot.
 
-# + {}
+# +
 import plotly.offline as offline
 import plotly.graph_objs as go
 

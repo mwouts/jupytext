@@ -116,7 +116,7 @@ def test_read_cell_two_blank_lines(pynb="""# ---
 # title: cell with two consecutive blank lines
 # ---
 
-# + {}
+# +
 a = 1
 
 
@@ -137,7 +137,7 @@ a + 2
 
 def test_read_cell_explicit_start(pynb='''
 import pandas as pd
-# + {}
+# +
 def data():
     return pd.DataFrame({'A': [0, 1]})
 
@@ -151,21 +151,21 @@ data()
 
 def test_read_complex_cells(pynb='''import pandas as pd
 
-# + {}
+# +
 def data():
     return pd.DataFrame({'A': [0, 1]})
 
 
 data()
 
-# + {}
+# +
 def data2():
     return pd.DataFrame({'B': [0, 1]})
 
 
 data2()
 
-# + {}
+# +
 # Finally we have a cell with only comments
 # This cell should remain a code cell and not get converted
 # to markdown
@@ -203,7 +203,7 @@ data2()
 def test_read_prev_function(
         pynb="""def test_read_cell_explicit_start_end(pynb='''
 import pandas as pd
-# + {}
+# +
 def data():
     return pd.DataFrame({'A': [0, 1]})
 
@@ -228,7 +228,7 @@ def test_read_cell_with_one_blank_line_end(pynb="""import pandas
     compare(pynb, pynb2)
 
 
-def test_read_code_cell_fully_commented(pynb="""# + {}
+def test_read_code_cell_fully_commented(pynb="""# +
 # This is a code cell that
 # only contains comments
 """):
@@ -250,7 +250,7 @@ def test_file_with_two_blank_line_end(pynb="""import pandas
     compare(pynb, pynb2)
 
 
-def test_one_blank_lines_after_endofcell(pynb="""# + {}
+def test_one_blank_lines_after_endofcell(pynb="""# +
 # This is a code cell with explicit end of cell
 1 + 1
 
@@ -275,13 +275,13 @@ def test_one_blank_lines_after_endofcell(pynb="""# + {}
     compare(pynb, pynb2)
 
 
-def test_two_cells_with_explicit_start(pynb="""# + {}
+def test_two_cells_with_explicit_start(pynb="""# +
 # Cell one
 1 + 1
 
 1 + 1
 
-# + {}
+# +
 # Cell two
 2 + 2
 
@@ -303,7 +303,7 @@ def test_two_cells_with_explicit_start(pynb="""# + {}
     compare(pynb, pynb2)
 
 
-def test_escape_start_pattern(pynb="""# The code start pattern '# + {}' can
+def test_escape_start_pattern(pynb="""# The code start pattern '# +' can
 # appear in code and markdown cells.
 
 # In markdown cells it is escaped like here:
@@ -454,7 +454,7 @@ print('Hello world')
     compare(pynb, pynb2)
 
 
-def test_notebook_blank_lines(script="""# + {}
+def test_notebook_blank_lines(script="""# +
 # This is a comment
 # followed by two variables
 a = 3
@@ -466,7 +466,7 @@ b = 4
 c = 5
 
 
-# + {}
+# +
 # Now we have two functions
 def f(x):
     return x + x
