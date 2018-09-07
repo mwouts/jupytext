@@ -1,6 +1,6 @@
 # ---
 # jupyter:
-#   jupytext_format_version: '1.1'
+#   jupytext_format_version: '1.2'
 #   jupytext_formats: ipynb,py,md
 #   kernelspec:
 #     display_name: Python 3
