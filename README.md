@@ -35,7 +35,7 @@ You like to work with scripts? The good news is that plain scripts, which you ca
 
 ### Code refactoring
 
-In the following we propose a quick demo of Jupytext. While the example remains simple, it shows how your favorite text editor or IDE can be used to edit your Jupyter notebooks. IDEs are more convenient than Jupyter for navigating through code, editing and executing cells or fractions of cells, and debugging.
+In the animation below we propose a quick demo of Jupytext. While the example remains simple, it shows how your favorite text editor or IDE can be used to edit your Jupyter notebooks. IDEs are more convenient than Jupyter for navigating through code, editing and executing cells or fractions of cells, and debugging.
 
 - We start with a Jupyter notebook.
 - The notebook includes a plot of the world population. The plot legend is not in order of decreasing population, we'll fix this.
@@ -46,7 +46,7 @@ In the following we propose a quick demo of Jupytext. While the example remains 
   - We find out that the columns of the data frame were not in the correct order. We update the corresponding cell, and get the correct plot.
 - The Jupyter notebook is refreshed in the browser. Modified inputs are loaded from the Python script. Outputs and variables are preserved. We finally rerun the code and get the correct plot.
 
-![](https://raw.githubusercontent.com/mwouts/jupytext/master/img/JupyterPyCharm.gif)
+![](https://gist.github.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/b8dd28f44678f8c91f262da2381276fc4d03b00a/JupyterPyCharm.gif)
 
 ## Installation
 
