@@ -4,6 +4,11 @@ import pytest
 import jupytext
 from .utils import list_all_notebooks
 
+try:
+  unicode        # Python 2
+except NameError:
+  unicode = str  # Python 3
+
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb') +
                          list_all_notebooks('.Rmd'))
@@ -11,10 +16,7 @@ def test_notebook_contents_is_unicode(nb_file):
     nb = jupytext.readf(nb_file)
 
     for cell in nb.cells:
-        if sys.version_info < (3, 0):
-            assert cell.source == '' or isinstance(cell.source, unicode)
-        else:
-            assert isinstance(cell.source, str)
+        assert cell.source == '' or isinstance(cell.source, unicode)
 
 
 def test_write_non_ascii(tmpdir):
