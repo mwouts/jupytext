@@ -4,6 +4,11 @@ import pytest
 import jupytext
 from .utils import list_all_notebooks
 
+try:
+  unicode        # Python 2
+except NameError:
+  unicode = str  # Python 3
+
 
 @pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb') +
                          list_all_notebooks('.Rmd'))
