@@ -158,3 +158,11 @@ Also, you may want some cells to be active only in the Python, or R Markdown rep
 ## I like this, how can I contribute?
 
 Your feedback is precious to us: please let us know how we can improve `jupytext`. With enough feedback we will be able to transition from the current beta phase to a stable phase. Thanks for staring the project on GitHub. Sharing it is also very helpful! By the way: stay tuned for announcements and demos on [medium](https://medium.com/@marc.wouts) and [twitter](https://twitter.com/marcwouts)!
+
+
+## Roadmap
+
+Planned developments are:
+- Refuse to load paired notebooks when text representation seems out of date [#63](https://github.com/mwouts/jupytext/issues/63).
+- Refactor code to allow easier addition of new formats, and document the corresponding procedure [#61](https://github.com/mwouts/jupytext/issues/61).
+- Implement a language agnostic format compatible with Atom/Hydrogen and VScode/Jupyter [#59](https://github.com/mwouts/jupytext/issues/59). 
