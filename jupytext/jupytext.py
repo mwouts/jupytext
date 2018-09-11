@@ -77,12 +77,6 @@ class TextNotebookReader(NotebookReader):
 
         set_main_and_cell_language(metadata, cells, self.ext)
 
-        # Backward compatibility with nbrmd
-        for key in ['nbrmd_formats', 'nbrmd_format_version']:
-            if key in metadata:
-                metadata[key.replace('nbrmd', 'jupytext')] = \
-                    metadata.pop(key)
-
         return new_notebook(cells=cells, metadata=metadata)
 
 

@@ -3,8 +3,18 @@
 Release History
 ---------------
 
-dev
-+++
+0.6.4 (2018-09-12)
++++++++++++++++++++
+
+**Improvements**
+
+- Jupytext will not load paired notebook when text representation is out of date (#63)
+- Package tested against Python 3.7 (#68)
+
+**BugFixes**
+
+- Allow unicode characters in notebook path (#70)
+- Read README.md as unicode in `setup.py` (#71)
 
 0.6.3 (2018-09-07)
 +++++++++++++++++++

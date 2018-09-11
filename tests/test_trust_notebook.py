@@ -39,15 +39,27 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
 
     cm.default_jupytext_formats = 'ipynb,py'
     cm.root_dir = str(tmpdir)
-    nb = cm.get(file)
+    model = cm.get(file)
 
-    # Sign notebook explicitely (save it, and reload without
-    # validating to remove 'trusted' metadata in cells)
-    cm.save(nb, py_file)
+    cm.save(model, py_file)
+
+    # Unsign and test notebook
+    nb = model['content']
+    for cell in nb.cells:
+        if 'trusted' in cell.metadata:
+            cell.metadata.pop('trusted')
+
+    cm.notary.unsign(nb)
+
+    model = cm.get(file)
+    for cell in model['content'].cells:
+        assert 'trusted' not in cell.metadata or not cell.metadata['trusted']
+
+    # Trust and reload
     cm.trust_notebook(py_file)
 
-    nb = cm.get(file)
-    for cell in nb['content'].cells:
+    model = cm.get(file)
+    for cell in model['content'].cells:
         assert cell.metadata.get('trusted', True)
 
     # Remove py file, content should be the same
@@ -56,4 +68,4 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
     for cell in nb2['content'].cells:
         assert cell.metadata.get('trusted', True)
 
-    assert nb['content'] == nb2['content']
+    assert model['content'] == nb2['content']

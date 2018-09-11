@@ -58,7 +58,7 @@ def check_file_version(notebook, source_path, outputs_path):
         return
 
     # Version larger than minimum readable version
-    if version <= current and version >= min_file_format_version(ext):
+    if min_file_format_version(ext) <= version <= current:
         return
 
         # Not merging? OK

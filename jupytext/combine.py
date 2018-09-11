@@ -25,6 +25,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
 
                 metadata = ocell.metadata
                 cell.metadata.update({k: metadata[k] for k in metadata
-                                      if metadata in _IGNORE_METADATA})
+                                      if k == 'trusted' or
+                                      k not in _IGNORE_METADATA})
                 remaining_output_cells = remaining_output_cells[(i + 1):]
                 break

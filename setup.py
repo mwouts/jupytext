@@ -1,13 +1,14 @@
 from os import path
+from io import open
 from setuptools import setup, find_packages
 
 this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, 'README.md')) as f:
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
     name='jupytext',
-    version='0.6.3',
+    version='0.6.4',
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
     description='Jupyter notebooks as Markdown documents, '
@@ -22,7 +23,7 @@ setup(
                        'pynotebook = jupytext:PyNotebookExporter',
                        'rnotebook = jupytext:RNotebookExporter']},
     tests_require=['pytest'],
-    install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml', 'six', 'testfixtures'],
+    install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml', 'testfixtures'],
     license='MIT',
     classifiers=('Development Status :: 4 - Beta',
                  'Environment :: Console',
