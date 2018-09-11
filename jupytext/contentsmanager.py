@@ -193,12 +193,11 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             load_alternative_format=True):
         """ Takes a path for an entity and returns its model"""
         path = path.strip('/')
+        nb_file, fmt, ext = file_fmt_ext(path)
 
         if self.exists(path) and \
                 (type == 'notebook' or
-                 (type is None and
-                  any([path.endswith(ext)
-                       for ext in self.all_nb_extensions()]))):
+                 (type is None and ext in self.all_nb_extensions())):
             model = self._notebook_model(path, content=content)
             if not content:
                 return model
@@ -206,7 +205,6 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             if not load_alternative_format:
                 return model
 
-            nb_file, fmt, _ = file_fmt_ext(path)
             fmt_group = self.format_group(fmt, model['content'])
 
             source_format = fmt
