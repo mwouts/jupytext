@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import os
 import sys
 import pytest
@@ -119,3 +121,45 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
 
     assert not os.path.isfile(str(tmpdir.join('new.ipynb')))
     assert os.path.isfile(str(tmpdir.join('new.nb.py')))
+
+
+@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
+                    reason=TextFileContentsManager)
+@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
+def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
+    tmp_ipynb = u'notebôk.ipynb'
+    tmp_nbpy = u'notebôk.nb.py'
+
+    cm = TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb'
+    tmpdir = u'' + str(tmpdir)
+    cm.root_dir = tmpdir
+
+    # open ipynb, save nb.py, reopen
+    nb = readf(nb_file)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
+    nbpy = cm.get(tmp_nbpy)
+    compare_notebooks(nb, nbpy['content'])
+
+    # open ipynb
+    nbipynb = cm.get(tmp_ipynb)
+    compare_notebooks(nb, nbipynb['content'])
+
+    # save ipynb
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    # rename nbpy
+    cm.rename(tmp_nbpy, u'nêw.nb.py')
+    assert not os.path.isfile(os.path.join(tmpdir, tmp_ipynb))
+    assert not os.path.isfile(os.path.join(tmpdir, tmp_nbpy))
+
+    assert os.path.isfile(os.path.join(tmpdir, u'nêw.ipynb'))
+    assert os.path.isfile(os.path.join(tmpdir, u'nêw.nb.py'))
+
+    # rename ipynb
+    cm.rename(u'nêw.ipynb', tmp_ipynb)
+    assert os.path.isfile(os.path.join(tmpdir, tmp_ipynb))
+    assert not os.path.isfile(os.path.join(tmpdir, tmp_nbpy))
+
+    assert not os.path.isfile(os.path.join(tmpdir, u'nêw.ipynb'))
+    assert os.path.isfile(os.path.join(tmpdir, u'nêw.nb.py'))

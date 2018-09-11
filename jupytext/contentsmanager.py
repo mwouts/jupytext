@@ -3,20 +3,25 @@
 import os
 import nbformat
 import mock
-import six
+from tornado.web import HTTPError
+from traitlets import Unicode
+from traitlets.config import Configurable
+
+from notebook.services.contents.filemanager import FileContentsManager
 
 try:
     import notebook.transutils  # noqa
 except ImportError:
     pass
-from notebook.services.contents.filemanager import FileContentsManager
-from tornado.web import HTTPError
-from traitlets import Unicode
-from traitlets.config import Configurable
-import jupytext
 
+import jupytext
 from . import combine
 from .file_format_version import check_file_version
+
+try:
+    unicode  # Python 2
+except NameError:
+    unicode = str  # Python 3
 
 
 def _jupytext_writes(ext):
@@ -58,7 +63,7 @@ def check_formats(formats):
             return check_formats([formats])
         validated_group = []
         for fmt in group:
-            if not isinstance(fmt, six.string_types):
+            if not isinstance(fmt, unicode):
                 raise ValueError('Extensions should be strings among {}'
                                  ', not {}.\n{}'
                                  .format(str(jupytext.NOTEBOOK_EXTENSIONS),
@@ -173,14 +178,14 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                     break
 
         if source_format != fmt:
-            self.log.info('Reading SOURCE from {}'
+            self.log.info(u'Reading SOURCE from {}'
                           .format(os.path.basename(file + source_format)))
             nb_outputs = nbk
             nbk = self._read_notebook(file + source_format,
                                       as_version=as_version,
                                       load_alternative_format=False)
         elif outputs_format != fmt:
-            self.log.info('Reading OUTPUTS from {}'
+            self.log.info(u'Reading OUTPUTS from {}'
                           .format(os.path.basename(file + outputs_format)))
             if outputs_format != fmt:
                 nb_outputs = self._read_notebook(file + outputs_format,
