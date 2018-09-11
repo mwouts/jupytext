@@ -2,7 +2,9 @@
 
 import os
 import sys
+import time
 import pytest
+from tornado.web import HTTPError
 import jupytext
 from jupytext import TextFileContentsManager, readf
 from jupytext.compare import compare_notebooks
@@ -163,3 +165,45 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
 
     assert not os.path.isfile(os.path.join(tmpdir, u'nêw.ipynb'))
     assert os.path.isfile(os.path.join(tmpdir, u'nêw.nb.py'))
+
+
+@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
+                    reason=TextFileContentsManager)
+@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb')[:1])
+def test_outdated_text_notebook(nb_file, tmpdir):
+    # 1. write py ipynb
+    tmp_ipynb = u'notebook.ipynb'
+    tmp_nbpy = u'notebook.py'
+
+    cm = TextFileContentsManager()
+    cm.default_jupytext_formats = 'py,ipynb'
+    cm.outdated_text_notebook_margin = 0
+    cm.root_dir = str(tmpdir)
+
+    # open ipynb, save py, reopen
+    nb = readf(nb_file)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
+    model_py = cm.get(tmp_nbpy, load_alternative_format=False)
+    model_ipynb = cm.get(tmp_ipynb, load_alternative_format=False)
+
+    # 2. check that time of ipynb <= py
+    assert model_ipynb['last_modified'] <= model_py['last_modified']
+
+    # 3. wait some time
+    time.sleep(0.5)
+
+    # 4. touch ipynb
+    with open(str(tmpdir.join(tmp_ipynb)), 'a'):
+        os.utime(str(tmpdir.join(tmp_ipynb)), None)
+
+    # 5. test error
+    with pytest.raises(HTTPError):
+        cm.get(tmp_nbpy)
+
+    # 6. test OK with
+    cm.outdated_text_notebook_margin = 1.0
+    cm.get(tmp_nbpy)
+
+    # 7. test OK with
+    cm.outdated_text_notebook_margin = float("inf")
+    cm.get(tmp_nbpy)

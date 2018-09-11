@@ -1,10 +1,11 @@
 """ContentsManager that allows to open Rmd, py, R and ipynb files as notebooks
 """
 import os
+from datetime import timedelta
 import nbformat
 import mock
 from tornado.web import HTTPError
-from traitlets import Unicode
+from traitlets import Unicode, Float
 from traitlets.config import Configurable
 
 from notebook.services.contents.filemanager import FileContentsManager
@@ -56,6 +57,9 @@ def check_formats(formats):
             # In early versions (0.4 and below), formats could be a list of
             # extensions. We understand this as a single group
             return check_formats([formats])
+
+        # Return ipynb on first position (save that file first, for #63)
+        has_ipynb = False
         validated_group = []
         for fmt in group:
             try:
@@ -77,7 +81,13 @@ def check_formats(formats):
                                  .format(str(group), fmt,
                                          str(jupytext.NOTEBOOK_EXTENSIONS),
                                          expected_format))
-            validated_group.append(fmt)
+            if fmt == '.ipynb':
+                has_ipynb = True
+            else:
+                validated_group.append(fmt)
+
+        if has_ipynb:
+            validated_group = ['.ipynb'] + validated_group
 
         if validated_group:
             validated_formats.append(validated_group)
@@ -118,8 +128,21 @@ class TextFileContentsManager(FileContentsManager, Configurable):
              'comma separated',
         config=True)
 
+    outdated_text_notebook_margin = Float(
+        1.0,
+        help='Refuse to overwrite inputs of a ipynb notebooks with those of a'
+             'text notebook when the text notebook plus margin is older than'
+             'the ipynb notebook',
+        config=True)
+
     def format_group(self, fmt, nbk=None):
         """Return the group of extensions that contains 'fmt'"""
+        # Backward compatibility with nbrmd
+        for key in ['nbrmd_formats', 'nbrmd_format_version']:
+            if nbk and key in nbk.metadata:
+                nbk.metadata[key.replace('nbrmd', 'jupytext')] = \
+                    nbk.metadata.pop(key)
+
         jupytext_formats = ((nbk.metadata.get('jupytext_formats')
                              if nbk else None) or
                             self.default_jupytext_formats)
@@ -134,77 +157,22 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             if fmt in group:
                 return group
 
+        # No such group, but 'ipynb'? Return current fmt + 'ipynb'
         if ['.ipynb'] in jupytext_formats:
-            return [fmt, '.ipynb']
+            return ['.ipynb', fmt]
 
         return [fmt]
 
-    def _read_notebook(self, os_path, as_version=4,
-                       load_alternative_format=True):
+    def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
-        file, fmt, ext = file_fmt_ext(os_path)
+        _, ext = os.path.splitext(os_path)
         if ext in self.nb_extensions:
             with mock.patch('nbformat.reads', _jupytext_reads(ext)):
-                nbk = super(TextFileContentsManager, self) \
+                return super(TextFileContentsManager, self) \
                     ._read_notebook(os_path, as_version)
         else:
-            nbk = super(TextFileContentsManager, self) \
+            return super(TextFileContentsManager, self) \
                 ._read_notebook(os_path, as_version)
-
-        if not load_alternative_format:
-            return nbk
-
-        fmt_group = self.format_group(fmt, nbk)
-
-        source_format = fmt
-        outputs_format = fmt
-
-        # Source format is first non ipynb format found on disk
-        if fmt.endswith('.ipynb'):
-            for alt_fmt in fmt_group:
-                if not alt_fmt.endswith('.ipynb') and \
-                        os.path.isfile(file + alt_fmt):
-                    source_format = alt_fmt
-                    break
-        # Outputs taken from ipynb if in group, if file exists
-        else:
-            for alt_fmt in fmt_group:
-                if alt_fmt.endswith('.ipynb') and \
-                        os.path.isfile(file + alt_fmt):
-                    outputs_format = alt_fmt
-                    break
-
-        if source_format != fmt:
-            self.log.info(u'Reading SOURCE from {}'
-                          .format(os.path.basename(file + source_format)))
-            nb_outputs = nbk
-            nbk = self._read_notebook(file + source_format,
-                                      as_version=as_version,
-                                      load_alternative_format=False)
-        elif outputs_format != fmt:
-            self.log.info(u'Reading OUTPUTS from {}'
-                          .format(os.path.basename(file + outputs_format)))
-            if outputs_format != fmt:
-                nb_outputs = self._read_notebook(file + outputs_format,
-                                                 as_version=as_version,
-                                                 load_alternative_format=False)
-        else:
-            nb_outputs = None
-
-        try:
-            check_file_version(nbk, file + source_format,
-                               file + outputs_format)
-        except ValueError as err:
-            raise HTTPError(400, str(err))
-
-        if nb_outputs:
-            combine.combine_inputs_with_outputs(nbk, nb_outputs)
-            if self.notary.check_signature(nb_outputs):
-                self.notary.sign(nbk)
-        elif not fmt.endswith('.ipynb'):
-            self.notary.sign(nbk)
-
-        return nbk
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
@@ -221,7 +189,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 super(TextFileContentsManager, self) \
                     ._save_notebook(os_path_fmt, nb)
 
-    def get(self, path, content=True, type=None, format=None):
+    def get(self, path, content=True, type=None, format=None,
+            load_alternative_format=True):
         """ Takes a path for an entity and returns its model"""
         path = path.strip('/')
 
@@ -230,7 +199,95 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                  (type is None and
                   any([path.endswith(ext)
                        for ext in self.all_nb_extensions()]))):
-            return self._notebook_model(path, content=content)
+            model = self._notebook_model(path, content=content)
+            if not content:
+                return model
+
+            if not load_alternative_format:
+                return model
+
+            nb_file, fmt, _ = file_fmt_ext(path)
+            fmt_group = self.format_group(fmt, model['content'])
+
+            source_format = fmt
+            outputs_format = fmt
+
+            # Source format is first non ipynb format found on disk
+            if fmt.endswith('.ipynb'):
+                for alt_fmt in fmt_group:
+                    if not alt_fmt.endswith('.ipynb') and \
+                            self.exists(nb_file + alt_fmt):
+                        source_format = alt_fmt
+                        break
+            # Outputs taken from ipynb if in group, if file exists
+            else:
+                for alt_fmt in fmt_group:
+                    if alt_fmt.endswith('.ipynb') and \
+                            self.exists(nb_file + alt_fmt):
+                        outputs_format = alt_fmt
+                        break
+
+            if source_format != fmt:
+                self.log.info(u'Reading SOURCE from {}'.format(
+                    os.path.basename(nb_file + source_format)))
+                model_outputs = model
+                model = self.get(nb_file + source_format, content=content,
+                                 type=type, format=format,
+                                 load_alternative_format=False)
+            elif outputs_format != fmt:
+                self.log.info(u'Reading OUTPUTS from {}'.format(
+                    os.path.basename(nb_file + outputs_format)))
+                model_outputs = self.get(nb_file + outputs_format,
+                                         content=content,
+                                         type=type, format=format,
+                                         load_alternative_format=False)
+            else:
+                model_outputs = None
+
+            try:
+                check_file_version(model['content'],
+                                   nb_file + source_format,
+                                   nb_file + outputs_format)
+            except ValueError as err:
+                raise HTTPError(400, str(err))
+
+            # Make sure we're not overwriting ipynb cells with an outdated
+            # text file
+            try:
+                if model_outputs and model_outputs['last_modified'] > \
+                        model['last_modified'] + \
+                        timedelta(seconds=self.outdated_text_notebook_margin):
+                    raise HTTPError(
+                        400,
+                        u'\n'
+                        '{out} (last modified {out_last})\n'
+                        'seems more recent than '
+                        '{src} (last modified {src_last})\n'
+                        'Please either:\n'
+                        '- open {src} in a text editor, make sure it is '
+                        'up to date, and save it,\n'
+                        '- or delete {src} if not up to date,\n'
+                        '- or increase check margin by adding, say, \n'
+                        '    c.ContentsManager.'
+                        'outdated_text_notebook_margin = 5 '
+                        '# in seconds # or float("inf")\n'
+                        'to your .jupyter/jupyter_notebook_config.py '
+                        'file\n'.format(src=nb_file + source_format,
+                                        src_last=model['last_modified'],
+                                        out=nb_file + outputs_format,
+                                        out_last=model_outputs[
+                                            'last_modified']))
+            except OverflowError:
+                pass
+
+            if model_outputs:
+                combine.combine_inputs_with_outputs(model['content'],
+                                                    model_outputs['content'])
+            elif not fmt.endswith('.ipynb'):
+                self.notary.sign(model['content'])
+                self.mark_trusted_cells(model['content'], path)
+
+            return model
 
         return super(TextFileContentsManager, self) \
             .get(path, content, type, format)
