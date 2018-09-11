@@ -163,6 +163,6 @@ Your feedback is precious to us: please let us know how we can improve `jupytext
 ## Roadmap
 
 Planned developments are:
-- Refuse to load paired notebooks when text representation seems out of date [#63](https://github.com/mwouts/jupytext/issues/63).
 - Refactor code to allow easier addition of new formats, and document the corresponding procedure [#61](https://github.com/mwouts/jupytext/issues/61).
 - Implement a language agnostic format compatible with Atom/Hydrogen and VScode/Jupyter [#59](https://github.com/mwouts/jupytext/issues/59). 
+- Cell metadata for markdown cells (currently not covered) [#66](https://github.com/mwouts/jupytext/issues/66).
