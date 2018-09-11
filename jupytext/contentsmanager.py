@@ -18,11 +18,6 @@ import jupytext
 from . import combine
 from .file_format_version import check_file_version
 
-try:
-    unicode  # Python 2
-except NameError:
-    unicode = str  # Python 3
-
 
 def _jupytext_writes(ext):
     def _writes(nbk, version=nbformat.NO_CONVERT, **kwargs):
@@ -63,7 +58,9 @@ def check_formats(formats):
             return check_formats([formats])
         validated_group = []
         for fmt in group:
-            if not isinstance(fmt, unicode):
+            try:
+                fmt = u'' + fmt
+            except UnicodeDecodeError:
                 raise ValueError('Extensions should be strings among {}'
                                  ', not {}.\n{}'
                                  .format(str(jupytext.NOTEBOOK_EXTENSIONS),
