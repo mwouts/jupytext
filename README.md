@@ -68,7 +68,7 @@ jupyter notebook
 
 ## Paired notebooks
 
-The idea of paired notebooks is to store a `.ipynb` file alongside other formats. This lets us get the best of both worlds: an easily sharable notebook that stores the outputs, and one or more text-only files that can for instance be put under version control.
+The idea of paired notebooks is to store an `.ipynb` file alongside other formats. This lets us get the best of both worlds: an easily sharable notebook that stores the outputs, and one or more text-only files that can for instance be put under version control.
 
 You can edit text-only files outside of Jupyter (first deactivate Jupyter's autosave by running `%autosave 0` in a cell), and then get the updated version in Jupyter by refreshing your browser.
 
