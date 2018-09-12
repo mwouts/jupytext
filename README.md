@@ -18,9 +18,9 @@ Jupytext can convert notebooks to and from
 - Markdown documents (extension `.md`),
 - R Markdown documents (extension `.Rmd`).
 
-Jupytext is available from within Jupyter. You can work as usual on your notebook in Jupyter, and save and read it in the formats you choose. The text representations can be edited outside of Jupyter (see our [demo](#code-refactoring) below). When the notebook is refreshed in Jupyter, cell inputs are loaded from the script or Markdown document and kernel variables are preserved. Cell outputs are taken from the original Jupyter notebook if you use [paired notebooks](#paired-notebooks), which we recommend.
+Jupytext is available from within Jupyter. You can work as usual on your notebook in Jupyter, and save and read it in the formats you choose. The text representations can be edited outside of Jupyter (see our [demo](#code-refactoring) below). When the notebook is refreshed in Jupyter, input cells are loaded from the script or Markdown document. Kernel variables are preserved. Outputs are not stored in such text documents, and are therefore lost when the notebook is refreshed. To avoid this, we recommend to [pair](#paired-notebooks) the text notebook with a traditional `.ipynb` notebook (both files are saved and loaded together).
 
-| Format       | Extension          | Text editor | Git friendly | Preserve outputs |
+| Format       | Extension          | Text editor friendly | Git friendly | Preserve outputs |
 | ------------ | ------------------ | ----------- | ------------ | ---------------- |
 | Jupyter notebook | `.ipynb`       |             |              | ✔                |
 | Script or Markdown  | `.jl`/`.py`/`.R`/`.md`/`.Rmd` | ✔  | ✔            |                  |
@@ -31,7 +31,7 @@ Jupytext is available from within Jupyter. You can work as usual on your noteboo
 
 ### Writing notebooks as plain text
 
-You like to work with scripts? The good news is that plain scripts, which you can draft and test in your favorite IDE, open naturally as notebooks in Jupyter when using Jupytext. Run the notebook in Jupyter to generate the outputs, [associate](#paired-notebooks) an `.ipynb` representation, save and share your research!
+You like to work with scripts? The good news is that plain scripts, which you can draft and test in your favorite IDE, open transparently as notebooks in Jupyter when using Jupytext. Run the notebook in Jupyter to generate the outputs, [associate](#paired-notebooks) an `.ipynb` representation, save and share your research as either a plain script or as a traditional Jupyter notebook with outputs.
 
 ### Code refactoring
 
@@ -39,7 +39,7 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 - We start with a Jupyter notebook.
 - The notebook includes a plot of the world population. The plot legend is not in order of decreasing population, we'll fix this.
-- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we add a `jupytext_formats` entry to the notebook metadata.
+- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we add a `"jupytext_formats": "ipynb,py",` entry to the notebook metadata.
 - The Python script can be opened with PyCharm:
   - Navigating in the code and documentation is easier than in Jupyter.
   - The console is convenient for quick tests. We don't need to create cells for this.
@@ -61,21 +61,26 @@ Then, configure Jupyter to use Jupytext:
 ```python
 c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 ```
-- and restart jupyter, i.e. run
+- and restart Jupyter, i.e. run
 ```bash
 jupyter notebook
 ```
 
 ## Paired notebooks
 
-The idea of paired notebooks is to store a `.ipynb` file alongside the text-only version. This lets us get the best of both worlds: a text-only document to put under version control, and an easily sharable notebook which stores the outputs.
+The idea of paired notebooks is to store a `.ipynb` file alongside other formats. This lets us get the best of both worlds: an easily sharable notebook that stores the outputs, and one or more text-only files that can for instance be put under version control.
 
-To enable paired notebooks, add a `jupytext_formats` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
+You can edit text-only files outside of Jupyter (first deactivate Jupyter's autosave by running `%autosave 0` in a cell), and then get the updated version in Jupyter by refreshing your browser.
+
+When loading or refreshing an `.ipynb` file, the input cells of the notebook are read from the first non-`.ipynb` file among the associated formats.
+
+When loading or refreshing a non-`.ipynb` file, the outputs are read from the `.ipynb` file (if `ipynb` is listed in the formats).
+
+To enable paired notebooks, one option is to set the output formats by adding a `jupytext_formats` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
 ```
 {
   "jupytext_formats": "ipynb,py",
   "kernelspec": {
-    "name": "python3",
     (...)
   },
   "language_info": {
@@ -83,37 +88,31 @@ To enable paired notebooks, add a `jupytext_formats` entry to the notebook metad
   }
 }
 ```
+Accepted formats are: `ipynb`, `md`, `Rmd`, `py` and `R`.
 
-When you save the notebook, both the Jupyter notebook and the python scripts are updated. You can edit the text version
-and then get the updated version in Jupyter by refreshing your browser (deactivate Jupyter's autosave by running `%autosave 0` in a cell).
-
-Accepted formats are: `ipynb`, `md`, `Rmd`, `py` and `R`. In case you want multiple text extensions, please note that the
-order matters: the first non-`ipynb` extension
-is the one used as the reference source for notebook inputs when you open the `ipynb` file.
-
-Finally, it is also possible to pair every notebook with a text representation. If you add
+Alternatively, it is also possible to set a default format pairing. Say you want to always associate `.ipynb` notebooks with an `.md` file  (and reciprocally). This is simply done by adding the following to your Jupyter configuration file:
 ```python
 c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
-c.ContentsManager.default_jupytext_formats = "ipynb,py" # or "ipynb,nb.py" # or "ipynb,md" # or "ipynb,Rmd"
+c.ContentsManager.default_jupytext_formats = "ipynb,md"
 ```
-to your Jupyter configuration file, then *every* Jupyter notebook that you save will have a companion `.py` (`.nb.py`, `.md`, or `.Rmd`) notebook. And every `.py` (`.nb.py`, `.md`, or `.Rmd`) notebook will have a companion `.ipynb` notebook.
+(and similarly for the other formats).
 
 ## Command line conversion
 
 The package provides a `jupytext` script for command line conversion between the various notebook extensions:
 
 ```bash
-jupytext notebook.ipynb --to md --test          # Test round trip conversion
-jupytext notebook.ipynb --to md --output -      # display the markdown version on screen
+jupytext --to python notebook.ipynb             # create a notebook.py file
+jupytext --to markdown notebook.ipynb           # create a notebook.md file
+jupytext --output script.py notebook.ipynb      # create a script.py file
 
-jupytext notebook.ipynb --to markdown           # create a notebook.md file
-jupytext notebook.ipynb --to python             # create a notebook.py file
-jupytext notebook.ipynb --output script.py      # create a notebook.py file
+jupytext --to notebook notebook.py              # overwrite notebook.ipynb (remove outputs)
+jupytext --to notebook --update notebook.py     # update notebook.ipynb (preserve outputs)
+jupytext --to ipynb notebook1.md notebook2.py   # overwrite notebook1.ipynb and notebook2.ipynb
 
-jupytext notebook.md --to notebook              # overwrite notebook.ipynb (remove outputs)
-jupytext notebook.md --to notebook --update     # update notebook.ipynb (preserve outputs)
+jupytext --to md --test notebook.ipynb          # Test round trip conversion
 
-jupytext notebook1.md notebook2.py --to ipynb   # overwrite notebook1.ipynb notebook2.ipynb
+jupytext --to md --output - notebook.ipynb      # display the markdown version on screen
 ```
 
 ## Round-trip conversion
@@ -164,5 +163,5 @@ Your feedback is precious to us: please let us know how we can improve `jupytext
 
 Planned developments are:
 - Refactor code to allow easier addition of new formats, and document the corresponding procedure [#61](https://github.com/mwouts/jupytext/issues/61).
-- Implement a language agnostic format compatible with Atom/Hydrogen and VScode/Jupyter [#59](https://github.com/mwouts/jupytext/issues/59). 
+- Implement a language agnostic format compatible with Atom/Hydrogen and VScode/Jupyter [#59](https://github.com/mwouts/jupytext/issues/59).
 - Cell metadata for markdown cells (currently not covered) [#66](https://github.com/mwouts/jupytext/issues/66).
