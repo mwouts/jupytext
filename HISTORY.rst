@@ -3,6 +3,19 @@
 Release History
 ---------------
 
+0.6.5 (2018-09-13)
++++++++++++++++++++
+
+**Improvements**
+
+- Code lines that start with a quotation mark in Jupyter are commented in the
+corresponding Python and Julia scripts (#73)
+- Update pypy , add flake8 tests on Travis CI (#74)
+
+**BugFixes**
+
+- Import notebook.transutils before notebook.services.contents.filemanager (#75)
+
 0.6.4 (2018-09-12)
 +++++++++++++++++++
 
