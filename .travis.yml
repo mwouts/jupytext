@@ -5,7 +5,7 @@ python:
   - "3.5"
   - "3.6"
   # PyPy versions
-  - "pypy3.5"
+  - "pypy"
 # command to install dependencies
 matrix:
   include:
@@ -14,12 +14,13 @@ matrix:
       sudo: required  # required for Python 3.7 (travis-ci/travis-ci#9069)
 
 install:
-  - pip install codecov
-  - pip install pytest pytest-cov
-  - pip install notebook
+  - pip install codecov flake8 notebook pytest pytest-cov
   - pip install -r requirements.txt
-  - pip install .
-# command to run tests
+before_script:
+  # stop the build if there are Python syntax errors or undefined names
+  - flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
+  # exit-zero treats all errors as warnings.  The GitHub editor is 127 chars wide
+  - flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 script:
   - coverage run --source=. -m py.test -s tests/
 after_success:
