@@ -8,12 +8,13 @@ from tornado.web import HTTPError
 from traitlets import Unicode, Float
 from traitlets.config import Configurable
 
-from notebook.services.contents.filemanager import FileContentsManager
-
+# import notebook.transutils before notebook.services.contents.filemanager #75
 try:
     import notebook.transutils  # noqa
 except ImportError:
     pass
+
+from notebook.services.contents.filemanager import FileContentsManager
 
 import jupytext
 from . import combine
