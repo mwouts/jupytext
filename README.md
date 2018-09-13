@@ -33,7 +33,7 @@ Jupytext is available from within Jupyter. You can work as usual on your noteboo
 
 You like to work with scripts? The good news is that plain scripts, which you can draft and test in your favorite IDE, open transparently as notebooks in Jupyter when using Jupytext. Run the notebook in Jupyter to generate the outputs, [associate](#paired-notebooks) an `.ipynb` representation, save and share your research as either a plain script or as a traditional Jupyter notebook with outputs.
 
-## Collaborating on Jupyter Notebooks
+### Collaborating on Jupyter Notebooks
 
 With Jupytext, collaborating on Jupyter notebooks with Git becomes as easy as collaborating on text files.
 
