@@ -29,7 +29,7 @@ def paragraph_is_fully_commented(lines, main_language):
     """Is the paragraph fully commented?"""
     for i, line in enumerate(lines):
         if line.startswith('#'):
-            if (line.startswith('# %') or line.startswith('# ?')) \
+            if (line.startswith(('# %', '# ?'))
                     and is_magic(line, main_language):
                 return False
             continue
