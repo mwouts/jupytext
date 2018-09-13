@@ -10,7 +10,7 @@ Release History
 
 - Code lines that start with a quotation mark in Jupyter are commented in the
 corresponding Python and Julia scripts (#73)
-- Update pypy , add flake8 tests on Travis CI (#74)
+- Update pypy, add flake8 tests on Travis CI (#74)
 
 **BugFixes**
 
