@@ -73,6 +73,20 @@ def test_rmd_unchanged(rmd_file):
 
 @pytest.mark.skipif(sys.version_info < (3, 6),
                     reason="unordered dict result in changes in chunk options")
+@pytest.mark.parametrize('ipynb_file', list_all_notebooks('.ipynb'))
+def test_rmd_from_ipynb_unchanged(ipynb_file):
+    rmd_file = mirror_file(ipynb_file).replace('.py', '.Rmd')
+    create_if_missing(rmd_file, ipynb_file)
+
+    with open(rmd_file, encoding='utf-8') as fp:
+        rmd = fp.read()
+
+    rmd_ref = jupytext.writes(jupytext.readf(ipynb_file), ext='.Rmd')
+    compare(rmd, rmd_ref)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="unordered dict result in changes in chunk options")
 @pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
 def test_py_unchanged_ipynb(nb_file):
     py_file = mirror_file(nb_file)
