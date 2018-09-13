@@ -34,18 +34,26 @@ _FORCE_ESC_RE = re.compile(r"^(# |#)*%(.*)(#| )escape")
 _FORCE_NOT_ESC_RE = re.compile(r"^(# |#)*%(.*)noescape")
 _MAGIC_RE = re.compile(r"^(# |#)*(%%|{})".format('|'.join(_LINE_MAGICS)))
 
+# Commands starting with a question marks have to be escaped
+_HELP_RE = re.compile(r"^(# |#)*\?")
 
-def is_magic(line):
+
+def is_magic(line, language):
     """Is the current line a (possibly escaped) Jupyter magic?"""
-    return (_FORCE_ESC_RE.match(line) or (not _FORCE_NOT_ESC_RE.match(line)
-                                          and _MAGIC_RE.match(line)))
+    if _FORCE_ESC_RE.match(line):
+        return True
+    if not _FORCE_NOT_ESC_RE.match(line) and _MAGIC_RE.match(line):
+        return True
+    if language == 'R':
+        return False
+    return _HELP_RE.match(line)
 
 
 def escape_magic(source, language='python'):
     """Escape Jupyter magics with '# '"""
     parser = StringParser(language)
     for pos, line in enumerate(source):
-        if not parser.is_quoted() and is_magic(line):
+        if not parser.is_quoted() and is_magic(line, language):
             source[pos] = '# ' + line
         parser.read_line(line)
     return source
@@ -64,7 +72,7 @@ def unescape_magic(source, language='python'):
     """Unescape Jupyter magics"""
     parser = StringParser(language)
     for pos, line in enumerate(source):
-        if not parser.is_quoted() and is_magic(line):
+        if not parser.is_quoted() and is_magic(line, language):
             source[pos] = unesc(line)
         parser.read_line(line)
     return source

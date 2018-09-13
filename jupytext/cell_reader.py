@@ -25,11 +25,12 @@ def uncomment(lines):
             for line in lines]
 
 
-def paragraph_is_fully_commented(lines):
+def paragraph_is_fully_commented(lines, main_language):
     """Is the paragraph fully commented?"""
     for i, line in enumerate(lines):
         if line.startswith('#'):
-            if line.startswith('# %') and is_magic(line):
+            if (line.startswith('# %') or line.startswith('# ?'))\
+                    and is_magic(line, main_language):
                 return False
             continue
         return i > 0 and _BLANK_LINE.match(line)
@@ -191,7 +192,8 @@ class CellReader():
     def find_cell_end_py(self, lines):
         """Return position of end of cell marker, and position
         of first line after cell"""
-        if self.metadata is None and paragraph_is_fully_commented(lines):
+        if self.metadata is None and \
+                paragraph_is_fully_commented(lines, 'python'):
             self.cell_type = 'markdown'
             for i, line in enumerate(lines):
                 if _BLANK_LINE.match(line):
