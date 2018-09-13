@@ -33,6 +33,21 @@ Jupytext is available from within Jupyter. You can work as usual on your noteboo
 
 You like to work with scripts? The good news is that plain scripts, which you can draft and test in your favorite IDE, open transparently as notebooks in Jupyter when using Jupytext. Run the notebook in Jupyter to generate the outputs, [associate](#paired-notebooks) an `.ipynb` representation, save and share your research as either a plain script or as a traditional Jupyter notebook with outputs.
 
+## Collaborating on Jupyter Notebooks
+
+With Jupytext, collaborating on Jupyter notebooks with Git becomes as easy as collaborating on text files.
+
+The setup is straightforward: 
+- Open your favorite notebook in Jupyter notebook
+- [Associate](#paired-notebooks) a `.py` representation (for instance) to that notebook
+- Save the notebook, and put the Python script under Git control. Sharing the `.ipynb` file is possible, but not required.
+
+Collaborating then works as follows:
+- Your collaborator pulls your script. The script opens as a notebook in Jupyter, with no outputs.
+- They run the notebook and save it. Outputs are regenerated, and a local `.ipynb` file is created.
+- They change the notebook, and push their updated script. The diff is nothing else than a standard diff on a Python script.
+- You pull the changed script, and refresh your browser. Input cells are updated. The outputs from cells that were changed are removed. Your variables are untouched, so you have the option to run only the modified cells to get the new outputs.
+
 ### Code refactoring
 
 In the animation below we propose a quick demo of Jupytext. While the example remains simple, it shows how your favorite text editor or IDE can be used to edit your Jupyter notebooks. IDEs are more convenient than Jupyter for navigating through code, editing and executing cells or fractions of cells, and debugging.
