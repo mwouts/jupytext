@@ -119,20 +119,20 @@ class TextNotebookWriter(NotebookWriter):
         for i, cell in enumerate(cells):
             text = texts[i]
 
-            # Simplify cell marker when previous line is blank
-            if text[0] == '# + {}' and (not lines or not lines[-1]):
-                text[0] = '# +'
+            if self.ext in ['.py', '.jl']:
+                # Simplify cell marker when previous line is blank
+                if text[0] == '# + {}' and (not lines or not lines[-1]):
+                    text[0] = '# +'
 
-            # remove end of cell marker when redundant
-            # with next explicit marker
-            if self.ext in ['.py', '.jl'] and cell.is_code() \
-                    and text[-1] == '# -':
-                if cell.lines_to_end_of_cell_marker:
-                    text = text[:-1] + \
-                           [''] * cell.lines_to_end_of_cell_marker + ['# -']
-                elif i + 1 >= len(texts) or \
-                        (texts[i + 1][0].startswith('# + {')):
-                    text = text[:-1]
+                # remove end of cell marker when redundant
+                # with next explicit marker
+                if cell.is_code() and text[-1] == '# -':
+                    if cell.lines_to_end_of_cell_marker:
+                        text = text[:-1] + \
+                               [''] * cell.lines_to_end_of_cell_marker + ['# -']
+                    elif i + 1 >= len(texts) or \
+                            (texts[i + 1][0].startswith('# + {')):
+                        text = text[:-1]
 
             lines.extend(text)
             lines.extend([''] * cell.lines_to_next_cell)
