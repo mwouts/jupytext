@@ -1,30 +1,25 @@
 # coding: utf-8
 
 import os
-import sys
 import time
 import pytest
 from tornado.web import HTTPError
 import jupytext
 from jupytext import TextFileContentsManager, readf
 from jupytext.compare import compare_notebooks
-from .utils import list_all_notebooks, list_py_notebooks
+from .utils import list_notebooks
+from .utils import skip_if_dict_is_not_ordered
 
 jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 jupytext.file_format_version.MIN_FILE_FORMAT_VERSION = {}
 
 
-@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
-                    reason=TextFileContentsManager)
 def test_create_contentsmanager():
     TextFileContentsManager()
 
 
-@pytest.mark.skipif(sys.version_info < (3, 6),
-                    reason="unordered dict result in changes in chunk options")
-@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
-                    reason=TextFileContentsManager)
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
 def test_load_save_rename(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_rmd = 'notebook.Rmd'
@@ -51,11 +46,10 @@ def test_load_save_rename(nb_file, tmpdir):
     assert os.path.isfile(str(tmpdir.join('new.Rmd')))
 
 
-@pytest.mark.skipif(sys.version_info < (3, 6),
-                    reason="unordered dict result in changes in chunk options")
+@skip_if_dict_is_not_ordered
 @pytest.mark.skipif(isinstance(TextFileContentsManager, str),
                     reason=TextFileContentsManager)
-@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_nbpy = 'notebook.nb.py'
@@ -82,11 +76,10 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
     assert os.path.isfile(str(tmpdir.join('new.nb.py')))
 
 
-@pytest.mark.skipif(sys.version_info < (3, 6),
-                    reason="unordered dict result in changes in chunk options")
+@skip_if_dict_is_not_ordered
 @pytest.mark.skipif(isinstance(TextFileContentsManager, str),
                     reason=TextFileContentsManager)
-@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_nbpy = 'notebook.nb.py'
@@ -127,7 +120,7 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
 
 @pytest.mark.skipif(isinstance(TextFileContentsManager, str),
                     reason=TextFileContentsManager)
-@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     tmp_ipynb = u'notebôk.ipynb'
     tmp_nbpy = u'notebôk.nb.py'
@@ -169,7 +162,7 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
 
 @pytest.mark.skipif(isinstance(TextFileContentsManager, str),
                     reason=TextFileContentsManager)
-@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb')[:1])
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
 def test_outdated_text_notebook(nb_file, tmpdir):
     # 1. write py ipynb
     tmp_ipynb = u'notebook.ipynb'

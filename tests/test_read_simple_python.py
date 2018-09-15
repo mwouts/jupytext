@@ -2,14 +2,8 @@
 
 import jupytext
 from testfixtures import compare
-from .python_notebook_sample import f, g
 
 jupytext.file_format_version.FILE_FORMAT_VERSION = {}
-
-
-def test_python_notebook_sample():
-    assert f(1) == 2
-    assert g(2) == 4
 
 
 def test_read_simple_file(pynb="""# ---

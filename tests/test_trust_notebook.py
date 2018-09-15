@@ -3,12 +3,12 @@ import shutil
 import pytest
 import jupytext
 from jupytext.contentsmanager import TextFileContentsManager
-from .utils import list_all_notebooks, list_py_notebooks
+from .utils import list_notebooks
 
 jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
 
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.py'))
+@pytest.mark.parametrize('nb_file', list_notebooks('python'))
 def test_py_notebooks_are_trusted(nb_file):
     cm = TextFileContentsManager()
     root, file = os.path.split(nb_file)
@@ -18,7 +18,7 @@ def test_py_notebooks_are_trusted(nb_file):
         assert cell.metadata.get('trusted', True)
 
 
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.Rmd'))
+@pytest.mark.parametrize('nb_file', list_notebooks('Rmd'))
 def test_rmd_notebooks_are_trusted(nb_file):
     cm = TextFileContentsManager()
     root, file = os.path.split(nb_file)
@@ -28,7 +28,7 @@ def test_rmd_notebooks_are_trusted(nb_file):
         assert cell.metadata.get('trusted', True)
 
 
-@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
     cm = TextFileContentsManager()
     root, file = os.path.split(nb_file)

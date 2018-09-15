@@ -7,27 +7,23 @@ from nbformat.v4.nbbase import new_notebook
 from jupytext import readf, writef, writes, file_format_version
 from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext
 from jupytext.compare import compare_notebooks
-from .utils import list_all_notebooks, list_py_notebooks
+from .utils import list_notebooks
 
 file_format_version.FILE_FORMAT_VERSION = {}
 file_format_version.MIN_FILE_FORMAT_VERSION = {}
 
 
-@pytest.mark.parametrize('nb_file',
-                         list_all_notebooks('.ipynb') +
-                         list_all_notebooks('.Rmd'))
+@pytest.mark.parametrize('nb_file', list_notebooks())
 def test_cli_single_file(nb_file):
     assert cli_jupytext([nb_file] + ['--to', 'py']).notebooks == [nb_file]
 
 
-@pytest.mark.parametrize('nb_files', [list_all_notebooks('.ipynb') +
-                                      list_all_notebooks('.Rmd')])
+@pytest.mark.parametrize('nb_files', [list_notebooks()])
 def test_cli_multiple_files(nb_files):
     assert cli_jupytext(nb_files + ['--to', 'py']).notebooks == nb_files
 
 
-@pytest.mark.parametrize('nb_file',
-                         list_py_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_convert_single_file_in_place(nb_file, tmpdir):
     nb_org = str(tmpdir.join(os.path.basename(nb_file)))
     base, ext = os.path.splitext(nb_org)
@@ -42,9 +38,8 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     compare_notebooks(nb1, nb2)
 
 
-@pytest.mark.parametrize('nb_file',
-                         list_all_notebooks('.ipynb') +
-                         list_all_notebooks('.Rmd'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb') +
+                         list_notebooks('Rmd'))
 def test_convert_single_file(nb_file, capsys):
     nb1 = readf(nb_file)
     pynb = writes(nb1, ext='.py')
@@ -55,8 +50,7 @@ def test_convert_single_file(nb_file, capsys):
     compare(out[:-1], pynb)
 
 
-@pytest.mark.parametrize('nb_files',
-                         [list_py_notebooks('.ipynb')])
+@pytest.mark.parametrize('nb_files', [list_notebooks('ipynb_py')])
 def test_convert_multiple_file(nb_files, tmpdir):
     nb_orgs = []
     nb_others = []
@@ -82,33 +76,33 @@ def test_error_not_notebook_ext_input(nb_file='notebook.ext'):
         convert_notebook_files([nb_file], ext='.py')
 
 
-def test_error_not_notebook_ext_dest1(nb_file=list_all_notebooks('.ipynb')[0]):
+def test_error_not_notebook_ext_dest1(nb_file=list_notebooks()[0]):
     with pytest.raises(TypeError):
         convert_notebook_files([nb_file], ext='.ext')
 
 
 def test_error_not_notebook_ext_output(
-        nb_file=list_all_notebooks('.ipynb')[0]):
+        nb_file=list_notebooks()[0]):
     with pytest.raises(TypeError):
         cli_jupytext([nb_file, '-o', 'not.ext'])
 
 
-def test_error_no_ext(nb_file=list_all_notebooks('.ipynb')[0]):
+def test_error_no_ext(nb_file=list_notebooks()[0]):
     with pytest.raises(TypeError):
         cli_jupytext([nb_file])
 
 
-def test_error_not_same_ext(nb_file=list_all_notebooks('.ipynb')[0]):
+def test_error_not_same_ext(nb_file=list_notebooks()[0]):
     with pytest.raises(TypeError):
         convert_notebook_files([nb_file], ext='.py', output='not.ext')
 
 
-def test_error_update_not_ipynb(nb_file=list_all_notebooks('.ipynb')[0]):
+def test_error_update_not_ipynb(nb_file=list_notebooks()[0]):
     with pytest.raises(ValueError):
         cli_jupytext([nb_file, '--to', 'py', '--update'])
 
 
-def test_error_multiple_input(nb_files=list_all_notebooks('.ipynb')):
+def test_error_multiple_input(nb_files=list_notebooks()):
     with pytest.raises(ValueError):
         convert_notebook_files(nb_files, ext='.py', output='notebook.py')
 

@@ -1,8 +1,8 @@
-import sys
 import pytest
 from jupytext.cell_metadata import rmd_options_to_metadata, \
     metadata_to_rmd_options, parse_rmd_options, RMarkdownOptionParsingError, \
     try_eval_metadata, json_options_to_metadata
+from .utils import skip_if_dict_is_not_ordered
 
 SAMPLES = [('r', ('R', {})),
            ('r plot_1, dpi=72, fig.path="fig_path/"',
@@ -34,8 +34,7 @@ def test_parse_rmd_options(options, language_and_metadata):
     assert rmd_options_to_metadata(options) == language_and_metadata
 
 
-@pytest.mark.skipif(sys.version_info < (3, 6),
-                    reason="unordered dict result in changes in chunk options")
+@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('options,language_and_metadata', SAMPLES)
 def test_build_options(options, language_and_metadata):
     assert metadata_to_rmd_options(*language_and_metadata) == options
