@@ -105,7 +105,7 @@ def py_endofcell_marker(source):
             return endofcell
 
 
-class CellExporter():
+class CellExporter:
     """A class that represent a notebook cell as text"""
 
     def __init__(self, cell, default_language, ext):

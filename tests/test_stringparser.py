@@ -33,7 +33,7 @@ def test_single_chars(text="""'This is a single line comment'''
 
 1 + 1
 """):
-    quoted = []
     sp = StringParser('python')
-    for i, line in enumerate(text.splitlines()):
+    for line in text.splitlines():
         assert not sp.is_quoted()
+        sp.read_line(line)

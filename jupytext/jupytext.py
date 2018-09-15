@@ -49,7 +49,7 @@ class TextNotebookReader(NotebookReader):
             line = line[1:]
         return line
 
-    def reads(self, s, **kwargs):
+    def reads(self, s, **_):
         """Read a notebook from text"""
         return self.to_notebook(s)
 
