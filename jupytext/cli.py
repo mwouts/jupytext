@@ -3,8 +3,8 @@
 
 import os
 import argparse
-from jupytext import readf, writef, writes
-from jupytext import NOTEBOOK_EXTENSIONS
+from .jupytext import readf, writef, writes
+from .jupytext import NOTEBOOK_EXTENSIONS
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion
 from .file_format_version import check_file_version
