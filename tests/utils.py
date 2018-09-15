@@ -1,5 +1,4 @@
 import os
-import copy
 
 
 def list_all_notebooks(ext, path=None):
