@@ -47,8 +47,6 @@ def test_load_save_rename(nb_file, tmpdir):
 
 
 @skip_if_dict_is_not_ordered
-@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
-                    reason=TextFileContentsManager)
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
@@ -77,8 +75,6 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
 
 
 @skip_if_dict_is_not_ordered
-@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
-                    reason=TextFileContentsManager)
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
@@ -118,8 +114,6 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     assert os.path.isfile(str(tmpdir.join('new.nb.py')))
 
 
-@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
-                    reason=TextFileContentsManager)
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     tmp_ipynb = u'notebôk.ipynb'
@@ -160,8 +154,6 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     assert os.path.isfile(os.path.join(tmpdir, u'nêw.nb.py'))
 
 
-@pytest.mark.skipif(isinstance(TextFileContentsManager, str),
-                    reason=TextFileContentsManager)
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
 def test_outdated_text_notebook(nb_file, tmpdir):
     # 1. write py ipynb

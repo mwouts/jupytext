@@ -68,6 +68,7 @@ def test_nbconvert_and_read_r(nb_file):
 
 
 pytest.importorskip('jupyter')
+pytestmark = skip_if_dict_is_not_ordered
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
@@ -89,7 +90,6 @@ def test_nbconvert_cmd_line(nb_file, tmpdir):
     assert rmd1 == rmd2
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_nbconvert_cmd_line_py(nb_file, tmpdir):
     py_file = str(tmpdir.join('notebook.py'))
@@ -109,7 +109,6 @@ def test_nbconvert_cmd_line_py(nb_file, tmpdir):
     assert py1 == py2
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
 def test_nbconvert_cmd_line_R(nb_file, tmpdir):
     r_file = str(tmpdir.join('notebook.R'))
