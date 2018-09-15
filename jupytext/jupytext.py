@@ -51,11 +51,7 @@ class TextNotebookReader(NotebookReader):
 
     def reads(self, s, **_):
         """Read a notebook from text"""
-        return self.to_notebook(s)
-
-    def to_notebook(self, text):
-        """Read a notebook from text"""
-        lines = text.splitlines()
+        lines = s.splitlines()
 
         cells = []
         metadata, header_cell, pos = \
