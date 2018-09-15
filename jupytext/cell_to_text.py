@@ -60,9 +60,9 @@ class BaseCellExporter:
         source = copy(self.source)
         if not self.prefix:
             escape_code_start(source, self.ext, None)
-        return self.markdown_escape(source)
+        return self.markdown_to_text(source)
 
-    def markdown_escape(self, source):
+    def markdown_to_text(self, source):
         """Escape the given source, for a markdown cell"""
         if not self.prefix:
             return source
