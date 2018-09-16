@@ -6,12 +6,12 @@ from tornado.web import HTTPError
 import jupytext
 from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.compare import compare_notebooks
-from .utils import list_all_notebooks, list_py_notebooks
+from .utils import list_notebooks
 
 jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
 
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks())
 def test_rmd_is_ok(nb_file, tmpdir):
     nb = jupytext.readf(nb_file)
     tmp_ipynb = 'notebook.ipynb'
@@ -31,7 +31,7 @@ def test_rmd_is_ok(nb_file, tmpdir):
     compare_notebooks(nb, nb2)
 
 
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.Rmd'))
+@pytest.mark.parametrize('nb_file', list_notebooks('Rmd'))
 def test_ipynb_is_ok(nb_file, tmpdir):
     nb = jupytext.readf(nb_file)
     tmp_ipynb = 'notebook.ipynb'
@@ -50,7 +50,7 @@ def test_ipynb_is_ok(nb_file, tmpdir):
     compare_notebooks(nb, nb2)
 
 
-@pytest.mark.parametrize('nb_file', list_py_notebooks('.ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_all_files_created(nb_file, tmpdir):
     nb = jupytext.readf(nb_file)
     tmp_ipynb = 'notebook.ipynb'

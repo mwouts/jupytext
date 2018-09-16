@@ -1,7 +1,7 @@
-import sys
 import pytest
 import jupytext
 from testfixtures import compare
+from .utils import skip_if_dict_is_not_ordered
 
 jupytext.file_format_version.FILE_FORMAT_VERSION = {}
 
@@ -51,8 +51,7 @@ ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
                            'outputs': []}}
 
 
-@pytest.mark.skipif(sys.version_info < (3, 6),
-                    reason="unordered dict result in changes in chunk options")
+@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_ipynb(ext):
     nb = jupytext.reads(ACTIVE_IPYNB[ext], ext=ext)
@@ -80,8 +79,7 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
                               'outputs': []}}
 
 
-@pytest.mark.skipif(sys.version_info < (3, 6),
-                    reason="unordered dict result in changes in chunk options")
+@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_py_ipynb(ext):
     nb = jupytext.reads(ACTIVE_PY_IPYNB[ext], ext=ext)
@@ -106,8 +104,7 @@ ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
                          'metadata': {'active': 'Rmd'}}}
 
 
-@pytest.mark.skipif(sys.version_info < (3, 6),
-                    reason="unordered dict result in changes in chunk options")
+@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_rmd(ext):
     nb = jupytext.reads(ACTIVE_RMD[ext], ext=ext)
@@ -134,8 +131,7 @@ ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd"}
                                             'hide_output': True}}}
 
 
-@pytest.mark.skipif(sys.version_info < (3, 6),
-                    reason="unordered dict result in changes in chunk options")
+@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_not_include_rmd(ext):
     nb = jupytext.reads(ACTIVE_NOT_INCLUDE_RMD[ext], ext=ext)

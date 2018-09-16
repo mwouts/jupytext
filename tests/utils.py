@@ -1,71 +1,26 @@
 import os
-import copy
+import sys
+import pytest
+
+skip_if_dict_is_not_ordered = pytest.mark.skipif(
+    sys.version_info < (3, 6),
+    reason="unordered dict result in changes in chunk options")
 
 
-def list_all_notebooks(ext, path=None):
-    """
-    :ext: desired extension
-    :return: all notebooks in the directory of this script,
-     with the desired extension
-    """
+def list_notebooks(path='ipynb'):
+    """All notebooks in the directory notebooks/path,
+    or in the package itself"""
+    if path == 'ipynb':
+        return list_notebooks('ipynb_julia') + \
+               list_notebooks('ipynb_py') + \
+               list_notebooks('ipynb_R')
+
     nb_path = os.path.dirname(os.path.abspath(__file__))
-    if path:
+    if path.startswith('.'):
         nb_path = os.path.join(nb_path, path)
-    notebooks = []
-    for nb_file in os.listdir(nb_path):
-        _, nb_ext = os.path.splitext(nb_file)
-        if nb_ext.lower() == ext.lower() and \
-                (not nb_file.startswith('ir_notebook')
-                 or nb_file.startswith('R_sample')):
-            notebooks.append(os.path.join(nb_path, nb_file))
-    return notebooks
-
-
-def list_r_notebooks(ext):
-    """
-    :ext: desired extension
-    :return: all R notebooks in the directory of this script,
-     with the desired extension
-    """
-    nb_path = os.path.dirname(os.path.abspath(__file__))
-    notebooks = []
-    for nb_file in os.listdir(nb_path):
-        _, nb_ext = os.path.splitext(nb_file)
-        if nb_ext.lower() == ext.lower() and \
-                (nb_file.startswith('ir_notebook')
-                 or nb_file.startswith('R_sample')):
-            notebooks.append(os.path.join(nb_path, nb_file))
-    return notebooks
-
-
-def list_julia_notebooks(ext):
-    """
-    :ext: desired extension
-    :return: all Julia notebooks in the directory of this script,
-     with the desired extension
-    """
-    nb_path = os.path.dirname(os.path.abspath(__file__))
-    notebooks = []
-    for nb_file in os.listdir(nb_path):
-        _, nb_ext = os.path.splitext(nb_file)
-        if nb_ext.lower() == ext.lower() and nb_file.startswith('julia_'):
-            notebooks.append(os.path.join(nb_path, nb_file))
-    return notebooks
-
-
-def list_py_notebooks(ext):
-    """
-    :ext: desired extension
-    :return: all Python notebooks in the directory of this script,
-     with the desired extension
-    """
-    nb_path = os.path.dirname(os.path.abspath(__file__))
-    notebooks = []
-    for nb_file in os.listdir(nb_path):
-        _, nb_ext = os.path.splitext(nb_file)
-        if nb_ext.lower() == ext.lower() and not (
-                nb_file.startswith('julia_')
-                or nb_file.startswith('ir_notebook')
-                or nb_file.startswith('R_sample')):
-            notebooks.append(os.path.join(nb_path, nb_file))
+    else:
+        nb_path = os.path.join(nb_path, 'notebooks', path)
+    notebooks = [os.path.join(nb_path, nb_file) for nb_file in
+                 os.listdir(nb_path)]
+    assert notebooks
     return notebooks

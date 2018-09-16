@@ -1,4 +1,3 @@
-import re
 from testfixtures import compare
 import jupytext
 

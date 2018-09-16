@@ -50,10 +50,10 @@ def encoding_and_executable(self, notebook):
 
 
 def metadata_and_cell_to_header(self, notebook):
-    '''
+    """
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
-    '''
+    """
 
     header = []
     skipline = True
@@ -90,9 +90,9 @@ def metadata_and_cell_to_header(self, notebook):
 
 
 def header_to_metadata_and_cell(self, lines):
-    '''
+    """
     Return the metadata, first cell of notebook, and next loc in text
-    '''
+    """
 
     header = []
     jupyter = []

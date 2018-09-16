@@ -1,7 +1,7 @@
 # coding: utf-8
 import pytest
 import jupytext
-from .utils import list_all_notebooks
+from .utils import list_notebooks
 
 try:
     unicode  # Python 2
@@ -9,8 +9,7 @@ except NameError:
     unicode = str  # Python 3
 
 
-@pytest.mark.parametrize('nb_file', list_all_notebooks('.ipynb') +
-                         list_all_notebooks('.Rmd'))
+@pytest.mark.parametrize('nb_file', list_notebooks() + list_notebooks('Rmd'))
 def test_notebook_contents_is_unicode(nb_file):
     nb = jupytext.readf(nb_file)
 
