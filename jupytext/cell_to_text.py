@@ -81,6 +81,9 @@ class BaseCellExporter:
 
         return False
 
+    def simplify_start_code_marker(self, text, next_text, lines):
+        return text
+
 
 class MarkdownCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as Markdown"""
@@ -170,6 +173,23 @@ class LightScriptCellExporter(BaseCellExporter):
         lines.extend(source)
         lines.append('# {}'.format(endofcell))
         return lines
+
+    def simplify_start_code_marker(self, text, next_text, lines):
+
+        # Simplify cell marker when previous line is blank
+        if text[0] == '# + {}' and (not lines or not lines[-1]):
+            text[0] = '# +'
+
+        # remove end of cell marker when redundant
+        # with next explicit marker
+        if self.is_code() and text[-1] == '# -':
+            if self.lines_to_end_of_cell_marker:
+                text = text[:-1] + \
+                       [''] * self.lines_to_end_of_cell_marker + ['# -']
+            elif not next_text or next_text[0].startswith('# + {'):
+                text = text[:-1]
+
+        return text
 
 
 class RScriptCellExporter(BaseCellExporter):
