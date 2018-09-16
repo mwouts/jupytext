@@ -37,7 +37,7 @@ You like to work with scripts? The good news is that plain scripts, which you ca
 
 With Jupytext, collaborating on Jupyter notebooks with Git becomes as easy as collaborating on text files.
 
-The setup is straightforward: 
+The setup is straightforward:
 - Open your favorite notebook in Jupyter notebook
 - [Associate](#paired-notebooks) a `.py` representation (for instance) to that notebook
 - Save the notebook, and put the Python script under Git control. Sharing the `.ipynb` file is possible, but not required.
@@ -162,6 +162,16 @@ We wanted to represent Jupyter notebooks with the least explicit markers possibl
 - Jupyter metadata go to an escaped YAML header
 - Markdown cells are commented with `# `, and separated with a blank line
 - Code cells are exported verbatim (except for Jupyter magics, which are escaped), and separated with blank lines. Code cells are reconstructed from consistent python paragraphs (no function, class or multiline comment will be broken). A start-of-cell delimiter `# +` is used for cells that contain blank lines (outside of functions, classes, etc). `# + {}` is used for cells that have explicit metadata (inside the curly bracket, in JSON format). The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
+
+## Jupyter Notebook or Jupyter Lab?
+
+Jupytext works very well with the Jupyter Notebook editor, and we recommend that you get used to Jupytext within `jupyter notebook` first.
+
+That being said, using Jupytext from Jupyter Lab is also an option. Please note that:
+- Jupytext's installation is identical in both Jupyter Notebook and Jupyter Lab
+- Jupyter Lab can open any [paired notebook](#paired-notebooks) with `.ipynb` extension. Paired notebooks work exactly as in Jupyter Notebook: input cells are taken from the text notebook, and outputs from the  `.ipynb` file. Both files are updated when the notebook is saved.
+- Pairing notebooks is less convenient in Jupyter Lab than in Jupyter Notebook. Indeed, Jupyter Lab has no notebook metadata editor [yet](https://github.com/jupyterlab/jupyterlab/issues/1308), so you will have to open the JSON representation of the notebook, find the notebook metadata, and add the `"jupytext_formats": "ipynb,py",` entry manually.
+- Jupyter Lab cannot currently open scripts or Markdown documents as notebooks. A workaround is to create the corresponding `.ipynb` file manually, e.g. `jupytext --to notebook.ipynb notebook.py`, and pair it with the script. Opening scripts or Markdown documents as notebooks will become possible in the next Jupyter Lab release (v. 0.35), for which we contributed a _Open With -> Notebook_ menu entry in the contextual menu (right-click on a text notebook).
 
 ## Will my notebook really run in an IDE?
 
