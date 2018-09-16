@@ -132,6 +132,7 @@ class BaseCellReader:
                 self.options_to_metadata(self.start_code_re.findall(line)[0])
 
     def options_to_metadata(self, options):
+        """Return language (str) and metadata (dict) from the option line"""
         raise NotImplementedError("Option parsing must be implemented in a "
                                   "sub class")
 
@@ -199,7 +200,7 @@ class BaseCellReader:
         # Cell content
         source = lines[cell_start:cell_end_marker]
 
-        self.content = self.unescape_cell_source(source)
+        self.content = self.uncomment_code_and_magics(source)
 
         # Exactly two empty lines at the end of cell (caused by PEP8)?
         if (self.ext == '.py' and explicit_eoc and
@@ -234,12 +235,14 @@ class BaseCellReader:
 
         return next_cell_start
 
-    def unescape_cell_source(self, lines):
-        raise NotImplementedError('This method must be implemented in a sub '
-                                  'class')
+    def uncomment_code_and_magics(self, lines):
+        """Uncomment code and possibly commented magic commands"""
+        raise NotImplementedError('This method must be implemented in a '
+                                  'sub class')
 
 
 class MarkdownCellReader(BaseCellReader):
+    """Read notebook cells from Markdown documents"""
     comment = ''
     start_code_re = re.compile(r"^```(.*)")
     end_code_re = re.compile(r"^```\s*$")
@@ -277,12 +280,13 @@ class MarkdownCellReader(BaseCellReader):
         # End not found
         return len(lines), len(lines), False
 
-    def unescape_cell_source(self, source):
-        return unescape_code_start(source, self.ext, self.language or
+    def uncomment_code_and_magics(self, lines):
+        return unescape_code_start(lines, self.ext, self.language or
                                    self.default_language)
 
 
 class RMarkdownCellReader(MarkdownCellReader):
+    """Read notebook cells from R Markdown notebooks"""
     comment = ''
     start_code_re = re.compile(r"^```{(.*)}\s*$")
     default_language = 'R'
@@ -290,36 +294,45 @@ class RMarkdownCellReader(MarkdownCellReader):
     def options_to_metadata(self, options):
         return rmd_options_to_metadata(options)
 
-    def unescape_cell_source(self, source):
+    def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code':
             if is_active(self.ext, self.metadata):
-                unescape_magic(source, self.language or self.default_language)
+                unescape_magic(lines, self.language or self.default_language)
 
-        unescape_code_start(source, self.ext, self.language or
+        unescape_code_start(lines, self.ext, self.language or
                             self.default_language)
 
-        return source
+        return lines
 
 
 class ScriptCellReader(BaseCellReader):
-    def unescape_cell_source(self, source):
+    """Read notebook cells from scripts
+    (common base for R and Python scripts)"""
+
+    def options_to_metadata(self, options):
+        raise NotImplementedError()
+
+    def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code':
             if is_active(self.ext, self.metadata):
-                unescape_magic(source, self.language or self.default_language)
+                unescape_magic(lines, self.language or self.default_language)
             else:
-                source = uncomment(source)
+                lines = uncomment(lines)
 
         if self.cell_type == 'code':
-            unescape_code_start(source, self.ext, self.language or
+            unescape_code_start(lines, self.ext, self.language or
                                 self.default_language)
 
         if self.cell_type == 'markdown':
-            source = uncomment(source, self.markdown_prefix or self.comment)
+            lines = uncomment(lines, self.markdown_prefix or self.comment)
 
-        return source
+        return lines
 
 
 class RScriptCellReader(ScriptCellReader):
+    """Read notebook cells from R scripts written according
+    to the knitr-spin syntax"""
+
     comment = "#'"
     markdown_prefix = "#'"
     default_language = 'R'
@@ -345,16 +358,22 @@ class RScriptCellReader(ScriptCellReader):
 
 
 class LightScriptCellReader(ScriptCellReader):
+    """Read notebook cells from plain Python or Julia files. Cells
+    are identified by line breaks, unless they start with an
+    explicit marker '# +' """
     comment = '#'
     start_code_re = _CODE_OPTION_PY
 
     def __init__(self, ext):
-        self.ext = ext
-        self.default_language = 'julia' if self.ext == '.jl' else 'python'
+        super(LightScriptCellReader, self).__init__(ext)
+        self.default_language = 'julia' if ext == '.jl' else 'python'
+
+    def options_to_metadata(self, options):
+        return json_options_to_metadata(options)
 
     def metadata_and_language_from_option_line(self, line):
         if _CODE_OPTION_PY.match(line):
-            self.metadata = json_options_to_metadata(
+            self.metadata = self.options_to_metadata(
                 _CODE_OPTION_PY.match(line).group(3))
         elif _SIMPLE_START_CODE_PY.match(line):
             self.metadata = {}

@@ -21,6 +21,7 @@ def cell_source(cell):
 
 class BaseCellExporter:
     """A class that represent a notebook cell as text"""
+    prefix = None
 
     def __init__(self, cell, default_language, ext):
         self.ext = ext
@@ -69,6 +70,11 @@ class BaseCellExporter:
         return [self.prefix + ' ' + line if line else self.prefix
                 for line in source]
 
+    def code_to_text(self):
+        """Return the text representation of this cell as a code cell"""
+        raise NotImplementedError('This method must be implemented '
+                                  'in a sub-class')
+
     def explicit_start_marker(self, source):
         """Does the python representation of this cell requires an explicit
         start of cell marker?"""
@@ -81,7 +87,8 @@ class BaseCellExporter:
 
         return False
 
-    def simplify_start_code_marker(self, text, next_text, lines):
+    def simplify_code_markers(self, text, next_text, lines):
+        """Simplify start code marker when possible"""
         return text
 
 
@@ -126,20 +133,21 @@ class RMarkdownCellExporter(BaseCellExporter):
         return lines
 
 
+def endofcell_marker(source):
+    """Issues #31 #38:  does the cell contain a blank line? In that case
+    we add an end-of-cell marker"""
+    endofcell = '-'
+    while True:
+        endofcell_re = re.compile(r'^#( )' + endofcell + r'\s*$')
+        if list(filter(endofcell_re.match, source)):
+            endofcell = endofcell + '-'
+        else:
+            return endofcell
+
+
 class LightScriptCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as a Python or Julia script"""
     prefix = '#'
-
-    def endofcell_marker(self, source):
-        """Issues #31 #38:  does the cell contain a blank line? In that case
-        we add an end-of-cell marker"""
-        endofcell = '-'
-        while True:
-            endofcell_re = re.compile(r'^#( )' + endofcell + r'\s*$')
-            if list(filter(endofcell_re.match, source)):
-                endofcell = endofcell + '-'
-            else:
-                return endofcell
 
     def code_to_text(self):
         """Return the text representation of a code cell"""
@@ -159,7 +167,7 @@ class LightScriptCellExporter(BaseCellExporter):
             source = ['# ' + line if line else '#' for line in source]
 
         if self.explicit_start_marker(source):
-            self.metadata['endofcell'] = self.endofcell_marker(source)
+            self.metadata['endofcell'] = endofcell_marker(source)
 
         if not self.metadata:
             return source
@@ -174,9 +182,9 @@ class LightScriptCellExporter(BaseCellExporter):
         lines.append('# {}'.format(endofcell))
         return lines
 
-    def simplify_start_code_marker(self, text, next_text, lines):
-
-        # Simplify cell marker when previous line is blank
+    def simplify_code_markers(self, text, next_text, lines):
+        """Simplify cell marker when previous line is blank, remove end
+        of cell marker when next cell has an explicit marker"""
         if text[0] == '# + {}' and (not lines or not lines[-1]):
             text[0] = '# +'
 
@@ -224,6 +232,7 @@ class RScriptCellExporter(BaseCellExporter):
 
 
 def CellExporter(cell, default_language, ext):
+    """TODO: REMOVE this temporary function"""
     if ext == '.md':
         return MarkdownCellExporter(cell, default_language, ext)
     if ext == '.Rmd':

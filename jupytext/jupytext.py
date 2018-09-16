@@ -113,7 +113,7 @@ class TextNotebookWriter(NotebookWriter):
         texts = [cell.cell_to_text() for cell in cells]
 
         for i, cell in enumerate(cells):
-            text = cell.simplify_start_code_marker(
+            text = cell.simplify_code_markers(
                 texts[i], texts[i + 1] if i + 1 < len(texts) else None, lines)
 
             lines.extend(text)
