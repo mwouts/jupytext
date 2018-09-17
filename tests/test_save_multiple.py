@@ -4,7 +4,6 @@ from nbformat.v4.nbbase import new_notebook
 from nbformat.validator import NotebookValidationError
 from tornado.web import HTTPError
 import jupytext
-from jupytext import header
 from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks

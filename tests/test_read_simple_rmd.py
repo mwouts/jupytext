@@ -1,7 +1,6 @@
 import re
 from testfixtures import compare
 import jupytext
-from jupytext import header
 
 jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 

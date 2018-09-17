@@ -12,7 +12,6 @@ R Markdown notebooks.
 
 from .jupytext import readf, writef, writes, reads
 from .formats import NOTEBOOK_EXTENSIONS
-from .header import INSERT_AND_CHECK_VERSION_NUMBER
 
 try:
     from .textexporter import RMarkdownExporter, MarkdownExporter, \
