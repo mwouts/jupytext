@@ -1,7 +1,7 @@
 import pytest
 from jupytext.cell_metadata import rmd_options_to_metadata, \
     metadata_to_rmd_options, parse_rmd_options, RMarkdownOptionParsingError, \
-    try_eval_metadata, json_options_to_metadata
+    try_eval_metadata, json_options_to_metadata, md_options_to_metadata
 from .utils import skip_if_dict_is_not_ordered
 
 SAMPLES = [('r', ('R', {})),
@@ -74,3 +74,9 @@ def test_try_eval_metadata():
 
 def test_parse_wrong_json():
     assert json_options_to_metadata("""{"key":'incorrect value'}""") == {}
+
+
+def test_parse_md_options():
+    assert md_options_to_metadata('python') == ('python', {})
+    assert md_options_to_metadata('not_a_language') == (None, {
+        'name': 'not_a_language'})

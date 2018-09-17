@@ -89,6 +89,34 @@ def test_active_py_ipynb(ext):
         compare(ACTIVE_PY_IPYNB[ext], jupytext.writes(nb, ext=ext))
 
 
+ACTIVE_PY_R_IPYNB = {'.py': """# + {"active": "ipynb,py,R"}
+# This cell is active in py, R and ipynb extensions
+""",
+                     '.Rmd': """```{python active="ipynb,py,R", eval=FALSE}
+# This cell is active in py, R and ipynb extensions
+```
+""",
+                     '.R': """#+ language="python", active="ipynb,py,R", eval=FALSE
+# This cell is active in py, R and ipynb extensions
+""",
+                     '.ipynb': {'cell_type': 'code',
+                                'source': '# This cell is active in py, R and '
+                                          'ipynb extensions',
+                                'metadata': {'active': 'ipynb,py,R'},
+                                'execution_count': None,
+                                'outputs': []}}
+
+
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
+def test_active_py_r_ipynb(ext):
+    nb = jupytext.reads(ACTIVE_PY_R_IPYNB[ext], ext=ext)
+    assert len(nb.cells) == 1
+    compare(nb.cells[0], ACTIVE_PY_R_IPYNB['.ipynb'])
+    if ext != '.R':
+        compare(ACTIVE_PY_R_IPYNB[ext], jupytext.writes(nb, ext=ext))
+
+
 ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
 # # This cell is active in Rmd only
 """,
