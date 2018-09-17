@@ -1,7 +1,6 @@
 import pytest
 from testfixtures import compare
 import jupytext
-from jupytext import header
 from .utils import list_notebooks
 from .utils import skip_if_dict_is_not_ordered
 
