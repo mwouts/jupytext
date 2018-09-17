@@ -70,7 +70,7 @@ def last_two_lines_blank(source):
             _BLANK_LINE.match(source[-1]))
 
 
-class BaseCellReader:
+class BaseCellReader(object):
     """A class that can read notebook cells from their text representation"""
 
     cell_type = None
