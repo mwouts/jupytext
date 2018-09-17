@@ -4,11 +4,12 @@ from nbformat.v4.nbbase import new_notebook
 from nbformat.validator import NotebookValidationError
 from tornado.web import HTTPError
 import jupytext
+from jupytext import header
 from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 
-jupytext.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks())

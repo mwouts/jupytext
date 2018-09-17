@@ -10,8 +10,7 @@ from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 from .utils import skip_if_dict_is_not_ordered
 
-jupytext.file_format_version.FILE_FORMAT_VERSION = {}
-jupytext.file_format_version.MIN_FILE_FORMAT_VERSION = {}
+jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 def test_create_contentsmanager():

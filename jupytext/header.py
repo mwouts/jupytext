@@ -5,7 +5,7 @@ import re
 import yaml
 import nbformat
 from nbformat.v4.nbbase import new_raw_cell
-from .file_format_version import file_format_version
+from .cell_to_text import comment
 
 _HEADER_RE = re.compile(r"^---\s*$")
 _BLANK_RE = re.compile(r"^\s*$")
@@ -14,6 +14,15 @@ _LEFTSPACE_RE = re.compile(r"^\s")
 _ENCODING_RE = re.compile('^[ \t\f]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)')
 _UTF8_HEADER = '# -*- coding: utf-8 -*-'
 
+# Change this to False in tests
+INSERT_AND_CHECK_VERSION_NUMBER = True
+
+
+def insert_or_test_version_number():
+    """Should the format name and version number be inserted in text
+    representations (not in tests!)"""
+    return INSERT_AND_CHECK_VERSION_NUMBER
+
 
 def _as_dict(metadata):
     if isinstance(metadata, nbformat.NotebookNode):
@@ -21,7 +30,18 @@ def _as_dict(metadata):
     return metadata
 
 
-def encoding_and_executable(self, notebook):
+def uncomment_line(line, prefix):
+    """Remove prefix (and space) from line"""
+    if not prefix:
+        return line
+    if line.startswith(prefix + ' '):
+        return line[len(prefix) + 1:]
+    if line.startswith(prefix):
+        return line[len(prefix):]
+    return line
+
+
+def encoding_and_executable(notebook, ext):
     """
     Return encoding and executable lines for a notebook, if applicable
     :param self:
@@ -31,14 +51,14 @@ def encoding_and_executable(self, notebook):
     lines = []
     metadata = notebook.get('metadata', {})
 
-    if self.ext not in ['.Rmd', '.md'] and 'executable' in metadata:
+    if ext not in ['.Rmd', '.md'] and 'executable' in metadata:
         lines.append('#!' + metadata['executable'])
         del metadata['executable']
 
     if 'encoding' in metadata:
         lines.append(metadata['encoding'])
         del metadata['encoding']
-    elif self.ext not in ['.Rmd', '.md']:
+    elif ext not in ['.Rmd', '.md']:
         for cell in notebook.cells:
             try:
                 cell.source.encode('ascii')
@@ -49,7 +69,7 @@ def encoding_and_executable(self, notebook):
     return lines
 
 
-def metadata_and_cell_to_header(self, notebook):
+def metadata_and_cell_to_header(notebook, text_format):
     """
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
@@ -71,8 +91,12 @@ def metadata_and_cell_to_header(self, notebook):
 
     metadata = _as_dict(notebook.get('metadata', {}))
 
-    if file_format_version(self.ext):
-        metadata['jupytext_format_version'] = file_format_version(self.ext)
+    if insert_or_test_version_number():
+        metadata['jupytext_format_version'] = \
+            text_format.current_version_number
+        metadata['jupytext_format_flavor'] = \
+            metadata.get('jupytext_format_flavor', {}).update(
+                {text_format.extension: text_format.format_name})
 
     if metadata:
         header.extend(yaml.safe_dump({'jupyter': metadata},
@@ -81,7 +105,7 @@ def metadata_and_cell_to_header(self, notebook):
     if header:
         header = ['---'] + header + ['---']
 
-    header = self.markdown_escape(header)
+    header = comment(header, text_format.header_prefix)
 
     if header and skipline:
         header += ['']
@@ -89,7 +113,7 @@ def metadata_and_cell_to_header(self, notebook):
     return header
 
 
-def header_to_metadata_and_cell(self, lines):
+def header_to_metadata_and_cell(lines, header_prefix):
     """
     Return the metadata, first cell of notebook, and next loc in text
     """
@@ -118,10 +142,10 @@ def header_to_metadata_and_cell(self, lines):
                 start = i + 1
                 continue
 
-        if not line.startswith(self.prefix):
+        if not line.startswith(header_prefix):
             break
 
-        line = self.markdown_unescape(line)
+        line = uncomment_line(line, header_prefix)
 
         if i == start:
             if _HEADER_RE.match(line):
@@ -149,7 +173,7 @@ def header_to_metadata_and_cell(self, lines):
 
         skipline = True
         if len(lines) > i + 1:
-            line = self.markdown_unescape(lines[i + 1])
+            line = uncomment_line(lines[i + 1], header_prefix)
             if not _BLANK_RE.match(line):
                 skipline = False
             else:

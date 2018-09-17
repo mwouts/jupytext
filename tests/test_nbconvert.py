@@ -31,7 +31,7 @@ def test_nbconvert_and_read_py(nb_file):
     py1 = jupytext.writes(nb, ext='.py')
 
     # Export to py using nbconvert exporter
-    py_exporter = jupytext.PyNotebookExporter()
+    py_exporter = jupytext.LightPythonExporter()
     (py2, resources) = py_exporter.from_notebook_node(nb)
 
     assert py1 == py2
@@ -46,7 +46,7 @@ def test_nbconvert_and_read_julia(nb_file):
     julia = jupytext.writes(nb, ext='.jl')
 
     # Export to py using nbconvert exporter
-    julia_exporter = jupytext.JlNotebookExporter()
+    julia_exporter = jupytext.LightJuliaExporter()
     (julia2, resources) = julia_exporter.from_notebook_node(nb)
 
     assert julia == julia2
@@ -61,7 +61,7 @@ def test_nbconvert_and_read_r(nb_file):
     r1 = jupytext.writes(nb, ext='.R')
 
     # Export to py using nbconvert exporter
-    r_exporter = jupytext.RNotebookExporter()
+    r_exporter = jupytext.RKnitrSpinExporter()
     (r2, resources) = r_exporter.from_notebook_node(nb)
 
     assert r1 == r2
@@ -81,8 +81,7 @@ def test_nbconvert_cmd_line(nb_file, tmpdir):
     assert os.path.isfile(rmd_file)
 
     nb = jupytext.readf(nb_file)
-    with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
-                    jupytext.file_format_version.FILE_FORMAT_VERSION_ORG):
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         rmd1 = jupytext.writes(nb, ext='.Rmd')
     with open(rmd_file) as fp:
         rmd2 = fp.read()
@@ -100,8 +99,7 @@ def test_nbconvert_cmd_line_py(nb_file, tmpdir):
     assert os.path.isfile(py_file)
 
     nb = jupytext.readf(nb_file)
-    with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
-                    jupytext.file_format_version.FILE_FORMAT_VERSION_ORG):
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         py1 = jupytext.writes(nb, ext='.py')
     with open(py_file) as fp:
         py2 = fp.read()
@@ -119,8 +117,7 @@ def test_nbconvert_cmd_line_R(nb_file, tmpdir):
     assert os.path.isfile(r_file)
 
     nb = jupytext.readf(nb_file)
-    with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
-                    jupytext.file_format_version.FILE_FORMAT_VERSION_ORG):
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         r = jupytext.writes(nb, ext='.R')
     with open(r_file) as fp:
         r2 = fp.read()

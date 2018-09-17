@@ -4,10 +4,9 @@
 import os
 import argparse
 from .jupytext import readf, writef, writes
-from .jupytext import NOTEBOOK_EXTENSIONS
+from .formats import NOTEBOOK_EXTENSIONS, check_file_version
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion
-from .file_format_version import check_file_version
 
 
 def convert_notebook_files(nb_files, ext, output=None,
@@ -32,6 +31,10 @@ def convert_notebook_files(nb_files, ext, output=None,
         dest, current_ext = os.path.splitext(nb_file)
         if current_ext not in NOTEBOOK_EXTENSIONS:
             raise TypeError('File {} is not a notebook'.format(nb_file))
+
+        if ext not in NOTEBOOK_EXTENSIONS:
+            raise TypeError('Destination extension {} is not a notebook'
+                            .format(nb_file))
 
         notebook = readf(nb_file)
         if test_round_trip:

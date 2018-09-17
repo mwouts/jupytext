@@ -4,7 +4,7 @@ import jupytext
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 
-jupytext.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))

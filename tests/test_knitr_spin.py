@@ -1,9 +1,8 @@
-import os
 import pytest
 import jupytext
 from .utils import list_notebooks, skip_if_dict_is_not_ordered
 
-jupytext.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 @skip_if_dict_is_not_ordered

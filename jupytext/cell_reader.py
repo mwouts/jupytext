@@ -379,7 +379,8 @@ class LightScriptCellReader(ScriptCellReader):
             self.metadata = {}
 
         if self.metadata is not None:
-            self.language = self.metadata.get('language', self.default_language)
+            self.language = self.metadata.get(
+                'language', self.default_language)
 
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position
@@ -397,15 +398,3 @@ class LightScriptCellReader(ScriptCellReader):
             self.end_code_re = re.compile('^# ' + end_of_cell + r'\s*$')
 
         return self.find_code_cell_end(lines)
-
-
-def CellReader(ext):
-    """Return a class that can read notebook cells from their text
-    representation, for the given file extension"""
-    if ext == '.md':
-        return MarkdownCellReader(ext)
-    if ext == '.Rmd':
-        return RMarkdownCellReader(ext)
-    if ext == '.R':
-        return RScriptCellReader(ext)
-    return LightScriptCellReader(ext)
