@@ -3,10 +3,10 @@
 import re
 from copy import copy
 from .languages import cell_language
-from .cell_reader import CellReader
 from .cell_metadata import filter_metadata, is_active, \
     metadata_to_rmd_options, metadata_to_json_options
 from .magics import escape_magic, escape_code_start
+from .cell_reader import LightScriptCellReader
 
 
 def cell_source(cell):
@@ -17,6 +17,13 @@ def cell_source(cell):
     if source.endswith('\n'):
         return source.splitlines() + ['']
     return source.splitlines()
+
+
+def comment(lines, prefix):
+    """Return commented lines"""
+    if not prefix:
+        return lines
+    return [prefix + ' ' + line if line else prefix for line in lines]
 
 
 class BaseCellExporter:
@@ -65,30 +72,16 @@ class BaseCellExporter:
 
     def markdown_to_text(self, source):
         """Escape the given source, for a markdown cell"""
-        if not self.prefix:
-            return source
-        return [self.prefix + ' ' + line if line else self.prefix
-                for line in source]
+        return comment(source, self.prefix)
 
     def code_to_text(self):
         """Return the text representation of this cell as a code cell"""
         raise NotImplementedError('This method must be implemented '
                                   'in a sub-class')
 
-    def explicit_start_marker(self, source):
-        """Does the python representation of this cell requires an explicit
-        start of cell marker?"""
-        if self.metadata:
-            return True
-        if all([line.startswith('#') for line in self.source]):
-            return True
-        if CellReader(self.ext).read(source)[1] < len(source):
-            return True
-
-        return False
-
     def simplify_code_markers(self, text, next_text, lines):
         """Simplify start code marker when possible"""
+        # pylint: disable=W0613,R0201
         return text
 
 
@@ -182,6 +175,18 @@ class LightScriptCellExporter(BaseCellExporter):
         lines.append('# {}'.format(endofcell))
         return lines
 
+    def explicit_start_marker(self, source):
+        """Does the python representation of this cell requires an explicit
+        start of cell marker?"""
+        if self.metadata:
+            return True
+        if all([line.startswith('#') for line in self.source]):
+            return True
+        if LightScriptCellReader(self.ext).read(source)[1] < len(source):
+            return True
+
+        return False
+
     def simplify_code_markers(self, text, next_text, lines):
         """Simplify cell marker when previous line is blank, remove end
         of cell marker when next cell has an explicit marker"""
@@ -229,15 +234,3 @@ class RScriptCellExporter(BaseCellExporter):
             lines.append('#+ {}'.format(options))
         lines.extend(source)
         return lines
-
-
-def CellExporter(cell, default_language, ext):
-    """TODO: REMOVE this temporary function"""
-    if ext == '.md':
-        return MarkdownCellExporter(cell, default_language, ext)
-    if ext == '.Rmd':
-        return RMarkdownCellExporter(cell, default_language, ext)
-    if ext == '.R':
-        return RScriptCellExporter(cell, default_language, ext)
-
-    return LightScriptCellExporter(cell, default_language, ext)

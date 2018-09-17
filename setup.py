@@ -20,8 +20,8 @@ setup(
     entry_points={'console_scripts': ['jupytext = jupytext.cli:jupytext'],
                   'nbconvert.exporters':
                       ['rmarkdown = jupytext:RMarkdownExporter',
-                       'pynotebook = jupytext:PyNotebookExporter',
-                       'rnotebook = jupytext:RNotebookExporter']},
+                       'pynotebook = jupytext:LightPythonExporter',
+                       'rnotebook = jupytext:RKnitrSpinExporter']},
     tests_require=['pytest'],
     install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml', 'testfixtures'],
     license='MIT',

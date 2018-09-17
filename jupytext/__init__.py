@@ -10,17 +10,17 @@ Use the 'jupytext' conversion script to convert Jupyter notebooks from/to
 R Markdown notebooks.
 """
 
-from .jupytext import readf, writef, writes, reads, NOTEBOOK_EXTENSIONS
-from .file_format_version import FILE_FORMAT_VERSION
+from .jupytext import readf, writef, writes, reads
+from .formats import NOTEBOOK_EXTENSIONS
+from .header import INSERT_AND_CHECK_VERSION_NUMBER
 
 try:
-    from .rmarkdownexporter import RMarkdownExporter
-    from .srcexporter import PyNotebookExporter
-    from .srcexporter import RNotebookExporter
-    from .srcexporter import JlNotebookExporter
+    from .textexporter import RMarkdownExporter, MarkdownExporter, \
+        LightPythonExporter, LightJuliaExporter, RKnitrSpinExporter
+
 except ImportError as err:
-    RMarkdownExporter = PyNotebookExporter = JlNotebookExporter =\
-        RNotebookExporter = str(err)
+    RMarkdownExporter = MarkdownExporter = LightPythonExporter = \
+        LightJuliaExporter = RKnitrSpinExporter = str(err)
 
 try:
     from .contentsmanager import TextFileContentsManager
@@ -28,6 +28,7 @@ except ImportError as err:
     TextFileContentsManager = str(err)
 
 __all__ = ['readf', 'writef', 'writes', 'reads',
-           'NOTEBOOK_EXTENSIONS', 'FILE_FORMAT_VERSION',
-           'RMarkdownExporter', 'PyNotebookExporter', 'RNotebookExporter',
+           'NOTEBOOK_EXTENSIONS',
+           'RMarkdownExporter', 'MarkdownExporter', 'LightPythonExporter',
+           'LightJuliaExporter', 'RKnitrSpinExporter',
            'TextFileContentsManager']

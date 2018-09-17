@@ -1,8 +1,9 @@
 import re
 from testfixtures import compare
 import jupytext
+from jupytext import header
 
-jupytext.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 def test_read_mostly_py_rmd_file(rmd="""---

@@ -18,7 +18,7 @@ from notebook.services.contents.filemanager import FileContentsManager
 
 import jupytext
 from . import combine
-from .file_format_version import check_file_version
+from .formats import check_file_version
 
 
 def _jupytext_writes(ext):
@@ -30,7 +30,7 @@ def _jupytext_writes(ext):
 
 def _jupytext_reads(ext):
     def _reads(text, as_version, **kwargs):
-        return jupytext.reads(text, ext, as_version, **kwargs)
+        return jupytext.reads(text, ext=ext, as_version=as_version, **kwargs)
 
     return _reads
 

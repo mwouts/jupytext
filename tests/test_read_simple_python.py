@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import jupytext
 from testfixtures import compare
+import jupytext
 
-jupytext.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 def test_read_simple_file(pynb="""# ---

@@ -4,13 +4,13 @@ import pytest
 from testfixtures import compare
 import mock
 from nbformat.v4.nbbase import new_notebook
-from jupytext import readf, writef, writes, file_format_version
+from jupytext import header
+from jupytext import readf, writef, writes
 from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 
-file_format_version.FILE_FORMAT_VERSION = {}
-file_format_version.MIN_FILE_FORMAT_VERSION = {}
+header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks())
@@ -116,7 +116,7 @@ def test_combine_same_version_ok(tmpdir):
         fp.write("""# ---
 # jupyter:
 #   jupytext_formats: ipynb,py
-#   jupytext_format_version: '1.0'
+#   jupytext_format_version: '1.2'
 # ---
 
 # New cell
@@ -125,8 +125,7 @@ def test_combine_same_version_ok(tmpdir):
     nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
     writef(nb, tmp_ipynb)
 
-    with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
-                    {'.py': '1.0'}):
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         # to jupyter notebook
         jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
         # test round trip
@@ -165,9 +164,6 @@ def test_combine_lower_version_raises(tmpdir):
     writef(nb, tmp_ipynb)
 
     with pytest.raises(SystemExit):
-        with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
-                        {'.py': '1.0'}):
-            with mock.patch(
-                    'jupytext.file_format_version.MIN_FILE_FORMAT_VERSION',
-                    {'.py': '1.0'}):
-                jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
+        with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER',
+                        True):
+            jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
