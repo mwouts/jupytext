@@ -17,8 +17,8 @@ except ImportError:
 from notebook.services.contents.filemanager import FileContentsManager
 
 import jupytext
-from . import combine
-from .formats import check_file_version
+from .combine import combine_inputs_with_outputs
+from .formats import check_file_version, NOTEBOOK_EXTENSIONS
 
 
 def _jupytext_writes(ext):
@@ -68,7 +68,7 @@ def check_formats(formats):
             except UnicodeDecodeError:
                 raise ValueError('Extensions should be strings among {}'
                                  ', not {}.\n{}'
-                                 .format(str(jupytext.NOTEBOOK_EXTENSIONS),
+                                 .format(str(formats.NOTEBOOK_EXTENSIONS),
                                          str(fmt),
                                          expected_format))
             if fmt == '':
@@ -76,11 +76,11 @@ def check_formats(formats):
             if not fmt.startswith('.'):
                 fmt = '.' + fmt
             if not any([fmt.endswith(ext)
-                        for ext in jupytext.NOTEBOOK_EXTENSIONS]):
+                        for ext in NOTEBOOK_EXTENSIONS]):
                 raise ValueError('Group extension {} contains {}, '
                                  'which does not end with either {}.\n{}'
                                  .format(str(group), fmt,
-                                         str(jupytext.NOTEBOOK_EXTENSIONS),
+                                         str(NOTEBOOK_EXTENSIONS),
                                          expected_format))
             if fmt == '.ipynb':
                 has_ipynb = True
@@ -112,8 +112,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
     Python (.py) or R scripts (.R)
     """
 
-    nb_extensions = [ext for ext in jupytext.NOTEBOOK_EXTENSIONS if
-                     ext != '.ipynb']
+    nb_extensions = [ext for ext in NOTEBOOK_EXTENSIONS if ext != '.ipynb']
 
     def all_nb_extensions(self):
         """
@@ -280,8 +279,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 pass
 
             if model_outputs:
-                combine.combine_inputs_with_outputs(model['content'],
-                                                    model_outputs['content'])
+                combine_inputs_with_outputs(model['content'],
+                                            model_outputs['content'])
             elif not fmt.endswith('.ipynb'):
                 self.notary.sign(model['content'])
                 self.mark_trusted_cells(model['content'], path)
