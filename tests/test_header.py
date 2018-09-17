@@ -1,10 +1,16 @@
 from nbformat.v4.nbbase import new_notebook, new_raw_cell, new_markdown_cell
 import jupytext
-from jupytext.header import header_to_metadata_and_cell, \
+from jupytext.header import uncomment_line, header_to_metadata_and_cell, \
     metadata_and_cell_to_header
 from jupytext.formats import get_format
 
 jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
+
+
+def test_uncomment():
+    assert uncomment_line('# line one', '#') == 'line one'
+    assert uncomment_line('#line two', '#') == 'line two'
+    assert uncomment_line('#line two', '') == '#line two'
 
 
 def test_header_to_metadata_and_cell_blank_line():
