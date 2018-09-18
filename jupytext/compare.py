@@ -13,8 +13,9 @@ def filtered_cell(cell, preserve_outputs):
                 'metadata': {key: cell.metadata[key] for key in cell.metadata
                              if key not in _IGNORE_METADATA}}
     if preserve_outputs:
-        filtered['execution_count'] = cell['execution_count']
-        filtered['outputs'] = cell['outputs']
+        for key in ['execution_count', 'outputs']:
+            if key in cell:
+                filtered[key] = cell[key]
     return filtered
 
 
