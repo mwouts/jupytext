@@ -47,7 +47,7 @@ def test_convert_single_file(nb_file, capsys):
 
     out, err = capsys.readouterr()
     assert err == ''
-    compare(out[:-1], pynb)
+    compare(out, pynb)
 
 
 @pytest.mark.parametrize('nb_files', [list_notebooks('ipynb_py')])

@@ -2,6 +2,7 @@
 """
 
 import os
+import sys
 import argparse
 from .jupytext import readf, writef, writes
 from .jupytext import NOTEBOOK_EXTENSIONS
@@ -39,7 +40,7 @@ def convert_notebook_files(nb_files, ext, output=None,
             continue
 
         if output == '-':
-            print(writes(notebook, ext=ext))
+            sys.stdout.write(writes(notebook, ext=ext))
             continue
 
         if output:
