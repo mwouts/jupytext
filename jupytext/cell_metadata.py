@@ -1,23 +1,28 @@
 """
-Convert between R markdown chunk options and jupyter cell metadata.
+Convert between text notebook metadata and jupyter cell metadata.
+
+See also https://ipython.org/ipython-doc/3/notebook/nbformat.html#cell-metadata
 
 metadata.hide_input and metadata.hide_output are documented here:
 http://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html
 
 TODO: Update this if a standard gets defined at
 https://github.com/jupyter/notebook/issues/3700
+
+Note: Nteract uses "outputHidden" and "inputHidden". We may want to switch
+to those.
 """
 
 import ast
 import json
 import re
-from copy import copy
 from .languages import _JUPYTER_LANGUAGES
 
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
-_IGNORE_METADATA = ['collapsed', 'autoscroll', 'deletable', 'format',
-                    'trusted', 'skipline', 'noskipline', 'lines_to_next_cell',
+_IGNORE_METADATA = ['collapsed', 'autoscroll', 'scrolled',
+                    'deletable', 'format', 'trusted', 'skipline',
+                    'noskipline', 'lines_to_next_cell',
                     'lines_to_end_of_cell_marker']
 
 
@@ -51,7 +56,7 @@ def metadata_to_rmd_options(language, metadata):
     :return:
     """
     options = (language or 'R').lower()
-    metadata = copy(metadata)
+    metadata = filter_metadata(metadata)
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
         del metadata['name']
@@ -63,9 +68,7 @@ def metadata_to_rmd_options(language, metadata):
     for opt_name in metadata:
         opt_value = metadata[opt_name]
         opt_name = opt_name.strip()
-        if opt_name in _IGNORE_METADATA:
-            continue
-        elif opt_name == 'active':
+        if opt_name == 'active':
             options += ' {}="{}",'.format(opt_name, str(opt_value))
         elif isinstance(opt_value, bool):
             options += ' {}={},'.format(
@@ -99,7 +102,7 @@ def update_metadata_from_rmd_options(name, value, metadata):
     return False
 
 
-class ParsingContext():
+class ParsingContext:
     """
     Class for determining where to split rmd options
     """
@@ -280,34 +283,22 @@ def try_eval_metadata(metadata, name):
         return
 
 
-def json_options_to_metadata(options):
-    """
-    Read metadata from its json representation
-    :param options:
-    :return:
-    """
+def json_options_to_metadata(options, add_brackets=True):
+    """Read metadata from its json representation"""
     try:
-        options = json.loads('{' + options + '}')
+        options = json.loads('{' + options + '}' if add_brackets else options)
         return options
     except ValueError:
         return {}
 
 
 def filter_metadata(metadata):
-    """
-    Filter technical metadata
-    :param metadata:
-    :return:
-    """
+    """Filter technical metadata"""
     return {k: metadata[k] for k in metadata if k not in _IGNORE_METADATA}
 
 
 def metadata_to_json_options(metadata):
-    """
-    Represent metadata as json text
-    :param metadata:
-    :return:
-    """
+    """Represent metadata as json text"""
     return json.dumps(metadata)
 
 
@@ -316,3 +307,38 @@ def is_active(ext, metadata):
     if 'active' not in metadata:
         return True
     return ext.replace('.', '') in re.split('\\.|,', metadata['active'])
+
+
+def double_percent_options_to_metadata(options):
+    """Parse double percent options"""
+    if '{' in options:
+        code_type_and_cell_name, metadata = options.split('{', 1)
+        metadata = json_options_to_metadata('{' + metadata, add_brackets=False)
+    else:
+        code_type_and_cell_name = options
+        metadata = {}
+
+    code_type_and_cell_name = code_type_and_cell_name.strip()
+    for cell_type in ['raw', 'markdown']:
+        if code_type_and_cell_name.startswith(cell_type):
+            metadata['cell_type'] = cell_type
+            code_type_and_cell_name = \
+                code_type_and_cell_name[len(cell_type) + 1:]
+            break
+
+    if code_type_and_cell_name:
+        metadata['name'] = code_type_and_cell_name
+
+    return metadata
+
+
+def metadata_to_double_percent_options(metadata):
+    """Metadata to double percent lines"""
+    options = []
+    if 'cell_type' in metadata:
+        options.append(metadata.pop('cell_type'))
+    if 'name' in metadata:
+        options.append(metadata.pop('name'))
+    if metadata:
+        options.append(metadata_to_json_options(metadata))
+    return ' '.join(options)

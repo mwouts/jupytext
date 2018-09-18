@@ -6,9 +6,10 @@ new formats here!
 import os
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
-    LightScriptCellReader, RScriptCellReader
+    LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader
 from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
-    LightScriptCellExporter, RScriptCellExporter
+    LightScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter
+from .stringparser import StringParser
 
 
 class NotebookFormatDescription:
@@ -72,7 +73,18 @@ JUPYTEXT_FORMATS = \
             # with one blank line #38
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
             current_version_number='1.2',
-            min_readable_version_number='1.1') for ext in ['.jl', '.py']]
+            min_readable_version_number='1.1') for ext in ['.jl', '.py']] + \
+    [
+        NotebookFormatDescription(
+            format_name='percent',
+            extension=ext,
+            header_prefix='#',
+            cell_reader_class=DoublePercentScriptCellReader,
+            cell_exporter_class=DoublePercentCellExporter,
+            # Version 1.0 on 2018-09-18 - jupytext v0.7.0 : Initial version
+            current_version_number='1.0')
+        for ext in
+        ['.jl', '.py', '.R']]
 
 NOTEBOOK_EXTENSIONS = list(dict.fromkeys(
     ['.ipynb'] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
@@ -102,19 +114,29 @@ def guess_format(text, ext):
         return metadata.get('jupytext_format_name')
 
     # Is this a Hydrogen-like script?
+    # Or a Sphinx-gallery script?
     if ext in ['.jl', '.py', '.R']:
-        double_percent_count = [line.startswith('# %%')
-                                for line in lines].count(True)
-        if double_percent_count >= 2:
-            return 'double_percent'
-
-    # Is this a Sphinx-gallery script?
-    if ext == '.py':
         twenty_dash = ''.join(['#'] * 20)
-        twenty_dash_count = [line.startswith(twenty_dash)
-                             for line in lines].count(True)
-        if twenty_dash_count:
-            return 'sphinx-gallery'
+        double_percent = '# %%'
+        twenty_dash_count = 0
+        double_percent_count = 0
+
+        parser = StringParser(language='R' if ext == '.R' else 'python')
+        for line in lines:
+            parser.read_line(line)
+            if parser.is_quoted():
+                continue
+
+            if line.startswith(double_percent):
+                double_percent_count += 1
+
+            if line.startswith(twenty_dash):
+                twenty_dash_count += 1
+
+        if double_percent_count >= 2 or twenty_dash_count >= 2:
+            if double_percent_count >= twenty_dash_count:
+                return 'percent'
+            return 'sphinx'
 
     # Default format
     return None
