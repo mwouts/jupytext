@@ -16,6 +16,12 @@ to those.
 import ast
 import json
 import re
+
+try:
+    unicode  # Python 2
+except NameError:
+    unicode = str  # Python 3
+
 from .languages import _JUPYTER_LANGUAGES
 
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
@@ -269,7 +275,7 @@ def md_options_to_metadata(options):
 def try_eval_metadata(metadata, name):
     """Evaluate given metadata to a python object, if possible"""
     value = metadata[name]
-    if not isinstance(value, str):
+    if not isinstance(value, (str, unicode)):
         return
     if value.startswith('"') or value.startswith("'"):
         return

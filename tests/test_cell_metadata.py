@@ -26,8 +26,9 @@ SAMPLES = [('r', ('R', {})),
             ('python', {'active': 'Rmd', 'hide_output': True})),
            ('r chunk_name, include=FALSE, active="Rmd"',
             ('R',
-             {'name': 'chunk_name', 'active': 'Rmd', 'hide_output': True}))
-           ]
+             {'name': 'chunk_name', 'active': 'Rmd', 'hide_output': True})),
+           ('python tags=c("parameters")',
+            ('python', {'tags': ['parameters']}))]
 
 
 @pytest.mark.parametrize('options,language_and_metadata', SAMPLES)
