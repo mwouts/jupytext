@@ -3,7 +3,8 @@
 import re
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from .cell_metadata import is_active, json_options_to_metadata, \
-    md_options_to_metadata, rmd_options_to_metadata
+    md_options_to_metadata, rmd_options_to_metadata, \
+    double_percent_options_to_metadata
 from .stringparser import StringParser
 from .magics import unescape_magic, is_magic, unescape_code_start
 
@@ -398,3 +399,59 @@ class LightScriptCellReader(ScriptCellReader):
             self.end_code_re = re.compile('^# ' + end_of_cell + r'\s*$')
 
         return self.find_code_cell_end(lines)
+
+
+class DoublePercentScriptCellReader(ScriptCellReader):
+    """Read notebook cells from Hydrogen/Spyder/VScode scripts (#59)"""
+
+    comment = '#'
+    default_language = 'python'
+    start_code_re = re.compile(r"^#\s+%%(.*)$")
+
+    def options_to_metadata(self, options):
+        return None, double_percent_options_to_metadata(options)
+
+    def find_cell_content(self, lines):
+        """Parse cell till its end and set content, lines_to_next_cell.
+        Return the position of next cell start"""
+        cell_end_marker, next_cell_start, explicit_eoc = \
+            self.find_cell_end(lines)
+
+        # Metadata to dict
+        if self.start_code_re.match(lines[0]):
+            cell_start = 1
+        else:
+            cell_start = 0
+
+        # Cell content
+        source = lines[cell_start:cell_end_marker]
+
+        if self.cell_type != 'code':
+            source = uncomment(source, self.comment)
+
+        self.content = source
+
+        self.lines_to_next_cell = count_lines_to_next_cell(
+            cell_end_marker,
+            next_cell_start,
+            len(lines),
+            explicit_eoc)
+
+        return next_cell_start
+
+    def find_cell_end(self, lines):
+        """Return position of end of cell marker, and position
+        of first line after cell"""
+
+        if self.metadata and 'cell_type' in self.metadata:
+            self.cell_type = self.metadata.pop('cell_type')
+        else:
+            self.cell_type = 'code'
+
+        for i, line in enumerate(lines):
+            if i > 0 and self.start_code_re.match(line):
+                if _BLANK_LINE.match(lines[i - 1]):
+                    return i - 1, i, False
+                return i, i, False
+
+        return len(lines), len(lines), False

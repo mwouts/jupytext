@@ -21,9 +21,10 @@ from .combine import combine_inputs_with_outputs
 from .formats import check_file_version, NOTEBOOK_EXTENSIONS
 
 
-def _jupytext_writes(ext):
+def _jupytext_writes(ext, format_name):
     def _writes(nbk, version=nbformat.NO_CONVERT, **kwargs):
-        return jupytext.writes(nbk, version=version, ext=ext, **kwargs)
+        return jupytext.writes(nbk, version=version, ext=ext,
+                               format_name=format_name, **kwargs)
 
     return _writes
 
@@ -125,7 +126,10 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         u'',
         help='Save notebooks to these file extensions. '
              'Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R '
-             'comma separated',
+             'comma separated. If you want another format than the '
+             'default one, append the format name to the extension, '
+             'e.g. ipynb,py:double_percent to save the notebook to '
+             'hydrogen/spyder/vscode compatible scripts',
         config=True)
 
     outdated_text_notebook_margin = Float(
@@ -176,13 +180,15 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
-        os_file, fmt, _ = file_fmt_ext(os_path)
+        os_file, fmt, ext = file_fmt_ext(os_path)
         for alt_fmt in self.format_group(fmt, nb):
             os_path_fmt = os_file + alt_fmt
             self.log.info("Saving %s", os.path.basename(os_path_fmt))
             alt_ext = '.' + alt_fmt.split('.')[-1]
+            format_name = nb.metadata.get('jupytext_format_name')
             if alt_ext in self.nb_extensions:
-                with mock.patch('nbformat.writes', _jupytext_writes(alt_ext)):
+                with mock.patch('nbformat.writes',
+                                _jupytext_writes(alt_ext, format_name)):
                     super(TextFileContentsManager, self) \
                         ._save_notebook(os_path_fmt, nb)
             else:

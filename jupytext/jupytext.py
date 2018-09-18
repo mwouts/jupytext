@@ -15,7 +15,7 @@ from copy import deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook
 import nbformat
-
+import jupytext
 from .formats import get_format, guess_format
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable
@@ -41,8 +41,7 @@ class TextNotebookReader(NotebookReader):
         if header_cell:
             cells.append(header_cell)
 
-        if pos > 0:
-            lines = lines[pos:]
+        lines = lines[pos:]
 
         while lines:
             reader = self.format.cell_reader_class(self.format.extension)
@@ -104,7 +103,14 @@ def reads(text, ext, as_version=4, format_name=None, **kwargs):
     if not format_name:
         format_name = guess_format(text, ext)
 
-    return TextNotebookReader(ext, format_name).reads(text, **kwargs)
+    notebook = TextNotebookReader(ext, format_name).reads(text, **kwargs)
+    if format_name and jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER:
+        if 'jupytext_format_name' not in notebook.metadata:
+            notebook.metadata['jupytext_format_name'] = {}
+        notebook.metadata['jupytext_format_name'].update(
+            {ext[1:]: format_name})
+
+    return notebook
 
 
 def read(file_or_stream, ext, as_version=4, format_name=None, **kwargs):
@@ -128,6 +134,11 @@ def writes(notebook, ext, format_name=None,
     """Write a notebook to a string"""
     if ext == '.ipynb':
         return nbformat.writes(notebook, version, **kwargs)
+
+    if not format_name:
+        format_name = notebook.metadata.get('jupytext_format_name', {})
+        if isinstance(format_name, dict):
+            format_name = format_name.get(ext[1:])
 
     return TextNotebookWriter(ext, format_name).writes(notebook)
 

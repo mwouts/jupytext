@@ -4,7 +4,8 @@ import re
 from copy import copy
 from .languages import cell_language
 from .cell_metadata import filter_metadata, is_active, \
-    metadata_to_rmd_options, metadata_to_json_options
+    metadata_to_rmd_options, metadata_to_json_options, \
+    metadata_to_double_percent_options
 from .magics import escape_magic, escape_code_start
 from .cell_reader import LightScriptCellReader
 
@@ -206,7 +207,7 @@ class LightScriptCellExporter(BaseCellExporter):
 
 
 class RScriptCellExporter(BaseCellExporter):
-    """A class that represent a notebook cell as a R script"""
+    """A class that can represent a notebook cell as a R script"""
     prefix = "#'"
 
     def code_to_text(self):
@@ -234,3 +235,30 @@ class RScriptCellExporter(BaseCellExporter):
             lines.append('#+ {}'.format(options))
         lines.extend(source)
         return lines
+
+
+class DoublePercentCellExporter(BaseCellExporter):
+    """A class that can represent a notebook cell as an
+    Hydrogen/Spyder/VScode script (#59)"""
+    prefix = '#'
+
+    def code_to_text(self):
+        """Not used"""
+        pass
+
+    def cell_to_text(self):
+        """Return the text representation for the cell"""
+        if self.cell_type != 'code':
+            self.metadata['cell_type'] = self.cell_type
+
+        if self.cell_type == 'raw' and 'active' in self.metadata and \
+                self.metadata['active'] == '':
+            del self.metadata['active']
+
+        lines = comment([metadata_to_double_percent_options(self.metadata)],
+                        '# %%')
+
+        if self.cell_type == 'code':
+            return lines + self.source
+
+        return lines + comment(self.source, self.prefix)

@@ -94,9 +94,7 @@ def metadata_and_cell_to_header(notebook, text_format):
     if insert_or_test_version_number():
         metadata['jupytext_format_version'] = \
             text_format.current_version_number
-        metadata['jupytext_format_flavor'] = \
-            metadata.get('jupytext_format_flavor', {}).update(
-                {text_format.extension: text_format.format_name})
+        metadata['jupytext_format_name'] = text_format.format_name
 
     if metadata:
         header.extend(yaml.safe_dump({'jupyter': metadata},
@@ -137,8 +135,7 @@ def header_to_metadata_and_cell(lines, header_prefix):
                 if encoding.group(1) != 'utf-8':
                     raise ValueError('Encodings other than utf-8 '
                                      'are not supported')
-                if line != _UTF8_HEADER:
-                    metadata['encoding'] = line
+                metadata['encoding'] = line
                 start = i + 1
                 continue
 
