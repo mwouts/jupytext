@@ -167,3 +167,15 @@ def test_combine_lower_version_raises(tmpdir):
         with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER',
                         True):
             jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_ipynb_to_py_then_update_test(nb_file, tmpdir):
+    """Reproduce https://github.com/mwouts/jupytext/issues/83"""
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_nbpy = str(tmpdir.join('notebook.py'))
+
+    copyfile(nb_file, tmp_ipynb)
+
+    jupytext(['--to', 'py', tmp_ipynb])
+    jupytext(['--test', '--update', '--to', 'ipynb', tmp_nbpy])
