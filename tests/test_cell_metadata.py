@@ -1,7 +1,8 @@
 import pytest
 from jupytext.cell_metadata import rmd_options_to_metadata, \
     metadata_to_rmd_options, parse_rmd_options, RMarkdownOptionParsingError, \
-    try_eval_metadata, json_options_to_metadata, md_options_to_metadata
+    try_eval_metadata, json_options_to_metadata, metadata_to_json_options, \
+    md_options_to_metadata, filter_metadata
 from .utils import skip_if_dict_is_not_ordered
 
 SAMPLES = [('r', ('R', {})),
@@ -64,6 +65,10 @@ def test_ignore_metadata():
     assert metadata_to_rmd_options('R', metadata) == 'r echo=FALSE'
 
 
+def test_filter_metadata():
+    assert filter_metadata({'scrolled': True}) == {}
+
+
 def test_try_eval_metadata():
     metadata = {'list': 'list("a",5)',
                 'c': 'c(1,2,3)'}
@@ -80,3 +85,10 @@ def test_parse_md_options():
     assert md_options_to_metadata('python') == ('python', {})
     assert md_options_to_metadata('not_a_language') == (None, {
         'name': 'not_a_language'})
+
+
+def test_write_parse_json():
+    metadata = {"tags": ["parameters"]}
+    options = metadata_to_json_options(metadata)
+    metadata2 = json_options_to_metadata(options, add_brackets=False)
+    assert metadata == metadata2
