@@ -15,10 +15,9 @@ from copy import deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook
 import nbformat
-import jupytext
 from .formats import get_format, guess_format
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
-    encoding_and_executable
+    encoding_and_executable, insert_or_test_version_number
 from .languages import default_language_from_metadata_and_ext, \
     set_main_and_cell_language
 
@@ -104,7 +103,7 @@ def reads(text, ext, as_version=4, format_name=None, **kwargs):
         format_name = guess_format(text, ext)
 
     notebook = TextNotebookReader(ext, format_name).reads(text, **kwargs)
-    if format_name and jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER:
+    if format_name and insert_or_test_version_number():
         if 'jupytext_format_name' not in notebook.metadata:
             notebook.metadata['jupytext_format_name'] = {}
         notebook.metadata['jupytext_format_name'].update(
