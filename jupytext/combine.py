@@ -23,9 +23,8 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
                 cell.execution_count = ocell.execution_count
                 cell.outputs = ocell.outputs
 
-                metadata = ocell.metadata
-                cell.metadata.update({k: metadata[k] for k in metadata
-                                      if k == 'trusted' or
-                                      k not in _IGNORE_METADATA})
+                ometadata = ocell.metadata
+                cell.metadata.update({k: ometadata[k] for k in ometadata
+                                      if k in _IGNORE_METADATA})
                 remaining_output_cells = remaining_output_cells[(i + 1):]
                 break
