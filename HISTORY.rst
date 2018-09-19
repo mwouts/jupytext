@@ -3,6 +3,24 @@
 Release History
 ---------------
 
+0.7.0 (2018-09-??)
++++++++++++++++++++
+
+**Improvements**
+
+- Jupytext can read and write notebooks as Hydrogen/VScode/Spyder/PyCharm
+compatible scripts (cells starting with `# %%`) (#59)
+- PENDING Jupytext can read and write notebooks as Sphynx-gallery compatible scripts (#80)
+- Metadata are supported for all cell types in light python and percent
+formats (#66). Due to this, light python format version is now 1.3. Light python
+notebooks in versions 1.1 and 1.2 are still readable.
+- PENDING Jupytext notebook metadata are in a "jupytext" dictionary.
+
+**BugFixes**
+
+- Fix merging of input and output notebooks (#83)
+- Removed extra new line on stdout in command line `jupytext` (#84)
+
 0.6.5 (2018-09-13)
 +++++++++++++++++++
 
