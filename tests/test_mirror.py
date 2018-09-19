@@ -108,11 +108,11 @@ def test_Rmd_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, '.ipynb', 'Rmd_to_ipynb')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='66'))
 def test_ipynb_to_Rmd(nb_file):
     assert_conversion_same_as_mirror(nb_file, '.Rmd', 'ipynb_to_Rmd')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='66'))
 def test_ipynb_to_md(nb_file):
     assert_conversion_same_as_mirror(nb_file, '.md', 'ipynb_to_md')

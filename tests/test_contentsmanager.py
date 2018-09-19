@@ -18,7 +18,7 @@ def test_create_contentsmanager():
 
 
 @skip_if_dict_is_not_ordered
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='66'))
 def test_load_save_rename(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_rmd = 'notebook.Rmd'
