@@ -147,6 +147,7 @@ class LightScriptCellExporter(BaseCellExporter):
         # Treat markdown cells with metadata as code cells (#66)
         if self.cell_type == 'markdown' and self.metadata:
             self.metadata['cell_type'] = self.cell_type
+            self.source = comment(self.source, self.prefix)
             return True
         return super(LightScriptCellExporter, self).is_code()
 
