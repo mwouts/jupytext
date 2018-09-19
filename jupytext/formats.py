@@ -67,12 +67,14 @@ JUPYTEXT_FORMATS = \
             header_prefix='#',
             cell_reader_class=LightScriptCellReader,
             cell_exporter_class=LightScriptCellExporter,
+            # Version 1.3 on 2018-09-19 - jupytext v0.7.0 : Metadata are
+            # allowed for all cell types (and then include 'cell_type')
             # Version 1.2 on 2018-09-05 - jupytext v0.6.3 : Metadata bracket
             # can be omitted when empty, if previous line is empty #57
             # Version 1.1 on 2018-08-25 - jupytext v0.6.0 : Cells separated
             # with one blank line #38
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
-            current_version_number='1.2',
+            current_version_number='1.3',
             min_readable_version_number='1.1') for ext in ['.jl', '.py']] + \
     [
         NotebookFormatDescription(
@@ -118,6 +120,7 @@ def guess_format(text, ext):
     if ext in ['.jl', '.py', '.R']:
         twenty_dash = ''.join(['#'] * 20)
         double_percent = '# %%'
+        double_percent_and_space = double_percent + ' '
         twenty_dash_count = 0
         double_percent_count = 0
 
@@ -127,7 +130,10 @@ def guess_format(text, ext):
             if parser.is_quoted():
                 continue
 
-            if line.startswith(double_percent):
+            # Don't count escaped Jupyter magics (no space between
+            # %% and command) as cells
+            if line == double_percent or \
+                    line.startswith(double_percent_and_space):
                 double_percent_count += 1
 
             if line.startswith(twenty_dash):

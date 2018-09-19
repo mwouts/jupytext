@@ -27,7 +27,7 @@ def comment(lines, prefix):
     return [prefix + ' ' + line if line else prefix for line in lines]
 
 
-class BaseCellExporter:
+class BaseCellExporter(object):
     """A class that represent a notebook cell as text"""
     prefix = None
 
@@ -142,6 +142,13 @@ def endofcell_marker(source):
 class LightScriptCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as a Python or Julia script"""
     prefix = '#'
+
+    def is_code(self):
+        # Treat markdown cells with metadata as code cells (#66)
+        if self.cell_type == 'markdown' and self.metadata:
+            self.metadata['cell_type'] = self.cell_type
+            return True
+        return super(LightScriptCellExporter, self).is_code()
 
     def code_to_text(self):
         """Return the text representation of a code cell"""

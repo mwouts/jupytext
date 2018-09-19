@@ -140,7 +140,10 @@ class BaseCellReader(object):
     def find_code_cell_end(self, lines):
         """Given that this is a code cell, return position of
         end of cell marker, and position of next cell start"""
-        self.cell_type = 'code'
+        if self.metadata and 'cell_type' in self.metadata:
+            self.cell_type = self.metadata.pop('cell_type')
+        else:
+            self.cell_type = 'code'
         parser = StringParser(self.language or self.default_language)
         for i, line in enumerate(lines):
             # skip cell header
