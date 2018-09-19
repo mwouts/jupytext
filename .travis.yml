@@ -6,7 +6,6 @@ python:
   - "3.6"
   # PyPy versions
   - "pypy"
-# command to install dependencies
 matrix:
   include:
     - python: 3.7
@@ -14,7 +13,8 @@ matrix:
       sudo: required  # required for Python 3.7 (travis-ci/travis-ci#9069)
 
 install:
-  - pip install codecov flake8 notebook pytest pytest-cov
+  # command to install dependencies
+  - pip install -r requirements-dev.txt
   - pip install -r requirements.txt
   # install is required for the nbconvert exporters
   - pip install .
