@@ -17,12 +17,12 @@ import ast
 import json
 import re
 
+from .languages import _JUPYTER_LANGUAGES
+
 try:
     unicode  # Python 2
 except NameError:
     unicode = str  # Python 3
-
-from .languages import _JUPYTER_LANGUAGES
 
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]

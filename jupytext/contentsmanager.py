@@ -180,7 +180,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
-        os_file, fmt, ext = file_fmt_ext(os_path)
+        os_file, fmt, _ = file_fmt_ext(os_path)
         for alt_fmt in self.format_group(fmt, nb):
             os_path_fmt = os_file + alt_fmt
             self.log.info("Saving %s", os.path.basename(os_path_fmt))
