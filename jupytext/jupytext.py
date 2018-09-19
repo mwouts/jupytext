@@ -73,13 +73,14 @@ class TextNotebookWriter(NotebookWriter):
         lines = encoding_and_executable(nb, self.ext)
         lines.extend(metadata_and_cell_to_header(nb, self.format))
 
-        cells = [self.format.cell_exporter_class(
-            cell, default_language,
-            self.format.extension) for cell in nb.cells]
+        cell_exporters = []
+        for cell in nb.cells:
+            cell_exporters.append(self.format.cell_exporter_class(
+                cell, default_language, self.format.extension))
 
-        texts = [cell.cell_to_text() for cell in cells]
+        texts = [cell.cell_to_text() for cell in cell_exporters]
 
-        for i, cell in enumerate(cells):
+        for i, cell in enumerate(cell_exporters):
             text = cell.simplify_code_markers(
                 texts[i], texts[i + 1] if i + 1 < len(texts) else None, lines)
 
@@ -88,7 +89,8 @@ class TextNotebookWriter(NotebookWriter):
 
             # two blank lines between markdown cells in Rmd
             if self.ext in ['.Rmd', '.md'] and not cell.is_code():
-                if i + 1 < len(cells) and not cells[i + 1].is_code():
+                if i + 1 < len(cell_exporters) and not \
+                        cell_exporters[i + 1].is_code():
                     lines.append('')
 
         return '\n'.join(lines)
@@ -102,7 +104,8 @@ def reads(text, ext, as_version=4, format_name=None, **kwargs):
     if not format_name:
         format_name = guess_format(text, ext)
 
-    notebook = TextNotebookReader(ext, format_name).reads(text, **kwargs)
+    reader = TextNotebookReader(ext, format_name)
+    notebook = reader.reads(text, **kwargs)
     if format_name and insert_or_test_version_number():
         if 'jupytext_format_name' not in notebook.metadata:
             notebook.metadata['jupytext_format_name'] = {}
@@ -121,11 +124,11 @@ def read(file_or_stream, ext, as_version=4, format_name=None, **kwargs):
                  **kwargs)
 
 
-def readf(nb_file):
+def readf(nb_file, format_name=None):
     """Read a notebook from the file with given name"""
     _, ext = os.path.splitext(nb_file)
     with io.open(nb_file, encoding='utf-8') as stream:
-        return read(stream, as_version=4, ext=ext)
+        return read(stream, as_version=4, ext=ext, format_name=format_name)
 
 
 def writes(notebook, ext, format_name=None,
@@ -139,7 +142,8 @@ def writes(notebook, ext, format_name=None,
         if isinstance(format_name, dict):
             format_name = format_name.get(ext[1:])
 
-    return TextNotebookWriter(ext, format_name).writes(notebook)
+    writer = TextNotebookWriter(ext, format_name)
+    return writer.writes(notebook)
 
 
 def write(notebook, file_or_stream, ext, format_name=None,
