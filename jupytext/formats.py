@@ -6,9 +6,11 @@ new formats here!
 import os
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
-    LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader
+    LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, \
+    SphinxGalleryScriptCellReader, SphinxGalleryScriptRst2mdCellReader
 from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
-    LightScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter
+    LightScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter, \
+    SphynxGalleryCellExporter
 from .stringparser import StringParser
 
 
@@ -83,10 +85,28 @@ JUPYTEXT_FORMATS = \
             header_prefix='#',
             cell_reader_class=DoublePercentScriptCellReader,
             cell_exporter_class=DoublePercentCellExporter,
-            # Version 1.0 on 2018-09-18 - jupytext v0.7.0 : Initial version
+            # Version 1.0 on 2018-09-29 - jupytext v0.7.0 : Initial version
             current_version_number='1.0')
         for ext in
-        ['.jl', '.py', '.R']]
+        ['.jl', '.py', '.R']] + \
+    [
+        NotebookFormatDescription(
+            format_name='sphinx',
+            extension='.py',
+            header_prefix='#',
+            cell_reader_class=SphinxGalleryScriptCellReader,
+            cell_exporter_class=SphynxGalleryCellExporter,
+            # Version 1.0 on 2018-09-29 - jupytext v0.7.0 : Initial version
+            current_version_number='1.0'),
+        NotebookFormatDescription(
+            format_name='sphinx-md',
+            extension='.py',
+            header_prefix='#',
+            cell_reader_class=SphinxGalleryScriptRst2mdCellReader,
+            cell_exporter_class=SphynxGalleryCellExporter,
+            # Version 1.0 on 2018-09-29 - jupytext v0.7.0 : Initial version
+            current_version_number='1.0')
+    ]
 
 NOTEBOOK_EXTENSIONS = list(dict.fromkeys(
     ['.ipynb'] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
@@ -94,14 +114,18 @@ NOTEBOOK_EXTENSIONS = list(dict.fromkeys(
 
 def get_format(ext, format_name=None):
     """Return the format description for the desired extension"""
+    formats_for_extension = []
     for fmt in JUPYTEXT_FORMATS:
         if fmt.extension == ext:
             if not format_name or fmt.format_name == format_name:
                 return fmt
+            formats_for_extension.append(fmt.format_name)
 
-    if format_name:
-        raise TypeError("Format '{}' is not associated to extension '{}'"
-                        .format(format_name, ext))
+    if formats_for_extension:
+        raise TypeError("Format '{}' is not associated to extension '{}'. "
+                        "Please choose one of: {}."
+                        .format(format_name, ext,
+                                ', '.join(formats_for_extension)))
     raise TypeError("Not format associated to extension '{}'".format(ext))
 
 
@@ -112,16 +136,16 @@ def guess_format(text, ext):
     metadata, _, _ = header_to_metadata_and_cell(
         lines, "#'" if ext == '.R' else '#')
 
-    if metadata:
+    if set(metadata).difference(['encoding', 'main_language']):
         return metadata.get('jupytext_format_name')
 
     # Is this a Hydrogen-like script?
     # Or a Sphinx-gallery script?
     if ext in ['.jl', '.py', '.R']:
-        twenty_dash = ''.join(['#'] * 20)
+        twenty_hash = ''.join(['#'] * 20)
         double_percent = '# %%'
         double_percent_and_space = double_percent + ' '
-        twenty_dash_count = 0
+        twenty_hash_count = 0
         double_percent_count = 0
 
         parser = StringParser(language='R' if ext == '.R' else 'python')
@@ -136,11 +160,11 @@ def guess_format(text, ext):
                     line.startswith(double_percent_and_space):
                 double_percent_count += 1
 
-            if line.startswith(twenty_dash):
-                twenty_dash_count += 1
+            if line.startswith(twenty_hash):
+                twenty_hash_count += 1
 
-        if double_percent_count >= 2 or twenty_dash_count >= 2:
-            if double_percent_count >= twenty_dash_count:
+        if double_percent_count >= 2 or twenty_hash_count >= 2:
+            if double_percent_count >= twenty_hash_count:
                 return 'percent'
             return 'sphinx'
 

@@ -270,3 +270,36 @@ class DoublePercentCellExporter(BaseCellExporter):
             return lines + self.source
 
         return lines + comment(self.source, self.prefix)
+
+
+class SphynxGalleryCellExporter(BaseCellExporter):
+    """A class that can represent a notebook cell as a
+    Sphynx Gallery script (#80)"""
+    prefix = '#'
+    default_cell_marker = '#' * 79
+
+    def code_to_text(self):
+        """Not used"""
+        pass
+
+    def cell_to_text(self):
+        """Return the text representation for the cell"""
+        if self.cell_type == 'code':
+            return self.source
+
+        if 'cell_marker' in self.metadata:
+            cell_marker = self.metadata.pop('cell_marker')
+        else:
+            cell_marker = self.default_cell_marker
+
+        if self.source == ['']:
+            if cell_marker in ['""', "''"]:
+                return [cell_marker]
+            return ['""']
+
+        if cell_marker in ['"""', "'''"]:
+            return [cell_marker] + self.source + [cell_marker]
+
+        return [cell_marker if cell_marker.startswith('#' * 20)
+                else self.default_cell_marker] + comment(self.source,
+                                                         self.prefix)
