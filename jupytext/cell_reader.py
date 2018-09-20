@@ -559,6 +559,10 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
         cell_end_marker, next_cell_start, explicit_eoc = \
             self.find_cell_end(lines)
 
+        if next_cell_start < len(lines) and \
+                _BLANK_LINE.match(lines[next_cell_start]):
+            next_cell_start += 1
+
         # Metadata to dict
         cell_start = 0
         if self.cell_type == 'markdown':
