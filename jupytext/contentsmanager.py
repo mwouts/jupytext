@@ -5,7 +5,7 @@ from datetime import timedelta
 import nbformat
 import mock
 from tornado.web import HTTPError
-from traitlets import Unicode, Float
+from traitlets import Unicode, Float, Bool
 from traitlets.config import Configurable
 
 # import notebook.transutils before notebook.services.contents.filemanager #75
@@ -18,7 +18,8 @@ from notebook.services.contents.filemanager import FileContentsManager
 
 import jupytext
 from .combine import combine_inputs_with_outputs
-from .formats import check_file_version, NOTEBOOK_EXTENSIONS
+from .formats import check_file_version, NOTEBOOK_EXTENSIONS, \
+    format_name_for_ext, parse_one_format
 
 
 def _jupytext_writes(ext, format_name):
@@ -29,9 +30,10 @@ def _jupytext_writes(ext, format_name):
     return _writes
 
 
-def _jupytext_reads(ext):
+def _jupytext_reads(ext, rst2md):
     def _reads(text, as_version, **kwargs):
-        return jupytext.reads(text, ext=ext, as_version=as_version, **kwargs)
+        return jupytext.reads(text, ext=ext, rst2md=rst2md,
+                              as_version=as_version, **kwargs)
 
     return _reads
 
@@ -74,8 +76,7 @@ def check_formats(formats):
                                          expected_format))
             if fmt == '':
                 continue
-            if not fmt.startswith('.'):
-                fmt = '.' + fmt
+            fmt, _ = parse_one_format(fmt)
             if not any([fmt.endswith(ext)
                         for ext in NOTEBOOK_EXTENSIONS]):
                 raise ValueError('Group extension {} contains {}, '
@@ -128,8 +129,14 @@ class TextFileContentsManager(FileContentsManager, Configurable):
              'Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R '
              'comma separated. If you want another format than the '
              'default one, append the format name to the extension, '
-             'e.g. ipynb,py:double_percent to save the notebook to '
+             'e.g. ipynb,py:percent to save the notebook to '
              'hydrogen/spyder/vscode compatible scripts',
+        config=True)
+
+    sphinx_rst2md = Bool(
+        False,
+        help='Translate the reStructuredText found in cells of '
+             'Sphinx gallery scripts into markdown',
         config=True)
 
     outdated_text_notebook_margin = Float(
@@ -171,7 +178,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         """Read a notebook from an os path."""
         _, ext = os.path.splitext(os_path)
         if ext in self.nb_extensions:
-            with mock.patch('nbformat.reads', _jupytext_reads(ext)):
+            with mock.patch('nbformat.reads', _jupytext_reads(
+                    ext, self.sphinx_rst2md)):
                 return super(TextFileContentsManager, self) \
                     ._read_notebook(os_path, as_version)
         else:
@@ -185,8 +193,9 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             os_path_fmt = os_file + alt_fmt
             self.log.info("Saving %s", os.path.basename(os_path_fmt))
             alt_ext = '.' + alt_fmt.split('.')[-1]
-            format_name = nb.metadata.get('jupytext_format_name')
+
             if alt_ext in self.nb_extensions:
+                format_name = format_name_for_ext(nb.metadata, alt_ext)
                 with mock.patch('nbformat.writes',
                                 _jupytext_writes(alt_ext, format_name)):
                     super(TextFileContentsManager, self) \

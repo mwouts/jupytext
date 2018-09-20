@@ -15,7 +15,8 @@ from copy import deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook
 import nbformat
-from .formats import get_format, guess_format
+from .formats import get_format, guess_format, \
+    formats_as_string, parse_formats, update_formats, format_name_for_ext
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable, insert_or_test_version_number
 from .languages import default_language_from_metadata_and_ext, \
@@ -96,21 +97,22 @@ class TextNotebookWriter(NotebookWriter):
         return '\n'.join(lines)
 
 
-def reads(text, ext, as_version=4, format_name=None, **kwargs):
+def reads(text, ext, as_version=4, format_name=None, rst2md=False, **kwargs):
     """Read a notebook from a string"""
     if ext == '.ipynb':
         return nbformat.reads(text, as_version, **kwargs)
 
     if not format_name:
         format_name = guess_format(text, ext)
+        if rst2md and format_name == 'sphinx':
+            format_name = 'sphinx-md'
 
     reader = TextNotebookReader(ext, format_name)
     notebook = reader.reads(text, **kwargs)
     if format_name and insert_or_test_version_number():
-        if 'jupytext_format_name' not in notebook.metadata:
-            notebook.metadata['jupytext_format_name'] = {}
-        notebook.metadata['jupytext_format_name'].update(
-            {ext[1:]: format_name})
+        formats = parse_formats(notebook.metadata.get('jupytext_formats', ''))
+        formats = update_formats(formats, ext, format_name)
+        notebook.metadata['jupytext_formats'] = formats_as_string(formats)
 
     return notebook
 
@@ -138,9 +140,7 @@ def writes(notebook, ext, format_name=None,
         return nbformat.writes(notebook, version, **kwargs)
 
     if not format_name:
-        format_name = notebook.metadata.get('jupytext_format_name', {})
-        if isinstance(format_name, dict):
-            format_name = format_name.get(ext[1:])
+        format_name = format_name_for_ext(notebook.metadata, ext)
 
     writer = TextNotebookWriter(ext, format_name)
     return writer.writes(notebook)

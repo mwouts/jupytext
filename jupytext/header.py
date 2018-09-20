@@ -94,7 +94,6 @@ def metadata_and_cell_to_header(notebook, text_format):
     if insert_or_test_version_number():
         metadata['jupytext_format_version'] = \
             text_format.current_version_number
-        metadata['jupytext_format_name'] = text_format.format_name
 
     if metadata:
         header.extend(yaml.safe_dump({'jupyter': metadata},

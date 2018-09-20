@@ -3,7 +3,9 @@
 import os
 import time
 import pytest
+import mock
 from tornado.web import HTTPError
+from testfixtures import compare
 import jupytext
 from jupytext import TextFileContentsManager, readf
 from jupytext.compare import compare_notebooks
@@ -191,3 +193,30 @@ def test_outdated_text_notebook(nb_file, tmpdir):
     # 7. test OK with
     cm.outdated_text_notebook_margin = float("inf")
     cm.get(tmp_nbpy)
+
+
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('percent'))
+def test_load_save_percent_format(nb_file, tmpdir):
+    tmp_py = 'notebook.py'
+    with open(nb_file) as stream:
+        text_py = stream.read()
+    with open(str(tmpdir.join(tmp_py)), 'w') as stream:
+        stream.write(text_py)
+
+    cm = TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # open python, save
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        nb = cm.get(tmp_py)['content']
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
+
+    # compare the new file with original one
+    with open(str(tmpdir.join(tmp_py))) as stream:
+        text_py2 = stream.read()
+
+    # Remove the YAML header
+    text_py2 = text_py2[-len(text_py):]
+
+    compare(text_py, text_py2)

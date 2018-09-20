@@ -114,6 +114,9 @@ NOTEBOOK_EXTENSIONS = list(dict.fromkeys(
 
 def get_format(ext, format_name=None):
     """Return the format description for the desired extension"""
+    if ext == '.ipynb':
+        return None
+
     formats_for_extension = []
     for fmt in JUPYTEXT_FORMATS:
         if fmt.extension == ext:
@@ -137,7 +140,7 @@ def guess_format(text, ext):
         lines, "#'" if ext == '.R' else '#')
 
     if set(metadata).difference(['encoding', 'main_language']):
-        return metadata.get('jupytext_format_name')
+        return format_name_for_ext(metadata, ext)
 
     # Is this a Hydrogen-like script?
     # Or a Sphinx-gallery script?
@@ -179,7 +182,7 @@ def check_file_version(notebook, source_path, outputs_path):
 
     _, ext = os.path.splitext(source_path)
     version = notebook.metadata.get('jupytext_format_version')
-    format_name = notebook.metadata.get('jupytext_format_name')
+    format_name = format_name_for_ext(notebook.metadata, ext)
     if version:
         del notebook.metadata['jupytext_format_version']
 
@@ -210,3 +213,65 @@ def check_file_version(notebook, source_path, outputs_path):
                      .format(os.path.basename(source_path),
                              version, current,
                              os.path.basename(outputs_path)))
+
+
+def parse_one_format(ext_and_format_name):
+    """Parse "py:percent" into (".py", "percent"), etc"""
+    if ext_and_format_name.find(':') >= 0:
+        ext, format_name = ext_and_format_name.split(':', 1)
+    else:
+        ext = ext_and_format_name
+        format_name = None
+
+    if not ext.startswith('.'):
+        ext = '.' + ext
+
+    return ext, format_name
+
+
+def parse_formats(formats):
+    """Parse "md,py:percent" into [(".md", None), (".py", "percent")], etc"""
+    return [parse_one_format(ext_and_format_name)
+            for ext_and_format_name in formats.split(',')]
+
+
+def update_formats(formats, ext, format_name):
+    """Update the format list with the given format name"""
+    updated_formats = []
+    found_ext = False
+    for org_ext, org_format_name in formats:
+        if not org_ext.endswith(ext):
+            updated_formats.append((org_ext, org_format_name))
+        elif not found_ext:
+            updated_formats.append((ext, format_name))
+            found_ext = True
+    if not found_ext:
+        updated_formats.append((ext, format_name))
+
+    return updated_formats
+
+
+def one_format_as_string(ext, format_name):
+    """('.py', None) to 'py', etc"""
+    if ext.startswith('.'):
+        ext = ext[1:]
+    if format_name:
+        return ext + ':' + format_name
+    return ext
+
+
+def formats_as_string(formats):
+    """Concatenate all formats into a string"""
+    return ','.join([one_format_as_string(ext, format_name)
+                     for ext, format_name in formats])
+
+
+def format_name_for_ext(metadata, ext):
+    """Return the format name for that extension"""
+    formats = metadata.get('jupytext_formats', '')
+    formats = parse_formats(formats)
+    for fmt_ext, ext_format_name in formats:
+        if fmt_ext.endswith(ext):
+            return ext_format_name
+
+    return None
