@@ -5,6 +5,7 @@
 [![Build Status](https://travis-ci.com/mwouts/jupytext.svg?branch=master)](https://travis-ci.com/mwouts/jupytext)
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=master)](https://codecov.io/github/mwouts/jupytext?branch=master)
 ![pylint Score](https://mperlet.github.io/pybadge/badges/9.9.svg)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/mwouts/jupytext.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mwouts/jupytext/context:python)
 [![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)
 
