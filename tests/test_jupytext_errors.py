@@ -1,5 +1,6 @@
 import pytest
 import jupytext
+from nbformat.v4.nbbase import new_notebook
 
 
 def test_read_wrong_ext(tmpdir, nb_file='notebook.ext'):
@@ -12,4 +13,4 @@ def test_read_wrong_ext(tmpdir, nb_file='notebook.ext'):
 def test_write_wrong_ext(tmpdir, nb_file='notebook.ext'):
     nb_file = str(tmpdir.join('nb_file'))
     with pytest.raises(TypeError):
-        jupytext.writef(dict(), nb_file)
+        jupytext.writef(new_notebook(), nb_file)
