@@ -486,7 +486,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
             if line.startswith(triple_quote):
                 return triple_quote
 
-        if line.startswith(self.twenty_hash):
+        if line.startswith('#') and self.twenty_hash in line:
             return line
 
         return None
