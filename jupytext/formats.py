@@ -4,13 +4,14 @@ new formats here!
 """
 
 import os
+from copy import copy
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
     LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, \
     SphinxGalleryScriptCellReader, SphinxGalleryScriptRst2mdCellReader
 from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
     LightScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter, \
-    SphynxGalleryCellExporter
+    SphinxGalleryCellExporter
 from .stringparser import StringParser
 
 
@@ -95,15 +96,15 @@ JUPYTEXT_FORMATS = \
             extension='.py',
             header_prefix='#',
             cell_reader_class=SphinxGalleryScriptCellReader,
-            cell_exporter_class=SphynxGalleryCellExporter,
+            cell_exporter_class=SphinxGalleryCellExporter,
             # Version 1.0 on 2018-09-29 - jupytext v0.7.0 : Initial version
             current_version_number='1.0'),
         NotebookFormatDescription(
-            format_name='sphinx-md',
+            format_name='sphinx-rst2md',
             extension='.py',
             header_prefix='#',
             cell_reader_class=SphinxGalleryScriptRst2mdCellReader,
-            cell_exporter_class=SphynxGalleryCellExporter,
+            cell_exporter_class=None,
             # Version 1.0 on 2018-09-29 - jupytext v0.7.0 : Initial version
             current_version_number='1.0')
     ]
@@ -120,7 +121,11 @@ def get_format(ext, format_name=None):
     formats_for_extension = []
     for fmt in JUPYTEXT_FORMATS:
         if fmt.extension == ext:
-            if not format_name or fmt.format_name == format_name:
+            if fmt.format_name == format_name:
+                return fmt
+            if not format_name:
+                fmt = copy(fmt)
+                fmt.format_name = None
                 return fmt
             formats_for_extension.append(fmt.format_name)
 
@@ -231,6 +236,8 @@ def parse_one_format(ext_and_format_name):
 
 def parse_formats(formats):
     """Parse "md,py:percent" into [(".md", None), (".py", "percent")], etc"""
+    if not formats:
+        return []
     return [parse_one_format(ext_and_format_name)
             for ext_and_format_name in formats.split(',')]
 
@@ -275,3 +282,10 @@ def format_name_for_ext(metadata, ext):
             return ext_format_name
 
     return None
+
+
+def update_jupytext_formats_metadata(notebook, ext, format_name):
+    """Update the jupytext_format metadata in the Jupyter notebook"""
+    formats = parse_formats(notebook.metadata.get('jupytext_formats', ''))
+    formats = update_formats(formats, ext, format_name)
+    notebook.metadata['jupytext_formats'] = formats_as_string(formats)

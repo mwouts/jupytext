@@ -272,9 +272,9 @@ class DoublePercentCellExporter(BaseCellExporter):
         return lines + comment(self.source, self.prefix)
 
 
-class SphynxGalleryCellExporter(BaseCellExporter):
+class SphinxGalleryCellExporter(BaseCellExporter):
     """A class that can represent a notebook cell as a
-    Sphynx Gallery script (#80)"""
+    Sphinx Gallery script (#80)"""
     prefix = '#'
     default_cell_marker = '#' * 79
 

@@ -467,7 +467,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
 
 
 class SphinxGalleryScriptCellReader(ScriptCellReader):
-    """Read notebook cells from Sphynx Gallery scripts (#80)"""
+    """Read notebook cells from Sphinx Gallery scripts (#80)"""
 
     comment = '#'
     default_language = 'python'
@@ -606,4 +606,6 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
 
 
 class SphinxGalleryScriptRst2mdCellReader(SphinxGalleryScriptCellReader):
+    """Read notebook cells from Sphinx Gallery scripts, and convert
+    reStructuredText to markdown"""
     rst2md = True
