@@ -30,7 +30,7 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     nb_other = base + '.py'
 
     copyfile(nb_file, nb_org)
-    convert_notebook_files([nb_org], ext='.py')
+    convert_notebook_files([nb_org], fmt='py')
 
     nb1 = readf(nb_org)
     nb2 = readf(nb_other)
@@ -43,7 +43,7 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
 def test_convert_single_file(nb_file, capsys):
     nb1 = readf(nb_file)
     pynb = writes(nb1, ext='.py')
-    convert_notebook_files([nb_file], ext='.py', output='-')
+    convert_notebook_files([nb_file], fmt='py', output='-')
 
     out, err = capsys.readouterr()
     assert err == ''
@@ -63,7 +63,7 @@ def test_convert_multiple_file(nb_files, tmpdir):
         nb_orgs.append(nb_org)
         nb_others.append(nb_other)
 
-    convert_notebook_files(nb_orgs, ext='.py')
+    convert_notebook_files(nb_orgs, fmt='py')
 
     for nb_org, nb_other in zip(nb_orgs, nb_others):
         nb1 = readf(nb_org)
@@ -73,12 +73,12 @@ def test_convert_multiple_file(nb_files, tmpdir):
 
 def test_error_not_notebook_ext_input(nb_file='notebook.ext'):
     with pytest.raises(TypeError):
-        convert_notebook_files([nb_file], ext='.py')
+        convert_notebook_files([nb_file], fmt='py')
 
 
 def test_error_not_notebook_ext_dest1(nb_file=list_notebooks()[0]):
     with pytest.raises(TypeError):
-        convert_notebook_files([nb_file], ext='.ext')
+        convert_notebook_files([nb_file], fmt='ext')
 
 
 def test_error_not_notebook_ext_output(
@@ -94,7 +94,7 @@ def test_error_no_ext(nb_file=list_notebooks()[0]):
 
 def test_error_not_same_ext(nb_file=list_notebooks()[0]):
     with pytest.raises(TypeError):
-        convert_notebook_files([nb_file], ext='.py', output='not.ext')
+        convert_notebook_files([nb_file], fmt='py', output='not.ext')
 
 
 def test_error_update_not_ipynb(nb_file=list_notebooks()[0]):
@@ -104,7 +104,7 @@ def test_error_update_not_ipynb(nb_file=list_notebooks()[0]):
 
 def test_error_multiple_input(nb_files=list_notebooks()):
     with pytest.raises(ValueError):
-        convert_notebook_files(nb_files, ext='.py', output='notebook.py')
+        convert_notebook_files(nb_files, fmt='py', output='notebook.py')
 
 
 def test_combine_same_version_ok(tmpdir):
@@ -179,3 +179,23 @@ def test_ipynb_to_py_then_update_test(nb_file, tmpdir):
 
     jupytext(['--to', 'py', tmp_ipynb])
     jupytext(['--test', '--update', '--to', 'ipynb', tmp_nbpy])
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_convert_to_percent_format(nb_file, tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_nbpy = str(tmpdir.join('notebook.py'))
+
+    copyfile(nb_file, tmp_ipynb)
+
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        jupytext(['--to', 'py:percent', tmp_ipynb])
+
+    with open(tmp_nbpy) as stream:
+        py_script = stream.read()
+        assert 'py:percent' in py_script
+
+    nb1 = readf(tmp_ipynb)
+    nb2 = readf(tmp_nbpy)
+
+    compare_notebooks(nb1, nb2)

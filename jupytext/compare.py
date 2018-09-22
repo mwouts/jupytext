@@ -73,10 +73,10 @@ def compare_notebooks(notebook_expected, notebook_actual,
             filtered_notebook_metadata(notebook_actual))
 
 
-def test_round_trip_conversion(notebook, ext, test_outputs):
+def test_round_trip_conversion(notebook, ext, format_name, test_outputs):
     """Test round trip conversion for a Jupyter notebook"""
-    text = writes(notebook, ext=ext)
-    round_trip = reads(text, ext=ext)
+    text = writes(notebook, ext=ext, format_name=format_name)
+    round_trip = reads(text, ext=ext, format_name=format_name)
 
     compare_notebooks(notebook, round_trip,
                       allow_split_markdown=(ext in ['.Rmd', '.md']),

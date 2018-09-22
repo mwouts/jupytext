@@ -16,7 +16,7 @@ from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook
 import nbformat
 from .formats import get_format, guess_format, \
-    formats_as_string, parse_formats, update_formats, format_name_for_ext
+    update_jupytext_formats_metadata, format_name_for_ext
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable, insert_or_test_version_number
 from .languages import default_language_from_metadata_and_ext, \
@@ -62,6 +62,10 @@ class TextNotebookWriter(NotebookWriter):
     def __init__(self, ext, format_name=None):
         self.ext = ext
         self.format = get_format(ext, format_name)
+        if not self.format.cell_exporter_class:
+            raise ValueError("Saving notebooks in format '{}' is not possible."
+                             " Please choose another format."
+                             .format(self.format.format_name))
 
     def writes(self, nb, **kwargs):
         """Write the text representation of a notebook to a string"""
@@ -97,22 +101,23 @@ class TextNotebookWriter(NotebookWriter):
         return '\n'.join(lines)
 
 
-def reads(text, ext, as_version=4, format_name=None, rst2md=False, **kwargs):
+def reads(text, ext, as_version=4, format_name=None,
+          rst2md=False, **kwargs):
     """Read a notebook from a string"""
     if ext == '.ipynb':
         return nbformat.reads(text, as_version, **kwargs)
 
     if not format_name:
         format_name = guess_format(text, ext)
-        if rst2md and format_name == 'sphinx':
-            format_name = 'sphinx-md'
+        if format_name == 'sphinx' and rst2md:
+            format_name = 'sphinx-rst2md'
 
     reader = TextNotebookReader(ext, format_name)
     notebook = reader.reads(text, **kwargs)
     if format_name and insert_or_test_version_number():
-        formats = parse_formats(notebook.metadata.get('jupytext_formats', ''))
-        formats = update_formats(formats, ext, format_name)
-        notebook.metadata['jupytext_formats'] = formats_as_string(formats)
+        if format_name == 'sphinx-rst2md' and rst2md:
+            format_name = 'sphinx'
+        update_jupytext_formats_metadata(notebook, ext, format_name)
 
     return notebook
 
@@ -142,6 +147,9 @@ def writes(notebook, ext, format_name=None,
     if not format_name:
         format_name = format_name_for_ext(notebook.metadata, ext)
 
+    if format_name and insert_or_test_version_number():
+        update_jupytext_formats_metadata(notebook, ext, format_name)
+
     writer = TextNotebookWriter(ext, format_name)
     return writer.writes(notebook)
 
@@ -151,6 +159,12 @@ def write(notebook, file_or_stream, ext, format_name=None,
     """Write a notebook to a file"""
     if ext == '.ipynb':
         return nbformat.write(notebook, file_or_stream, version, **kwargs)
+
+    if not format_name:
+        format_name = format_name_for_ext(notebook.metadata, ext)
+
+    if format_name and insert_or_test_version_number():
+        update_jupytext_formats_metadata(notebook, ext, format_name)
 
     return TextNotebookWriter(ext, format_name).write(notebook, file_or_stream)
 

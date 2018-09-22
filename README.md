@@ -4,7 +4,7 @@
 [![Pypi](https://img.shields.io/pypi/l/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Build Status](https://travis-ci.com/mwouts/jupytext.svg?branch=master)](https://travis-ci.com/mwouts/jupytext)
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=master)](https://codecov.io/github/mwouts/jupytext?branch=master)
-![pylint Score](https://mperlet.github.io/pybadge/badges/9.9.svg)
+![pylint Score](https://mperlet.github.io/pybadge/badges/9.8.svg)
 [![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)
 
@@ -118,6 +118,7 @@ The package provides a `jupytext` script for command line conversion between the
 
 ```bash
 jupytext --to python notebook.ipynb             # create a notebook.py file
+jupytext --to py:percent notebook.ipynb         # create a notebook.py file in the double percent format
 jupytext --to markdown notebook.ipynb           # create a notebook.md file
 jupytext --output script.py notebook.ipynb      # create a script.py file
 
@@ -128,6 +129,7 @@ jupytext --to ipynb notebook1.md notebook2.py   # overwrite notebook1.ipynb and 
 jupytext --to md --test notebook.ipynb          # Test round trip conversion
 
 jupytext --to md --output - notebook.ipynb      # display the markdown version on screen
+jupytext --from ipynb --to py:percent           # read ipynb from stdin and write double percent script on stdout
 ```
 
 ## Round-trip conversion
@@ -147,21 +149,66 @@ a yaml header at the top of your script.
 Our implementation for Jupyter notebooks as Markdown or R Markdown documents is straightforward:
 - A YAML header contains the notebook metadata (Jupyter kernel, etc)
 - Markdown cells are inserted verbatim, and separated with two blank lines
-- Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are available in the [R Markdown format](https://rmarkdown.rstudio.com/authoring_quick_tour.html).
+- Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are not available in the markdown format, but code cell metadata are available in the [R Markdown format](https://rmarkdown.rstudio.com/authoring_quick_tour.html).
 
 ### R scripts
 
 Implement these [specifications](https://rmarkdown.rstudio.com/articles_report_from_r_script.html):
-- Jupyter metadata in YAML format, in a `#' `-escaped header
+- Jupyter metadata in YAML format, in a `#' `-commented header
 - Markdown cells are commented with `#' `
 - Code cells are exported verbatim. Cell metadata are signalled with `#+`. Cells end with a blank line, an explicit start of cell marker, or a Markdown comment.
 
 ### Python and Julia scripts
 
-We wanted to represent Jupyter notebooks with the least explicit markers possible. The rationale for that is to allow **arbitrary** python files to open as Jupyter notebooks, even files which were never prepared to become a notebook. Precisely:
+The default format for Python and Julia scripts is the `light` format. We wanted to represent Jupyter notebooks with the least explicit markers possible. The rationale for that is to allow **arbitrary** python files to open as Jupyter notebooks, even files which were never prepared to become a notebook. Precisely:
 - Jupyter metadata go to an escaped YAML header
 - Markdown cells are commented with `# `, and separated with a blank line
 - Code cells are exported verbatim (except for Jupyter magics, which are escaped), and separated with blank lines. Code cells are reconstructed from consistent python paragraphs (no function, class or multiline comment will be broken). A start-of-cell delimiter `# +` is used for cells that contain blank lines (outside of functions, classes, etc). `# + {}` is used for cells that have explicit metadata (inside the curly bracket, in JSON format). The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
+
+### Julia, Python and R scripts in the double percent format
+
+A series of editors recognize cells delimited with a commented double percent sign `# %%`, including
+- [Hydrogen](https://atom.io/packages/hydrogen),
+- [Spyder](https://pythonhosted.org/spyder/editor.html),
+- Visual studio code when using the [Jupyter](https://github.com/DonJayamanne/vscodeJupyter) extension,
+- and PyCharm professional.
+
+We have implemented code, markdown and raw cells, as well as cell metadata. Sample code cells may be:
+```python
+# %% {"tags": ["parameters"]}
+# This is a code cell with notebook parameters compatible with papermill
+a = 1
+
+# %% markdown
+# This is a markdown cell.
+
+# %% Text here goes to the cell metadata "name"
+# This is a code cell
+a + 1
+```
+
+If you want to pair a Jupyter notebook to a Python script in this double percent format, modify the notebook metadata to `"jupytext_formats": "ipynb,py:percent",` (replace `py` with `jl` or `R` for Julia and R).
+
+Note that the double percent scripts you have written outside of Jupytext will be opened as such by Jupytext, provided that they contain at least two cells.
+
+If you want to write the Python representation of your notebooks in that format per default, add the following to your `.jupyter/jupyter_notebook_config.py` file:
+```python
+c.ContentsManager.preferred_jupytext_formats = "py:percent"
+```
+
+### Sphinx-gallery scripts
+
+Another popular notebook-like format for Python script is the Sphinx-gallery [format](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-gallery notebooks by Jupytext.
+
+If you want that the reStructuredText be converted to markdown for a nicer display, add a `c.ContentsManager.sphinx_convert_rst2md = True` line to your Jupyter configuration file. Please notice however that this is a non-reversible transformation - use this only with Binder, and leave the option to its default value, that is `False` if you plan to edit your Sphinx Gallery files.
+
+```python
+# Sample Binder + Jupytext configuration
+# 1. Save the below as .jupyter/jupyter_notebook_config.py in your GitHub project, and
+# 2. Create binder/requirements.txt
+c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
+c.ContentsManager.sphinx_convert_rst2md = True
+```
 
 ## Jupyter Notebook or Jupyter Lab?
 
@@ -175,7 +222,7 @@ That being said, using Jupytext from Jupyter Lab is also an option. Please note 
 
 ## Will my notebook really run in an IDE?
 
-Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in the IDE code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` escapes Jupyter magics found in your notebook. Comment a magic with `#noescape` on the same line to avoid escaping. User defined magics can be escaped with `#escape` (magics are not escaped in the plain Markdown representation).
+Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in the IDE code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to the `light` (default) format. Comment a magic with `#noescape` on the same line to avoid escaping. User defined magics can be escaped with `#escape`. Magics are not commented in the plain Markdown representation, nor in the double percent format, as most editors use that format in combination with Jupyter kernels.
 
 Also, you may want some cells to be active only in the Python, or R Markdown representation. For this, use the `active` cell metadata. Set `"active": "ipynb"` if you want that cell to be active only in the Jupyter notebook. And `"active": "py"` if you want it to be active only in the Python script. And `"active": "ipynb,py"` if you want it to be active in both, but not in the R Markdown representation...
 

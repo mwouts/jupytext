@@ -10,12 +10,12 @@ Release History
 
 - Jupytext can read and write notebooks as Hydrogen/VScode/Spyder/PyCharm
 compatible scripts (cells starting with `# %%`) (#59)
-- Jupytext can read and write notebooks as Sphynx-gallery compatible scripts (#80)
+- Jupytext can read and write notebooks as Sphinx-gallery compatible scripts (#80)
 - Metadata are supported for all cell types in light python and percent
 formats (#66). Due to this, light python format version is now 1.3. Light python
 notebooks in versions 1.1 and 1.2 are still readable.
-- PENDING: Update doc (percent and sphinx formats, rst2md)
-- PENDING: Update command line tool and its help (allow format names)
+- Command line `jupytext` has a `from` argument, and now accepts notebook from
+the standard input.
 
 **BugFixes**
 

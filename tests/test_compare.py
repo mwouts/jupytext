@@ -122,4 +122,4 @@ def test_test_round_trip_conversion():
         }
     ])], metadata={'main_language': 'python'})
 
-    round_trip_conversion(notebook, '.py', test_outputs=True)
+    round_trip_conversion(notebook, '.py', None, test_outputs=True)

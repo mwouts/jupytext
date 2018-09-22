@@ -19,7 +19,7 @@ from notebook.services.contents.filemanager import FileContentsManager
 import jupytext
 from .combine import combine_inputs_with_outputs
 from .formats import check_file_version, NOTEBOOK_EXTENSIONS, \
-    format_name_for_ext, parse_one_format
+    format_name_for_ext, parse_one_format, parse_formats
 
 
 def _jupytext_writes(ext, format_name):
@@ -133,10 +133,18 @@ class TextFileContentsManager(FileContentsManager, Configurable):
              'hydrogen/spyder/vscode compatible scripts',
         config=True)
 
-    sphinx_rst2md = Bool(
+    preferred_jupytext_formats = Unicode(
+        u'',
+        help='Preferred format when saving notebooks as text, per extension. '
+             'Use "jl:percent,py:percent,R:percent" if you want to save '
+             'Julia, Python and R scripts in the double percent format and '
+             'only write "jupytext_formats": "py" in the notebook metadata.',
+        config=True)
+
+    sphinx_convert_rst2md = Bool(
         False,
-        help='Translate the reStructuredText found in cells of '
-             'Sphinx gallery scripts into markdown',
+        help='When opening a Sphinx Gallery script, convert the '
+             'reStructuredText to markdown',
         config=True)
 
     outdated_text_notebook_margin = Float(
@@ -174,12 +182,20 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
         return [fmt]
 
+    def preferred_format(self, ext):
+        """Returns the preferred format for that extension"""
+        for fmt_ext, format_name in \
+                parse_formats(self.preferred_jupytext_formats):
+            if fmt_ext == ext:
+                return format_name
+        return None
+
     def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
         _, ext = os.path.splitext(os_path)
         if ext in self.nb_extensions:
-            with mock.patch('nbformat.reads', _jupytext_reads(
-                    ext, self.sphinx_rst2md)):
+            with mock.patch('nbformat.reads',
+                            _jupytext_reads(ext, self.sphinx_convert_rst2md)):
                 return super(TextFileContentsManager, self) \
                     ._read_notebook(os_path, as_version)
         else:
@@ -195,7 +211,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             alt_ext = '.' + alt_fmt.split('.')[-1]
 
             if alt_ext in self.nb_extensions:
-                format_name = format_name_for_ext(nb.metadata, alt_ext)
+                format_name = format_name_for_ext(nb.metadata, alt_ext) or \
+                              self.preferred_format(alt_ext)
                 with mock.patch('nbformat.writes',
                                 _jupytext_writes(alt_ext, format_name)):
                     super(TextFileContentsManager, self) \
@@ -240,6 +257,9 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                         outputs_format = alt_fmt
                         break
 
+            if source_format == outputs_format:
+                return model
+
             if source_format != fmt:
                 self.log.info(u'Reading SOURCE from {}'.format(
                     os.path.basename(nb_file + source_format)))
@@ -254,8 +274,6 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                                          content=content,
                                          type=type, format=format,
                                          load_alternative_format=False)
-            else:
-                model_outputs = None
 
             try:
                 check_file_version(model['content'],
