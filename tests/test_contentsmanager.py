@@ -236,7 +236,7 @@ def test_save_to_percent_format(nb_file, tmpdir):
 
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.preferred_jupytext_formats = 'jl:percent'
+    cm.preferred_jupytext_formats_save = 'jl:percent'
 
     nb['metadata']['jupytext_formats'] = 'ipynb,jl'
 

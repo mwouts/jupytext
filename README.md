@@ -194,7 +194,7 @@ Note that the double percent scripts you have written outside of Jupytext will b
 
 If you want to write the Python representation of your notebooks in that format per default, add the following to your `.jupyter/jupyter_notebook_config.py` file:
 ```python
-c.ContentsManager.preferred_jupytext_formats = "py:percent"
+c.ContentsManager.preferred_jupytext_formats_save = "py:percent"
 ```
 
 ### Sphinx-gallery scripts
@@ -208,6 +208,7 @@ If you want that the reStructuredText be converted to markdown for a nicer displ
 # 1. Save the below as .jupyter/jupyter_notebook_config.py in your GitHub project, and
 # 2. Create binder/requirements.txt
 c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
+c.ContentsManager.preferred_jupytext_formats_read = "py:sphinx"
 c.ContentsManager.sphinx_convert_rst2md = True
 ```
 
