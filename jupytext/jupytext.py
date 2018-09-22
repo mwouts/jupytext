@@ -13,7 +13,7 @@ import os
 import io
 from copy import deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
-from nbformat.v4.nbbase import new_notebook
+from nbformat.v4.nbbase import new_notebook, new_code_cell
 import nbformat
 from .formats import get_format, guess_format, \
     update_jupytext_formats_metadata, format_name_for_ext
@@ -42,6 +42,10 @@ class TextNotebookReader(NotebookReader):
             cells.append(header_cell)
 
         lines = lines[pos:]
+
+        if self.format.format_name and \
+                self.format.format_name.startswith('sphinx'):
+            cells.append(new_code_cell(source='%matplotlib inline'))
 
         while lines:
             reader = self.format.cell_reader_class(self.format.extension)
@@ -88,6 +92,11 @@ class TextNotebookWriter(NotebookWriter):
         for i, cell in enumerate(cell_exporters):
             text = cell.simplify_code_markers(
                 texts[i], texts[i + 1] if i + 1 < len(texts) else None, lines)
+
+            if i == 0 and self.format.format_name and \
+                    self.format.format_name.startswith('sphinx') and \
+                    text == ['%matplotlib inline']:
+                continue
 
             lines.extend(text)
             lines.extend([''] * cell.lines_to_next_cell)
