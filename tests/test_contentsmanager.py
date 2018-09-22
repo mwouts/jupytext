@@ -9,6 +9,7 @@ from testfixtures import compare
 import jupytext
 from jupytext import TextFileContentsManager, readf
 from jupytext.compare import compare_notebooks
+from jupytext.header import header_to_metadata_and_cell
 from .utils import list_notebooks
 from .utils import skip_if_dict_is_not_ordered
 
@@ -216,7 +217,37 @@ def test_load_save_percent_format(nb_file, tmpdir):
     with open(str(tmpdir.join(tmp_py))) as stream:
         text_py2 = stream.read()
 
+    # do we find 'percent' in the header?
+    header = text_py2[:-len(text_py)]
+    assert any(['percent' in line for line in header.splitlines()])
+
     # Remove the YAML header
     text_py2 = text_py2[-len(text_py):]
 
     compare(text_py, text_py2)
+
+
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_julia'))
+def test_save_to_percent_format(nb_file, tmpdir):
+    tmp_ipynb = 'notebook.ipynb'
+    tmp_jl = 'notebook.jl'
+    nb = jupytext.readf(nb_file)
+
+    cm = TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.preferred_jupytext_formats = 'jl:percent'
+
+    nb['metadata']['jupytext_formats'] = 'ipynb,jl'
+
+    # open python, save
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    # read jl file
+    with open(str(tmpdir.join(tmp_jl))) as stream:
+        text_jl = stream.read()
+
+    # Parse the YAML header
+    metadata, _, _ = header_to_metadata_and_cell(text_jl.splitlines(), '#')
+    assert metadata['jupytext_formats'] == 'ipynb,jl:percent'
