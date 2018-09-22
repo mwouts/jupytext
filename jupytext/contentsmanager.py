@@ -257,9 +257,6 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                         outputs_format = alt_fmt
                         break
 
-            if source_format == outputs_format:
-                return model
-
             if source_format != fmt:
                 self.log.info(u'Reading SOURCE from {}'.format(
                     os.path.basename(nb_file + source_format)))
@@ -274,6 +271,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                                          content=content,
                                          type=type, format=format,
                                          load_alternative_format=False)
+            else:
+                model_outputs = None
 
             try:
                 check_file_version(model['content'],
