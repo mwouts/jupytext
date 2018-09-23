@@ -332,10 +332,10 @@ def double_percent_options_to_metadata(options):
         metadata['cell_type'] = cell_type[1:-1]
 
     # Second and fourth match are description
-    description = [matches[i].strip() for i in [1, 3]]
-    description = [part for part in description if part]
-    if description:
-        metadata['description'] = ' '.join(description)
+    title = [matches[i].strip() for i in [1, 3]]
+    title = [part for part in title if part]
+    if title:
+        metadata['title'] = ' '.join(title)
 
     return metadata
 
@@ -343,8 +343,8 @@ def double_percent_options_to_metadata(options):
 def metadata_to_double_percent_options(metadata):
     """Metadata to double percent lines"""
     options = []
-    if 'description' in metadata:
-        options.append(metadata.pop('description'))
+    if 'title' in metadata:
+        options.append(metadata.pop('title'))
     if 'cell_type' in metadata:
         options.append('[{}]'.format(metadata.pop('cell_type')))
     if metadata:

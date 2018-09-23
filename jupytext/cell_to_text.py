@@ -263,8 +263,11 @@ class DoublePercentCellExporter(BaseCellExporter):
                 self.metadata['active'] == '':
             del self.metadata['active']
 
-        lines = comment([metadata_to_double_percent_options(self.metadata)],
-                        '# %%')
+        options = metadata_to_double_percent_options(self.metadata)
+        if options.startswith('%') or not options:
+            lines = ['# %%' + options]
+        else:
+            lines = ['# %% ' + options]
 
         if self.cell_type == 'code':
             return lines + self.source
