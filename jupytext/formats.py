@@ -188,6 +188,8 @@ def check_file_version(notebook, source_path, outputs_path):
         return
 
     _, ext = os.path.splitext(source_path)
+    if ext == '.ipynb':
+        return
     version = notebook.metadata.get('jupytext_format_version')
     format_name = format_name_for_ext(notebook.metadata, ext)
     if version:
