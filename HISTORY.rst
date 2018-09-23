@@ -3,8 +3,16 @@
 Release History
 ---------------
 
-0.7.0 (2018-09-??)
-+++++++++++++++++++
+0.7.0-rc1 (2018-09-23)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Header for cells in `percent` format is more robust: use `[markdown]` and
+ `[raw]` to identify cell types. Cell type comes after the cell title. (#59)
+
+0.7.0-rc0 (2018-09-22)
+++++++++++++++++++++++
 
 **Improvements**
 
