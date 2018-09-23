@@ -7,7 +7,6 @@ import mock
 from tornado.web import HTTPError
 from testfixtures import compare
 import jupytext
-from jupytext import TextFileContentsManager, readf
 from jupytext.compare import compare_notebooks
 from jupytext.header import header_to_metadata_and_cell
 from .utils import list_notebooks
@@ -17,7 +16,7 @@ jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 def test_create_contentsmanager():
-    TextFileContentsManager()
+    jupytext.TextFileContentsManager()
 
 
 @skip_if_dict_is_not_ordered
@@ -26,12 +25,12 @@ def test_load_save_rename(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_rmd = 'notebook.Rmd'
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.default_jupytext_formats = 'ipynb,Rmd'
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save Rmd, reopen
-    nb = readf(nb_file)
+    nb = jupytext.readf(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_rmd)
     nb_rmd = cm.get(tmp_rmd)
     compare_notebooks(nb, nb_rmd['content'])
@@ -54,12 +53,12 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_nbpy = 'notebook.nb.py'
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.default_jupytext_formats = 'ipynb,nb.py'
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
-    nb = readf(nb_file)
+    nb = jupytext.readf(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
     compare_notebooks(nb, nbpy['content'])
@@ -82,12 +81,12 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_nbpy = 'notebook.nb.py'
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.default_jupytext_formats = 'ipynb'
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
-    nb = readf(nb_file)
+    nb = jupytext.readf(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
     compare_notebooks(nb, nbpy['content'])
@@ -121,13 +120,13 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     tmp_ipynb = u'notebôk.ipynb'
     tmp_nbpy = u'notebôk.nb.py'
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.default_jupytext_formats = 'ipynb'
     tmpdir = u'' + str(tmpdir)
     cm.root_dir = tmpdir
 
     # open ipynb, save nb.py, reopen
-    nb = readf(nb_file)
+    nb = jupytext.readf(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
     compare_notebooks(nb, nbpy['content'])
@@ -162,13 +161,13 @@ def test_outdated_text_notebook(nb_file, tmpdir):
     tmp_ipynb = u'notebook.ipynb'
     tmp_nbpy = u'notebook.py'
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.default_jupytext_formats = 'py,ipynb'
     cm.outdated_text_notebook_margin = 0
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save py, reopen
-    nb = readf(nb_file)
+    nb = jupytext.readf(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     model_py = cm.get(tmp_nbpy, load_alternative_format=False)
     model_ipynb = cm.get(tmp_ipynb, load_alternative_format=False)
@@ -205,7 +204,7 @@ def test_load_save_percent_format(nb_file, tmpdir):
     with open(str(tmpdir.join(tmp_py)), 'w') as stream:
         stream.write(text_py)
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
     # open python, save
@@ -234,7 +233,7 @@ def test_save_to_percent_format(nb_file, tmpdir):
     tmp_jl = 'notebook.jl'
     nb = jupytext.readf(nb_file)
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     cm.preferred_jupytext_formats_save = 'jl:percent'
 

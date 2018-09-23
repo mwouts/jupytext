@@ -16,7 +16,12 @@ from .formats import NOTEBOOK_EXTENSIONS, guess_format, get_format
 try:
     from .contentsmanager import TextFileContentsManager
 except ImportError as err:
-    TextFileContentsManager = str(err)
+    class TextFileContentsManager:
+        """A class that raises the previous ImportError"""
+        err = err
+
+        def __init__(self):
+            raise self.err
 
 __all__ = ['readf', 'writef', 'writes', 'reads',
            'NOTEBOOK_EXTENSIONS', 'guess_format', 'get_format',

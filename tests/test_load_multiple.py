@@ -3,7 +3,6 @@ import mock
 from tornado.web import HTTPError
 from nbformat.v4.nbbase import new_notebook
 import jupytext
-from jupytext import TextFileContentsManager
 
 
 def test_combine_same_version_ok(tmpdir):
@@ -23,7 +22,7 @@ def test_combine_same_version_ok(tmpdir):
     nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
     jupytext.writef(nb, str(tmpdir.join(tmp_ipynb)))
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.default_jupytext_formats = 'ipynb,py'
     cm.root_dir = str(tmpdir)
 
@@ -52,7 +51,7 @@ def test_combine_lower_version_raises(tmpdir):
     nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
     jupytext.writef(nb, str(tmpdir.join(tmp_ipynb)))
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.default_jupytext_formats = 'ipynb,py'
     cm.root_dir = str(tmpdir)
 
