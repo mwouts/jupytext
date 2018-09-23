@@ -140,28 +140,30 @@ jupytext --from ipynb --to py:percent           # read ipynb from stdin and writ
 
 ## Conversion in a Python script
 
-The `jupytext` package offers a few methods for reading and writing notebooks in Python.
+`jupytext`'s main Python functions for reading and writing notebooks are:
 
 ```python
 # Read notebook from file in given format (guess format when `format_name` is None)
 readf(nb_file, format_name=None)
+
 # Read notebook from text, given extension and format name
 reads(text, ext, format_name=None, [...])
+
 # Return the text representation for the notebook, given extension and format name
 writes(notebook, ext, format_name=None, [...])
+
 # Write notebook to file in desired format
 writef(notebook, nb_file, format_name=None)
 ```
 
 ## Round-trip conversion
 
-Round-trip conversion is safe! A few hundred tests help guarantee this.
-- Script to Jupyter notebook, to script again is identity. If you
-associate a Jupyter kernel with your notebook, that information will go to
-a yaml header at the top of your script.
-- Markdown to Jupyter notebook, to Markdown again is identity.
-- Jupyter to script, then back to Jupyter again preserves source and metadata.
-- Jupyter to Markdown, and Jupyter again preserves source and metadata (cell metadata available only for R Markdown). Note that Markdown cells with two consecutive blank lines will be split into multiple cells (as the two blank line pattern is used to separate cells).
+Round-trip conversion is safe! A few hundred tests help guarantee this. And you can test the round trip conversion on your favorite notebook with `jupytext --test`.
+
+Please note that
+- When you associate a Jupyter kernel with your text notebook, that information goes to a YAML header at the top of your script or Markdown document.
+- Cell metadata are available in `light` and `percent` formats for all cell types. R Markdown and R scripts support cell metadata for code cells. Markdown documents do not currently support cell metadata.
+- Representing Jupyter notebooks as Markdown document has the effect of splitting markdown cells with two consecutive blank lines into multiple cells (as the two blank line pattern is used to separate cells).
 
 ## Format specifications
 
@@ -172,7 +174,7 @@ Our implementation for Jupyter notebooks as Markdown or [R Markdown ](https://rm
 - Markdown cells are inserted verbatim, and separated with two blank lines
 - Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are not available in the markdown format. The [code cell options](https://yihui.name/knitr/options/) in the R Markdown format are mapped to the corresponding Jupyter cell metadata options, when available.
 
-### R scripts
+### R knit::spin scripts
 
 Implement these [specifications](https://rmarkdown.rstudio.com/articles_report_from_r_script.html):
 - Jupyter metadata in YAML format, in a `#' `-commented header
@@ -231,7 +233,7 @@ That being said, using Jupytext from Jupyter Lab is also an option. Please note 
 
 ## Will my notebook really run in an IDE?
 
-Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in the IDE code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to the `light` (default) format. Comment a magic with `#noescape` on the same line to avoid escaping. User defined magics can be escaped with `#escape`. Magics are not commented in the plain Markdown representation, nor in the double percent format, as most editors use that format in combination with Jupyter kernels.
+Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in the IDE code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to the `light` (default) format. Comment a magic with `#noescape` on the same line to avoid escaping. User defined magics can be escaped with `#escape`. Magics are not commented in the plain Markdown representation, nor in the double percent format, as most editors use that format in combination with IPython or Jupyter kernels.
 
 Also, you may want some cells to be active only in the Python, or R Markdown representation. For this, use the `active` cell metadata. Set `"active": "ipynb"` if you want that cell to be active only in the Jupyter notebook. And `"active": "py"` if you want it to be active only in the Python script. And `"active": "ipynb,py"` if you want it to be active in both, but not in the R Markdown representation...
 
