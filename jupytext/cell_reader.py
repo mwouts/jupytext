@@ -471,7 +471,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
 
     comment = '#'
     default_language = 'python'
-    twenty_hash = '#' * 20
+    twenty_hash = re.compile('^#( |)#{19,}\s*$')
     markdown_marker = None
     rst2md = False
 
@@ -486,7 +486,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
             if line.startswith(triple_quote):
                 return triple_quote
 
-        if line.startswith('#') and self.twenty_hash in line:
+        if self.twenty_hash.match(line):
             return line
 
         return None
@@ -576,7 +576,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
                     last = lines[cell_end_marker - 1]
                     lines[cell_end_marker - 1] = \
                         last[:last.rfind(self.markdown_marker)]
-            if self.markdown_marker.startswith(self.twenty_hash):
+            if self.twenty_hash.match(self.markdown_marker):
                 cell_start = 1
         else:
             self.metadata = {}

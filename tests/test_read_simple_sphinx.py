@@ -69,6 +69,9 @@ Another markdown cell'''
 Another markdown cell'''
 1 + 2 + 3 + 4
 
+# ################################
+# A fifth one
+
 '''And a last one
 '''
 """):
@@ -97,6 +100,9 @@ Another markdown cell'''
     assert nb.cells[6].source == '1 + 2 + 3 + 4'
 
     assert nb.cells[7].cell_type == 'markdown'
-    assert nb.cells[7].source == 'And a last one'
+    assert nb.cells[7].source == 'A fifth one'
 
-    assert len(nb.cells) == 8
+    assert nb.cells[8].cell_type == 'markdown'
+    assert nb.cells[8].source == 'And a last one'
+
+    assert len(nb.cells) == 9
