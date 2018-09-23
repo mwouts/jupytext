@@ -193,9 +193,9 @@ The `light` format has:
 ### Julia, Python and R scripts in the double percent format
 
 Many Python editors recognize cells delimited with a commented double percent sign `# %%`, including
-- [Spyder](https://pythonhosted.org/spyder/editor.html),
-- [Hydrogen](https://atom.io/packages/hydrogen)'s plugin for Atom,
-- [Jupyter](https://github.com/DonJayamanne/vscodeJupyter)'s plugin for Visual Studio Code,
+- [Spyder IDE](https://pythonhosted.org/spyder/editor.html),
+- [Hydrogen](https://atom.io/packages/hydrogen), a package for Atom,
+- [vscodeJupyter](https://github.com/DonJayamanne/vscodeJupyter), a plugin for Visual Studio Code,
 - and PyCharm Professional.
 
 Our implementation of the `percent` format is compatible with the above editors. Cell headers have the following structure:
