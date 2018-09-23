@@ -195,7 +195,7 @@ The `light` format has:
 Many Python editors recognize cells delimited with a commented double percent sign `# %%`, including
 - [Spyder IDE](https://pythonhosted.org/spyder/editor.html),
 - [Hydrogen](https://atom.io/packages/hydrogen), a package for Atom,
-- [vscodeJupyter](https://github.com/DonJayamanne/vscodeJupyter), a plugin for Visual Studio Code,
+- [vscodeJupyter](https://marketplace.visualstudio.com/items?itemName=donjayamanne.jupyter), an extension for Visual Studio Code,
 - and PyCharm Professional.
 
 Our implementation of the `percent` format is compatible with the above editors. Cell headers have the following structure:
