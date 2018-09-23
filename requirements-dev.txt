@@ -1,2 +1,6 @@
+flake8
 pytest
+pytest-cov
+codecov
 notebook
+sphinx_gallery

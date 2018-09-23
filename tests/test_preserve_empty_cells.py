@@ -3,7 +3,7 @@ from testfixtures import compare
 from nbformat.v4.nbbase import new_notebook, new_code_cell, new_markdown_cell
 import jupytext
 
-jupytext.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 @pytest.mark.parametrize('blank_lines', range(1, 6))

@@ -3,6 +3,33 @@
 Release History
 ---------------
 
+0.7.0 (2018-09-23)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Header for cells in `percent` format is more robust: use `[markdown]` and
+ `[raw]` to identify cell types. Cell type comes after the cell title. (#59)
+
+0.7.0-rc0 (2018-09-22)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Jupytext can read and write notebooks as Hydrogen/VScode/Spyder/PyCharm
+compatible scripts (cells starting with `# %%`) (#59)
+- Jupytext can read and write notebooks as Sphinx-gallery compatible scripts (#80)
+- Metadata are supported for all cell types in light python and percent
+formats (#66). Due to this, light python format version is now 1.3. Light python
+notebooks in versions 1.1 and 1.2 are still readable.
+- Command line `jupytext` has a `from` argument, and now accepts notebook from
+the standard input.
+
+**BugFixes**
+
+- Fix merging of input and output notebooks (#83)
+- Removed extra new line on stdout in command line `jupytext` (#84)
+
 0.6.5 (2018-09-13)
 +++++++++++++++++++
 

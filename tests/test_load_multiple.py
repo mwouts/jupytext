@@ -3,7 +3,6 @@ import mock
 from tornado.web import HTTPError
 from nbformat.v4.nbbase import new_notebook
 import jupytext
-from jupytext import TextFileContentsManager
 
 
 def test_combine_same_version_ok(tmpdir):
@@ -14,7 +13,7 @@ def test_combine_same_version_ok(tmpdir):
         fp.write("""# ---
 # jupyter:
 #   jupytext_formats: ipynb,py
-#   jupytext_format_version: '1.0'
+#   jupytext_format_version: '1.2'
 # ---
 
 # New cell
@@ -23,12 +22,11 @@ def test_combine_same_version_ok(tmpdir):
     nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
     jupytext.writef(nb, str(tmpdir.join(tmp_ipynb)))
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.default_jupytext_formats = 'ipynb,py'
     cm.root_dir = str(tmpdir)
 
-    with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
-                    {'.py': '1.0'}):
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         nb = cm.get(tmp_ipynb)
     cells = nb['content']['cells']
     assert len(cells) == 1
@@ -53,14 +51,11 @@ def test_combine_lower_version_raises(tmpdir):
     nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
     jupytext.writef(nb, str(tmpdir.join(tmp_ipynb)))
 
-    cm = TextFileContentsManager()
+    cm = jupytext.TextFileContentsManager()
     cm.default_jupytext_formats = 'ipynb,py'
     cm.root_dir = str(tmpdir)
 
     with pytest.raises(HTTPError):
-        with mock.patch('jupytext.file_format_version.FILE_FORMAT_VERSION',
-                        {'.py': '1.0'}):
-            with mock.patch(
-                    'jupytext.file_format_version.MIN_FILE_FORMAT_VERSION',
-                    {'.py': '1.0'}):
-                cm.get(tmp_ipynb)
+        with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER',
+                        True):
+            cm.get(tmp_ipynb)

@@ -5,7 +5,7 @@ from datetime import timedelta
 import nbformat
 import mock
 from tornado.web import HTTPError
-from traitlets import Unicode, Float
+from traitlets import Unicode, Float, Bool
 from traitlets.config import Configurable
 
 # import notebook.transutils before notebook.services.contents.filemanager #75
@@ -17,20 +17,24 @@ except ImportError:
 from notebook.services.contents.filemanager import FileContentsManager
 
 import jupytext
-from . import combine
-from .file_format_version import check_file_version
+from .combine import combine_inputs_with_outputs
+from .formats import check_file_version, NOTEBOOK_EXTENSIONS, \
+    format_name_for_ext, parse_one_format, parse_formats
 
 
-def _jupytext_writes(ext):
+def _jupytext_writes(ext, format_name):
     def _writes(nbk, version=nbformat.NO_CONVERT, **kwargs):
-        return jupytext.writes(nbk, version=version, ext=ext, **kwargs)
+        return jupytext.writes(nbk, version=version, ext=ext,
+                               format_name=format_name, **kwargs)
 
     return _writes
 
 
-def _jupytext_reads(ext):
+def _jupytext_reads(ext, format_name, rst2md):
     def _reads(text, as_version, **kwargs):
-        return jupytext.reads(text, ext, as_version, **kwargs)
+        return jupytext.reads(text, ext=ext,
+                              format_name=format_name, rst2md=rst2md,
+                              as_version=as_version, **kwargs)
 
     return _reads
 
@@ -68,19 +72,18 @@ def check_formats(formats):
             except UnicodeDecodeError:
                 raise ValueError('Extensions should be strings among {}'
                                  ', not {}.\n{}'
-                                 .format(str(jupytext.NOTEBOOK_EXTENSIONS),
+                                 .format(str(formats.NOTEBOOK_EXTENSIONS),
                                          str(fmt),
                                          expected_format))
             if fmt == '':
                 continue
-            if not fmt.startswith('.'):
-                fmt = '.' + fmt
+            fmt, _ = parse_one_format(fmt)
             if not any([fmt.endswith(ext)
-                        for ext in jupytext.NOTEBOOK_EXTENSIONS]):
+                        for ext in NOTEBOOK_EXTENSIONS]):
                 raise ValueError('Group extension {} contains {}, '
                                  'which does not end with either {}.\n{}'
                                  .format(str(group), fmt,
-                                         str(jupytext.NOTEBOOK_EXTENSIONS),
+                                         str(NOTEBOOK_EXTENSIONS),
                                          expected_format))
             if fmt == '.ipynb':
                 has_ipynb = True
@@ -112,8 +115,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
     Python (.py) or R scripts (.R)
     """
 
-    nb_extensions = [ext for ext in jupytext.NOTEBOOK_EXTENSIONS if
-                     ext != '.ipynb']
+    nb_extensions = [ext for ext in NOTEBOOK_EXTENSIONS if ext != '.ipynb']
 
     def all_nb_extensions(self):
         """
@@ -126,7 +128,31 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         u'',
         help='Save notebooks to these file extensions. '
              'Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R '
-             'comma separated',
+             'comma separated. If you want another format than the '
+             'default one, append the format name to the extension, '
+             'e.g. ipynb,py:percent to save the notebook to '
+             'hydrogen/spyder/vscode compatible scripts',
+        config=True)
+
+    preferred_jupytext_formats_save = Unicode(
+        u'',
+        help='Preferred format when saving notebooks as text, per extension. '
+             'Use "jl:percent,py:percent,R:percent" if you want to save '
+             'Julia, Python and R scripts in the double percent format and '
+             'only write "jupytext_formats": "py" in the notebook metadata.',
+        config=True)
+
+    preferred_jupytext_formats_read = Unicode(
+        u'',
+        help='Preferred format when reading notebooks from text, per '
+             'extension. Use "py:sphinx" if you want to read all python '
+             'scripts as Sphinx gallery scripts.',
+        config=True)
+
+    sphinx_convert_rst2md = Bool(
+        False,
+        help='When opening a Sphinx Gallery script, convert the '
+             'reStructuredText to markdown',
         config=True)
 
     outdated_text_notebook_margin = Float(
@@ -164,11 +190,23 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
         return [fmt]
 
+    def preferred_format(self, ext, preferred):
+        """Returns the preferred format for that extension"""
+        for fmt_ext, format_name in \
+                parse_formats(preferred):
+            if fmt_ext == ext:
+                return format_name
+        return None
+
     def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
         _, ext = os.path.splitext(os_path)
         if ext in self.nb_extensions:
-            with mock.patch('nbformat.reads', _jupytext_reads(ext)):
+            format_name = self.preferred_format(
+                ext, self.preferred_jupytext_formats_read)
+            with mock.patch('nbformat.reads',
+                            _jupytext_reads(ext, format_name,
+                                            self.sphinx_convert_rst2md)):
                 return super(TextFileContentsManager, self) \
                     ._read_notebook(os_path, as_version)
         else:
@@ -182,8 +220,14 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             os_path_fmt = os_file + alt_fmt
             self.log.info("Saving %s", os.path.basename(os_path_fmt))
             alt_ext = '.' + alt_fmt.split('.')[-1]
+
             if alt_ext in self.nb_extensions:
-                with mock.patch('nbformat.writes', _jupytext_writes(alt_ext)):
+                format_name = format_name_for_ext(nb.metadata, alt_ext) or \
+                              self.preferred_format(
+                                  alt_ext,
+                                  self.preferred_jupytext_formats_save)
+                with mock.patch('nbformat.writes',
+                                _jupytext_writes(alt_ext, format_name)):
                     super(TextFileContentsManager, self) \
                         ._save_notebook(os_path_fmt, nb)
             else:
@@ -280,8 +324,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 pass
 
             if model_outputs:
-                combine.combine_inputs_with_outputs(model['content'],
-                                                    model_outputs['content'])
+                combine_inputs_with_outputs(model['content'],
+                                            model_outputs['content'])
             elif not fmt.endswith('.ipynb'):
                 self.notary.sign(model['content'])
                 self.mark_trusted_cells(model['content'], path)

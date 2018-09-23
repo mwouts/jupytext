@@ -8,10 +8,10 @@ from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 
-jupytext.file_format_version.FILE_FORMAT_VERSION = {}
+jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks())
+@pytest.mark.parametrize('nb_file', list_notebooks(skip='66'))
 def test_rmd_is_ok(nb_file, tmpdir):
     nb = jupytext.readf(nb_file)
     tmp_ipynb = 'notebook.ipynb'
@@ -50,7 +50,7 @@ def test_ipynb_is_ok(nb_file, tmpdir):
     compare_notebooks(nb, nb2)
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='66'))
 def test_all_files_created(nb_file, tmpdir):
     nb = jupytext.readf(nb_file)
     tmp_ipynb = 'notebook.ipynb'

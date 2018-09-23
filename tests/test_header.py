@@ -1,19 +1,16 @@
-import pytest
 from nbformat.v4.nbbase import new_notebook, new_raw_cell, new_markdown_cell
 import jupytext
-from jupytext.jupytext import TextNotebookReader, TextNotebookWriter
+from jupytext.header import uncomment_line, header_to_metadata_and_cell, \
+    metadata_and_cell_to_header
+from jupytext.formats import get_format
 
-jupytext.file_format_version.FILE_FORMAT_VERSION = {}
-
-
-@pytest.fixture
-def reader():
-    return TextNotebookReader(ext='.Rmd')
+jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
-@pytest.fixture
-def writer():
-    return TextNotebookWriter(ext='.Rmd')
+def test_uncomment():
+    assert uncomment_line('# line one', '#') == 'line one'
+    assert uncomment_line('#line two', '#') == 'line two'
+    assert uncomment_line('#line two', '') == '#line two'
 
 
 def test_header_to_metadata_and_cell_blank_line():
@@ -24,7 +21,7 @@ title: Sample header
 Header is followed by a blank line
 """
     lines = text.splitlines()
-    metadata, cell, pos = reader().header_to_metadata_and_cell(lines)
+    metadata, cell, pos = header_to_metadata_and_cell(lines, '')
 
     assert metadata == {}
     assert cell.cell_type == 'raw'
@@ -42,7 +39,7 @@ title: Sample header
 Header is not followed by a blank line
 """
     lines = text.splitlines()
-    metadata, cell, pos = reader().header_to_metadata_and_cell(lines)
+    metadata, cell, pos = header_to_metadata_and_cell(lines, '')
 
     assert metadata == {}
     assert cell.cell_type == 'raw'
@@ -61,7 +58,7 @@ jupyter:
 ---
 """
     lines = text.splitlines()
-    metadata, cell, pos = reader().header_to_metadata_and_cell(lines)
+    metadata, cell, pos = header_to_metadata_and_cell(lines, '')
 
     assert metadata == {'mainlanguage': 'python'}
     assert cell.cell_type == 'raw'
@@ -78,7 +75,7 @@ def test_metadata_and_cell_to_header():
         cells=[new_raw_cell(
             source="---\ntitle: Sample header\n---",
             metadata={'noskipline': True})])
-    header = writer().metadata_and_cell_to_header(nb)
+    header = metadata_and_cell_to_header(nb, get_format('.md'))
     assert '\n'.join(header) == """---
 title: Sample header
 jupyter:
@@ -89,6 +86,6 @@ jupyter:
 
 def test_metadata_and_cell_to_header2():
     nb = new_notebook(cells=[new_markdown_cell(source="Some markdown\ntext")])
-    header = writer().metadata_and_cell_to_header(nb)
+    header = metadata_and_cell_to_header(nb, get_format('.md'))
     assert header == []
     assert len(nb.cells) == 1
