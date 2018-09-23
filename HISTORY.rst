@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+0.7.1 (2018-09-24)
+++++++++++++++++++++++
+
+**BugFixes**
+
+- Markdown cells header in sphinx gallery format may have a space between
+first # and following.
+
 0.7.0 (2018-09-23)
 ++++++++++++++++++++++
 
