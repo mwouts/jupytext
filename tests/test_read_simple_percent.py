@@ -10,10 +10,10 @@ def test_read_simple_file(script="""# ---
 # title: Simple file
 # ---
 
-# %% markdown
+# %% [markdown]
 # This is a markdown cell
 
-# %% raw
+# %% [raw]
 # This is a raw cell
 
 # %% And now a code cell
@@ -37,7 +37,7 @@ def test_read_simple_file(script="""# ---
 6
 
 7''')
-    assert nb.cells[3].metadata == {'name': 'And now a code cell'}
+    assert nb.cells[3].metadata == {'description': 'And now a code cell'}
 
     script2 = jupytext.writes(nb, ext='.py', format_name='percent')
     compare(script, script2)
@@ -51,8 +51,9 @@ a = 3
     assert len(nb.cells) == 1
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[0].source == 'a = 3'
-    assert nb.cells[0].metadata == {'name': 'a code cell with parameters',
-                                    'tags': ['parameters']}
+    assert nb.cells[0].metadata == {
+        'description': 'a code cell with parameters',
+        'tags': ['parameters']}
 
     script2 = jupytext.writes(nb, ext='.py', format_name='percent')
     compare(script, script2)

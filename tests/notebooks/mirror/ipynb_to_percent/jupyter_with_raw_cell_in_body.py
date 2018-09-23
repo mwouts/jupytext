@@ -20,8 +20,8 @@
 # %%
 1+2+3
 
-# %% raw
+# %% [raw]
 # This is a raw cell
 
-# %% markdown
+# %% [markdown]
 # This is a markdown cell

@@ -4,7 +4,6 @@
 [![Pypi](https://img.shields.io/pypi/l/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Build Status](https://travis-ci.com/mwouts/jupytext.svg?branch=master)](https://travis-ci.com/mwouts/jupytext)
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=master)](https://codecov.io/github/mwouts/jupytext?branch=master)
-![pylint Score](https://mperlet.github.io/pybadge/badges/9.8.svg)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/mwouts/jupytext.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mwouts/jupytext/context:python)
 [![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)
@@ -104,7 +103,7 @@ To enable paired notebooks, one option is to set the output formats by adding a 
   }
 }
 ```
-Accepted formats are: `ipynb`, `md`, `Rmd`, `py` and `R`.
+Accepted formats are: `ipynb`, `md`, `Rmd`, `jl`, `jl:percent`, `py`, `py:percent`, `py:sphinx`, `R` and `R:percent`.
 
 Alternatively, it is also possible to set a default format pairing. Say you want to always associate `.ipynb` notebooks with an `.md` file  (and reciprocally). This is simply done by adding the following to your Jupyter configuration file:
 ```python
@@ -112,6 +111,12 @@ c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 c.ContentsManager.default_jupytext_formats = "ipynb,md"
 ```
 (and similarly for the other formats).
+
+In case the [`percent` format](#julia-python-and-r-scripts-in-the-double-percent-format) is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
+```python
+c.ContentsManager.preferred_jupytext_formats_save = "py:percent"
+```
+and then, Jupytext will understand `"jupytext_formats": "ipynb,py",` as an instruction to create the paired Python script in the `percent` format.
 
 ## Command line conversion
 
@@ -133,6 +138,21 @@ jupytext --to md --output - notebook.ipynb      # display the markdown version o
 jupytext --from ipynb --to py:percent           # read ipynb from stdin and write double percent script on stdout
 ```
 
+## Conversion in a Python script
+
+The `jupytext` package offers a few methods for reading and writing notebooks in Python.
+
+```python
+# Read notebook from file in given format (guess format when `format_name` is None)
+readf(nb_file, format_name=None)
+# Read notebook from text, given extension and format name
+reads(text, ext, format_name=None, [...])
+# Return the text representation for the notebook, given extension and format name
+writes(notebook, ext, format_name=None, [...])
+# Write notebook to file in desired format
+writef(notebook, nb_file, format_name=None)
+```
+
 ## Round-trip conversion
 
 Round-trip conversion is safe! A few hundred tests help guarantee this.
@@ -147,10 +167,10 @@ a yaml header at the top of your script.
 
 ### Markdown and R markdown
 
-Our implementation for Jupyter notebooks as Markdown or R Markdown documents is straightforward:
+Our implementation for Jupyter notebooks as Markdown or [R Markdown ](https://rmarkdown.rstudio.com/authoring_quick_tour.html) documents is straightforward:
 - A YAML header contains the notebook metadata (Jupyter kernel, etc)
 - Markdown cells are inserted verbatim, and separated with two blank lines
-- Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are not available in the markdown format, but code cell metadata are available in the [R Markdown format](https://rmarkdown.rstudio.com/authoring_quick_tour.html).
+- Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are not available in the markdown format. The [code cell options](https://yihui.name/knitr/options/) in the R Markdown format are mapped to the corresponding Jupyter cell metadata options, when available.
 
 ### R scripts
 
@@ -161,52 +181,39 @@ Implement these [specifications](https://rmarkdown.rstudio.com/articles_report_f
 
 ### Python and Julia scripts
 
-The default format for Python and Julia scripts is the `light` format. We wanted to represent Jupyter notebooks with the least explicit markers possible. The rationale for that is to allow **arbitrary** python files to open as Jupyter notebooks, even files which were never prepared to become a notebook. Precisely:
-- Jupyter metadata go to an escaped YAML header
+The default format for Python and Julia scripts is the `light` format. That format can read any Python or Julia script as a Jupyter notebook, even scripts which were never prepared to become a notebook. When a notebook is written as a script using this format, as few cells markers as possible are introduced.
+
+The `light` format has:
+- A YAML header, commented with `# `, that contains the notebook metadata
 - Markdown cells are commented with `# `, and separated with a blank line
-- Code cells are exported verbatim (except for Jupyter magics, which are escaped), and separated with blank lines. Code cells are reconstructed from consistent python paragraphs (no function, class or multiline comment will be broken). A start-of-cell delimiter `# +` is used for cells that contain blank lines (outside of functions, classes, etc). `# + {}` is used for cells that have explicit metadata (inside the curly bracket, in JSON format). The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
+- Code cells are exported verbatim (except for Jupyter magics, which are commented), and separated with blank lines. Code cells are reconstructed from consistent Python paragraphs (no function, class or multiline comment will be broken). A start-of-cell delimiter `# +` is used for cells that contain more than one Python paragraphs. `# + {}` is used for cells that have explicit metadata (inside the curly bracket, in JSON format). The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
 ### Julia, Python and R scripts in the double percent format
 
-A series of editors recognize cells delimited with a commented double percent sign `# %%`, including
-- [Hydrogen](https://atom.io/packages/hydrogen),
+Many Python editors recognize cells delimited with a commented double percent sign `# %%`, including
 - [Spyder](https://pythonhosted.org/spyder/editor.html),
-- Visual studio code when using the [Jupyter](https://github.com/DonJayamanne/vscodeJupyter) extension,
-- and PyCharm professional.
+- [Hydrogen](https://atom.io/packages/hydrogen)'s plugin for Atom,
+- [Jupyter](https://github.com/DonJayamanne/vscodeJupyter)'s plugin for Visual Studio Code,
+- and PyCharm Professional.
 
-We have implemented code, markdown and raw cells, as well as cell metadata. Sample code cells may be:
+Our implementation of the `percent` format is compatible with the above editors. Cell headers have the following structure:
 ```python
-# %% {"tags": ["parameters"]}
-# This is a code cell with notebook parameters compatible with papermill
-a = 1
-
-# %% markdown
-# This is a markdown cell.
-
-# %% Text here goes to the cell metadata "name"
-# This is a code cell
-a + 1
+# %% Optional text [cell type] {optional JSON metadata}
 ```
-
-If you want to pair a Jupyter notebook to a Python script in this double percent format, modify the notebook metadata to `"jupytext_formats": "ipynb,py:percent",` (replace `py` with `jl` or `R` for Julia and R).
+where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The content of markdown and raw cells is commented in the resulting script.
 
 Note that the double percent scripts you have written outside of Jupytext will be opened as such by Jupytext, provided that they contain at least two cells.
-
-If you want to write the Python representation of your notebooks in that format per default, add the following to your `.jupyter/jupyter_notebook_config.py` file:
-```python
-c.ContentsManager.preferred_jupytext_formats_save = "py:percent"
-```
 
 ### Sphinx-gallery scripts
 
 Another popular notebook-like format for Python script is the Sphinx-gallery [format](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-gallery notebooks by Jupytext.
 
-If you want that the reStructuredText be converted to markdown for a nicer display, add a `c.ContentsManager.sphinx_convert_rst2md = True` line to your Jupyter configuration file. Please notice however that this is a non-reversible transformation - use this only with Binder, and leave the option to its default value, that is `False` if you plan to edit your Sphinx Gallery files.
+If you want that the reStructuredText be converted to markdown for a nicer display, add a `c.ContentsManager.sphinx_convert_rst2md = True` line to your Jupyter configuration file. Please notice however that this is a non-reversible transformation - use this only with Binder. You should not use that if you want to edit the Sphinx Gallery files with Jupytext.
 
+By the way, if you want to use Jupytext and Binder to visualize your Sphinx Gallery scripts, you just need to create two files in your GitHub repo:
+- `binder/requirements.txt` with the required packages (including `jupytext`)
+- `.jupyter/jupyter_notebook_config.py` with the following contents:
 ```python
-# Sample Binder + Jupytext configuration
-# 1. Save the below as .jupyter/jupyter_notebook_config.py in your GitHub project, and
-# 2. Create binder/requirements.txt
 c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 c.ContentsManager.preferred_jupytext_formats_read = "py:sphinx"
 c.ContentsManager.sphinx_convert_rst2md = True
@@ -231,11 +238,3 @@ Also, you may want some cells to be active only in the Python, or R Markdown rep
 ## I like this, how can I contribute?
 
 Your feedback is precious to us: please let us know how we can improve `jupytext`. With enough feedback we will be able to transition from the current beta phase to a stable phase. Thanks for staring the project on GitHub. Sharing it is also very helpful! By the way: stay tuned for announcements and demos on [medium](https://medium.com/@marc.wouts) and [twitter](https://twitter.com/marcwouts)!
-
-
-## Roadmap
-
-Planned developments are:
-- Refactor code to allow easier addition of new formats, and document the corresponding procedure [#61](https://github.com/mwouts/jupytext/issues/61).
-- Implement a language agnostic format compatible with Atom/Hydrogen and VScode/Jupyter [#59](https://github.com/mwouts/jupytext/issues/59).
-- Cell metadata for markdown cells (currently not covered) [#66](https://github.com/mwouts/jupytext/issues/66).

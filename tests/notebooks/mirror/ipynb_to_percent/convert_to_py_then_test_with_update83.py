@@ -22,7 +22,7 @@
 
 print('asdf')
 
-# %% markdown
+# %% [markdown]
 # Thanks for jupytext!
 
 # %%

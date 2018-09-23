@@ -110,8 +110,8 @@ class TextNotebookWriter(NotebookWriter):
         return '\n'.join(lines)
 
 
-def reads(text, ext, as_version=4, format_name=None,
-          rst2md=False, **kwargs):
+def reads(text, ext, format_name=None,
+          rst2md=False, as_version=4, **kwargs):
     """Read a notebook from a string"""
     if ext == '.ipynb':
         return nbformat.reads(text, as_version, **kwargs)
@@ -131,7 +131,7 @@ def reads(text, ext, as_version=4, format_name=None,
     return notebook
 
 
-def read(file_or_stream, ext, as_version=4, format_name=None, **kwargs):
+def read(file_or_stream, ext, format_name=None, as_version=4, **kwargs):
     """Read a notebook from a file"""
     if ext == '.ipynb':
         return nbformat.read(file_or_stream, as_version, **kwargs)

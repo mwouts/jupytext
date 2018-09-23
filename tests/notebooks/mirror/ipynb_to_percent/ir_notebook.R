@@ -13,7 +13,7 @@
 #     version: 3.5.0
 # ---
 
-# %% markdown
+# %% [markdown]
 # This is a jupyter notebook that uses the IR kernel.
 
 # %%

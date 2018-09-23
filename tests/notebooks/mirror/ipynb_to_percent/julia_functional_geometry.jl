@@ -81,28 +81,28 @@ ia.hide()
 }
 </script>""")
 
-# %% markdown
+# %% [markdown]
 # # Functional Geometry
 # *Functional Geometry* is a paper by Peter Henderson ([original (1982)](users.ecs.soton.ac.uk/peter/funcgeo.pdf), [revisited (2002)](https://cs.au.dk/~hosc/local/HOSC-15-4-pp349-365.pdf)) which deconstructs the MC Escher woodcut *Square Limit*
 #
 # ![Square Limit](http://i.imgur.com/LjRzmNM.png)
 
-# %% markdown
+# %% [markdown]
 # > A picture is an example of a complex object that can be described in terms of its parts.
 # Yet a picture needs to be rendered on a printer or a screen by a device that expects to
 # be given a sequence of commands. Programming that sequence of commands directly is
 # much harder than having an application generate the commands automatically from the
 # simpler, denotational description.
 
-# %% markdown
+# %% [markdown]
 # A `picture` is a *denotation* of something to draw.
 #
 # e.g. The value of f here denotes the picture of the letter F
 
-# %% markdown
+# %% [markdown]
 # Original at http://nbviewer.jupyter.org/github/shashi/ijulia-notebooks/blob/master/funcgeo/Functional%20Geometry.ipynb
 
-# %% markdown
+# %% [markdown]
 # ## In conclusion
 #
 # We described Escher's *Square Limit* from the description of its smaller parts, which in turn were described in terms of their smaller parts.

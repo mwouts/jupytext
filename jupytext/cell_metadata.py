@@ -30,6 +30,8 @@ _IGNORE_METADATA = ['collapsed', 'autoscroll', 'scrolled',
                     'deletable', 'format', 'trusted', 'skipline',
                     'noskipline', 'lines_to_next_cell',
                     'lines_to_end_of_cell_marker']
+_PERCENT_CELL = re.compile(
+    r'(# |#)%%([^\{\[]*)(|\[raw\]|\[markdown\])([^\{\[]*)(|\{.*\})\s*$')
 
 
 def _r_logical_values(pybool):
@@ -317,23 +319,23 @@ def is_active(ext, metadata):
 
 def double_percent_options_to_metadata(options):
     """Parse double percent options"""
-    if '{' in options:
-        code_type_and_cell_name, metadata = options.split('{', 1)
-        metadata = json_options_to_metadata('{' + metadata, add_brackets=False)
+    matches = _PERCENT_CELL.findall('# %%' + options)[0]
+    # Fifth match are JSON metadata
+    if matches[4]:
+        metadata = json_options_to_metadata(matches[4], add_brackets=False)
     else:
-        code_type_and_cell_name = options
         metadata = {}
 
-    code_type_and_cell_name = code_type_and_cell_name.strip()
-    for cell_type in ['raw', 'markdown']:
-        if code_type_and_cell_name.startswith(cell_type):
-            metadata['cell_type'] = cell_type
-            code_type_and_cell_name = \
-                code_type_and_cell_name[len(cell_type) + 1:]
-            break
+    # Third match is cell type
+    cell_type = matches[2]
+    if cell_type:
+        metadata['cell_type'] = cell_type[1:-1]
 
-    if code_type_and_cell_name:
-        metadata['name'] = code_type_and_cell_name
+    # Second and fourth match are description
+    description = [matches[i].strip() for i in [1, 3]]
+    description = [part for part in description if part]
+    if description:
+        metadata['description'] = ' '.join(description)
 
     return metadata
 
@@ -341,10 +343,10 @@ def double_percent_options_to_metadata(options):
 def metadata_to_double_percent_options(metadata):
     """Metadata to double percent lines"""
     options = []
+    if 'description' in metadata:
+        options.append(metadata.pop('description'))
     if 'cell_type' in metadata:
-        options.append(metadata.pop('cell_type'))
-    if 'name' in metadata:
-        options.append(metadata.pop('name'))
+        options.append('[{}]'.format(metadata.pop('cell_type')))
     if metadata:
         options.append(metadata_to_json_options(metadata))
     return ' '.join(options)
