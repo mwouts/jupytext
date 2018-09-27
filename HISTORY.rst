@@ -3,6 +3,16 @@
 Release History
 ---------------
 
+0.7.2 (2018-09-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- `light` and `percent` formats made available for scheme and cpp notebooks. Adding more formats
+is straightforward - just add a new entry to _SCRIPT_EXTENSIONS in languages.py, a sample notebook
+and a mirror test (#61)
+
+
 0.7.1 (2018-09-24)
 ++++++++++++++++++++++
 

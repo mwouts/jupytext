@@ -2,6 +2,7 @@
 
 import re
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
+from .languages import _SCRIPT_EXTENSIONS
 
 try:
     from sphinx_gallery.notebook import rst2md
@@ -12,10 +13,8 @@ from .cell_metadata import is_active, json_options_to_metadata, \
     md_options_to_metadata, rmd_options_to_metadata, \
     double_percent_options_to_metadata
 from .stringparser import StringParser
-from .magics import unescape_magic, is_magic, unescape_code_start
+from .magics import uncomment_magic, is_magic, unescape_code_start
 
-_CODE_OPTION_PY = re.compile(r"^(#|# )\+(\s*){(.*)}\s*$")
-_SIMPLE_START_CODE_PY = re.compile(r"^(#|# )\+(\s*)$")
 _BLANK_LINE = re.compile(r"^\s*$")
 _PY_COMMENT = re.compile(r"^\s*#")
 _PY_INDENTED = re.compile(r"^\s")
@@ -88,6 +87,7 @@ class BaseCellReader(object):
     lines_to_next_cell = 1
 
     start_code_re = None
+    simple_start_code_re = None
     end_code_re = None
 
     # How to make code inactive
@@ -171,9 +171,9 @@ class BaseCellReader(object):
 
             # Simple code pattern in LightScripts must be preceded with
             # a blank line
-            if i > 0 and self.start_code_re == _CODE_OPTION_PY and \
+            if i > 0 and self.simple_start_code_re and \
                     _BLANK_LINE.match(lines[i - 1]) and \
-                    _SIMPLE_START_CODE_PY.match(line):
+                    self.simple_start_code_re.match(line):
                 return i - 1, i, False
 
             if self.end_code_re:
@@ -307,7 +307,7 @@ class RMarkdownCellReader(MarkdownCellReader):
     def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code':
             if is_active(self.ext, self.metadata):
-                unescape_magic(lines, self.language or self.default_language)
+                uncomment_magic(lines, self.language or self.default_language)
 
         unescape_code_start(lines, self.ext, self.language or
                             self.default_language)
@@ -325,7 +325,7 @@ class ScriptCellReader(BaseCellReader):
     def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code':
             if is_active(self.ext, self.metadata):
-                unescape_magic(lines, self.language or self.default_language)
+                uncomment_magic(lines, self.language or self.default_language)
             else:
                 lines = uncomment(lines)
 
@@ -371,21 +371,25 @@ class LightScriptCellReader(ScriptCellReader):
     """Read notebook cells from plain Python or Julia files. Cells
     are identified by line breaks, unless they start with an
     explicit marker '# +' """
-    comment = '#'
-    start_code_re = _CODE_OPTION_PY
 
     def __init__(self, ext):
         super(LightScriptCellReader, self).__init__(ext)
-        self.default_language = 'julia' if ext == '.jl' else 'python'
+        script = _SCRIPT_EXTENSIONS[ext]
+        self.default_language = script['language']
+        self.comment = script['comment']
+        self.start_code_re = re.compile("^({0}|{0} )".format(self.comment) +
+                                        r"\+(\s*){(.*)}\s*$")
+        self.simple_start_code_re = re.compile(
+            r"^({0}|{0} )\+(\s*)$".format(self.comment))
 
     def options_to_metadata(self, options):
         return json_options_to_metadata(options)
 
     def metadata_and_language_from_option_line(self, line):
-        if _CODE_OPTION_PY.match(line):
+        if self.start_code_re.match(line):
             self.metadata = self.options_to_metadata(
-                _CODE_OPTION_PY.match(line).group(3))
-        elif _SIMPLE_START_CODE_PY.match(line):
+                self.start_code_re.match(line).group(3))
+        elif self.simple_start_code_re.match(line):
             self.metadata = {}
 
         if self.metadata is not None:
@@ -413,9 +417,12 @@ class LightScriptCellReader(ScriptCellReader):
 class DoublePercentScriptCellReader(ScriptCellReader):
     """Read notebook cells from Hydrogen/Spyder/VScode scripts (#59)"""
 
-    comment = '#'
-    default_language = 'python'
-    start_code_re = re.compile(r"^#\s+%%(.*)$")
+    def __init__(self, ext):
+        ScriptCellReader.__init__(self, ext)
+        script = _SCRIPT_EXTENSIONS[ext]
+        self.default_language = script['language']
+        self.comment = script['comment']
+        self.start_code_re = re.compile(r"^{}\s+%%(.*)$".format(self.comment))
 
     def options_to_metadata(self, options):
         return None, double_percent_options_to_metadata(options)
@@ -471,7 +478,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
 
     comment = '#'
     default_language = 'python'
-    twenty_hash = re.compile('^#( |)#{19,}\s*$')
+    twenty_hash = re.compile(r'^#( |)#{19,}\s*$')
     markdown_marker = None
     rst2md = False
 

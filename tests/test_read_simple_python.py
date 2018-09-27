@@ -131,7 +131,7 @@ a + 2
 
 def test_read_cell_explicit_start(pynb='''
 import pandas as pd
-# +
+# + {}
 def data():
     return pd.DataFrame({'A': [0, 1]})
 

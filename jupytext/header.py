@@ -5,14 +5,14 @@ import re
 import yaml
 import nbformat
 from nbformat.v4.nbbase import new_raw_cell
-from .cell_to_text import comment
+from .cell_to_text import comment_lines
+from .languages import _SCRIPT_EXTENSIONS
 
 _HEADER_RE = re.compile(r"^---\s*$")
 _BLANK_RE = re.compile(r"^\s*$")
 _JUPYTER_RE = re.compile(r"^jupyter\s*:\s*$")
 _LEFTSPACE_RE = re.compile(r"^\s")
-_ENCODING_RE = re.compile('^[ \t\f]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)')
-_UTF8_HEADER = '# -*- coding: utf-8 -*-'
+_UTF8_HEADER = ' -*- coding: utf-8 -*-'
 
 # Change this to False in tests
 INSERT_AND_CHECK_VERSION_NUMBER = True
@@ -50,9 +50,10 @@ def encoding_and_executable(notebook, ext):
     """
     lines = []
     metadata = notebook.get('metadata', {})
+    comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment')
 
     if ext not in ['.Rmd', '.md'] and 'executable' in metadata:
-        lines.append('#!' + metadata['executable'])
+        lines.append(comment + '!' + metadata['executable'])
         del metadata['executable']
 
     if 'encoding' in metadata:
@@ -63,7 +64,7 @@ def encoding_and_executable(notebook, ext):
             try:
                 cell.source.encode('ascii')
             except (UnicodeEncodeError, UnicodeDecodeError):
-                lines.append(_UTF8_HEADER)
+                lines.append(comment + _UTF8_HEADER)
                 break
 
     return lines
@@ -102,7 +103,7 @@ def metadata_and_cell_to_header(notebook, text_format):
     if header:
         header = ['---'] + header + ['---']
 
-    header = comment(header, text_format.header_prefix)
+    header = comment_lines(header, text_format.header_prefix)
 
     if header and skipline:
         header += ['']
@@ -123,13 +124,17 @@ def header_to_metadata_and_cell(lines, header_prefix):
     start = 0
     i = -1
 
+    comment = '#' if header_prefix == "#'" else header_prefix
+
+    encoding_re = re.compile(r'^[ \t\f]*{}.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)'.format(comment))
+
     for i, line in enumerate(lines):
-        if i == 0 and line.startswith('#!'):
+        if i == 0 and line.startswith(comment + '!'):
             metadata['executable'] = line[2:]
             start = i + 1
             continue
-        if i == 0 or (i == 1 and not _ENCODING_RE.match(lines[0])):
-            encoding = _ENCODING_RE.match(line)
+        if i == 0 or (i == 1 and not encoding_re.match(lines[0])):
+            encoding = encoding_re.match(line)
             if encoding:
                 if encoding.group(1) != 'utf-8':
                     raise ValueError('Encodings other than utf-8 '

@@ -7,12 +7,17 @@ _JUPYTER_LANGUAGES = ['R', 'bash', 'sh', 'python', 'python2', 'python3',
 _JUPYTER_LANGUAGES_RE = [re.compile(r"^%%{}\s*".format(lang))
                          for lang in _JUPYTER_LANGUAGES]
 
+_SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
+                      '.R': {'language': 'R', 'comment': '#'},
+                      '.jl': {'language': 'julia', 'comment': '#'},
+                      '.cpp': {'language': 'c++', 'comment': '//'},
+                      '.ss': {'language': 'scheme', 'comment': ';;'}}
+
 
 def default_language_from_metadata_and_ext(notebook, ext):
     """Return the default language for a notebook that was read
     from the given file extension"""
-    default_from_ext = 'R' if ext == '.R' \
-        else 'julia' if ext == '.jl' else 'python'
+    default_from_ext = _SCRIPT_EXTENSIONS.get(ext, {}).get('language', 'python')
 
     return (notebook.metadata.get('language_info', {}).get('name')
             or notebook.metadata.get('main_language') or default_from_ext)
@@ -21,8 +26,7 @@ def default_language_from_metadata_and_ext(notebook, ext):
 def set_main_and_cell_language(metadata, cells, ext):
     """Set main language for the given collection of cells, and
     use magics for cells that use other languages"""
-    default_from_ext = 'R' if ext == '.R' \
-        else 'julia' if ext == '.jl' else 'python'
+    default_from_ext = _SCRIPT_EXTENSIONS.get(ext, {}).get('language', 'python')
     main_language = (metadata.get('language_info', {}).get('name') or
                      metadata.get('main_language'))
     if main_language is None:

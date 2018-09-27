@@ -13,6 +13,7 @@ from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
     LightScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter, \
     SphinxGalleryCellExporter
 from .stringparser import StringParser
+from .languages import _SCRIPT_EXTENSIONS
 
 
 class NotebookFormatDescription:
@@ -67,7 +68,7 @@ JUPYTEXT_FORMATS = \
         NotebookFormatDescription(
             format_name='light',
             extension=ext,
-            header_prefix='#',
+            header_prefix=_SCRIPT_EXTENSIONS[ext]['comment'],
             cell_reader_class=LightScriptCellReader,
             cell_exporter_class=LightScriptCellExporter,
             # Version 1.3 on 2018-09-22 - jupytext v0.7.0rc0 : Metadata are
@@ -78,20 +79,18 @@ JUPYTEXT_FORMATS = \
             # with one blank line #38
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
             current_version_number='1.3',
-            min_readable_version_number='1.1') for ext in ['.jl', '.py']] + \
+            min_readable_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
     [
         NotebookFormatDescription(
             format_name='percent',
             extension=ext,
-            header_prefix='#',
+            header_prefix=_SCRIPT_EXTENSIONS[ext]['comment'],
             cell_reader_class=DoublePercentScriptCellReader,
             cell_exporter_class=DoublePercentCellExporter,
             # Version 1.1 on 2018-09-23 - jupytext v0.7.0rc1 : [markdown] and
             # [raw] for markdown and raw cells.
             # Version 1.0 on 2018-09-22 - jupytext v0.7.0rc0 : Initial version
-            current_version_number='1.1')
-        for ext in
-        ['.jl', '.py', '.R']] + \
+            current_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
     [
         NotebookFormatDescription(
             format_name='sphinx',
