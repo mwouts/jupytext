@@ -9,6 +9,7 @@ from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, \
     check_file_version, one_format_as_string, parse_one_format
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion
+from .languages import _SCRIPT_EXTENSIONS
 
 
 def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
@@ -117,12 +118,11 @@ def canonize_format(format_or_ext, file_path=None):
 
         raise ValueError('Please specificy either --to or --output')
 
-    return {'notebook': 'ipynb',
-            'python': 'py',
-            'julia': 'jl',
-            'r': 'R',
-            'markdown': 'md',
-            'rmarkdown': 'Rmd'}[format_or_ext]
+    for ext in _SCRIPT_EXTENSIONS:
+        if _SCRIPT_EXTENSIONS[ext]['language'] == format_or_ext:
+            return ext.replace('.', '')
+
+    return {'notebook': 'ipynb', 'markdown': 'md', 'rmarkdown': 'Rmd'}[format_or_ext]
 
 
 def cli_jupytext(args=None):
@@ -131,8 +131,8 @@ def cli_jupytext(args=None):
         description='Jupyter notebooks as markdown documents, '
                     'Julia, Python or R scripts')
 
-    notebook_formats = (['notebook', 'python', 'julia', 'r', 'markdown',
-                         'rmarkdown'] +
+    notebook_formats = (['notebook', 'rmarkdown', 'markdown'] +
+                        [_SCRIPT_EXTENSIONS[ext]['language'] for ext in _SCRIPT_EXTENSIONS] +
                         [ext.replace('.', '') for ext in NOTEBOOK_EXTENSIONS] +
                         [one_format_as_string(fmt.extension, fmt.format_name)
                          for fmt in JUPYTEXT_FORMATS])
