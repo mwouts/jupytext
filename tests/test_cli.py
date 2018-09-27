@@ -50,6 +50,17 @@ def test_convert_single_file(nb_file, capsys):
     compare(out, pynb)
 
 
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_cpp'))
+def test_to_cpluplus(nb_file, capsys):
+    nb1 = readf(nb_file)
+    text_cpp = writes(nb1, ext='.cpp')
+    jupytext([nb_file, '--to', 'c++', '--output', '-'])
+
+    out, err = capsys.readouterr()
+    assert err == ''
+    compare(out, text_cpp)
+
+
 @pytest.mark.parametrize('nb_files', [list_notebooks('ipynb_py')])
 def test_convert_multiple_file(nb_files, tmpdir):
     nb_orgs = []
