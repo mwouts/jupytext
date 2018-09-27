@@ -164,8 +164,7 @@ class LightScriptCellExporter(BaseCellExporter):
     def code_to_text(self):
         """Return the text representation of a code cell"""
         active = is_active(self.ext, self.metadata)
-        if active and self.language != (
-                'python' if self.ext == '.py' else 'julia'):
+        if active and self.language != self.default_language:
             active = False
             self.metadata['active'] = 'ipynb'
             self.metadata['language'] = self.language

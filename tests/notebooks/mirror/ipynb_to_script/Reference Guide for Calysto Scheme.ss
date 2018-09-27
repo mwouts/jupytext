@@ -90,44 +90,31 @@
 ;; * \Sigma - Σ
 ;; * \_i - subscript i, such as vectorᵢ
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (define α 67)
+(define α 67)
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; α
+α
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (define i 2)
-;; (define vectorᵢ (vector-ref (vector 0 6 3 2) i))
-;; vectorᵢ
-;; -
+(define i 2)
+(define vectorᵢ (vector-ref (vector 0 6 3 2) i))
+vectorᵢ
 
 ;; ### Rich media
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (import "calysto.display")
+(import "calysto.display")
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (calysto.display.HTML "This is <b>bold</b>, <i>italics</i>, <u>underlined</u>.")
+(calysto.display.HTML "This is <b>bold</b>, <i>italics</i>, <u>underlined</u>.")
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (import "calysto.graphics")
+(import "calysto.graphics")
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (define canvas (calysto.graphics.Canvas))
+(define canvas (calysto.graphics.Canvas))
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (define ball (calysto.graphics.Circle '(150 150) 100))
+(define ball (calysto.graphics.Circle '(150 150) 100))
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (ball.draw canvas)
-;; -
+(ball.draw canvas)
 
 ;; ### Shell commands
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; ! ls /tmp
-;; -
+! ls /tmp
 
 ;; ### Stepper/Debugger
 ;;
@@ -152,31 +139,23 @@
 ;;
 ;; In addition, if you wish, you can execute expressions and statements in a Python environment:
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (python-eval "1 + 2")
+(python-eval "1 + 2")
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (python-exec 
-;; "
-;; def mypyfunc(a, b):
-;;     return a * b
-;; ")
-;; -
+(python-exec 
+"
+def mypyfunc(a, b):
+    return a * b
+")
 
 ;; This is a shared environment with Scheme:
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (mypyfunc 4 5)
-;; -
+(mypyfunc 4 5)
 
 ;; You can use `func` to turn a Scheme procedure into a Python function, and `define!` to put it into the shared enviornment with Python:
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (define! mypyfunc2 (func (lambda (n) n)))
+(define! mypyfunc2 (func (lambda (n) n)))
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (python-eval "mypyfunc2(34)")
-;; -
+(python-eval "mypyfunc2(34)")
 
 ;; # Differences Between Languages
 ;;
@@ -202,16 +181,13 @@
 ;;
 ;; Calysto Scheme acts as if it has a call stack, for easier debugging. For example:
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (define fact
-;;     (lambda (n)
-;;       (if (= n 1)
-;;            q
-;;            (* n (fact (- n 1))))))
+(define fact
+    (lambda (n)
+      (if (= n 1)
+           q
+           (* n (fact (- n 1))))))
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (fact 5)
-;; -
+(fact 5)
 
 ;; To turn off the stack trace on error:
 ;;
@@ -225,209 +201,186 @@
 ;; ## SCHEMEPATH
 ;; SCHEMEPATH is a list of search directories used with (load NAME). This is a reference, so you should append to it rather than attempting to redefine it.
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; SCHEMEPATH
+SCHEMEPATH
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (set-cdr! (cdr SCHEMEPATH) (list "/var/modules"))
+(set-cdr! (cdr SCHEMEPATH) (list "/var/modules"))
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; SCHEMEPATH
-;; -
+SCHEMEPATH
 
 ;; ## Getting Started
 ;;
 ;; Note that you can use the word `lambda` or \lambda and then press [TAB]
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (define factorial
-;;   (λ (n)
-;;      (cond
-;;       ((zero? n) 1)
-;;       (else (* n (factorial (- n 1)))))))
+(define factorial
+  (λ (n)
+     (cond
+      ((zero? n) 1)
+      (else (* n (factorial (- n 1)))))))
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (factorial 5)
-;; -
+(factorial 5)
 
 ;; ## define-syntax
 ;; (define-syntax NAME RULES): a method for creating macros
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (define-syntax time 
-;;   [(time ?exp) (let ((start (current-time)))
-;;                  ?exp
-;;                  (- (current-time) start))])
+(define-syntax time 
+  [(time ?exp) (let ((start (current-time)))
+                 ?exp
+                 (- (current-time) start))])
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (time (car '(1 2 3 4)))
+(time (car '(1 2 3 4)))
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; ;;---------------------------------------------------------------------
-;; ;; collect is like list comprehension in Python
-;;
-;; (define-syntax collect
-;;   [(collect ?exp for ?var in ?list)
-;;    (filter-map (lambda (?var) ?exp) (lambda (?var) #t) ?list)]
-;;   [(collect ?exp for ?var in ?list if ?condition)
-;;    (filter-map (lambda (?var) ?exp) (lambda (?var) ?condition) ?list)])
-;;
-;; (define filter-map
-;;   (lambda (f pred? values)
-;;     (if (null? values)
-;;       '()
-;;       (if (pred? (car values))
-;;           (cons (f (car values)) (filter-map f pred? (cdr values)))
-;;           (filter-map f pred? (cdr values))))))
+;; +
+;;---------------------------------------------------------------------
+;; collect is like list comprehension in Python
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (collect (* n n) for n in (range 10))
+(define-syntax collect
+  [(collect ?exp for ?var in ?list)
+   (filter-map (lambda (?var) ?exp) (lambda (?var) #t) ?list)]
+  [(collect ?exp for ?var in ?list if ?condition)
+   (filter-map (lambda (?var) ?exp) (lambda (?var) ?condition) ?list)])
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (collect (* n n) for n in (range 5 20 3))
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (collect (* n n) for n in (range 10) if (> n 5))
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; ;;---------------------------------------------------------------------
-;; ;; for loops
-;;
-;; (define-syntax for
-;;   [(for ?exp times do . ?bodies)
-;;    (for-repeat ?exp (lambda () . ?bodies))]
-;;   [(for ?var in ?exp do . ?bodies)
-;;    (for-iterate1 ?exp (lambda (?var) . ?bodies))]
-;;   [(for ?var at (?i) in ?exp do . ?bodies)
-;;    (for-iterate2 0 ?exp (lambda (?var ?i) . ?bodies))]
-;;   [(for ?var at (?i ?j . ?rest) in ?exp do . ?bodies)
-;;    (for ?var at (?i) in ?exp do
-;;      (for ?var at (?j . ?rest) in ?var do . ?bodies))])
-;;
-;; (define for-repeat
-;;   (lambda (n f)
-;;     (if (< n 1)
-;;       'done
-;;       (begin
-;;         (f)
-;;         (for-repeat (- n 1) f)))))
-;;
-;; (define for-iterate1
-;;   (lambda (values f)
-;;     (if (null? values)
-;;       'done
-;;       (begin
-;;         (f (car values))
-;;         (for-iterate1 (cdr values) f)))))
-;;
-;; (define for-iterate2
-;;   (lambda (i values f)
-;;     (if (null? values)
-;;       'done
-;;       (begin
-;;         (f (car values) i)
-;;         (for-iterate2 (+ i 1) (cdr values) f)))))
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (define matrix2d
-;;   '((10 20)
-;;     (30 40)
-;;     (50 60)
-;;     (70 80)))
-;;
-;; (define matrix3d
-;;   '(((10 20 30) (40 50 60))
-;;     ((70 80 90) (100 110 120))
-;;     ((130 140 150) (160 170 180))
-;;     ((190 200 210) (220 230 240))))
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (begin 
-;;  (define hello 0)
-;;  (for 5 times do (set! hello (+ hello 1)))
-;;  hello
-;;  )
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (for sym in '(a b c d) do (define x 1) (set! x sym) (print x))
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (for n in (range 10 20 2) do (print n))
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (for n at (i j) in matrix2d do (print (list n 'coords: i j)))
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (for n at (i j k) in matrix3d do (print (list n 'coords: i j k)))
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (define-syntax scons
-;;   [(scons ?x ?y) (cons ?x (lambda () ?y))])
-;;
-;; (define scar car)
-;;
-;; (define scdr
-;;   (lambda (s)
-;;     (let ((result ((cdr s))))
-;;       (set-cdr! s (lambda () result))
-;;       result)))
-;;
-;; (define first
-;;   (lambda (n s)
-;;     (if (= n 0)
-;;       '()
-;;       (cons (scar s) (first (- n 1) (scdr s))))))
-;;
-;; (define nth
-;;   (lambda (n s)
-;;     (if (= n 0)
-;;       (scar s)
-;;       (nth (- n 1) (scdr s)))))
-;;
-;; (define smap
-;;   (lambda (f s)
-;;     (scons (f (scar s)) (smap f (scdr s)))))
-;;
-;; (define ones (scons 1 ones))
-;;
-;; (define nats (scons 0 (combine nats + ones)))
-;;
-;; (define combine
-;;   (lambda (s1 op s2)
-;;     (scons (op (scar s1) (scar s2)) (combine (scdr s1) op (scdr s2)))))
-;;
-;; (define fibs (scons 1 (scons 1 (combine fibs + (scdr fibs)))))
-;;
-;; (define facts (scons 1 (combine facts * (scdr nats))))
-;;
-;; (define ! (lambda (n) (nth n facts)))
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (! 5)
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (nth 10 facts)
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (nth 20 fibs)
-
-;; + {"active": "ipynb", "language": "scheme"}
-;; (first 30 fibs)
+(define filter-map
+  (lambda (f pred? values)
+    (if (null? values)
+      '()
+      (if (pred? (car values))
+          (cons (f (car values)) (filter-map f pred? (cdr values)))
+          (filter-map f pred? (cdr values))))))
 ;; -
+
+(collect (* n n) for n in (range 10))
+
+(collect (* n n) for n in (range 5 20 3))
+
+(collect (* n n) for n in (range 10) if (> n 5))
+
+;; +
+;;---------------------------------------------------------------------
+;; for loops
+
+(define-syntax for
+  [(for ?exp times do . ?bodies)
+   (for-repeat ?exp (lambda () . ?bodies))]
+  [(for ?var in ?exp do . ?bodies)
+   (for-iterate1 ?exp (lambda (?var) . ?bodies))]
+  [(for ?var at (?i) in ?exp do . ?bodies)
+   (for-iterate2 0 ?exp (lambda (?var ?i) . ?bodies))]
+  [(for ?var at (?i ?j . ?rest) in ?exp do . ?bodies)
+   (for ?var at (?i) in ?exp do
+     (for ?var at (?j . ?rest) in ?var do . ?bodies))])
+
+(define for-repeat
+  (lambda (n f)
+    (if (< n 1)
+      'done
+      (begin
+        (f)
+        (for-repeat (- n 1) f)))))
+
+(define for-iterate1
+  (lambda (values f)
+    (if (null? values)
+      'done
+      (begin
+        (f (car values))
+        (for-iterate1 (cdr values) f)))))
+
+(define for-iterate2
+  (lambda (i values f)
+    (if (null? values)
+      'done
+      (begin
+        (f (car values) i)
+        (for-iterate2 (+ i 1) (cdr values) f)))))
+
+;; +
+(define matrix2d
+  '((10 20)
+    (30 40)
+    (50 60)
+    (70 80)))
+
+(define matrix3d
+  '(((10 20 30) (40 50 60))
+    ((70 80 90) (100 110 120))
+    ((130 140 150) (160 170 180))
+    ((190 200 210) (220 230 240))))
+;; -
+
+(begin 
+ (define hello 0)
+ (for 5 times do (set! hello (+ hello 1)))
+ hello
+ )
+
+(for sym in '(a b c d) do (define x 1) (set! x sym) (print x))
+
+(for n in (range 10 20 2) do (print n))
+
+(for n at (i j) in matrix2d do (print (list n 'coords: i j)))
+
+(for n at (i j k) in matrix3d do (print (list n 'coords: i j k)))
+
+;; +
+(define-syntax scons
+  [(scons ?x ?y) (cons ?x (lambda () ?y))])
+
+(define scar car)
+
+(define scdr
+  (lambda (s)
+    (let ((result ((cdr s))))
+      (set-cdr! s (lambda () result))
+      result)))
+
+(define first
+  (lambda (n s)
+    (if (= n 0)
+      '()
+      (cons (scar s) (first (- n 1) (scdr s))))))
+
+(define nth
+  (lambda (n s)
+    (if (= n 0)
+      (scar s)
+      (nth (- n 1) (scdr s)))))
+
+(define smap
+  (lambda (f s)
+    (scons (f (scar s)) (smap f (scdr s)))))
+
+(define ones (scons 1 ones))
+
+(define nats (scons 0 (combine nats + ones)))
+
+(define combine
+  (lambda (s1 op s2)
+    (scons (op (scar s1) (scar s2)) (combine (scdr s1) op (scdr s2)))))
+
+(define fibs (scons 1 (scons 1 (combine fibs + (scdr fibs)))))
+
+(define facts (scons 1 (combine facts * (scdr nats))))
+
+(define ! (lambda (n) (nth n facts)))
+;; -
+
+(! 5)
+
+(nth 10 facts)
+
+(nth 20 fibs)
+
+(first 30 fibs)
 
 ;; ## for-each
 ;; (for-each PROCEDURE LIST): apply PROCEDURE to each item in LIST; like `map` but don't return results
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (for-each (lambda (n) (print n)) '(3 4 5))
-;; -
+(for-each (lambda (n) (print n)) '(3 4 5))
 
 ;; ## format
 ;; (format STRING ITEM ...): format the string with ITEMS as arguments
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (format "This uses formatting ~a ~s ~%" 'apple 'apple)
-;; -
+(format "This uses formatting ~a ~s ~%" 'apple 'apple)
 
 ;; ## func
 ;;
@@ -435,9 +388,7 @@
 ;;
 ;; (func (lambda ...))
 
-;; + {"active": "ipynb", "language": "scheme"}
-;; (func (lambda (n) n))
-;; -
+(func (lambda (n) n))
 
 ;; ## There's more!
 ;;

@@ -41,29 +41,23 @@
 //
 // `std::cout` and `std::cerr` are redirected to the notebook frontend.
 
-// + {"active": "ipynb", "language": "c++"}
-// #include <iostream>
-//
-// std::cout << "some output" << std::endl;
+// +
+#include <iostream>
 
-// + {"active": "ipynb", "language": "c++"}
-// std::cerr << "some error" << std::endl;
-
-// + {"active": "ipynb", "language": "c++"}
-// #include <stdexcept>
-
-// + {"active": "ipynb", "language": "c++"}
-// throw std::runtime_error("Unknown exception");
+std::cout << "some output" << std::endl;
 // -
+
+std::cerr << "some error" << std::endl;
+
+#include <stdexcept>
+
+throw std::runtime_error("Unknown exception");
 
 // Omitting the `;` in the last statement of a cell results in an output being printed
 
-// + {"active": "ipynb", "language": "c++"}
-// int j = 5;
+int j = 5;
 
-// + {"active": "ipynb", "language": "c++"}
-// j
-// -
+j
 
 // # Interpreting the C++ programming language
 //
@@ -71,134 +65,120 @@
 
 // ## Functions
 
-// + {"active": "ipynb", "language": "c++"}
-// double sqr(double a)
-// {
-//     return a * a;
-// }
+double sqr(double a)
+{
+    return a * a;
+}
 
-// + {"active": "ipynb", "language": "c++"}
-// double a = 2.5;
-// double asqr = sqr(a);
-// asqr
-// -
+double a = 2.5;
+double asqr = sqr(a);
+asqr
 
 // ## Classes
 
-// + {"active": "ipynb", "language": "c++"}
-// class Foo
-// {
-// public:
-//
-//     virtual ~Foo() {}
-//     
-//     virtual void print(double value) const
-//     {
-//         std::cout << "Foo value = " << value << std::endl;
-//     }
-// };
+class Foo
+{
+public:
 
-// + {"active": "ipynb", "language": "c++"}
-// Foo bar;
-// bar.print(1.2);
-// -
+    virtual ~Foo() {}
+    
+    virtual void print(double value) const
+    {
+        std::cout << "Foo value = " << value << std::endl;
+    }
+};
+
+Foo bar;
+bar.print(1.2);
 
 // ## Polymorphism
 
-// + {"active": "ipynb", "language": "c++"}
-// class Bar : public Foo
-// {
-// public:
-//
-//     virtual ~Bar() {}
-//     
-//     virtual void print(double value) const
-//     {
-//         std::cout << "Bar value = " << 2 * value << std::endl;
-//     }
-// };
+class Bar : public Foo
+{
+public:
 
-// + {"active": "ipynb", "language": "c++"}
-// Foo* bar2 = new Bar;
-// bar2->print(1.2);
-// delete bar2;
-// -
+    virtual ~Bar() {}
+    
+    virtual void print(double value) const
+    {
+        std::cout << "Bar value = " << 2 * value << std::endl;
+    }
+};
+
+Foo* bar2 = new Bar;
+bar2->print(1.2);
+delete bar2;
 
 // ## Templates
 
-// + {"active": "ipynb", "language": "c++"}
-// #include <typeinfo>
-//
-// template <class T>
-// class FooT
-// {
-// public:
-//     
-//     explicit FooT(const T& t) : m_t(t) {}
-//     
-//     void print() const
-//     {
-//         std::cout << typeid(T).name() << " m_t = " << m_t << std::endl;
-//     }
-//     
-// private:
-//     
-//     T m_t;
-// };
-//
-// template <>
-// class FooT<int>
-// {
-// public:
-//     
-//     explicit FooT(const int& t) : m_t(t) {}
-//     
-//     void print() const
-//     {
-//         std::cout << "m_t = " << m_t << std::endl;
-//     }
-//     
-// private:
-//     
-//     int m_t;
-// };
+// +
+#include <typeinfo>
 
-// + {"active": "ipynb", "language": "c++"}
-// FooT<double> foot1(1.2);
-// foot1.print();
+template <class T>
+class FooT
+{
+public:
+    
+    explicit FooT(const T& t) : m_t(t) {}
+    
+    void print() const
+    {
+        std::cout << typeid(T).name() << " m_t = " << m_t << std::endl;
+    }
+    
+private:
+    
+    T m_t;
+};
 
-// + {"active": "ipynb", "language": "c++"}
-// FooT<int> foot2(4);
-// foot2.print();
+template <>
+class FooT<int>
+{
+public:
+    
+    explicit FooT(const int& t) : m_t(t) {}
+    
+    void print() const
+    {
+        std::cout << "m_t = " << m_t << std::endl;
+    }
+    
+private:
+    
+    int m_t;
+};
 // -
+
+FooT<double> foot1(1.2);
+foot1.print();
+
+FooT<int> foot2(4);
+foot2.print();
 
 // ## C++11 / C++14 support
 
-// + {"active": "ipynb", "language": "c++"}
-// class Foo11
-// {
-// public:
-//     
-//     Foo11() { std::cout << "Foo11 default constructor" << std::endl; }
-//     Foo11(const Foo11&) { std::cout << "Foo11 copy constructor" << std::endl; }
-//     Foo11(Foo11&&) { std::cout << "Foo11 move constructor" << std::endl; }
-// };
+class Foo11
+{
+public:
+    
+    Foo11() { std::cout << "Foo11 default constructor" << std::endl; }
+    Foo11(const Foo11&) { std::cout << "Foo11 copy constructor" << std::endl; }
+    Foo11(Foo11&&) { std::cout << "Foo11 move constructor" << std::endl; }
+};
 
-// + {"active": "ipynb", "language": "c++"}
-// Foo11 f1;
-// Foo11 f2(f1);
-// Foo11 f3(std::move(f1));
+Foo11 f1;
+Foo11 f2(f1);
+Foo11 f3(std::move(f1));
 
-// + {"active": "ipynb", "language": "c++"}
-// #include <vector>
-//
-// std::vector<int> v = { 1, 2, 3};
-// auto iter = ++v.begin();
-// v
+// +
+#include <vector>
 
-// + {"active": "ipynb", "language": "c++"}
-// *iter
+std::vector<int> v = { 1, 2, 3};
+auto iter = ++v.begin();
+v
 // -
+
+*iter
 
 // ... and also lambda, universal references, `decltype`, etc ...
 
@@ -208,9 +188,7 @@
 //  - The quick-help feature can also be enabled for user-defined types and third-party libraries. More documentation on this feature is available at https://xeus-cling.readthedocs.io/en/latest/inline_help.html.
 //
 
-// + {"active": "ipynb", "language": "c++"}
-// ?std::vector
-// -
+?std::vector
 
 // ## Using the `display_data` mechanism
 
@@ -220,140 +198,135 @@
 
 // ### Image example
 
-// + {"active": "ipynb", "language": "c++"}
-// #include <string>
-// #include <fstream>
-//
-// #include "xtl/xbase64.hpp"
-// #include "xeus/xjson.hpp"
-//
-// namespace im
-// {
-//     struct image
-//     {   
-//         inline image(const std::string& filename)
-//         {
-//             std::ifstream fin(filename, std::ios::binary);   
-//             m_buffer << fin.rdbuf();
-//         }
-//         
-//         std::stringstream m_buffer;
-//     };
-//     
-//     xeus::xjson mime_bundle_repr(const image& i)
-//     {
-//         auto bundle = xeus::xjson::object();
-//         bundle["image/png"] = xtl::base64encode(i.m_buffer.str());
-//         return bundle;
-//     }
-// }
+// +
+#include <string>
+#include <fstream>
 
-// + {"active": "ipynb", "language": "c++"}
-// im::image marie("images/marie.png");
-// marie
+#include "xtl/xbase64.hpp"
+#include "xeus/xjson.hpp"
+
+namespace im
+{
+    struct image
+    {   
+        inline image(const std::string& filename)
+        {
+            std::ifstream fin(filename, std::ios::binary);   
+            m_buffer << fin.rdbuf();
+        }
+        
+        std::stringstream m_buffer;
+    };
+    
+    xeus::xjson mime_bundle_repr(const image& i)
+    {
+        auto bundle = xeus::xjson::object();
+        bundle["image/png"] = xtl::base64encode(i.m_buffer.str());
+        return bundle;
+    }
+}
 // -
+
+im::image marie("images/marie.png");
+marie
 
 // ### Audio example
 
-// + {"active": "ipynb", "language": "c++"}
-// #include <string>
-// #include <fstream>
-//
-// #include "xtl/xbase64.hpp"
-// #include "xeus/xjson.hpp"
-//
-// namespace au
-// {
-//     struct audio
-//     {   
-//         inline audio(const std::string& filename)
-//         {
-//             std::ifstream fin(filename, std::ios::binary);   
-//             m_buffer << fin.rdbuf();
-//         }
-//         
-//         std::stringstream m_buffer;
-//     };
-//     
-//     xeus::xjson mime_bundle_repr(const audio& a)
-//     {
-//         auto bundle = xeus::xjson::object();
-//         bundle["text/html"] =
-//            std::string("<audio controls=\"controls\"><source src=\"data:audio/wav;base64,")
-//            + xtl::base64encode(a.m_buffer.str()) +
-//             "\" type=\"audio/wav\" /></audio>";
-//         return bundle;
-//     }
-// }
+// +
+#include <string>
+#include <fstream>
 
-// + {"active": "ipynb", "language": "c++"}
-// au::audio drums("audio/audio.wav");
-// drums
+#include "xtl/xbase64.hpp"
+#include "xeus/xjson.hpp"
+
+namespace au
+{
+    struct audio
+    {   
+        inline audio(const std::string& filename)
+        {
+            std::ifstream fin(filename, std::ios::binary);   
+            m_buffer << fin.rdbuf();
+        }
+        
+        std::stringstream m_buffer;
+    };
+    
+    xeus::xjson mime_bundle_repr(const audio& a)
+    {
+        auto bundle = xeus::xjson::object();
+        bundle["text/html"] =
+           std::string("<audio controls=\"controls\"><source src=\"data:audio/wav;base64,")
+           + xtl::base64encode(a.m_buffer.str()) +
+            "\" type=\"audio/wav\" /></audio>";
+        return bundle;
+    }
+}
 // -
+
+au::audio drums("audio/audio.wav");
+drums
 
 // ### Display
 
-// + {"active": "ipynb", "language": "c++"}
-// #include "xcpp/xdisplay.hpp"
+#include "xcpp/xdisplay.hpp"
 
-// + {"active": "ipynb", "language": "c++"}
-// xcpp::display(drums);
-// -
+xcpp::display(drums);
 
 // ### Update-display
 
-// + {"active": "ipynb", "language": "c++"}
-// #include <string>
-// #include "xcpp/xdisplay.hpp"
-//
-// namespace ht
-// {
-//     struct html
-//     {   
-//         inline html(const std::string& content)
-//         {
-//             m_content = content;
-//         }
-//         std::string m_content;
-//     };
-//
-//     xeus::xjson mime_bundle_repr(const html& a)
-//     {
-//         auto bundle = xeus::xjson::object();
-//         bundle["text/html"] = a.m_content;
-//         return bundle;
-//     }
-// }
-//
-// // A red rectangle
-// ht::html rect(R"(
-// <div style='
-//     width: 90px;
-//     height: 50px;
-//     line-height: 50px;
-//     background-color: blue;
-//     color: white;
-//     text-align: center;'>
-// Original
-// </div>)");
+// +
+#include <string>
+#include "xcpp/xdisplay.hpp"
 
-// + {"active": "ipynb", "language": "c++"}
-// xcpp::display(rect, "some_display_id");
+namespace ht
+{
+    struct html
+    {   
+        inline html(const std::string& content)
+        {
+            m_content = content;
+        }
+        std::string m_content;
+    };
 
-// + {"active": "ipynb", "language": "c++"}
-// // Update the rectangle to be blue
-// rect.m_content = R"(
-// <div style='
-//     width: 90px;
-//     height: 50px;
-//     line-height: 50px;
-//     background-color: red;
-//     color: white;
-//     text-align: center;'>
-// Updated
-// </div>)";
-//
-// xcpp::display(rect, "some_display_id", true);
+    xeus::xjson mime_bundle_repr(const html& a)
+    {
+        auto bundle = xeus::xjson::object();
+        bundle["text/html"] = a.m_content;
+        return bundle;
+    }
+}
+
+// A red rectangle
+ht::html rect(R"(
+<div style='
+    width: 90px;
+    height: 50px;
+    line-height: 50px;
+    background-color: blue;
+    color: white;
+    text-align: center;'>
+Original
+</div>)");
+// -
+
+xcpp::display(rect, "some_display_id");
+
+// +
+// Update the rectangle to be blue
+rect.m_content = R"(
+<div style='
+    width: 90px;
+    height: 50px;
+    line-height: 50px;
+    background-color: red;
+    color: white;
+    text-align: center;'>
+Updated
+</div>)";
+
+xcpp::display(rect, "some_display_id", true);
 // -
 
 // ## Magics
@@ -364,16 +337,12 @@
 //
 // More documentation for magics is available at https://xeus-cling.readthedocs.io/en/latest/magics.html.
 
-// + {"active": "ipynb", "language": "c++"}
-// #include <algorithm>
-// #include <vector>
+#include <algorithm>
+#include <vector>
 
-// + {"active": "ipynb", "language": "c++"}
-// std::vector<double> to_shuffle = {1, 2, 3, 4};
+std::vector<double> to_shuffle = {1, 2, 3, 4};
 
-// + {"active": "ipynb", "language": "c++"}
-// %timeit std::random_shuffle(to_shuffle.begin(), to_shuffle.end());
-// -
+# %timeit std::random_shuffle(to_shuffle.begin(), to_shuffle.end());
 
 // [![xtensor](images/xtensor.png)](https://github.com/QuantStack/xtensor/)
 //
@@ -383,56 +352,54 @@
 //
 // `xtensor` is a C++ library for manipulating N-D arrays with an API very similar to that of numpy.
 
-// + {"active": "ipynb", "language": "c++"}
-// #include <iostream>
-//
-// #include "xtensor/xarray.hpp"
-// #include "xtensor/xio.hpp"
-// #include "xtensor/xview.hpp"
-//
-// xt::xarray<double> arr1
-//   {{1.0, 2.0, 3.0},
-//    {2.0, 5.0, 7.0},
-//    {2.0, 5.0, 7.0}};
-//
-// xt::xarray<double> arr2
-//   {5.0, 6.0, 7.0};
-//
-// xt::view(arr1, 1) + arr2
+// +
+#include <iostream>
+
+#include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xview.hpp"
+
+xt::xarray<double> arr1
+  {{1.0, 2.0, 3.0},
+   {2.0, 5.0, 7.0},
+   {2.0, 5.0, 7.0}};
+
+xt::xarray<double> arr2
+  {5.0, 6.0, 7.0};
+
+xt::view(arr1, 1) + arr2
 // -
 
 // Together with the C++ Jupyter kernel, `xtensor` offers a similar experience as `NumPy` in the Python Jupyter kernel, including broadcasting and universal functions.
 
-// + {"active": "ipynb", "language": "c++"}
-// #include <iostream>
-// #include "xtensor/xarray.hpp"
-// #include "xtensor/xio.hpp"
+#include <iostream>
+#include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
 
-// + {"active": "ipynb", "language": "c++"}
-// xt::xarray<int> arr
-//   {1, 2, 3, 4, 5, 6, 7, 8, 9};
-//
-// arr.reshape({3, 3});
-//
-// std::cout << arr;
+// +
+xt::xarray<int> arr
+  {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-// + {"active": "ipynb", "language": "c++"}
-// #include "xtensor-blas/xlinalg.hpp"
+arr.reshape({3, 3});
 
-// + {"active": "ipynb", "language": "c++"}
-// xt::xtensor<double, 2> m = {{1.5, 0.5}, {0.7, 1.0}};
-// std::cout << "Matrix rank: " << std::endl << xt::linalg::matrix_rank(m) << std::endl;
-// std::cout << "Matrix inverse: " << std::endl << xt::linalg::inv(m) << std::endl;
-// std::cout << "Eigen values: " << std::endl << xt::linalg::eigvals(m) << std::endl;
+std::cout << arr;
+// -
 
-// + {"active": "ipynb", "language": "c++"}
-// xt::xarray<double> arg1 = xt::arange<double>(9);
-// xt::xarray<double> arg2 = xt::arange<double>(18);
-//
-// arg1.reshape({3, 3});
-// arg2.reshape({2, 3, 3});
-//
-// std::cout << xt::linalg::dot(arg1, arg2) << std::endl;
+#include "xtensor-blas/xlinalg.hpp"
 
-// + {"active": "ipynb", "language": "c++"}
-//
+xt::xtensor<double, 2> m = {{1.5, 0.5}, {0.7, 1.0}};
+std::cout << "Matrix rank: " << std::endl << xt::linalg::matrix_rank(m) << std::endl;
+std::cout << "Matrix inverse: " << std::endl << xt::linalg::inv(m) << std::endl;
+std::cout << "Eigen values: " << std::endl << xt::linalg::eigvals(m) << std::endl;
+
+// +
+xt::xarray<double> arg1 = xt::arange<double>(9);
+xt::xarray<double> arg2 = xt::arange<double>(18);
+
+arg1.reshape({3, 3});
+arg2.reshape({2, 3, 3});
+
+std::cout << xt::linalg::dot(arg1, arg2) << std::endl;
+// -
+
+
