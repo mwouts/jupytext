@@ -77,6 +77,34 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
 
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
+    tmp_ipynb = '1.notebook.ipynb'
+    tmp_nbpy = '1.notebook.py'
+
+    cm = jupytext.TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb,py'
+    cm.root_dir = str(tmpdir)
+
+    # open ipynb, save nb.py, reopen
+    nb = jupytext.readf(nb_file)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
+    nbpy = cm.get(tmp_nbpy)
+    compare_notebooks(nb, nbpy['content'])
+
+    # save ipynb
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    # rename py
+    cm.rename(tmp_nbpy, '2.new.py')
+    assert not os.path.isfile(str(tmpdir.join(tmp_ipynb)))
+    assert not os.path.isfile(str(tmpdir.join(tmp_nbpy)))
+
+    assert os.path.isfile(str(tmpdir.join('2.new.ipynb')))
+    assert os.path.isfile(str(tmpdir.join('2.new.py')))
+
+
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_nbpy = 'notebook.nb.py'
