@@ -12,6 +12,10 @@ Release History
 is straightforward - just add a new entry to _SCRIPT_EXTENSIONS in languages.py, a sample notebook
 and a mirror test (#61)
 
+**BugFixes**
+
+- Notebooks extensions can only be prefixed with `.nb` to solve #87
+
 
 0.7.1 (2018-09-24)
 ++++++++++++++++++++++

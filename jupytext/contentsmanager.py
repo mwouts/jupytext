@@ -105,7 +105,10 @@ def file_fmt_ext(path):
     """
     file, ext = os.path.splitext(path)
     file, intermediate_ext = os.path.splitext(file)
-    return file, intermediate_ext + ext, ext
+    if intermediate_ext in ['.nb']:
+        return file, intermediate_ext + ext, ext
+    else:
+        return file + intermediate_ext, ext, ext
 
 
 class TextFileContentsManager(FileContentsManager, Configurable):
