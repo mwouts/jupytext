@@ -192,19 +192,20 @@ The `light` format has:
 
 ### Julia, Python and R scripts in the double percent format
 
-Many Python editors recognize cells delimited with a commented double percent sign `# %%`, including
-- [Spyder IDE](https://pythonhosted.org/spyder/editor.html),
+The _double percent_ format is a representation of Jupyter notebooks as scripts, in which cells are delimited with a commented double percent sign `# %%`. The format was introduced by Spyder a few years ago, and is now supported by many editors, including
+- [Spyder IDE](https://docs.spyder-ide.org/editor.html#defining-code-cells),
 - [Hydrogen](https://atom.io/packages/hydrogen), a package for Atom,
-- [vscodeJupyter](https://marketplace.visualstudio.com/items?itemName=donjayamanne.jupyter), an extension for Visual Studio Code,
-- and PyCharm Professional.
+- [VS Code](https://code.visualstudio.com/) with the [vscodeJupyter](https://marketplace.visualstudio.com/items?itemName=donjayamanne.jupyter) extension,
+- [Python Tools for Visual Studio](https://github.com/Microsoft/PTVS),
+- and [PyCharm Professional](https://www.jetbrains.com/pycharm/).
 
-Our implementation of the `percent` format is compatible with the above editors. Cell headers have the following structure:
+Our implementation of the `percent` format is compatible with the original specifications by Spyder. We extended the format to allow markdown cells and cell metadata. Cell headers have the following structure:
 ```python
 # %% Optional text [cell type] {optional JSON metadata}
 ```
 where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The content of markdown and raw cells is commented in the resulting script.
 
-Note that the double percent scripts you have written outside of Jupytext will be opened as such by Jupytext, provided that they contain at least two cells.
+Double percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least two double percent cells are identified as double percent scripts.
 
 ### Sphinx-gallery scripts
 
