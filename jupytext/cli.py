@@ -102,21 +102,21 @@ def save_notebook_as(notebook, nb_file, nb_dest, format_name, combine):
 
 def canonize_format(format_or_ext, file_path=None):
     """Return the canonical form of the format"""
+    if not format_or_ext:
+        if file_path and file_path != '-':
+            _, ext = os.path.splitext(file_path)
+            if ext not in NOTEBOOK_EXTENSIONS:
+                raise TypeError('Output extensions should be in {}'
+                                 .format(", ".join(NOTEBOOK_EXTENSIONS)))
+            return ext.replace('.', '')
+
+        raise ValueError('Please specificy either --to or --output')
+
     if '.' + format_or_ext in NOTEBOOK_EXTENSIONS:
         return format_or_ext
 
     if ':' in format_or_ext:
         return format_or_ext
-
-    if not format_or_ext:
-        if file_path and file_path != '-':
-            _, ext = os.path.splitext(file_path)
-            if ext not in NOTEBOOK_EXTENSIONS:
-                raise ValueError('Output extensions should be in {}'
-                                 .format(", ".join(NOTEBOOK_EXTENSIONS)))
-            return ext.replace('.', '')
-
-        raise ValueError('Please specificy either --to or --output')
 
     for ext in _SCRIPT_EXTENSIONS:
         if _SCRIPT_EXTENSIONS[ext]['language'] == format_or_ext:
