@@ -122,6 +122,9 @@ class BaseCellReader(object):
         else:
             new_cell = new_raw_cell
 
+        if not self.metadata:
+            self.metadata = {}
+
         if self.lines_to_next_cell != 1:
             self.metadata['lines_to_next_cell'] = self.lines_to_next_cell
 
