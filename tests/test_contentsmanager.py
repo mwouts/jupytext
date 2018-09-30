@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import os
+import shutil
 import time
 import pytest
 import mock
@@ -259,15 +260,15 @@ def test_load_save_percent_format(nb_file, tmpdir):
 def test_save_to_percent_format(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_jl = 'notebook.jl'
-    nb = jupytext.readf(nb_file)
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     cm.preferred_jupytext_formats_save = 'jl:percent'
 
+    nb = jupytext.readf(nb_file)
     nb['metadata']['jupytext_formats'] = 'ipynb,jl'
 
-    # open python, save
+    # save to ipynb and jl
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
@@ -278,3 +279,69 @@ def test_save_to_percent_format(nb_file, tmpdir):
     # Parse the YAML header
     metadata, _, _ = header_to_metadata_and_cell(text_jl.splitlines(), '#')
     assert metadata['jupytext_formats'] == 'ipynb,jl:percent'
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
+def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
+    # 1. write py ipynb
+    tmp_ipynb = u'notebook.ipynb'
+    tmp_nbpy = u'notebook.py'
+
+    cm = jupytext.TextFileContentsManager()
+    cm.preferred_jupytext_formats_save = 'py:light'
+    cm.root_dir = str(tmpdir)
+
+    # load notebook and save it using the cm
+    nb = jupytext.readf(nb_file)
+    nb['metadata']['jupytext_formats'] = 'ipynb,py'
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    # Saving does not update the metadata, as 'save' makes a copy of the notebook
+    # assert nb['metadata']['jupytext_formats'] == 'ipynb,py:light'
+
+    # Set preferred format for reading
+    cm.preferred_jupytext_formats_read = 'py:percent'
+
+    # Read notebook
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        model = cm.get(tmp_nbpy)
+
+    # Check that format is explicit
+    assert model['content']['metadata']['jupytext_formats'] == 'ipynb,py:light'
+
+    # Check contents
+    compare_notebooks(nb, model['content'])
+
+    # Change save format and save
+    model['content']['metadata']['jupytext_formats'] == 'ipynb,py'
+    cm.preferred_jupytext_formats_save = 'py:percent'
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    # Read notebook
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        model = cm.get(tmp_nbpy)
+    compare_notebooks(nb, model['content'])
+
+    # Check that format is explicit
+    assert model['content']['metadata']['jupytext_formats'] == 'ipynb,py:percent'
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('python'))
+def test_preferred_format_allows_to_read_implicit_light_format(nb_file, tmpdir):
+    # copy content to notebook.py
+    tmp_nbpy = u'notebook.py'
+    shutil.copy(nb_file, str(tmpdir.join(tmp_nbpy)))
+
+    # create contents manager with default load format as percent
+    cm = jupytext.TextFileContentsManager()
+    cm.preferred_jupytext_formats_load = 'py:percent'
+    cm.root_dir = str(tmpdir)
+
+    # load notebook
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        model = cm.get(tmp_nbpy)
+
+    # check that format (missing) is recognized as light
+    assert 'py:light' in model['content']['metadata']['jupytext_formats']

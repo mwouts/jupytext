@@ -107,8 +107,7 @@ def file_fmt_ext(path):
     file, intermediate_ext = os.path.splitext(file)
     if intermediate_ext in ['.nb']:
         return file, intermediate_ext + ext, ext
-    else:
-        return file + intermediate_ext, ext, ext
+    return file + intermediate_ext, ext, ext
 
 
 class TextFileContentsManager(FileContentsManager, Configurable):
@@ -225,10 +224,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             alt_ext = '.' + alt_fmt.split('.')[-1]
 
             if alt_ext in self.nb_extensions:
-                format_name = format_name_for_ext(nb.metadata, alt_ext) or \
-                              self.preferred_format(
-                                  alt_ext,
-                                  self.preferred_jupytext_formats_save)
+                format_name = format_name_for_ext(nb.metadata, alt_ext, explicit_default=False) or \
+                              self.preferred_format(alt_ext, self.preferred_jupytext_formats_save)
                 with mock.patch('nbformat.writes',
                                 _jupytext_writes(alt_ext, format_name)):
                     super(TextFileContentsManager, self) \
