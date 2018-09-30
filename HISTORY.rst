@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-0.7.2 (2018-09-??)
+0.7.2 (2018-10-01)
 ++++++++++++++++++++++
 
 **Improvements**
@@ -11,10 +11,11 @@ Release History
 - `light` and `percent` formats made available for scheme and cpp notebooks. Adding more formats
 is straightforward - just add a new entry to _SCRIPT_EXTENSIONS in languages.py, a sample notebook
 and a mirror test (#61)
+- Format name is automatically appended to extension in `jupytext_formats` when notebook is loaded/saved.
 
 **BugFixes**
 
-- Notebooks extensions can only be prefixed with `.nb` to solve #87
+- Notebooks extensions can only be prefixed with `.nb` (#87)
 
 
 0.7.1 (2018-09-24)
