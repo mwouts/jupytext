@@ -13,6 +13,11 @@ from .utils import list_notebooks
 header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
+def test_cli_no_argument():
+    with pytest.raises(ValueError):
+        cli_jupytext()
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks())
 def test_cli_single_file(nb_file):
     assert cli_jupytext([nb_file] + ['--to', 'py']).notebooks == [nb_file]
@@ -99,7 +104,7 @@ def test_error_not_notebook_ext_output(
 
 
 def test_error_no_ext(nb_file=list_notebooks()[0]):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         cli_jupytext([nb_file])
 
 
