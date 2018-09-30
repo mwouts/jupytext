@@ -4,7 +4,6 @@ new formats here!
 """
 
 import os
-from copy import copy
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
     LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, \
@@ -57,7 +56,7 @@ JUPYTEXT_FORMATS = \
             current_version_number='1.0'),
 
         NotebookFormatDescription(
-            format_name='rscript',
+            format_name='spin',
             extension='.R',
             header_prefix="#'",
             cell_reader_class=RScriptCellReader,
@@ -122,11 +121,7 @@ def get_format(ext, format_name=None):
     formats_for_extension = []
     for fmt in JUPYTEXT_FORMATS:
         if fmt.extension == ext:
-            if fmt.format_name == format_name:
-                return fmt
-            if not format_name:
-                fmt = copy(fmt)
-                fmt.format_name = None
+            if fmt.format_name == format_name or not format_name:
                 return fmt
             formats_for_extension.append(fmt.format_name)
 
@@ -136,6 +131,19 @@ def get_format(ext, format_name=None):
                         .format(format_name, ext,
                                 ', '.join(formats_for_extension)))
     raise TypeError("Not format associated to extension '{}'".format(ext))
+
+
+def read_format_from_metadata(text, ext):
+    """Return the format of the file, when that information is available from the metadata"""
+    lines = text.splitlines()
+
+    metadata, _, _ = header_to_metadata_and_cell(
+        lines, "#'" if ext == '.R' else '#')
+
+    if set(metadata).difference(['encoding', 'main_language']):
+        return format_name_for_ext(metadata, ext)
+
+    return None
 
 
 def guess_format(text, ext):
@@ -178,7 +186,7 @@ def guess_format(text, ext):
             return 'sphinx'
 
     # Default format
-    return None
+    return get_format(ext).format_name
 
 
 def check_file_version(notebook, source_path, outputs_path):
@@ -276,15 +284,19 @@ def formats_as_string(formats):
                      for ext, format_name in formats])
 
 
-def format_name_for_ext(metadata, ext):
+def format_name_for_ext(metadata, ext, explicit_default=True):
     """Return the format name for that extension"""
     formats = metadata.get('jupytext_formats', '')
     formats = parse_formats(formats)
     for fmt_ext, ext_format_name in formats:
         if fmt_ext.endswith(ext):
-            return ext_format_name
+            if (not explicit_default) or ext_format_name:
+                return ext_format_name
 
-    return None
+    if (not explicit_default) or ext in ['.Rmd', 'md']:
+        return None
+
+    return get_format(ext).format_name
 
 
 def update_jupytext_formats_metadata(notebook, ext, format_name):

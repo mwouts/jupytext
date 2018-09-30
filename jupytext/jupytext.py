@@ -15,7 +15,7 @@ from copy import deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 import nbformat
-from .formats import get_format, guess_format, \
+from .formats import get_format, read_format_from_metadata, guess_format, \
     update_jupytext_formats_metadata, format_name_for_ext
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable, insert_or_test_version_number
@@ -115,6 +115,8 @@ def reads(text, ext, format_name=None,
     """Read a notebook from a string"""
     if ext == '.ipynb':
         return nbformat.reads(text, as_version, **kwargs)
+
+    format_name = read_format_from_metadata(text, ext) or format_name
 
     if not format_name:
         format_name = guess_format(text, ext)
