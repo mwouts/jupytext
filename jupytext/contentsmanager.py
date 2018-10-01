@@ -105,7 +105,7 @@ def file_fmt_ext(path):
     """
     file, ext = os.path.splitext(path)
     file, intermediate_ext = os.path.splitext(file)
-    if intermediate_ext in ['.nb']:
+    if len(intermediate_ext) <= 4:
         return file, intermediate_ext + ext, ext
     return file + intermediate_ext, ext, ext
 
@@ -202,12 +202,12 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
-        _, ext = os.path.splitext(os_path)
+        _, fmt, ext = file_fmt_ext(os_path)
         if ext in self.nb_extensions:
             format_name = self.preferred_format(
-                ext, self.preferred_jupytext_formats_read)
+                fmt, self.preferred_jupytext_formats_read)
             with mock.patch('nbformat.reads',
-                            _jupytext_reads(ext, format_name,
+                            _jupytext_reads(fmt, format_name,
                                             self.sphinx_convert_rst2md)):
                 return super(TextFileContentsManager, self) \
                     ._read_notebook(os_path, as_version)
@@ -224,10 +224,10 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             alt_ext = '.' + alt_fmt.split('.')[-1]
 
             if alt_ext in self.nb_extensions:
-                format_name = format_name_for_ext(nb.metadata, alt_ext, explicit_default=False) or \
-                              self.preferred_format(alt_ext, self.preferred_jupytext_formats_save)
+                format_name = format_name_for_ext(nb.metadata, alt_fmt, explicit_default=False) or \
+                              self.preferred_format(alt_fmt, self.preferred_jupytext_formats_save)
                 with mock.patch('nbformat.writes',
-                                _jupytext_writes(alt_ext, format_name)):
+                                _jupytext_writes(alt_fmt, format_name)):
                     super(TextFileContentsManager, self) \
                         ._save_notebook(os_path_fmt, nb)
             else:
@@ -244,6 +244,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 (type == 'notebook' or
                  (type is None and ext in self.all_nb_extensions())):
             model = self._notebook_model(path, content=content)
+            if fmt != ext:
+                model['name'], _ = os.path.splitext(model['name'])
             if not content:
                 return model
 

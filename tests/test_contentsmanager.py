@@ -10,6 +10,7 @@ from testfixtures import compare
 import jupytext
 from jupytext.compare import compare_notebooks
 from jupytext.header import header_to_metadata_and_cell
+from jupytext.formats import read_format_from_metadata
 from .utils import list_notebooks
 from .utils import skip_if_dict_is_not_ordered
 
@@ -279,6 +280,51 @@ def test_save_to_percent_format(nb_file, tmpdir):
     # Parse the YAML header
     metadata, _, _ = header_to_metadata_and_cell(text_jl.splitlines(), '#')
     assert metadata['jupytext_formats'] == 'ipynb,jl:percent'
+
+
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
+    tmp_ipynb = 'notebook.ipynb'
+    tmp_lgt_py = 'notebook.lgt.py'
+    tmp_pct_py = 'notebook.pct.py'
+    tmp_spx_py = 'notebook.spx.py'
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    nb = jupytext.readf(nb_file)
+    nb['metadata']['jupytext_formats'] = 'ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx'
+
+    # save to ipynb and three python flavors
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    # read files
+    with open(str(tmpdir.join(tmp_pct_py))) as stream:
+        assert read_format_from_metadata(stream.read(), 'pct.py') == 'percent'
+
+    with open(str(tmpdir.join(tmp_lgt_py))) as stream:
+        assert read_format_from_metadata(stream.read(), 'lgt.py') == 'light'
+
+    with open(str(tmpdir.join(tmp_spx_py))) as stream:
+        assert read_format_from_metadata(stream.read(), 'spx.py') == 'sphinx'
+
+    model = cm.get(path=tmp_pct_py)
+    assert model['name'] == 'notebook.pct'
+    compare_notebooks(nb, model['content'])
+
+    model = cm.get(path=tmp_lgt_py)
+    assert model['name'] == 'notebook.lgt'
+    compare_notebooks(nb, model['content'])
+
+    model = cm.get(path=tmp_spx_py)
+    assert model['name'] == 'notebook.spx'
+    # (notebooks not equal as we insert %matplotlib inline in sphinx)
+
+    model = cm.get(path=tmp_ipynb)
+    assert model['name'] == 'notebook.pct'
+    compare_notebooks(nb, model['content'])
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
