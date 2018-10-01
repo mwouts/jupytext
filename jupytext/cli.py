@@ -106,8 +106,7 @@ def canonize_format(format_or_ext, file_path=None):
         if file_path and file_path != '-':
             _, ext = os.path.splitext(file_path)
             if ext not in NOTEBOOK_EXTENSIONS:
-                raise TypeError('Output extensions should be in {}'
-                                 .format(", ".join(NOTEBOOK_EXTENSIONS)))
+                raise TypeError('Output extensions should be in {}'.format(", ".join(NOTEBOOK_EXTENSIONS)))
             return ext.replace('.', '')
 
         raise ValueError('Please specificy either --to or --output')
