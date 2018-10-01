@@ -339,11 +339,16 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def trust_notebook(self, path):
         """Trust the current notebook"""
-        file, fmt, _ = file_fmt_ext(path)
-        for alt_fmt in self.format_group(fmt):
-            if alt_fmt.endswith('.ipynb'):
-                super(TextFileContentsManager, self) \
-                    .trust_notebook(file + alt_fmt)
+        if path.endswith('.ipynb'):
+            super(TextFileContentsManager, self).trust_notebook(path)
+        else:
+            # Otherwise, we need to read the notebook to determine
+            # which extension ends with '.ipynb':
+            model = self.get(path)
+            file, fmt, _ = file_fmt_ext(path)
+            for alt_fmt in self.format_group(fmt, model['content']):
+                if alt_fmt.endswith('.ipynb'):
+                    super(TextFileContentsManager, self).trust_notebook(file + alt_fmt)
 
     def rename_file(self, old_path, new_path):
         """Rename the current notebook, as well as its
