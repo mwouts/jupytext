@@ -97,12 +97,12 @@ def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # rename py
-    cm.rename(tmp_nbpy, '2.new.py')
+    cm.rename(tmp_nbpy, '2.new_notebook.py')
     assert not os.path.isfile(str(tmpdir.join(tmp_ipynb)))
     assert not os.path.isfile(str(tmpdir.join(tmp_nbpy)))
 
-    assert os.path.isfile(str(tmpdir.join('2.new.ipynb')))
-    assert os.path.isfile(str(tmpdir.join('2.new.py')))
+    assert os.path.isfile(str(tmpdir.join('2.new_notebook.ipynb')))
+    assert os.path.isfile(str(tmpdir.join('2.new_notebook.py')))
 
 
 @skip_if_dict_is_not_ordered

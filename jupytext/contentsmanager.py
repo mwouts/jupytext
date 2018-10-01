@@ -105,7 +105,7 @@ def file_fmt_ext(path):
     """
     file, ext = os.path.splitext(path)
     file, intermediate_ext = os.path.splitext(file)
-    if len(intermediate_ext) <= 4:
+    if file and len(intermediate_ext) <= 4:
         return file, intermediate_ext + ext, ext
     return file + intermediate_ext, ext, ext
 
