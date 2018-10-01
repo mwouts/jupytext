@@ -1,7 +1,7 @@
 ---
 jupyter:
   jupytext_format_version: '1.0'
-  jupytext_formats: ipynb,py,md
+  jupytext_formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md:markdown
   kernelspec:
     display_name: Python 3
     language: python

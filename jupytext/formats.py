@@ -115,6 +115,9 @@ NOTEBOOK_EXTENSIONS = list(dict.fromkeys(
 
 def get_format(ext, format_name=None):
     """Return the format description for the desired extension"""
+    # remove pre-extension if any
+    ext = '.' + ext.split('.')[-1]
+
     if ext == '.ipynb':
         return None
 
@@ -258,7 +261,7 @@ def update_formats(formats, ext, format_name):
     updated_formats = []
     found_ext = False
     for org_ext, org_format_name in formats:
-        if not org_ext.endswith(ext):
+        if org_ext != ext:
             updated_formats.append((org_ext, org_format_name))
         elif not found_ext:
             updated_formats.append((ext, format_name))
