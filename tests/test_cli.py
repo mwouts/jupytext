@@ -15,7 +15,7 @@ header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 def test_cli_no_argument():
     with pytest.raises(ValueError):
-        cli_jupytext()
+        cli_jupytext([])
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks())
