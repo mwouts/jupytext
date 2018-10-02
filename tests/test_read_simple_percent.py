@@ -62,3 +62,43 @@ a = 3
 
     script2 = jupytext.writes(nb, ext='.py', format_name='percent')
     compare(script, script2)
+
+
+def test_read_nbconvert_script(script="""
+# coding: utf-8
+
+# A markdown cell
+
+# In[1]:
+
+
+import pandas as pd
+
+pd.options.display.max_rows = 6
+pd.options.display.max_columns = 20
+
+
+# Another markdown cell
+
+# In[2]:
+
+
+1 + 1
+
+
+# Again, a markdown cell
+
+# In[33]:
+
+
+2 + 2
+
+
+# <codecell>
+
+
+3 + 3
+"""):
+    assert jupytext.formats.guess_format(script, '.py') == 'percent'
+    nb = jupytext.reads(script, '.py')
+    assert len(nb.cells) == 5
