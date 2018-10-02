@@ -94,7 +94,7 @@ def metadata_and_cell_to_header(notebook, text_format):
 
     if insert_or_test_version_number():
         metadata.setdefault('jupytext', {})['this_document'] = {'format_name': text_format.format_name,
-                                                           'format_version': text_format.current_version_number}
+                                                                'format_version': text_format.current_version_number}
 
     if 'jupytext' in metadata and not metadata['jupytext']:
         del metadata['jupytext']
