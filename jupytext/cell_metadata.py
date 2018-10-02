@@ -335,7 +335,15 @@ def double_percent_options_to_metadata(options):
     title = [matches[i].strip() for i in [1, 3]]
     title = [part for part in title if part]
     if title:
-        metadata['title'] = ' '.join(title)
+        title = ' '.join(title)
+        cell_depth = 0
+        while title.startswith('%'):
+            cell_depth += 1
+            title = title[1:]
+
+        if cell_depth:
+            metadata['cell_depth'] = cell_depth
+        metadata['title'] = title.strip()
 
     return metadata
 
@@ -343,6 +351,8 @@ def double_percent_options_to_metadata(options):
 def metadata_to_double_percent_options(metadata):
     """Metadata to double percent lines"""
     options = []
+    if 'cell_depth' in metadata:
+        options.append('%' * metadata.pop('cell_depth'))
     if 'title' in metadata:
         options.append(metadata.pop('title'))
     if 'cell_type' in metadata:
