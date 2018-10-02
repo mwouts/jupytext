@@ -426,6 +426,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
         self.default_language = script['language']
         self.comment = script['comment']
         self.start_code_re = re.compile(r"^{}\s+%%(.*)$".format(self.comment))
+        self.nbconvert_start_code_re = re.compile(r"^{} (<codecell>|In\[[0-9 ]*\]:?)$".format(self.comment))
 
     def options_to_metadata(self, options):
         return None, double_percent_options_to_metadata(options)
@@ -437,7 +438,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
             self.find_cell_end(lines)
 
         # Metadata to dict
-        if self.start_code_re.match(lines[0]):
+        if self.start_code_re.match(lines[0]) or self.nbconvert_start_code_re.match(lines[0]):
             cell_start = 1
         else:
             cell_start = 0
@@ -468,7 +469,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
             self.cell_type = 'code'
 
         for i, line in enumerate(lines):
-            if i > 0 and self.start_code_re.match(line):
+            if i > 0 and (self.start_code_re.match(line) or self.nbconvert_start_code_re.match(line)):
                 if _BLANK_LINE.match(lines[i - 1]):
                     return i - 1, i, False
                 return i, i, False

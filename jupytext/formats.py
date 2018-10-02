@@ -4,6 +4,7 @@ new formats here!
 """
 
 import os
+import re
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
     LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, \
@@ -169,10 +170,12 @@ def guess_format(text, ext):
 
     # Is this a Hydrogen-like script?
     # Or a Sphinx-gallery script?
-    if ext in ['.jl', '.py', '.R']:
+    if ext in _SCRIPT_EXTENSIONS:
+        comment = _SCRIPT_EXTENSIONS[ext]['comment']
         twenty_hash = ''.join(['#'] * 20)
-        double_percent = '# %%'
+        double_percent = comment + ' %%'
         double_percent_and_space = double_percent + ' '
+        nbconvert_script_re = re.compile(r'^{}( <codecell>| In\[[0-9 ]*\]:?)'.format(comment))
         twenty_hash_count = 0
         double_percent_count = 0
 
@@ -184,11 +187,10 @@ def guess_format(text, ext):
 
             # Don't count escaped Jupyter magics (no space between
             # %% and command) as cells
-            if line == double_percent or \
-                    line.startswith(double_percent_and_space):
+            if line == double_percent or line.startswith(double_percent_and_space) or nbconvert_script_re.match(line):
                 double_percent_count += 1
 
-            if line.startswith(twenty_hash):
+            if line.startswith(twenty_hash) and ext == '.py':
                 twenty_hash_count += 1
 
         if double_percent_count >= 2 or twenty_hash_count >= 2:
