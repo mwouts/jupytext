@@ -118,7 +118,7 @@ def get_format(ext, format_name=None):
     # remove pre-extension if any
     ext = '.' + ext.split('.')[-1]
 
-    if ext == '.ipynb':
+    if ext.endswith('.ipynb'):
         return None
 
     formats_for_extension = []
@@ -143,7 +143,14 @@ def read_format_from_metadata(text, ext):
     metadata, _, _ = header_to_metadata_and_cell(
         lines, "#'" if ext == '.R' else '#')
 
-    if set(metadata).difference(['encoding', 'main_language']):
+    transition_to_jupytext_section_in_metadata(metadata, ext.endswith('.ipynb'))
+
+    format_name = metadata.get('jupytext', {}).get('this_document', {}).get('format_name')
+    if format_name:
+        return format_name
+
+    if ('jupytext' in metadata and set(metadata['jupytext']).difference(['encoding', 'main_language'])) or \
+            set(metadata).difference(['jupytext']):
         return format_name_for_ext(metadata, ext)
 
     return None
@@ -156,7 +163,8 @@ def guess_format(text, ext):
     metadata, _, _ = header_to_metadata_and_cell(
         lines, "#'" if ext == '.R' else '#')
 
-    if set(metadata).difference(['encoding', 'main_language']):
+    if ('jupytext' in metadata and set(metadata['jupytext']).difference(['encoding', 'main_language'])) or \
+            set(metadata).difference(['jupytext']):
         return format_name_for_ext(metadata, ext)
 
     # Is this a Hydrogen-like script?
@@ -198,12 +206,12 @@ def check_file_version(notebook, source_path, outputs_path):
         return
 
     _, ext = os.path.splitext(source_path)
-    if ext == '.ipynb':
+    if ext.endswith('.ipynb'):
         return
-    version = notebook.metadata.get('jupytext_format_version')
+    version = notebook.metadata.get('jupytext', {}).get('this_document', {}).get('format_version')
     format_name = format_name_for_ext(notebook.metadata, ext)
-    if version:
-        del notebook.metadata['jupytext_format_version']
+    if 'this_document' in notebook.metadata['jupytext']:
+        del notebook.metadata['jupytext']['this_document']
 
     fmt = get_format(ext, format_name)
     current = fmt.current_version_number
@@ -289,7 +297,7 @@ def formats_as_string(formats):
 
 def format_name_for_ext(metadata, ext, explicit_default=True):
     """Return the format name for that extension"""
-    formats = metadata.get('jupytext_formats', '')
+    formats = metadata.get('jupytext', {}).get('formats', '')
     formats = parse_formats(formats)
     for fmt_ext, ext_format_name in formats:
         if fmt_ext.endswith(ext):
@@ -304,6 +312,23 @@ def format_name_for_ext(metadata, ext, explicit_default=True):
 
 def update_jupytext_formats_metadata(notebook, ext, format_name):
     """Update the jupytext_format metadata in the Jupyter notebook"""
-    formats = parse_formats(notebook.metadata.get('jupytext_formats', ''))
+    formats = parse_formats(notebook.metadata.get('jupytext', {}).get('formats', ''))
     formats = update_formats(formats, ext, format_name)
-    notebook.metadata['jupytext_formats'] = formats_as_string(formats)
+    notebook.metadata.setdefault('jupytext', {})['formats'] = formats_as_string(formats)
+
+
+def transition_to_jupytext_section_in_metadata(metadata, is_ipynb):
+    """Convert the jupytext_formats metadata entry to jupytext/formats, etc. See #91"""
+
+    # Backward compatibility with nbrmd
+    for key in ['nbrmd_formats', 'nbrmd_format_version']:
+        if key in metadata:
+            metadata[key.replace('nbrmd', 'jupytext')] = metadata.pop(key)
+
+    if 'jupytext_formats' in metadata:
+        metadata.setdefault('jupytext', {})['formats'] = metadata.pop('jupytext_formats')
+    if 'jupytext_format_version' in metadata:
+        metadata.setdefault('jupytext', {})['this_document'] = {'format_version': metadata.pop('jupytext_format_version')}
+    for entry in ['encoding', 'executable']:
+        if is_ipynb and entry in metadata:
+            metadata.setdefault('jupytext', {})[entry] = metadata.pop(entry)

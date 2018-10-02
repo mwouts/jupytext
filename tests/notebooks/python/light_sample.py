@@ -1,7 +1,10 @@
 # ---
 # jupyter:
-#   jupytext_format_version: '1.2'
-#   jupytext_formats: ipynb,py
+#   jupytext:
+#     formats: ipynb,py
+#     this_document:
+#       format_name: light
+#       format_version: '1.2'
 # ---
 
 # # Sample notebook

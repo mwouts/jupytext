@@ -17,7 +17,7 @@ def test_rmd_is_ok(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_rmd = 'notebook.Rmd'
 
-    nb.metadata['jupytext_formats'] = 'ipynb,Rmd'
+    nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,Rmd'
 
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -56,7 +56,7 @@ def test_all_files_created(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_rmd = 'notebook.Rmd'
     tmp_py = 'notebook.py'
-    nb.metadata['jupytext_formats'] = 'ipynb,Rmd,py'
+    nb.metadata['jupytext'] = {'formats': 'ipynb,Rmd,py'}
 
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)

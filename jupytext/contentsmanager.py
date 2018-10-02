@@ -19,7 +19,7 @@ from notebook.services.contents.filemanager import FileContentsManager
 import jupytext
 from .combine import combine_inputs_with_outputs
 from .formats import check_file_version, NOTEBOOK_EXTENSIONS, \
-    format_name_for_ext, parse_one_format, parse_formats
+    format_name_for_ext, parse_one_format, parse_formats, transition_to_jupytext_section_in_metadata
 
 
 def _jupytext_writes(ext, format_name):
@@ -85,7 +85,7 @@ def check_formats(formats):
                                  .format(str(group), fmt,
                                          str(NOTEBOOK_EXTENSIONS),
                                          expected_format))
-            if fmt == '.ipynb':
+            if fmt.endswith('.ipynb'):
                 has_ipynb = True
             else:
                 validated_group.append(fmt)
@@ -166,14 +166,10 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def format_group(self, fmt, nbk=None):
         """Return the group of extensions that contains 'fmt'"""
-        # Backward compatibility with nbrmd
-        for key in ['nbrmd_formats', 'nbrmd_format_version']:
-            if nbk and key in nbk.metadata:
-                nbk.metadata[key.replace('nbrmd', 'jupytext')] = \
-                    nbk.metadata.pop(key)
+        if nbk:
+            transition_to_jupytext_section_in_metadata(nbk.metadata, fmt.endswith('.ipynb'))
 
-        jupytext_formats = ((nbk.metadata.get('jupytext_formats')
-                             if nbk else None) or
+        jupytext_formats = ((nbk.metadata.get('jupytext', {}).get('formats') if nbk else None) or
                             self.default_jupytext_formats)
 
         try:
