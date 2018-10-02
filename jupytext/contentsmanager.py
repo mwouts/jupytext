@@ -244,7 +244,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 (type == 'notebook' or
                  (type is None and ext in self.all_nb_extensions())):
             model = self._notebook_model(path, content=content)
-            if fmt != ext:
+            if fmt != ext and content:
                 model['name'], _ = os.path.splitext(model['name'])
             if not content:
                 return model
