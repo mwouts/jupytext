@@ -109,3 +109,36 @@ pd.options.display.max_columns = 20
     assert jupytext.formats.guess_format(script, '.py') == 'percent'
     nb = jupytext.reads(script, '.py')
     assert len(nb.cells) == 5
+
+
+def test_read_remove_blank_lines(script="""# %%
+import pandas as pd
+
+# %% Display a data frame
+df = pd.DataFrame({'A': [1, 2], 'B': [3, 4]},
+                  index=pd.Index(['x0', 'x1'], name='x'))
+df
+
+# %% Pandas plot {"tags": ["parameters"]}
+df.plot(kind='bar')
+
+
+# %% sample class
+class MyClass:
+    pass
+
+
+# %% a function
+def f(x):
+    return 42 * x
+
+"""):
+    nb = jupytext.reads(script, ext='.py')
+    assert len(nb.cells) == 5
+    for i in range(5):
+        assert nb.cells[i].cell_type == 'code'
+        assert not nb.cells[i].source.startswith('\n')
+        assert not nb.cells[i].source.endswith('\n')
+
+    script2 = jupytext.writes(nb, ext='.py', format_name='percent')
+    compare(script, script2)

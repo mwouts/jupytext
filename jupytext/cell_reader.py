@@ -468,13 +468,17 @@ class DoublePercentScriptCellReader(ScriptCellReader):
         else:
             self.cell_type = 'code'
 
+        next_cell = len(lines)
         for i, line in enumerate(lines):
             if i > 0 and (self.start_code_re.match(line) or self.nbconvert_start_code_re.match(line)):
-                if _BLANK_LINE.match(lines[i - 1]):
-                    return i - 1, i, False
-                return i, i, False
+                next_cell = i
+                break
 
-        return len(lines), len(lines), False
+        if last_two_lines_blank(lines[:next_cell]):
+            return next_cell - 2, next_cell, False
+        if next_cell > 0 and _BLANK_LINE.match(lines[next_cell - 1]):
+            return next_cell - 1, next_cell, False
+        return next_cell, next_cell, False
 
 
 class SphinxGalleryScriptCellReader(ScriptCellReader):
