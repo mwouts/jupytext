@@ -1,7 +1,10 @@
 # ---
 # jupyter:
-#   jupytext_format_version: '1.3'
-#   jupytext_formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md
+#   jupytext:
+#     formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md
+#     this_document:
+#       format_name: light
+#       format_version: '1.3'
 #   kernelspec:
 #     display_name: Python 3
 #     language: python

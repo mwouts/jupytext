@@ -49,7 +49,7 @@ def encoding_and_executable(notebook, ext):
     :return:
     """
     lines = []
-    metadata = notebook.get('metadata', {})
+    metadata = notebook.get('metadata', {}).get('jupytext', {})
     comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment')
 
     if ext not in ['.Rmd', '.md'] and 'executable' in metadata:
@@ -93,12 +93,14 @@ def metadata_and_cell_to_header(notebook, text_format):
     metadata = _as_dict(notebook.get('metadata', {}))
 
     if insert_or_test_version_number():
-        metadata['jupytext_format_version'] = \
-            text_format.current_version_number
+        metadata.setdefault('jupytext', {})['this_document'] = {'format_name': text_format.format_name,
+                                                           'format_version': text_format.current_version_number}
+
+    if 'jupytext' in metadata and not metadata['jupytext']:
+        del metadata['jupytext']
 
     if metadata:
-        header.extend(yaml.safe_dump({'jupyter': metadata},
-                                     default_flow_style=False).splitlines())
+        header.extend(yaml.safe_dump({'jupyter': metadata}, default_flow_style=False).splitlines())
 
     if header:
         header = ['---'] + header + ['---']
@@ -130,16 +132,15 @@ def header_to_metadata_and_cell(lines, header_prefix):
 
     for i, line in enumerate(lines):
         if i == 0 and line.startswith(comment + '!'):
-            metadata['executable'] = line[2:]
+            metadata.setdefault('jupytext', {})['executable'] = line[2:]
             start = i + 1
             continue
         if i == 0 or (i == 1 and not encoding_re.match(lines[0])):
             encoding = encoding_re.match(line)
             if encoding:
                 if encoding.group(1) != 'utf-8':
-                    raise ValueError('Encodings other than utf-8 '
-                                     'are not supported')
-                metadata['encoding'] = line
+                    raise ValueError('Encodings other than utf-8 are not supported')
+                metadata.setdefault('jupytext', {})['encoding'] = line
                 start = i + 1
                 continue
 

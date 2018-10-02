@@ -21,8 +21,7 @@ def filtered_cell(cell, preserve_outputs):
 
 def filtered_notebook_metadata(notebook):
     """Notebook metadata, filtered for metadata added by Jupytext itself"""
-    return {key: notebook.metadata[key] for key
-            in notebook.metadata if not key.startswith('jupytext_')}
+    return {key: notebook.metadata[key] for key in notebook.metadata if key != 'jupytext'}
 
 
 def compare_notebooks(notebook_expected, notebook_actual,

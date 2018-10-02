@@ -3,6 +3,21 @@
 Release History
 ---------------
 
+0.7.3 (2018-10-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- All `jupytext` related metadata goes to a `jupytext` section (#91)
+- Notebooks extensions can be prefixed with any prefix of at most three chars (#87)
+- Export of the same notebook to multiple formats is now supported. To export to all python formats,
+plus `.ipynb` and `.md`, use `"jupytext_formats": "ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md",`.
+
+**BugFixes**
+
+- Trusting notebooks made functional again.
+- Command line `jupytext` returns a meaningful error when no argument is given.
+
 0.7.2 (2018-10-01)
 ++++++++++++++++++++++
 

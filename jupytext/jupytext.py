@@ -16,7 +16,7 @@ from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 import nbformat
 from .formats import get_format, read_format_from_metadata, guess_format, \
-    update_jupytext_formats_metadata, format_name_for_ext
+    update_jupytext_formats_metadata, format_name_for_ext, transition_to_jupytext_section_in_metadata
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable, insert_or_test_version_number
 from .languages import default_language_from_metadata_and_ext, \
@@ -113,7 +113,7 @@ class TextNotebookWriter(NotebookWriter):
 def reads(text, ext, format_name=None,
           rst2md=False, as_version=4, **kwargs):
     """Read a notebook from a string"""
-    if ext == '.ipynb':
+    if ext.endswith('.ipynb'):
         return nbformat.reads(text, as_version, **kwargs)
 
     format_name = read_format_from_metadata(text, ext) or format_name
@@ -125,6 +125,8 @@ def reads(text, ext, format_name=None,
 
     reader = TextNotebookReader(ext, format_name)
     notebook = reader.reads(text, **kwargs)
+    transition_to_jupytext_section_in_metadata(notebook.metadata, False)
+
     if format_name and insert_or_test_version_number():
         if format_name == 'sphinx-rst2md' and rst2md:
             format_name = 'sphinx'
@@ -135,11 +137,12 @@ def reads(text, ext, format_name=None,
 
 def read(file_or_stream, ext, format_name=None, as_version=4, **kwargs):
     """Read a notebook from a file"""
-    if ext == '.ipynb':
-        return nbformat.read(file_or_stream, as_version, **kwargs)
+    if ext.endswith('.ipynb'):
+        notebook = nbformat.read(file_or_stream, as_version, **kwargs)
+        transition_to_jupytext_section_in_metadata(notebook.metadata, True)
+        return notebook
 
-    return reads(file_or_stream.read(), ext=ext, format_name=format_name,
-                 **kwargs)
+    return reads(file_or_stream.read(), ext=ext, format_name=format_name, **kwargs)
 
 
 def readf(nb_file, format_name=None):
@@ -152,7 +155,9 @@ def readf(nb_file, format_name=None):
 def writes(notebook, ext, format_name=None,
            version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a string"""
-    if ext == '.ipynb':
+    transition_to_jupytext_section_in_metadata(notebook.metadata, ext.endswith('.ipynb'))
+
+    if ext.endswith('.ipynb'):
         return nbformat.writes(notebook, version, **kwargs)
 
     if not format_name:
@@ -168,7 +173,9 @@ def writes(notebook, ext, format_name=None,
 def write(notebook, file_or_stream, ext, format_name=None,
           version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a file"""
-    if ext == '.ipynb':
+    transition_to_jupytext_section_in_metadata(notebook.metadata, ext.endswith('.ipynb'))
+
+    if ext.endswith('.ipynb'):
         return nbformat.write(notebook, file_or_stream, version, **kwargs)
 
     if not format_name:
@@ -177,7 +184,8 @@ def write(notebook, file_or_stream, ext, format_name=None,
     if format_name and insert_or_test_version_number():
         update_jupytext_formats_metadata(notebook, ext, format_name)
 
-    return TextNotebookWriter(ext, format_name).write(notebook, file_or_stream)
+    writer = TextNotebookWriter(ext, format_name)
+    return writer.write(notebook, file_or_stream)
 
 
 def writef(notebook, nb_file, format_name=None):
