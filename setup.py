@@ -6,9 +6,12 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+with open(path.join(this_directory, 'VERSION')) as version_file:
+    version = version_file.read().strip()
+
 setup(
     name='jupytext',
-    version='0.7.3',
+    version=version,
     author='Marc Wouts',
     author_email='marc.wouts@gmail.com',
     description='Jupyter notebooks as Markdown documents, '
