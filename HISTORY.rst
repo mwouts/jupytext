@@ -3,15 +3,18 @@
 Release History
 ---------------
 
-0.7.3 (2018-10-??)
+0.8.0 (2018-10-??)
 ++++++++++++++++++++++
 
 **Improvements**
 
-- All `jupytext` related metadata goes to a `jupytext` section (#91)
+- All `jupytext` related metadata goes to a `jupytext` section (#91). Please make
+sure your collaborators use the same version of Jupytext, as the new version can read
+previous metadata, but not the opposite.
 - Notebooks extensions can be prefixed with any prefix of at most three chars (#87)
 - Export of the same notebook to multiple formats is now supported. To export to all python formats,
-plus `.ipynb` and `.md`, use `"jupytext_formats": "ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md",`.
+plus `.ipynb` and `.md`, use `"jupytext": {"formats": "ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md"},`.
+- README includes a short section on how to extend `light` and `percent` formats to more languages (#61)
 
 **BugFixes**
 
