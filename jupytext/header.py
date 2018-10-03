@@ -5,6 +5,7 @@ import re
 import yaml
 import nbformat
 from nbformat.v4.nbbase import new_raw_cell
+import jupytext
 from .cell_to_text import comment_lines
 from .languages import _SCRIPT_EXTENSIONS
 
@@ -94,7 +95,8 @@ def metadata_and_cell_to_header(notebook, text_format):
 
     if insert_or_test_version_number():
         metadata.setdefault('jupytext', {})['this_document'] = {'format_name': text_format.format_name,
-                                                                'format_version': text_format.current_version_number}
+                                                                'format_version': text_format.current_version_number,
+                                                                'jupytext_version': jupytext.__version__}
 
     if 'jupytext' in metadata and not metadata['jupytext']:
         del metadata['jupytext']
