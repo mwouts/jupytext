@@ -111,7 +111,7 @@ c.ContentsManager.default_jupytext_formats = "ipynb,md"
 ```
 (and similarly for the other formats).
 
-In case the [`percent` format](#julia-python-and-r-scripts-in-the-double-percent-format) is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
+In case the [`percent`](#the-percent-format) format is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
 ```python
 c.ContentsManager.preferred_jupytext_formats_save = "py:percent"
 ```
@@ -218,10 +218,10 @@ c.ContentsManager.preferred_jupytext_formats_read = "py:sphinx"
 c.ContentsManager.sphinx_convert_rst2md = True
 ```
 
-### R knit::spin scripts
+### R knitr::spin scripts
 
-Implement these [specifications](https://rmarkdown.rstudio.com/articles_report_from_r_script.html):
-- Jupyter metadata in YAML format, in a `#' `-commented header.
+The `spin` format implements these [specifications](https://rmarkdown.rstudio.com/articles_report_from_r_script.html):
+- Jupyter metadata are in YAML format, in a `#' `-commented header.
 - Markdown cells are commented with `#' `.
 - Code cells are exported verbatim. Cell metadata are signalled with `#+`. Cells end with a blank line, an explicit start of cell marker, or a markdown cell.
 
