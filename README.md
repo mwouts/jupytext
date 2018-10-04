@@ -64,7 +64,7 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 ## Installation
 
-Install Jupytext with
+Install or update Jupytext with
 ```bash
 pip install jupytext --upgrade
 ```
@@ -168,14 +168,14 @@ Please note that
 
 ### Markdown and R Markdown
 
-Our implementation for Jupyter notebooks as Markdown or [R Markdown ](https://rmarkdown.rstudio.com/authoring_quick_tour.html) documents is straightforward:
+Our implementation for Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) or [R Markdown ](https://rmarkdown.rstudio.com/authoring_quick_tour.html) documents is straightforward:
 - A YAML header contains the notebook metadata (Jupyter kernel, etc)
 - Markdown cells are inserted verbatim, and separated with two blank lines
 - Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are not available in the Markdown format. The [code cell options](https://yihui.name/knitr/options/) in the R Markdown format are mapped to the corresponding Jupyter cell metadata options, when available.
 
 ### The `light` format for notebooks as scripts
 
-The default format for Python and Julia scripts is the `light` format. That format can read any Python or Julia script as a Jupyter notebook, even scripts which were never prepared to become a notebook. When a notebook is written as a script using this format, as few cells markers as possible are introduced.
+The `light` format was created for this project. It is the default format for Python and Julia scripts. That format can read any Python or Julia script as a Jupyter notebook, even scripts which were never prepared to become a notebook. When a notebook is written as a script using this format, only a few cells markers are introduced—none if possible.
 
 The `light` format has:
 - A YAML header, commented with `# `, that contains the notebook metadata.
@@ -207,7 +207,7 @@ The `percent` format is currently available for Python, Julia, R, Scheme and C++
 
 Another popular notebook-like format for Python script is the Sphinx-gallery [format](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-gallery notebooks by Jupytext.
 
-If you want that the reStructuredText be converted to markdown for a nicer display, add a `c.ContentsManager.sphinx_convert_rst2md = True` line to your Jupyter configuration file. Please notice however that this is a non-reversible transformation - use this only with Binder. You should not use that if you want to edit the Sphinx Gallery files with Jupytext.
+If you want that the reStructuredText be converted to markdown for a nicer display, add a `c.ContentsManager.sphinx_convert_rst2md = True` line to your Jupyter configuration file. Please notice however that this is a non-reversible transformation—use this only with Binder. You should not use that if you want to edit the Sphinx Gallery files with Jupytext.
 
 By the way, if you want to use Jupytext and Binder to visualize your Sphinx Gallery scripts, you just need to create two files in your GitHub repo:
 - `binder/requirements.txt` with the required packages (including `jupytext`)
@@ -251,15 +251,11 @@ Also, you may want some cells to be active only in the Python, or R Markdown rep
 
 ## Jupytext's releases and backward compatibility
 
-Jupytext will continue to evolve as we collect more feedback, and discover more ways to represent notebooks as text files. When a new release of Jupytext comes out, we make our best to ensure that it will not break your notebooks.
+Jupytext will continue to evolve as we collect more feedback, and discover more ways to represent notebooks as text files. When a new release of Jupytext comes out, we make our best to ensure that it will not break your notebooks. Format changes will not happen often, and we try hard not to introduce breaking changes.
 
-To this aim, all the Jupytext formats have a version number, which is stored in the text representations of the notebooks. Jupytext will open any text notebook, but not paired notebooks for which the text file has either a deprecated format, or a format that is more recent than the one known to Jupytext. If you find yourself in that situation, you have to choose between:
-- updating Jupytext
-- deleting either the `.ipynb`, or its paired text representation. Keep the one that is up-to-date, re-open your notebook, and Jupytext will regenerate the other file.
+Jupytext tests the version format for paired notebook only. If the format version of the text representation is not the current one, Jupytext will refuse to open the paired notebook. You may want to update Jupytext if the format version of the file is newer than the one available in the installed Jupytext. Otherwise, you will have to choose between deleting (or renaming) either the `.ipynb`, or its paired text representation. Keep the one that is up-to-date, re-open your notebook, and Jupytext will regenerate the other file.
 
-Format changes will not happen often, and we try hard not to introduce breaking changes. For instance, the last change to the `light` format was the support of cell metadata for all cell types. We incremented the format version to 1.3, while preserving the ability to read `light` files from versions 1.1 and 1.2, thus avoiding any impact on the users.
-
-Finally, notice that people who use Jupytext to collaborate on notebooks should update Jupytext simultaneously.
+Finally, note that people who use Jupytext to collaborate on notebooks should update Jupytext simultaneously.
 
 ## I like this, how can I contribute?
 
