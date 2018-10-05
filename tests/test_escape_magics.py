@@ -84,3 +84,23 @@ def test_magics_are_not_commented(ext_and_format_name):
     if format_name == 'sphinx':
         nb2.cells = nb2.cells[1:]
     compare_notebooks(nb, nb2)
+
+
+def test_force_comment_using_contents_manager(tmpdir):
+    tmp_py = 'notebook.py'
+
+    cm = jupytext.TextFileContentsManager()
+    cm.preferred_jupytext_formats_save = 'py:percent'
+    cm.root_dir = str(tmpdir)
+
+    nb = new_notebook(cells=[new_code_cell('%pylab inline')])
+
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
+    with open(str(tmpdir.join(tmp_py))) as stream:
+        assert '%pylab inline' in stream.read().splitlines()
+
+    cm.default_comment_magics = True
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
+    with open(str(tmpdir.join(tmp_py))) as stream:
+        assert '# %pylab inline' in stream.read().splitlines()
+
