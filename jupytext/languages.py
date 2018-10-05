@@ -20,7 +20,7 @@ def default_language_from_metadata_and_ext(notebook, ext):
     default_from_ext = _SCRIPT_EXTENSIONS.get(ext, {}).get('language', 'python')
 
     return (notebook.metadata.get('language_info', {}).get('name')
-            or notebook.metadata.get('main_language') or default_from_ext)
+            or notebook.metadata.get('jupytext', {}).get('main_language') or default_from_ext)
 
 
 def set_main_and_cell_language(metadata, cells, ext):
@@ -28,7 +28,7 @@ def set_main_and_cell_language(metadata, cells, ext):
     use magics for cells that use other languages"""
     default_from_ext = _SCRIPT_EXTENSIONS.get(ext, {}).get('language', 'python')
     main_language = (metadata.get('language_info', {}).get('name') or
-                     metadata.get('main_language'))
+                     metadata.get('jupytext', {}).get('main_language'))
     if main_language is None:
         languages = {default_from_ext: 0.5}
         for cell in cells:
@@ -40,7 +40,7 @@ def set_main_and_cell_language(metadata, cells, ext):
 
         # save main language when not kernel is set
         if 'name' not in metadata.get('language_info', {}):
-            metadata['main_language'] = main_language
+            metadata.setdefault('jupytext', {})['main_language'] = main_language
 
     # Remove 'language' meta data and add a magic if not main language
     for cell in cells:

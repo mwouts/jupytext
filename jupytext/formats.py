@@ -331,6 +331,8 @@ def transition_to_jupytext_section_in_metadata(metadata, is_ipynb):
         metadata.setdefault('jupytext', {})['formats'] = metadata.pop('jupytext_formats')
     if 'jupytext_format_version' in metadata:
         metadata.setdefault('jupytext', {})['this_document'] = {'format_version': metadata.pop('jupytext_format_version')}
+    if 'main_language' in metadata:
+        metadata.setdefault('jupytext', {})['main_language'] = metadata.pop('main_language')
     for entry in ['encoding', 'executable']:
         if is_ipynb and entry in metadata:
             metadata.setdefault('jupytext', {})[entry] = metadata.pop(entry)
