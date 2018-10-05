@@ -5,7 +5,7 @@ from datetime import timedelta
 import nbformat
 import mock
 from tornado.web import HTTPError
-from traitlets import Unicode, Float, Bool
+from traitlets import Unicode, Float, Bool, Enum
 from traitlets.config import Configurable
 
 # import notebook.transutils before notebook.services.contents.filemanager #75
@@ -151,6 +151,12 @@ class TextFileContentsManager(FileContentsManager, Configurable):
              'scripts as Sphinx gallery scripts.',
         config=True)
 
+    comment_magics = Enum(
+        values=[True, False],
+        allow_none=True,
+        help='Should Jupyter magic commands be commented out in the text representation?',
+        config=True)
+
     sphinx_convert_rst2md = Bool(
         False,
         help='When opening a Sphinx Gallery script, convert the '
@@ -211,8 +217,14 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             return super(TextFileContentsManager, self) \
                 ._read_notebook(os_path, as_version)
 
+    def set_comment_magics_if_none(self, nb):
+        """Set the 'comment_magics' metadata if default is not None"""
+        if self.comment_magics is not None and 'commment_magics' not in nb.metadata.get('jupytext', {}):
+            nb.metadata.setdefault('jupytext', {})['commment_magics'] = self.comment_magics
+
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
+        self.set_comment_magics_if_none(nb)
         os_file, fmt, _ = file_fmt_ext(os_path)
         for alt_fmt in self.format_group(fmt, nb):
             os_path_fmt = os_file + alt_fmt
@@ -224,11 +236,9 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                               self.preferred_format(alt_fmt, self.preferred_jupytext_formats_save)
                 with mock.patch('nbformat.writes',
                                 _jupytext_writes(alt_fmt, format_name)):
-                    super(TextFileContentsManager, self) \
-                        ._save_notebook(os_path_fmt, nb)
+                    super(TextFileContentsManager, self)._save_notebook(os_path_fmt, nb)
             else:
-                super(TextFileContentsManager, self) \
-                    ._save_notebook(os_path_fmt, nb)
+                super(TextFileContentsManager, self)._save_notebook(os_path_fmt, nb)
 
     def get(self, path, content=True, type=None, format=None,
             load_alternative_format=True):

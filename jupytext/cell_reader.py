@@ -53,8 +53,7 @@ def next_code_is_indented(lines):
     return False
 
 
-def count_lines_to_next_cell(cell_end_marker, next_cell_start,
-                             total, explicit_eoc):
+def count_lines_to_next_cell(cell_end_marker, next_cell_start, total, explicit_eoc):
     """How many blank lines between end of cell marker and next cell?"""
     if cell_end_marker < total:
         lines_to_next_cell = next_cell_start - cell_end_marker
@@ -82,6 +81,7 @@ class BaseCellReader(object):
     cell_type = None
     language = None
     default_language = 'python'
+    default_comment_magics = None
     metadata = None
     content = []
     lines_to_next_cell = 1
@@ -96,9 +96,10 @@ class BaseCellReader(object):
     # Any specific prefix for lines in markdown cells (like in R spin format?)
     markdown_prefix = None
 
-    def __init__(self, ext):
+    def __init__(self, ext, comment_magics=None):
         """Create a cell reader with empty content"""
         self.ext = ext
+        self.comment_magics = comment_magics if comment_magics is not None else self.default_comment_magics
 
     def read(self, lines):
         """Read one cell from the given lines, and return the cell,
@@ -250,8 +251,7 @@ class BaseCellReader(object):
 
     def uncomment_code_and_magics(self, lines):
         """Uncomment code and possibly commented magic commands"""
-        raise NotImplementedError('This method must be implemented in a '
-                                  'sub class')
+        raise NotImplementedError('This method must be implemented in a sub class')
 
 
 class MarkdownCellReader(BaseCellReader):
@@ -259,6 +259,7 @@ class MarkdownCellReader(BaseCellReader):
     comment = ''
     start_code_re = re.compile(r"^```(.*)")
     end_code_re = re.compile(r"^```\s*$")
+    default_comment_magics = False
 
     def options_to_metadata(self, options):
         return md_options_to_metadata(options)
@@ -294,8 +295,9 @@ class MarkdownCellReader(BaseCellReader):
         return len(lines), len(lines), False
 
     def uncomment_code_and_magics(self, lines):
-        return unescape_code_start(lines, self.ext, self.language or
-                                   self.default_language)
+        if self.comment_magics:
+            lines = uncomment_magic(lines, self.language)
+        return unescape_code_start(lines, self.ext, self.language or self.default_language)
 
 
 class RMarkdownCellReader(MarkdownCellReader):
@@ -303,13 +305,14 @@ class RMarkdownCellReader(MarkdownCellReader):
     comment = ''
     start_code_re = re.compile(r"^```{(.*)}\s*$")
     default_language = 'R'
+    default_comment_magics = True
 
     def options_to_metadata(self, options):
         return rmd_options_to_metadata(options)
 
     def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code':
-            if is_active(self.ext, self.metadata):
+            if is_active(self.ext, self.metadata) and self.comment_magics:
                 uncomment_magic(lines, self.language or self.default_language)
 
         unescape_code_start(lines, self.ext, self.language or
@@ -327,10 +330,11 @@ class ScriptCellReader(BaseCellReader):
 
     def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code':
-            if is_active(self.ext, self.metadata):
-                uncomment_magic(lines, self.language or self.default_language)
-            else:
-                lines = uncomment(lines)
+            if self.comment_magics:
+                if is_active(self.ext, self.metadata):
+                    uncomment_magic(lines, self.language or self.default_language)
+                else:
+                    lines = uncomment(lines)
 
         if self.cell_type == 'code':
             unescape_code_start(lines, self.ext, self.language or
@@ -350,6 +354,7 @@ class RScriptCellReader(ScriptCellReader):
     markdown_prefix = "#'"
     default_language = 'R'
     start_code_re = re.compile(r"^#\+(.*)\s*$")
+    default_comment_magics = True
 
     def options_to_metadata(self, options):
         return rmd_options_to_metadata('r ' + options)
@@ -374,9 +379,10 @@ class LightScriptCellReader(ScriptCellReader):
     """Read notebook cells from plain Python or Julia files. Cells
     are identified by line breaks, unless they start with an
     explicit marker '# +' """
+    default_comment_magics = True
 
-    def __init__(self, ext):
-        super(LightScriptCellReader, self).__init__(ext)
+    def __init__(self, ext, comment_magics=None):
+        super(LightScriptCellReader, self).__init__(ext, comment_magics)
         script = _SCRIPT_EXTENSIONS[ext]
         self.default_language = script['language']
         self.comment = script['comment']
@@ -396,8 +402,7 @@ class LightScriptCellReader(ScriptCellReader):
             self.metadata = {}
 
         if self.metadata is not None:
-            self.language = self.metadata.get(
-                'language', self.default_language)
+            self.language = self.metadata.get('language', self.default_language)
 
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position
@@ -419,9 +424,10 @@ class LightScriptCellReader(ScriptCellReader):
 
 class DoublePercentScriptCellReader(ScriptCellReader):
     """Read notebook cells from Hydrogen/Spyder/VScode scripts (#59)"""
+    default_comment_magics = False
 
-    def __init__(self, ext):
-        ScriptCellReader.__init__(self, ext)
+    def __init__(self, ext, comment_magics=None):
+        ScriptCellReader.__init__(self, ext, comment_magics)
         script = _SCRIPT_EXTENSIONS[ext]
         self.default_language = script['language']
         self.comment = script['comment']
@@ -448,6 +454,8 @@ class DoublePercentScriptCellReader(ScriptCellReader):
 
         if self.cell_type != 'code':
             source = uncomment(source, self.comment)
+        elif self.comment_magics:
+            source = self.uncomment_code_and_magics(source)
 
         self.content = source
 
@@ -486,6 +494,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
 
     comment = '#'
     default_language = 'python'
+    default_comment_magics = True
     twenty_hash = re.compile(r'^#( |)#{19,}\s*$')
     markdown_marker = None
     rst2md = False
@@ -598,6 +607,9 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
 
         # Cell content
         source = lines[cell_start:cell_end_marker]
+
+        if self.cell_type == 'code' and self.comment_magics:
+            uncomment_magic(source, self.language or self.default_language)
 
         if self.cell_type == 'markdown' and source:
             if self.markdown_marker.startswith(self.comment):
