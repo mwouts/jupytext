@@ -24,7 +24,7 @@ cube(x)
 # And a markdown comment
 '''):
     nb = jupytext.reads(julia, ext='.jl')
-    assert nb.metadata == {'main_language': 'julia'}
+    assert nb.metadata == {'jupytext': {'main_language': 'julia'}}
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[0].source == '''"""

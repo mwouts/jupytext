@@ -31,7 +31,7 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 ```
 """):
     nb = jupytext.reads(markdown, ext='.md')
-    assert nb.metadata == {'main_language': 'python'}
+    assert nb.metadata == {'jupytext': {'main_language': 'python'}}
     compare(nb.cells, [{'cell_type': 'raw',
                         'source': '---\ntitle: Simple file\n---',
                         'metadata': {}},
