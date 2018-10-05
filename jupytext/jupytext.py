@@ -35,20 +35,19 @@ class TextNotebookReader(NotebookReader):
         lines = s.splitlines()
 
         cells = []
-        metadata, header_cell, pos = \
-            header_to_metadata_and_cell(lines, self.format.header_prefix)
+        metadata, header_cell, pos = header_to_metadata_and_cell(lines, self.format.header_prefix)
+        comment_magics = metadata.get('jupytext', {}).get('comment_magics')
 
         if header_cell:
             cells.append(header_cell)
 
         lines = lines[pos:]
 
-        if self.format.format_name and \
-                self.format.format_name.startswith('sphinx'):
+        if self.format.format_name and self.format.format_name.startswith('sphinx'):
             cells.append(new_code_cell(source='%matplotlib inline'))
 
         while lines:
-            reader = self.format.cell_reader_class(self.format.extension)
+            reader = self.format.cell_reader_class(self.format.extension, comment_magics)
             cell, pos = reader.read(lines)
             cells.append(cell)
             if pos <= 0:
@@ -74,10 +73,10 @@ class TextNotebookWriter(NotebookWriter):
     def writes(self, nb, **kwargs):
         """Write the text representation of a notebook to a string"""
         nb = deepcopy(nb)
-        default_language = default_language_from_metadata_and_ext(
-            nb, self.format.extension)
-        if 'main_language' in nb.metadata:
-            del nb.metadata['main_language']
+        default_language = default_language_from_metadata_and_ext(nb, self.format.extension)
+        comment_magics = nb.metadata.get('jupytext', {}).get('comment_magics')
+        if 'main_language' in nb.metadata.get('jupytext', {}):
+            del nb.metadata['jupytext']['main_language']
 
         lines = encoding_and_executable(nb, self.ext)
         lines.extend(metadata_and_cell_to_header(nb, self.format))
@@ -85,7 +84,7 @@ class TextNotebookWriter(NotebookWriter):
         cell_exporters = []
         for cell in nb.cells:
             cell_exporters.append(self.format.cell_exporter_class(
-                cell, default_language, self.format.extension))
+                cell, default_language, self.format.extension, comment_magics))
 
         texts = [cell.cell_to_text() for cell in cell_exporters]
 
@@ -95,7 +94,7 @@ class TextNotebookWriter(NotebookWriter):
 
             if i == 0 and self.format.format_name and \
                     self.format.format_name.startswith('sphinx') and \
-                    text == ['%matplotlib inline']:
+                    (text == ['%matplotlib inline'] or text == ['# %matplotlib inline']):
                 continue
 
             lines.extend(text)

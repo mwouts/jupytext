@@ -141,8 +141,7 @@ def read_format_from_metadata(text, ext):
     """Return the format of the file, when that information is available from the metadata"""
     lines = text.splitlines()
 
-    metadata, _, _ = header_to_metadata_and_cell(
-        lines, "#'" if ext == '.R' else '#')
+    metadata, _, _ = header_to_metadata_and_cell(lines, "#'" if ext == '.R' else '#')
 
     transition_to_jupytext_section_in_metadata(metadata, ext.endswith('.ipynb'))
 
@@ -150,7 +149,7 @@ def read_format_from_metadata(text, ext):
     if format_name:
         return format_name
 
-    if ('jupytext' in metadata and set(metadata['jupytext']).difference(['encoding', 'main_language'])) or \
+    if ('jupytext' in metadata and set(metadata['jupytext']).difference(['encoding', 'main_language', 'comment_magics'])) or \
             set(metadata).difference(['jupytext']):
         return format_name_for_ext(metadata, ext)
 

@@ -30,8 +30,9 @@ def comment_lines(lines, prefix):
 
 class BaseCellExporter(object):
     """A class that represent a notebook cell as text"""
+    default_comment_magics = None
 
-    def __init__(self, cell, default_language, ext):
+    def __init__(self, cell, default_language, ext, comment_magics=None):
         self.ext = ext
         self.cell_type = cell.cell_type
         self.source = cell_source(cell)
@@ -39,6 +40,7 @@ class BaseCellExporter(object):
         self.language = cell_language(self.source) or default_language
         self.default_language = default_language
         self.comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
+        self.comment_magics = comment_magics if comment_magics is not None else self.default_comment_magics
 
         # how many blank lines before next cell
         self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', 1)
@@ -78,8 +80,7 @@ class BaseCellExporter(object):
 
     def code_to_text(self):
         """Return the text representation of this cell as a code cell"""
-        raise NotImplementedError('This method must be implemented '
-                                  'in a sub-class')
+        raise NotImplementedError('This method must be implemented in a sub-class')
 
     def simplify_code_markers(self, text, next_text, lines):
         """Simplify start code marker when possible"""
@@ -89,15 +90,19 @@ class BaseCellExporter(object):
 
 class MarkdownCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as Markdown"""
+    default_comment_magics = False
 
-    def __init__(self, cell, default_language, ext):
-        BaseCellExporter.__init__(self, cell, default_language, ext)
+    def __init__(self, cell, default_language, ext, comment_magics=None):
+        BaseCellExporter.__init__(self, cell, default_language, ext, comment_magics)
         self.comment = ''
 
     def code_to_text(self):
         """Return the text representation of a code cell"""
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
+
+        if self.comment_magics:
+            comment_magic(source, self.language)
 
         options = []
         if self.cell_type == 'code' and self.language:
@@ -110,9 +115,10 @@ class MarkdownCellExporter(BaseCellExporter):
 
 class RMarkdownCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as Markdown"""
+    default_comment_magics = True
 
-    def __init__(self, cell, default_language, ext):
-        BaseCellExporter.__init__(self, cell, default_language, ext)
+    def __init__(self, cell, default_language, ext, comment_magics=None):
+        BaseCellExporter.__init__(self, cell, default_language, ext, comment_magics)
         self.comment = ''
 
     def code_to_text(self):
@@ -121,7 +127,7 @@ class RMarkdownCellExporter(BaseCellExporter):
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
 
-        if active:
+        if active and self.comment_magics:
             comment_magic(source, self.language)
 
         lines = []
@@ -148,10 +154,7 @@ def endofcell_marker(source, comment):
 
 class LightScriptCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as a Python or Julia script"""
-
-    def __init__(self, cell, default_language, ext):
-        BaseCellExporter.__init__(self, cell, default_language, ext)
-        self.comment = _SCRIPT_EXTENSIONS[ext]['comment']
+    default_comment_magics = True
 
     def is_code(self):
         # Treat markdown cells with metadata as code cells (#66)
@@ -173,7 +176,8 @@ class LightScriptCellExporter(BaseCellExporter):
         escape_code_start(source, self.ext, self.language)
 
         if active:
-            comment_magic(source, self.language)
+            if self.comment_magics:
+                comment_magic(source, self.language)
         else:
             source = [self.comment + ' ' + line if line else self.comment for line in source]
 
@@ -225,9 +229,10 @@ class LightScriptCellExporter(BaseCellExporter):
 
 class RScriptCellExporter(BaseCellExporter):
     """A class that can represent a notebook cell as a R script"""
+    default_comment_magics = True
 
-    def __init__(self, cell, default_language, ext):
-        BaseCellExporter.__init__(self, cell, default_language, ext)
+    def __init__(self, cell, default_language, ext, comment_magics=None):
+        BaseCellExporter.__init__(self, cell, default_language, ext, comment_magics)
         self.comment = "#'"
 
     def code_to_text(self):
@@ -241,7 +246,7 @@ class RScriptCellExporter(BaseCellExporter):
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
 
-        if active:
+        if active and self.comment_magics:
             comment_magic(source, self.language)
 
         if not active:
@@ -260,10 +265,7 @@ class RScriptCellExporter(BaseCellExporter):
 class DoublePercentCellExporter(BaseCellExporter):
     """A class that can represent a notebook cell as an
     Hydrogen/Spyder/VScode script (#59)"""
-
-    def __init__(self, cell, default_language, ext):
-        BaseCellExporter.__init__(self, cell, default_language, ext)
-        self.comment = _SCRIPT_EXTENSIONS[ext]['comment']
+    default_comment_magics = False
 
     def code_to_text(self):
         """Not used"""
@@ -274,8 +276,7 @@ class DoublePercentCellExporter(BaseCellExporter):
         if self.cell_type != 'code':
             self.metadata['cell_type'] = self.cell_type
 
-        if self.cell_type == 'raw' and 'active' in self.metadata and \
-                self.metadata['active'] == '':
+        if self.cell_type == 'raw' and 'active' in self.metadata and self.metadata['active'] == '':
             del self.metadata['active']
 
         options = metadata_to_double_percent_options(self.metadata)
@@ -285,7 +286,10 @@ class DoublePercentCellExporter(BaseCellExporter):
             lines = [self.comment + ' %% ' + options]
 
         if self.cell_type == 'code':
-            return lines + self.source
+            source = copy(self.source)
+            if self.comment_magics:
+                comment_magic(source, self.language)
+            return lines + source
 
         return lines + comment_lines(self.source, self.comment)
 
@@ -295,9 +299,10 @@ class SphinxGalleryCellExporter(BaseCellExporter):
     Sphinx Gallery script (#80)"""
 
     default_cell_marker = '#' * 79
+    default_comment_magics = True
 
-    def __init__(self, cell, default_language, ext):
-        BaseCellExporter.__init__(self, cell, default_language, ext)
+    def __init__(self, cell, default_language, ext, comment_magics=None):
+        BaseCellExporter.__init__(self, cell, default_language, ext, comment_magics)
         self.comment = '#'
 
     def code_to_text(self):
@@ -307,7 +312,10 @@ class SphinxGalleryCellExporter(BaseCellExporter):
     def cell_to_text(self):
         """Return the text representation for the cell"""
         if self.cell_type == 'code':
-            return self.source
+            source = copy(self.source)
+            if self.comment_magics:
+                comment_magic(source, self.language)
+            return source
 
         if 'cell_marker' in self.metadata:
             cell_marker = self.metadata.pop('cell_marker')
