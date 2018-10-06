@@ -151,7 +151,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
              'scripts as Sphinx gallery scripts.',
         config=True)
 
-    default_comment_magics = Enum(
+    comment_magics = Enum(
         values=[True, False],
         allow_none=True,
         help='Should Jupyter magic commands be commented out in the text representation?',
@@ -219,8 +219,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def set_comment_magics_if_none(self, nb):
         """Set the 'comment_magics' metadata if default is not None"""
-        if self.default_comment_magics is not None and 'comment_magics' not in nb.metadata.get('jupytext', {}):
-            nb.metadata.setdefault('jupytext', {})['comment_magics'] = self.default_comment_magics
+        if self.comment_magics is not None and 'comment_magics' not in nb.metadata.get('jupytext', {}):
+            nb.metadata.setdefault('jupytext', {})['comment_magics'] = self.comment_magics
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
