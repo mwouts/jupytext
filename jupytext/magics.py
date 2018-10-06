@@ -36,8 +36,8 @@ _FORCE_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
 _FORCE_NOT_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
     r"^({0} |{0})*%(.*)({0}| )noescape".format(_SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS}
 _MAGIC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
-    r"^({0} |{0})*(%%[a-zA-Z]|{1})".format(_SCRIPT_EXTENSIONS[ext]['comment'], '|'.join(_LINE_MAGICS))) for ext in
-_SCRIPT_EXTENSIONS}
+    r"^({0} |{0})*(%%[a-zA-Z]|{1})".format(
+        _SCRIPT_EXTENSIONS[ext]['comment'], '|'.join(_LINE_MAGICS))) for ext in _SCRIPT_EXTENSIONS}
 _COMMENT = {_SCRIPT_EXTENSIONS[ext]['language']: _SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS}
 
 # Commands starting with a question marks have to be escaped

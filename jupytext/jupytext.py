@@ -94,7 +94,7 @@ class TextNotebookWriter(NotebookWriter):
 
             if i == 0 and self.format.format_name and \
                     self.format.format_name.startswith('sphinx') and \
-                    (text == ['%matplotlib inline'] or text == ['# %matplotlib inline']):
+                    (text in [['%matplotlib inline'], ['# %matplotlib inline']]):
                 continue
 
             lines.extend(text)
