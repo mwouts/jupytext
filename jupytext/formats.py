@@ -137,11 +137,26 @@ def get_format(ext, format_name=None):
     raise TypeError("Not format associated to extension '{}'".format(ext))
 
 
-def read_format_from_metadata(text, ext):
-    """Return the format of the file, when that information is available from the metadata"""
+def read_metadata(text, ext):
+    """Return the header metadata"""
+    ext = '.' + ext.split('.')[-1]
     lines = text.splitlines()
 
-    metadata, _, _ = header_to_metadata_and_cell(lines, "#'" if ext == '.R' else '#')
+    if ext in ['.md', '.Rmd']:
+        comment = ''
+    else:
+        comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
+
+    metadata, _, _ = header_to_metadata_and_cell(lines, comment)
+    if ext == '.R' and not metadata:
+        metadata, _, _ = header_to_metadata_and_cell(lines, "#'")
+
+    return metadata
+
+
+def read_format_from_metadata(text, ext):
+    """Return the format of the file, when that information is available from the metadata"""
+    metadata = read_metadata(text, ext)
 
     transition_to_jupytext_section_in_metadata(metadata, ext.endswith('.ipynb'))
 
@@ -160,8 +175,7 @@ def guess_format(text, ext):
     """Guess the format of the file, given its extension and content"""
     lines = text.splitlines()
 
-    metadata, _, _ = header_to_metadata_and_cell(
-        lines, "#'" if ext == '.R' else '#')
+    metadata = read_metadata(text, ext)
 
     if ('jupytext' in metadata and set(metadata['jupytext']).difference(['encoding', 'main_language'])) or \
             set(metadata).difference(['jupytext']):

@@ -56,6 +56,8 @@ def check_formats(formats):
                        "Groups can be separated with colon, for instance: "
                        "'ipynb,nb.py;script.ipynb,py'")
 
+    allowed_extension = NOTEBOOK_EXTENSIONS + ['auto']
+
     validated_formats = []
     for group in formats:
         if not isinstance(group, list):
@@ -70,21 +72,15 @@ def check_formats(formats):
             try:
                 fmt = u'' + fmt
             except UnicodeDecodeError:
-                raise ValueError('Extensions should be strings among {}'
-                                 ', not {}.\n{}'
-                                 .format(str(formats.NOTEBOOK_EXTENSIONS),
-                                         str(fmt),
-                                         expected_format))
+                raise ValueError('Extensions should be strings among {}, not {}.\n{}'
+                                 .format(str(allowed_extension), str(fmt), expected_format))
             if fmt == '':
                 continue
             fmt, _ = parse_one_format(fmt)
-            if not any([fmt.endswith(ext)
-                        for ext in NOTEBOOK_EXTENSIONS]):
+            if not any([fmt.endswith(ext) for ext in allowed_extension]):
                 raise ValueError('Group extension {} contains {}, '
                                  'which does not end with either {}.\n{}'
-                                 .format(str(group), fmt,
-                                         str(NOTEBOOK_EXTENSIONS),
-                                         expected_format))
+                                 .format(str(group), fmt, str(allowed_extension), expected_format))
             if fmt.endswith('.ipynb'):
                 has_ipynb = True
             else:
@@ -170,6 +166,17 @@ class TextFileContentsManager(FileContentsManager, Configurable):
              'the ipynb notebook',
         config=True)
 
+    def replace_auto_ext(self, group, auto_ext):
+        """Replace any .auto extension with the given extension, and if none,
+        removes that alternative format from the group"""
+        result = []
+        for fmt in group:
+            if not fmt.endswith('.auto'):
+                result.append(fmt)
+            elif auto_ext:
+                result.append(fmt.replace('.auto', auto_ext))
+        return result
+
     def format_group(self, fmt, nbk=None):
         """Return the group of extensions that contains 'fmt'"""
         if nbk:
@@ -183,10 +190,15 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         except ValueError as err:
             raise HTTPError(400, str(err))
 
+        auto_ext = nbk.metadata.get('language_info', {}).get('file_extension') if nbk else None
+        if auto_ext == '.r':
+            auto_ext = '.R'
         # Find group that contains the current format
         for group in jupytext_formats:
+            if auto_ext and fmt.replace(auto_ext, '.auto') in group:
+                return self.replace_auto_ext(group, auto_ext)
             if fmt in group:
-                return group
+                return self.replace_auto_ext(group, auto_ext)
 
         # No such group, but 'ipynb'? Return current fmt + 'ipynb'
         if ['.ipynb'] in jupytext_formats:
@@ -196,10 +208,18 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def preferred_format(self, ext, preferred):
         """Returns the preferred format for that extension"""
-        for fmt_ext, format_name in \
-                parse_formats(preferred):
+        for fmt_ext, format_name in parse_formats(preferred):
             if fmt_ext == ext:
                 return format_name
+            if not (ext.endswith('.md') or ext.endswith('.Rmd')):
+                if fmt_ext == '.auto':
+                    return format_name
+                if fmt_ext.endswith('.auto'):
+                    base_ext, ext_ext = os.path.splitext(ext)
+                    base_fmt, _ = os.path.splitext(fmt_ext)
+                    if base_ext == base_fmt and ext_ext:
+                        return format_name
+
         return None
 
     def _read_notebook(self, os_path, as_version=4):
