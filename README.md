@@ -108,7 +108,7 @@ To enable paired notebooks, one option is to set the output formats by adding a 
   }
 }
 ```
-Accepted formats are composed of an extension, like `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, and an optional format name among `light` (default for Julia, Python), `percent`, `sphinx`, `spin` (default for R). Use `ipynb,py:percent` if you want to pair the `.ipynb` notebook with a `.py` script in the `percent` format.
+Accepted formats are composed of an extension, like `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, and an optional format name among `light` (default for Julia, Python), `percent`, `sphinx`, `spin` (default for R). Use `ipynb,py:percent` if you want to pair the `.ipynb` notebook with a `.py` script in the `percent` format. To have the script extension chosen according to the Jupyter kernel, use the `auto` extension.
 
 Alternatively, it is also possible to set a default format pairing. Say you want to always associate `.ipynb` notebooks with an `.md` file  (and reciprocally). This is simply done by adding the following to your Jupyter configuration file:
 ```python
