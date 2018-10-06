@@ -245,7 +245,10 @@ That being said, using Jupytext from Jupyter Lab is also an option. Please note 
 
 ## Will my notebook really run in an IDE?
 
-Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in the IDE code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to the `light` format. Comment a magic with `#noescape` on the same line to avoid escaping. User defined magics can be escaped with `#escape`. Magics are not commented in the plain Markdown representation, nor in the double percent format, as most editors use that format in combination with IPython or Jupyter kernels.
+Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in the IDE code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to R Markdown, and to scripts in all format but the `percent` one. Magics are not commented in the plain Markdown representation, nor in the double percent format, as most editors use that format in combination with IPython or Jupyter kernels. Change this by adding a `"comment_magics": true` or `false` entry in the notebook metadata, in the `"jupytext"` section. Or set your preference globally on the contents manager by adding this line to `.jupyter/jupyter_notebook_config.py`:
+```python
+c.ContentsManager.comment_magics = True # or False
+```
 
 Also, you may want some cells to be active only in the Python, or R Markdown representation. For this, use the `active` cell metadata. Set `"active": "ipynb"` if you want that cell to be active only in the Jupyter notebook. And `"active": "py"` if you want it to be active only in the Python script. And `"active": "ipynb,py"` if you want it to be active in both, but not in the R Markdown representation...
 
