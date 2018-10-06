@@ -8,32 +8,27 @@ Release History
 
 **Improvements**
 
-- All `jupytext` related metadata goes to a `jupytext` section (#91). Please make
-sure your collaborators use the same version of Jupytext, as the new version can read
-previous metadata, but not the opposite.
+- All ``jupytext`` related metadata goes to a ``jupytext`` section (#91). Please make sure your collaborators use the same version of Jupytext, as the new version can read previous metadata, but not the opposite.
 - Notebooks extensions can be prefixed with any prefix of at most three chars (#87)
-- Export of the same notebook to multiple formats is now supported. To export to all python formats,
-plus `.ipynb` and `.md`, use `"jupytext": {"formats": "ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md"},`.
-- README includes a short section on how to extend `light` and `percent` formats to more languages (#61)
+- Export of the same notebook to multiple formats is now supported. To export to all python formats, plus ``.ipynb`` and ``.md``, use ``"jupytext": {"formats": "ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md"},``.
+- README includes a short section on how to extend ``light`` and ``percent`` formats to more languages (#61)
 
 **BugFixes**
 
 - Trusting notebooks made functional again.
-- Command line `jupytext` returns a meaningful error when no argument is given.
+- Command line ``jupytext`` returns a meaningful error when no argument is given.
 
 0.7.2 (2018-10-01)
 ++++++++++++++++++++++
 
 **Improvements**
 
-- `light` and `percent` formats made available for scheme and cpp notebooks. Adding more formats
-is straightforward - just add a new entry to _SCRIPT_EXTENSIONS in languages.py, a sample notebook
-and a mirror test (#61)
-- Format name is automatically appended to extension in `jupytext_formats` when notebook is loaded/saved.
+- ``light`` and ``percent`` formats made available for scheme and cpp notebooks. Adding more formats is straightforward - just add a new entry to _SCRIPT_EXTENSIONS in languages.py, a sample notebook and a mirror test (#61)
+- Format name is automatically appended to extension in ``jupytext_formats`` when notebook is loaded/saved.
 
 **BugFixes**
 
-- Notebooks extensions can only be prefixed with `.nb` (#87)
+- Notebooks extensions can only be prefixed with ``.nb`` (#87)
 
 
 0.7.1 (2018-09-24)
@@ -41,43 +36,36 @@ and a mirror test (#61)
 
 **BugFixes**
 
-- Markdown cells header in sphinx gallery format may have a space between
-first # and following.
+- Markdown cells header in sphinx gallery format may have a space between first # and following.
 
 0.7.0 (2018-09-23)
 ++++++++++++++++++++++
 
 **Improvements**
 
-- Header for cells in `percent` format is more robust: use `[markdown]` and
- `[raw]` to identify cell types. Cell type comes after the cell title. (#59)
+- Header for cells in ``percent`` format is more robust: use ``[markdown]`` and ``[raw]`` to identify cell types. Cell type comes after the cell title. (#59)
 
 0.7.0-rc0 (2018-09-22)
 ++++++++++++++++++++++
 
 **Improvements**
 
-- Jupytext can read and write notebooks as Hydrogen/VScode/Spyder/PyCharm
-compatible scripts (cells starting with `# %%`) (#59)
+- Jupytext can read and write notebooks as Hydrogen/VScode/Spyder/PyCharm compatible scripts (cells starting with ``# %%``) (#59)
 - Jupytext can read and write notebooks as Sphinx-gallery compatible scripts (#80)
-- Metadata are supported for all cell types in light python and percent
-formats (#66). Due to this, light python format version is now 1.3. Light python
-notebooks in versions 1.1 and 1.2 are still readable.
-- Command line `jupytext` has a `from` argument, and now accepts notebook from
-the standard input.
+- Metadata are supported for all cell types in light python and percent formats (#66). Due to this, light python format version is now 1.3. Light python notebooks in versions 1.1 and 1.2 are still readable.
+- Command line ``jupytext`` has a ``from`` argument, and now accepts notebook from the standard input.
 
 **BugFixes**
 
 - Fix merging of input and output notebooks (#83)
-- Removed extra new line on stdout in command line `jupytext` (#84)
+- Removed extra new line on stdout in command line ``jupytext`` (#84)
 
 0.6.5 (2018-09-13)
 +++++++++++++++++++
 
 **Improvements**
 
-- Code lines that start with a quotation mark in Jupyter are commented in the
-corresponding Python and Julia scripts (#73)
+- Code lines that start with a quotation mark in Jupyter are commented in the corresponding Python and Julia scripts (#73)
 - Update pypy, add flake8 tests on Travis CI (#74)
 
 **BugFixes**
@@ -95,20 +83,19 @@ corresponding Python and Julia scripts (#73)
 **BugFixes**
 
 - Allow unicode characters in notebook path (#70)
-- Read README.md as unicode in `setup.py` (#71)
+- Read README.md as unicode in ``setup.py`` (#71)
 
 0.6.3 (2018-09-07)
 +++++++++++++++++++
 
 **Improvements**
 
-- Lighter cell markers for Python and Julia scripts (#57). Corresponding file
-format version at 1.2. Scripts in previous version 1.1 can still be opened.
+- Lighter cell markers for Python and Julia scripts (#57). Corresponding file format version at 1.2. Scripts in previous version 1.1 can still be opened.
 - New screenshots for the README.
 
 **BugFixes**
 
-- Command line conversion tool `jupytext` fixed on Python 2.7 (#46)
+- Command line conversion tool ``jupytext`` fixed on Python 2.7 (#46)
 
 0.6.2 (2018-09-05)
 +++++++++++++++++++
@@ -116,9 +103,8 @@ format version at 1.2. Scripts in previous version 1.1 can still be opened.
 **Improvements**
 
 - Initial support for Jupyter notebooks as Julia scripts (#56)
-- Command line conversion tool `jupytext` has explicit `to` and `output`
-options (#46)
-- Round trip test with `jupytext --test` improved (#54)
+- Command line conversion tool ``jupytext`` has explicit ``to`` and ``output`` options (#46)
+- Round trip test with ``jupytext --test`` improved (#54)
 - Improved README (#51)
 
 
@@ -132,29 +118,24 @@ options (#46)
 
 **Improvements**
 
-- Package and conversion script renamed from `nbrmd` to `jupytext`.
+- Package and conversion script renamed from ``nbrmd`` to ``jupytext``.
 
 0.6.0 (2018-08-31)
 +++++++++++++++++++
 
 **Improvements**
 
-- Cell parsing and exporting done in two specialized classes. This is way
-easier to read. Pylint score at 9.9 !
-- Python file format updated to 1.1: default end of cell for python scripts is
-one blank space. Two blank spaces are allowed as well. Now you can reformat
-code in Python IDE without breaking notebook cells (#38).
+- Cell parsing and exporting done in two specialized classes. This is way easier to read. Pylint score at 9.9 !
+- Python file format updated to 1.1: default end of cell for python scripts is one blank space. Two blank spaces are allowed as well. Now you can reformat code in Python IDE without breaking notebook cells (#38).
 - Added support for plain markdown files (#40, #44).
 - Demonstration notebooks more user friendly (#45).
 - Command line tool simpler to use (#46).
 - Start code patterns present in Jupyter cells are escaped.
-- Default `nbrmd_format` is empty (mwouts/nbsrc/#5): no Jupyter notebook
-is created on disk when the user opens a Python or R file and saves it from
-Jupyter, unless the users asks for it by setting `nbrmd_format`.
+- Default ``nbrmd_format`` is empty (mwouts/nbsrc/#5): no Jupyter notebook is created on disk when the user opens a Python or R file and saves it from Jupyter, unless the users asks for it by setting ``nbrmd_format``.
 
 **BugFixes**
 
-- Fixed message in the `nbsrc` script (#43)
+- Fixed message in the ``nbsrc`` script (#43)
 - Technical metadata don't appear any more in scripts unless required (#42)
 - Code cells that are fully commented remain code cells after round trip (#41)
 
@@ -181,8 +162,7 @@ Jupyter, unless the users asks for it by setting `nbrmd_format`.
 **Improvements**
 
 - Classical jupyter extensions (autoreload, rmagics) are also escaped (#35)
-- Explicit file format version, set at 1.0, to avoid overriding ipynb
-files by accident (#36)
+- Explicit file format version, set at 1.0, to avoid overriding ipynb files by accident (#36)
 
 
 0.5.1 (2018-08-21)
@@ -201,15 +181,10 @@ files by accident (#36)
 - 'endofcell' option for explicit (optional) end-of-cell marker (#31)
 - 'active' cell option now supported for .py and .R export (#30)
 - Raw cells now preserved when exported to .py or .R (#32)
-- Extensions can be prefixed, like `.nb.py`, (mwouts/nbsrc#5)
-- When a file with an extension not associated to 'ipynb' is opened and saved,
-no 'ipynb' file is created (mwouts/nbsrc#5)
-- Extensions can now be a sequence of groups. For instance,
-`nbrmd_formats="ipynb,nb.py;script.ipynb,py"` will create an `ipynb` file
-when a `nb.py` is opened (and conversely), and a `script.ipynb` file when a
-`py` file is opened (mwouts/nbsrc#5)
-- `nbsrc` script was moved to the `nbrmd` package. The `nbsrc` package now only
-contains the documentation (mwouts/nbsrc#3)
+- Extensions can be prefixed, like ``.nb.py``, (mwouts/nbsrc#5)
+- When a file with an extension not associated to 'ipynb' is opened and saved, no 'ipynb' file is created (mwouts/nbsrc#5)
+- Extensions can now be a sequence of groups. For instance, ``nbrmd_formats="ipynb,nb.py;script.ipynb,py"`` will create an ``ipynb`` file when a ``nb.py`` is opened (and conversely), and a ``script.ipynb`` file when a ``py`` file is opened (mwouts/nbsrc#5)
+- ``nbsrc`` script was moved to the ``nbrmd`` package. The ``nbsrc`` package now only contains the documentation (mwouts/nbsrc#3)
 
 
 0.4.6 (2018-07-26)
@@ -223,15 +198,14 @@ contains the documentation (mwouts/nbsrc#3)
 
 **BugFixes**
 
-- Removed dependency of `setup.py` on `yaml`
+- Removed dependency of ``setup.py`` on ``yaml``
 
 0.4.4 (2018-07-26)
 +++++++++++++++++++
 
 **BugFixes**
 
-- Package republished with `python setup.py sdist bdist_wheel` to fix missing
-dependencies
+- Package republished with ``python setup.py sdist bdist_wheel`` to fix missing dependencies
 
 0.4.3 (2018-07-26)
 +++++++++++++++++++
@@ -243,10 +217,9 @@ dependencies
 
 **BugFixes**
 
-- ContentsManager can be imported even if `notebook.transutils` is not
-available, for compatibility with older python distributions.
+- ContentsManager can be imported even if ``notebook.transutils`` is not available, for compatibility with older python distributions.
 - Fixed missing cell metadata #27
-- Documentation tells how to avoid creating `.ipynb` files #16
+- Documentation tells how to avoid creating ``.ipynb`` files #16
 
 0.4.2 (2018-07-23)
 +++++++++++++++++++
@@ -255,8 +228,7 @@ available, for compatibility with older python distributions.
 
 - Added test for R notebooks
 - Added pylint badge, imports now in correct order
-- New `active` cell metadata that allows cell activation only for desired
-extensions (currently available for Rmd and ipynb extensions only)
+- New ``active`` cell metadata that allows cell activation only for desired extensions (currently available for Rmd and ipynb extensions only)
 
 0.4.1 (2018-07-20)
 +++++++++++++++++++
@@ -271,31 +243,28 @@ extensions (currently available for Rmd and ipynb extensions only)
 
 **Improvements**
 
-- `.py` format for notebooks is lighter and pep8 compliant
+- ``.py`` format for notebooks is lighter and pep8 compliant
 
 **BugFixes**
 
 - Default nbrmd config not added to notebooks (#17)
-- `nbrmd_formats` becomes a configurable traits (#16)
-- Removed `nbrmd_sourceonly_format` metadata. Source notebook is current notebook
-when not `.ipynb`, otherwise the first notebook format in `nbrmd_formats` (not
-`.ipynb`) that is found on disk
+- ``nbrmd_formats`` becomes a configurable traits (#16)
+- Removed ``nbrmd_sourceonly_format`` metadata. Source notebook is current notebook when not ``.ipynb``, otherwise the first notebook format in ``nbrmd_formats`` (not ``.ipynb``) that is found on disk
 
 0.3.0 (2018-07-17)
 +++++++++++++++++++
 
 **Improvements**
 
-- Introducing support for notebooks as python `.py` or R scripts `.R`
+- Introducing support for notebooks as python ``.py`` or R scripts ``.R``
 
 0.2.6 (2018-07-13)
 +++++++++++++++++++
 
 **Improvements**
 
-- Introduced `nbrmd_sourceonly_format` metadata
-- Inputs are loaded from `.Rmd` file when a matching `.ipynb` file is
-opened.
+- Introduced ``nbrmd_sourceonly_format`` metadata
+- Inputs are loaded from ``.Rmd`` file when a matching ``.ipynb`` file is opened.
 
 **BugFixes**
 
@@ -306,8 +275,7 @@ opened.
 
 **Improvements**
 
-- Outputs of existing `.ipynb` versions are combined with matching inputs
- of R markdown version, as suggested by @grst (#12)
+- Outputs of existing ``.ipynb`` versions are combined with matching inputs of R markdown version, as suggested by @grst (#12)
 
 **BugFixes**
 
@@ -319,14 +287,13 @@ opened.
 
 **Improvements**
 
-- nbrmd will always open notebooks, even if header of code cells are not terminated. Merge conflicts can thus be
-solved in Jupyter directly.
+- nbrmd will always open notebooks, even if header of code cells are not terminated. Merge conflicts can thus be solved in Jupyter directly.
 - New metadata 'main language' that preserves the notebook language.
 
 **BugFixes**
 
-- dependencies included in `setup.py`
-- pre_save_hook work with non-empty `notebook_dir` (#9)
+- dependencies included in ``setup.py``
+- pre_save_hook work with non-empty ``notebook_dir`` (#9)
 
 0.2.3 (2018-06-28)
 +++++++++++++++++++
@@ -337,7 +304,7 @@ solved in Jupyter directly.
 
 **BugFixes**
 
-- rmarkdown exporter for nbconvert fixed on non-recent python
+- RMarkdown exporter for nbconvert fixed on non-recent python
 - Tests compatible with other revisions of nbformat >= 4.0
 - Tests compatible with older pytest versions
 
@@ -361,7 +328,7 @@ solved in Jupyter directly.
 **Improvements**
 
 - Support for editing markdown files in Jupyter
-- New pre-save hook `update_selected_formats` that saves to formats in metadata 'nbrmd_formats'
+- New pre-save hook ``update_selected_formats`` that saves to formats in metadata 'nbrmd_formats'
 - Rmd cell options directly mapped to cell metadata
 
 **BugFixes**
@@ -388,5 +355,4 @@ solved in Jupyter directly.
 0.1 (2018-06-18)
 +++++++++++++++++++
 
-- Initial version with the ``nbrmd`` converter and Jupyter ``pre_save_hook``
-
+- Initial version with the nbrmd`` converter and Jupyter ``pre_save_hook``
