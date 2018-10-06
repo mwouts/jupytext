@@ -15,7 +15,13 @@ You've always wanted to
 
 Jupytext can convert notebooks to and from
 - Markdown and R Markdown documents (extensions `.md` and `.Rmd`)
-- Julia, Python, R, Scheme and C++ scripts (extensions `.jl`, `.py`, `.R`, etc). Multiple representations of Jupyter notebooks as scripts are provided: the `light` format has implicit or discrete cell markers, the `percent` format has explicit `# %%` cells, the `sphinx` format produces Sphinx gallery scripts (Python only), and the `spin` format for R scripts is compatible with Knitr's spin function.
+- Julia, Python, R, Scheme and C++ scripts (extensions `.jl`, `.py`, `.R`, etc).
+
+Jupytext implements a few different [formats](#format-specifications) for notebooks as scripts:
+- the [`light`](#the-light-format-for-notebooks-as-scripts) format allows to open arbitrary scripts as notebooks, and to save notebooks as scripts with implicit, or discrete cell markers,
+- the [`percent`](#the-percent-format) format with explicit `# %%` cells is compatible with various editors,
+- the [`sphinx`](#sphinx-gallery-scripts) format produces Sphinx gallery scripts (Python only),
+- and the [`spin`](#r-knitrspin-scripts) format is compatible with Knitr's spin function (R only).
 
 Jupytext is available from within Jupyter. You can work as usual on your notebook in Jupyter, and save and read it in the formats you choose. The text representations can be edited outside of Jupyter (see our [demo](#code-refactoring) below). When the notebook is refreshed in Jupyter, input cells are loaded from the script or Markdown document. Kernel variables are preserved. Outputs are not stored in such text documents, and are therefore lost when the notebook is refreshed. To avoid this, we recommend to [pair](#paired-notebooks) the text notebook with a traditional `.ipynb` notebook (both files are saved and loaded together).
 
@@ -23,8 +29,8 @@ Jupytext is available from within Jupyter. You can work as usual on your noteboo
 | ------------ | ------------------ | -------------------- | ------------ | ------------ | ---------------- |
 | Jupyter notebook | `.ipynb`       |                      |              |              | ✔                |
 | Markdown or R Markdown | `.md`/`.Rmd` | ✔                |              | ✔            |                  |
-| Julia, Python or R script | `.jl`/`.py`/`.R` | ✔         | ✔            | ✔            |                  |
-| [Paired notebook](#paired-notebooks)  | (`.jl`/`.py`/`.R`/`.md`/`.Rmd`) + `.ipynb` | ✔ | (✔) | ✔ | ✔      |
+| Julia, Python or R script | `.jl`/`.py`/`.R`/... | ✔         | ✔            | ✔            |                  |
+| [Paired notebook](#paired-notebooks)  | (`.jl`/`.py`/`.R`/.../`.md`/`.Rmd`) + `.ipynb` | ✔ | (✔) | ✔ | ✔      |
 
 ## Example usage
 
@@ -175,12 +181,13 @@ Our implementation for Jupyter notebooks as [Markdown](https://daringfireball.ne
 
 ### The `light` format for notebooks as scripts
 
-The `light` format was created for this project. It is the default format for Python and Julia scripts. That format can read any Python or Julia script as a Jupyter notebook, even scripts which were never prepared to become a notebook. When a notebook is written as a script using this format, only a few cells markers are introduced—none if possible.
+The `light` format was created for this project. It is the default format for Python and Julia scripts. That format can read any script as a Jupyter notebook, even scripts which were never prepared to become a notebook. When a notebook is written as a script using this format, only a few cells markers are introduced—none if possible.
 
 The `light` format has:
-- A YAML header, commented with `# `, that contains the notebook metadata.
-- Markdown cells are commented with `# `, and separated with a blank line.
-- Code cells are exported verbatim (except for Jupyter magics, which are commented), and separated with blank lines. Code cells are reconstructed from consistent Python paragraphs (no function, class or multiline comment will be broken). A start-of-cell delimiter `# +` is used for cells that contain more than one Python paragraphs. `# + {}` is used for cells that have explicit metadata (inside the curly bracket, in JSON format). The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
+- A (commented) YAML header, that contains the notebook metadata.
+- Markdown cells are commented, and separated with a blank line.
+- Code cells are exported verbatim (except for Jupyter magics, which are commented), and separated with blank lines. Code cells are reconstructed from consistent Python paragraphs (no function, class or multiline comment will be broken).
+- Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter `# +` (replace `#` with comment character in other languages than Julia, Python or R). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
 The `light` format is currently available for Python, Julia, R, Scheme and C++.
 
