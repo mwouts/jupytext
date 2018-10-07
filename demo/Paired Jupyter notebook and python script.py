@@ -1,5 +1,7 @@
 # ---
 # jupyter:
+#   jupytext_format_version: '1.3'
+#   jupytext_formats: ipynb,py:light
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -13,12 +15,10 @@
 #     name: python
 #     nbconvert_exporter: python
 #     pygments_lexer: ipython3
-#     version: 3.6.5
-#   jupytext_format_version: '1.2'
-#   jupytext_formats: ipynb,py
+#     version: 3.6.6
 # ---
 
-# This is a notebook that you can use to test the jupytext/nbsrc packages.
+# This is a notebook that you can use to experiment with the jupytext package.
 #
 # Proposed experimentations are
 # 1. Open this Jupyter notebook (extension .ipynb) in Jupyter
@@ -30,9 +30,9 @@
 # ```
 # https://hub.mybinder.org/user/mwouts-jupytext-g7315gce/edit/demo/Sample%20notebook%20with%20python%20representation.py
 # ```
-# 3. Modify the notebook in Jupyter. Save. Refresh the python file in the editor, and observe the changes
+# 3. Modify the notebook in Jupyter. Save. Refresh the python file in the editor, and observe the changes.
 # 4. Now, modify the python file, save, and refresh the Jupyter notebook. Observe how inputs were updated, outputs preserved when possible, and kernel was left unchanged.
-# 5. Browse the github repo using Jupyter in binder, and open arbitrary python files as notebooks. Run some of them when applicable (test `Matplotlib example.py` for instance).
+# 5. Browse the github repo using Jupyter in binder, and open arbitrary python files as notebooks. Run them when applicable.
 
 # %matplotlib inline
 
