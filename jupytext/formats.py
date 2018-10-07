@@ -186,8 +186,8 @@ def guess_format(text, ext):
     if ext in _SCRIPT_EXTENSIONS:
         comment = _SCRIPT_EXTENSIONS[ext]['comment']
         twenty_hash = ''.join(['#'] * 20)
-        double_percent = comment + ' %%'
-        double_percent_and_space = double_percent + ' '
+        double_percent_re = re.compile(r'^{}( %%|%%)$'.format(comment))
+        double_percent_and_space_re = re.compile(r'^{}( %%|%%)\s'.format(comment))
         nbconvert_script_re = re.compile(r'^{}( <codecell>| In\[[0-9 ]*\]:?)'.format(comment))
         twenty_hash_count = 0
         double_percent_count = 0
@@ -200,15 +200,16 @@ def guess_format(text, ext):
 
             # Don't count escaped Jupyter magics (no space between
             # %% and command) as cells
-            if line == double_percent or line.startswith(double_percent_and_space) or nbconvert_script_re.match(line):
+            if double_percent_re.match(line) or double_percent_and_space_re.match(line) or nbconvert_script_re.match(line):
                 double_percent_count += 1
 
             if line.startswith(twenty_hash) and ext == '.py':
                 twenty_hash_count += 1
 
-        if double_percent_count >= 2 or twenty_hash_count >= 2:
-            if double_percent_count >= twenty_hash_count:
-                return 'percent'
+        if double_percent_count >= 1:
+            return 'percent'
+
+        if twenty_hash_count >= 2:
             return 'sphinx'
 
     # Default format
