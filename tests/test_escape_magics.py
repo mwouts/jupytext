@@ -103,4 +103,3 @@ def test_force_comment_using_contents_manager(tmpdir):
     cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
     with open(str(tmpdir.join(tmp_py))) as stream:
         assert '# %pylab inline' in stream.read().splitlines()
-
