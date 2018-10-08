@@ -17,12 +17,6 @@ Jupytext can convert notebooks to and from
 - Markdown and R Markdown documents (extensions `.md` and `.Rmd`)
 - Julia, Python, R, Scheme and C++ scripts (extensions `.jl`, `.py`, `.R`, etc).
 
-Jupytext implements a few different [formats](#format-specifications) for notebooks as scripts:
-- the [`light`](#the-light-format-for-notebooks-as-scripts) format allows to open arbitrary scripts as notebooks, and to save notebooks as scripts with implicit, or discrete cell markers,
-- the [`percent`](#the-percent-format) format with explicit `# %%` cells is compatible with various editors,
-- the [`sphinx`](#sphinx-gallery-scripts) format produces Sphinx gallery scripts (Python only),
-- and the [`spin`](#r-knitrspin-scripts) format is compatible with Knitr's spin function (R only).
-
 Jupytext is available from within Jupyter. You can work as usual on your notebook in Jupyter, and save and read it in the formats you choose. The text representations can be edited outside of Jupyter (see our [demo](#code-refactoring) below). When the notebook is refreshed in Jupyter, input cells are loaded from the script or Markdown document. Kernel variables are preserved. Outputs are not stored in such text documents, and are therefore lost when the notebook is refreshed. To avoid this, we recommend to [pair](#paired-notebooks) the text notebook with a traditional `.ipynb` notebook (both files are saved and loaded together).
 
 | Format       | Extension          | Text editor friendly | IDE friendly | Git friendly | Preserve outputs |
@@ -31,6 +25,12 @@ Jupytext is available from within Jupyter. You can work as usual on your noteboo
 | Markdown or R Markdown | `.md`/`.Rmd` | ✔                |              | ✔            |                  |
 | Julia, Python or R script | `.jl`/`.py`/`.R`/... | ✔         | ✔            | ✔            |                  |
 | [Paired notebook](#paired-notebooks)  | (`.jl`/`.py`/`.R`/.../`.md`/`.Rmd`) + `.ipynb` | ✔ | (✔) | ✔ | ✔      |
+
+Note that Jupytext implements a few different [formats](#format-specifications) for notebooks as scripts:
+- the [`light`](#the-light-format-for-notebooks-as-scripts) format allows to open arbitrary scripts as notebooks, and to save notebooks as scripts with implicit, or discrete cell markers,
+- the [`percent`](#the-percent-format) format with explicit `# %%` cells is compatible with various editors,
+- the [`sphinx`](#sphinx-gallery-scripts) format produces Sphinx gallery scripts (Python only),
+- and the [`spin`](#r-knitrspin-scripts) format is compatible with Knitr's spin function (R only).
 
 ## Example usage
 
@@ -96,7 +96,7 @@ When loading or refreshing an `.ipynb` file, the input cells of the notebook are
 
 When loading or refreshing a non-`.ipynb` file, the outputs are read from the `.ipynb` file (if `ipynb` is listed in the formats).
 
-To enable paired notebooks, one option is to set the output formats by adding a `"jupytext": {"formats": "ipynb,py"}` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
+To enable paired notebooks, one option is to set the output formats by adding a `"jupytext": {"formats": "ipynb,py"},` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
 ```
 {
   "jupytext": {"formats": "ipynb,py"},
@@ -163,11 +163,11 @@ writef(notebook, nb_file, format_name=None)
 
 ## Round-trip conversion
 
-Round-trip conversion is safe! A few hundred tests help guarantee this. And you can test the round trip conversion on your favorite notebook with `jupytext --test`.
+Representing Jupyter notebooks as scripts requires a solid round trip conversion. You don't want your notebooks (nor your scripts) to be modified because you are converting them to the other form. A few hundred tests ensure that round trip conversion is safe. For convenience, you can also test directly the round trip conversion on your favorite notebook, or script, with `jupytext --test`.
 
 Please note that
 - When you associate a Jupyter kernel with your text notebook, that information goes to a YAML header at the top of your script or Markdown document.
-- Cell metadata are available in `light` and `percent` formats for all cell types. R Markdown and R scripts support cell metadata for code cells. Markdown documents do not currently support cell metadata.
+- Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata.
 - Representing Jupyter notebooks as Markdown document has the effect of splitting markdown cells with two consecutive blank lines into multiple cells (as the two blank line pattern is used to separate cells).
 
 ## Format specifications
@@ -187,7 +187,7 @@ The `light` format has:
 - A (commented) YAML header, that contains the notebook metadata.
 - Markdown cells are commented, and separated with a blank line.
 - Code cells are exported verbatim (except for Jupyter magics, which are commented), and separated with blank lines. Code cells are reconstructed from consistent Python paragraphs (no function, class or multiline comment will be broken).
-- Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter `# +` (replace `#` with comment character in other languages than Julia, Python or R). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
+- Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter `# +` (`// +` in C++, etc). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
 The `light` format is currently available for Python, Julia, R, Scheme and C++.
 
@@ -206,18 +206,18 @@ Our implementation of the `percent` format is compatible with the original speci
 ```
 where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The content of markdown and raw cells is commented out in the resulting script.
 
-Percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least two double percent cells are identified as double percent scripts.
+Percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least one `# %%` cell are identified as `percent` scripts.
 
 The `percent` format is currently available for Python, Julia, R, Scheme and C++.
 
 ### Sphinx-gallery scripts
 
-Another popular notebook-like format for Python script is the Sphinx-gallery [format](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-gallery notebooks by Jupytext.
+Another popular notebook-like format for Python script is the Sphinx-gallery [format](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-Gallery notebooks by Jupytext.
 
-If you want that the reStructuredText be converted to markdown for a nicer display, add a `c.ContentsManager.sphinx_convert_rst2md = True` line to your Jupyter configuration file. Please notice however that this is a non-reversible transformation—use this only with Binder. You should not use that if you want to edit the Sphinx Gallery files with Jupytext.
+Comments in Sphinx-Gallery scripts are formatted using reStructuredText rather than markdown. They can be converted to markdown for a nicer display in Jupyter by adding a `c.ContentsManager.sphinx_convert_rst2md = True` line to your Jupyter configuration file. Please note that this is a non-reversible transformation—use this only with Binder. Revert to the default value `sphinx_convert_rst2md = False` when you edit Sphinx-Gallery files with Jupytext.
 
-By the way, if you want to use Jupytext and Binder to visualize your Sphinx Gallery scripts, you just need to create two files in your GitHub repo:
-- `binder/requirements.txt` with the required packages (including `jupytext`)
+Turn a GitHub repository containing Sphinx-Gallery scripts into a live notebook repository with [Binder](https://mybinder.org/) and Jupytext by adding only two files to the repo:
+- `binder/requirements.txt`, a list of the required packages (including `jupytext`)
 - `.jupyter/jupyter_notebook_config.py` with the following contents:
 ```python
 c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
@@ -252,7 +252,7 @@ That being said, using Jupytext from Jupyter Lab is also an option. Please note 
 
 ## Will my notebook really run in an IDE?
 
-Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in the IDE code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to R Markdown, and to scripts in all format but the `percent` one. Magics are not commented in the plain Markdown representation, nor in the double percent format, as most editors use that format in combination with IPython or Jupyter kernels. Change this by adding a `"comment_magics": true` or `false` entry in the notebook metadata, in the `"jupytext"` section. Or set your preference globally on the contents manager by adding this line to `.jupyter/jupyter_notebook_config.py`:
+Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in most IDEs the code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to R Markdown, and to scripts in all format but the `percent` one. Magics are not commented in the plain Markdown representation, nor in the `percent` format, as some editors use that format in combination with Jupyter kernels. Change this by adding a `"comment_magics": true` or `false` entry in the notebook metadata, in the `"jupytext"` section. Or set your preference globally on the contents manager by adding this line to `.jupyter/jupyter_notebook_config.py`:
 ```python
 c.ContentsManager.comment_magics = True # or False
 ```
@@ -265,7 +265,7 @@ Jupytext will continue to evolve as we collect more feedback, and discover more 
 
 Jupytext tests the version format for paired notebook only. If the format version of the text representation is not the current one, Jupytext will refuse to open the paired notebook. You may want to update Jupytext if the format version of the file is newer than the one available in the installed Jupytext. Otherwise, you will have to choose between deleting (or renaming) either the `.ipynb`, or its paired text representation. Keep the one that is up-to-date, re-open your notebook, and Jupytext will regenerate the other file.
 
-Finally, note that people who use Jupytext to collaborate on notebooks should update Jupytext simultaneously.
+We also recommend that people who use Jupytext to collaborate on notebooks use identical versions of Jupytext.
 
 ## I like this, how can I contribute?
 
