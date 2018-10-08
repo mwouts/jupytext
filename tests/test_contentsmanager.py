@@ -382,7 +382,7 @@ def test_preferred_format_allows_to_read_implicit_light_format(nb_file, tmpdir):
 
     # create contents manager with default load format as percent
     cm = jupytext.TextFileContentsManager()
-    cm.preferred_jupytext_formats_load = 'py:percent'
+    cm.preferred_jupytext_formats_read = 'py:percent'
     cm.root_dir = str(tmpdir)
 
     # load notebook
@@ -390,7 +390,30 @@ def test_preferred_format_allows_to_read_implicit_light_format(nb_file, tmpdir):
         model = cm.get(tmp_nbpy)
 
     # check that format (missing) is recognized as light
-    assert 'py:light' in model['content']['metadata']['jupytext']['formats']
+    if 'light' in nb_file:
+        assert 'py:light' in model['content']['metadata']['jupytext']['formats']
+    else:
+        assert 'py:percent' in model['content']['metadata']['jupytext']['formats']
+
+
+def test_preferred_formats_read_auto(tmpdir):
+    tmp_py = u'notebook.py'
+    with open(str(tmpdir.join(tmp_py)), 'w') as script:
+        script.write("""# cell one
+1 + 1
+""")
+
+    # create contents manager with default load format as percent
+    cm = jupytext.TextFileContentsManager()
+    cm.preferred_jupytext_formats_read = 'auto:percent'
+    cm.root_dir = str(tmpdir)
+
+    # load notebook
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        model = cm.get(tmp_py)
+
+    # check that script is open as percent
+    assert 'py:percent' in model['content']['metadata']['jupytext']['formats']
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
