@@ -19,6 +19,7 @@ Release History
 
 - Trusting notebooks made functional again.
 - Command line ``jupytext`` returns a meaningful error when no argument is given.
+- Fixed global pairing configuration (#95).
 
 0.7.2 (2018-10-01)
 ++++++++++++++++++++++
