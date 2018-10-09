@@ -189,7 +189,7 @@ The `light` format has:
 - Code cells are exported verbatim (except for Jupyter magics, which are commented), and separated with blank lines. Code cells are reconstructed from consistent Python paragraphs (no function, class or multiline comment will be broken).
 - Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter `# +` (`// +` in C++, etc). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
-The `light` format is currently available for Python, Julia, R, Scheme and C++.
+The `light` format is currently available for Python, Julia, R, Scheme and C++. A sample notebook in the `light` format is available [here](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.lgt.py).
 
 ### The `percent` format
 
@@ -208,7 +208,13 @@ where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The
 
 Percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least one `# %%` cell are identified as `percent` scripts.
 
-The `percent` format is currently available for Python, Julia, R, Scheme and C++.
+The `percent` format is currently available for Python, Julia, R, Scheme and C++. A sample notebook in the `percent` format is available [here](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.pct.py).
+
+If the `percent` format is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
+```python
+c.ContentsManager.preferred_jupytext_formats_save = "py:percent" # or "auto:percent"
+```
+Then, Jupytext's content manager will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
 
 ### Sphinx-gallery scripts
 
@@ -224,6 +230,8 @@ c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 c.ContentsManager.preferred_jupytext_formats_read = "py:sphinx"
 c.ContentsManager.sphinx_convert_rst2md = True
 ```
+
+A sample notebook in the `sphinx` format is available [here](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.spx.py).
 
 ### R knitr::spin scripts
 
@@ -252,7 +260,7 @@ That being said, using Jupytext from Jupyter Lab is also an option. Please note 
 
 ## Will my notebook really run in an IDE?
 
-Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in most IDEs the code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to R Markdown, and to scripts in all format but the `percent` one. Magics are not commented in the plain Markdown representation, nor in the `percent` format, as some editors use that format in combination with Jupyter kernels. Change this by adding a `#escape` or `#noescape` flag on the same line as the magic, or a "comment_magics": true` or `false` entry in the notebook metadata, in the `"jupytext"` section. Or set your preference globally on the contents manager by adding this line to `.jupyter/jupyter_notebook_config.py`:
+Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in most IDEs the code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to R Markdown, and to scripts in all format but the `percent` one. Magics are not commented in the plain Markdown representation, nor in the `percent` format, as some editors use that format in combination with Jupyter kernels. Change this by adding a `#escape` or `#noescape` flag on the same line as the magic, or a `"comment_magics": true` or `false` entry in the notebook metadata, in the `"jupytext"` section. Or set your preference globally on the contents manager by adding this line to `.jupyter/jupyter_notebook_config.py`:
 ```python
 c.ContentsManager.comment_magics = True # or False
 ```
