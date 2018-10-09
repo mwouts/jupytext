@@ -69,12 +69,7 @@ def check_formats(formats):
         has_ipynb = False
         validated_group = []
         for fmt in group:
-            try:
-                fmt = u'' + fmt
-            except UnicodeDecodeError:
-                raise ValueError('Extensions should be strings among {}, not {}.\n{}'
-                                 .format(str(allowed_extension), str(fmt), expected_format))
-            if fmt == '':
+            if not fmt:
                 continue
             fmt, _ = parse_one_format(fmt)
             if not any([fmt.endswith(ext) for ext in allowed_extension]):
