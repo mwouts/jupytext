@@ -209,7 +209,7 @@ def test_convert_to_percent_format(nb_file, tmpdir):
 
     with open(tmp_nbpy) as stream:
         py_script = stream.read()
-        assert 'py:percent' in py_script
+        assert 'format_name: percent' in py_script
 
     nb1 = readf(tmp_ipynb)
     nb2 = readf(tmp_nbpy)
