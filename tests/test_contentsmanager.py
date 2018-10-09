@@ -10,7 +10,7 @@ from testfixtures import compare
 import jupytext
 from jupytext.compare import compare_notebooks
 from jupytext.header import header_to_metadata_and_cell
-from jupytext.formats import read_format_from_metadata
+from jupytext.formats import read_format_from_metadata, auto_ext_from_metadata
 from .utils import list_notebooks
 from .utils import skip_if_dict_is_not_ordered
 
@@ -391,9 +391,9 @@ def test_preferred_format_allows_to_read_implicit_light_format(nb_file, tmpdir):
 
     # check that format (missing) is recognized as light
     if 'light' in nb_file:
-        assert 'py:light' in model['content']['metadata']['jupytext']['formats']
+        assert 'light' == model['content']['metadata']['jupytext']['text_representation']['format_name']
     else:
-        assert 'py:percent' in model['content']['metadata']['jupytext']['formats']
+        assert 'percent' == model['content']['metadata']['jupytext']['text_representation']['format_name']
 
 
 def test_preferred_formats_read_auto(tmpdir):
@@ -412,20 +412,18 @@ def test_preferred_formats_read_auto(tmpdir):
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         model = cm.get(tmp_py)
 
-    # check that script is open as percent
-    assert 'py:percent' in model['content']['metadata']['jupytext']['formats']
+    # check that script is opened as percent
+    assert 'percent' == model['content']['metadata']['jupytext']['text_representation']['format_name']
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
-def test_save_in_auto_extension(nb_file, tmpdir):
+def test_save_in_auto_extension_global(nb_file, tmpdir):
     # load notebook
     nb = jupytext.readf(nb_file)
     if 'language_info' not in nb.metadata:
         return
 
-    auto_ext = nb.metadata['language_info']['file_extension']
-    if auto_ext == '.r':
-        auto_ext = '.R'
+    auto_ext = auto_ext_from_metadata(nb.metadata)
     tmp_ipynb = 'notebook.ipynb'
     tmp_script = 'notebook' + auto_ext
 
@@ -443,6 +441,46 @@ def test_save_in_auto_extension(nb_file, tmpdir):
     with open(str(tmpdir.join(tmp_script))) as stream:
         assert read_format_from_metadata(stream.read(), auto_ext) == 'percent'
 
+    # reload and compare with original notebook
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        model = cm.get(path=tmp_script)
+
+    # saving should not create a format entry #95
+    assert 'formats' not in model['content'].metadata.get('jupytext', {})
+
+    compare_notebooks(nb, model['content'])
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
+def test_save_in_auto_extension_local(nb_file, tmpdir):
+    # load notebook
+    nb = jupytext.readf(nb_file)
+    nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,auto:percent'
+    if 'language_info' not in nb.metadata:
+        return
+
+    auto_ext = auto_ext_from_metadata(nb.metadata)
+    tmp_ipynb = 'notebook.ipynb'
+    tmp_script = 'notebook' + auto_ext
+
+    # create contents manager with default load format as percent
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # save notebook
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    # check that text representation exists, and is in percent format
+    with open(str(tmpdir.join(tmp_script))) as stream:
+        assert read_format_from_metadata(stream.read(), auto_ext) == 'percent'
+
+    # reload and compare with original notebook
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        model = cm.get(path=tmp_script)
+
+    compare_notebooks(nb, model['content'])
+
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
 def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
@@ -451,9 +489,7 @@ def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
     if 'language_info' not in nb.metadata:
         return
 
-    auto_ext = nb.metadata['language_info']['file_extension']
-    if auto_ext == '.r':
-        auto_ext = '.R'
+    auto_ext = auto_ext_from_metadata(nb.metadata)
     tmp_ipynb = 'notebook.ipynb'
     tmp_pct_script = 'notebook.pct' + auto_ext
     tmp_lgt_script = 'notebook.lgt' + auto_ext
