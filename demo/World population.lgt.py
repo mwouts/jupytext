@@ -2,9 +2,11 @@
 # jupyter:
 #   jupytext:
 #     formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md
-#     this_document:
+#     text_representation:
+#       extension: .lgt.py
 #       format_name: light
 #       format_version: '1.3'
+#       jupytext_version: 0.8.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python

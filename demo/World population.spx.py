@@ -2,9 +2,11 @@
 # jupyter:
 #   jupytext:
 #     formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md
-#     this_document:
+#     text_representation:
+#       extension: .spx.py
 #       format_name: sphinx
 #       format_version: '1.1'
+#       jupytext_version: 0.8.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
