@@ -9,10 +9,11 @@ Release History
 **Improvements**
 
 - All ``jupytext`` related metadata goes to a ``jupytext`` section (#91). Please make sure your collaborators use the same version of Jupytext, as the new version can read previous metadata, but not the opposite.
-- Notebooks extensions can be prefixed with any prefix of at most three chars (#87)
+- Notebooks extensions can be prefixed with any prefix of at most three chars (#87).
 - Export of the same notebook to multiple formats is now supported. To export to all python formats, plus ``.ipynb`` and ``.md``, use ``"jupytext": {"formats": "ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md"},``.
-- README includes a short section on how to extend ``light`` and ``percent`` formats to more languages (#61)
-- Jupytext's contents manager accepts the ``auto`` extension in ``default_jupytext_formats`` (#93)
+- README includes a short section on how to extend ``light`` and ``percent`` formats to more languages (#61).
+- Jupytext's contents manager accepts the ``auto`` extension in ``default_jupytext_formats`` (#93).
+- All Jupyter magics are escaped in ``light`` scripts and R markdown documents. Escape magics in other formats with a ``comment_magics`` metadata (true or false), or with the contents manager ``comment_magics`` global flag (#94).
 
 **BugFixes**
 

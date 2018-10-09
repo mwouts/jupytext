@@ -100,9 +100,7 @@ class MarkdownCellExporter(BaseCellExporter):
         """Return the text representation of a code cell"""
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
-
-        if self.comment_magics:
-            comment_magic(source, self.language)
+        comment_magic(source, self.language, self.comment_magics)
 
         options = []
         if self.cell_type == 'code' and self.language:
@@ -127,8 +125,8 @@ class RMarkdownCellExporter(BaseCellExporter):
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
 
-        if active and self.comment_magics:
-            comment_magic(source, self.language)
+        if active:
+            comment_magic(source, self.language, self.comment_magics)
 
         lines = []
         if not is_active('Rmd', self.metadata):
@@ -176,8 +174,7 @@ class LightScriptCellExporter(BaseCellExporter):
         escape_code_start(source, self.ext, self.language)
 
         if active:
-            if self.comment_magics:
-                comment_magic(source, self.language)
+            comment_magic(source, self.language, self.comment_magics)
         else:
             source = [self.comment + ' ' + line if line else self.comment for line in source]
 
@@ -246,8 +243,8 @@ class RScriptCellExporter(BaseCellExporter):
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
 
-        if active and self.comment_magics:
-            comment_magic(source, self.language)
+        if active:
+            comment_magic(source, self.language, self.comment_magics)
 
         if not active:
             source = ['# ' + line if line else '#' for line in source]
@@ -287,8 +284,7 @@ class DoublePercentCellExporter(BaseCellExporter):
 
         if self.cell_type == 'code':
             source = copy(self.source)
-            if self.comment_magics:
-                comment_magic(source, self.language)
+            comment_magic(source, self.language, self.comment_magics)
             return lines + source
 
         return lines + comment_lines(self.source, self.comment)
@@ -313,8 +309,7 @@ class SphinxGalleryCellExporter(BaseCellExporter):
         """Return the text representation for the cell"""
         if self.cell_type == 'code':
             source = copy(self.source)
-            if self.comment_magics:
-                comment_magic(source, self.language)
+            comment_magic(source, self.language, self.comment_magics)
             return source
 
         if 'cell_marker' in self.metadata:
