@@ -79,7 +79,7 @@ class TextNotebookWriter(NotebookWriter):
             del nb.metadata['jupytext']['main_language']
 
         lines = encoding_and_executable(nb, self.ext)
-        lines.extend(metadata_and_cell_to_header(nb, self.format))
+        lines.extend(metadata_and_cell_to_header(nb, self.format, self.ext))
 
         cell_exporters = []
         for cell in nb.cells:
@@ -130,6 +130,8 @@ def reads(text, ext, format_name=None,
         if format_name == 'sphinx-rst2md' and rst2md:
             format_name = 'sphinx'
         update_jupytext_formats_metadata(notebook, ext, format_name)
+        notebook.metadata.setdefault('jupytext', {}).setdefault('text_representation', {}).update(
+            {'extension': ext, 'format_name': format_name})
 
     return notebook
 

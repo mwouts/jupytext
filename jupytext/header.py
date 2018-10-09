@@ -71,7 +71,7 @@ def encoding_and_executable(notebook, ext):
     return lines
 
 
-def metadata_and_cell_to_header(notebook, text_format):
+def metadata_and_cell_to_header(notebook, text_format, ext):
     """
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
@@ -94,9 +94,11 @@ def metadata_and_cell_to_header(notebook, text_format):
     metadata = _as_dict(notebook.get('metadata', {}))
 
     if insert_or_test_version_number():
-        metadata.setdefault('jupytext', {})['this_document'] = {'format_name': text_format.format_name,
-                                                                'format_version': text_format.current_version_number,
-                                                                'jupytext_version': __version__}
+        metadata.setdefault('jupytext', {})['text_representation'] = {
+            'extension': ext,
+            'format_name': text_format.format_name,
+            'format_version': text_format.current_version_number,
+            'jupytext_version': __version__}
 
     if 'jupytext' in metadata and not metadata['jupytext']:
         del metadata['jupytext']

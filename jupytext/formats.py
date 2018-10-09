@@ -160,7 +160,7 @@ def read_format_from_metadata(text, ext):
 
     transition_to_jupytext_section_in_metadata(metadata, ext.endswith('.ipynb'))
 
-    format_name = metadata.get('jupytext', {}).get('this_document', {}).get('format_name')
+    format_name = metadata.get('jupytext', {}).get('text_representation', {}).get('format_name')
     if format_name:
         return format_name
 
@@ -224,10 +224,8 @@ def check_file_version(notebook, source_path, outputs_path):
     _, ext = os.path.splitext(source_path)
     if ext.endswith('.ipynb'):
         return
-    version = notebook.metadata.get('jupytext', {}).get('this_document', {}).get('format_version')
+    version = notebook.metadata.get('jupytext', {}).get('text_representation', {}).get('format_version')
     format_name = format_name_for_ext(notebook.metadata, ext)
-    if 'this_document' in notebook.metadata['jupytext']:
-        del notebook.metadata['jupytext']['this_document']
 
     fmt = get_format(ext, format_name)
     current = fmt.current_version_number
@@ -290,8 +288,6 @@ def update_formats(formats, ext, format_name):
         elif not found_ext:
             updated_formats.append((ext, format_name))
             found_ext = True
-    if not found_ext:
-        updated_formats.append((ext, format_name))
 
     return updated_formats
 
@@ -311,14 +307,34 @@ def formats_as_string(formats):
                      for ext, format_name in formats])
 
 
+def auto_ext_from_metadata(metadata):
+    auto_ext = metadata.get('language_info', {}).get('file_extension')
+    if auto_ext == '.r':
+        return '.R'
+    return auto_ext
+
+
 def format_name_for_ext(metadata, ext, explicit_default=True):
     """Return the format name for that extension"""
+
+    # Current format: Don't change it unless an explicit instruction is given in the 'formats' field.
+    text_repr = metadata.get('jupytext', {}).get('text_representation')
+    if text_repr and text_repr.get('extension') == ext and text_repr.get('format_name'):
+        current_format = text_repr.get('format_name')
+    else:
+        current_format = None
+
+    auto_ext = auto_ext_from_metadata(metadata)
+
     formats = metadata.get('jupytext', {}).get('formats', '')
     formats = parse_formats(formats)
     for fmt_ext, ext_format_name in formats:
-        if fmt_ext.endswith(ext):
+        if fmt_ext.endswith(ext) or (fmt_ext.endswith('.auto') and auto_ext and ext.endswith(auto_ext)):
             if (not explicit_default) or ext_format_name:
-                return ext_format_name
+                return ext_format_name or current_format
+
+    if current_format:
+        return current_format
 
     if (not explicit_default) or ext in ['.Rmd', 'md']:
         return None
@@ -330,7 +346,8 @@ def update_jupytext_formats_metadata(notebook, ext, format_name):
     """Update the jupytext_format metadata in the Jupyter notebook"""
     formats = parse_formats(notebook.metadata.get('jupytext', {}).get('formats', ''))
     formats = update_formats(formats, ext, format_name)
-    notebook.metadata.setdefault('jupytext', {})['formats'] = formats_as_string(formats)
+    if formats:
+        notebook.metadata.setdefault('jupytext', {})['formats'] = formats_as_string(formats)
 
 
 def transition_to_jupytext_section_in_metadata(metadata, is_ipynb):
@@ -344,7 +361,8 @@ def transition_to_jupytext_section_in_metadata(metadata, is_ipynb):
     if 'jupytext_formats' in metadata:
         metadata.setdefault('jupytext', {})['formats'] = metadata.pop('jupytext_formats')
     if 'jupytext_format_version' in metadata:
-        metadata.setdefault('jupytext', {})['this_document'] = {'format_version': metadata.pop('jupytext_format_version')}
+        metadata.setdefault('jupytext', {})['text_representation'] = {
+            'format_version': metadata.pop('jupytext_format_version')}
     if 'main_language' in metadata:
         metadata.setdefault('jupytext', {})['main_language'] = metadata.pop('main_language')
     for entry in ['encoding', 'executable']:
