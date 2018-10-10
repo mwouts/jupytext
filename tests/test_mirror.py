@@ -129,6 +129,12 @@ def test_percent_to_ipynb(nb_file):
                                      format_name='percent')
 
 
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_ipynb_to_python_sphinx(nb_file):
+    assert_conversion_same_as_mirror(nb_file, '.py', 'ipynb_to_sphinx',
+                                     format_name='sphinx')
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('sphinx'))
 def test_sphinx_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, '.ipynb', 'sphinx_to_ipynb',
