@@ -452,6 +452,40 @@ def test_save_in_auto_extension_global(nb_file, tmpdir):
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
+def test_save_in_auto_extension_global_with_format(nb_file, tmpdir):
+    # load notebook
+    nb = jupytext.readf(nb_file)
+    if 'language_info' not in nb.metadata:
+        return
+
+    auto_ext = auto_ext_from_metadata(nb.metadata)
+    tmp_ipynb = 'notebook.ipynb'
+    tmp_script = 'notebook' + auto_ext
+
+    # create contents manager with default load format as percent
+    cm = jupytext.TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb,auto:percent'
+    cm.root_dir = str(tmpdir)
+
+    # save notebook
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    # check that text representation exists, and is in percent format
+    with open(str(tmpdir.join(tmp_script))) as stream:
+        assert read_format_from_metadata(stream.read(), auto_ext) == 'percent'
+
+    # reload and compare with original notebook
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        model = cm.get(path=tmp_script)
+
+    # saving should not create a format entry #95
+    assert 'formats' not in model['content'].metadata.get('jupytext', {})
+
+    compare_notebooks(nb, model['content'])
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
 def test_save_in_auto_extension_local(nb_file, tmpdir):
     # load notebook
     nb = jupytext.readf(nb_file)
