@@ -157,18 +157,8 @@ def read_metadata(text, ext):
 def read_format_from_metadata(text, ext):
     """Return the format of the file, when that information is available from the metadata"""
     metadata = read_metadata(text, ext)
-
     transition_to_jupytext_section_in_metadata(metadata, ext.endswith('.ipynb'))
-
-    format_name = metadata.get('jupytext', {}).get('text_representation', {}).get('format_name')
-    if format_name:
-        return format_name
-
-    if ('jupytext' in metadata and set(metadata['jupytext']).difference(['encoding', 'main_language', 'comment_magics'])) or \
-            set(metadata).difference(['jupytext']):
-        return format_name_for_ext(metadata, ext)
-
-    return None
+    return format_name_for_ext(metadata, ext, explicit_default=False)
 
 
 def guess_format(text, ext):
