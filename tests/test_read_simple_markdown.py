@@ -93,3 +93,14 @@ In markdown cells it is escaped like here:
 %matplotlib inline''')
     markdown2 = jupytext.writes(nb, ext='.md')
     compare(markdown, markdown2)
+
+
+def test_read_julia_notebook(markdown="""```julia
+1 + 1
+```
+"""):
+    nb = jupytext.reads(markdown, ext='.md')
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == 'code'
+    markdown2 = jupytext.writes(nb, ext='.md')
+    compare(markdown, markdown2)
