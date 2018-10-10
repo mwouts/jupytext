@@ -336,7 +336,7 @@ def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default
     if current_format:
         return current_format
 
-    if (not explicit_default) or ext in ['.Rmd', 'md']:
+    if (not explicit_default) or ext in ['.Rmd', '.md']:
         return None
 
     return get_format(ext).format_name
