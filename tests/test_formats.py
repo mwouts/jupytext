@@ -1,5 +1,5 @@
 import pytest
-from jupytext.formats import guess_format
+from jupytext.formats import guess_format, read_format_from_metadata
 from .utils import list_notebooks
 
 
@@ -34,3 +34,16 @@ def test_script_with_spyder_cell_is_percent(script="""#%%
 def test_script_with_spyder_cell_with_name_is_percent(script="""#%% cell name
 1 + 2"""):
     assert guess_format(script, '.py') == 'percent'
+
+
+def test_read_format_from_metadata(script="""---
+jupyter:
+  jupytext:
+    formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md,Rmd
+    text_representation:
+      extension: .pct.py
+      format_name: percent
+      format_version: '1.1'
+      jupytext_version: 0.8.0
+---"""):
+    assert read_format_from_metadata(script, '.Rmd') is None
