@@ -210,7 +210,7 @@ where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The
 
 Percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least one `# %%` cell are identified as `percent` scripts.
 
-The `percent` format is currently available for Python, Julia, R, Scheme and C++. Open our sample notebook in the `percent` [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py).
+The `percent` format is currently available for Python, Julia, R, Scheme and C++. Open our sample notebook in the `percent` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py).
 
 If the `percent` format is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
 ```python
