@@ -26,6 +26,7 @@ def test_read_simple_file(script="""# ---
 1 + 2 + 3 + 4
 5
 6
+# %%magic # this is a commented magic, not a cell
 
 7
 """):
@@ -47,6 +48,7 @@ def test_read_simple_file(script="""# ---
     compare(nb.cells[5].source, '''1 + 2 + 3 + 4
 5
 6
+# %%magic # this is a commented magic, not a cell
 
 7''')
     assert nb.cells[5].metadata == {'title': 'And now a code cell'}
