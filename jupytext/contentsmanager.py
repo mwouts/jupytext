@@ -247,7 +247,9 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             alt_ext = '.' + alt_fmt.split('.')[-1]
 
             if alt_ext in self.nb_extensions:
-                format_name = format_name_for_ext(nb.metadata, alt_fmt, explicit_default=False) or \
+                format_name = format_name_for_ext(nb.metadata, alt_fmt,
+                                                  self.default_jupytext_formats,
+                                                  explicit_default=False) or \
                               self.preferred_format(alt_fmt, self.preferred_jupytext_formats_save)
                 with mock.patch('nbformat.writes',
                                 _jupytext_writes(alt_fmt, format_name)):

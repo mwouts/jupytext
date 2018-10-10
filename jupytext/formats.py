@@ -314,7 +314,7 @@ def auto_ext_from_metadata(metadata):
     return auto_ext
 
 
-def format_name_for_ext(metadata, ext, explicit_default=True):
+def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default=True):
     """Return the format name for that extension"""
 
     # Current format: Don't change it unless an explicit instruction is given in the 'formats' field.
@@ -326,7 +326,7 @@ def format_name_for_ext(metadata, ext, explicit_default=True):
 
     auto_ext = auto_ext_from_metadata(metadata)
 
-    formats = metadata.get('jupytext', {}).get('formats', '')
+    formats = metadata.get('jupytext', {}).get('formats', '') or cm_default_formats
     formats = parse_formats(formats)
     for fmt_ext, ext_format_name in formats:
         if fmt_ext.endswith(ext) or (fmt_ext.endswith('.auto') and auto_ext and ext.endswith(auto_ext)):
