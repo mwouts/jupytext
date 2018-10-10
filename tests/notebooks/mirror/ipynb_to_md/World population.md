@@ -1,12 +1,5 @@
 ---
 jupyter:
-  jupytext:
-    formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md,Rmd
-    text_representation:
-      extension: .pct.py
-      format_name: percent
-      format_version: '1.1'
-      jupytext_version: 0.8.0
   kernelspec:
     display_name: Python 3
     language: python

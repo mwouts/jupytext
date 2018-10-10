@@ -32,12 +32,11 @@ def uncomment(lines, prefix='#'):
             for line in lines]
 
 
-def paragraph_is_fully_commented(lines, main_language):
+def paragraph_is_fully_commented(lines, comment, main_language):
     """Is the paragraph fully commented?"""
     for i, line in enumerate(lines):
-        if line.startswith('#'):
-            if (line.startswith(('# %', '# ?'))
-                    and is_magic(line, main_language)):
+        if line.startswith(comment):
+            if line.startswith((comment + ' %', comment + ' ?')) and is_magic(line, main_language):
                 return False
             continue
         return i > 0 and _BLANK_LINE.match(line)
@@ -139,13 +138,11 @@ class BaseCellReader(object):
         """Parse code options on the given line. When a start of a code cell
         is found, self.metadata is set to a dictionary."""
         if self.start_code_re.match(line):
-            self.language, self.metadata = \
-                self.options_to_metadata(self.start_code_re.findall(line)[0])
+            self.language, self.metadata = self.options_to_metadata(self.start_code_re.findall(line)[0])
 
     def options_to_metadata(self, options):
         """Return language (str) and metadata (dict) from the option line"""
-        raise NotImplementedError("Option parsing must be implemented in a "
-                                  "sub class")
+        raise NotImplementedError("Option parsing must be implemented in a sub class")
 
     def find_code_cell_end(self, lines):
         """Given that this is a code cell, return position of
@@ -195,14 +192,12 @@ class BaseCellReader(object):
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position
         of first line after cell"""
-        raise NotImplementedError('This method must be implemented in a '
-                                  'sub class')
+        raise NotImplementedError('This method must be implemented in a sub class')
 
     def find_cell_content(self, lines):
         """Parse cell till its end and set content, lines_to_next_cell.
         Return the position of next cell start"""
-        cell_end_marker, next_cell_start, explicit_eoc = \
-            self.find_cell_end(lines)
+        cell_end_marker, next_cell_start, explicit_eoc = self.find_cell_end(lines)
 
         # Metadata to dict
         if self.metadata is None:
@@ -337,8 +332,7 @@ class ScriptCellReader(BaseCellReader):
                     lines = uncomment(lines)
 
         if self.cell_type == 'code':
-            unescape_code_start(lines, self.ext, self.language or
-                                self.default_language)
+            unescape_code_start(lines, self.ext, self.language or self.default_language)
 
         if self.cell_type == 'markdown':
             lines = uncomment(lines, self.markdown_prefix or self.comment)
@@ -396,8 +390,7 @@ class LightScriptCellReader(ScriptCellReader):
 
     def metadata_and_language_from_option_line(self, line):
         if self.start_code_re.match(line):
-            self.metadata = self.options_to_metadata(
-                self.start_code_re.match(line).group(3))
+            self.metadata = self.options_to_metadata(self.start_code_re.match(line).group(3))
         elif self.simple_start_code_re.match(line):
             self.metadata = {}
 
@@ -407,8 +400,7 @@ class LightScriptCellReader(ScriptCellReader):
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position
         of first line after cell"""
-        if self.metadata is None and \
-                paragraph_is_fully_commented(lines, 'python'):
+        if self.metadata is None and paragraph_is_fully_commented(lines, self.comment, self.default_language):
             self.cell_type = 'markdown'
             for i, line in enumerate(lines):
                 if _BLANK_LINE.match(line):
@@ -417,7 +409,7 @@ class LightScriptCellReader(ScriptCellReader):
 
         if self.metadata is not None:
             end_of_cell = self.metadata.get('endofcell', '-')
-            self.end_code_re = re.compile('^# ' + end_of_cell + r'\s*$')
+            self.end_code_re = re.compile('^' + self.comment + ' ' + end_of_cell + r'\s*$')
 
         return self.find_code_cell_end(lines)
 
@@ -431,8 +423,16 @@ class DoublePercentScriptCellReader(ScriptCellReader):
         script = _SCRIPT_EXTENSIONS[ext]
         self.default_language = script['language']
         self.comment = script['comment']
-        self.start_code_re = re.compile(r"^{}\s+%%(.*)$".format(self.comment))
-        self.nbconvert_start_code_re = re.compile(r"^{} (<codecell>|In\[[0-9 ]*\]:?)$".format(self.comment))
+        self.start_code_re = re.compile(r"^{}\s*%%(%*)\s(.*)$".format(self.comment))
+        self.alternative_start_code_re = re.compile(r"^{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(self.comment))
+
+    def metadata_and_language_from_option_line(self, line):
+        """Parse code options on the given line. When a start of a code cell
+        is found, self.metadata is set to a dictionary."""
+        if self.start_code_re.match(line):
+            self.language, self.metadata = self.options_to_metadata(line[line.find('%%') + 2:])
+        elif self.alternative_start_code_re.match(line):
+            self.metadata = {}
 
     def options_to_metadata(self, options):
         return None, double_percent_options_to_metadata(options)
@@ -440,11 +440,10 @@ class DoublePercentScriptCellReader(ScriptCellReader):
     def find_cell_content(self, lines):
         """Parse cell till its end and set content, lines_to_next_cell.
         Return the position of next cell start"""
-        cell_end_marker, next_cell_start, explicit_eoc = \
-            self.find_cell_end(lines)
+        cell_end_marker, next_cell_start, explicit_eoc = self.find_cell_end(lines)
 
         # Metadata to dict
-        if self.start_code_re.match(lines[0]) or self.nbconvert_start_code_re.match(lines[0]):
+        if self.start_code_re.match(lines[0]) or self.alternative_start_code_re.match(lines[0]):
             cell_start = 1
         else:
             cell_start = 0
@@ -478,7 +477,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
 
         next_cell = len(lines)
         for i, line in enumerate(lines):
-            if i > 0 and (self.start_code_re.match(line) or self.nbconvert_start_code_re.match(line)):
+            if i > 0 and (self.start_code_re.match(line) or self.alternative_start_code_re.match(line)):
                 next_cell = i
                 break
 

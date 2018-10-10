@@ -1,12 +1,5 @@
 # ---
 # jupyter:
-#   jupytext:
-#     formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md,Rmd
-#     text_representation:
-#       extension: .pct.py
-#       format_name: percent
-#       format_version: '1.1'
-#       jupytext_version: 0.8.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -87,6 +80,7 @@ assert all(data.loc['World']['Population, total'] == population.sum(axis=1))
 
 import matplotlib.pyplot as plt
 
+""
 plt.clf()
 plt.figure(figsize=(10, 5), dpi=100)
 plt.stackplot(population.index, population.values.T / 1e9)
@@ -108,6 +102,7 @@ import plotly.graph_objs as go
 
 offline.init_notebook_mode()
 
+""
 bars = [go.Bar(x=population.index, y=population[zone], name=zone)
         for zone in zones]
 fig = go.Figure(data=bars,

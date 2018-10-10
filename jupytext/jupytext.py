@@ -56,6 +56,15 @@ class TextNotebookReader(NotebookReader):
 
         set_main_and_cell_language(metadata, cells, self.format.extension)
 
+        if self.format.format_name and self.format.format_name.startswith('sphinx'):
+            filtered_cells = []
+            for i, cell in enumerate(cells):
+                if cell.source == '' and i > 0 and i + 1 < len(cells) \
+                        and cells[i - 1].cell_type != 'markdown' and cells[i + 1].cell_type != 'markdown':
+                    continue
+                filtered_cells.append(cell)
+            cells = filtered_cells
+
         return new_notebook(cells=cells, metadata=metadata)
 
 
@@ -102,9 +111,16 @@ class TextNotebookWriter(NotebookWriter):
 
             # two blank lines between markdown cells in Rmd
             if self.ext in ['.Rmd', '.md'] and not cell.is_code():
-                if i + 1 < len(cell_exporters) and not \
-                        cell_exporters[i + 1].is_code():
+                if i + 1 < len(cell_exporters) and not cell_exporters[i + 1].is_code():
                     lines.append('')
+
+            # "" between two consecutive code cells in sphinx
+            if self.format.format_name.startswith('sphinx') and cell.is_code():
+                if i + 1 < len(cell_exporters) and cell_exporters[i + 1].is_code():
+                    lines.append('""')
+                if i + 1 == len(cell_exporters) and cell.source == ['']:
+                    lines.append('""')
+
 
         return '\n'.join(lines)
 
