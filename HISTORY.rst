@@ -3,6 +3,17 @@
 Release History
 ---------------
 
+
+0.8.1 (2018-10-11)
+++++++++++++++++++++++
+
+**BugFixes**
+
+- Sphinx format tested on ``World population`` notebook (#97)
+- Mirror test made stronger on this occasion!
+- Markdown representation recognize Julia, Scheme and C++ code cells as such
+- Light representation of Scheme and C++ notebooks fixed (#61)
+
 0.8.0 (2018-10-10)
 ++++++++++++++++++++++
 
