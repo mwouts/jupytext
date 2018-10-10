@@ -27,9 +27,9 @@ Jupytext is available from within Jupyter. You can work as usual on your noteboo
 | [Paired notebook](#paired-notebooks)  | (`.jl`/`.py`/`.R`/.../`.md`/`.Rmd`) + `.ipynb` | ✔ | (✔) | ✔ | ✔      |
 
 Note that Jupytext implements a few different [formats](#format-specifications) for notebooks as scripts:
-- the [`light`](#the-light-format-for-notebooks-as-scripts) format allows to open arbitrary scripts as notebooks, and to save notebooks as scripts with implicit, or discrete cell markers,
-- the [`percent`](#the-percent-format) format with explicit `# %%` cells is compatible with various editors,
-- the [`sphinx`](#sphinx-gallery-scripts) format produces Sphinx gallery scripts (Python only),
+- the [`light`](#the-light-format-for-notebooks-as-scripts) format allows to open arbitrary scripts as notebooks. Reversely, use it to save notebooks as scripts with very few cell markers.
+- the [`percent`](#the-percent-format) format with explicit `# %%` cells is compatible with various Python editors.
+- the [`sphinx`](#sphinx-gallery-scripts) format produces Sphinx gallery scripts (Python only).
 - and the [`spin`](#r-knitrspin-scripts) format is compatible with Knitr's spin function (R only).
 
 ## Example usage
@@ -179,7 +179,7 @@ Our implementation for Jupyter notebooks as [Markdown](https://daringfireball.ne
 - Markdown cells are inserted verbatim, and separated with two blank lines
 - Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are not available in the Markdown format. The [code cell options](https://yihui.name/knitr/options/) in the R Markdown format are mapped to the corresponding Jupyter cell metadata options, when available.
 
-See how our `World population.ipynb` notebook in the [demo folder][https://github.com/mwouts/jupytext/tree/v0.8.0/demo] is represented in [Markdown](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.md) or [R Markdown](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.Rmd).
+See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/v0.8.0/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.md) or [R Markdown](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.Rmd).
 
 ### The `light` format for notebooks as scripts
 
@@ -216,7 +216,7 @@ If the `percent` format is your favorite, add the following to your `.jupyter/ju
 ```python
 c.ContentsManager.preferred_jupytext_formats_save = "py:percent" # or "auto:percent"
 ```
-Then, Jupytext's content manager will understand `"jupytext": {"formats": "ipynb,py"},` (or `"ipynb,auto"` if you use other languages) as an instruction to create the paired Python script in the `percent` format.
+Then, Jupytext's content manager will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
 
 ### Sphinx-gallery scripts
 
