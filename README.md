@@ -179,7 +179,7 @@ Our implementation for Jupyter notebooks as [Markdown](https://daringfireball.ne
 - Markdown cells are inserted verbatim, and separated with two blank lines
 - Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are not available in the Markdown format. The [code cell options](https://yihui.name/knitr/options/) in the R Markdown format are mapped to the corresponding Jupyter cell metadata options, when available.
 
-See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/v0.8.0/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.md) or [R Markdown](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.Rmd).
+See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.md) or [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
 
 ### The `light` format for notebooks as scripts
 
@@ -191,7 +191,7 @@ The `light` format has:
 - Code cells are exported verbatim (except for Jupyter magics, which are commented), and separated with blank lines. Code cells are reconstructed from consistent Python paragraphs (no function, class or multiline comment will be broken).
 - Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter `# +` (`// +` in C++, etc). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
-The `light` format is currently available for Python, Julia, R, Scheme and C++. Open our sample notebook in the `light` format [here](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.lgt.py).
+The `light` format is currently available for Python, Julia, R, Scheme and C++. Open our sample notebook in the `light` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.lgt.py).
 
 ### The `percent` format
 
@@ -210,7 +210,7 @@ where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The
 
 Percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least one `# %%` cell are identified as `percent` scripts.
 
-The `percent` format is currently available for Python, Julia, R, Scheme and C++. Open our sample notebook in the `percent` [here](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.pct.py).
+The `percent` format is currently available for Python, Julia, R, Scheme and C++. Open our sample notebook in the `percent` [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py).
 
 If the `percent` format is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
 ```python
@@ -233,7 +233,7 @@ c.ContentsManager.preferred_jupytext_formats_read = "py:sphinx"
 c.ContentsManager.sphinx_convert_rst2md = True
 ```
 
-Our sample notebook is also represented in `sphinx` format [here](https://github.com/mwouts/jupytext/blob/v0.8.0/demo/World%20population.spx.py).
+Our sample notebook is also represented in `sphinx` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.spx.py).
 
 ### R knitr::spin scripts
 
