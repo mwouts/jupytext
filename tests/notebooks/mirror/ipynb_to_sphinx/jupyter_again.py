@@ -26,7 +26,9 @@ editor_options:
      chunk_output_type console
 '''
 
+""
 import yaml
 print(yaml.dump(yaml.load(c)))
 
+""
 # ?next
