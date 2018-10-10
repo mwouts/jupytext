@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import pytest
 
 skip_if_dict_is_not_ordered = pytest.mark.skipif(
@@ -20,8 +21,12 @@ def list_notebooks(path='ipynb', skip=''):
         nb_path = os.path.join(nb_path, path)
     else:
         nb_path = os.path.join(nb_path, 'notebooks', path)
-    notebooks = [os.path.join(nb_path, nb_file) for nb_file in
-                 os.listdir(nb_path) if not skip or skip not in nb_file]
+
+    if skip:
+        skip_re = re.compile('.*' + skip + '.*')
+        notebooks = [os.path.join(nb_path, nb_file) for nb_file in os.listdir(nb_path) if not skip_re.match(nb_file)]
+    else:
+        notebooks = [os.path.join(nb_path, nb_file) for nb_file in os.listdir(nb_path)]
 
     assert notebooks
     return notebooks
