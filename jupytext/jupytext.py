@@ -121,7 +121,6 @@ class TextNotebookWriter(NotebookWriter):
                 if i + 1 == len(cell_exporters) and cell.source == ['']:
                     lines.append('""')
 
-
         return '\n'.join(lines)
 
 
