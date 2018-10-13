@@ -5,15 +5,13 @@ import os
 import sys
 import argparse
 from .jupytext import readf, reads, writef, writes
-from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, \
-    check_file_version, one_format_as_string, parse_one_format
+from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version, one_format_as_string, parse_one_format
 from .combine import combine_inputs_with_outputs
-from .compare import test_round_trip_conversion
+from .compare import test_round_trip_conversion, NotebookDifference
 from .languages import _SCRIPT_EXTENSIONS
 
 
-def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
-                           test_round_trip=False, preserve_outputs=True):
+def convert_notebook_files(nb_files, fmt, input_format=None, output=None, test_round_trip=False, preserve_outputs=True):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
@@ -29,27 +27,24 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
 
     ext, format_name = parse_one_format(fmt)
     if ext not in NOTEBOOK_EXTENSIONS:
-        raise TypeError('Destination extension {} is not a notebook'
-                        .format(ext))
+        raise TypeError('Destination extension {} is not a notebook'.format(ext))
 
     if not nb_files:
         if not input_format:
-            raise ValueError('Reading notebook from the standard input '
-                             'requires the --from field.')
+            raise ValueError('Reading notebook from the standard input requires the --from field.')
         parse_one_format(input_format)
         nb_files = [sys.stdin]
 
     if len(nb_files) > 1 and output:
-        raise ValueError(
-            "Output argument can only be used with a single notebook")
+        raise ValueError("Output argument can only be used with a single notebook")
+
+    notebooks_in_error = 0
 
     for nb_file in nb_files:
         if nb_file == sys.stdin:
             dest = None
             current_ext, _ = parse_one_format(input_format)
-            notebook = reads(nb_file.read(),
-                             ext=current_ext,
-                             format_name=format_name)
+            notebook = reads(nb_file.read(), ext=current_ext, format_name=format_name)
         else:
             dest, current_ext = os.path.splitext(nb_file)
             notebook = None
@@ -70,13 +65,15 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
             notebook = readf(nb_file, format_name=format_name)
 
         if test_round_trip:
-            test_round_trip_conversion(notebook, ext, format_name,
-                                       preserve_outputs)
+            try:
+                test_round_trip_conversion(notebook, ext, format_name, preserve_outputs)
+            except NotebookDifference as error:
+                notebooks_in_error += 1
+                print('{}: {}'.format(nb_file, str(error)))
             continue
 
         if output == '-':
-            sys.stdout.write(writes(notebook, ext=ext,
-                                    format_name=format_name))
+            sys.stdout.write(writes(notebook, ext=ext, format_name=format_name))
             continue
 
         if output:
@@ -85,8 +82,10 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
                 raise TypeError('Destination extension {} is not consistent'
                                 'with format {} '.format(dest_ext, ext))
 
-        save_notebook_as(notebook, nb_file, dest + ext, format_name,
-                         preserve_outputs)
+        save_notebook_as(notebook, nb_file, dest + ext, format_name, preserve_outputs)
+
+    if notebooks_in_error:
+        exit(notebooks_in_error)
 
 
 def save_notebook_as(notebook, nb_file, nb_dest, format_name, combine):
