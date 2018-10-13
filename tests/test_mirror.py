@@ -72,10 +72,10 @@ def assert_conversion_same_as_mirror(nb_file, ext, mirror_name, format_name=None
             for cell in notebook.cells:
                 cell.metadata = {}
 
-        compare_notebooks(notebook, nb_mirror, allow_split_markdown=ext in ['.Rmd', '.md'])
+        compare_notebooks(notebook, nb_mirror, ext=ext)
 
         combine_inputs_with_outputs(nb_mirror, notebook)
-        compare_notebooks(notebook, nb_mirror, allow_split_markdown=ext in ['.Rmd', '.md'], test_outputs=True)
+        compare_notebooks(notebook, nb_mirror, ext=ext, compare_outputs=True)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('julia') + list_notebooks('python') + list_notebooks('R'))
