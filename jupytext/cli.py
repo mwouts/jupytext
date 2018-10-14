@@ -11,7 +11,9 @@ from .compare import test_round_trip_conversion, NotebookDifference
 from .languages import _SCRIPT_EXTENSIONS
 
 
-def convert_notebook_files(nb_files, fmt, input_format=None, output=None, test_round_trip=False, preserve_outputs=True):
+def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
+                           test_round_trip=False, test_round_trip_strict=False, stop_on_first_error=True,
+                           update=True):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
@@ -20,7 +22,9 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, test_r
     :param fmt: destination format, e.g. "py:percent"
     :param output: None, destination file, or '-' for stdout
     :param test_round_trip: should round trip conversion be tested?
-    :param preserve_outputs: preserve the current outputs of .ipynb file
+    :param test_round_trip_strict: should round trip conversion be tested, with strict notebook comparison?
+    :param stop_on_first_error: when testing, should we stop on first error, or compare the full notebook?
+    :param update: preserve the current outputs of .ipynb file
     when possible
     :return:
     """
@@ -64,9 +68,11 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, test_r
         if not notebook:
             notebook = readf(nb_file, format_name=format_name)
 
-        if test_round_trip:
+        if test_round_trip or test_round_trip_strict:
             try:
-                test_round_trip_conversion(notebook, ext, format_name, preserve_outputs)
+                test_round_trip_conversion(notebook, ext, format_name, update,
+                                           allow_expected_differences=not test_round_trip_strict,
+                                           stop_on_first_error=stop_on_first_error)
             except NotebookDifference as error:
                 notebooks_in_error += 1
                 print('{}: {}'.format(nb_file, str(error)))
@@ -82,7 +88,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, test_r
                 raise TypeError('Destination extension {} is not consistent'
                                 'with format {} '.format(dest_ext, ext))
 
-        save_notebook_as(notebook, nb_file, dest + ext, format_name, preserve_outputs)
+        save_notebook_as(notebook, nb_file, dest + ext, format_name, update)
 
     if notebooks_in_error:
         exit(notebooks_in_error)
@@ -155,9 +161,15 @@ def cli_jupytext(args=None):
     parser.add_argument('--update', action='store_true',
                         help='Preserve outputs of .ipynb destination '
                              '(when file exists and inputs match)')
-    parser.add_argument('--test', dest='test', action='store_true',
-                        help='Test that notebook is stable under '
-                             'round trip conversion')
+    test = parser.add_mutually_exclusive_group()
+    test.add_argument('--test', dest='test', action='store_true',
+                      help='Test that notebook is stable under '
+                           'round trip conversion, up to expected changes')
+    test.add_argument('--test-strict', dest='test_strict', action='store_true',
+                      help='Test that notebook is strictly stable under '
+                           'round trip conversion')
+    parser.add_argument('-x', '--stop', dest='stop_on_first_error', action='store_true',
+                        help='Stop on first round trip conversion error, and report stack traceback')
     args = parser.parse_args(args)
 
     args.to = canonize_format(args.to, args.output)
@@ -171,8 +183,8 @@ def cli_jupytext(args=None):
         if not args.notebooks:
             raise ValueError('Please specificy either --from or notebooks')
 
-    if args.update and args.to != 'ipynb':
-        raise ValueError('--update works exclusively with --to notebook')
+    if args.update and not (args.test or args.test_strict) and args.to != 'ipynb':
+        raise ValueError('--update works exclusively with --to notebook ')
 
     return args
 
@@ -186,7 +198,9 @@ def jupytext(args=None):
                                input_format=args.input_format,
                                output=args.output,
                                test_round_trip=args.test,
-                               preserve_outputs=args.update)
+                               test_round_trip_strict=args.test_strict,
+                               stop_on_first_error=args.stop_on_first_error,
+                               update=args.update)
     except ValueError as err:  # (ValueError, TypeError, IOError) as err:
         print('jupytext: error: ' + str(err))
         exit(1)

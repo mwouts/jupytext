@@ -64,7 +64,7 @@ def test_raise_on_different_cell_metadata():
 
 
 def test_does_not_raise_on_blank_line_removed():
-    ref = new_notebook(cells=[new_code_cell('1+1\n')])
+    ref = new_notebook(cells=[new_code_cell('1+1\n    ')])
     test = new_notebook(cells=[new_code_cell('1+1')])
     compare_notebooks(ref, test, ext='.py', format_name='light')
 
@@ -125,4 +125,4 @@ def test_test_round_trip_conversion():
         }
     ])], metadata={'main_language': 'python'})
 
-    round_trip_conversion(notebook, '.py', None, test_outputs=True)
+    round_trip_conversion(notebook, '.py', None, update=True)
