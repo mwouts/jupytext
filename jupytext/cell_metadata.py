@@ -26,10 +26,14 @@ except NameError:
 
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
-_IGNORE_METADATA = ['collapsed', 'autoscroll', 'scrolled',
-                    'deletable', 'format', 'trusted', 'skipline',
-                    'noskipline', 'lines_to_next_cell',
-                    'lines_to_end_of_cell_marker']
+_IGNORE_METADATA = [
+    # Frequent cell metadata that should not enter the text representation
+    # (these metadata are preserved in the paired Jupyter notebook).
+    'autoscroll', 'collapsed', 'scrolled', 'trusted',
+    # Pre-jupytext metadata
+    'skipline', 'noskipline',
+    # Jupytext metadata
+    'lines_to_next_cell', 'lines_to_end_of_cell_marker']
 _PERCENT_CELL = re.compile(
     r'(# |#)%%([^\{\[]*)(|\[raw\]|\[markdown\])([^\{\[]*)(|\{.*\})\s*$')
 
