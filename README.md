@@ -163,11 +163,22 @@ writef(notebook, nb_file, format_name=None)
 
 ## Round-trip conversion
 
-Representing Jupyter notebooks as scripts requires a solid round trip conversion. You don't want your notebooks (nor your scripts) to be modified because you are converting them to the other form. A few hundred tests ensure that round trip conversion is safe. For convenience, you can also test directly the round trip conversion on your favorite notebook, or script, with `jupytext --test`.
+Representing Jupyter notebooks as scripts requires a solid round trip conversion. You don't want your notebooks (nor your scripts) to be modified because you are converting them to the other form. A few hundred tests ensure that round trip conversion is safe.
+ 
+You can easily test that the round trip conversion preserves your Jupyter notebooks and scripts. Run for instance:
+```bash
+# Test the ipynb -> py:percent -> ipynb round trip conversion
+jupytext --test notebook.ipynb -to py:percent
+
+# Test the ipynb -> (py:percent + ipynb) -> ipynb (à la paired notebook) conversion
+jupytext --test --update notebook.ipynb -to py:percent
+```
+
+Note that `jupytext --test` compares the resulting notebooks according to its expectations. If you wish to proceed to a strict comparison of the two notebooks, use `jupytext --test-strict`, and use the flag `-x` to report with more details on the first error.
 
 Please note that
-- When you associate a Jupyter kernel with your text notebook, that information goes to a YAML header at the top of your script or Markdown document.
-- Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata.
+- When you associate a Jupyter kernel with your text notebook, that information goes to a YAML header at the top of your script or Markdown document. And Jupytext itself may create a `jupytext` entry in the notebook metadata.
+- Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata. And a few cell metadata (`autoscroll`, `collapsed`, `scrolled`, `trusted`) are never included in the text representation, but are still preserved by the paired notebooks, and the `--update` conversion. 
 - Representing Jupyter notebooks as Markdown document has the effect of splitting markdown cells with two consecutive blank lines into multiple cells (as the two blank line pattern is used to separate cells).
 
 ## Format specifications
