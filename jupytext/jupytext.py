@@ -118,8 +118,6 @@ class TextNotebookWriter(NotebookWriter):
             if self.format.format_name.startswith('sphinx') and cell.is_code():
                 if i + 1 < len(cell_exporters) and cell_exporters[i + 1].is_code():
                     lines.append('""')
-                if i + 1 == len(cell_exporters) and cell.source == ['']:
-                    lines.append('""')
 
         return '\n'.join(lines)
 
