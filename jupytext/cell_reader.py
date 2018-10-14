@@ -485,6 +485,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
     default_language = 'python'
     default_comment_magics = True
     twenty_hash = re.compile(r'^#( |)#{19,}\s*$')
+    default_markdown_cell_marker = '#' * 79
     markdown_marker = None
     rst2md = False
 
@@ -508,7 +509,8 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
         self.markdown_marker = self.start_of_new_markdown_cell(line)
         if self.markdown_marker:
             self.cell_type = 'markdown'
-            self.metadata = {'cell_marker': self.markdown_marker}
+            if self.markdown_marker != self.default_markdown_cell_marker:
+                self.metadata = {'cell_marker': self.markdown_marker}
         else:
             self.cell_type = 'code'
 
