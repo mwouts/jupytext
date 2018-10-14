@@ -20,6 +20,10 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
     output_code_cells = [cell for cell in nb_outputs.cells if cell.cell_type == 'code']
     output_other_cells = [cell for cell in nb_outputs.cells if cell.cell_type != 'code']
 
+    text_representation = nb_source.metadata.get('jupytext', {}).get('text_representation', {})
+    ext = text_representation.get('extension')
+    format_name = text_representation.get('format_name')
+
     for cell in nb_source.cells:
         # Remove outputs to warranty that trust of returned notebook is that of second notebook
         if cell.cell_type == 'code':
@@ -28,19 +32,22 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
 
             for i, ocell in enumerate(output_code_cells):
                 if same_content(cell.source, ocell.source):
+                    # Fill outputs with that of second notebook
                     cell.execution_count = ocell.execution_count
                     cell.outputs = ocell.outputs
 
                     ometadata = ocell.metadata
-                    cell.metadata.update({k: ometadata[k] for k in ometadata if k in _IGNORE_METADATA})
+                    cell.metadata.update(ometadata if (ext and ext.endswith('.md')) or format_name == 'sphinx' else
+                                         {k: ometadata[k] for k in ometadata if k in _IGNORE_METADATA})
                     output_code_cells = output_code_cells[(i + 1):]
                     break
         else:
-            # Fill outputs with that of second notebook
             for i, ocell in enumerate(output_other_cells):
                 if cell.cell_type == ocell.cell_type and same_content(cell.source, ocell.source):
                     ometadata = ocell.metadata
-                    cell.metadata.update({k: ometadata[k] for k in ometadata if k in _IGNORE_METADATA})
+                    cell.metadata.update(ometadata if ext and (ext.endswith('.md') or ext.endswith('.Rmd') or
+                                                               format_name in ['spin', 'sphinx', 'sphinx']) else
+                                         {k: ometadata[k] for k in ometadata if k in _IGNORE_METADATA})
 
                     output_other_cells = output_other_cells[(i + 1):]
                     break
