@@ -41,9 +41,6 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
     model = cm.get(file)
     nb = model['content']
-    if nb.metadata.get('jupytext', {}).get('formats'):
-        del nb.metadata['jupytext']['formats']
-
     cm.save(model, py_file)
 
     # Unsign and test notebook
