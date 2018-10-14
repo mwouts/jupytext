@@ -3,11 +3,14 @@
 
 import re
 import yaml
+from yaml.representer import SafeRepresenter
 import nbformat
 from nbformat.v4.nbbase import new_raw_cell
 from .version import __version__
 from .cell_to_text import comment_lines
 from .languages import _SCRIPT_EXTENSIONS
+
+SafeRepresenter.add_representer(nbformat.NotebookNode, SafeRepresenter.represent_dict)
 
 _HEADER_RE = re.compile(r"^---\s*$")
 _BLANK_RE = re.compile(r"^\s*$")
@@ -23,12 +26,6 @@ def insert_or_test_version_number():
     """Should the format name and version number be inserted in text
     representations (not in tests!)"""
     return INSERT_AND_CHECK_VERSION_NUMBER
-
-
-def _as_dict(metadata):
-    if isinstance(metadata, nbformat.NotebookNode):
-        return {k: _as_dict(metadata[k]) for k in metadata.keys()}
-    return metadata
 
 
 def uncomment_line(line, prefix):
@@ -91,7 +88,7 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
                 skipline = not cell.metadata.get('noskipline', False)
                 notebook.cells = notebook.cells[1:]
 
-    metadata = _as_dict(notebook.get('metadata', {}))
+    metadata = notebook.get('metadata', {})
 
     if insert_or_test_version_number():
         metadata.setdefault('jupytext', {})['text_representation'] = {
