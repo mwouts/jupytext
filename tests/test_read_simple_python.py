@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from nbformat.v4.nbbase import new_markdown_cell, new_notebook
 from testfixtures import compare
 import jupytext
 
@@ -495,3 +496,11 @@ d = 6
     script2 = jupytext.writes(notebook, ext='.py')
 
     compare(script, script2)
+
+
+def test_round_trip_markdown_cell_with_magic():
+    notebook = new_notebook(cells=[new_markdown_cell('IPython has magic commands like\n%quickref')],
+                            metadata={'jupytext': {'main_language': 'python'}})
+    text = jupytext.writes(notebook, ext='.py')
+    notebook2 = jupytext.reads(text, ext='.py')
+    compare(notebook, notebook2)

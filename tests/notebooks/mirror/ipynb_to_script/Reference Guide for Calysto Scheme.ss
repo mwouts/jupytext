@@ -125,7 +125,7 @@ vectorᵢ
 ;; It has breakpoints (click in left margin). You must press Stop to exit the debugger.
 
 ;; ```scheme
-;; %%debug
+;; ;; %%debug
 ;;
 ;; (begin
 ;;  (define x 1)

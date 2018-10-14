@@ -316,7 +316,7 @@ class ScriptCellReader(BaseCellReader):
         raise NotImplementedError()
 
     def uncomment_code_and_magics(self, lines):
-        if self.cell_type == 'code':
+        if self.cell_type == 'code' or self.comment != "#'":
             if self.comment_magics:
                 if is_active(self.ext, self.metadata):
                     uncomment_magic(lines, self.language or self.default_language)
@@ -443,7 +443,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
 
         if self.cell_type != 'code':
             source = uncomment(source, self.comment)
-        elif self.comment_magics:
+        if self.comment_magics:
             source = self.uncomment_code_and_magics(source)
 
         self.content = source
