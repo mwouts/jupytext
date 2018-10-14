@@ -72,6 +72,9 @@ def compare_notebooks(notebook_expected,
                                                                            or format_name in ['sphinx', 'spin'])
     allow_removed_final_blank_line = allow_expected_differences
 
+    if format_name == 'sphinx' and notebook_actual.cells and notebook_actual.cells[0].source == '%matplotlib inline':
+        notebook_actual.cells = notebook_actual.cells[1:]
+
     # Compare cells type and content
     test_cell_iter = iter(notebook_actual.cells)
     modified_cells = set()
