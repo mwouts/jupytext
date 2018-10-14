@@ -313,8 +313,6 @@ class SphinxGalleryCellExporter(BaseCellExporter):
         """Return the text representation for the cell"""
         if self.cell_type == 'code':
             source = copy(self.source)
-            if not source:
-                source == ['']
             return comment_magic(source, self.language, self.comment_magics)
 
         if 'cell_marker' in self.metadata:
