@@ -298,6 +298,7 @@ def formats_as_string(formats):
 
 
 def auto_ext_from_metadata(metadata):
+    """Script extension from kernel information"""
     auto_ext = metadata.get('language_info', {}).get('file_extension')
     if auto_ext == '.r':
         return '.R'
