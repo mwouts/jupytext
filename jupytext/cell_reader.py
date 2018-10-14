@@ -9,8 +9,7 @@ try:
 except ImportError:
     rst2md = None
 
-from .cell_metadata import is_active, json_options_to_metadata, \
-    md_options_to_metadata, rmd_options_to_metadata, \
+from .cell_metadata import is_active, json_options_to_metadata, md_options_to_metadata, rmd_options_to_metadata, \
     double_percent_options_to_metadata
 from .stringparser import StringParser
 from .magics import uncomment_magic, is_magic, unescape_code_start
@@ -69,9 +68,7 @@ def last_two_lines_blank(source):
     """Are the two last lines blank, and not the third last one?"""
     if len(source) < 3:
         return False
-    return (not _BLANK_LINE.match(source[-3]) and
-            _BLANK_LINE.match(source[-2]) and
-            _BLANK_LINE.match(source[-1]))
+    return not _BLANK_LINE.match(source[-3]) and _BLANK_LINE.match(source[-2]) and _BLANK_LINE.match(source[-1])
 
 
 class BaseCellReader(object):
@@ -131,8 +128,7 @@ class BaseCellReader(object):
         if self.language:
             self.metadata['language'] = self.language
 
-        return new_cell(source='\n'.join(self.content),
-                        metadata=self.metadata), pos_next_cell
+        return new_cell(source='\n'.join(self.content), metadata=self.metadata), pos_next_cell
 
     def metadata_and_language_from_option_line(self, line):
         """Parse code options on the given line. When a start of a code cell
@@ -163,17 +159,14 @@ class BaseCellReader(object):
 
             parser.read_line(line)
 
-            if self.start_code_re.match(line) or \
-                    (self.markdown_prefix and
-                     line.startswith(self.markdown_prefix)):
+            if self.start_code_re.match(line) or (self.markdown_prefix and line.startswith(self.markdown_prefix)):
                 if i > 1 and _BLANK_LINE.match(lines[i - 1]):
                     return i - 1, i, False
                 return i, i, False
 
             # Simple code pattern in LightScripts must be preceded with
             # a blank line
-            if i > 0 and self.simple_start_code_re and \
-                    _BLANK_LINE.match(lines[i - 1]) and \
+            if i > 0 and self.simple_start_code_re and _BLANK_LINE.match(lines[i - 1]) and \
                     self.simple_start_code_re.match(line):
                 return i - 1, i, False
 
@@ -212,8 +205,7 @@ class BaseCellReader(object):
         self.content = self.uncomment_code_and_magics(source)
 
         # Exactly two empty lines at the end of cell (caused by PEP8)?
-        if (self.ext == '.py' and explicit_eoc and
-                last_two_lines_blank(source)):
+        if (self.ext == '.py' and explicit_eoc and last_two_lines_blank(source)):
             self.content = source[:-2]
             self.metadata['lines_to_end_of_cell_marker'] = 2
 
@@ -380,10 +372,8 @@ class LightScriptCellReader(ScriptCellReader):
         script = _SCRIPT_EXTENSIONS[ext]
         self.default_language = script['language']
         self.comment = script['comment']
-        self.start_code_re = re.compile("^({0}|{0} )".format(self.comment) +
-                                        r"\+(\s*){(.*)}\s*$")
-        self.simple_start_code_re = re.compile(
-            r"^({0}|{0} )\+(\s*)$".format(self.comment))
+        self.start_code_re = re.compile("^({0}|{0} )".format(self.comment) + r"\+(\s*){(.*)}\s*$")
+        self.simple_start_code_re = re.compile(r"^({0}|{0} )\+(\s*)$".format(self.comment))
 
     def options_to_metadata(self, options):
         return json_options_to_metadata(options)
@@ -540,18 +530,15 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
             # Multi-line comment with triple quote
             if len(self.markdown_marker) == 3:
                 for i, line in enumerate(lines):
-                    if (i > 0 or line.strip() != self.markdown_marker) and \
-                            line.rstrip().endswith(self.markdown_marker):
-                        explicit_end_of_cell_marker = \
-                            line.strip() == self.markdown_marker
+                    if (i > 0 or line.strip() != self.markdown_marker) and line.rstrip().endswith(self.markdown_marker):
+                        explicit_end_of_cell_marker = line.strip() == self.markdown_marker
                         if explicit_end_of_cell_marker:
                             end_of_cell = i
                         else:
                             end_of_cell = i + 1
                         if len(lines) <= i + 1 or _BLANK_LINE.match(
                                 lines[i + 1]):
-                            return end_of_cell, i + 2, \
-                                   explicit_end_of_cell_marker
+                            return end_of_cell, i + 2, explicit_end_of_cell_marker
                         return end_of_cell, i + 1, explicit_end_of_cell_marker
             else:
                 # 20 # or more
@@ -579,12 +566,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
     def find_cell_content(self, lines):
         """Parse cell till its end and set content, lines_to_next_cell.
         Return the position of next cell start"""
-        cell_end_marker, next_cell_start, explicit_eoc = \
-            self.find_cell_end(lines)
-
-        if next_cell_start < len(lines) and \
-                _BLANK_LINE.match(lines[next_cell_start]):
-            next_cell_start += 1
+        cell_end_marker, next_cell_start, explicit_eoc = self.find_cell_end(lines)
 
         # Metadata to dict
         cell_start = 0
@@ -597,8 +579,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
                     lines[0] = lines[0][3:]
                 if not explicit_eoc:
                     last = lines[cell_end_marker - 1]
-                    lines[cell_end_marker - 1] = \
-                        last[:last.rfind(self.markdown_marker)]
+                    lines[cell_end_marker - 1] = last[:last.rfind(self.markdown_marker)]
             if self.twenty_hash.match(self.markdown_marker):
                 cell_start = 1
         else:
@@ -617,8 +598,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
                     if rst2md:
                         source = rst2md('\n'.join(source)).splitlines()
                     else:
-                        raise ImportError('Could not import rst2md '
-                                          'from sphinx_gallery.notebook')
+                        raise ImportError('Could not import rst2md from sphinx_gallery.notebook')
 
         self.content = source
 

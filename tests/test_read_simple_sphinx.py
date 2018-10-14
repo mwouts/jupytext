@@ -105,3 +105,24 @@ Another markdown cell'''
     assert nb.cells[8].source == 'And a last one'
 
     assert len(nb.cells) == 9
+
+
+def test_read_empty_code_cell(script="""##################################
+# Markdown cell
+
+
+"""):
+    nb = jupytext.reads(script, ext='.py', format_name='sphinx')
+
+    assert nb.cells[0].cell_type == 'code'
+    assert nb.cells[0].source == '%matplotlib inline'
+
+    assert nb.cells[1].cell_type == 'markdown'
+    assert nb.cells[1].source == 'Markdown cell'
+
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[2].source == ''
+
+    assert len(nb.cells) == 3
+
+    assert jupytext.writes(nb, ext='.py', format_name='sphinx') == script
