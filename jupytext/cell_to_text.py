@@ -76,6 +76,10 @@ class BaseCellExporter(object):
 
     def markdown_to_text(self, source):
         """Escape the given source, for a markdown cell"""
+        if self.comment and self.comment != "#'":
+            source = copy(source)
+            comment_magic(source, self.language, self.comment_magics)
+
         return comment_lines(source, self.comment)
 
     def code_to_text(self):
@@ -311,8 +315,7 @@ class SphinxGalleryCellExporter(BaseCellExporter):
             source = copy(self.source)
             if not source:
                 source == ['']
-            comment_magic(source, self.language, self.comment_magics)
-            return source
+            return comment_magic(source, self.language, self.comment_magics)
 
         if 'cell_marker' in self.metadata:
             cell_marker = self.metadata.pop('cell_marker')
