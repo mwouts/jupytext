@@ -3,6 +3,18 @@
 Release History
 ---------------
 
+0.8.2 (2018-10-14)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Round trip conversion testing with ``jupytext --test`` was improved (#99)
+- Round trip conversion tested on Jake Vanderplas' Python for Data Science Handbook.
+
+**BugFixes**
+
+- Nested lists and dictionaries are now supported in notebook metadata
+- Final empty code cell supported in Sphinx representation
 
 0.8.1 (2018-10-11)
 ++++++++++++++++++++++
