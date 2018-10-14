@@ -28,7 +28,7 @@ def test_rmd_is_ok(nb_file, tmpdir):
 
     nb2 = jupytext.readf(str(tmpdir.join(tmp_rmd)))
 
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb, nb2, ext='.Rmd')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('Rmd'))
@@ -69,7 +69,7 @@ def test_all_files_created(nb_file, tmpdir):
     compare_notebooks(nb, nb2)
 
     nb3 = jupytext.readf(str(tmpdir.join(tmp_rmd)))
-    compare_notebooks(nb, nb3)
+    compare_notebooks(nb, nb3, ext='.Rmd')
 
 
 def test_no_files_created_on_no_format(tmpdir):

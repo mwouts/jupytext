@@ -34,7 +34,7 @@ def test_load_save_rename(nb_file, tmpdir):
     nb = jupytext.readf(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_rmd)
     nb_rmd = cm.get(tmp_rmd)
-    compare_notebooks(nb, nb_rmd['content'])
+    compare_notebooks(nb, nb_rmd['content'], ext='.Rmd')
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
