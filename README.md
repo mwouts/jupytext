@@ -164,7 +164,7 @@ writef(notebook, nb_file, format_name=None)
 ## Round-trip conversion
 
 Representing Jupyter notebooks as scripts requires a solid round trip conversion. You don't want your notebooks (nor your scripts) to be modified because you are converting them to the other form. A few hundred tests ensure that round trip conversion is safe.
- 
+
 You can easily test that the round trip conversion preserves your Jupyter notebooks and scripts. Run for instance:
 ```bash
 # Test the ipynb -> py:percent -> ipynb round trip conversion
@@ -178,7 +178,7 @@ Note that `jupytext --test` compares the resulting notebooks according to its ex
 
 Please note that
 - When you associate a Jupyter kernel with your text notebook, that information goes to a YAML header at the top of your script or Markdown document. And Jupytext itself may create a `jupytext` entry in the notebook metadata.
-- Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata. And a few cell metadata (`autoscroll`, `collapsed`, `scrolled`, `trusted`) are never included in the text representation, but are still preserved by the paired notebooks, and the `--update` conversion. 
+- Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata. And a few cell metadata (`autoscroll`, `collapsed`, `scrolled`, `trusted`) are never included in the text representation, but are still preserved by the paired notebooks, and the `--update` conversion.
 - Representing a Jupyter notebook as a Markdown or R Markdown document has the effect of splitting markdown cells with two consecutive blank lines into multiple cells (as the two blank line pattern is used to separate cells).
 
 ## Format specifications
@@ -265,11 +265,13 @@ You want to extend the `light` and `percent` format to another language? Please 
 
 Jupytext works very well with the Jupyter Notebook editor, and we recommend that you get used to Jupytext within `jupyter notebook` first.
 
-That being said, using Jupytext from Jupyter Lab is also an option. Please note that:
+That being said, Jupytext also works well from Jupyter Lab. Please note that:
 - Jupytext's installation is identical in both Jupyter Notebook and Jupyter Lab
 - Jupyter Lab can open any [paired notebook](#paired-notebooks) with `.ipynb` extension. Paired notebooks work exactly as in Jupyter Notebook: input cells are taken from the text notebook, and outputs from the  `.ipynb` file. Both files are updated when the notebook is saved.
-- Pairing notebooks is less convenient in Jupyter Lab than in Jupyter Notebook. Indeed, Jupyter Lab has no notebook metadata editor [yet](https://github.com/jupyterlab/jupyterlab/issues/1308), so you will have to open the JSON representation of the notebook, find the notebook metadata, and add the `"jupytext" : {"formats": "ipynb,py"},` entry manually.
-- Jupyter Lab cannot currently open scripts or Markdown documents as notebooks. A workaround is to create the corresponding `.ipynb` file manually, e.g. `jupytext --to notebook.ipynb notebook.py`, and pair it with the script. Opening scripts or Markdown documents as notebooks will become possible in the next Jupyter Lab release (v. 0.35), for which we contributed a _Open With -> Notebook_ menu entry in the contextual menu (right-click on a text notebook).
+- Pairing notebooks is slightly less convenient in Jupyter Lab than in Jupyter Notebook as Jupyter Lab has no notebook metadata editor [yet](https://github.com/jupyterlab/jupyterlab/issues/1308). You will have to open the JSON representation of the notebook in an editor, find the notebook metadata and add the `"jupytext" : {"formats": "ipynb,py"},` entry manually.
+- In Jupyter Lab, scripts or Markdown documents open as text by default. Open them as notebook with the  _Open With -> Notebook_ context menu (available in Jupyter Lab 0.35 and above) as shown below:
+
+![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/403b53ac5097446a15ea664579ba44cd1badcc57/ContextMenuLab.png)
 
 ## Will my notebook really run in an IDE?
 
