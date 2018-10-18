@@ -29,7 +29,7 @@ _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
 _IGNORE_METADATA = [
     # Frequent cell metadata that should not enter the text representation
     # (these metadata are preserved in the paired Jupyter notebook).
-    'autoscroll', 'collapsed', 'scrolled', 'trusted',
+    'autoscroll', 'collapsed', 'scrolled', 'trusted', 'ExecuteTime',
     # Pre-jupytext metadata
     'skipline', 'noskipline',
     # Jupytext metadata

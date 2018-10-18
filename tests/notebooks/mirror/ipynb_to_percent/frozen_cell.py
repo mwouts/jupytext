@@ -16,7 +16,7 @@
 #     version: 3.7.0
 # ---
 
-# %% {"ExecuteTime": {"end_time": "2018-10-17T10:31:56.160823Z", "start_time": "2018-10-17T10:31:56.157308Z"}}
+# %%
 # This is an unfrozen cell. Works as usual.
 print("I'm a regular cell so I run and print!")
 
