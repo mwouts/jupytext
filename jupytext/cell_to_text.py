@@ -277,6 +277,7 @@ class DoublePercentCellExporter(BaseCellExporter):
         if self.cell_type != 'code':
             self.metadata['cell_type'] = self.cell_type
 
+        active = is_active('py', self.metadata)
         if self.cell_type == 'raw' and 'active' in self.metadata and self.metadata['active'] == '':
             del self.metadata['active']
 
@@ -289,7 +290,8 @@ class DoublePercentCellExporter(BaseCellExporter):
         if self.cell_type == 'code':
             source = copy(self.source)
             comment_magic(source, self.language, self.comment_magics)
-            return lines + source
+            if active:
+                return lines + source
 
         return lines + comment_lines(self.source, self.comment)
 
