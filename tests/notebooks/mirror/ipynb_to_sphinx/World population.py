@@ -16,14 +16,15 @@
 #     version: 3.6.6
 # ---
 
-###############################################################################
-# # A quick insight at world population
-#
-# ## Collecting population data
-#
-# In the below we retrieve population data from the
-# [World Bank](http://www.worldbank.org/)
-# using the [wbdata](https://github.com/OliverSherouse/wbdata) python package
+"""
+# A quick insight at world population
+
+## Collecting population data
+
+In the below we retrieve population data from the
+[World Bank](http://www.worldbank.org/)
+using the [wbdata](https://github.com/OliverSherouse/wbdata) python package
+"""
 
 import pandas as pd
 import wbdata as wb

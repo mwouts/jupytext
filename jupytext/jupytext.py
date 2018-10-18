@@ -91,7 +91,13 @@ class TextNotebookWriter(NotebookWriter):
         lines.extend(metadata_and_cell_to_header(nb, self.format, self.ext))
 
         cell_exporters = []
+        looking_for_first_markdown_cell = self.format.format_name and self.format.format_name.startswith('sphinx')
+
         for cell in nb.cells:
+            if looking_for_first_markdown_cell and cell.cell_type == 'markdown':
+                cell.metadata['cell_marker'] = '"""'
+                looking_for_first_markdown_cell = False
+
             cell_exporters.append(self.format.cell_exporter_class(
                 cell, default_language, self.format.extension, comment_magics))
 
