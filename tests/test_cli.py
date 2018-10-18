@@ -4,7 +4,7 @@ import pytest
 from testfixtures import compare
 import mock
 from nbformat.v4.nbbase import new_notebook
-from jupytext import header
+from jupytext import header, __version__
 from jupytext import readf, writef, writes
 from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext
 from jupytext.compare import compare_notebooks
@@ -53,6 +53,14 @@ def test_convert_single_file(nb_file, capsys):
     out, err = capsys.readouterr()
     assert err == ''
     compare(out, pynb)
+
+
+def test_jupytext_version(capsys):
+    jupytext(['--version'])
+
+    out, err = capsys.readouterr()
+    assert err == ''
+    compare(out, __version__)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_cpp'))
