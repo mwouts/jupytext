@@ -9,6 +9,7 @@ from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version, 
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
 from .languages import _SCRIPT_EXTENSIONS
+from .version import __version__
 
 
 def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
@@ -170,7 +171,12 @@ def cli_jupytext(args=None):
                            'round trip conversion')
     parser.add_argument('-x', '--stop', dest='stop_on_first_error', action='store_true',
                         help='Stop on first round trip conversion error, and report stack traceback')
+    parser.add_argument('--version', action='store_true',
+                        help="Show jupytext's version number and exit")
     args = parser.parse_args(args)
+
+    if args.version:
+        return args
 
     args.to = canonize_format(args.to, args.output)
 
@@ -193,6 +199,11 @@ def jupytext(args=None):
     """Entry point for the jupytext script"""
     try:
         args = cli_jupytext(args)
+
+        if args.version:
+            sys.stdout.write(__version__)
+            return
+
         convert_notebook_files(nb_files=args.notebooks,
                                fmt=args.to,
                                input_format=args.input_format,
