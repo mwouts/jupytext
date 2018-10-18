@@ -440,7 +440,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
         # Cell content
         source = lines[cell_start:cell_end_marker]
 
-        if self.cell_type != 'code':
+        if self.cell_type != 'code' or (self.metadata and not is_active('py', self.metadata)):
             source = uncomment(source, self.comment)
         if self.comment_magics:
             source = self.uncomment_code_and_magics(source)
