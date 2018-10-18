@@ -210,9 +210,8 @@ class BaseCellReader(object):
             self.metadata['lines_to_end_of_cell_marker'] = 2
 
         # Is this a raw cell?
-        if not is_active('ipynb', self.metadata) or (
-                self.ext == '.md' and self.cell_type == 'code'
-                and self.language is None):
+        if ('active' in self.metadata and not is_active('ipynb', self.metadata)) or \
+                (self.ext == '.md' and self.cell_type == 'code' and self.language is None):
             if self.metadata.get('active') == '':
                 del self.metadata['active']
             self.cell_type = 'raw'

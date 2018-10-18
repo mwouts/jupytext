@@ -249,7 +249,7 @@ def rmd_options_to_metadata(options):
     for name in metadata:
         try_eval_metadata(metadata, name)
 
-    if 'active' in metadata and 'eval' in metadata:
+    if ('active' in metadata or metadata.get('run_control', {}).get('frozen') is True) and 'eval' in metadata:
         del metadata['eval']
 
     return language, metadata
@@ -316,6 +316,8 @@ def metadata_to_json_options(metadata):
 
 def is_active(ext, metadata):
     """Is the cell active for the given file extension?"""
+    if metadata.get('run_control', {}).get('frozen') is True:
+        return False
     if 'active' not in metadata:
         return True
     return ext.replace('.', '') in re.split('\\.|,', metadata['active'])
