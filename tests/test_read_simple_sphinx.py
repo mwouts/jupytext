@@ -6,10 +6,10 @@ import jupytext
 jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
-def test_read_simple_file(script="""# -*- coding: utf-8 -*-
-'''
+def test_read_simple_file(script='''# -*- coding: utf-8 -*-
+"""
 This is a markdown cell
-'''
+"""
 
 1 + 2 + 3 + 4
 5
@@ -22,9 +22,9 @@ This is a markdown cell
 # Another markdown cell
 
 def f(x):
-   '''Sample docstring'''
+   """Sample docstring"""
    return 4
-"""):
+'''):
     nb = jupytext.reads(script, ext='.py', format_name='sphinx')
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[0].source == '%matplotlib inline'
@@ -44,9 +44,9 @@ def f(x):
     assert nb.cells[4].source == 'Another markdown cell'
 
     assert nb.cells[5].cell_type == 'code'
-    assert nb.cells[5].source == """def f(x):
-   '''Sample docstring'''
-   return 4"""
+    assert nb.cells[5].source == '''def f(x):
+   """Sample docstring"""
+   return 4'''
     assert len(nb.cells) == 6
 
     script2 = jupytext.writes(nb, ext='.py', format_name='sphinx')
@@ -107,11 +107,12 @@ Another markdown cell'''
     assert len(nb.cells) == 9
 
 
-def test_read_empty_code_cell(script="""##################################
-# Markdown cell
+def test_read_empty_code_cell(script='''"""
+Markdown cell
+"""
 
 
-"""):
+'''):
     nb = jupytext.reads(script, ext='.py', format_name='sphinx')
 
     assert nb.cells[0].cell_type == 'code'
