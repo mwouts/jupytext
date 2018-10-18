@@ -3,6 +3,17 @@
 Release History
 ---------------
 
+0.8.3 (2018-10-19)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Frozen cells are supported in R Markdown, light and percent scripts (#101)
+- Inactive cells extended to percent scripts (#108)
+- ``jupytext`` gains a ``--version`` argument (#103)
+- "ExecuteTime" cell metadata is not included in the text representation anymore (#106)
+
+
 0.8.2 (2018-10-15)
 ++++++++++++++++++++++
 
