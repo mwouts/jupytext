@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+0.8.4 (2018-10-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Notebook metadata is filtered - only the most common metadata are stored in the text representation (#105)
+- Notebooks created from light and sphinx scripts do not have YAML header or cell metadata if there was none initially (#110)
+- First markdown cell exported as a docstring when using the Sphinx format (#107)
+
 0.8.3 (2018-10-19)
 ++++++++++++++++++++++
 
