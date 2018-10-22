@@ -1,6 +1,5 @@
 ---
 jupyter:
-  celltoolbar: Edit Metadata
   kernelspec:
     display_name: Python 3
     language: python
