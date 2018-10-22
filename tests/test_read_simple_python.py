@@ -3,6 +3,7 @@
 from nbformat.v4.nbbase import new_markdown_cell, new_notebook
 from testfixtures import compare
 import jupytext
+from jupytext.compare import compare_notebooks
 
 jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
@@ -503,4 +504,4 @@ def test_round_trip_markdown_cell_with_magic():
                             metadata={'jupytext': {'main_language': 'python'}})
     text = jupytext.writes(notebook, ext='.py')
     notebook2 = jupytext.reads(text, ext='.py')
-    compare(notebook, notebook2)
+    compare_notebooks(notebook, notebook2)
