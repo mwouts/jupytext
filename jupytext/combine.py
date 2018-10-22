@@ -1,7 +1,10 @@
 """Combine source and outputs from two notebooks
 """
 import re
+import copy
 from .cell_metadata import _IGNORE_METADATA
+from .header import _DEFAULT_METADATA
+from .metadata_filter import filter_metadata
 
 _BLANK_LINE = re.compile(r'^\s*$')
 
@@ -23,6 +26,15 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
     text_representation = nb_source.metadata.get('jupytext', {}).get('text_representation', {})
     ext = text_representation.get('extension')
     format_name = text_representation.get('format_name')
+
+    nb_outputs_metadata = copy.deepcopy(nb_outputs.metadata)
+    nb_outputs_metadata = filter_metadata(nb_outputs_metadata,
+                                          nb_source.metadata.get('jupytext', {}).get('metadata', {}).get('notebook'),
+                                          _DEFAULT_METADATA)
+
+    for key in nb_outputs.metadata:
+        if key not in nb_outputs_metadata:
+            nb_source.metadata[key] = nb_outputs.metadata[key]
 
     for cell in nb_source.cells:
         # Remove outputs to warranty that trust of returned notebook is that of second notebook

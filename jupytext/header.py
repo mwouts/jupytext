@@ -9,6 +9,7 @@ from nbformat.v4.nbbase import new_raw_cell
 from .version import __version__
 from .cell_to_text import comment_lines
 from .languages import _SCRIPT_EXTENSIONS
+from .metadata_filter import filter_metadata
 
 SafeRepresenter.add_representer(nbformat.NotebookNode, SafeRepresenter.represent_dict)
 
@@ -17,6 +18,14 @@ _BLANK_RE = re.compile(r"^\s*$")
 _JUPYTER_RE = re.compile(r"^jupyter\s*:\s*$")
 _LEFTSPACE_RE = re.compile(r"^\s")
 _UTF8_HEADER = ' -*- coding: utf-8 -*-'
+
+_DEFAULT_METADATA = [
+    # Preserve Jupytext section
+    'jupytext',
+    # Preserve kernel specs and language_info
+    'kernelspec', 'language_info',
+    # Kernel_info found in Nteract notebooks
+    'kernel_info']
 
 # Change this to False in tests
 INSERT_AND_CHECK_VERSION_NUMBER = True
@@ -99,6 +108,9 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
 
     if 'jupytext' in metadata and not metadata['jupytext']:
         del metadata['jupytext']
+
+    notebook_metadata_filter = metadata.get('jupytext', {}).get('metadata', {}).get('notebook')
+    metadata = filter_metadata(metadata, notebook_metadata_filter, _DEFAULT_METADATA)
 
     if metadata:
         header.extend(yaml.safe_dump({'jupyter': metadata}, default_flow_style=False).splitlines())
