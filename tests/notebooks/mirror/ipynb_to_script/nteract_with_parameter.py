@@ -16,8 +16,6 @@
 #     nbconvert_exporter: python
 #     pygments_lexer: ipython3
 #     version: 3.6.6
-#   nteract:
-#     version: 0.11.6
 # ---
 
 # + {"outputHidden": false, "inputHidden": false, "tags": ["parameters"]}
