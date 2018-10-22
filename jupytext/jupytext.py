@@ -95,7 +95,7 @@ class TextNotebookWriter(NotebookWriter):
 
         for cell in nb.cells:
             if looking_for_first_markdown_cell and cell.cell_type == 'markdown':
-                cell.metadata['cell_marker'] = '"""'
+                cell.metadata.setdefault('cell_marker', '"""')
                 looking_for_first_markdown_cell = False
 
             cell_exporters.append(self.format.cell_exporter_class(
