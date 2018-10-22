@@ -7,8 +7,8 @@ jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 def test_raise_on_different_metadata():
-    ref = new_notebook(metadata={'main_language': 'python'}, cells=[new_markdown_cell('Cell one')])
-    test = new_notebook(metadata={'main_language': 'R'}, cells=[new_markdown_cell('Cell one')])
+    ref = new_notebook(metadata={'language_info': {'name': 'python'}}, cells=[new_markdown_cell('Cell one')])
+    test = new_notebook(metadata={'language_info': {'name': 'R'}}, cells=[new_markdown_cell('Cell one')])
     with pytest.raises(NotebookDifference):
         compare_notebooks(ref, test, ext='.md')
 
