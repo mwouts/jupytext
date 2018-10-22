@@ -46,13 +46,21 @@ class TextNotebookReader(NotebookReader):
         if self.format.format_name and self.format.format_name.startswith('sphinx'):
             cells.append(new_code_cell(source='%matplotlib inline'))
 
+        cell_metadata = set()
+
         while lines:
             reader = self.format.cell_reader_class(self.format.extension, comment_magics)
             cell, pos = reader.read(lines)
             cells.append(cell)
+            cell_metadata.update(cell.metadata.keys())
             if pos <= 0:
                 raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
             lines = lines[pos:]
+
+        if not metadata and self.format.format_name in ['markdown', 'light', 'sphinx', 'sphinx-rst2md']:
+            metadata['jupytext'] = {'metadata': {'notebook': False}}
+            if not cell_metadata:
+                metadata['jupytext']['metadata']['cell'] = False
 
         set_main_and_cell_language(metadata, cells, self.format.extension)
 

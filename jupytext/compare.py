@@ -3,6 +3,7 @@
 import re
 from testfixtures import compare
 from .cell_metadata import _IGNORE_METADATA
+from .header import _DEFAULT_METADATA
 from .jupytext import reads, writes
 from .combine import combine_inputs_with_outputs
 
@@ -25,7 +26,7 @@ def filtered_cell(cell, preserve_outputs):
 
 def filtered_notebook_metadata(notebook):
     """Notebook metadata, filtered for metadata added by Jupytext itself"""
-    return {key: notebook.metadata[key] for key in notebook.metadata if key != 'jupytext'}
+    return {key: notebook.metadata[key] for key in notebook.metadata if key != 'jupytext' and key in _DEFAULT_METADATA}
 
 
 class NotebookDifference(Exception):
