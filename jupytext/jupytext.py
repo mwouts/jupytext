@@ -58,9 +58,9 @@ class TextNotebookReader(NotebookReader):
             lines = lines[pos:]
 
         if not metadata and self.format.format_name in ['markdown', 'light', 'sphinx', 'sphinx-rst2md']:
-            metadata['jupytext'] = {'metadata': {'notebook': False}}
+            metadata['jupytext'] = {'metadata_filter': {'notebook': False}}
             if not cell_metadata:
-                metadata['jupytext']['metadata']['cell'] = False
+                metadata['jupytext']['metadata_filter']['cells'] = False
 
         set_main_and_cell_language(metadata, cells, self.format.extension)
 
@@ -92,6 +92,7 @@ class TextNotebookWriter(NotebookWriter):
         nb = deepcopy(nb)
         default_language = default_language_from_metadata_and_ext(nb, self.format.extension)
         comment_magics = nb.metadata.get('jupytext', {}).get('comment_magics')
+        cell_metadata_filter = nb.metadata.get('jupytext', {}).get('metadata_filter', {}).get('cells')
         if 'main_language' in nb.metadata.get('jupytext', {}):
             del nb.metadata['jupytext']['main_language']
 
@@ -107,7 +108,7 @@ class TextNotebookWriter(NotebookWriter):
                 looking_for_first_markdown_cell = False
 
             cell_exporters.append(self.format.cell_exporter_class(
-                cell, default_language, self.format.extension, comment_magics))
+                cell, default_language, self.format.extension, comment_magics, cell_metadata_filter))
 
         texts = [cell.cell_to_text() for cell in cell_exporters]
 

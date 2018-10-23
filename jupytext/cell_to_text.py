@@ -3,9 +3,9 @@
 import re
 from copy import copy
 from .languages import cell_language
-from .cell_metadata import filter_metadata, is_active, \
-    metadata_to_rmd_options, metadata_to_json_options, \
-    metadata_to_double_percent_options
+from .cell_metadata import is_active, _IGNORE_CELL_METADATA
+from .cell_metadata import metadata_to_rmd_options, metadata_to_json_options, metadata_to_double_percent_options
+from .metadata_filter import filter_metadata
 from .magics import comment_magic, escape_code_start
 from .cell_reader import LightScriptCellReader
 from .languages import _SCRIPT_EXTENSIONS
@@ -32,11 +32,12 @@ class BaseCellExporter(object):
     """A class that represent a notebook cell as text"""
     default_comment_magics = None
 
-    def __init__(self, cell, default_language, ext, comment_magics=None):
+    def __init__(self, cell, default_language, ext, comment_magics=None, cell_metadata_filter=None):
         self.ext = ext
         self.cell_type = cell.cell_type
         self.source = cell_source(cell)
-        self.metadata = filter_metadata(cell.metadata)
+        self.metadata = copy(cell.metadata)
+        filter_metadata(self.metadata, cell_metadata_filter, _IGNORE_CELL_METADATA)
         self.language = cell_language(self.source) or default_language
         self.default_language = default_language
         self.comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
@@ -96,8 +97,8 @@ class MarkdownCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as Markdown"""
     default_comment_magics = False
 
-    def __init__(self, cell, default_language, ext, comment_magics=None):
-        BaseCellExporter.__init__(self, cell, default_language, ext, comment_magics)
+    def __init__(self, *args, **kwargs):
+        BaseCellExporter.__init__(self, *args, **kwargs)
         self.comment = ''
 
     def code_to_text(self):
@@ -119,8 +120,8 @@ class RMarkdownCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as Markdown"""
     default_comment_magics = True
 
-    def __init__(self, cell, default_language, ext, comment_magics=None):
-        BaseCellExporter.__init__(self, cell, default_language, ext, comment_magics)
+    def __init__(self, *args, **kwargs):
+        BaseCellExporter.__init__(self, *args, **kwargs)
         self.comment = ''
 
     def code_to_text(self):
@@ -232,8 +233,8 @@ class RScriptCellExporter(BaseCellExporter):
     """A class that can represent a notebook cell as a R script"""
     default_comment_magics = True
 
-    def __init__(self, cell, default_language, ext, comment_magics=None):
-        BaseCellExporter.__init__(self, cell, default_language, ext, comment_magics)
+    def __init__(self, *args, **kwargs):
+        BaseCellExporter.__init__(self, *args, **kwargs)
         self.comment = "#'"
 
     def code_to_text(self):
@@ -303,8 +304,8 @@ class SphinxGalleryCellExporter(BaseCellExporter):
     default_cell_marker = '#' * 79
     default_comment_magics = True
 
-    def __init__(self, cell, default_language, ext, comment_magics=None):
-        BaseCellExporter.__init__(self, cell, default_language, ext, comment_magics)
+    def __init__(self, *args, **kwargs):
+        BaseCellExporter.__init__(self, *args, **kwargs)
         self.comment = '#'
 
     def code_to_text(self):

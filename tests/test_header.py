@@ -95,8 +95,8 @@ def test_notebook_from_plain_script_has_metadata_filter(script="""print('Hello w
 """):
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         nb = jupytext.reads(script, '.py')
-    assert nb.metadata.get('jupytext', {}).get('metadata', {}).get('notebook') is False
-    assert nb.metadata.get('jupytext', {}).get('metadata', {}).get('cell') is False
+    assert nb.metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook') is False
+    assert nb.metadata.get('jupytext', {}).get('metadata_filter', {}).get('cells') is False
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         scripts2 = jupytext.writes(nb, '.py')
 

@@ -26,14 +26,14 @@ except NameError:
 
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
-_IGNORE_METADATA = [
+_IGNORE_CELL_METADATA = '-' + ','.join([
     # Frequent cell metadata that should not enter the text representation
     # (these metadata are preserved in the paired Jupyter notebook).
     'autoscroll', 'collapsed', 'scrolled', 'trusted', 'ExecuteTime',
     # Pre-jupytext metadata
     'skipline', 'noskipline',
     # Jupytext metadata
-    'lines_to_next_cell', 'lines_to_end_of_cell_marker']
+    'lines_to_next_cell', 'lines_to_end_of_cell_marker'])
 _PERCENT_CELL = re.compile(
     r'(# |#)%%([^\{\[]*)(|\[raw\]|\[markdown\])([^\{\[]*)(|\{.*\})\s*$')
 
@@ -68,7 +68,6 @@ def metadata_to_rmd_options(language, metadata):
     :return:
     """
     options = (language or 'R').lower()
-    metadata = filter_metadata(metadata)
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
         del metadata['name']
@@ -302,11 +301,6 @@ def json_options_to_metadata(options, add_brackets=True):
         return options
     except ValueError:
         return {}
-
-
-def filter_metadata(metadata):
-    """Filter technical metadata"""
-    return {k: metadata[k] for k in metadata if k not in _IGNORE_METADATA}
 
 
 def metadata_to_json_options(metadata):
