@@ -33,7 +33,7 @@ _IGNORE_CELL_METADATA = '-' + ','.join([
     # Pre-jupytext metadata
     'skipline', 'noskipline',
     # Jupytext metadata
-    'lines_to_next_cell', 'lines_to_end_of_cell_marker'])
+    'cell_marker', 'lines_to_next_cell', 'lines_to_end_of_cell_marker'])
 _PERCENT_CELL = re.compile(
     r'(# |#)%%([^\{\[]*)(|\[raw\]|\[markdown\])([^\{\[]*)(|\{.*\})\s*$')
 
