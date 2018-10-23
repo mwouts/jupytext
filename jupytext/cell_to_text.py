@@ -36,8 +36,8 @@ class BaseCellExporter(object):
         self.ext = ext
         self.cell_type = cell.cell_type
         self.source = cell_source(cell)
-        self.metadata = copy(cell.metadata)
-        filter_metadata(self.metadata, cell_metadata_filter, _IGNORE_CELL_METADATA)
+        self.unfiltered_metadata = cell.metadata
+        self.metadata = filter_metadata(copy(cell.metadata), cell_metadata_filter, _IGNORE_CELL_METADATA)
         self.language = cell_language(self.source) or default_language
         self.default_language = default_language
         self.comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
@@ -158,6 +158,12 @@ def endofcell_marker(source, comment):
 class LightScriptCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as a Python or Julia script"""
     default_comment_magics = True
+
+    def __init__(self, *args, **kwargs):
+        BaseCellExporter.__init__(self, *args, **kwargs)
+        for key in ['endofcell']:
+            if key in self.unfiltered_metadata:
+                self.metadata[key] = self.unfiltered_metadata[key]
 
     def is_code(self):
         # Treat markdown cells with metadata as code cells (#66)
@@ -307,6 +313,10 @@ class SphinxGalleryCellExporter(BaseCellExporter):
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
         self.comment = '#'
+
+        for key in ['cell_marker']:
+            if key in self.unfiltered_metadata:
+                self.metadata[key] = self.unfiltered_metadata[key]
 
     def code_to_text(self):
         """Not used"""
