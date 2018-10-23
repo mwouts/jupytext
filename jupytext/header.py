@@ -19,13 +19,13 @@ _JUPYTER_RE = re.compile(r"^jupyter\s*:\s*$")
 _LEFTSPACE_RE = re.compile(r"^\s")
 _UTF8_HEADER = ' -*- coding: utf-8 -*-'
 
-_DEFAULT_METADATA = [
+_DEFAULT_NOTEBOOK_METADATA = ','.join([
     # Preserve Jupytext section
     'jupytext',
     # Preserve kernel specs and language_info
     'kernelspec', 'language_info',
     # Kernel_info found in Nteract notebooks
-    'kernel_info']
+    'kernel_info'])
 
 # Change this to False in tests
 INSERT_AND_CHECK_VERSION_NUMBER = True
@@ -109,8 +109,8 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
     if 'jupytext' in metadata and not metadata['jupytext']:
         del metadata['jupytext']
 
-    notebook_metadata_filter = metadata.get('jupytext', {}).get('metadata', {}).get('notebook')
-    metadata = filter_metadata(metadata, notebook_metadata_filter, _DEFAULT_METADATA)
+    notebook_metadata_filter = metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook')
+    metadata = filter_metadata(metadata, notebook_metadata_filter, _DEFAULT_NOTEBOOK_METADATA)
 
     if metadata:
         header.extend(yaml.safe_dump({'jupyter': metadata}, default_flow_style=False).splitlines())

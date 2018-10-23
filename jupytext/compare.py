@@ -1,20 +1,25 @@
 """Compare two Jupyter notebooks"""
 
 import re
+from copy import copy
 from testfixtures import compare
-from .cell_metadata import _IGNORE_METADATA
-from .header import _DEFAULT_METADATA
+from .cell_metadata import _IGNORE_CELL_METADATA
+from .header import _DEFAULT_NOTEBOOK_METADATA
+from .metadata_filter import filter_metadata
 from .jupytext import reads, writes
 from .combine import combine_inputs_with_outputs
 
 _BLANK_LINE = re.compile(r'^\s*$')
 
 
-def filtered_cell(cell, preserve_outputs):
+def filtered_cell(cell, preserve_outputs, cell_metadata_filter):
     """Cell type, metadata and source from given cell"""
+    metadata = copy(cell.metadata)
+    filter_metadata(metadata, cell_metadata_filter, _IGNORE_CELL_METADATA)
+
     filtered = {'cell_type': cell.cell_type,
                 'source': cell.source,
-                'metadata': {key: cell.metadata[key] for key in cell.metadata if key not in _IGNORE_METADATA}}
+                'metadata': metadata}
 
     if preserve_outputs:
         for key in ['execution_count', 'outputs']:
@@ -26,7 +31,10 @@ def filtered_cell(cell, preserve_outputs):
 
 def filtered_notebook_metadata(notebook):
     """Notebook metadata, filtered for metadata added by Jupytext itself"""
-    return {key: notebook.metadata[key] for key in notebook.metadata if key != 'jupytext' and key in _DEFAULT_METADATA}
+    metadata = copy(notebook.metadata)
+    return filter_metadata(metadata,
+                           notebook.metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook'),
+                           _DEFAULT_NOTEBOOK_METADATA.replace('jupytext,', ''))
 
 
 class NotebookDifference(Exception):
@@ -73,6 +81,8 @@ def compare_notebooks(notebook_expected,
                                                                            or format_name in ['sphinx', 'spin'])
     allow_removed_final_blank_line = allow_expected_differences
 
+    cell_metadata_filter = notebook_actual.get('jupytext', {}).get('metadata_filter', {}).get('cells')
+
     if format_name == 'sphinx' and notebook_actual.cells and notebook_actual.cells[0].source == '%matplotlib inline':
         notebook_actual.cells = notebook_actual.cells[1:]
 
@@ -109,9 +119,9 @@ def compare_notebooks(notebook_expected,
 
                 if allow_filtered_cell_metadata:
                     ref_cell.metadata = {key: ref_cell.metadata[key] for key in ref_cell.metadata
-                                         if key not in _IGNORE_METADATA}
+                                         if key not in _IGNORE_CELL_METADATA}
                     test_cell.metadata = {key: test_cell.metadata[key] for key in test_cell.metadata
-                                          if key not in _IGNORE_METADATA}
+                                          if key not in _IGNORE_CELL_METADATA}
 
                 if ref_cell.metadata != test_cell.metadata:
                     if raise_on_first_difference:
@@ -172,8 +182,12 @@ def compare_notebooks(notebook_expected,
         if ref_cell.cell_type != 'code':
             continue
 
-        ref_cell = filtered_cell(ref_cell, preserve_outputs=compare_outputs)
-        test_cell = filtered_cell(test_cell, preserve_outputs=compare_outputs)
+        ref_cell = filtered_cell(ref_cell,
+                                 preserve_outputs=compare_outputs,
+                                 cell_metadata_filter=cell_metadata_filter)
+        test_cell = filtered_cell(test_cell,
+                                  preserve_outputs=compare_outputs,
+                                  cell_metadata_filter=cell_metadata_filter)
 
         try:
             compare(ref_cell, test_cell)

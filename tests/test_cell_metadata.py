@@ -1,8 +1,8 @@
 import pytest
-from jupytext.cell_metadata import rmd_options_to_metadata, \
-    metadata_to_rmd_options, parse_rmd_options, RMarkdownOptionParsingError, \
-    try_eval_metadata, json_options_to_metadata, metadata_to_json_options, \
-    md_options_to_metadata, filter_metadata
+from jupytext.cell_metadata import rmd_options_to_metadata, metadata_to_rmd_options, parse_rmd_options
+from jupytext.cell_metadata import _IGNORE_CELL_METADATA, RMarkdownOptionParsingError, try_eval_metadata
+from jupytext.cell_metadata import json_options_to_metadata, metadata_to_json_options, md_options_to_metadata
+from jupytext.metadata_filter import filter_metadata
 from .utils import skip_if_dict_is_not_ordered
 
 SAMPLES = [('r', ('R', {})),
@@ -63,11 +63,12 @@ def test_parsing_error(options):
 
 def test_ignore_metadata():
     metadata = {'trusted': True, 'hide_input': True}
+    metadata = filter_metadata(metadata, None, _IGNORE_CELL_METADATA)
     assert metadata_to_rmd_options('R', metadata) == 'r echo=FALSE'
 
 
 def test_filter_metadata():
-    assert filter_metadata({'scrolled': True}) == {}
+    assert filter_metadata({'scrolled': True}, None, _IGNORE_CELL_METADATA) == {}
 
 
 def test_try_eval_metadata():
