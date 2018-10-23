@@ -532,3 +532,43 @@ def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
     # check that text representation exists in light format
     with open(str(tmpdir.join(tmp_lgt_script))) as stream:
         assert read_format_from_metadata(stream.read(), '.lgt' + auto_ext) == 'light'
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
+def test_metadata_filter_is_effective(nb_file, tmpdir):
+    nb = jupytext.readf(nb_file)
+    tmp_ipynb = 'notebook.ipynb'
+    tmp_script = 'notebook.py'
+
+    # create contents manager
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # save notebook to tmpdir
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    # set config
+    cm.default_jupytext_formats = 'ipynb,py'
+    cm.default_notebook_metadata_filter = 'jupytext-all'
+    cm.default_cell_metadata_filter = '-all'
+
+    # load notebook
+    nb = cm.get(tmp_ipynb)['content']
+
+    # save notebook again
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    # read text version
+    nb2 = jupytext.readf(str(tmpdir.join(tmp_script)))
+
+    # test no metadata
+    assert nb2.metadata.keys() == {'jupytext'}
+    for cell in nb2.cells:
+        assert not cell.metadata
+
+    # read paired notebook
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        nb3 = cm.get(tmp_script)['content']
+
+    compare_notebooks(nb, nb3)

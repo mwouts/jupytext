@@ -136,6 +136,18 @@ class TextFileContentsManager(FileContentsManager, Configurable):
              'scripts as Sphinx gallery scripts.',
         config=True)
 
+    default_notebook_metadata_filter = Unicode(
+        u'',
+        help="Cell metadata that should be save in the text representations. "
+             "Examples: 'all', '-all', 'widgets,nteract', 'kernelspec,jupytext-all'",
+        config=True)
+
+    default_cell_metadata_filter = Unicode(
+        u'',
+        help="Notebook metadata that should be saved in the text representations. "
+             "Examples: 'all', 'hide_input,hide_output'",
+        config=True)
+
     comment_magics = Enum(
         values=[True, False],
         allow_none=True,
@@ -215,11 +227,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         """Read a notebook from an os path."""
         _, fmt, ext = file_fmt_ext(os_path)
         if ext in self.nb_extensions:
-            format_name = self.preferred_format(
-                fmt, self.preferred_jupytext_formats_read)
-            with mock.patch('nbformat.reads',
-                            _jupytext_reads(fmt, format_name,
-                                            self.sphinx_convert_rst2md)):
+            format_name = self.preferred_format(fmt, self.preferred_jupytext_formats_read)
+            with mock.patch('nbformat.reads', _jupytext_reads(fmt, format_name, self.sphinx_convert_rst2md)):
                 return super(TextFileContentsManager, self)._read_notebook(os_path, as_version)
         else:
             return super(TextFileContentsManager, self)._read_notebook(os_path, as_version)
@@ -283,18 +292,14 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                         break
 
             if source_format != fmt:
-                self.log.info(u'Reading SOURCE from {}'.format(
-                    os.path.basename(nb_file + source_format)))
+                self.log.info(u'Reading SOURCE from {}'.format(os.path.basename(nb_file + source_format)))
                 model_outputs = model
                 model = self.get(nb_file + source_format, content=content,
-                                 type=type, format=format,
-                                 load_alternative_format=False)
+                                 type=type, format=format, load_alternative_format=False)
             elif outputs_format != fmt:
-                self.log.info(u'Reading OUTPUTS from {}'.format(
-                    os.path.basename(nb_file + outputs_format)))
+                self.log.info(u'Reading OUTPUTS from {}'.format(os.path.basename(nb_file + outputs_format)))
                 model_outputs = self.get(nb_file + outputs_format, content=content,
-                                         type=type, format=format,
-                                         load_alternative_format=False)
+                                         type=type, format=format, load_alternative_format=False)
             else:
                 model_outputs = None
 
@@ -325,6 +330,15 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                                        'last_modified']))
             except OverflowError:
                 pass
+
+            if self.default_notebook_metadata_filter:
+                (model['content'].metadata.setdefault('jupytext', {})
+                 .setdefault('metadata_filter', {})
+                 .setdefault('notebook', self.default_notebook_metadata_filter))
+            if self.default_cell_metadata_filter:
+                (model['content'].metadata.setdefault('jupytext', {})
+                 .setdefault('metadata_filter', {})
+                 .setdefault('cells', self.default_cell_metadata_filter))
 
             if model_outputs:
                 combine_inputs_with_outputs(model['content'], model_outputs['content'])
