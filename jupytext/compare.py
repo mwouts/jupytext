@@ -32,9 +32,12 @@ def filtered_cell(cell, preserve_outputs, cell_metadata_filter):
 def filtered_notebook_metadata(notebook):
     """Notebook metadata, filtered for metadata added by Jupytext itself"""
     metadata = copy(notebook.metadata)
-    return filter_metadata(metadata,
-                           notebook.metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook'),
-                           _DEFAULT_NOTEBOOK_METADATA.replace('jupytext,', ''))
+    metadata = filter_metadata(metadata,
+                               notebook.metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook'),
+                               _DEFAULT_NOTEBOOK_METADATA)
+    if 'jupytext' in metadata:
+        del metadata['jupytext']
+    return metadata
 
 
 class NotebookDifference(Exception):
