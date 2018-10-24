@@ -277,29 +277,21 @@ Also, you may want some cells to be active only in the Python, or R Markdown rep
 
 ## Cell and notebook metadata filtering
 
-The text representation of the notebook focuses on the part of the notebook that you have written, and that should go under version control. Outputs and metadata that are (re)-constructed automatically when the notebook is executed do not need to enter the text representation.
+The text representation of the notebook focuses on the part of the notebook that you have written. That is also the part of the notebook that should go under version control. Outputs and metadata that are (re)-constructed automatically when the notebook is executed do not need to enter the text representation.
 
-To that aim, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. And only the most standard notebook metadata (`kernelspec`, `language_info` and `jupytext`) are saved when a notebook is exported as text.
+To that aim, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. And only the required notebook metadata: `kernelspec`, `language_info` and `jupytext` are saved when a notebook is exported as text.
 
-When a paired notebook is loaded, Jupytext loads the filtered metadata from the `.ipynb` file. Please keep in mind that the `.ipynb` file is typically not distributed accross contributors, and that the cell metadata may be lost when an input cell changes (cells are matched according to their contents). If you happen to miss a notebook or cell metadata, you can change the default filtering as follows. If you want to preserve all the notebook metadata but `widget` and `varInspector`, set a notebook metadata
-```
-"jupytext": {"metadata_filter": {"notebook": "all-widget,varInspector"}}
-```
-If you want to preserve the `toc` section (in addition to the default YAML header), use
-```
-"jupytext": {"metadata_filter": {"notebook": "toc"}}
-```
-At last, if you want to modify the default cell filter and allow `ExecuteTime` and `autoscroll`, but not `hide_ouput`, use
-```
-"jupytext": {"metadata_filter": {"cells": "ExecuteTime,autoscroll-hide_ouput"}}
-```
+When a paired notebook is loaded, Jupytext reconstructs the filtered metadata using the `.ipynb` file. Please keep in mind that the `.ipynb` file is typically not distributed accross contributors, and that the cell metadata may be lost when an input cell changes (cells are matched according to their contents). Thus, if some cell or notebook metadata are important to your notebook, you should preserve it in the text version. Change the default metadata filtering as follows:
+- If you want to preserve all the notebook metadata but `widget` and `varInspector` in the YAML header, set a notebook metadata `"jupytext": {"metadata_filter": {"notebook": "all-widget,varInspector"}}`
+- If you want to preserve the `toc` section (in addition to the default YAML header), use `"jupytext": {"metadata_filter": {"notebook": "toc"}}`
+- At last, if you want to modify the default cell filter and allow `ExecuteTime` and `autoscroll`, but not `hide_ouput`, use `"jupytext": {"metadata_filter": {"cells": "ExecuteTime,autoscroll-hide_ouput"}}`
 
-A default value for these configuration options can be set on Jupytext's content manager using, for instance
+A default value for these filters can be set on Jupytext's content manager using, for instance
 ```
 c.default_notebook_metadata_filter = "all-widget,varInspector"
 c.default_cell_metadata_filter = "ExecuteTime,autoscroll-hide_ouput"
 ```
-If you are aware of a notebook metadata that should not be filtered, or of a cell metadata that should be filtered, please open an issue and let us know.
+Help us improving the default configuration: if you are aware of a notebook metadata that should not be filtered, or of a cell metadata that should always be filtered, please open an issue and let us know.
 
 Finally, if you prefer that scripts and markdown files with no YAML header do not get one (nor additional cell metadata) when opened and saved in Jupyter, set the following option on Jupytext's content manager:
 ```python
