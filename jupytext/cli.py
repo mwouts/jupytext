@@ -201,7 +201,7 @@ def jupytext(args=None):
         args = cli_jupytext(args)
 
         if args.version:
-            sys.stdout.write(__version__)
+            sys.stdout.write(__version__ + '\n')
             return
 
         convert_notebook_files(nb_files=args.notebooks,

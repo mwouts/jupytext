@@ -60,7 +60,7 @@ def test_jupytext_version(capsys):
 
     out, err = capsys.readouterr()
     assert err == ''
-    compare(out, __version__)
+    compare(out, __version__ + '\n')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_cpp'))
