@@ -178,7 +178,8 @@ Note that `jupytext --test` compares the resulting notebooks according to its ex
 
 Please note that
 - When you associate a Jupyter kernel with your text notebook, that information goes to a YAML header at the top of your script or Markdown document. And Jupytext itself may create a `jupytext` entry in the notebook metadata.
-- Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata. And a few cell metadata (`autoscroll`, `collapsed`, `scrolled`, `trusted`) are never included in the text representation, but are still preserved by the paired notebooks, and the `--update` conversion.
+- Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata.
+- By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in this in the [metadata filtering](#Cell-and-notebook-metadata-filtering) section.
 - Representing a Jupyter notebook as a Markdown or R Markdown document has the effect of splitting markdown cells with two consecutive blank lines into multiple cells (as the two blank line pattern is used to separate cells).
 
 ## Format specifications
@@ -253,14 +254,6 @@ The `spin` format implements these [specifications](https://rmarkdown.rstudio.co
 - Markdown cells are commented with `#' `.
 - Code cells are exported verbatim. Cell metadata are signalled with `#+`. Cells end with a blank line, an explicit start of cell marker, or a markdown cell.
 
-## Extending the `light` and `percent` formats to more languages
-
-You want to extend the `light` and `percent` format to another language? Please let us know! In principle that is easy, and you will only have to:
-- document the language extension and comment by adding one line to `_SCRIPT_EXTENSIONS` in `languages.py`.
-- contribute a sample notebook in `tests\notebooks\ipynb_[language]`.
-- add two tests in `test_mirror.py`: one for the `light` format, and another one for the `percent` format.
-- Make sure that the tests pass, and that the text representations of your notebook, found in  `tests\notebooks\mirror\ipynb_to_script` and `tests\notebooks\mirror\ipynb_to_percent`, are valid scripts.
-
 ## Jupyter Notebook or Jupyter Lab?
 
 Jupytext works very well with the Jupyter Notebook editor, and we recommend that you get used to Jupytext within `jupyter notebook` first.
@@ -281,6 +274,45 @@ c.ContentsManager.comment_magics = True # or False
 ```
 
 Also, you may want some cells to be active only in the Python, or R Markdown representation. For this, use the `active` cell metadata. Set `"active": "ipynb"` if you want that cell to be active only in the Jupyter notebook. And `"active": "py"` if you want it to be active only in the Python script. And `"active": "ipynb,py"` if you want it to be active in both, but not in the R Markdown representation...
+
+## Cell and notebook metadata filtering
+
+The text representation of the notebook focuses on the part of the notebook that you have written, and that should go under version control. Outputs and metadata that are (re)-constructed automatically when the notebook is executed do not need to enter the text representation.
+
+To that aim, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. And only the most standard notebook metadata (`kernelspec`, `language_info` and `jupytext`) are saved when a notebook is exported as text.
+
+When a paired notebook is loaded, Jupytext loads the filtered metadata from the `.ipynb` file. Please keep in mind that the `.ipynb` file is typically not distributed accross contributors, and that the cell metadata may be lost when an input cell changes (cells are matched according to their contents). If you happen to miss a notebook or cell metadata, you can change the default filtering as follows. If you want to preserve all the notebook metadata but `widget` and `varInspector`, set a notebook metadata
+```
+"jupytext": {"metadata_filter": {"notebook": "all-widget,varInspector"}}
+```
+If you want to preserve the `toc` section (in addition to the default YAML header), use
+```
+"jupytext": {"metadata_filter": {"notebook": "toc"}}
+```
+At last, if you want to modify the default cell filter and allow `ExecuteTime` and `autoscroll`, but not `hide_ouput`, use
+```
+"jupytext": {"metadata_filter": {"cells": "ExecuteTime,autoscroll-hide_ouput"}}
+```
+
+A default value for these configuration options can be set on Jupytext's content manager using, for instance
+```
+c.default_notebook_metadata_filter = "all-widget,varInspector"
+c.default_cell_metadata_filter = "ExecuteTime,autoscroll-hide_ouput"
+```
+If you are aware of a notebook metadata that should not be filtered, or of a cell metadata that should be filtered, please open an issue and let us know.
+
+Finally, if you prefer that scripts and markdown files with no YAML header do not get one (nor additional cell metadata) when opened and saved in Jupyter, set the following option on Jupytext's content manager:
+```python
+c.ContentsManager.additional_metadata_on_text_files = False
+```
+
+## Extending the `light` and `percent` formats to more languages
+
+You want to extend the `light` and `percent` format to another language? Please let us know! In principle that is easy, and you will only have to:
+- document the language extension and comment by adding one line to `_SCRIPT_EXTENSIONS` in `languages.py`.
+- contribute a sample notebook in `tests\notebooks\ipynb_[language]`.
+- add two tests in `test_mirror.py`: one for the `light` format, and another one for the `percent` format.
+- Make sure that the tests pass, and that the text representations of your notebook, found in  `tests\notebooks\mirror\ipynb_to_script` and `tests\notebooks\mirror\ipynb_to_percent`, are valid scripts.
 
 ## Jupytext's releases and backward compatibility
 
