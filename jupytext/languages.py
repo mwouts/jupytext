@@ -2,10 +2,8 @@
 
 import re
 
-_JUPYTER_LANGUAGES = ['R', 'bash', 'sh', 'python', 'python2', 'python3',
-                      'javascript', 'js', 'perl']
-_JUPYTER_LANGUAGES_RE = [re.compile(r"^%%{}\s*".format(lang))
-                         for lang in _JUPYTER_LANGUAGES]
+_JUPYTER_LANGUAGES = ['R', 'bash', 'sh', 'python', 'python2', 'python3', 'javascript', 'js', 'perl']
+_JUPYTER_LANGUAGES_RE = [re.compile(r"^%%{}\s*".format(lang)) for lang in _JUPYTER_LANGUAGES]
 
 _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.R': {'language': 'R', 'comment': '#'},
@@ -45,23 +43,30 @@ def set_main_and_cell_language(metadata, cells, ext):
     # Remove 'language' meta data and add a magic if not main language
     for cell in cells:
         if 'language' in cell['metadata']:
-            language = cell['metadata']['language']
-            del cell['metadata']['language']
-            if language != main_language and \
-                    language in _JUPYTER_LANGUAGES:
-                cell['source'] = u'%%{}\n'.format(language) + cell['source']
+            language = cell['metadata'].pop('language')
+            if language != main_language and language in _JUPYTER_LANGUAGES:
+                if 'magic_args' in cell['metadata']:
+                    magic_args = cell['metadata'].pop('magic_args')
+                    if (magic_args.startswith('"') and magic_args.endswith('"')) or \
+                            (magic_args.startswith("'") and magic_args.endswith("'")):
+                        magic_args = magic_args[1:-1]
+                    cell['source'] = u'%%{} {}\n'.format(language, magic_args) + cell['source']
+                else:
+                    cell['source'] = u'%%{}\n'.format(language) + cell['source']
 
 
 def cell_language(source):
     """
-    Return cell language
+    Return cell language and language options, if any
     :param source:
     :return:
     """
     if source:
         for lang, pattern in zip(_JUPYTER_LANGUAGES, _JUPYTER_LANGUAGES_RE):
+            line = source[0]
             if pattern.match(source[0]):
                 source.pop(0)
-                return lang
+                magic_args = line[len(pattern.findall(line)[0]):].strip()
+                return lang, magic_args
 
-    return None
+    return None, None
