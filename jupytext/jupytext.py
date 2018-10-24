@@ -26,9 +26,10 @@ from .languages import default_language_from_metadata_and_ext, \
 class TextNotebookReader(NotebookReader):
     """Text notebook reader"""
 
-    def __init__(self, ext, format_name=None):
+    def __init__(self, ext, format_name=None, additional_metadata_on_text_files=True):
         self.ext = ext
         self.format = get_format(ext, format_name)
+        self.additional_metadata_on_text_files = additional_metadata_on_text_files
 
     def reads(self, s, **_):
         """Read a notebook from text"""
@@ -57,7 +58,7 @@ class TextNotebookReader(NotebookReader):
                 raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
             lines = lines[pos:]
 
-        if not metadata and self.format.format_name in ['markdown', 'light', 'sphinx', 'sphinx-rst2md']:
+        if not self.additional_metadata_on_text_files and not metadata:
             metadata['jupytext'] = {'metadata_filter': {'notebook': False}}
             if not cell_metadata:
                 metadata['jupytext']['metadata_filter']['cells'] = False
@@ -138,7 +139,7 @@ class TextNotebookWriter(NotebookWriter):
 
 
 def reads(text, ext, format_name=None,
-          rst2md=False, as_version=4, **kwargs):
+          rst2md=False, additional_metadata_on_text_files=True, as_version=4, **kwargs):
     """Read a notebook from a string"""
     if ext.endswith('.ipynb'):
         return nbformat.reads(text, as_version, **kwargs)
@@ -150,7 +151,7 @@ def reads(text, ext, format_name=None,
         if format_name == 'sphinx' and rst2md:
             format_name = 'sphinx-rst2md'
 
-    reader = TextNotebookReader(ext, format_name)
+    reader = TextNotebookReader(ext, format_name, additional_metadata_on_text_files)
     notebook = reader.reads(text, **kwargs)
     transition_to_jupytext_section_in_metadata(notebook.metadata, False)
 
