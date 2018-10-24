@@ -563,7 +563,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     nb2 = jupytext.readf(str(tmpdir.join(tmp_script)))
 
     # test no metadata
-    assert nb2.metadata.keys() == {'jupytext'}
+    assert set(nb2.metadata.keys()) == {'jupytext'}
     for cell in nb2.cells:
         assert not cell.metadata
 
