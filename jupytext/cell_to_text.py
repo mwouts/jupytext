@@ -38,7 +38,15 @@ class BaseCellExporter(object):
         self.source = cell_source(cell)
         self.unfiltered_metadata = cell.metadata
         self.metadata = filter_metadata(copy(cell.metadata), cell_metadata_filter, _IGNORE_CELL_METADATA)
-        self.language = cell_language(self.source) or default_language
+        self.language, magic_args = cell_language(self.source)
+        if magic_args:
+            if ext.endswith('.Rmd'):
+                if "'" in magic_args:
+                    magic_args = '"' + magic_args + '"'
+                else:
+                    magic_args = "'" + magic_args + "'"
+            self.metadata['magic_args'] = magic_args
+        self.language = self.language or default_language
         self.default_language = default_language
         self.comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
         self.comment_magics = comment_magics if comment_magics is not None else self.default_comment_magics
