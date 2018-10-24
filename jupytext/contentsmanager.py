@@ -29,9 +29,11 @@ def _jupytext_writes(ext, format_name):
     return _writes
 
 
-def _jupytext_reads(ext, format_name, rst2md):
+def _jupytext_reads(ext, format_name, rst2md, additional_metadata_on_text_files):
     def _reads(text, as_version, **kwargs):
-        return jupytext.reads(text, ext=ext, format_name=format_name, rst2md=rst2md, as_version=as_version, **kwargs)
+        return jupytext.reads(text, ext=ext, format_name=format_name, rst2md=rst2md,
+                              additional_metadata_on_text_files=additional_metadata_on_text_files,
+                              as_version=as_version, **kwargs)
 
     return _reads
 
@@ -148,6 +150,13 @@ class TextFileContentsManager(FileContentsManager, Configurable):
              "Examples: 'all', 'hide_input,hide_output'",
         config=True)
 
+    additional_metadata_on_text_files = Bool(
+        True,
+        help='Allow (or not) additional notebook and cell metadata to be saved to a text file '
+             'that has no "jupyter" section or no YAML header.',
+        config=True
+    )
+
     comment_magics = Enum(
         values=[True, False],
         allow_none=True,
@@ -228,7 +237,9 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         _, fmt, ext = file_fmt_ext(os_path)
         if ext in self.nb_extensions:
             format_name = self.preferred_format(fmt, self.preferred_jupytext_formats_read)
-            with mock.patch('nbformat.reads', _jupytext_reads(fmt, format_name, self.sphinx_convert_rst2md)):
+            with mock.patch('nbformat.reads', _jupytext_reads(fmt, format_name,
+                                                              self.sphinx_convert_rst2md,
+                                                              self.additional_metadata_on_text_files)):
                 return super(TextFileContentsManager, self)._read_notebook(os_path, as_version)
         else:
             return super(TextFileContentsManager, self)._read_notebook(os_path, as_version)
@@ -251,8 +262,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 format_name = format_name_for_ext(nb.metadata, alt_fmt, self.default_jupytext_formats,
                                                   explicit_default=False) or \
                               self.preferred_format(alt_fmt, self.preferred_jupytext_formats_save)
-                with mock.patch('nbformat.writes',
-                                _jupytext_writes(alt_fmt, format_name)):
+                with mock.patch('nbformat.writes', _jupytext_writes(alt_fmt, format_name)):
                     super(TextFileContentsManager, self)._save_notebook(os_path_fmt, nb)
             else:
                 super(TextFileContentsManager, self)._save_notebook(os_path_fmt, nb)

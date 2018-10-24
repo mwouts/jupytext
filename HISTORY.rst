@@ -9,7 +9,7 @@ Release History
 **Improvements**
 
 - Notebook metadata is filtered - only the most common metadata are stored in the text representation (#105)
-- Notebooks created from light and sphinx scripts do not have YAML header or cell metadata if there was none initially (#110)
+- New config option `additional_metadata_on_text_files` on the content manager. Defaults to `True`. Change its value to `False` to avoid creating a YAML header or cell metadata if there was none initially (#110)
 - First markdown cell exported as a docstring when using the Sphinx format (#107)
 
 0.8.3 (2018-10-19)
