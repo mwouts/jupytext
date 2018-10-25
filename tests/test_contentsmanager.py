@@ -548,7 +548,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # set config
-    cm.default_jupytext_formats = 'ipynb,py'
+    cm.default_jupytext_formats = 'ipynb, py'
     cm.default_notebook_metadata_filter = 'jupytext-all'
     cm.default_cell_metadata_filter = '-all'
 
