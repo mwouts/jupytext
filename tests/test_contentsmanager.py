@@ -545,25 +545,28 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # save notebook to tmpdir
-    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # set config
     cm.default_jupytext_formats = 'ipynb, py'
-    cm.default_notebook_metadata_filter = 'jupytext,-all'
+    cm.default_notebook_metadata_filter = 'language_info,jupytext,-all'
     cm.default_cell_metadata_filter = '-all'
 
     # load notebook
-    nb = cm.get(tmp_ipynb)['content']
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        nb = cm.get(tmp_ipynb)['content']
 
     # save notebook again
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # read text version
-    nb2 = jupytext.readf(str(tmpdir.join(tmp_script)))
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        nb2 = jupytext.readf(str(tmpdir.join(tmp_script)))
 
     # test no metadata
-    assert set(nb2.metadata.keys()) == {'jupytext'}
+    assert set(nb2.metadata.keys()) <= {'language_info', 'jupytext'}
     for cell in nb2.cells:
         assert not cell.metadata
 
