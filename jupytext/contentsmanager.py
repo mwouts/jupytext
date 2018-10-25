@@ -20,6 +20,7 @@ import jupytext
 from .combine import combine_inputs_with_outputs
 from .formats import check_file_version, NOTEBOOK_EXTENSIONS, \
     format_name_for_ext, parse_one_format, parse_formats, transition_to_jupytext_section_in_metadata
+from .metadata_filter import metadata_filter_as_dict
 
 
 def _jupytext_writes(ext, format_name):
@@ -341,14 +342,18 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             except OverflowError:
                 pass
 
+            jupytext_metadata = model['content']['metadata'].setdefault('jupytext', {})
             if self.default_notebook_metadata_filter:
-                (model['content'].metadata.setdefault('jupytext', {})
-                 .setdefault('metadata_filter', {})
+                (jupytext_metadata.setdefault('metadata_filter', {})
                  .setdefault('notebook', self.default_notebook_metadata_filter))
             if self.default_cell_metadata_filter:
-                (model['content'].metadata.setdefault('jupytext', {})
-                 .setdefault('metadata_filter', {})
+                (jupytext_metadata.setdefault('metadata_filter', {})
                  .setdefault('cells', self.default_cell_metadata_filter))
+
+            for filter_level in ['notebook', 'cells']:
+                filter = jupytext_metadata.get('metadata_filter', {}).get(filter_level)
+                if filter is not None:
+                    jupytext_metadata['metadata_filter'][filter_level] = metadata_filter_as_dict(filter)
 
             if model_outputs:
                 combine_inputs_with_outputs(model['content'], model_outputs['content'])
