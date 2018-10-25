@@ -282,13 +282,13 @@ The text representation of the notebook focuses on the part of the notebook that
 To that aim, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. And only the required notebook metadata: `kernelspec`, `language_info` and `jupytext` are saved when a notebook is exported as text.
 
 When a paired notebook is loaded, Jupytext reconstructs the filtered metadata using the `.ipynb` file. Please keep in mind that the `.ipynb` file is typically not distributed accross contributors, and that the cell metadata may be lost when an input cell changes (cells are matched according to their contents). Thus, if some cell or notebook metadata are important to your notebook, you should preserve it in the text version. Change the default metadata filtering as follows:
-- If you want to preserve all the notebook metadata but `widget` and `varInspector` in the YAML header, set a notebook metadata `"jupytext": {"metadata_filter": {"notebook": "all-widget,varInspector"}}`
+- If you want to preserve all the notebook metadata but `widgets` and `varInspector` in the YAML header, set a notebook metadata `"jupytext": {"metadata_filter": {"notebook": "all-widgets,varInspector"}}`
 - If you want to preserve the `toc` section (in addition to the default YAML header), use `"jupytext": {"metadata_filter": {"notebook": "toc"}}`
 - At last, if you want to modify the default cell filter and allow `ExecuteTime` and `autoscroll`, but not `hide_ouput`, use `"jupytext": {"metadata_filter": {"cells": "ExecuteTime,autoscroll-hide_ouput"}}`
 
 A default value for these filters can be set on Jupytext's content manager using, for instance
 ```
-c.default_notebook_metadata_filter = "all-widget,varInspector"
+c.default_notebook_metadata_filter = "all-widgets,varInspector"
 c.default_cell_metadata_filter = "ExecuteTime,autoscroll-hide_ouput"
 ```
 Help us improving the default configuration: if you are aware of a notebook metadata that should not be filtered, or of a cell metadata that should always be filtered, please open an issue and let us know.
