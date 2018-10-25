@@ -68,7 +68,7 @@ def check_formats(formats):
         for fmt in group:
             if not fmt:
                 continue
-            fmt, _ = parse_one_format(fmt)
+            fmt, _ = parse_one_format(fmt.strip())
             if not any([fmt.endswith(ext) for ext in allowed_extension]):
                 raise ValueError('Group extension {} contains {}, which does not end with either {}.\n{}'
                                  .format(str(group), fmt, str(allowed_extension), expected_format))
