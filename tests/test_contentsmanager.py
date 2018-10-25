@@ -549,7 +549,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
 
     # set config
     cm.default_jupytext_formats = 'ipynb, py'
-    cm.default_notebook_metadata_filter = 'jupytext-all'
+    cm.default_notebook_metadata_filter = 'jupytext,-all'
     cm.default_cell_metadata_filter = '-all'
 
     # load notebook
