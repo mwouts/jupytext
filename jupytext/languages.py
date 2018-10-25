@@ -47,9 +47,6 @@ def set_main_and_cell_language(metadata, cells, ext):
             if language != main_language and language in _JUPYTER_LANGUAGES:
                 if 'magic_args' in cell['metadata']:
                     magic_args = cell['metadata'].pop('magic_args')
-                    if (magic_args.startswith('"') and magic_args.endswith('"')) or \
-                            (magic_args.startswith("'") and magic_args.endswith("'")):
-                        magic_args = magic_args[1:-1]
                     cell['source'] = u'%%{} {}\n'.format(language, magic_args) + cell['source']
                 else:
                     cell['source'] = u'%%{}\n'.format(language) + cell['source']

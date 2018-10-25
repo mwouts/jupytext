@@ -236,9 +236,6 @@ def rmd_options_to_metadata(options):
         else:
             if update_metadata_from_rmd_options(name, value, metadata):
                 continue
-            if name == 'active':
-                metadata[name] = value.replace('"', '').replace("'", '')
-                continue
             try:
                 metadata[name] = _py_logical_values(value)
                 continue
@@ -251,7 +248,7 @@ def rmd_options_to_metadata(options):
     if ('active' in metadata or metadata.get('run_control', {}).get('frozen') is True) and 'eval' in metadata:
         del metadata['eval']
 
-    return language, metadata
+    return metadata.get('language') or language, metadata
 
 
 def md_options_to_metadata(options):
@@ -282,7 +279,9 @@ def try_eval_metadata(metadata, name):
     value = metadata[name]
     if not isinstance(value, (str, unicode)):
         return
-    if value.startswith('"') or value.startswith("'"):
+    if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+        if name in ['active', 'magic_args', 'language']:
+            metadata[name] = value[1:-1]
         return
     if value.startswith('c(') and value.endswith(')'):
         value = '[' + value[2:-1] + ']'

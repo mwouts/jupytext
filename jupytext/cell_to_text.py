@@ -31,6 +31,7 @@ def comment_lines(lines, prefix):
 class BaseCellExporter(object):
     """A class that represent a notebook cell as text"""
     default_comment_magics = None
+    parse_cell_language = True
 
     def __init__(self, cell, default_language, ext, comment_magics=None, cell_metadata_filter=None):
         self.ext = ext
@@ -38,14 +39,20 @@ class BaseCellExporter(object):
         self.source = cell_source(cell)
         self.unfiltered_metadata = cell.metadata
         self.metadata = filter_metadata(copy(cell.metadata), cell_metadata_filter, _IGNORE_CELL_METADATA)
-        self.language, magic_args = cell_language(self.source)
-        if magic_args:
-            if ext.endswith('.Rmd'):
-                if "'" in magic_args:
-                    magic_args = '"' + magic_args + '"'
-                else:
-                    magic_args = "'" + magic_args + "'"
-            self.metadata['magic_args'] = magic_args
+        self.language, magic_args = cell_language(self.source) if self.parse_cell_language else (None, None)
+
+        if self.language:
+            if magic_args:
+                if ext.endswith('.Rmd'):
+                    if "'" in magic_args:
+                        magic_args = '"' + magic_args + '"'
+                    else:
+                        magic_args = "'" + magic_args + "'"
+                self.metadata['magic_args'] = magic_args
+
+            if not ext.endswith('.Rmd'):
+                self.metadata['language'] = self.language
+
         self.language = self.language or default_language
         self.default_language = default_language
         self.comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
@@ -184,10 +191,8 @@ class LightScriptCellExporter(BaseCellExporter):
     def code_to_text(self):
         """Return the text representation of a code cell"""
         active = is_active(self.ext, self.metadata)
-        if active and self.language != self.default_language:
+        if self.language != self.default_language and 'active' not in self.metadata:
             active = False
-            self.metadata['active'] = 'ipynb'
-            self.metadata['language'] = self.language
 
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
@@ -282,6 +287,7 @@ class DoublePercentCellExporter(BaseCellExporter):
     """A class that can represent a notebook cell as an
     Hydrogen/Spyder/VScode script (#59)"""
     default_comment_magics = False
+    parse_cell_language = False
 
     def code_to_text(self):
         """Not used"""

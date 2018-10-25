@@ -76,7 +76,6 @@ class BaseCellReader(object):
 
     cell_type = None
     language = None
-    default_language = 'python'
     default_comment_magics = None
     metadata = None
     content = []
@@ -95,6 +94,7 @@ class BaseCellReader(object):
     def __init__(self, ext, comment_magics=None):
         """Create a cell reader with empty content"""
         self.ext = ext
+        self.default_language = _SCRIPT_EXTENSIONS.get(ext, {}).get('language', 'python')
         self.comment_magics = comment_magics if comment_magics is not None else self.default_comment_magics
 
     def read(self, lines):
@@ -106,8 +106,7 @@ class BaseCellReader(object):
         self.metadata_and_language_from_option_line(lines[0])
 
         if self.metadata and 'language' in self.metadata:
-            self.language = self.metadata['language']
-            del self.metadata['language']
+            self.language = self.metadata.pop('language')
 
         # Parse cell till its end and set content, lines_to_next_cell
         pos_next_cell = self.find_cell_content(lines)
@@ -202,10 +201,14 @@ class BaseCellReader(object):
         # Cell content
         source = lines[cell_start:cell_end_marker]
 
-        self.content = self.uncomment_code_and_magics(source)
+        if not is_active(self.ext, self.metadata) or \
+                ('active' not in self.metadata and self.language and self.language != self.default_language):
+            self.content = uncomment(source, self.comment if self.ext != '.R' else '#')
+        else:
+            self.content = self.uncomment_code_and_magics(source)
 
         # Exactly two empty lines at the end of cell (caused by PEP8)?
-        if (self.ext == '.py' and explicit_eoc and last_two_lines_blank(source)):
+        if self.ext == '.py' and explicit_eoc and last_two_lines_blank(source):
             self.content = source[:-2]
             self.metadata['lines_to_end_of_cell_marker'] = 2
 
