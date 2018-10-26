@@ -557,6 +557,10 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         nb = cm.get(tmp_ipynb)['content']
 
+    assert nb.metadata['jupytext']['metadata_filter']['cells'] == {'excluded': 'all'}
+    assert nb.metadata['jupytext']['metadata_filter']['notebook'] == {'additional': ['language_info', 'jupytext'],
+                                                                      'excluded': 'all'}
+
     # save notebook again
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
