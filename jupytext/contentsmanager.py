@@ -30,10 +30,10 @@ def _jupytext_writes(ext, format_name):
     return _writes
 
 
-def _jupytext_reads(ext, format_name, rst2md, additional_metadata_on_text_files):
+def _jupytext_reads(ext, format_name, rst2md, freeze_metadata):
     def _reads(text, as_version, **kwargs):
         return jupytext.reads(text, ext=ext, format_name=format_name, rst2md=rst2md,
-                              additional_metadata_on_text_files=additional_metadata_on_text_files,
+                              freeze_metadata=freeze_metadata,
                               as_version=as_version, **kwargs)
 
     return _reads
@@ -151,12 +151,11 @@ class TextFileContentsManager(FileContentsManager, Configurable):
              "Examples: 'all', 'hide_input,hide_output'",
         config=True)
 
-    additional_metadata_on_text_files = Bool(
-        True,
-        help='Allow (or not) additional notebook and cell metadata to be saved to a text file '
-             'that has no "jupyter" section or no YAML header.',
-        config=True
-    )
+    freeze_metadata = Bool(
+        False,
+        help='Filter notebook and cell metadata that are not in the text notebook. '
+             'Use this to avoid creating a YAML header when editing text files.',
+        config=True)
 
     comment_magics = Enum(
         values=[True, False],
@@ -240,7 +239,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             format_name = self.preferred_format(fmt, self.preferred_jupytext_formats_read)
             with mock.patch('nbformat.reads', _jupytext_reads(fmt, format_name,
                                                               self.sphinx_convert_rst2md,
-                                                              self.additional_metadata_on_text_files)):
+                                                              self.freeze_metadata)):
                 return super(TextFileContentsManager, self)._read_notebook(os_path, as_version)
         else:
             return super(TextFileContentsManager, self)._read_notebook(os_path, as_version)
