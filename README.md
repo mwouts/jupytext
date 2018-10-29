@@ -293,7 +293,7 @@ c.default_cell_metadata_filter = "ExecuteTime,autoscroll,-hide_ouput"
 ```
 Help us improving the default configuration: if you are aware of a notebook metadata that should not be filtered, or of a cell metadata that should always be filtered, please open an issue and let us know.
 
-Finally, if you prefer that scripts and markdown files with no YAML header do not get one (nor additional cell metadata) when opened and saved in Jupyter, set the following option on Jupytext's content manager:
+Finally, if you prefer that scripts and markdown files with no YAML header do not get one (nor additional cell metadata) when opened and saved in Jupyter, use the `freeze_metadata` option on the command line `jupytext`, or set the following option on Jupytext's content manager:
 ```python
 c.ContentsManager.freeze_metadata = True
 ```

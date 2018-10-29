@@ -3,13 +3,13 @@
 Release History
 ---------------
 
-0.8.4 (2018-10-??)
+0.8.4 (2018-10-29)
 ++++++++++++++++++++++
 
 **Improvements**
 
 - Notebook metadata is filtered - only the most common metadata are stored in the text representation (#105)
-- New config option ``additional_metadata_on_text_files`` on the content manager. Defaults to ``True``. Change its value to ``False`` to avoid creating a YAML header or cell metadata if there was none initially (#110)
+- New config option ``freeze_metadata`` on the content manager and on the command line interface (defaults to ``False``). Use this option to avoid creating a YAML header or cell metadata if there was none initially. (#110)
 - Language magic arguments are preserved in R Markdown, and also supported in ``light`` and ``percent`` scripts (#111, #114, #115)
 - First markdown cell exported as a docstring when using the Sphinx format (#107)
 
