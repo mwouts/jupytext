@@ -325,7 +325,18 @@ def is_active(ext, metadata):
 
 def double_percent_options_to_metadata(options):
     """Parse double percent options"""
-    matches = _PERCENT_CELL.findall('# %%' + options)[0]
+    matches = _PERCENT_CELL.findall('# %%' + options)
+    if matches == []: ## didn't match with options
+        matches = _PERCENT_CELL.findall('# %%')
+        ## assume a code cell, with extra stuff
+        if matches == []: ## didn't match at all
+            return {}
+        else:
+            ## Put rest of line in title metadata:
+            matches = list(matches[0])
+            matches[1] = options
+    else:
+        matches = matches[0]
     # Fifth match are JSON metadata
     if matches[4]:
         metadata = json_options_to_metadata(matches[4], add_brackets=False)
