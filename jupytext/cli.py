@@ -14,7 +14,7 @@ from .version import __version__
 
 def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
                            test_round_trip=False, test_round_trip_strict=False, stop_on_first_error=True,
-                           update=True):
+                           update=True, freeze_metadata=False):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
@@ -49,7 +49,8 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
         if nb_file == sys.stdin:
             dest = None
             current_ext, _ = parse_one_format(input_format)
-            notebook = reads(nb_file.read(), ext=current_ext, format_name=format_name)
+            notebook = reads(nb_file.read(), ext=current_ext, format_name=format_name,
+                             freeze_metadata=freeze_metadata)
         else:
             dest, current_ext = os.path.splitext(nb_file)
             notebook = None
@@ -67,7 +68,8 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
             input_format = None
 
         if not notebook:
-            notebook = readf(nb_file, format_name=format_name)
+            notebook = readf(nb_file, format_name=format_name,
+                             freeze_metadata=freeze_metadata)
 
         if test_round_trip or test_round_trip_strict:
             try:
@@ -175,6 +177,9 @@ def cli_jupytext(args=None):
     parser.add_argument('--update', action='store_true',
                         help='Preserve outputs of .ipynb destination '
                              '(when file exists and inputs match)')
+    parser.add_argument('--freeze-metadata', action='store_true',
+                        help='Filter notebook and cell metadata that are not in the text notebook. '
+                             'Use this to avoid creating a YAML header when editing text files.')
     test = parser.add_mutually_exclusive_group()
     test.add_argument('--test', dest='test', action='store_true',
                       help='Test that notebook is stable under '
@@ -224,7 +229,8 @@ def jupytext(args=None):
                                test_round_trip=args.test,
                                test_round_trip_strict=args.test_strict,
                                stop_on_first_error=args.stop_on_first_error,
-                               update=args.update)
+                               update=args.update,
+                               freeze_metadata=args.freeze_metadata)
     except ValueError as err:  # (ValueError, TypeError, IOError) as err:
         print('jupytext: error: ' + str(err))
         exit(1)

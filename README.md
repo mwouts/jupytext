@@ -177,7 +177,7 @@ jupytext --test --update notebook.ipynb -to py:percent
 Note that `jupytext --test` compares the resulting notebooks according to its expectations. If you wish to proceed to a strict comparison of the two notebooks, use `jupytext --test-strict`, and use the flag `-x` to report with more details on the first difference, if any.
 
 Please note that
-- When you associate a Jupyter kernel with your text notebook, that information goes to a YAML header at the top of your script or Markdown document. And Jupytext itself may create a `jupytext` entry in the notebook metadata.
+- When you associate a Jupyter kernel with your text notebook, that information goes to a YAML header at the top of your script or Markdown document. And Jupytext itself may create a `jupytext` entry in the notebook metadata. Have a look at the [`freeze_metadata` option](#cell-and-notebook-metadata-filtering) if you want to avoid this.
 - Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata.
 - By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in this in the [metadata filtering](#Cell-and-notebook-metadata-filtering) section.
 - Representing a Jupyter notebook as a Markdown or R Markdown document has the effect of splitting markdown cells with two consecutive blank lines into multiple cells (as the two blank line pattern is used to separate cells).
@@ -295,7 +295,7 @@ Help us improving the default configuration: if you are aware of a notebook meta
 
 Finally, if you prefer that scripts and markdown files with no YAML header do not get one (nor additional cell metadata) when opened and saved in Jupyter, set the following option on Jupytext's content manager:
 ```python
-c.ContentsManager.additional_metadata_on_text_files = False
+c.ContentsManager.freeze_metadata = True
 ```
 
 ## Extending the `light` and `percent` formats to more languages
