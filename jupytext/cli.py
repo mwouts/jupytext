@@ -89,6 +89,20 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
                 raise TypeError('Destination extension {} is not consistent'
                                 'with format {} '.format(dest_ext, ext))
 
+        if os.path.isfile(dest + ext):
+            if update:
+                action = ' (destination file updated)'
+            else:
+                action = ' (destination file replaced)'
+        else:
+            action = ''
+
+        sys.stdout.write("[jupytext] Converting '{org_file}' to '{dest_file}'{format}{action}\n"
+                         .format(dest_file=dest + ext,
+                                 org_file=nb_file,
+                                 format=" using format '{}'".format(format_name) if format_name else '',
+                                 action=action))
+
         save_notebook_as(notebook, nb_file, dest + ext, format_name, update)
 
     if notebooks_in_error:
@@ -97,8 +111,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
 
 def save_notebook_as(notebook, nb_file, nb_dest, format_name, combine):
     """Save notebook to file, in desired format"""
-    if combine and os.path.isfile(nb_dest) and \
-            os.path.splitext(nb_dest)[1] == '.ipynb':
+    if combine and os.path.isfile(nb_dest) and os.path.splitext(nb_dest)[1] == '.ipynb':
         check_file_version(notebook, nb_file, nb_dest)
         nb_outputs = readf(nb_dest)
         combine_inputs_with_outputs(notebook, nb_outputs)
