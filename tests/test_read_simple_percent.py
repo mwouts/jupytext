@@ -144,3 +144,11 @@ def f(x):
 
     script2 = jupytext.writes(nb, ext='.py', format_name='percent')
     compare(script, script2)
+
+
+def test_no_crash_on_square_bracket(script="""# %% In [2]
+print('Hello')
+"""):
+    nb = jupytext.reads(script, ext='.py')
+    script2 = jupytext.writes(nb, ext='.py', format_name='percent')
+    compare(script, script2)
