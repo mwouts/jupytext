@@ -152,3 +152,25 @@ print('Hello')
     nb = jupytext.reads(script, ext='.py')
     script2 = jupytext.writes(nb, ext='.py', format_name='percent')
     compare(script, script2)
+
+
+def test_nbconvert_cell(script="""# In[2]:
+print('Hello')
+"""):
+    nb = jupytext.reads(script, ext='.py')
+    script2 = jupytext.writes(nb, ext='.py', format_name='percent')
+    expected = """# %%
+print('Hello')
+"""
+    compare(expected, script2)
+
+
+def test_nbformat_v3_nbpy_cell(script="""# <codecell>
+print('Hello')
+"""):
+    nb = jupytext.reads(script, ext='.py')
+    script2 = jupytext.writes(nb, ext='.py', format_name='percent')
+    expected = """# %%
+print('Hello')
+"""
+    compare(expected, script2)
