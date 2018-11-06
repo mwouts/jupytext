@@ -71,9 +71,13 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 ## Installation
 
-Install or update Jupytext with
+Install or update Jupytext with either
 ```bash
 pip install jupytext --upgrade
+```
+or
+```bash
+conda install -c conda-forge jupytext
 ```
 
 Then, configure Jupyter to use Jupytext:
