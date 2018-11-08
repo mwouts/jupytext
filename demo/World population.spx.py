@@ -6,7 +6,7 @@
 #       extension: .spx.py
 #       format_name: sphinx
 #       format_version: '1.1'
-#       jupytext_version: 0.8.0
+#       jupytext_version: 0.8.4
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -23,14 +23,15 @@
 #     version: 3.6.6
 # ---
 
-###############################################################################
-# # A quick insight at world population
-#
-# ## Collecting population data
-#
-# In the below we retrieve population data from the
-# [World Bank](http://www.worldbank.org/)
-# using the [wbdata](https://github.com/OliverSherouse/wbdata) python package
+"""
+# A quick insight at world population
+
+## Collecting population data
+
+In the below we retrieve population data from the
+[World Bank](http://www.worldbank.org/)
+using the [wbdata](https://github.com/OliverSherouse/wbdata) python package
+"""
 
 import pandas as pd
 import wbdata as wb
@@ -98,21 +99,14 @@ plt.show()
 ###############################################################################
 # ## Stacked bar plot with plotly
 
-###############################################################################
-# Stacked area plots (with cumulated values computed depending on
-# selected legends) are
-# [on their way](https://github.com/plotly/plotly.js/pull/2960) at Plotly. For
-# now we just do a stacked bar plot.
-
 import plotly.offline as offline
 import plotly.graph_objs as go
 
 offline.init_notebook_mode()
 
 ""
-bars = [go.Bar(x=population.index, y=population[zone], name=zone)
+data = [go.Scatter(x=population.index, y=population[zone], name=zone, stackgroup='World')
         for zone in zones]
-fig = go.Figure(data=bars,
-                layout=go.Layout(title='World population',
-                                 barmode='stack'))
+fig = go.Figure(data=data,
+                layout=go.Layout(title='World population'))
 offline.iplot(fig)
