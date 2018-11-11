@@ -7,6 +7,7 @@ _JUPYTER_LANGUAGES_RE = [re.compile(r"^%%{}\s*".format(lang)) for lang in _JUPYT
 
 _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.R': {'language': 'R', 'comment': '#'},
+                      '.r': {'language': 'R', 'comment': '#'},
                       '.jl': {'language': 'julia', 'comment': '#'},
                       '.cpp': {'language': 'c++', 'comment': '//'},
                       '.ss': {'language': 'scheme', 'comment': ';;'}}
