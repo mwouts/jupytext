@@ -63,6 +63,14 @@ JUPYTEXT_FORMATS = \
             cell_reader_class=RScriptCellReader,
             cell_exporter_class=RScriptCellExporter,
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
+            current_version_number='1.0'),
+
+        NotebookFormatDescription(
+            format_name='spin',
+            extension='.r',
+            header_prefix="#'",
+            cell_reader_class=RScriptCellReader,
+            cell_exporter_class=RScriptCellExporter,
             current_version_number='1.0')] + \
     [
         NotebookFormatDescription(
