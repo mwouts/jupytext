@@ -173,10 +173,10 @@ Representing Jupyter notebooks as scripts requires a solid round trip conversion
 You can easily test that the round trip conversion preserves your Jupyter notebooks and scripts. Run for instance:
 ```bash
 # Test the ipynb -> py:percent -> ipynb round trip conversion
-jupytext --test notebook.ipynb -to py:percent
+jupytext --test notebook.ipynb --to py:percent
 
 # Test the ipynb -> (py:percent + ipynb) -> ipynb (à la paired notebook) conversion
-jupytext --test --update notebook.ipynb -to py:percent
+jupytext --test --update notebook.ipynb --to py:percent
 ```
 
 Note that `jupytext --test` compares the resulting notebooks according to its expectations. If you wish to proceed to a strict comparison of the two notebooks, use `jupytext --test-strict`, and use the flag `-x` to report with more details on the first difference, if any.
