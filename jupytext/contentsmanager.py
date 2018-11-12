@@ -31,7 +31,7 @@ def kernelspec_from_language(language):
             ks = get_kernel_spec(name)
             if ks.language == language:
                 return {'name': name, 'language': language, 'display_name': ks.display_name}
-    except KeyError:
+    except (KeyError, ValueError):
         pass
     return None
 
