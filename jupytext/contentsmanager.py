@@ -26,10 +26,13 @@ from .metadata_filter import metadata_filter_as_dict
 
 def kernelspec_from_language(language):
     """Return the kernel specification for the first kernel with a matching language"""
-    for name in find_kernel_specs():
-        ks = get_kernel_spec(name)
-        if ks.language == language:
-            return {'name': name, 'language': language, 'display_name': ks.display_name}
+    try:
+        for name in find_kernel_specs():
+            ks = get_kernel_spec(name)
+            if ks.language == language:
+                return {'name': name, 'language': language, 'display_name': ks.display_name}
+    except KeyError:
+        pass
     return None
 
 
