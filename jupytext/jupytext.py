@@ -59,10 +59,9 @@ class TextNotebookReader(NotebookReader):
             lines = lines[pos:]
 
         if self.freeze_metadata:
-            metadata['jupytext'] = {'metadata_filter': {
-                'notebook': {'additional': list(metadata.keys()), 'excluded': 'all'}}}
-            metadata['jupytext']['metadata_filter']['cells'] = {
-                'additional': list(cell_metadata), 'excluded': 'all'}
+            metadata.setdefault('jupytext', {})['metadata_filter'] = {
+                'notebook': {'additional': list(metadata.keys()), 'excluded': 'all'},
+                'cells': {'additional': list(cell_metadata), 'excluded': 'all'}}
 
         set_main_and_cell_language(metadata, cells, self.format.extension)
 
