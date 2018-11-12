@@ -54,24 +54,16 @@ JUPYTEXT_FORMATS = \
             cell_reader_class=RMarkdownCellReader,
             cell_exporter_class=RMarkdownCellExporter,
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
-            current_version_number='1.0'),
-
+            current_version_number='1.0')] + \
+    [
         NotebookFormatDescription(
             format_name='spin',
-            extension='.R',
+            extension=ext,
             header_prefix="#'",
             cell_reader_class=RScriptCellReader,
             cell_exporter_class=RScriptCellExporter,
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
-            current_version_number='1.0'),
-
-        NotebookFormatDescription(
-            format_name='spin',
-            extension='.r',
-            header_prefix="#'",
-            cell_reader_class=RScriptCellReader,
-            cell_exporter_class=RScriptCellExporter,
-            current_version_number='1.0')] + \
+            current_version_number='1.0') for ext in ['.r', '.R']] + \
     [
         NotebookFormatDescription(
             format_name='light',
@@ -156,7 +148,7 @@ def read_metadata(text, ext):
         comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
 
     metadata, _, _ = header_to_metadata_and_cell(lines, comment)
-    if ext == '.R' and not metadata:
+    if ext in ['.r', '.R'] and not metadata:
         metadata, _, _ = header_to_metadata_and_cell(lines, "#'")
 
     return metadata
@@ -190,7 +182,7 @@ def guess_format(text, ext):
         twenty_hash_count = 0
         double_percent_count = 0
 
-        parser = StringParser(language='R' if ext == '.R' else 'python')
+        parser = StringParser(language='R' if ext in ['.r', '.R'] else 'python')
         for line in lines:
             parser.read_line(line)
             if parser.is_quoted():
@@ -198,7 +190,8 @@ def guess_format(text, ext):
 
             # Don't count escaped Jupyter magics (no space between
             # %% and command) as cells
-            if double_percent_re.match(line) or double_percent_and_space_re.match(line) or nbconvert_script_re.match(line):
+            if double_percent_re.match(line) or double_percent_and_space_re.match(line) or \
+                    nbconvert_script_re.match(line):
                 double_percent_count += 1
 
             if line.startswith(twenty_hash) and ext == '.py':

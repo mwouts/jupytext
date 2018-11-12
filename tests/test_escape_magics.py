@@ -57,7 +57,8 @@ def test_magics_are_commented(ext_and_format_name):
     ext, format_name = parse_one_format(ext_and_format_name)
     nb = new_notebook(cells=[new_code_cell('%pylab inline')],
                       metadata={'jupytext': {'comment_magics': True,
-                                             'main_language': 'R' if ext == '.R' else 'scheme' if ext == '.ss' else 'python'}})
+                                             'main_language': 'R' if ext in ['.r', '.R']
+                                             else 'scheme' if ext == '.ss' else 'python'}})
 
     text = jupytext.writes(nb, ext, format_name)
     assert '%pylab inline' not in text.splitlines()
@@ -75,7 +76,8 @@ def test_magics_are_not_commented(ext_and_format_name):
     ext, format_name = parse_one_format(ext_and_format_name)
     nb = new_notebook(cells=[new_code_cell('%pylab inline')],
                       metadata={'jupytext': {'comment_magics': False,
-                                             'main_language': 'R' if ext == '.R' else 'scheme' if ext == '.ss' else 'python'}})
+                                             'main_language': 'R' if ext in ['.r', '.R']
+                                             else 'scheme' if ext == '.ss' else 'python'}})
 
     text = jupytext.writes(nb, ext, format_name)
     assert '%pylab inline' in text.splitlines()
