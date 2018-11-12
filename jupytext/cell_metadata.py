@@ -26,14 +26,16 @@ except NameError:
 
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
-_IGNORE_CELL_METADATA = ','.join('-{}'.format(name) for name in [
-    # Frequent cell metadata that should not enter the text representation
-    # (these metadata are preserved in the paired Jupyter notebook).
-    'autoscroll', 'collapsed', 'scrolled', 'trusted', 'ExecuteTime',
+_JUPYTEXT_CELL_METADATA = [
     # Pre-jupytext metadata
     'skipline', 'noskipline',
     # Jupytext metadata
-    'cell_marker', 'lines_to_next_cell', 'lines_to_end_of_cell_marker'])
+    'cell_marker', 'lines_to_next_cell', 'lines_to_end_of_cell_marker']
+_IGNORE_CELL_METADATA = ','.join('-{}'.format(name) for name in [
+    # Frequent cell metadata that should not enter the text representation
+    # (these metadata are preserved in the paired Jupyter notebook).
+    'autoscroll', 'collapsed', 'scrolled', 'trusted', 'ExecuteTime'] +
+                                 _JUPYTEXT_CELL_METADATA)
 _PERCENT_CELL = re.compile(
     r'(# |#)%%([^\{\[]*)(|\[raw\]|\[markdown\])([^\{\[]*)(|\{.*\})\s*$')
 

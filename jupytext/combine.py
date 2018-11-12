@@ -2,7 +2,7 @@
 """
 import re
 from copy import copy
-from .cell_metadata import _IGNORE_CELL_METADATA
+from .cell_metadata import _IGNORE_CELL_METADATA, _JUPYTEXT_CELL_METADATA
 from .header import _DEFAULT_NOTEBOOK_METADATA
 from .metadata_filter import filter_metadata
 
@@ -58,7 +58,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
                                         _IGNORE_CELL_METADATA)
 
                     for key in ocell.metadata:
-                        if key not in ocell_filtered_metadata:
+                        if key not in ocell_filtered_metadata and key not in _JUPYTEXT_CELL_METADATA:
                             cell.metadata[key] = ocell.metadata[key]
 
                     output_code_cells = output_code_cells[(i + 1):]
