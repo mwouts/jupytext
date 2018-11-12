@@ -293,8 +293,8 @@ When a paired notebook is loaded, Jupytext reconstructs the filtered metadata us
 
 A default value for these filters can be set on Jupytext's content manager using, for instance
 ```
-c.default_notebook_metadata_filter = "all,-widgets,-varInspector"
-c.default_cell_metadata_filter = "ExecuteTime,autoscroll,-hide_ouput"
+c.ContentsManager.default_notebook_metadata_filter = "all,-widgets,-varInspector"
+c.ContentsManager.default_cell_metadata_filter = "ExecuteTime,autoscroll,-hide_ouput"
 ```
 Help us improving the default configuration: if you are aware of a notebook metadata that should not be filtered, or of a cell metadata that should always be filtered, please open an issue and let us know.
 
