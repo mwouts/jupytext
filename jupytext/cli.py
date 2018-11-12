@@ -178,8 +178,9 @@ def cli_jupytext(args=None):
                         help='Preserve outputs of .ipynb destination '
                              '(when file exists and inputs match)')
     parser.add_argument('--freeze-metadata', action='store_true',
-                        help='Filter notebook and cell metadata that are not in the text notebook. '
-                             'Use this to avoid creating a YAML header when editing text files.')
+                        help='Set a metadata filter (unless one exists already) '
+                             'equal to the current metadata of the notebook. Use this '
+                             'to avoid creating a YAML header when editing text files.')
     test = parser.add_mutually_exclusive_group()
     test.add_argument('--test', dest='test', action='store_true',
                       help='Test that notebook is stable under '

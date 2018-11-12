@@ -58,7 +58,7 @@ class TextNotebookReader(NotebookReader):
                 raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
             lines = lines[pos:]
 
-        if self.freeze_metadata:
+        if self.freeze_metadata and 'metadata_filter' not in metadata.get('jupytext', {}):
             metadata.setdefault('jupytext', {})['metadata_filter'] = {
                 'notebook': {'additional': list(metadata.keys()), 'excluded': 'all'},
                 'cells': {'additional': list(cell_metadata), 'excluded': 'all'}}
