@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+0.8.5 (2018-11-13)
+++++++++++++++++++++++
+
+**Improvements**
+
+- ``bash`` scripts as notebooks (#127)
+- R scripts with ``.r`` extension are supported (#122)
+- Jupytext selects the first kernel that matches the language (#120)
+
 0.8.4 (2018-10-29)
 ++++++++++++++++++++++
 
