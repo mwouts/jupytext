@@ -499,6 +499,40 @@ d = 6
     compare(script, script2)
 
 
+def test_notebook_two_blank_lines_before_next_cell(script="""# +
+# This is cell with a function
+
+def f(x):
+    return 4
+
+
+# +
+# Another cell
+c = 5
+
+
+def g(x):
+    return 6
+
+
+# +
+# Final cell
+
+1 + 1
+"""):
+    notebook = jupytext.reads(script, ext='.py')
+    assert len(notebook.cells) == 3
+    for cell in notebook.cells:
+        lines = cell.source.splitlines()
+        if len(lines) != 1:
+            assert lines[0]
+            assert lines[-1]
+
+    script2 = jupytext.writes(notebook, ext='.py')
+
+    compare(script, script2)
+
+
 def test_round_trip_markdown_cell_with_magic():
     notebook = new_notebook(cells=[new_markdown_cell('IPython has magic commands like\n%quickref')],
                             metadata={'jupytext': {'main_language': 'python'}})
