@@ -203,7 +203,7 @@ class BaseCellReader(object):
 
         if not is_active(self.ext, self.metadata) or \
                 ('active' not in self.metadata and self.language and self.language != self.default_language):
-            self.content = uncomment(source, self.comment if self.ext != '.R' else '#')
+            self.content = uncomment(source, self.comment if self.ext not in ['.r', '.R'] else '#')
         else:
             self.content = self.uncomment_code_and_magics(source)
 

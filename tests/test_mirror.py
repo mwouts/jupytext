@@ -98,6 +98,11 @@ def test_ipynb_to_R(nb_file):
     assert_conversion_same_as_mirror(nb_file, '.R', 'ipynb_to_script')
 
 
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
+def test_ipynb_to_r(nb_file):
+    assert_conversion_same_as_mirror(nb_file, '.low.r', 'ipynb_to_script')
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_scheme'))
 def test_ipynb_to_scheme(nb_file):
     assert_conversion_same_as_mirror(nb_file, '.ss', 'ipynb_to_script')
@@ -121,6 +126,21 @@ def test_ipynb_to_python_percent(nb_file):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
 def test_ipynb_to_R_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, '.R', 'ipynb_to_percent', format_name='percent')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
+def test_ipynb_to_r_percent(nb_file):
+    assert_conversion_same_as_mirror(nb_file, '.low.r', 'ipynb_to_percent', format_name='percent')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
+def test_ipynb_to_R_spin(nb_file):
+    assert_conversion_same_as_mirror(nb_file, '.R', 'ipynb_to_spin', format_name='spin')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
+def test_ipynb_to_r_spin(nb_file):
+    assert_conversion_same_as_mirror(nb_file, '.low.r', 'ipynb_to_spin', format_name='spin')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_cpp'))
