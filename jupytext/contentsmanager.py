@@ -341,7 +341,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             except OverflowError:
                 pass
 
-            jupytext_metadata = model['content']['metadata'].setdefault('jupytext', {})
+            jupytext_metadata = model['content']['metadata'].get('jupytext', {})
             if self.default_notebook_metadata_filter:
                 (jupytext_metadata.setdefault('metadata_filter', {})
                  .setdefault('notebook', self.default_notebook_metadata_filter))
@@ -353,6 +353,9 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 filter = jupytext_metadata.get('metadata_filter', {}).get(filter_level)
                 if filter is not None:
                     jupytext_metadata['metadata_filter'][filter_level] = metadata_filter_as_dict(filter)
+
+            if jupytext_metadata:
+                model['content']['metadata']['jupytext'] = jupytext_metadata
 
             if model_outputs:
                 combine_inputs_with_outputs(model['content'], model_outputs['content'])
