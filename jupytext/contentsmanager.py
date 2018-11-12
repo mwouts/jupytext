@@ -15,12 +15,22 @@ except ImportError:
     pass
 
 from notebook.services.contents.filemanager import FileContentsManager
+from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 
 import jupytext
 from .combine import combine_inputs_with_outputs
 from .formats import check_file_version, NOTEBOOK_EXTENSIONS, \
     format_name_for_ext, parse_one_format, parse_formats, transition_to_jupytext_section_in_metadata
 from .metadata_filter import metadata_filter_as_dict
+
+
+def kernelspec_from_language(language):
+    """Return the kernel specification for the first kernel with a matching language"""
+    for name in find_kernel_specs():
+        ks = get_kernel_spec(name)
+        if ks.language == language:
+            return {'name': name, 'language': language, 'display_name': ks.display_name}
+    return None
 
 
 def _jupytext_writes(ext, format_name):
@@ -360,8 +370,15 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             if model_outputs:
                 combine_inputs_with_outputs(model['content'], model_outputs['content'])
             elif not fmt.endswith('.ipynb'):
-                self.notary.sign(model['content'])
-                self.mark_trusted_cells(model['content'], path)
+                nb = model['content']
+                language = nb.metadata.get('jupytext', {}).get('main_language', 'python')
+                if 'kernelspec' not in nb.metadata and language != 'python':
+                    kernelspec = kernelspec_from_language(language)
+                    if kernelspec:
+                        nb.metadata['kernelspec'] = kernelspec
+
+                self.notary.sign(nb)
+                self.mark_trusted_cells(nb, path)
 
             return model
 
