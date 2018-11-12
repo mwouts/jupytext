@@ -1,0 +1,2 @@
+# Install the bash kernel
+python -m bash_kernel.install
