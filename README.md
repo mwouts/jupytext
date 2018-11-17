@@ -16,7 +16,7 @@ You've always wanted to
 
 Jupytext can convert notebooks to and from
 - Markdown and R Markdown documents (extensions `.md` and `.Rmd`)
-- Julia, Python, R, Scheme and C++ scripts (extensions `.jl`, `.py`, `.R`, etc).
+- Julia, Python, R, Bash, Scheme and C++ scripts (extensions `.jl`, `.py`, `.R`, etc).
 
 Jupytext is available from within Jupyter. You can work as usual on your notebook in Jupyter, and save and read it in the formats you choose. The text representations can be edited outside of Jupyter (see our [demo](#code-refactoring) below). When the notebook is refreshed in Jupyter, input cells are loaded from the script or Markdown document. Kernel variables are preserved. Outputs are not stored in such text documents, and are therefore lost when the notebook is refreshed. To avoid this, we recommend to [pair](#paired-notebooks) the text notebook with a traditional `.ipynb` notebook (both files are saved and loaded together).
 
@@ -208,7 +208,7 @@ The `light` format has:
 - Code cells are exported verbatim (except for Jupyter magics, which are commented), and separated with blank lines. Code cells are reconstructed from consistent Python paragraphs (no function, class or multiline comment will be broken).
 - Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter `# +` (`// +` in C++, etc). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
-The `light` format is currently available for Python, Julia, R, Scheme and C++. Open our sample notebook in the `light` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.lgt.py).
+The `light` format is currently available for Python, Julia, R, Bash, Scheme and C++. Open our sample notebook in the `light` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.lgt.py).
 
 ### The `percent` format
 
@@ -227,7 +227,7 @@ where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The
 
 Percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least one `# %%` cell are identified as `percent` scripts.
 
-The `percent` format is currently available for Python, Julia, R, Scheme and C++. Open our sample notebook in the `percent` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py).
+The `percent` format is currently available for Python, Julia, R, Bash, Scheme and C++. Open our sample notebook in the `percent` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py).
 
 If the `percent` format is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
 ```python
