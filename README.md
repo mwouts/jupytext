@@ -284,7 +284,7 @@ Also, you may want some cells to be active only in the Python, or R Markdown rep
 
 The text representation of the notebook focuses on the part of the notebook that you have written. That is also the part of the notebook that should go under version control. Outputs and metadata that are (re)-constructed automatically when the notebook is executed do not need to enter the text representation.
 
-To that aim, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. And only the required notebook metadata: `kernelspec`, `language_info` and `jupytext` are saved when a notebook is exported as text.
+To that aim, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. And only the required notebook metadata: `kernelspec` and `jupytext` are saved when a notebook is exported as text.
 
 When a paired notebook is loaded, Jupytext reconstructs the filtered metadata using the `.ipynb` file. Please keep in mind that the `.ipynb` file is typically not distributed accross contributors, and that the cell metadata may be lost when an input cell changes (cells are matched according to their contents). Thus, if some cell or notebook metadata are important to your notebook, you should preserve it in the text version. Change the default metadata filtering as follows:
 - If you want to preserve all the notebook metadata but `widgets` and `varInspector` in the YAML header, set a notebook metadata `"jupytext": {"metadata_filter": {"notebook": "all,-widgets,-varInspector"}}`
