@@ -4,12 +4,6 @@
 //     display_name: C++14
 //     language: C++14
 //     name: xeus-cling-cpp14
-//   language_info:
-//     codemirror_mode: text/x-c++src
-//     file_extension: .cpp
-//     mimetype: text/x-c++src
-//     name: c++
-//     version: -std=c++14
 // ---
 
 // %% [markdown]

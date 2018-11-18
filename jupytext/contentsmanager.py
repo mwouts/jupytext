@@ -29,7 +29,7 @@ def kernelspec_from_language(language):
     try:
         for name in find_kernel_specs():
             ks = get_kernel_spec(name)
-            if ks.language == language:
+            if ks.language == language or (language == 'c++' and ks.language.startswith('C++')):
                 return {'name': name, 'language': language, 'display_name': ks.display_name}
     except (KeyError, ValueError):
         pass

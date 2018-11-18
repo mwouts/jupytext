@@ -4,11 +4,6 @@
 #     display_name: Bash
 #     language: bash
 #     name: bash
-#   language_info:
-#     codemirror_mode: shell
-#     file_extension: .sh
-#     mimetype: text/x-sh
-#     name: bash
 # ---
 
 ls

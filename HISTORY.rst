@@ -3,6 +3,13 @@
 Release History
 ---------------
 
+0.8.6 (2018-11-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- The ``language_info`` section is not part of the default header any more. Language information is now taken from metadata ``kernelspec.language``. (#105).
+
 0.8.5 (2018-11-13)
 ++++++++++++++++++++++
 

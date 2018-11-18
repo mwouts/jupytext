@@ -534,7 +534,7 @@ def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
         assert read_format_from_metadata(stream.read(), '.lgt' + auto_ext) == 'light'
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='magic'))
 def test_metadata_filter_is_effective(nb_file, tmpdir):
     nb = jupytext.readf(nb_file)
     tmp_ipynb = 'notebook.ipynb'
@@ -550,7 +550,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
 
     # set config
     cm.default_jupytext_formats = 'ipynb, py'
-    cm.default_notebook_metadata_filter = 'language_info,jupytext,-all'
+    cm.default_notebook_metadata_filter = 'jupytext,-all'
     cm.default_cell_metadata_filter = '-all'
 
     # load notebook
@@ -558,7 +558,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
         nb = cm.get(tmp_ipynb)['content']
 
     assert nb.metadata['jupytext']['metadata_filter']['cells'] == {'excluded': 'all'}
-    assert nb.metadata['jupytext']['metadata_filter']['notebook'] == {'additional': ['language_info', 'jupytext'],
+    assert nb.metadata['jupytext']['metadata_filter']['notebook'] == {'additional': ['jupytext'],
                                                                       'excluded': 'all'}
 
     # save notebook again
@@ -570,7 +570,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
         nb2 = jupytext.readf(str(tmpdir.join(tmp_script)))
 
     # test no metadata
-    assert set(nb2.metadata.keys()) <= {'language_info', 'jupytext'}
+    assert set(nb2.metadata.keys()) <= {'jupytext'}
     for cell in nb2.cells:
         assert not cell.metadata
 
