@@ -235,6 +235,12 @@ c.ContentsManager.preferred_jupytext_formats_save = "py:percent" # or "auto:perc
 ```
 Then, Jupytext's content manager will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
 
+By default, Jupyter magics are not commented in the `percent` representation. If you are using percent scripts in another editor that Hydrogen, add a metadata `"jupytext": {"comment_magics": true},"` to your notebook, or add 
+```python
+c.ContentsManager.comment_magics = True
+```
+to Jupyter's configuration file.
+
 ### Sphinx-gallery scripts
 
 Another popular notebook-like format for Python script is the Sphinx-gallery [format](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-Gallery notebooks by Jupytext.
@@ -287,6 +293,12 @@ The text representation of the notebook focuses on the part of the notebook that
 To that aim, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. And only the required notebook metadata: `kernelspec`, `language_info` and `jupytext` are saved when a notebook is exported as text.
 
 When a paired notebook is loaded, Jupytext reconstructs the filtered metadata using the `.ipynb` file. Please keep in mind that the `.ipynb` file is typically not distributed accross contributors, and that the cell metadata may be lost when an input cell changes (cells are matched according to their contents). Thus, if some cell or notebook metadata are important to your notebook, you should preserve it in the text version. Change the default metadata filtering as follows:
+- If you want no YAML header in your script, then set a notebook metadata
+`"jupytext": {"metadata_filter": {"notebook": "-all"}}`, or append the below to Jupyter's configuration file:
+```
+c.ContentsManager.default_notebook_metadata_filter = "-all"
+```
+Note that when the Jupytext metadata is not included in the text representation, paired notebooks have to be opened by selecting the `ipynb` file.
 - If you want to preserve all the notebook metadata but `widgets` and `varInspector` in the YAML header, set a notebook metadata `"jupytext": {"metadata_filter": {"notebook": "all,-widgets,-varInspector"}}`
 - If you want to preserve the `toc` section (in addition to the default YAML header), use `"jupytext": {"metadata_filter": {"notebook": "toc"}}`
 - At last, if you want to modify the default cell filter and allow `ExecuteTime` and `autoscroll`, but not `hide_ouput`, use `"jupytext": {"metadata_filter": {"cells": "ExecuteTime,autoscroll,-hide_ouput"}}`
