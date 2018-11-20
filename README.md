@@ -33,6 +33,8 @@ Note that Jupytext implements a few different [formats](#format-specifications) 
 - the [`sphinx`](#sphinx-gallery-scripts) format produces Sphinx gallery scripts (Python only).
 - and the [`spin`](#r-knitrspin-scripts) format is compatible with Knitr's spin function (R only).
 
+If you want to have a demo of Jupytext, have a look at the original [announcement](https://towardsdatascience.com/introducing-jupytext-9234fdff6c57), or watch the [PyParis presentation](https://github.com/mwouts/jupytext_pyparis_2018/blob/master/README.md).
+
 ## Example usage
 
 ### Writing notebooks as plain text
