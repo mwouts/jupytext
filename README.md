@@ -8,6 +8,7 @@
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/mwouts/jupytext.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mwouts/jupytext/context:python)
 [![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)
+[![PyParis](https://img.shields.io/badge/PyParis-YouTube-red.svg)](https://www.youtube.com/watch?v=y-VEZenk824)
 
 You've always wanted to
 * edit Jupyter notebooks as e.g. plain Python scripts in your favorite editor?
