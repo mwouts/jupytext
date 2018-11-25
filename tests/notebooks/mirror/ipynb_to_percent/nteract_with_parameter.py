@@ -20,5 +20,5 @@ df = pd.DataFrame({'A': [1, 2], 'B': [3 + param, 4]},
 df
 
 # %% {"outputHidden": false, "inputHidden": false}
-%matplotlib inline
+# %matplotlib inline
 df.plot(kind='bar')

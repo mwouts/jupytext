@@ -135,6 +135,7 @@ The package provides a `jupytext` script for command line conversion between the
 ```bash
 jupytext --to python notebook.ipynb             # create a notebook.py file
 jupytext --to py:percent notebook.ipynb         # create a notebook.py file in the double percent format
+jupytext --to py:percent --comment-magics false notebook.ipynb   # create a notebook.py file in the double percent format, and do not comment magic commands
 jupytext --to markdown notebook.ipynb           # create a notebook.md file
 jupytext --output script.py notebook.ipynb      # create a script.py file
 
@@ -273,7 +274,7 @@ That being said, Jupytext also works well from Jupyter Lab. Please note that:
 
 ## Will my notebook really run in an IDE?
 
-Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in most IDEs the code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to R Markdown, and to scripts in all format but the `percent` one. Magics are not commented in the plain Markdown representation, nor in the `percent` format, as some editors use that format in combination with Jupyter kernels. Change this by adding a `#escape` or `#noescape` flag on the same line as the magic, or a `"comment_magics": true` or `false` entry in the notebook metadata, in the `"jupytext"` section. Or set your preference globally on the contents manager by adding this line to `.jupyter/jupyter_notebook_config.py`:
+Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in most IDEs the code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to all format but the plain Markdown one. Change this by adding a `#escape` or `#noescape` flag on the same line as the magic, or a `"comment_magics": true` or `false` entry in the notebook metadata, in the `"jupytext"` section. Or set your preference globally on the contents manager by adding this line to `.jupyter/jupyter_notebook_config.py`:
 ```python
 c.ContentsManager.comment_magics = True # or False
 ```

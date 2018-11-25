@@ -36,7 +36,7 @@ def test_force_noescape_with_gbl_esc_flag(line):
 
 @pytest.mark.parametrize('ext_and_format_name,commented',
                          zip(['md', 'Rmd', 'py:light', 'py:percent', 'py:sphinx', 'R', 'ss:light', 'ss:percent'],
-                             [False, True, True, False, True, True, True, False]))
+                             [False, True, True, True, True, True, True, True]))
 def test_magics_commented_default(ext_and_format_name, commented):
     ext, format_name = parse_one_format(ext_and_format_name)
     nb = new_notebook(cells=[new_code_cell('%pylab inline')])
@@ -99,9 +99,9 @@ def test_force_comment_using_contents_manager(tmpdir):
 
     cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
     with open(str(tmpdir.join(tmp_py))) as stream:
-        assert '%pylab inline' in stream.read().splitlines()
+        assert '# %pylab inline' in stream.read().splitlines()
 
-    cm.comment_magics = True
+    cm.comment_magics = False
     cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
     with open(str(tmpdir.join(tmp_py))) as stream:
-        assert '# %pylab inline' in stream.read().splitlines()
+        assert '%pylab inline' in stream.read().splitlines()
