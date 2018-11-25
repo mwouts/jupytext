@@ -30,6 +30,36 @@ define([
     events
 ) {
     "use strict";
+    
+    var show_notebook_settings_dialog = function () {
+
+        var modal = $('<div class="modal fade" role="dialog"/>');
+        var dialog_content = $("<div/>")
+            .addClass("modal-content")
+            .appendTo($('<div class="modal-dialog">').appendTo(modal));
+        $('<div class="modal-header">')
+            .append('<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>')
+            .append('<h4 class="modal-title">Jupytext settings</h4>')
+            .on('mousedown', function() { $('.modal').draggable({handle: '.modal-header'});})
+            .appendTo(dialog_content);
+        $('<div>')
+            .addClass('modal-body')
+            .append([
+                $('<div>').text(JSON.stringify(Jupyter.notebook.metadata.jupytext)),
+            ])
+            .appendTo(dialog_content);
+        $('<div class="modal-footer">')
+            .append('<button class="btn btn-default btn-sm btn-primary" data-dismiss="modal">Ok</button>')
+            .appendTo(dialog_content);
+        // focus button on open
+        modal.on('shown.bs.modal', function () {
+            setTimeout(function () {
+                dialog_content.find('.modal-footer button').last().focus();
+            }, 0);
+        });
+
+        return modal.modal({backdrop: 'static'});
+    };
 
     var jupytext_button = function() {
         if (!Jupyter.toolbar) {
@@ -39,8 +69,9 @@ define([
         if ($("#jupytext_button").length === 0) {
             Jupyter.toolbar.add_buttons_group([{
                     'label' : 'Jupytext',
-                    'help'   : 'Configure Jupytext',
-                    'icon'   : 'fa-wrench'
+                    'help'  : 'Jupytext settings',
+                    'icon'  : 'fa-wrench',
+                    'callback': show_notebook_settings_dialog,
                 },
             ]);
         }
