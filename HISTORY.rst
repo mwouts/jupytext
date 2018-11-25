@@ -9,6 +9,7 @@ Release History
 **Improvements**
 
 - The ``language_info`` section is not part of the default header any more. Language information is now taken from metadata ``kernelspec.language``. (#105).
+- When opening a paired notebook, the active file is now the file that was originally opened (#118). When saving a notebook, timestamps of all the alternative representations are tested to ensure that Jupyter's autosave does not override manual modifications.
 
 0.8.5 (2018-11-13)
 ++++++++++++++++++++++

@@ -119,6 +119,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
     """
 
     nb_extensions = [ext for ext in NOTEBOOK_EXTENSIONS if ext != '.ipynb']
+    paired_notebooks = {}
 
     def all_nb_extensions(self):
         """
@@ -245,6 +246,29 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
         return None
 
+    def drop_paired_notebook(self, path):
+        """Remove the current notebook from the list of paired notebooks"""
+        if path not in self.paired_notebooks:
+            return
+
+        for alt_path in self.paired_notebooks.pop(path):
+            if alt_path in self.paired_notebooks:
+                self.drop_paired_notebook(alt_path)
+
+    def update_paired_notebooks(self, path, fmt_group):
+        """Update the list of paired notebooks to include/update the current pair"""
+        if len(fmt_group) <= 1:
+            self.drop_paired_notebook(path)
+            return
+
+        base_path, fmt, _ = file_fmt_ext(path)
+        paths = [base_path + fmt for fmt in fmt_group]
+        for alt_path in paths:
+            self.drop_paired_notebook(alt_path)
+
+        for alt_path in paths:
+            self.paired_notebooks[alt_path] = paths
+
     def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
         _, fmt, ext = file_fmt_ext(os_path)
@@ -261,6 +285,16 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         """Set the 'comment_magics' metadata if default is not None"""
         if self.comment_magics is not None and 'comment_magics' not in nb.metadata.get('jupytext', {}):
             nb.metadata.setdefault('jupytext', {})['comment_magics'] = self.comment_magics
+
+    def save(self, model, path=''):
+        """Save the file model and return the model with no content."""
+        if model['type'] == 'notebook':
+            nb = nbformat.from_dict(model['content'])
+            _, fmt, _ = file_fmt_ext(path)
+            fmt_group = self.format_group(fmt, nb)
+            self.update_paired_notebooks(path, fmt_group)
+
+        return super(TextFileContentsManager, self).save(model, path)
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
@@ -288,18 +322,31 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
         if self.exists(path) and (type == 'notebook' or (type is None and ext in self.all_nb_extensions())):
             model = self._notebook_model(path, content=content)
-            if fmt != ext and content:
-                model['name'], _ = os.path.splitext(model['name'])
-            if not content:
-                return model
-
             if not load_alternative_format:
                 return model
 
-            fmt_group = self.format_group(fmt, model['content'])
+            if not content:
+                # Modification time of a paired notebook, in this context - Jupyter is checking timestamp
+                # before saving - is the most recent among all representations #118
+                for alt_path in self.paired_notebooks.get(path, []):
+                    if alt_path != path:
+                        alt_model = self._notebook_model(alt_path, content=False)
+                        if alt_model['last_modified'] > model['last_modified']:
+                            model['last_modified'] = alt_model['last_modified']
+
+                return model
+
+                # Otherwise, the modification time of a notebook is the timestamp of the source - see below.
+
+            if fmt != ext:
+                model['name'], _ = os.path.splitext(model['name'])
 
             source_format = fmt
             outputs_format = fmt
+            org_model = model
+
+            fmt_group = self.format_group(fmt, model['content'])
+            self.update_paired_notebooks(path, fmt_group)
 
             # Source format is first non ipynb format found on disk
             if fmt.endswith('.ipynb'):
@@ -383,6 +430,10 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 self.notary.sign(nb)
                 self.mark_trusted_cells(nb, path)
 
+            # Path and name of the notebook is the one of the original path
+            model['path'] = org_model['path']
+            model['name'] = org_model['name']
+
             return model
 
         return super(TextFileContentsManager, self).get(path, content, type, format)
@@ -406,8 +457,18 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         old_file, org_fmt, _ = file_fmt_ext(old_path)
         new_file, new_fmt, _ = file_fmt_ext(new_path)
 
+        alt_paths = self.paired_notebooks.get(old_path, [])
+        self.drop_paired_notebook(old_path)
+        self.drop_paired_notebook(new_path)
+
         if org_fmt == new_fmt:
-            for alt_fmt in self.format_group(org_fmt):
+            if alt_paths:
+                fmt_group = [file_fmt_ext(alt_path)[1] for alt_path in alt_paths]
+                self.update_paired_notebooks(new_path, fmt_group)
+            else:
+                fmt_group = self.format_group(org_fmt)
+
+            for alt_fmt in fmt_group:
                 if self.file_exists(old_file + alt_fmt):
                     super(TextFileContentsManager, self).rename_file(old_file + alt_fmt, new_file + alt_fmt)
         else:
