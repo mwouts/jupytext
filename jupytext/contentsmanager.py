@@ -329,7 +329,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 # Modification time of a paired notebook, in this context - Jupyter is checking timestamp
                 # before saving - is the most recent among all representations #118
                 for alt_path in self.paired_notebooks.get(path, []):
-                    if alt_path != path:
+                    if alt_path != path and self.exists(alt_path):
                         alt_model = self._notebook_model(alt_path, content=False)
                         if alt_model['last_modified'] > model['last_modified']:
                             model['last_modified'] = alt_model['last_modified']

@@ -47,6 +47,22 @@ def test_load_save_rename(nb_file, tmpdir):
     assert os.path.isfile(str(tmpdir.join('new.ipynb')))
     assert os.path.isfile(str(tmpdir.join('new.Rmd')))
 
+    # delete one file, test that we can still read and rename it
+    cm.delete('new.Rmd')
+    assert not os.path.isfile(str(tmpdir.join('new.Rmd')))
+    model = cm.get('new.ipynb', content=False)
+    assert 'last_modified' in model
+    cm.save(model=dict(type='notebook', content=nb), path='new.ipynb')
+    assert os.path.isfile(str(tmpdir.join('new.Rmd')))
+
+    cm.delete('new.Rmd')
+    cm.rename('new.ipynb', tmp_ipynb)
+
+    assert os.path.isfile(str(tmpdir.join(tmp_ipynb)))
+    assert not os.path.isfile(str(tmpdir.join(tmp_rmd)))
+    assert not os.path.isfile(str(tmpdir.join('new.ipynb')))
+    assert not os.path.isfile(str(tmpdir.join('new.Rmd')))
+
 
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
