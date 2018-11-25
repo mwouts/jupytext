@@ -328,7 +328,7 @@ def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     # (notebooks not equal as we insert %matplotlib inline in sphinx)
 
     model = cm.get(path=tmp_ipynb)
-    assert model['name'] == 'notebook.pct'
+    assert model['name'] == 'notebook.ipynb'
     compare_notebooks(nb, model['content'])
 
 
