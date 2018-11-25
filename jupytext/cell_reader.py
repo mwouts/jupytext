@@ -408,7 +408,7 @@ class LightScriptCellReader(ScriptCellReader):
 
 class DoublePercentScriptCellReader(ScriptCellReader):
     """Read notebook cells from Hydrogen/Spyder/VScode scripts (#59)"""
-    default_comment_magics = False
+    default_comment_magics = True
 
     def __init__(self, ext, comment_magics=None):
         ScriptCellReader.__init__(self, ext, comment_magics)
@@ -443,9 +443,10 @@ class DoublePercentScriptCellReader(ScriptCellReader):
         # Cell content
         source = lines[cell_start:cell_end_marker]
 
-        if self.cell_type != 'code' or (self.metadata and not is_active('py', self.metadata)):
+        if self.cell_type != 'code' or (self.metadata and not is_active('py', self.metadata)) \
+                or (self.language is not None and self.language != self.default_language):
             source = uncomment(source, self.comment)
-        if self.comment_magics:
+        elif self.metadata is not None and self.comment_magics:
             source = self.uncomment_code_and_magics(source)
 
         self.content = source

@@ -223,3 +223,24 @@ def test_convert_to_percent_format(nb_file, tmpdir):
     nb2 = readf(tmp_nbpy)
 
     compare_notebooks(nb1, nb2)
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_nbpy = str(tmpdir.join('notebook.py'))
+
+    copyfile(nb_file, tmp_ipynb)
+
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        jupytext(['--to', 'py:percent', '--comment-magics', 'no', tmp_ipynb])
+
+    with open(tmp_nbpy) as stream:
+        py_script = stream.read()
+        assert 'format_name: percent' in py_script
+        assert '# %%time' not in py_script
+
+    nb1 = readf(tmp_ipynb)
+    nb2 = readf(tmp_nbpy)
+
+    compare_notebooks(nb1, nb2)

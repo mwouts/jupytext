@@ -10,7 +10,7 @@
 # ---
 
 # %%
-%%time
+# %%time
 
 print('asdf')
 

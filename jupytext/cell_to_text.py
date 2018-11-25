@@ -60,8 +60,7 @@ class BaseCellExporter(object):
 
         # how many blank lines before next cell
         self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', 1)
-        self.lines_to_end_of_cell_marker = \
-            cell.metadata.get('lines_to_end_of_cell_marker', 0)
+        self.lines_to_end_of_cell_marker = cell.metadata.get('lines_to_end_of_cell_marker', 0)
 
         # for compatibility with v0.5.4 and lower (to be removed)
         if 'skipline' in cell.metadata:
@@ -286,8 +285,8 @@ class RScriptCellExporter(BaseCellExporter):
 class DoublePercentCellExporter(BaseCellExporter):
     """A class that can represent a notebook cell as an
     Hydrogen/Spyder/VScode script (#59)"""
-    default_comment_magics = False
-    parse_cell_language = False
+    default_comment_magics = True
+    parse_cell_language = True
 
     def code_to_text(self):
         """Not used"""
@@ -299,6 +298,8 @@ class DoublePercentCellExporter(BaseCellExporter):
             self.metadata['cell_type'] = self.cell_type
 
         active = is_active('py', self.metadata)
+        if self.language != self.default_language and 'active' not in self.metadata:
+            active = False
         if self.cell_type == 'raw' and 'active' in self.metadata and self.metadata['active'] == '':
             del self.metadata['active']
 
@@ -308,11 +309,10 @@ class DoublePercentCellExporter(BaseCellExporter):
         else:
             lines = [self.comment + ' %% ' + options]
 
-        if self.cell_type == 'code':
+        if self.cell_type == 'code' and active:
             source = copy(self.source)
             comment_magic(source, self.language, self.comment_magics)
-            if active:
-                return lines + source
+            return lines + source
 
         return lines + comment_lines(self.source, self.comment)
 

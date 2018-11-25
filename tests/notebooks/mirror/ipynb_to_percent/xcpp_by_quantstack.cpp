@@ -373,7 +373,7 @@ xcpp::display(rect, "some_display_id", true);
 std::vector<double> to_shuffle = {1, 2, 3, 4};
 
 // %%
-%timeit std::random_shuffle(to_shuffle.begin(), to_shuffle.end());
+// %timeit std::random_shuffle(to_shuffle.begin(), to_shuffle.end());
 
 // %% [markdown]
 // [![xtensor](images/xtensor.png)](https://github.com/QuantStack/xtensor/)

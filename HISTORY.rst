@@ -10,6 +10,8 @@ Release History
 
 - The ``language_info`` section is not part of the default header any more. Language information is now taken from metadata ``kernelspec.language``. (#105).
 - When opening a paired notebook, the active file is now the file that was originally opened (#118). When saving a notebook, timestamps of all the alternative representations are tested to ensure that Jupyter's autosave does not override manual modifications.
+- Jupyter magic commands are now commented per default in the ``percent`` format (#126, #132). Version for the ``percent`` format increases from '1.1' to '1.2'. Set an option ``comment_magics`` to ``false`` either per notebook, or globally on Jupytext's contents manager, or on `jupytext`'s command line, if you prefer not to comment Jupyter magics.
+
 
 0.8.5 (2018-11-13)
 ++++++++++++++++++++++

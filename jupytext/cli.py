@@ -14,7 +14,7 @@ from .version import __version__
 
 def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
                            test_round_trip=False, test_round_trip_strict=False, stop_on_first_error=True,
-                           update=True, freeze_metadata=False):
+                           update=True, freeze_metadata=False, comment_magics=None):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
@@ -26,6 +26,8 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
     :param test_round_trip_strict: should round trip conversion be tested, with strict notebook comparison?
     :param stop_on_first_error: when testing, should we stop on first error, or compare the full notebook?
     :param update: preserve the current outputs of .ipynb file
+    :param freeze_metadata: set metadata filters equal to the current script metadata
+    :param comment_magics: comment, or not, Jupyter magics
     when possible
     :return:
     """
@@ -80,6 +82,9 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
                 notebooks_in_error += 1
                 print('{}: {}'.format(nb_file, str(error)))
             continue
+
+        if comment_magics is not None:
+            notebook.metadata.setdefault('jupytext', {})['comment_magics'] = comment_magics
 
         if output == '-':
             sys.stdout.write(writes(notebook, ext=ext, format_name=format_name))
@@ -145,6 +150,18 @@ def canonize_format(format_or_ext, file_path=None):
     return {'notebook': 'ipynb', 'markdown': 'md', 'rmarkdown': 'Rmd'}[format_or_ext]
 
 
+def str2bool(input):
+    """Parse Yes/No/Default string
+    https://stackoverflow.com/questions/15008758/parsing-boolean-values-with-argparse"""
+    if input.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    if input.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    if input.lower() in ('d', 'default', ''):
+        return None
+    raise argparse.ArgumentTypeError('Expected: (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
+
+
 def cli_jupytext(args=None):
     """Command line parser for jupytext"""
     parser = argparse.ArgumentParser(
@@ -177,6 +194,11 @@ def cli_jupytext(args=None):
     parser.add_argument('--update', action='store_true',
                         help='Preserve outputs of .ipynb destination '
                              '(when file exists and inputs match)')
+    parser.add_argument('--comment-magics',
+                        type=str2bool,
+                        nargs='?',
+                        default=None,
+                        help='Should Jupyter magic commands be commented? (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
     parser.add_argument('--freeze-metadata', action='store_true',
                         help='Set a metadata filter (unless one exists already) '
                              'equal to the current metadata of the notebook. Use this '
@@ -231,7 +253,8 @@ def jupytext(args=None):
                                test_round_trip_strict=args.test_strict,
                                stop_on_first_error=args.stop_on_first_error,
                                update=args.update,
-                               freeze_metadata=args.freeze_metadata)
+                               freeze_metadata=args.freeze_metadata,
+                               comment_magics=args.comment_magics)
     except ValueError as err:  # (ValueError, TypeError, IOError) as err:
         print('jupytext: error: ' + str(err))
         exit(1)
