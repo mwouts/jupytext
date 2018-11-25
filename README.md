@@ -1,40 +1,27 @@
 # Jupyter notebooks as Markdown documents, Julia, Python or R scripts
 
-[![Conda Version](https://img.shields.io/conda/vn/conda-forge/jupytext.svg)](https://anaconda.org/conda-forge/jupytext)
-[![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
-[![Pypi](https://img.shields.io/pypi/l/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![Build Status](https://travis-ci.com/mwouts/jupytext.svg?branch=master)](https://travis-ci.com/mwouts/jupytext)
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=master)](https://codecov.io/github/mwouts/jupytext?branch=master)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/mwouts/jupytext.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mwouts/jupytext/context:python)
-[![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)
-[![PyParis](https://img.shields.io/badge/PyParis-YouTube-red.svg)](https://www.youtube.com/watch?v=y-VEZenk824)
+[![Language grade: Python](https://img.shields.io/badge/lgtm-A+-brightgreen.svg)](https://lgtm.com/projects/g/mwouts/jupytext/context:python)
 
-You've always wanted to
-* edit Jupyter notebooks as e.g. plain Python scripts in your favorite editor?
-* do version control of Jupyter notebooks with clear and meaningful diffs?
-* *collaborate* on Jupyter notebooks using standard (text oriented) merge tools?
+You've always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningfull diffs when doing version control? Then... Jupytext may well be the tool you were looking for!
 
-Jupytext can convert notebooks to and from
-- Markdown and R Markdown documents (extensions `.md` and `.Rmd`)
-- Julia, Python, R, Bash, Scheme and C++ scripts (extensions `.jl`, `.py`, `.R`, etc).
+Jupytext can save Jupyter notebooks as
+- Markdown and R Markdown documents,
+- Julia, Python, R, Bash, Scheme and C++ scripts.
 
-Jupytext is available from within Jupyter. You can work as usual on your notebook in Jupyter, and save and read it in the formats you choose. The text representations can be edited outside of Jupyter (see our [demo](#code-refactoring) below). When the notebook is refreshed in Jupyter, input cells are loaded from the script or Markdown document. Kernel variables are preserved. Outputs are not stored in such text documents, and are therefore lost when the notebook is refreshed. To avoid this, we recommend to [pair](#paired-notebooks) the text notebook with a traditional `.ipynb` notebook (both files are saved and loaded together).
+Jupytext is available as a command line tool and as _contents manager_ for Jupyter. With the later, Jupyter will save your notebook to your favorite format(s), from `.ipynb` to `.py`, `.R`, `.jl`, `.md`, `.Rmd`... The text representation can be edited outside of Jupyter. Simply refresh the notebook in Jupyter to get the latest input cells from the script or Markdown document. When refreshing, kernel variables are unaffected, and output cells are reloaded from the traditionnal `.ipynb` if present.
 
-| Format       | Extension          | Text editor friendly | IDE friendly | Git friendly | Preserve outputs |
-| ------------ | ------------------ | -------------------- | ------------ | ------------ | ---------------- |
-| Jupyter notebook | `.ipynb`       |                      |              |              | ✔                |
-| Markdown or R Markdown | `.md`/`.Rmd` | ✔                |              | ✔            |                  |
-| Julia, Python or R script | `.jl`/`.py`/`.R`/... | ✔         | ✔            | ✔            |                  |
-| [Paired notebook](#paired-notebooks)  | (`.jl`/`.py`/`.R`/.../`.md`/`.Rmd`) + `.ipynb` | ✔ | (✔) | ✔ | ✔      |
+## Demo time
 
-Note that Jupytext implements a few different [formats](#format-specifications) for notebooks as scripts:
-- the [`light`](#the-light-format-for-notebooks-as-scripts) format allows to open arbitrary scripts as notebooks. Reversely, use it to save notebooks as scripts with very few cell markers.
-- the [`percent`](#the-percent-format) format with explicit `# %%` cells is compatible with various Python editors.
-- the [`sphinx`](#sphinx-gallery-scripts) format produces Sphinx gallery scripts (Python only).
-- and the [`spin`](#r-knitrspin-scripts) format is compatible with Knitr's spin function (R only).
+[![Introducing Jupytext](https://img.shields.io/badge/TDS-Introducing%20Jupytext-blue.svg)](https://towardsdatascience.com/introducing-jupytext-9234fdff6c57)
+[![PyParis](https://img.shields.io/badge/YouTube-PyParis-red.svg)](https://www.youtube.com/watch?v=y-VEZenk824)
+[![Binder](https://img.shields.io/badge/Binder-Try%20it!-blue.svg)](https://mybinder.org/v2/gh/mwouts/jupytext_pyparis_2018/master?filepath=demo)
 
-If you want to have a demo of Jupytext, have a look at the original [announcement](https://towardsdatascience.com/introducing-jupytext-9234fdff6c57), or watch the [PyParis presentation](https://github.com/mwouts/jupytext_pyparis_2018/blob/master/README.md).
+Looking for a demo?
+- Read the original [announcement](https://towardsdatascience.com/introducing-jupytext-9234fdff6c57) in Towards Data Science,
+- Watch the [PyParis talk](https://github.com/mwouts/jupytext_pyparis_2018/blob/master/README.md),
+- or, try Jupytext online with [binder](https://mybinder.org/v2/gh/mwouts/jupytext_pyparis_2018/master?filepath=demo)!
 
 ## Example usage
 
@@ -74,7 +61,11 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 ## Installation
 
-Install or update Jupytext with either
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/jupytext.svg)](https://anaconda.org/conda-forge/jupytext)
+[![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
+[![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
+
+Jupytext is available on pypi and on conda-forge. Run either of
 ```bash
 pip install jupytext --upgrade
 ```
@@ -96,17 +87,9 @@ c.ContentsManager.default_jupytext_formats = "ipynb,py"  # add your favorite for
 jupyter notebook
 ```
 
-## Paired notebooks
+### <a name="paired-notebooks"></a> Per-notebook configuration
 
-The idea of paired notebooks is to store an `.ipynb` file alongside other formats. This lets us get the best of both worlds: an easily sharable notebook that stores the outputs, and one or more text-only files that can for instance be put under version control.
-
-You can edit text-only files outside of Jupyter (first deactivate Jupyter's autosave by running `%autosave 0` in a cell), and then get the updated version in Jupyter by refreshing your browser.
-
-When loading or refreshing an `.ipynb` file, the input cells of the notebook are read from the first non-`.ipynb` file among the associated formats.
-
-When loading or refreshing a non-`.ipynb` file, the outputs are read from the `.ipynb` file (if `ipynb` is listed in the formats).
-
-To enable paired notebooks, one option is to set the output formats by adding a `"jupytext": {"formats": "ipynb,py"},` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
+Configure the multiple export formats for your notebook by adding a `"jupytext": {"formats": "ipynb,py"},` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
 ```
 {
   "jupytext": {"formats": "ipynb,py"},
@@ -118,20 +101,43 @@ To enable paired notebooks, one option is to set the output formats by adding a 
   }
 }
 ```
-Accepted formats are composed of an extension, like `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, and an optional format name among `light` (default for Julia, Python), `percent`, `sphinx`, `spin` (default for R). Use `ipynb,py:percent` if you want to pair the `.ipynb` notebook with a `.py` script in the `percent` format. To have the script extension chosen according to the Jupyter kernel, use the `auto` extension.
+Accepted formats are composed of an extension, like `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`... and an optional format name among `light` (default for Julia, Python), `percent`, `sphinx`, `spin` (default for R) &mdash; see below for the [format specifications](#Format-specifications). Use `ipynb,py:percent` if you want to pair the `.ipynb` notebook with a `.py` script in the `percent` format. To have the script extension chosen according to the Jupyter kernel, use the `auto` extension.
 
-Alternatively, it is also possible to set a default format pairing. Say you want to always associate `.ipynb` notebooks with an `.md` file  (and reciprocally). This is simply done by adding the following to your Jupyter configuration file:
+Jupytext accepts a few additional options:
+- `comment_magics`: By default, Jupyter magics are commented when notebooks are exported to any other format than markdown. If you prefer otherwise, use this boolean option, or is global counterpart (see below).
+- `metadata_filter.notebook`: By default, Jupytext only exports the `kernelspec` and `jupytext` metadata to the text files. Set `"jupytext": {"metadata_filter": {"notebook": "-all"}}` if you want that the script has no notebook metadata at all. The value for `metadata_filter.notebook` is a comma separated list of additional/excluded (negated) entries, with `all` a keyword that allows to exclude all entries.
+- `metadata_filter.cells`: By default, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. Add or exclude more cell metadata with this option.
+
+### Global configuration
+
+Jupytext's contents manager also accepts global options. We start with the default format pairing. Say you want to always associate every `.ipynb` notebook with a `.md` file  (and reciprocally). This is simply done by adding the following to your Jupyter configuration file:
 ```python
-c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
+# Always pair ipynb notebooks to md files
 c.ContentsManager.default_jupytext_formats = "ipynb,md"
 ```
 (and similarly for the other formats).
 
 In case the [`percent`](#the-percent-format) format is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
 ```python
+# Use the percent format when saving as py
 c.ContentsManager.preferred_jupytext_formats_save = "py:percent"
 ```
 and then, Jupytext will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
+
+If you use Jupytext to edit and run scripts and markdown files as Jupyter notebooks, but you don't want Jupyter to add a YAML header to those, use:
+```python
+# Do not add metadata to existing scripts
+c.ContentsManager.freeze_metadata = True
+```
+
+If you want to control the default metadata filter, use for instance:
+```python
+# Filter out all metadata in text representations
+c.ContentsManager.default_notebook_metadata_filter = "-all"
+c.ContentsManager.default_cell_metadata_filter = "-all"
+```
+
+NB: All these global options (and more) are documented [here](https://github.com/mwouts/jupytext/blob/master/jupytext/contentsmanager.py).
 
 ## Command line conversion
 
@@ -241,7 +247,7 @@ c.ContentsManager.preferred_jupytext_formats_save = "py:percent" # or "auto:perc
 ```
 Then, Jupytext's content manager will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
 
-By default, Jupyter magics are commented in the `percent` representation. If you are using percent scripts in Hydrogen and you want to preserve Jupyter magics, then add a metadata `"jupytext": {"comment_magics": false},"` to your notebook, or add 
+By default, Jupyter magics are commented in the `percent` representation. If you are using percent scripts in Hydrogen and you want to preserve Jupyter magics, then add a metadata `"jupytext": {"comment_magics": false},"` to your notebook, or add
 ```python
 c.ContentsManager.comment_magics = False
 ```
@@ -291,35 +297,6 @@ c.ContentsManager.comment_magics = True # or False
 ```
 
 Also, you may want some cells to be active only in the Python, or R Markdown representation. For this, use the `active` cell metadata. Set `"active": "ipynb"` if you want that cell to be active only in the Jupyter notebook. And `"active": "py"` if you want it to be active only in the Python script. And `"active": "ipynb,py"` if you want it to be active in both, but not in the R Markdown representation...
-
-## Cell and notebook metadata filtering
-
-The text representation of the notebook focuses on the part of the notebook that you have written. That is also the part of the notebook that should go under version control. Outputs and metadata that are (re)-constructed automatically when the notebook is executed do not need to enter the text representation.
-
-To that aim, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. And only the required notebook metadata: `kernelspec` and `jupytext` are saved when a notebook is exported as text.
-
-When a paired notebook is loaded, Jupytext reconstructs the filtered metadata using the `.ipynb` file. Please keep in mind that the `.ipynb` file is typically not distributed accross contributors, and that the cell metadata may be lost when an input cell changes (cells are matched according to their contents). Thus, if some cell or notebook metadata are important to your notebook, you should preserve it in the text version. Change the default metadata filtering as follows:
-- If you want no YAML header in your script, then set a notebook metadata
-`"jupytext": {"metadata_filter": {"notebook": "-all"}}`, or append the below to Jupyter's configuration file:
-```
-c.ContentsManager.default_notebook_metadata_filter = "-all"
-```
-Note that when the Jupytext metadata is not included in the text representation, paired notebooks have to be opened by selecting the `ipynb` file.
-- If you want to preserve all the notebook metadata but `widgets` and `varInspector` in the YAML header, set a notebook metadata `"jupytext": {"metadata_filter": {"notebook": "all,-widgets,-varInspector"}}`
-- If you want to preserve the `toc` section (in addition to the default YAML header), use `"jupytext": {"metadata_filter": {"notebook": "toc"}}`
-- At last, if you want to modify the default cell filter and allow `ExecuteTime` and `autoscroll`, but not `hide_ouput`, use `"jupytext": {"metadata_filter": {"cells": "ExecuteTime,autoscroll,-hide_ouput"}}`
-
-A default value for these filters can be set on Jupytext's content manager using, for instance
-```
-c.ContentsManager.default_notebook_metadata_filter = "all,-widgets,-varInspector"
-c.ContentsManager.default_cell_metadata_filter = "ExecuteTime,autoscroll,-hide_ouput"
-```
-Help us improving the default configuration: if you are aware of a notebook metadata that should not be filtered, or of a cell metadata that should always be filtered, please open an issue and let us know.
-
-Finally, if you prefer that scripts and markdown files with no YAML header do not get one (nor additional cell metadata) when opened and saved in Jupyter, use the `freeze_metadata` option on the command line `jupytext`, or set the following option on Jupytext's content manager:
-```python
-c.ContentsManager.freeze_metadata = True
-```
 
 ## Extending the `light` and `percent` formats to more languages
 
