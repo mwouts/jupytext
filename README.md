@@ -239,9 +239,9 @@ c.ContentsManager.preferred_jupytext_formats_save = "py:percent" # or "auto:perc
 ```
 Then, Jupytext's content manager will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
 
-By default, Jupyter magics are not commented in the `percent` representation. If you are using percent scripts in another editor that Hydrogen, add a metadata `"jupytext": {"comment_magics": true},"` to your notebook, or add 
+By default, Jupyter magics are commented in the `percent` representation. If you are using percent scripts in Hydrogen and you want to preserve Jupyter magics, then add a metadata `"jupytext": {"comment_magics": false},"` to your notebook, or add 
 ```python
-c.ContentsManager.comment_magics = True
+c.ContentsManager.comment_magics = False
 ```
 to Jupyter's configuration file.
 
