@@ -87,7 +87,9 @@ Then, configure Jupyter to use Jupytext:
 - generate a Jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit `.jupyter/jupyter_notebook_config.py` and append the following:
 ```python
-c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
+c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"  # necessary
+# optional but recommended default - always pairs notebooks for example to .py files:
+c.ContentsManager.default_jupytext_formats = "ipynb,py"  # add your favorite formats
 ```
 - and restart Jupyter, i.e. run
 ```bash
