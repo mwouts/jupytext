@@ -4,13 +4,13 @@
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=master)](https://codecov.io/github/mwouts/jupytext?branch=master)
 [![Language grade: Python](https://img.shields.io/badge/lgtm-A+-brightgreen.svg)](https://lgtm.com/projects/g/mwouts/jupytext/context:python)
 
-You've always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningfull diffs when doing version control? Then... Jupytext may well be the tool you were looking for!
+Have you always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningfull diffs when doing version control? Then... Jupytext may well be the tool you're looking for!
 
 Jupytext can save Jupyter notebooks as
 - Markdown and R Markdown documents,
 - Julia, Python, R, Bash, Scheme and C++ scripts.
 
-Jupytext is available as a command line tool and as _contents manager_ for Jupyter. With the later, Jupyter will save your notebook to your favorite format(s), from `.ipynb` to `.py`, `.R`, `.jl`, `.md`, `.Rmd`... The text representation can be edited outside of Jupyter. Simply refresh the notebook in Jupyter to get the latest input cells from the script or Markdown document. When refreshing, kernel variables are unaffected, and output cells are reloaded from the traditionnal `.ipynb` if present.
+Jupytext is available as a command line tool and as a _contents manager_ for Jupyter. With the latter, Jupyter will save your notebook to your favorite format(s), from `.ipynb` to `.py`, `.R`, `.jl`, `.md`, `.Rmd`... The text representation can be edited outside of Jupyter. Simply refresh the notebook in Jupyter to get the latest input cells from the script or Markdown document. When refreshing, kernel variables are unaffected, and output cells are reloaded from the traditionnal `.ipynb` if present. You can also delete your `.ipynb` notebook entirely if you don't need to save output cells.
 
 ## Demo time
 
