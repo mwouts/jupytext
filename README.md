@@ -123,19 +123,19 @@ c.ContentsManager.preferred_jupytext_formats_save = "py:percent"
 ```
 and then, Jupytext will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
 
-If you want that the generated text files have no metadata, you may use the global metadata filters below. Please note that with this setting, the metadata is only preserved in the `.ipynb` file &mdash; be sure to open that file in Jupyter, and not the text file which will miss the pairing information.
+If you want that the text files created by Jupytext have no metadata, you may use the global metadata filters below. Please note that with this setting, the metadata is only preserved in the `.ipynb` file &mdash; be sure to open that file in Jupyter, and not the text file which will miss the pairing information.
 ```python
 # Filter out all metadata in text representations
+# Alternatively, build your own filter: comma separated values, minus for exclusion
 c.ContentsManager.default_notebook_metadata_filter = "-all"
 c.ContentsManager.default_cell_metadata_filter = "-all"
 ```
 
-Finally, if you use Jupytext as an interactive editor for scripts and markdown files, but you don't want Jupyter to add a YAML header to those, use:
+Finally, if you want metadata in the text representation of your notebooks, but not in the pre-existing scripts or markdown files that you may edit in Jupyter, use:
 ```python
-# Do not add metadata to existing scripts
+# Do not add metadata when editing a markdown document or a script
 c.ContentsManager.freeze_metadata = True
 ```
-
 
 NB: All these global options (and more) are documented [here](https://github.com/mwouts/jupytext/blob/master/jupytext/contentsmanager.py).
 
