@@ -123,17 +123,25 @@ c.ContentsManager.preferred_jupytext_formats_save = "py:percent"
 ```
 and then, Jupytext will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
 
+#### Default metadata filtering
+
+You can specify which metadata to include or exclude in the text files created by Jupytext by default by setting `c.ContentsManager.default_notebook_metadata_filter` (notebook metadata) and `c.ContentsManager.default_cell_metadata_filter` (cell metadata). They accept a string of comma separated keywords. A minus sign `-` in font of a keyword means exclusion.
+
+Suppose you want to keep all the notebook metadata but `widgets` and `varInspector` in the YAML header. For cell metadata, you want to allow `ExecuteTime` and `autoscroll`, but not `hide_output`. You can set
+```python
+c.ContentsManager.default_notebook_metadata_filter = "all,-widgets,-varInspector"
+c.ContentsManager.default_cell_metadata_filter = "ExecuteTime,autoscroll,-hide_output"
+```
+
 If you want that the text files created by Jupytext have no metadata, you may use the global metadata filters below. Please note that with this setting, the metadata is only preserved in the `.ipynb` file &mdash; be sure to open that file in Jupyter, and not the text file which will miss the pairing information.
 ```python
-# Filter out all metadata in text representations
-# Alternatively, build your own filter: comma separated values, minus for exclusion
 c.ContentsManager.default_notebook_metadata_filter = "-all"
 c.ContentsManager.default_cell_metadata_filter = "-all"
 ```
 
-Finally, if you want metadata in the text representation of your notebooks, but not in the pre-existing scripts or markdown files that you may edit in Jupyter, use:
+Finally, if you want Jupytext to preserve metadata in pre-existing scripts or markdowns files, use:
 ```python
-# Do not add metadata when editing a markdown document or a script
+# Do not modify metadata when editing a markdown document or a script
 c.ContentsManager.freeze_metadata = True
 ```
 
