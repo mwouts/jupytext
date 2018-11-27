@@ -326,3 +326,44 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     assert not os.path.isfile(tmp_ipynb)
     assert not os.path.isfile(tmp_py)
     assert not os.path.isfile(tmp_md)
+
+
+def test_manual_call_of_pre_commit_hook(tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+    nb = new_notebook(cells=[])
+    os.chdir(str(tmpdir))
+
+    def system_in_tmpdir(*args):
+        return system(*args, cwd=str(tmpdir))
+
+    def git(*args):
+        print(system_in_tmpdir('git', *args))
+
+    git('init')
+    git('status')
+
+    def hook():
+        with mock.patch('jupytext.cli.system', system_in_tmpdir):
+            jupytext(['--to', 'py', '--pre-commit'])
+
+    writef(nb, tmp_ipynb)
+    assert os.path.isfile(tmp_ipynb)
+    assert not os.path.isfile(tmp_py)
+
+    git('add', 'notebook.ipynb')
+    git('status')
+    hook()
+    git('commit', '-m', 'created')
+    git('status')
+
+    assert os.path.isfile(tmp_py)
+
+    git('rm', 'notebook.ipynb')
+    git('status')
+    hook()
+    git('commit', '-m', 'deleted')
+    git('status')
+
+    assert not os.path.isfile(tmp_ipynb)
+    assert not os.path.isfile(tmp_py)
