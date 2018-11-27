@@ -219,7 +219,7 @@ def cli_jupytext(args=None):
                         help="Input format")
     parser.add_argument('notebooks',
                         help='One or more notebook(s). Input is read from stdin when no notebook '
-                             'is provided , but then the --from field is mandatory',
+                             'is provided, but then the --from field is mandatory',
                         nargs='*')
     parser.add_argument('--pre-commit', action='store_true',
                         help="""Run Jupytext on the ipynb files in the git index.
