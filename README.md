@@ -139,9 +139,9 @@ c.ContentsManager.default_notebook_metadata_filter = "-all"
 c.ContentsManager.default_cell_metadata_filter = "-all"
 ```
 
-Finally, if you want Jupytext to preserve metadata in pre-existing scripts or markdowns files, use:
+Finally, if you want that Jupytext exports no other metadata that the one already present in pre-existing scripts or markdowns files, use:
 ```python
-# Do not modify metadata when editing a markdown document or a script
+# Do not add new metadata when editing a markdown document or a script
 c.ContentsManager.freeze_metadata = True
 ```
 
