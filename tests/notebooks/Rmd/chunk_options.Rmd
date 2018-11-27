@@ -3,8 +3,10 @@ title: "Test chunk options in Rmd/Jupyter conversion"
 author: "Marc Wouts"
 date: "June 16, 2018"
 jupyter:
-  language_info:
-    name: python
+  kernelspec:
+    display_name: Python
+    language: python
+    name: python3
 ---
 
 ```{r knitr_setup, include=FALSE}

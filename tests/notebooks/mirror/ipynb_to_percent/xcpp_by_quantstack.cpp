@@ -4,12 +4,6 @@
 //     display_name: C++14
 //     language: C++14
 //     name: xeus-cling-cpp14
-//   language_info:
-//     codemirror_mode: text/x-c++src
-//     file_extension: .cpp
-//     mimetype: text/x-c++src
-//     name: c++
-//     version: -std=c++14
 // ---
 
 // %% [markdown]
@@ -379,7 +373,7 @@ xcpp::display(rect, "some_display_id", true);
 std::vector<double> to_shuffle = {1, 2, 3, 4};
 
 // %%
-%timeit std::random_shuffle(to_shuffle.begin(), to_shuffle.end());
+// %timeit std::random_shuffle(to_shuffle.begin(), to_shuffle.end());
 
 // %% [markdown]
 // [![xtensor](images/xtensor.png)](https://github.com/QuantStack/xtensor/)

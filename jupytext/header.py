@@ -22,8 +22,8 @@ _UTF8_HEADER = ' -*- coding: utf-8 -*-'
 _DEFAULT_NOTEBOOK_METADATA = ','.join([
     # Preserve Jupytext section
     'jupytext',
-    # Preserve kernel specs and language_info
-    'kernelspec', 'language_info',
+    # Preserve kernel specs
+    'kernelspec',
     # Kernel_info found in Nteract notebooks
     'kernel_info'])
 

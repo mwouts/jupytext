@@ -47,6 +47,22 @@ def test_load_save_rename(nb_file, tmpdir):
     assert os.path.isfile(str(tmpdir.join('new.ipynb')))
     assert os.path.isfile(str(tmpdir.join('new.Rmd')))
 
+    # delete one file, test that we can still read and rename it
+    cm.delete('new.Rmd')
+    assert not os.path.isfile(str(tmpdir.join('new.Rmd')))
+    model = cm.get('new.ipynb', content=False)
+    assert 'last_modified' in model
+    cm.save(model=dict(type='notebook', content=nb), path='new.ipynb')
+    assert os.path.isfile(str(tmpdir.join('new.Rmd')))
+
+    cm.delete('new.Rmd')
+    cm.rename('new.ipynb', tmp_ipynb)
+
+    assert os.path.isfile(str(tmpdir.join(tmp_ipynb)))
+    assert not os.path.isfile(str(tmpdir.join(tmp_rmd)))
+    assert not os.path.isfile(str(tmpdir.join('new.ipynb')))
+    assert not os.path.isfile(str(tmpdir.join('new.Rmd')))
+
 
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
@@ -328,7 +344,7 @@ def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     # (notebooks not equal as we insert %matplotlib inline in sphinx)
 
     model = cm.get(path=tmp_ipynb)
-    assert model['name'] == 'notebook.pct'
+    assert model['name'] == 'notebook.ipynb'
     compare_notebooks(nb, model['content'])
 
 
@@ -534,7 +550,7 @@ def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
         assert read_format_from_metadata(stream.read(), '.lgt' + auto_ext) == 'light'
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='magic'))
 def test_metadata_filter_is_effective(nb_file, tmpdir):
     nb = jupytext.readf(nb_file)
     tmp_ipynb = 'notebook.ipynb'
@@ -550,7 +566,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
 
     # set config
     cm.default_jupytext_formats = 'ipynb, py'
-    cm.default_notebook_metadata_filter = 'language_info,jupytext,-all'
+    cm.default_notebook_metadata_filter = 'jupytext,-all'
     cm.default_cell_metadata_filter = '-all'
 
     # load notebook
@@ -558,7 +574,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
         nb = cm.get(tmp_ipynb)['content']
 
     assert nb.metadata['jupytext']['metadata_filter']['cells'] == {'excluded': 'all'}
-    assert nb.metadata['jupytext']['metadata_filter']['notebook'] == {'additional': ['language_info', 'jupytext'],
+    assert nb.metadata['jupytext']['metadata_filter']['notebook'] == {'additional': ['jupytext'],
                                                                       'excluded': 'all'}
 
     # save notebook again
@@ -570,7 +586,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
         nb2 = jupytext.readf(str(tmpdir.join(tmp_script)))
 
     # test no metadata
-    assert set(nb2.metadata.keys()) <= {'language_info', 'jupytext'}
+    assert set(nb2.metadata.keys()) <= {'jupytext'}
     for cell in nb2.cells:
         assert not cell.metadata
 

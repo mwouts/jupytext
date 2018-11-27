@@ -1,4 +1,5 @@
 import os
+import stat
 from shutil import copyfile
 import pytest
 from testfixtures import compare
@@ -6,7 +7,7 @@ import mock
 from nbformat.v4.nbbase import new_notebook
 from jupytext import header, __version__
 from jupytext import readf, writef, writes
-from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext
+from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext, system
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 
@@ -223,3 +224,105 @@ def test_convert_to_percent_format(nb_file, tmpdir):
     nb2 = readf(tmp_nbpy)
 
     compare_notebooks(nb1, nb2)
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_nbpy = str(tmpdir.join('notebook.py'))
+
+    copyfile(nb_file, tmp_ipynb)
+
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        jupytext(['--to', 'py:percent', '--comment-magics', 'no', tmp_ipynb])
+
+    with open(tmp_nbpy) as stream:
+        py_script = stream.read()
+        assert 'format_name: percent' in py_script
+        assert '# %%time' not in py_script
+
+    nb1 = readf(tmp_ipynb)
+    nb2 = readf(tmp_nbpy)
+
+    compare_notebooks(nb1, nb2)
+
+
+def test_pre_commit_hook(tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+    nb = new_notebook(cells=[])
+
+    def git(*args):
+        print(system('git', *args, cwd=str(tmpdir)))
+
+    git('init')
+    git('status')
+    hook = str(tmpdir.join('.git/hooks/pre-commit'))
+    with open(hook, 'w') as fp:
+        fp.write('#!/bin/sh\n'
+                 'jupytext --to py:light --pre-commit\n')
+
+    st = os.stat(hook)
+    os.chmod(hook, st.st_mode | stat.S_IEXEC)
+
+    writef(nb, tmp_ipynb)
+    assert os.path.isfile(tmp_ipynb)
+    assert not os.path.isfile(tmp_py)
+
+    git('add', 'notebook.ipynb')
+    git('status')
+    git('commit', '-m', 'created')
+    git('status')
+
+    assert os.path.isfile(tmp_py)
+
+    git('rm', 'notebook.ipynb')
+    git('status')
+    git('commit', '-m', 'deleted')
+    git('status')
+
+    assert not os.path.isfile(tmp_ipynb)
+    assert not os.path.isfile(tmp_py)
+
+
+def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+    tmp_md = str(tmpdir.join('notebook.md'))
+    nb = new_notebook(cells=[])
+
+    def git(*args):
+        print(system('git', *args, cwd=str(tmpdir)))
+
+    git('init')
+    git('status')
+    hook = str(tmpdir.join('.git/hooks/pre-commit'))
+    with open(hook, 'w') as fp:
+        fp.write('#!/bin/sh\n'
+                 'jupytext --from py:light --to ipynb --pre-commit\n'
+                 'jupytext --from py:light --to md --pre-commit\n')
+
+    st = os.stat(hook)
+    os.chmod(hook, st.st_mode | stat.S_IEXEC)
+
+    writef(nb, tmp_py)
+    assert os.path.isfile(tmp_py)
+    assert not os.path.isfile(tmp_ipynb)
+    assert not os.path.isfile(tmp_md)
+
+    git('add', 'notebook.py')
+    git('status')
+    git('commit', '-m', 'created')
+    git('status')
+
+    assert os.path.isfile(tmp_ipynb)
+    assert os.path.isfile(tmp_md)
+
+    git('rm', 'notebook.py')
+    git('status')
+    git('commit', '-m', 'deleted')
+    git('status')
+
+    assert not os.path.isfile(tmp_ipynb)
+    assert not os.path.isfile(tmp_py)
+    assert not os.path.isfile(tmp_md)

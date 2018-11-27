@@ -2,7 +2,9 @@
 """
 
 import os
+import re
 import sys
+import subprocess
 import argparse
 from .jupytext import readf, reads, writef, writes
 from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version, one_format_as_string, parse_one_format
@@ -12,9 +14,9 @@ from .languages import _SCRIPT_EXTENSIONS
 from .version import __version__
 
 
-def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
+def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_commit=False,
                            test_round_trip=False, test_round_trip_strict=False, stop_on_first_error=True,
-                           update=True, freeze_metadata=False):
+                           update=True, freeze_metadata=False, comment_magics=None):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
@@ -22,10 +24,13 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
     :param input_format: input format, e.g. "py:percent"
     :param fmt: destination format, e.g. "py:percent"
     :param output: None, destination file, or '-' for stdout
+    :param pre_commit: convert notebooks in the git index?
     :param test_round_trip: should round trip conversion be tested?
     :param test_round_trip_strict: should round trip conversion be tested, with strict notebook comparison?
     :param stop_on_first_error: when testing, should we stop on first error, or compare the full notebook?
     :param update: preserve the current outputs of .ipynb file
+    :param freeze_metadata: set metadata filters equal to the current script metadata
+    :param comment_magics: comment, or not, Jupyter magics
     when possible
     :return:
     """
@@ -33,6 +38,23 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
     ext, format_name = parse_one_format(fmt)
     if ext not in NOTEBOOK_EXTENSIONS:
         raise TypeError('Destination extension {} is not a notebook'.format(ext))
+
+    if pre_commit:
+        input_format = input_format or 'ipynb'
+        input_ext, _ = parse_one_format(input_format)
+        modified, deleted = modified_and_deleted_files(input_ext)
+
+        for file in modified:
+            dest_file = file[:-len(input_ext)] + ext
+            nb = readf(file)
+            writef(nb, dest_file, format_name=format_name)
+            system('git', 'add', dest_file)
+
+        for file in deleted:
+            dest_file = file[:-len(input_ext)] + ext
+            system('git', 'rm', dest_file)
+
+        return
 
     if not nb_files:
         if not input_format:
@@ -81,6 +103,9 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
                 print('{}: {}'.format(nb_file, str(error)))
             continue
 
+        if comment_magics is not None:
+            notebook.metadata.setdefault('jupytext', {})['comment_magics'] = comment_magics
+
         if output == '-':
             sys.stdout.write(writes(notebook, ext=ext, format_name=format_name))
             continue
@@ -109,6 +134,22 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
 
     if notebooks_in_error:
         exit(notebooks_in_error)
+
+
+def system(*args, **kwargs):
+    """Execute the given bash command"""
+    kwargs.setdefault('stdout', subprocess.PIPE)
+    proc = subprocess.Popen(args, **kwargs)
+    out, err = proc.communicate()
+    return out
+
+
+def modified_and_deleted_files(ext):
+    """Return the list of modified and deleted ipynb files in the git index"""
+    re_modified = re.compile(r'^[AM]+\s+(?P<name>.*{})'.format(ext.replace('.', r'\.')), re.MULTILINE)
+    re_deleted = re.compile(r'^[D]+\s+(?P<name>.*{})'.format(ext.replace('.', r'\.')), re.MULTILINE)
+    files = system('git', 'status', '--porcelain').decode('utf-8')
+    return re_modified.findall(files), re_deleted.findall(files)
 
 
 def save_notebook_as(notebook, nb_file, nb_dest, format_name, combine):
@@ -145,11 +186,23 @@ def canonize_format(format_or_ext, file_path=None):
     return {'notebook': 'ipynb', 'markdown': 'md', 'rmarkdown': 'Rmd'}[format_or_ext]
 
 
+def str2bool(input):
+    """Parse Yes/No/Default string
+    https://stackoverflow.com/questions/15008758/parsing-boolean-values-with-argparse"""
+    if input.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    if input.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    if input.lower() in ('d', 'default', ''):
+        return None
+    raise argparse.ArgumentTypeError('Expected: (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
+
+
 def cli_jupytext(args=None):
     """Command line parser for jupytext"""
     parser = argparse.ArgumentParser(
-        description='Jupyter notebooks as markdown documents, '
-                    'Julia, Python or R scripts')
+        description='Jupyter notebooks as markdown documents, Julia, Python or R scripts',
+        formatter_class=argparse.RawTextHelpFormatter)
 
     notebook_formats = (['notebook', 'rmarkdown', 'markdown'] +
                         [_SCRIPT_EXTENSIONS[ext]['language'] for ext in _SCRIPT_EXTENSIONS] +
@@ -165,11 +218,16 @@ def cli_jupytext(args=None):
                         choices=notebook_formats,
                         help="Input format")
     parser.add_argument('notebooks',
-                        help='One or more notebook(s) to be converted. Input '
-                             'is read from stdin when no notebook is '
-                             'provided , but then the --from field is '
-                             'mandatory',
+                        help='One or more notebook(s). Input is read from stdin when no notebook '
+                             'is provided , but then the --from field is mandatory',
                         nargs='*')
+    parser.add_argument('--pre-commit', action='store_true',
+                        help="""Run Jupytext on the ipynb files in the git index. 
+Create a pre-commit hook with:                        
+
+echo '#!/bin/sh
+jupytext --to py:light --pre-commit' > .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit""")
     parser.add_argument('-o', '--output',
                         help='Destination file. Defaults to original file, '
                              'with extension changed to destination format. '
@@ -177,6 +235,11 @@ def cli_jupytext(args=None):
     parser.add_argument('--update', action='store_true',
                         help='Preserve outputs of .ipynb destination '
                              '(when file exists and inputs match)')
+    parser.add_argument('--comment-magics',
+                        type=str2bool,
+                        nargs='?',
+                        default=None,
+                        help='Should Jupyter magic commands be commented? (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
     parser.add_argument('--freeze-metadata', action='store_true',
                         help='Set a metadata filter (unless one exists already) '
                              'equal to the current metadata of the notebook. Use this '
@@ -205,11 +268,17 @@ def cli_jupytext(args=None):
             args.output = '-'
 
     if not args.input_format:
-        if not args.notebooks:
-            raise ValueError('Please specificy either --from or notebooks')
+        if not args.notebooks and not args.pre_commit:
+            raise ValueError('Please specificy either --from, --pre-commit or notebooks')
 
     if args.update and not (args.test or args.test_strict) and args.to != 'ipynb':
         raise ValueError('--update works exclusively with --to notebook ')
+
+    if args.pre_commit:
+        if args.notebooks:
+            raise ValueError('--pre-commit takes notebooks from the git index. Do not pass any notebook here.')
+        if args.test or args.test_strict:
+            raise ValueError('--pre-commit cannot be used with --test or --test-strict')
 
     return args
 
@@ -227,11 +296,13 @@ def jupytext(args=None):
                                fmt=args.to,
                                input_format=args.input_format,
                                output=args.output,
+                               pre_commit=args.pre_commit,
                                test_round_trip=args.test,
                                test_round_trip_strict=args.test_strict,
                                stop_on_first_error=args.stop_on_first_error,
                                update=args.update,
-                               freeze_metadata=args.freeze_metadata)
+                               freeze_metadata=args.freeze_metadata,
+                               comment_magics=args.comment_magics)
     except ValueError as err:  # (ValueError, TypeError, IOError) as err:
         print('jupytext: error: ' + str(err))
         exit(1)

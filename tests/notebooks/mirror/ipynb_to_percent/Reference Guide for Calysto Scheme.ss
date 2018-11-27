@@ -5,12 +5,6 @@
 ;;     display_name: Calysto Scheme (Python)
 ;;     language: scheme
 ;;     name: calysto_scheme
-;;   language_info:
-;;     codemirror_mode:
-;;       name: scheme
-;;     mimetype: text/x-scheme
-;;     name: scheme
-;;     pygments_lexer: scheme
 ;; ---
 
 ;; %% [markdown]
