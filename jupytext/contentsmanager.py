@@ -28,9 +28,9 @@ def kernelspec_from_language(language):
     """Return the kernel specification for the first kernel with a matching language"""
     try:
         for name in find_kernel_specs():
-            ks = get_kernel_spec(name)
-            if ks.language == language or (language == 'c++' and ks.language.startswith('C++')):
-                return {'name': name, 'language': language, 'display_name': ks.display_name}
+            kernel_specs = get_kernel_spec(name)
+            if kernel_specs.language == language or (language == 'c++' and kernel_specs.language.startswith('C++')):
+                return {'name': name, 'language': language, 'display_name': kernel_specs.display_name}
     except (KeyError, ValueError):
         pass
     return None

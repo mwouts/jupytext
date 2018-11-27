@@ -140,7 +140,7 @@ def system(*args, **kwargs):
     """Execute the given bash command"""
     kwargs.setdefault('stdout', subprocess.PIPE)
     proc = subprocess.Popen(args, **kwargs)
-    out, err = proc.communicate()
+    out, _ = proc.communicate()
     return out
 
 
@@ -186,14 +186,14 @@ def canonize_format(format_or_ext, file_path=None):
     return {'notebook': 'ipynb', 'markdown': 'md', 'rmarkdown': 'Rmd'}[format_or_ext]
 
 
-def str2bool(input):
+def str2bool(value):
     """Parse Yes/No/Default string
     https://stackoverflow.com/questions/15008758/parsing-boolean-values-with-argparse"""
-    if input.lower() in ('yes', 'true', 't', 'y', '1'):
+    if value.lower() in ('yes', 'true', 't', 'y', '1'):
         return True
-    if input.lower() in ('no', 'false', 'f', 'n', '0'):
+    if value.lower() in ('no', 'false', 'f', 'n', '0'):
         return False
-    if input.lower() in ('d', 'default', ''):
+    if value.lower() in ('d', 'default', ''):
         return None
     raise argparse.ArgumentTypeError('Expected: (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
 
@@ -222,8 +222,8 @@ def cli_jupytext(args=None):
                              'is provided , but then the --from field is mandatory',
                         nargs='*')
     parser.add_argument('--pre-commit', action='store_true',
-                        help="""Run Jupytext on the ipynb files in the git index. 
-Create a pre-commit hook with:                        
+                        help="""Run Jupytext on the ipynb files in the git index.
+Create a pre-commit hook with:
 
 echo '#!/bin/sh
 jupytext --to py:light --pre-commit' > .git/hooks/pre-commit
