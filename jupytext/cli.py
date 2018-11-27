@@ -201,8 +201,8 @@ def str2bool(input):
 def cli_jupytext(args=None):
     """Command line parser for jupytext"""
     parser = argparse.ArgumentParser(
-        description='Jupyter notebooks as markdown documents, '
-                    'Julia, Python or R scripts')
+        description='Jupyter notebooks as markdown documents, Julia, Python or R scripts',
+        formatter_class=argparse.RawTextHelpFormatter)
 
     notebook_formats = (['notebook', 'rmarkdown', 'markdown'] +
                         [_SCRIPT_EXTENSIONS[ext]['language'] for ext in _SCRIPT_EXTENSIONS] +
@@ -218,15 +218,16 @@ def cli_jupytext(args=None):
                         choices=notebook_formats,
                         help="Input format")
     parser.add_argument('notebooks',
-                        help='One or more notebook(s) to be converted. Input '
-                             'is read from stdin when no notebook is '
-                             'provided , but then the --from field is '
-                             'mandatory',
+                        help='One or more notebook(s). Input is read from stdin when no notebook '
+                             'is provided , but then the --from field is mandatory',
                         nargs='*')
     parser.add_argument('--pre-commit', action='store_true',
-                        help="""Run Jupytext on the ipynb files in the git index. Use Jupytext 
-                        as a pre-commit hook with: echo '#!/bin/sh
-                        jupytext --to py:light --pre-commit' > .git/hooks/pre-commit""")
+                        help="""Run Jupytext on the ipynb files in the git index. 
+Create a pre-commit hook with:                        
+
+echo '#!/bin/sh
+jupytext --to py:light --pre-commit' > .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit""")
     parser.add_argument('-o', '--output',
                         help='Destination file. Defaults to original file, '
                              'with extension changed to destination format. '
