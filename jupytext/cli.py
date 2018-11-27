@@ -2,7 +2,9 @@
 """
 
 import os
+import re
 import sys
+import subprocess
 import argparse
 from .jupytext import readf, reads, writef, writes
 from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version, one_format_as_string, parse_one_format
@@ -12,7 +14,7 @@ from .languages import _SCRIPT_EXTENSIONS
 from .version import __version__
 
 
-def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
+def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_commit=False,
                            test_round_trip=False, test_round_trip_strict=False, stop_on_first_error=True,
                            update=True, freeze_metadata=False, comment_magics=None):
     """
@@ -22,6 +24,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
     :param input_format: input format, e.g. "py:percent"
     :param fmt: destination format, e.g. "py:percent"
     :param output: None, destination file, or '-' for stdout
+    :param pre_commit: convert notebooks in the git index?
     :param test_round_trip: should round trip conversion be tested?
     :param test_round_trip_strict: should round trip conversion be tested, with strict notebook comparison?
     :param stop_on_first_error: when testing, should we stop on first error, or compare the full notebook?
@@ -35,6 +38,23 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
     ext, format_name = parse_one_format(fmt)
     if ext not in NOTEBOOK_EXTENSIONS:
         raise TypeError('Destination extension {} is not a notebook'.format(ext))
+
+    if pre_commit:
+        input_format = input_format or 'ipynb'
+        input_ext, _ = parse_one_format(input_format)
+        modified, deleted = modified_and_deleted_files(input_ext)
+
+        for file in modified:
+            dest_file = file[:-len(input_ext)] + ext
+            nb = readf(file)
+            writef(nb, dest_file, format_name=format_name)
+            system('git', 'add', dest_file)
+
+        for file in deleted:
+            dest_file = file[:-len(input_ext)] + ext
+            system('git', 'rm', dest_file)
+
+        return
 
     if not nb_files:
         if not input_format:
@@ -116,6 +136,22 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None,
         exit(notebooks_in_error)
 
 
+def system(*args, **kwargs):
+    """Execute the given bash command"""
+    kwargs.setdefault('stdout', subprocess.PIPE)
+    proc = subprocess.Popen(args, **kwargs)
+    out, err = proc.communicate()
+    return out
+
+
+def modified_and_deleted_files(ext):
+    """Return the list of modified and deleted ipynb files in the git index"""
+    re_modified = re.compile(r'^[AM]+\s+(?P<name>.*{})'.format(ext.replace('.', r'\.')), re.MULTILINE)
+    re_deleted = re.compile(r'^[D]+\s+(?P<name>.*{})'.format(ext.replace('.', r'\.')), re.MULTILINE)
+    files = system('git', 'status', '--porcelain').decode('utf-8')
+    return re_modified.findall(files), re_deleted.findall(files)
+
+
 def save_notebook_as(notebook, nb_file, nb_dest, format_name, combine):
     """Save notebook to file, in desired format"""
     if combine and os.path.isfile(nb_dest) and os.path.splitext(nb_dest)[1] == '.ipynb':
@@ -187,6 +223,10 @@ def cli_jupytext(args=None):
                              'provided , but then the --from field is '
                              'mandatory',
                         nargs='*')
+    parser.add_argument('--pre-commit', action='store_true',
+                        help="""Run Jupytext on the ipynb files in the git index. Use Jupytext 
+                        as a pre-commit hook with: echo '#!/bin/sh
+                        jupytext --to py:light --pre-commit' > .git/hooks/pre-commit""")
     parser.add_argument('-o', '--output',
                         help='Destination file. Defaults to original file, '
                              'with extension changed to destination format. '
@@ -227,11 +267,17 @@ def cli_jupytext(args=None):
             args.output = '-'
 
     if not args.input_format:
-        if not args.notebooks:
-            raise ValueError('Please specificy either --from or notebooks')
+        if not args.notebooks and not args.pre_commit:
+            raise ValueError('Please specificy either --from, --pre-commit or notebooks')
 
     if args.update and not (args.test or args.test_strict) and args.to != 'ipynb':
         raise ValueError('--update works exclusively with --to notebook ')
+
+    if args.pre_commit:
+        if args.notebooks:
+            raise ValueError('--pre-commit takes notebooks from the git index. Do not pass any notebook here.')
+        if args.test or args.test_strict:
+            raise ValueError('--pre-commit cannot be used with --test or --test-strict')
 
     return args
 
@@ -249,6 +295,7 @@ def jupytext(args=None):
                                fmt=args.to,
                                input_format=args.input_format,
                                output=args.output,
+                               pre_commit=args.pre_commit,
                                test_round_trip=args.test,
                                test_round_trip_strict=args.test_strict,
                                stop_on_first_error=args.stop_on_first_error,
