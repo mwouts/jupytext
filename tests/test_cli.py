@@ -1,4 +1,5 @@
 import os
+import stat
 from shutil import copyfile
 import pytest
 from testfixtures import compare
@@ -256,9 +257,13 @@ def test_pre_commit_hook(tmpdir):
 
     git('init')
     git('status')
-    with open(str(tmpdir.join('.git/hooks/pre-commit')), 'w') as fp:
+    hook = str(tmpdir.join('.git/hooks/pre-commit'))
+    with open(hook, 'w') as fp:
         fp.write('#!/bin/sh\n'
                  'jupytext --to py:light --pre-commit\n')
+
+    st = os.stat(hook)
+    os.chmod(hook, st.st_mode | stat.S_IEXEC)
 
     writef(nb, tmp_ipynb)
     assert os.path.isfile(tmp_ipynb)
@@ -291,10 +296,14 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
 
     git('init')
     git('status')
-    with open(str(tmpdir.join('.git/hooks/pre-commit')), 'w') as fp:
+    hook = str(tmpdir.join('.git/hooks/pre-commit'))
+    with open(hook, 'w') as fp:
         fp.write('#!/bin/sh\n'
                  'jupytext --from py:light --to ipynb --pre-commit\n'
                  'jupytext --from py:light --to md --pre-commit\n')
+
+    st = os.stat(hook)
+    os.chmod(hook, st.st_mode | stat.S_IEXEC)
 
     writef(nb, tmp_py)
     assert os.path.isfile(tmp_py)
