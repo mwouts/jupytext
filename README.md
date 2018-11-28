@@ -168,10 +168,14 @@ jupytext --to md --output - notebook.ipynb      # display the markdown version o
 jupytext --from ipynb --to py:percent           # read ipynb from stdin and write double percent script on stdout
 ```
 
-Jupytext is also available as a pre-commit hook. Use this if you want Jupytext to create and update the `.py` representation of your `.ipynb` notebooks on every commit. All you need is to create an executable `.git/hooks/pre-commit` file with the following content:
+Jupytext is also available as a pre-commit hook. Use this if you want Jupytext to create and update the `.py` (or `.md`...) representation of the staged `.ipynb` notebooks. All you need is to create an executable `.git/hooks/pre-commit` file with the following content:
 ```bash
 #!/bin/sh
 jupytext --to py:light --pre-commit
+```
+If you don't want notebooks to be committed (and only commit the representations), you can ask the pre-commit hook to unstage notebooks after conversion by adding the following line:
+```bash
+git reset HEAD **/*.ipynb
 ```
 Jupytext does not offer a merge driver. If a conflict occurs, solve it on the text representation and then update or recreate the `.ipynb` notebook. Or give a try to nbdime and its [merge driver](https://nbdime.readthedocs.io/en/stable/vcs.html#merge-driver).
 
