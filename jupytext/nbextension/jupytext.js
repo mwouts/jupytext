@@ -47,6 +47,11 @@ define([
             .append([
                 $('<div>').text(JSON.stringify(Jupyter.notebook.metadata.jupytext)),
             ])
+            .append('<button type="button" id="jupytext-enable">new button</button>')
+            .append(' <select id="jupytext-dropdownList"> \
+                        <option value="1">Option 1</option>  \
+                        <option value="2">Option 2</option>  \
+                      </select>')
             .appendTo(dialog_content);
         $('<div class="modal-footer">')
             .append('<button class="btn btn-default btn-sm btn-primary" data-dismiss="modal">Ok</button>')
@@ -55,6 +60,17 @@ define([
         modal.on('shown.bs.modal', function () {
             setTimeout(function () {
                 dialog_content.find('.modal-footer button').last().focus();
+                $("#jupytext-enable").on("click", function(){
+                  console.log("jupytext-enable clicked");
+                });
+                // see this tutorial for selected value https://www.codexworld.com/how-to/get-text-value-of-selected-option-using-jquery/
+                $('#jupytext-dropdownList').on('change',function(){
+                  var optionValue = $(this).val();
+                  alert(optionValue)
+                  //var optionText = $('#dropdownList option[value="'+optionValue+'"]').text();
+                  // var optionText = $("#dropdownList option:selected").text();
+                  // alert("Selected Option Text: "+optionText);
+                });
             }, 0);
         });
 
