@@ -88,7 +88,7 @@ jupyter notebook
 
 ### <a name="paired-notebooks"></a> Per-notebook configuration
 
-Configure the multiple export formats for your notebook by adding a `"jupytext": {"formats": "ipynb,py"},` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
+Configure the multiple export formats for the current notebook by adding a `"jupytext": {"formats": "ipynb,py"},` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
 ```
 {
   "jupytext": {"formats": "ipynb,py"},
