@@ -43,6 +43,12 @@ define([
                 .append('<h3 class="modal-title">Jupytext configuration for the current notebook</h3>')
                 .on('mousedown', function () { $('.modal').draggable({ handle: '.modal-header' }); })
                 .appendTo(dialog_content);
+
+            console.log("comment_magics status", Jupyter.notebook.metadata.jupytext.comment_magics);
+            var comment_magics_default = (!("comment_magics" in Jupyter.notebook.metadata.jupytext)) ? "checked" : "";
+            var comment_magics_true = (Jupyter.notebook.metadata.jupytext.comment_magics === true) ? "checked" : "";
+            var comment_magics_false = (Jupyter.notebook.metadata.jupytext.comment_magics === false) ? "checked" : "";
+
             $('<div>')
                 .addClass('modal-body')
                 .append('<h3>Notebook formats</h3>')
@@ -62,10 +68,9 @@ define([
                 // TODO: Create or update Jupyter.notebook.metadata.jupytext.formats to match the selected values
 
                 .append(`<h3>Jupyter magic commands</h3>
-                    <input type="radio" name="jupytext-comment-magics" value="default" checked="true">Default (commented in scripts and Rmd)
-                    <input type="radio" name="jupytext-comment-magics" value="true">Commented
-                    <input type="radio" name="jupytext-comment-magics" value="false">Not commented`)
-                // TODO: Set the initial values above from Jupyter.notebook.metadata.jupytext.comment_magics
+                    <input type="radio" id="jupytext-comment-magics-default" name="jupytext-comment-magics" value="default" ${comment_magics_default}>Default (commented in scripts and Rmd)
+                    <input type="radio" id="jupytext-comment-magics-true" name="jupytext-comment-magics" value="true" ${comment_magics_true}>Commented
+                    <input type="radio" id="jupytext-comment-magics-false" name="jupytext-comment-magics" value="false" ${comment_magics_false}>Not commented`)
                 // TODO: Create, update or delete Jupyter.notebook.metadata.jupytext.comment_magics to match the selected value
 
                 .append('<h3>Metadata filters</h3>')
