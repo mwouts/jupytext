@@ -71,7 +71,6 @@ define([
                     <input type="radio" id="jupytext-comment-magics-default" name="jupytext-comment-magics" value="default" ${comment_magics_default}>Default (commented in scripts and Rmd)
                     <input type="radio" id="jupytext-comment-magics-true" name="jupytext-comment-magics" value="true" ${comment_magics_true}>Commented
                     <input type="radio" id="jupytext-comment-magics-false" name="jupytext-comment-magics" value="false" ${comment_magics_false}>Not commented`)
-                // TODO: Create, update or delete Jupyter.notebook.metadata.jupytext.comment_magics to match the selected value
 
                 .append('<h3>Metadata filters</h3>')
                 .append('<h4>Notebook metadata</h4>')
@@ -109,11 +108,26 @@ define([
                         // var optionText = $("#dropdownList option:selected").text();
                         // alert("Selected Option Text: "+optionText);
                     });
+                    save_comment_magics_on_change();
                 }, 0);
             });
 
             return modal.modal({ backdrop: 'static' });
         };
+
+        var save_comment_magics_on_change = function () {
+            $('input[name=jupytext-comment-magics]').on("change", function(){
+                console.log("input[name=jupytext-comment-magics] CHANGED");
+                if($('#jupytext-comment-magics-default').prop('checked')){
+                    delete Jupyter.notebook.metadata.jupytext["comment_magics"];
+                } else if($('#jupytext-comment-magics-true').prop('checked')){
+                    Jupyter.notebook.metadata.jupytext.comment_magics = true;
+                } else if($('#jupytext-comment-magics-false').prop('checked')){
+                    Jupyter.notebook.metadata.jupytext.comment_magics = false;
+                }
+                Jupyter.notebook.save_notebook();
+            });
+        }
 
         var jupytext_button = function () {
             if (!Jupyter.toolbar) {
