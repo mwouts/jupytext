@@ -289,7 +289,7 @@ def one_format_as_string(ext, format_name):
     """('.py', None) to 'py', etc"""
     if ext.startswith('.'):
         ext = ext[1:]
-    if format_name:
+    if format_name and format_name not in ['markdown', 'rmarkdown']:
         return ext + ':' + format_name
     return ext
 

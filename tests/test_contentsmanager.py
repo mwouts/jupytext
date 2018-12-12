@@ -65,6 +65,25 @@ def test_load_save_rename(nb_file, tmpdir):
 
 
 @skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='magic'))
+def test_save_load_paired_md_notebook(nb_file, tmpdir):
+    tmp_ipynb = 'notebook.ipynb'
+    tmp_md = 'notebook.md'
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # open ipynb, save with cm, reopen
+    nb = jupytext.readf(nb_file)
+    nb.metadata['jupytext'] = {'formats': 'ipynb,md'}
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+        nb_md = cm.get(tmp_md)
+    compare_notebooks(nb, nb_md['content'], ext='.md')
+    assert nb_md['content'].metadata['jupytext']['formats'] == 'ipynb,md'
+
+
+@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
