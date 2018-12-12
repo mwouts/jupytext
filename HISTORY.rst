@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+0.9.0 (2018-12-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- TODO: By default, Jupytext does not add metadata to a Python script or Markdown document that had no metadata (#124)
+- TODO: File names with dot are supported (#138)
+- TODO: First version of a Jupyter notebook extension (#86)
+
 0.8.6 (2018-11-29)
 ++++++++++++++++++++++
 
