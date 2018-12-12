@@ -5,6 +5,29 @@ from .utils import skip_if_dict_is_not_ordered
 
 jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
+HEADER = {'.py': '''# ---
+# jupyter:
+#   jupytext:
+#     main_language: python
+# ---
+
+''',
+          '.R': '''#' ---
+#' jupyter:
+#'   jupytext:
+#'     main_language: python
+#' ---
+
+''',
+
+          '.Rmd': '''---
+jupyter:
+  jupytext:
+    main_language: python
+---
+
+'''}
+
 ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
 # This cell is active in all extensions
 """,
@@ -54,7 +77,7 @@ ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_ipynb(ext):
-    nb = jupytext.reads(ACTIVE_IPYNB[ext], ext=ext)
+    nb = jupytext.reads(HEADER[ext] + ACTIVE_IPYNB[ext], ext=ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_IPYNB['.ipynb'])
     if ext != '.R':
@@ -82,7 +105,7 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_py_ipynb(ext):
-    nb = jupytext.reads(ACTIVE_PY_IPYNB[ext], ext=ext)
+    nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_IPYNB[ext], ext=ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_PY_IPYNB['.ipynb'])
     if ext != '.R':
@@ -110,7 +133,7 @@ ACTIVE_PY_R_IPYNB = {'.py': """# + {"active": "ipynb,py,R"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_py_r_ipynb(ext):
-    nb = jupytext.reads(ACTIVE_PY_R_IPYNB[ext], ext=ext)
+    nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_R_IPYNB[ext], ext=ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_PY_R_IPYNB['.ipynb'])
     if ext != '.R':
@@ -135,7 +158,7 @@ ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_rmd(ext):
-    nb = jupytext.reads(ACTIVE_RMD[ext], ext=ext)
+    nb = jupytext.reads(HEADER[ext] + ACTIVE_RMD[ext], ext=ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_RMD['.ipynb'])
     if ext != '.R':

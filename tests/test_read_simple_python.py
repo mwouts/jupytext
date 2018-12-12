@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from nbformat.v4.nbbase import new_markdown_cell, new_notebook
+from nbformat.v4.nbbase import new_markdown_cell, new_code_cell, new_notebook
 from testfixtures import compare
 import jupytext
 from jupytext.compare import compare_notebooks
@@ -536,6 +536,27 @@ def g(x):
 def test_round_trip_markdown_cell_with_magic():
     notebook = new_notebook(cells=[new_markdown_cell('IPython has magic commands like\n%quickref')],
                             metadata={'jupytext': {'main_language': 'python'}})
+    text = jupytext.writes(notebook, ext='.py')
+    notebook2 = jupytext.reads(text, ext='.py')
+    compare_notebooks(notebook, notebook2)
+
+
+def test_round_trip_python_with_js_cell():
+    notebook = new_notebook(cells=[new_code_cell('''import notebook.nbextensions
+notebook.nbextensions.install_nbextension('jupytext.js', user=True)'''),
+                                   new_code_cell('''%%javascript
+Jupyter.utils.load_extensions('jupytext')''')])
+    text = jupytext.writes(notebook, ext='.py')
+    notebook2 = jupytext.reads(text, ext='.py')
+    compare_notebooks(notebook, notebook2)
+
+
+def test_round_trip_python_with_js_cell_no_cell_metadata():
+    notebook = new_notebook(cells=[new_code_cell('''import notebook.nbextensions
+notebook.nbextensions.install_nbextension('jupytext.js', user=True)'''),
+                                   new_code_cell('''%%javascript
+Jupyter.utils.load_extensions('jupytext')''')],
+                            metadata={'jupytext': {'metadata_filter': {'notebook': '-all', 'cells': '-all'}}})
     text = jupytext.writes(notebook, ext='.py')
     notebook2 = jupytext.reads(text, ext='.py')
     compare_notebooks(notebook, notebook2)

@@ -12,6 +12,10 @@ Release History
 - TODO: File names with dot are supported (#138)
 - TODO: First version of a Jupyter notebook extension (#86)
 
+**BugFixes**
+
+- Main language of scripts is inferred from script extension. Fixes the round trip conversion on Python notebooks with a javascript cell.
+
 0.8.6 (2018-11-29)
 ++++++++++++++++++++++
 
