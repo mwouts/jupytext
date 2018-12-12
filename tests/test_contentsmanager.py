@@ -93,6 +93,33 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
 
 
 @skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('script', list_notebooks('python', skip='light'))
+def test_load_save_py_freeze_metadata(script, tmpdir):
+    tmp_nbpy = 'notebook.py'
+
+    cm = jupytext.TextFileContentsManager()
+    cm.freeze_metadata = True
+    cm.root_dir = str(tmpdir)
+
+    # read original file
+    with open(script) as fp:
+        text_py = fp.read()
+
+    # write to tmp_nbpy
+    with open(str(tmpdir.join(tmp_nbpy)), 'w') as fp:
+        fp.write(text_py)
+
+    # open and save notebook
+    nb = cm.get(tmp_nbpy)['content']
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
+
+    with open(str(tmpdir.join(tmp_nbpy))) as fp:
+        text_py2 = fp.read()
+
+    compare(text_py, text_py2)
+
+
+@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
     tmp_ipynb = '1.notebook.ipynb'

@@ -19,8 +19,8 @@ from .formats import get_format, read_format_from_metadata, guess_format, \
     update_jupytext_formats_metadata, format_name_for_ext, transition_to_jupytext_section_in_metadata
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable, insert_or_test_version_number
-from .languages import default_language_from_metadata_and_ext, \
-    set_main_and_cell_language
+from .languages import default_language_from_metadata_and_ext, set_main_and_cell_language
+from .cell_metadata import _JUPYTEXT_CELL_METADATA
 
 
 class TextNotebookReader(NotebookReader):
@@ -59,6 +59,7 @@ class TextNotebookReader(NotebookReader):
             lines = lines[pos:]
 
         if self.freeze_metadata and 'metadata_filter' not in metadata.get('jupytext', {}):
+            cell_metadata = [m for m in cell_metadata if m not in _JUPYTEXT_CELL_METADATA]
             metadata.setdefault('jupytext', {})['metadata_filter'] = {
                 'notebook': {'additional': list(metadata.keys()), 'excluded': 'all'},
                 'cells': {'additional': list(cell_metadata), 'excluded': 'all'}}
