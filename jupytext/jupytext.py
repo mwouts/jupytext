@@ -61,8 +61,8 @@ class TextNotebookReader(NotebookReader):
         if self.freeze_metadata and 'metadata_filter' not in metadata.get('jupytext', {}):
             cell_metadata = [m for m in cell_metadata if m not in _JUPYTEXT_CELL_METADATA]
             metadata.setdefault('jupytext', {})['metadata_filter'] = {
-                'notebook': {'additional': list(metadata.keys()), 'excluded': 'all'},
-                'cells': {'additional': list(cell_metadata), 'excluded': 'all'}}
+                'notebook': ','.join(list(metadata.keys()) + ['-all']),
+                'cells': ','.join(cell_metadata + ['-all'])}
 
         set_main_and_cell_language(metadata, cells, self.format.extension)
 

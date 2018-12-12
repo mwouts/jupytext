@@ -362,3 +362,20 @@ def transition_to_jupytext_section_in_metadata(metadata, is_ipynb):
     for entry in ['encoding', 'executable']:
         if is_ipynb and entry in metadata:
             metadata.setdefault('jupytext', {})[entry] = metadata.pop(entry)
+
+    filters = metadata.get('jupytext', {}).get('metadata_filter', {})
+    for filter_level in ['notebook', 'cells']:
+        if isinstance(filters.get(filter_level), dict):
+            additional = filters.get(filter_level).get('additional', [])
+            if additional == 'all':
+                entries = ['all']
+            else:
+                entries = additional
+
+            excluded = filters.get(filter_level).get('excluded', [])
+            if excluded == 'all':
+                entries.append('-all')
+            else:
+                entries.extend(['-' + e for e in excluded])
+
+            filters[filter_level] = ','.join(entries)

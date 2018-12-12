@@ -409,11 +409,6 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 (jupytext_metadata.setdefault('metadata_filter', {})
                  .setdefault('cells', self.default_cell_metadata_filter))
 
-            for filter_level in ['notebook', 'cells']:
-                filter = jupytext_metadata.get('metadata_filter', {}).get(filter_level)
-                if filter is not None:
-                    jupytext_metadata['metadata_filter'][filter_level] = metadata_filter_as_dict(filter)
-
             if jupytext_metadata:
                 model['content']['metadata']['jupytext'] = jupytext_metadata
 
