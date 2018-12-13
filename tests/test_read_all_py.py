@@ -3,8 +3,6 @@ from testfixtures import compare
 import jupytext
 from .utils import list_notebooks
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 @pytest.mark.parametrize('py_file',
                          [py_file for py_file in

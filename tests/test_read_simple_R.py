@@ -4,8 +4,6 @@ import pytest
 from testfixtures import compare
 import jupytext
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 @pytest.mark.parametrize('ext', ['.r', '.R'])
 def test_read_simple_file(ext, rnb="""#' ---

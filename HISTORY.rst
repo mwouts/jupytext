@@ -8,8 +8,8 @@ Release History
 
 **Improvements**
 
-- TODO: By default, Jupytext does not add metadata to a Python script or Markdown document that had no metadata (#124)
-- TODO: File names with dot are supported (#138)
+- Python scripts or Markdown documents that have no Jupyter metadata receive a metadata filter that ensures that metadata is not exported back to the text representation (#124)
+- Metadata filters are represented as strings rather than dictionaries. Previous syntax from #105 is still supported.
 - TODO: First version of a Jupyter notebook extension (#86)
 
 **BugFixes**

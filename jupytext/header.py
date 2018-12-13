@@ -128,7 +128,8 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
 
 def header_to_metadata_and_cell(lines, header_prefix):
     """
-    Return the metadata, first cell of notebook, and next loc in text
+    Return the metadata, a boolean to indicate if a jupyter section was found,
+     the first cell of notebook if some metadata is found outside of the jupyter section, and next loc in text
     """
 
     header = []
@@ -203,6 +204,6 @@ def header_to_metadata_and_cell(lines, header_prefix):
         else:
             cell = None
 
-        return metadata, cell, i + 1
+        return metadata, jupyter, cell, i + 1
 
-    return metadata, None, start
+    return metadata, False, None, start

@@ -3,8 +3,6 @@
 from testfixtures import compare
 import jupytext
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 def test_read_simple_file(script='''# -*- coding: utf-8 -*-
 """

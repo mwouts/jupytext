@@ -4,8 +4,6 @@ from nbformat.v4.nbbase import new_notebook, new_code_cell, new_markdown_cell
 import jupytext
 from jupytext.compare import compare_notebooks
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 @pytest.mark.parametrize('blank_lines', range(1, 6))
 def test_file_with_blank_lines(blank_lines):

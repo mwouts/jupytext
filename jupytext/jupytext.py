@@ -26,17 +26,16 @@ from .cell_metadata import _JUPYTEXT_CELL_METADATA
 class TextNotebookReader(NotebookReader):
     """Text notebook reader"""
 
-    def __init__(self, ext, format_name=None, freeze_metadata=False):
+    def __init__(self, ext, format_name=None):
         self.ext = ext
         self.format = get_format(ext, format_name)
-        self.freeze_metadata = freeze_metadata
 
     def reads(self, s, **_):
         """Read a notebook from text"""
         lines = s.splitlines()
 
         cells = []
-        metadata, header_cell, pos = header_to_metadata_and_cell(lines, self.format.header_prefix)
+        metadata, jupyter_md, header_cell, pos = header_to_metadata_and_cell(lines, self.format.header_prefix)
         comment_magics = metadata.get('jupytext', {}).get('comment_magics')
 
         if header_cell:
@@ -58,11 +57,11 @@ class TextNotebookReader(NotebookReader):
                 raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
             lines = lines[pos:]
 
-        if self.freeze_metadata and 'metadata_filter' not in metadata.get('jupytext', {}):
+        if not jupyter_md:
+            # Set a metadata filter equal to the current metadata in script
             cell_metadata = [m for m in cell_metadata if m not in _JUPYTEXT_CELL_METADATA]
             metadata.setdefault('jupytext', {})['metadata_filter'] = {
-                'notebook': ','.join(list(metadata.keys()) + ['-all']),
-                'cells': ','.join(cell_metadata + ['-all'])}
+                'notebook': '-all', 'cells': ','.join(cell_metadata + ['-all'])}
 
         set_main_and_cell_language(metadata, cells, self.format.extension)
 
@@ -139,8 +138,7 @@ class TextNotebookWriter(NotebookWriter):
         return '\n'.join(lines)
 
 
-def reads(text, ext, format_name=None,
-          rst2md=False, freeze_metadata=False, as_version=4, **kwargs):
+def reads(text, ext, format_name=None, rst2md=False, as_version=4, **kwargs):
     """Read a notebook from a string"""
     if ext.endswith('.ipynb'):
         return nbformat.reads(text, as_version, **kwargs)
@@ -152,7 +150,7 @@ def reads(text, ext, format_name=None,
         if format_name == 'sphinx' and rst2md:
             format_name = 'sphinx-rst2md'
 
-    reader = TextNotebookReader(ext, format_name, freeze_metadata)
+    reader = TextNotebookReader(ext, format_name)
     notebook = reader.reads(text, **kwargs)
     transition_to_jupytext_section_in_metadata(notebook.metadata, False)
 
@@ -166,24 +164,21 @@ def reads(text, ext, format_name=None,
     return notebook
 
 
-def read(file_or_stream, ext, format_name=None,
-         freeze_metadata=False, as_version=4, **kwargs):
+def read(file_or_stream, ext, format_name=None, as_version=4, **kwargs):
     """Read a notebook from a file"""
     if ext.endswith('.ipynb'):
         notebook = nbformat.read(file_or_stream, as_version, **kwargs)
         transition_to_jupytext_section_in_metadata(notebook.metadata, True)
         return notebook
 
-    return reads(file_or_stream.read(), ext=ext, format_name=format_name,
-                 freeze_metadata=freeze_metadata, **kwargs)
+    return reads(file_or_stream.read(), ext=ext, format_name=format_name, **kwargs)
 
 
-def readf(nb_file, format_name=None, freeze_metadata=False):
+def readf(nb_file, format_name=None):
     """Read a notebook from the file with given name"""
     _, ext = os.path.splitext(nb_file)
     with io.open(nb_file, encoding='utf-8') as stream:
-        return read(stream, as_version=4, ext=ext, format_name=format_name,
-                    freeze_metadata=freeze_metadata)
+        return read(stream, as_version=4, ext=ext, format_name=format_name)
 
 
 def writes(notebook, ext, format_name=None,

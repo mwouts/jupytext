@@ -4,8 +4,6 @@ import jupytext
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_identity_source_write_read(nb_file):

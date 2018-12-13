@@ -1,9 +1,6 @@
 import pytest
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell, new_raw_cell
-import jupytext
 from jupytext.compare import compare_notebooks, NotebookDifference, test_round_trip_conversion as round_trip_conversion
-
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 def test_raise_on_different_metadata():

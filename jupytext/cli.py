@@ -16,7 +16,7 @@ from .version import __version__
 
 def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_commit=False,
                            test_round_trip=False, test_round_trip_strict=False, stop_on_first_error=True,
-                           update=True, freeze_metadata=False, comment_magics=None):
+                           update=True, comment_magics=None):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
@@ -29,7 +29,6 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
     :param test_round_trip_strict: should round trip conversion be tested, with strict notebook comparison?
     :param stop_on_first_error: when testing, should we stop on first error, or compare the full notebook?
     :param update: preserve the current outputs of .ipynb file
-    :param freeze_metadata: set metadata filters equal to the current script metadata
     :param comment_magics: comment, or not, Jupyter magics
     when possible
     :return:
@@ -71,8 +70,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
         if nb_file == sys.stdin:
             dest = None
             current_ext, _ = parse_one_format(input_format)
-            notebook = reads(nb_file.read(), ext=current_ext, format_name=format_name,
-                             freeze_metadata=freeze_metadata)
+            notebook = reads(nb_file.read(), ext=current_ext, format_name=format_name)
         else:
             dest, current_ext = os.path.splitext(nb_file)
             notebook = None
@@ -90,8 +88,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
             input_format = None
 
         if not notebook:
-            notebook = readf(nb_file, format_name=format_name,
-                             freeze_metadata=freeze_metadata)
+            notebook = readf(nb_file, format_name=format_name)
 
         if test_round_trip or test_round_trip_strict:
             try:
@@ -240,10 +237,6 @@ chmod +x .git/hooks/pre-commit""")
                         nargs='?',
                         default=None,
                         help='Should Jupyter magic commands be commented? (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
-    parser.add_argument('--freeze-metadata', action='store_true',
-                        help='Set a metadata filter (unless one exists already) '
-                             'equal to the current metadata of the notebook. Use this '
-                             'to avoid creating a YAML header when editing text files.')
     test = parser.add_mutually_exclusive_group()
     test.add_argument('--test', dest='test', action='store_true',
                       help='Test that notebook is stable under '
@@ -301,7 +294,6 @@ def jupytext(args=None):
                                test_round_trip_strict=args.test_strict,
                                stop_on_first_error=args.stop_on_first_error,
                                update=args.update,
-                               freeze_metadata=args.freeze_metadata,
                                comment_magics=args.comment_magics)
     except (ValueError, TypeError, IOError) as err:
         print('jupytext: error: ' + str(err))

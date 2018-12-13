@@ -1,7 +1,5 @@
 import jupytext
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 def test_incomplete_header(rmd="""---
 title: Incomplete header

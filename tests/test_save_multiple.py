@@ -8,8 +8,6 @@ from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 @pytest.mark.parametrize('nb_file', list_notebooks(skip='66'))
 def test_rmd_is_ok(nb_file, tmpdir):

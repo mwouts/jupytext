@@ -22,7 +22,7 @@ title: Sample header
 Header is followed by a blank line
 """
     lines = text.splitlines()
-    metadata, cell, pos = header_to_metadata_and_cell(lines, '')
+    metadata, _, cell, pos = header_to_metadata_and_cell(lines, '')
 
     assert metadata == {}
     assert cell.cell_type == 'raw'
@@ -40,7 +40,7 @@ title: Sample header
 Header is not followed by a blank line
 """
     lines = text.splitlines()
-    metadata, cell, pos = header_to_metadata_and_cell(lines, '')
+    metadata, _, cell, pos = header_to_metadata_and_cell(lines, '')
 
     assert metadata == {}
     assert cell.cell_type == 'raw'
@@ -59,7 +59,7 @@ jupyter:
 ---
 """
     lines = text.splitlines()
-    metadata, cell, pos = header_to_metadata_and_cell(lines, '')
+    metadata, _, cell, pos = header_to_metadata_and_cell(lines, '')
 
     assert metadata == {'mainlanguage': 'python'}
     assert cell.cell_type == 'raw'
@@ -94,7 +94,7 @@ def test_metadata_and_cell_to_header2():
 def test_notebook_from_plain_script_has_metadata_filter(script="""print('Hello world")
 """):
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        nb = jupytext.reads(script, '.py', freeze_metadata=True)
+        nb = jupytext.reads(script, '.py')
     assert nb.metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook') == '-all'
     assert nb.metadata.get('jupytext', {}).get('metadata_filter', {}).get('cells') == '-all'
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):

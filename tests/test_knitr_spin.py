@@ -2,8 +2,6 @@ import pytest
 import jupytext
 from .utils import list_notebooks, skip_if_dict_is_not_ordered
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('r_file', list_notebooks('R'))

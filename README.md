@@ -136,16 +136,10 @@ c.ContentsManager.default_notebook_metadata_filter = "all,-widgets,-varInspector
 c.ContentsManager.default_cell_metadata_filter = "ExecuteTime,autoscroll,-hide_output"
 ```
 
-If you want that the text files created by Jupytext have no metadata, you may use the global metadata filters below. Please note that with this setting, the metadata is only preserved in the `.ipynb` file &mdash; be sure to open that file in Jupyter, and not the text file which will miss the pairing information.
+If you want that the text files created by Jupytext have no metadata, you may use the global metadata filters below. Please note that with this setting, the metadata is only preserved in the `.ipynb` file.
 ```python
 c.ContentsManager.default_notebook_metadata_filter = "-all"
 c.ContentsManager.default_cell_metadata_filter = "-all"
-```
-
-Finally, if you want that Jupytext exports no other metadata that the one already present in pre-existing scripts or markdowns files, use:
-```python
-# Do not add new metadata when editing a markdown document or a script
-c.ContentsManager.freeze_metadata = True
 ```
 
 NB: All these global options (and more) are documented [here](https://github.com/mwouts/jupytext/blob/master/jupytext/contentsmanager.py).
@@ -216,7 +210,8 @@ jupytext --test --update notebook.ipynb --to py:percent
 Note that `jupytext --test` compares the resulting notebooks according to its expectations. If you wish to proceed to a strict comparison of the two notebooks, use `jupytext --test-strict`, and use the flag `-x` to report with more details on the first difference, if any.
 
 Please note that
-- When you associate a Jupyter kernel with your text notebook, that information goes to a YAML header at the top of your script or Markdown document. And Jupytext itself may create a `jupytext` entry in the notebook metadata. Have a look at the [`freeze_metadata` option](#default-metadata-filtering) if you want to avoid this.
+- Scripts opened with Jupyter have a default [metadata filter](#default-metadata-filtering) that prevents additional notebook or cell
+metadata to be added back to the script. Remove the filter if you want to store Jupytext's settings, or the kernel information, in the text file.
 - Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata.
 - By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in the sections for [notebook specific](#-per-notebook-configuration) and [global settings](#default-metadata-filtering) for metadata filtering.
 - Representing a Jupyter notebook as a Markdown or R Markdown document has the effect of splitting markdown cells with two consecutive blank lines into multiple cells (as the two blank line pattern is used to separate cells).

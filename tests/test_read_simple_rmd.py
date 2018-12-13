@@ -3,8 +3,6 @@ from testfixtures import compare
 import jupytext
 from .utils import skip_if_dict_is_not_ordered
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 @skip_if_dict_is_not_ordered
 def test_read_mostly_py_rmd_file(rmd="""---
@@ -30,7 +28,6 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 ```
 """):
     nb = jupytext.reads(rmd, ext='.Rmd')
-    assert nb.metadata == {'jupytext': {'main_language': 'python'}}
     assert nb.cells == [{'cell_type': 'raw',
                          'source': '---\ntitle: Simple file\n---',
                          'metadata': {}},

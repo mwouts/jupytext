@@ -4,6 +4,8 @@ from tornado.web import HTTPError
 from nbformat.v4.nbbase import new_notebook
 import jupytext
 
+jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
+
 
 def test_combine_same_version_ok(tmpdir):
     tmp_ipynb = 'notebook.ipynb'

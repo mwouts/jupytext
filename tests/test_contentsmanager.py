@@ -117,7 +117,6 @@ def test_load_save_py_freeze_metadata(script, tmpdir):
     tmp_nbpy = 'notebook.py'
 
     cm = jupytext.TextFileContentsManager()
-    cm.freeze_metadata = True
     cm.root_dir = str(tmpdir)
 
     # read original file
@@ -307,6 +306,7 @@ def test_load_save_percent_format(nb_file, tmpdir):
     # open python, save
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         nb = cm.get(tmp_py)['content']
+        del nb.metadata['jupytext']['metadata_filter']
         cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
 
     # compare the new file with original one
@@ -345,7 +345,7 @@ def test_save_to_percent_format(nb_file, tmpdir):
         text_jl = stream.read()
 
     # Parse the YAML header
-    metadata, _, _ = header_to_metadata_and_cell(text_jl.splitlines(), '#')
+    metadata, _, _, _ = header_to_metadata_and_cell(text_jl.splitlines(), '#')
     assert metadata['jupytext']['formats'] == 'ipynb,jl:percent'
 
 

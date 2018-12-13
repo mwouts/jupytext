@@ -150,9 +150,9 @@ def read_metadata(text, ext):
     else:
         comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
 
-    metadata, _, _ = header_to_metadata_and_cell(lines, comment)
+    metadata, _, _, _ = header_to_metadata_and_cell(lines, comment)
     if ext in ['.r', '.R'] and not metadata:
-        metadata, _, _ = header_to_metadata_and_cell(lines, "#'")
+        metadata, _, _, _ = header_to_metadata_and_cell(lines, "#'")
 
     return metadata
 
@@ -170,7 +170,8 @@ def guess_format(text, ext):
 
     metadata = read_metadata(text, ext)
 
-    if ('jupytext' in metadata and set(metadata['jupytext']).difference(['encoding', 'main_language'])) or \
+    if ('jupytext' in metadata and set(metadata['jupytext'])
+            .difference(['encoding', 'executable', 'main_language'])) or \
             set(metadata).difference(['jupytext']):
         return format_name_for_ext(metadata, ext)
 
