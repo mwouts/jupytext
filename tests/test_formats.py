@@ -31,6 +31,12 @@ def test_script_with_spyder_cell_is_percent(script="""#%%
     assert guess_format(script, '.py') == 'percent'
 
 
+def test_script_with_percent_cell_and_magic_is_hydrogen(script="""#%%
+%matplotlib inline
+"""):
+    assert guess_format(script, '.py') == 'hydrogen'
+
+
 def test_script_with_spyder_cell_with_name_is_percent(script="""#%% cell name
 1 + 2"""):
     assert guess_format(script, '.py') == 'percent'

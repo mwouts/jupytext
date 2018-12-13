@@ -254,7 +254,7 @@ Our implementation of the `percent` format is compatible with the original speci
 ```
 where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The content of markdown and raw cells is commented out in the resulting script.
 
-Percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least one `# %%` cell are identified as `percent` scripts.
+Percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least one `# %%` cell are identified as `percent` scripts. Scripts with at least one double percent cell, and an uncommented Jupyter magic command, are identified as `hydrogen` scripts.
 
 The `percent` format is currently available for Python, Julia, R, Bash, Scheme and C++. Open our sample notebook in the `percent` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py).
 
@@ -264,11 +264,7 @@ c.ContentsManager.preferred_jupytext_formats_save = "py:percent" # or "auto:perc
 ```
 Then, Jupytext's content manager will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
 
-By default, Jupyter magics are commented in the `percent` representation. If you are using percent scripts in Hydrogen and you want to preserve Jupyter magics, then add a metadata `"jupytext": {"comment_magics": false},"` to your notebook, or add
-```python
-c.ContentsManager.comment_magics = False
-```
-to Jupyter's configuration file.
+By default, Jupyter magics are commented in the `percent` representation. If you run the percent scripts in Hydrogen, use instead the `hydrogen` format, a variant of the `percent` format that does not comment Jupyter magic commands.
 
 ### Sphinx-gallery scripts
 

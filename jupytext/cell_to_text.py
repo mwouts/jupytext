@@ -283,8 +283,7 @@ class RScriptCellExporter(BaseCellExporter):
 
 
 class DoublePercentCellExporter(BaseCellExporter):
-    """A class that can represent a notebook cell as an
-    Hydrogen/Spyder/VScode script (#59)"""
+    """A class that can represent a notebook cell as a Spyder/VScode script (#59)"""
     default_comment_magics = True
     parse_cell_language = True
 
@@ -315,6 +314,11 @@ class DoublePercentCellExporter(BaseCellExporter):
             return lines + source
 
         return lines + comment_lines(self.source, self.comment)
+
+
+class HydrogenCellExporter(DoublePercentCellExporter):
+    """A class that can represent a notebook cell as a Hydrogen script (#59)"""
+    default_comment_magics = False
 
 
 class SphinxGalleryCellExporter(BaseCellExporter):

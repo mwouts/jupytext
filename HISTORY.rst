@@ -8,14 +8,15 @@ Release History
 
 **Improvements**
 
-- Python scripts or Markdown documents that have no Jupyter metadata receive a metadata filter that ensures that metadata is not exported back to the text representation (#124)
+- Python scripts or Markdown documents that have no Jupyter metadata receive a metadata filter that ensures that metadata is not exported back to the text representation (#124).
 - Metadata filters are represented as strings rather than dictionaries. Previous syntax from #105 is still supported.
-- TODO: First version of a Jupyter notebook extension (#86)
+- New ``hydrogen`` format for scripts, which derives from ``percent``. In that format Jupyter magic commands are not commented (#59, #126, #132).
+- TODO: First version of a Jupyter notebook extension (#86).
 
 **BugFixes**
 
 - Main language of scripts is inferred from script extension. Fixes a round trip conversion issue for Python notebooks with a Javascript cell.
-- Format extension must start with one of ``.lgt``,``.pct``,``.spx`` and ``.nb`` (#87,#138)
+- Format extension must start prefix, if any, in ``.lgt``,``.pct``, ``.hyd``, ``.spx`` or ``.nb`` (#87,#138).
 
 0.8.6 (2018-11-29)
 ++++++++++++++++++++++

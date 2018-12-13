@@ -407,7 +407,7 @@ class LightScriptCellReader(ScriptCellReader):
 
 
 class DoublePercentScriptCellReader(ScriptCellReader):
-    """Read notebook cells from Hydrogen/Spyder/VScode scripts (#59)"""
+    """Read notebook cells from Spyder/VScode scripts (#59)"""
     default_comment_magics = True
 
     def __init__(self, ext, comment_magics=None):
@@ -479,6 +479,11 @@ class DoublePercentScriptCellReader(ScriptCellReader):
         if next_cell > 0 and _BLANK_LINE.match(lines[next_cell - 1]):
             return next_cell - 1, next_cell, False
         return next_cell, next_cell, False
+
+
+class HydrogenCellReader(DoublePercentScriptCellReader):
+    """Read notebook cells from Hydrogen scripts (#59)"""
+    default_comment_magics = False
 
 
 class SphinxGalleryScriptCellReader(ScriptCellReader):

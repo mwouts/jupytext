@@ -7,11 +7,11 @@ import os
 import re
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
-    LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, \
+    LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, HydrogenCellReader, \
     SphinxGalleryScriptCellReader, SphinxGalleryScriptRst2mdCellReader
 from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
     LightScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter, \
-    SphinxGalleryCellExporter
+    HydrogenCellExporter, SphinxGalleryCellExporter
 from .stringparser import StringParser
 from .languages import _SCRIPT_EXTENSIONS
 
@@ -95,6 +95,16 @@ JUPYTEXT_FORMATS = \
             min_readable_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
     [
         NotebookFormatDescription(
+            format_name='hydrogen',
+            extension=ext,
+            header_prefix=_SCRIPT_EXTENSIONS[ext]['comment'],
+            cell_reader_class=HydrogenCellReader,
+            cell_exporter_class=HydrogenCellExporter,
+            # Version 1.2 on 2018-12-14 - jupytext v0.9.0: same as percent - only magics are not commented by default
+            current_version_number='1.2',
+            min_readable_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
+    [
+        NotebookFormatDescription(
             format_name='sphinx',
             extension='.py',
             header_prefix='#',
@@ -114,7 +124,7 @@ JUPYTEXT_FORMATS = \
 
 NOTEBOOK_EXTENSIONS = list(dict.fromkeys(
     ['.ipynb'] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
-EXTENSION_PREFIXES = ['.lgt', '.spx', '.pct', '.nb']
+EXTENSION_PREFIXES = ['.lgt', '.spx', '.pct', '.hyd', '.nb']
 
 
 def get_format(ext, format_name=None):
@@ -180,11 +190,13 @@ def guess_format(text, ext):
     if ext in _SCRIPT_EXTENSIONS:
         comment = _SCRIPT_EXTENSIONS[ext]['comment']
         twenty_hash = ''.join(['#'] * 20)
+        magic_re = re.compile(r'^(%|%%|%%%)[a-zA-Z]')
         double_percent_re = re.compile(r'^{}( %%|%%)$'.format(comment))
         double_percent_and_space_re = re.compile(r'^{}( %%|%%)\s'.format(comment))
         nbconvert_script_re = re.compile(r'^{}( <codecell>| In\[[0-9 ]*\]:?)'.format(comment))
         twenty_hash_count = 0
         double_percent_count = 0
+        magic_command_count = 0
 
         parser = StringParser(language='R' if ext in ['.r', '.R'] else 'python')
         for line in lines:
@@ -192,17 +204,22 @@ def guess_format(text, ext):
             if parser.is_quoted():
                 continue
 
-            # Don't count escaped Jupyter magics (no space between
-            # %% and command) as cells
+            # Don't count escaped Jupyter magics (no space between %% and command) as cells
             if double_percent_re.match(line) or double_percent_and_space_re.match(line) or \
                     nbconvert_script_re.match(line):
                 double_percent_count += 1
+
+            if magic_re.match(line):
+                magic_command_count += 1
 
             if line.startswith(twenty_hash) and ext == '.py':
                 twenty_hash_count += 1
 
         if double_percent_count >= 1:
-            return 'percent'
+            if magic_command_count:
+                return 'hydrogen'
+            else:
+                return 'percent'
 
         if twenty_hash_count >= 2:
             return 'sphinx'
