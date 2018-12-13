@@ -114,6 +114,7 @@ JUPYTEXT_FORMATS = \
 
 NOTEBOOK_EXTENSIONS = list(dict.fromkeys(
     ['.ipynb'] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
+EXTENSION_PREFIXES = ['.lgt', '.spx', '.pct', '.nb']
 
 
 def get_format(ext, format_name=None):
@@ -260,7 +261,17 @@ def parse_one_format(ext_and_format_name):
     if not ext.startswith('.'):
         ext = '.' + ext
 
-    return ext, format_name
+    legitimate_extensions = NOTEBOOK_EXTENSIONS + ['.auto']
+    if ext in legitimate_extensions:
+        return ext, format_name
+
+    if ext.rfind('.') > 0:
+        pre, short_ext = os.path.splitext(ext)
+        if short_ext in legitimate_extensions and pre in EXTENSION_PREFIXES:
+            return ext, format_name
+
+    raise ValueError("Extension '{}' should have been one of '{}', with optional prefix among '{}'".format(
+        ext, "','".join(legitimate_extensions), "','".join(EXTENSION_PREFIXES)))
 
 
 def parse_formats(formats):

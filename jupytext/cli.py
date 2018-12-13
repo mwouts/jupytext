@@ -303,6 +303,6 @@ def jupytext(args=None):
                                update=args.update,
                                freeze_metadata=args.freeze_metadata,
                                comment_magics=args.comment_magics)
-    except ValueError as err:  # (ValueError, TypeError, IOError) as err:
+    except (ValueError, TypeError, IOError) as err:
         print('jupytext: error: ' + str(err))
         exit(1)

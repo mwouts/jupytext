@@ -14,7 +14,8 @@ Release History
 
 **BugFixes**
 
-- Main language of scripts is inferred from script extension. Fixes the round trip conversion on Python notebooks with a javascript cell.
+- Main language of scripts is inferred from script extension. Fixes a round trip conversion issue for Python notebooks with a Javascript cell.
+- Format extension must start with one of ``.lgt``,``.pct``,``.spx`` and ``.nb`` (#87,#138)
 
 0.8.6 (2018-11-29)
 ++++++++++++++++++++++

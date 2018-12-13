@@ -394,6 +394,38 @@ def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     compare_notebooks(nb, model['content'])
 
 
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_pair_notebook_with_dot(nb_file, tmpdir):
+    # Reproduce issue #138
+    tmp_py = 'file.5.1.py'
+    tmp_ipynb = 'file.5.1.ipynb'
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    nb = jupytext.readf(nb_file)
+    nb['metadata']['jupytext'] = {'formats': 'ipynb,py:percent'}
+
+    # save to ipynb and three python flavors
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+
+    assert os.path.isfile(str(tmpdir.join(tmp_ipynb)))
+
+    # read files
+    with open(str(tmpdir.join(tmp_py))) as stream:
+        assert read_format_from_metadata(stream.read(), '.py') == 'percent'
+
+    model = cm.get(path=tmp_py)
+    assert model['name'] == 'file.5.1.py'
+    compare_notebooks(nb, model['content'])
+
+    model = cm.get(path=tmp_ipynb)
+    assert model['name'] == 'file.5.1.ipynb'
+    compare_notebooks(nb, model['content'])
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
 def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
     # 1. write py ipynb
@@ -611,7 +643,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
         cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # set config
-    cm.default_jupytext_formats = 'ipynb, py'
+    cm.default_jupytext_formats = 'ipynb,py'
     cm.default_notebook_metadata_filter = 'jupytext,-all'
     cm.default_cell_metadata_filter = '-all'
 

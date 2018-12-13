@@ -19,9 +19,8 @@ from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 
 import jupytext
 from .combine import combine_inputs_with_outputs
-from .formats import check_file_version, NOTEBOOK_EXTENSIONS, \
+from .formats import check_file_version, NOTEBOOK_EXTENSIONS, EXTENSION_PREFIXES, \
     format_name_for_ext, parse_one_format, parse_formats, transition_to_jupytext_section_in_metadata
-from .metadata_filter import metadata_filter_as_dict
 
 
 def kernelspec_from_language(language):
@@ -105,10 +104,10 @@ def file_fmt_ext(path):
     Return file name, format (possibly .nb.py) and extension (.py)
     """
     file, ext = os.path.splitext(path)
-    file, intermediate_ext = os.path.splitext(file)
-    if file and len(intermediate_ext) <= 4:
-        return file, intermediate_ext + ext, ext
-    return file + intermediate_ext, ext, ext
+    file, ext_prefix = os.path.splitext(file)
+    if file and ext_prefix in EXTENSION_PREFIXES:
+        return file, ext_prefix + ext, ext
+    return file + ext_prefix, ext, ext
 
 
 class TextFileContentsManager(FileContentsManager, Configurable):
