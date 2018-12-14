@@ -21,6 +21,7 @@ import jupytext
 from .combine import combine_inputs_with_outputs
 from .formats import check_file_version, NOTEBOOK_EXTENSIONS, EXTENSION_PREFIXES, \
     format_name_for_ext, parse_one_format, parse_formats, transition_to_jupytext_section_in_metadata
+from .metadata_filter import metadata_filter_as_dict
 
 
 def kernelspec_from_language(language):
@@ -33,6 +34,20 @@ def kernelspec_from_language(language):
     except (KeyError, ValueError):
         pass
     return None
+
+
+def jupytext_formats_from_metadata(metadata, ext):
+    if ext == '.ipynb':
+        return True
+    else:
+        notebook_metadata_filter = metadata_filter_as_dict(
+            metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook', ''))
+        if 'jupytext' in notebook_metadata_filter.get('additional', []):
+            return True
+        excluded = notebook_metadata_filter.get('excluded', [])
+        if 'jupytext' in excluded or excluded == 'all':
+            return False
+        return True
 
 
 def _jupytext_writes(ext, format_name):
@@ -237,6 +252,14 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
         return None
 
+    def format_group_from_paired_notebook(self, path):
+        """Return the format group associated to a given path"""
+        _, ext = os.path.splitext(path)
+        if path not in self.paired_notebooks:
+            return [ext]
+
+        return [file_fmt_ext(alt_path)[1] for alt_path in self.paired_notebooks[path]]
+
     def drop_paired_notebook(self, path):
         """Remove the current notebook from the list of paired notebooks"""
         if path not in self.paired_notebooks:
@@ -334,8 +357,11 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             outputs_format = fmt
             org_model = model
 
-            fmt_group = self.format_group(fmt, model['content'])
-            self.update_paired_notebooks(path, fmt_group)
+            if jupytext_formats_from_metadata(model['content'].metadata, ext):
+                fmt_group = self.format_group(fmt, model['content'])
+                self.update_paired_notebooks(path, fmt_group)
+            else:
+                fmt_group = self.format_group_from_paired_notebook(path)
 
             # Source format is first non ipynb format found on disk
             if fmt.endswith('.ipynb'):

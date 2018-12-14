@@ -84,6 +84,47 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
 
 
 @skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('py_file', list_notebooks('percent'))
+def test_pair_plain_script(py_file, tmpdir):
+    tmp_py = 'notebook.py'
+    tmp_ipynb = 'notebook.ipynb'
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # open py file, pair, save with cm
+    nb = jupytext.readf(py_file)
+    nb.metadata['jupytext']['formats'] = 'ipynb,py:hydrogen'
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
+
+    assert os.path.isfile(str(tmpdir.join(tmp_py)))
+    assert os.path.isfile(str(tmpdir.join(tmp_ipynb)))
+
+    # Make sure we've not changed the script
+    with open(py_file) as fp:
+        script = fp.read()
+
+    with open(str(tmpdir.join(tmp_py))) as fp:
+        script2 = fp.read()
+
+    compare(script, script2)
+
+    # reopen py file with the cm
+    nb2 = cm.get(tmp_py)['content']
+    compare_notebooks(nb, nb2)
+    assert nb2.metadata['jupytext']['formats'] == 'ipynb,py:hydrogen'
+
+    # remove the pairing and save
+    del nb.metadata['jupytext']['formats']
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
+
+    # reopen py file with the cm
+    nb2 = cm.get(tmp_py)['content']
+    compare_notebooks(nb, nb2)
+    assert 'formats' not in nb2.metadata['jupytext']
+
+
+@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
