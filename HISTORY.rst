@@ -9,8 +9,8 @@ Release History
 **Improvements**
 
 - Python scripts or Markdown documents that have no Jupyter metadata receive a metadata filter that ensures that metadata is not exported back to the text representation (#124).
-- Metadata filters are represented as strings rather than dictionaries. Previous syntax from #105 is still supported.
-- New ``hydrogen`` format for scripts, which derives from ``percent``. In that format Jupyter magic commands are not commented (#59, #126, #132).
+- Metadata filters are represented as strings rather than dictionaries to make YAML headers shorter. Previous syntax from #105 is still supported.
+- Introducing a new ``hydrogen`` format for scripts, which derives from ``percent``. In that format Jupyter magic commands are not commented (#59, #126, #132).
 - TODO: First version of a Jupyter notebook extension (#86).
 
 **BugFixes**
