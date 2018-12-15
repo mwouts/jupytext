@@ -6,6 +6,7 @@ import re
 import sys
 import subprocess
 import argparse
+import json
 from .jupytext import readf, reads, writef, writes
 from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version, one_format_as_string, parse_one_format
 from .combine import combine_inputs_with_outputs
@@ -16,7 +17,7 @@ from .version import __version__
 
 def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_commit=False,
                            test_round_trip=False, test_round_trip_strict=False, stop_on_first_error=True,
-                           update=True, comment_magics=None):
+                           update=True, comment_magics=None, update_metadata=None):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
@@ -29,8 +30,8 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
     :param test_round_trip_strict: should round trip conversion be tested, with strict notebook comparison?
     :param stop_on_first_error: when testing, should we stop on first error, or compare the full notebook?
     :param update: preserve the current outputs of .ipynb file
-    :param comment_magics: comment, or not, Jupyter magics
-    when possible
+    :param comment_magics: comment, or not, Jupyter magics when possible
+    :param update_metadata: update the notebook metadata with the given JSON dictionary
     :return:
     """
 
@@ -99,6 +100,14 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
                 notebooks_in_error += 1
                 print('{}: {}'.format(nb_file, str(error)))
             continue
+
+        if update_metadata:
+            try:
+                updated_metadata = json.loads(update_metadata)
+            except json.JSONDecodeError as exception:
+                raise ValueError("Could not parse --update-metadata {}. JSONDecodeError: {}".
+                                 format(update_metadata, str(exception)))
+            recursive_update(notebook.metadata, updated_metadata)
 
         if comment_magics is not None:
             notebook.metadata.setdefault('jupytext', {})['comment_magics'] = comment_magics
@@ -195,6 +204,21 @@ def str2bool(value):
     raise argparse.ArgumentTypeError('Expected: (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
 
 
+def recursive_update(target, update):
+    """ Update recursively a (nested) dictionary with the content of another.
+    Inspired from https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
+    """
+    for key in update:
+        value = update[key]
+        if value is None:
+            del target[key]
+        elif isinstance(value, dict):
+            target[key] = recursive_update(target.get(key, {}), value)
+        else:
+            target[key] = value
+    return target
+
+
 def cli_jupytext(args=None):
     """Command line parser for jupytext"""
     parser = argparse.ArgumentParser(
@@ -237,6 +261,11 @@ chmod +x .git/hooks/pre-commit""")
                         nargs='?',
                         default=None,
                         help='Should Jupyter magic commands be commented? (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
+    parser.add_argument('--update-metadata',
+                        default=None,
+                        help='Update the notebook metadata with the desired dictionary. Argument must be given in JSON '
+                             'format. For instance, if you want to activate a pairing in the generated file, '
+                             """use e.g. '{"jupytext":{"formats":"ipynb,py:light"}}'""")
     test = parser.add_mutually_exclusive_group()
     test.add_argument('--test', dest='test', action='store_true',
                       help='Test that notebook is stable under '
@@ -294,7 +323,8 @@ def jupytext(args=None):
                                test_round_trip_strict=args.test_strict,
                                stop_on_first_error=args.stop_on_first_error,
                                update=args.update,
-                               comment_magics=args.comment_magics)
+                               comment_magics=args.comment_magics,
+                               update_metadata=args.update_metadata)
     except (ValueError, TypeError, IOError) as err:
-        print('jupytext: error: ' + str(err))
+        sys.stderr.write('jupytext: error: ' + str(err) + '\n')
         exit(1)

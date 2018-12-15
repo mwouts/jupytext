@@ -366,3 +366,30 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
 
     assert not os.path.isfile(tmp_ipynb)
     assert not os.path.isfile(tmp_py)
+
+
+@pytest.mark.parametrize('py_file', list_notebooks('python'))
+def test_update_metadata(py_file, tmpdir, capsys):
+    tmp_py = str(tmpdir.join('notebook.py'))
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+
+    copyfile(py_file, tmp_py)
+
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"jupytext":{"formats":"ipynb,py:light"}}'])
+
+    nb = readf(tmp_ipynb)
+    assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
+    assert 'text_representation' in nb.metadata['jupytext']
+
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
+        jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"jupytext":{"text_representation":null}}'])
+
+    nb = readf(tmp_ipynb)
+    assert 'text_representation' not in nb.metadata['jupytext']
+
+    with pytest.raises(SystemExit):
+        jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"incorrect": "JSON"'])
+
+    out, err = capsys.readouterr()
+    assert 'JSONDecodeError' in err
