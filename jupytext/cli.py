@@ -104,7 +104,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
         if update_metadata:
             try:
                 updated_metadata = json.loads(update_metadata)
-            except json.JSONDecodeError as exception:
+            except ValueError as exception:
                 raise ValueError("Could not parse --update-metadata {}. JSONDecodeError: {}".
                                  format(update_metadata, str(exception)))
             recursive_update(notebook.metadata, updated_metadata)
