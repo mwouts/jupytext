@@ -189,8 +189,7 @@ def test_combine_lower_version_raises(tmpdir):
     writef(nb, tmp_ipynb)
 
     with pytest.raises(SystemExit):
-        with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER',
-                        True):
+        with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
             jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
 
 

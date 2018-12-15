@@ -45,8 +45,8 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
 
         for file in modified:
             dest_file = file[:-len(input_ext)] + ext
-            nb = readf(file)
-            writef(nb, dest_file, format_name=format_name)
+            notebook = readf(file)
+            writef(notebook, dest_file, format_name=format_name)
             system('git', 'add', dest_file)
 
         for file in deleted:

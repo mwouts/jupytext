@@ -218,8 +218,7 @@ def guess_format(text, ext):
         if double_percent_count >= 1:
             if magic_command_count:
                 return 'hydrogen'
-            else:
-                return 'percent'
+            return 'percent'
 
         if twenty_hash_count >= 2:
             return 'sphinx'
