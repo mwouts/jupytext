@@ -23,15 +23,15 @@ from .languages import default_language_from_metadata_and_ext, set_main_and_cell
 from .cell_metadata import _JUPYTEXT_CELL_METADATA
 
 
-class TextNotebookReader(NotebookReader):
-    """Text notebook reader"""
+class TextNotebookConverter(NotebookReader, NotebookWriter):
+    """A class that can read or write a Jupyter notebook as text"""
 
     def __init__(self, ext, format_name=None):
         self.ext = ext
         self.format = get_format(ext, format_name)
 
     def reads(self, s, **_):
-        """Read a notebook from text"""
+        """Read a notebook represented as text"""
         lines = s.splitlines()
 
         cells = []
@@ -76,20 +76,13 @@ class TextNotebookReader(NotebookReader):
 
         return new_notebook(cells=cells, metadata=metadata)
 
-
-class TextNotebookWriter(NotebookWriter):
-    """Write notebook to their text representations"""
-
-    def __init__(self, ext, format_name=None):
-        self.ext = ext
-        self.format = get_format(ext, format_name)
+    def writes(self, nb, **kwargs):
+        """Return the text representation of the notebook"""
         if not self.format.cell_exporter_class:
             raise ValueError("Saving notebooks in format '{}' is not possible."
                              " Please choose another format."
                              .format(self.format.format_name))
 
-    def writes(self, nb, **kwargs):
-        """Write the text representation of a notebook to a string"""
         nb = deepcopy(nb)
         default_language = default_language_from_metadata_and_ext(nb, self.format.extension)
         comment_magics = nb.metadata.get('jupytext', {}).get('comment_magics')
@@ -150,7 +143,7 @@ def reads(text, ext, format_name=None, rst2md=False, as_version=4, **kwargs):
         if format_name == 'sphinx' and rst2md:
             format_name = 'sphinx-rst2md'
 
-    reader = TextNotebookReader(ext, format_name)
+    reader = TextNotebookConverter(ext, format_name)
     notebook = reader.reads(text, **kwargs)
     transition_to_jupytext_section_in_metadata(notebook.metadata, False)
 
@@ -195,7 +188,7 @@ def writes(notebook, ext, format_name=None,
     if format_name and insert_or_test_version_number():
         update_jupytext_formats_metadata(notebook, ext, format_name)
 
-    writer = TextNotebookWriter(ext, format_name)
+    writer = TextNotebookConverter(ext, format_name)
     return writer.writes(notebook)
 
 
@@ -213,7 +206,7 @@ def write(notebook, file_or_stream, ext, format_name=None,
     if format_name and insert_or_test_version_number():
         update_jupytext_formats_metadata(notebook, ext, format_name)
 
-    writer = TextNotebookWriter(ext, format_name)
+    writer = TextNotebookConverter(ext, format_name)
     return writer.write(notebook, file_or_stream)
 
 
