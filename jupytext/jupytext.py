@@ -174,8 +174,7 @@ def readf(nb_file, format_name=None):
         return read(stream, as_version=4, ext=ext, format_name=format_name)
 
 
-def writes(notebook, ext, format_name=None,
-           version=nbformat.NO_CONVERT, **kwargs):
+def writes(notebook, ext, format_name=None, version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a string"""
     transition_to_jupytext_section_in_metadata(notebook.metadata, ext.endswith('.ipynb'))
 
@@ -192,22 +191,9 @@ def writes(notebook, ext, format_name=None,
     return writer.writes(notebook)
 
 
-def write(notebook, file_or_stream, ext, format_name=None,
-          version=nbformat.NO_CONVERT, **kwargs):
+def write(notebook, file_or_stream, ext, format_name=None, version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a file"""
-    transition_to_jupytext_section_in_metadata(notebook.metadata, ext.endswith('.ipynb'))
-
-    if ext.endswith('.ipynb'):
-        return nbformat.write(notebook, file_or_stream, version, **kwargs)
-
-    if not format_name:
-        format_name = format_name_for_ext(notebook.metadata, ext)
-
-    if format_name and insert_or_test_version_number():
-        update_jupytext_formats_metadata(notebook, ext, format_name)
-
-    writer = TextNotebookConverter(ext, format_name)
-    return writer.write(notebook, file_or_stream)
+    file_or_stream.write(writes(notebook, ext, format_name, version, **kwargs))
 
 
 def writef(notebook, nb_file, format_name=None):
