@@ -10,7 +10,10 @@ Jupytext can save Jupyter notebooks as
 - Markdown and R Markdown documents,
 - Julia, Python, R, Bash, Scheme and C++ scripts.
 
-Jupytext is available as a command line tool and as a _contents manager_ for Jupyter. With the latter, Jupyter will save your notebook to your favorite format(s), from `.ipynb` to `.py`, `.R`, `.jl`, `.md`, `.Rmd`... The text representation can be edited outside of Jupyter. Simply refresh the notebook in Jupyter to get the latest input cells from the script or Markdown document. When refreshing, kernel variables are unaffected, and output cells are reloaded from the traditionnal `.ipynb` if present. You can also delete your `.ipynb` notebook entirely if you don't need to save output cells.
+There are multiple ways to use `jupytext`:
+- on the [command line](https://github.com/mwouts/jupytext/blob/master/README.md#command-line-conversion)
+- through [jupytext.vim](https://github.com/goerz/jupytext.vim), a plugin for Vim that lets you edit Jupyter notebooks represented as markdown documents or Python scripts
+- directly from Jupyter Notebook or Jupyter Lab. Jupytext provides a _contents manager_ that allows Jupyter to save your notebook to your favorite format (`.py`, `.R`, `.jl`, `.md`, `.Rmd`...) in addition to (or in place of) the traditional `.ipynb` file. The text representation can be edited in your favorite editor. When you're done, refresh the notebook in Jupyter: inputs cells are loaded from the text file, while output cells are reloaded from the `.ipynb` file if present. Refreshing preserves kernel variables, so you can resume your work in the notebook and run the modified cells without having to rerun the notebook in full.
 
 ## Demo time
 
