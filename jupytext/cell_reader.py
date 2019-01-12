@@ -250,6 +250,10 @@ class MarkdownCellReader(BaseCellReader):
     end_code_re = re.compile(r"^```\s*$")
     default_comment_magics = False
 
+    def __init__(self, fmt={}):
+        super(MarkdownCellReader, self).__init__(fmt)
+        self.split_at_heading = fmt.get('split_at_heading', False)
+
     def options_to_metadata(self, options):
         return md_options_to_metadata(options)
 
@@ -265,6 +269,8 @@ class MarkdownCellReader(BaseCellReader):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False
+                if self.split_at_heading and line.startswith('#') and prev_blank >= 1:
+                    return i - 1, i, False
                 if _BLANK_LINE.match(lines[i]):
                     prev_blank += 1
                 elif i > 2 and prev_blank >= 2:
@@ -623,5 +629,3 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
             explicit_eoc)
 
         return next_cell_start
-
-

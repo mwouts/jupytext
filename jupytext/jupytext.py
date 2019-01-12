@@ -86,6 +86,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         cell_exporters = []
         looking_for_first_markdown_cell = self.implementation.format_name and \
                                           self.implementation.format_name.startswith('sphinx')
+        split_at_heading = self.fmt.get('split_at_heading', False)
 
         for cell in nb.cells:
             if looking_for_first_markdown_cell and cell.cell_type == 'markdown':
@@ -110,7 +111,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
             # two blank lines between markdown cells in Rmd
             if self.ext in ['.Rmd', '.md'] and not cell.is_code():
-                if i + 1 < len(cell_exporters) and not cell_exporters[i + 1].is_code():
+                if i + 1 < len(cell_exporters) and not cell_exporters[i + 1].is_code() and (
+                        not split_at_heading or not (texts[i + 1] and texts[i + 1][0].startswith('#'))):
                     lines.append('')
 
             # "" between two consecutive code cells in sphinx

@@ -227,6 +227,12 @@ Our implementation for Jupyter notebooks as [Markdown](https://daringfireball.ne
 
 See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.md) or [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
 
+The Markdown and R Markdown notebook format have an option to split markdown cells on headings. Activate the option in a given notebook by adding the metadata `split_at_heading` in the jupytext section, and activate it by default in Jupyter with
+
+```python
+c.ContentsManager.split_at_heading = True
+```
+
 ### The `light` format for notebooks as scripts
 
 The `light` format was created for this project. It is the default format for Python and Julia scripts. That format can read any script as a Jupyter notebook, even scripts which were never prepared to become a notebook. When a notebook is written as a script using this format, only a few cells markers are introduced—none if possible.

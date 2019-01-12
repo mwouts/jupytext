@@ -184,10 +184,14 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         help='Should Jupyter magic commands be commented out in the text representation?',
         config=True)
 
+    split_at_heading = Bool(
+        False,
+        help='Split markdown cells on headings (Markdown and R Markdown formats only)',
+        config=True)
+
     sphinx_convert_rst2md = Bool(
         False,
-        help='When opening a Sphinx Gallery script, convert the '
-             'reStructuredText to markdown',
+        help='When opening a Sphinx Gallery script, convert the reStructuredText to markdown',
         config=True)
 
     outdated_text_notebook_margin = Float(
@@ -297,10 +301,12 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         else:
             return super(TextFileContentsManager, self)._read_notebook(os_path, as_version)
 
-    def set_comment_magics_if_none(self, nb):
-        """Set the 'comment_magics' metadata if default is not None"""
+    def set_default_format_options(self, nb):
+        """Set default format option"""
         if self.comment_magics is not None and 'comment_magics' not in nb.metadata.get('jupytext', {}):
             nb.metadata.setdefault('jupytext', {})['comment_magics'] = self.comment_magics
+        if self.split_at_heading and 'split_at_heading' not in nb.metadata.get('jupytext', {}):
+            nb.metadata.setdefault('jupytext', {})['split_at_heading'] = True
 
     def save(self, model, path=''):
         """Save the file model and return the model with no content."""
@@ -314,7 +320,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def _save_notebook(self, os_path, nb):
         """Save a notebook to an os_path."""
-        self.set_comment_magics_if_none(nb)
+        self.set_default_format_options(nb)
         os_file, fmt, _ = file_fmt_ext(os_path)
         for alt_fmt in self.format_group(fmt, nb):
             os_path_fmt = os_file + alt_fmt

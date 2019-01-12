@@ -102,3 +102,32 @@ def test_read_julia_notebook(markdown="""```julia
     assert nb.cells[0].cell_type == 'code'
     markdown2 = jupytext.writes(nb, 'md')
     compare(markdown, markdown2)
+
+
+def test_split_on_header(markdown="""A paragraph
+
+# H1 Header
+
+## H2 Header
+
+Another paragraph
+"""):
+    fmt = {'extension': '.md', 'split_at_heading': True}
+    nb = jupytext.reads(markdown, fmt)
+    assert nb.cells[0].source == 'A paragraph'
+    assert nb.cells[1].source == '# H1 Header'
+    assert nb.cells[2].source == '## H2 Header\n\nAnother paragraph'
+    assert len(nb.cells) == 3
+    markdown2 = jupytext.writes(nb, fmt)
+    compare(markdown, markdown2)
+
+
+def test_split_on_header_after_two_blank_lines(markdown="""A paragraph
+
+
+# H1 Header
+"""):
+    fmt = {'extension': '.Rmd', 'split_at_heading': True}
+    nb = jupytext.reads(markdown, fmt)
+    markdown2 = jupytext.writes(nb, fmt)
+    compare(markdown, markdown2)

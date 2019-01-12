@@ -12,6 +12,7 @@ Release History
 - Metadata filters are represented as strings rather than dictionaries to make YAML headers shorter. Previous syntax from #105 is still supported.
 - Metadata filters were renamed to ``notebook_metadata_filter`` and ``cell_metadata_filter``.
 - Introducing a new ``hydrogen`` format for scripts, which derives from ``percent``. In that format Jupyter magic commands are not commented (#59, #126, #132).
+- Markdown and RMarkdown formats have a new option ``split_at_heading`` that split Markdown cells at heading (#130)
 - TODO: First version of a Jupyter notebook extension (#86).
 
 **BugFixes**
