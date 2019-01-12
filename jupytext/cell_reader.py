@@ -91,11 +91,11 @@ class BaseCellReader(object):
     # Any specific prefix for lines in markdown cells (like in R spin format?)
     markdown_prefix = None
 
-    def __init__(self, ext, comment_magics=None):
+    def __init__(self, fmt={}):
         """Create a cell reader with empty content"""
-        self.ext = ext
-        self.default_language = _SCRIPT_EXTENSIONS.get(ext, {}).get('language', 'python')
-        self.comment_magics = comment_magics if comment_magics is not None else self.default_comment_magics
+        self.ext = fmt.get('extension')
+        self.default_language = _SCRIPT_EXTENSIONS.get(self.ext, {}).get('language', 'python')
+        self.comment_magics = fmt['comment_magics'] if 'comment_magics' in fmt else self.default_comment_magics
 
     def read(self, lines):
         """Read one cell from the given lines, and return the cell,
@@ -301,11 +301,10 @@ class RMarkdownCellReader(MarkdownCellReader):
 
     def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code':
-            if is_active(self.ext, self.metadata) and self.comment_magics:
+            if is_active('.Rmd', self.metadata) and self.comment_magics:
                 uncomment_magic(lines, self.language or self.default_language)
 
-        unescape_code_start(lines, self.ext, self.language or
-                            self.default_language)
+        unescape_code_start(lines, '.Rmd', self.language or self.default_language)
 
         return lines
 
@@ -369,9 +368,10 @@ class LightScriptCellReader(ScriptCellReader):
     explicit marker '# +' """
     default_comment_magics = True
 
-    def __init__(self, ext, comment_magics=None):
-        super(LightScriptCellReader, self).__init__(ext, comment_magics)
-        script = _SCRIPT_EXTENSIONS[ext]
+    def __init__(self, fmt={}):
+        super(LightScriptCellReader, self).__init__(fmt)
+        self.ext = self.ext or '.py'
+        script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = script['language']
         self.comment = script['comment']
         self.start_code_re = re.compile("^({0}|{0} )".format(self.comment) + r"\+(\s*){(.*)}\s*$")
@@ -410,9 +410,9 @@ class DoublePercentScriptCellReader(ScriptCellReader):
     """Read notebook cells from Spyder/VScode scripts (#59)"""
     default_comment_magics = True
 
-    def __init__(self, ext, comment_magics=None):
-        ScriptCellReader.__init__(self, ext, comment_magics)
-        script = _SCRIPT_EXTENSIONS[ext]
+    def __init__(self, fmt):
+        ScriptCellReader.__init__(self, fmt)
+        script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = script['language']
         self.comment = script['comment']
         self.start_code_re = re.compile(r"^{}\s*%%(%*)\s(.*)$".format(self.comment))

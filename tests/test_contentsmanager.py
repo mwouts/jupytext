@@ -662,11 +662,11 @@ def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
 
     # check that text representation exists in percent format
     with open(str(tmpdir.join(tmp_pct_script))) as stream:
-        assert read_format_from_metadata(stream.read(), '.pct' + auto_ext) == 'percent'
+        assert read_format_from_metadata(stream.read(), auto_ext) == 'percent'
 
     # check that text representation exists in light format
     with open(str(tmpdir.join(tmp_lgt_script))) as stream:
-        assert read_format_from_metadata(stream.read(), '.lgt' + auto_ext) == 'light'
+        assert read_format_from_metadata(stream.read(), auto_ext) == 'light'
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='magic'))

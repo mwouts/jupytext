@@ -76,3 +76,10 @@ def cell_language(source):
                 return lang, magic_args
 
     return None, None
+
+
+def comment_lines(lines, prefix):
+    """Return commented lines"""
+    if not prefix:
+        return lines
+    return [prefix + ' ' + line if line else prefix for line in lines]

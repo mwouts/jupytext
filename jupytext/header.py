@@ -7,8 +7,7 @@ from yaml.representer import SafeRepresenter
 import nbformat
 from nbformat.v4.nbbase import new_raw_cell
 from .version import __version__
-from .cell_to_text import comment_lines
-from .languages import _SCRIPT_EXTENSIONS
+from .languages import _SCRIPT_EXTENSIONS, comment_lines
 from .metadata_filter import filter_metadata
 
 SafeRepresenter.add_representer(nbformat.NotebookNode, SafeRepresenter.represent_dict)

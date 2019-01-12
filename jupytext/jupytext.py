@@ -15,7 +15,7 @@ from copy import deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 import nbformat
-from .formats import get_format_implementation, read_format_from_metadata, guess_format, \
+from .formats import get_format_implementation, read_format_from_metadata, guess_format, long_form_one_format, \
     update_jupytext_formats_metadata, format_name_for_ext, transition_to_jupytext_section_in_metadata
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable, insert_or_test_version_number
@@ -26,30 +26,32 @@ from .cell_metadata import _JUPYTEXT_CELL_METADATA
 class TextNotebookConverter(NotebookReader, NotebookWriter):
     """A class that can read or write a Jupyter notebook as text"""
 
-    def __init__(self, ext, format_name=None):
-        self.ext = ext
-        self.format = get_format_implementation(ext, format_name)
+    def __init__(self, fmt):
+        self.fmt = long_form_one_format(fmt)
+        self.ext = self.fmt['extension']
+        self.implementation = get_format_implementation(self.ext, self.fmt.get('format_name'))
 
     def reads(self, s, **_):
         """Read a notebook represented as text"""
         lines = s.splitlines()
 
         cells = []
-        metadata, jupyter_md, header_cell, pos = header_to_metadata_and_cell(lines, self.format.header_prefix)
-        comment_magics = metadata.get('jupytext', {}).get('comment_magics')
+        metadata, jupyter_md, header_cell, pos = header_to_metadata_and_cell(lines, self.implementation.header_prefix)
+        if 'comment_magics' in metadata.get('jupytext', {}):
+            self.fmt['comment_magics'] = metadata['jupytext']['comment_magics']
 
         if header_cell:
             cells.append(header_cell)
 
         lines = lines[pos:]
 
-        if self.format.format_name and self.format.format_name.startswith('sphinx'):
+        if self.implementation.format_name and self.implementation.format_name.startswith('sphinx'):
             cells.append(new_code_cell(source='%matplotlib inline'))
 
         cell_metadata = set()
 
         while lines:
-            reader = self.format.cell_reader_class(self.format.extension, comment_magics)
+            reader = self.implementation.cell_reader_class(self.fmt)
             cell, pos = reader.read(lines)
             cells.append(cell)
             cell_metadata.update(cell.metadata.keys())
@@ -63,9 +65,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             metadata.setdefault('jupytext', {})['notebook_metadata_filter'] = '-all'
             metadata.setdefault('jupytext', {})['cell_metadata_filter'] = ','.join(cell_metadata + ['-all'])
 
-        set_main_and_cell_language(metadata, cells, self.format.extension)
+        set_main_and_cell_language(metadata, cells, self.implementation.extension)
 
-        if self.format.format_name and self.format.format_name.startswith('sphinx'):
+        if self.implementation.format_name and self.implementation.format_name.startswith('sphinx'):
             filtered_cells = []
             for i, cell in enumerate(cells):
                 if cell.source == '' and i > 0 and i + 1 < len(cells) \
@@ -78,31 +80,33 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
     def writes(self, nb, **kwargs):
         """Return the text representation of the notebook"""
-        if not self.format.cell_exporter_class:
+        if not self.implementation.cell_exporter_class:
             raise ValueError("Saving notebooks in format '{}' is not possible."
                              " Please choose another format."
-                             .format(self.format.format_name))
+                             .format(self.implementation.format_name))
 
         nb = deepcopy(nb)
-        default_language = default_language_from_metadata_and_ext(nb, self.format.extension)
-        comment_magics = nb.metadata.get('jupytext', {}).get('comment_magics')
-        cell_metadata_filter = nb.metadata.get('jupytext', {}).get('cell_metadata_filter')
+        default_language = default_language_from_metadata_and_ext(nb, self.implementation.extension)
+        for option in ['comment_magics', 'cell_metadata_filter']:
+            if option in nb.metadata.get('jupytext', {}):
+                self.fmt[option] = nb.metadata['jupytext'][option]
+
         if 'main_language' in nb.metadata.get('jupytext', {}):
             del nb.metadata['jupytext']['main_language']
 
         lines = encoding_and_executable(nb, self.ext)
-        lines.extend(metadata_and_cell_to_header(nb, self.format, self.ext))
+        lines.extend(metadata_and_cell_to_header(nb, self.implementation, self.ext))
 
         cell_exporters = []
-        looking_for_first_markdown_cell = self.format.format_name and self.format.format_name.startswith('sphinx')
+        looking_for_first_markdown_cell = self.implementation.format_name and \
+                                          self.implementation.format_name.startswith('sphinx')
 
         for cell in nb.cells:
             if looking_for_first_markdown_cell and cell.cell_type == 'markdown':
                 cell.metadata.setdefault('cell_marker', '"""')
                 looking_for_first_markdown_cell = False
 
-            cell_exporters.append(self.format.cell_exporter_class(
-                cell, default_language, self.format.extension, comment_magics, cell_metadata_filter))
+            cell_exporters.append(self.implementation.cell_exporter_class(cell, default_language, self.fmt))
 
         texts = [cell.cell_to_text() for cell in cell_exporters]
 
@@ -110,8 +114,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             text = cell.simplify_code_markers(
                 texts[i], texts[i + 1] if i + 1 < len(texts) else None, lines)
 
-            if i == 0 and self.format.format_name and \
-                    self.format.format_name.startswith('sphinx') and \
+            if i == 0 and self.implementation.format_name and \
+                    self.implementation.format_name.startswith('sphinx') and \
                     (text in [['%matplotlib inline'], ['# %matplotlib inline']]):
                 continue
 
@@ -124,7 +128,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                     lines.append('')
 
             # "" between two consecutive code cells in sphinx
-            if self.format.format_name.startswith('sphinx') and cell.is_code():
+            if self.implementation.format_name.startswith('sphinx') and cell.is_code():
                 if i + 1 < len(cell_exporters) and cell_exporters[i + 1].is_code():
                     lines.append('""')
 
@@ -143,7 +147,8 @@ def reads(text, ext, format_name=None, rst2md=False, as_version=4, **kwargs):
         if format_name == 'sphinx' and rst2md:
             format_name = 'sphinx-rst2md'
 
-    reader = TextNotebookConverter(ext, format_name)
+    fmt = ext + ':' + format_name if format_name else ext
+    reader = TextNotebookConverter(fmt)
     notebook = reader.reads(text, **kwargs)
     transition_to_jupytext_section_in_metadata(notebook.metadata, False)
 
@@ -187,7 +192,8 @@ def writes(notebook, ext, format_name=None, version=nbformat.NO_CONVERT, **kwarg
     if format_name and insert_or_test_version_number():
         update_jupytext_formats_metadata(notebook, ext, format_name)
 
-    writer = TextNotebookConverter(ext, format_name)
+    fmt = ext + ':' + format_name if format_name else ext
+    writer = TextNotebookConverter(fmt)
     return writer.writes(notebook)
 
 

@@ -2,7 +2,7 @@
 
 import re
 from copy import copy
-from .languages import cell_language
+from .languages import cell_language, comment_lines
 from .cell_metadata import is_active, _IGNORE_CELL_METADATA
 from .cell_metadata import metadata_to_rmd_options, metadata_to_json_options, metadata_to_double_percent_options
 from .metadata_filter import filter_metadata
@@ -21,42 +21,36 @@ def cell_source(cell):
     return source.splitlines()
 
 
-def comment_lines(lines, prefix):
-    """Return commented lines"""
-    if not prefix:
-        return lines
-    return [prefix + ' ' + line if line else prefix for line in lines]
-
-
 class BaseCellExporter(object):
     """A class that represent a notebook cell as text"""
     default_comment_magics = None
     parse_cell_language = True
 
-    def __init__(self, cell, default_language, ext, comment_magics=None, cell_metadata_filter=None):
-        self.ext = ext
+    def __init__(self, cell, default_language, fmt={}):
+        self.fmt = fmt
+        self.ext = fmt.get('extension')
         self.cell_type = cell.cell_type
         self.source = cell_source(cell)
         self.unfiltered_metadata = cell.metadata
-        self.metadata = filter_metadata(copy(cell.metadata), cell_metadata_filter, _IGNORE_CELL_METADATA)
+        self.metadata = filter_metadata(copy(cell.metadata), fmt.get('cell_metadata_filter'), _IGNORE_CELL_METADATA)
         self.language, magic_args = cell_language(self.source) if self.parse_cell_language else (None, None)
 
         if self.language:
             if magic_args:
-                if ext.endswith('.Rmd'):
+                if self.ext.endswith('.Rmd'):
                     if "'" in magic_args:
                         magic_args = '"' + magic_args + '"'
                     else:
                         magic_args = "'" + magic_args + "'"
                 self.metadata['magic_args'] = magic_args
 
-            if not ext.endswith('.Rmd'):
+            if not self.ext.endswith('.Rmd'):
                 self.metadata['language'] = self.language
 
         self.language = self.language or default_language
         self.default_language = default_language
-        self.comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
-        self.comment_magics = comment_magics if comment_magics is not None else self.default_comment_magics
+        self.comment = _SCRIPT_EXTENSIONS.get(self.ext, {}).get('comment', '#')
+        self.comment_magics = fmt['comment_magics'] if 'comment_magics' in fmt else self.default_comment_magics
 
         # how many blank lines before next cell
         self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', 1)
@@ -136,6 +130,7 @@ class RMarkdownCellExporter(BaseCellExporter):
 
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
+        self.ext = '.Rmd'
         self.comment = ''
 
     def code_to_text(self):
@@ -224,7 +219,7 @@ class LightScriptCellExporter(BaseCellExporter):
             return True
         if all([line.startswith(self.comment) for line in self.source]):
             return True
-        if LightScriptCellReader(self.ext).read(source)[1] < len(source):
+        if LightScriptCellReader(self.fmt).read(source)[1] < len(source):
             return True
 
         return False

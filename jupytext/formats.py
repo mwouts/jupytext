@@ -416,3 +416,25 @@ def transition_to_jupytext_section_in_metadata(metadata, is_ipynb):
 
     if jupytext_metadata:
         metadata['jupytext'] = jupytext_metadata
+
+
+def long_form_one_format(jupytext_format):
+    """Parse 'sfx.py:percent' into {'suffix':'sfx', 'extension':'py', 'format_name':'percent'}"""
+    if not isinstance(jupytext_format, str):
+        return jupytext_format
+
+    if jupytext_format.find(':') >= 0:
+        ext, format_name = jupytext_format.split(':', 1)
+        jupytext_format = {'format_name': format_name}
+    else:
+        ext = jupytext_format
+        jupytext_format = {}
+
+    if ext.rfind('.') > 0:
+        jupytext_format['suffix'], ext = os.path.splitext(ext)
+
+    if not ext.startswith('.'):
+        ext = '.' + ext
+
+    jupytext_format['extension'] = ext
+    return jupytext_format
