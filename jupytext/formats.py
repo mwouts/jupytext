@@ -170,7 +170,7 @@ def read_metadata(text, ext):
 def read_format_from_metadata(text, ext):
     """Return the format of the file, when that information is available from the metadata"""
     metadata = read_metadata(text, ext)
-    transition_to_jupytext_section_in_metadata(metadata, ext.endswith('.ipynb'))
+    rearrange_jupytext_metadata(metadata)
     return format_name_for_ext(metadata, ext, explicit_default=False)
 
 
@@ -372,7 +372,7 @@ def update_jupytext_formats_metadata(notebook, ext, format_name):
         notebook.metadata.setdefault('jupytext', {})['formats'] = formats_as_string(formats)
 
 
-def transition_to_jupytext_section_in_metadata(metadata, is_ipynb):
+def rearrange_jupytext_metadata(metadata):
     """Convert the jupytext_formats metadata entry to jupytext/formats, etc. See #91"""
 
     # Backward compatibility with nbrmd
@@ -389,7 +389,7 @@ def transition_to_jupytext_section_in_metadata(metadata, is_ipynb):
     if 'main_language' in metadata:
         jupytext_metadata['main_language'] = metadata.pop('main_language')
     for entry in ['encoding', 'executable']:
-        if is_ipynb and entry in metadata:
+        if entry in metadata:
             jupytext_metadata[entry] = metadata.pop(entry)
 
     filters = jupytext_metadata.pop('metadata_filter', {})

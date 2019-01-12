@@ -20,7 +20,7 @@ from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 import jupytext
 from .combine import combine_inputs_with_outputs
 from .formats import check_file_version, NOTEBOOK_EXTENSIONS, EXTENSION_PREFIXES, \
-    format_name_for_ext, parse_one_format, parse_formats, transition_to_jupytext_section_in_metadata
+    format_name_for_ext, parse_one_format, parse_formats, rearrange_jupytext_metadata
 from .metadata_filter import metadata_filter_as_dict
 
 
@@ -211,7 +211,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
     def format_group(self, fmt, nbk=None):
         """Return the group of extensions that contains 'fmt'"""
         if nbk:
-            transition_to_jupytext_section_in_metadata(nbk.metadata, fmt.endswith('.ipynb'))
+            rearrange_jupytext_metadata(nbk.metadata)
 
         jupytext_formats = ((nbk.metadata.get('jupytext', {}).get('formats') if nbk else None) or
                             self.default_jupytext_formats)

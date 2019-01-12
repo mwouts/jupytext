@@ -16,7 +16,7 @@ from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 import nbformat
 from .formats import get_format_implementation, read_format_from_metadata, guess_format, long_form_one_format, \
-    update_jupytext_formats_metadata, format_name_for_ext, transition_to_jupytext_section_in_metadata
+    update_jupytext_formats_metadata, format_name_for_ext, rearrange_jupytext_metadata
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable, insert_or_test_version_number
 from .languages import default_language_from_metadata_and_ext, set_main_and_cell_language
@@ -150,7 +150,7 @@ def reads(text, ext, format_name=None, rst2md=False, as_version=4, **kwargs):
     fmt = ext + ':' + format_name if format_name else ext
     reader = TextNotebookConverter(fmt)
     notebook = reader.reads(text, **kwargs)
-    transition_to_jupytext_section_in_metadata(notebook.metadata, False)
+    rearrange_jupytext_metadata(notebook.metadata)
 
     if format_name and insert_or_test_version_number():
         if format_name == 'sphinx-rst2md' and rst2md:
@@ -166,7 +166,7 @@ def read(file_or_stream, ext, format_name=None, as_version=4, **kwargs):
     """Read a notebook from a file"""
     if ext.endswith('.ipynb'):
         notebook = nbformat.read(file_or_stream, as_version, **kwargs)
-        transition_to_jupytext_section_in_metadata(notebook.metadata, True)
+        rearrange_jupytext_metadata(notebook.metadata)
         return notebook
 
     return reads(file_or_stream.read(), ext=ext, format_name=format_name, **kwargs)
@@ -181,7 +181,7 @@ def readf(nb_file, format_name=None):
 
 def writes(notebook, ext, format_name=None, version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a string"""
-    transition_to_jupytext_section_in_metadata(notebook.metadata, ext.endswith('.ipynb'))
+    rearrange_jupytext_metadata(notebook.metadata)
 
     if ext.endswith('.ipynb'):
         return nbformat.writes(notebook, version, **kwargs)
