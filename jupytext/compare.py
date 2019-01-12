@@ -33,7 +33,7 @@ def filtered_notebook_metadata(notebook):
     """Notebook metadata, filtered for metadata added by Jupytext itself"""
     metadata = copy(notebook.metadata)
     metadata = filter_metadata(metadata,
-                               notebook.metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook'),
+                               notebook.metadata.get('jupytext', {}).get('notebook_metadata_filter'),
                                _DEFAULT_NOTEBOOK_METADATA)
     if 'jupytext' in metadata:
         del metadata['jupytext']
@@ -84,7 +84,7 @@ def compare_notebooks(notebook_expected,
                                                                            or format_name in ['sphinx', 'spin'])
     allow_removed_final_blank_line = allow_expected_differences
 
-    cell_metadata_filter = notebook_actual.get('jupytext', {}).get('metadata_filter', {}).get('cells')
+    cell_metadata_filter = notebook_actual.get('jupytext', {}).get('cell_metadata_filter')
 
     if format_name == 'sphinx' and notebook_actual.cells and notebook_actual.cells[0].source == '%matplotlib inline':
         notebook_actual.cells = notebook_actual.cells[1:]

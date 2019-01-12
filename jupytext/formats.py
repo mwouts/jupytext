@@ -380,19 +380,25 @@ def transition_to_jupytext_section_in_metadata(metadata, is_ipynb):
         if key in metadata:
             metadata[key.replace('nbrmd', 'jupytext')] = metadata.pop(key)
 
+    jupytext_metadata = metadata.pop('jupytext', {})
+
     if 'jupytext_formats' in metadata:
-        metadata.setdefault('jupytext', {})['formats'] = metadata.pop('jupytext_formats')
+        jupytext_metadata['formats'] = metadata.pop('jupytext_formats')
     if 'jupytext_format_version' in metadata:
-        metadata.setdefault('jupytext', {})['text_representation'] = {
-            'format_version': metadata.pop('jupytext_format_version')}
+        jupytext_metadata['text_representation'] = {'format_version': metadata.pop('jupytext_format_version')}
     if 'main_language' in metadata:
-        metadata.setdefault('jupytext', {})['main_language'] = metadata.pop('main_language')
+        jupytext_metadata['main_language'] = metadata.pop('main_language')
     for entry in ['encoding', 'executable']:
         if is_ipynb and entry in metadata:
-            metadata.setdefault('jupytext', {})[entry] = metadata.pop(entry)
+            jupytext_metadata[entry] = metadata.pop(entry)
 
-    filters = metadata.get('jupytext', {}).get('metadata_filter', {})
-    for filter_level in ['notebook', 'cells']:
+    filters = jupytext_metadata.pop('metadata_filter', {})
+    if 'notebook' in filters:
+        jupytext_metadata['notebook_metadata_filter'] = filters['notebook']
+    if 'cells' in filters:
+        jupytext_metadata['cell_metadata_filter'] = filters['cells']
+
+    for filter_level in ['notebook_metadata_filter', 'cell_metadata_filter']:
         if isinstance(filters.get(filter_level), dict):
             additional = filters.get(filter_level).get('additional', [])
             if additional == 'all':
@@ -406,4 +412,7 @@ def transition_to_jupytext_section_in_metadata(metadata, is_ipynb):
             else:
                 entries.extend(['-' + e for e in excluded])
 
-            filters[filter_level] = ','.join(entries)
+            jupytext_metadata[filter_level] = ','.join(entries)
+
+    if jupytext_metadata:
+        metadata['jupytext'] = jupytext_metadata

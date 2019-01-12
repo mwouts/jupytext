@@ -107,8 +107,8 @@ Accepted formats are composed of an extension, like `ipynb`, `md`, `Rmd`, `jl`, 
 
 Jupytext accepts a few additional options:
 - `comment_magics`: By default, Jupyter magics are commented when notebooks are exported to any other format than markdown. If you prefer otherwise, use this boolean option, or is global counterpart (see below).
-- `metadata_filter.notebook`: By default, Jupytext only exports the `kernelspec` and `jupytext` metadata to the text files. Set `"jupytext": {"metadata_filter": {"notebook": "-all"}}` if you want that the script has no notebook metadata at all. The value for `metadata_filter.notebook` is a comma separated list of additional/excluded (negated) entries, with `all` a keyword that allows to exclude all entries.
-- `metadata_filter.cells`: By default, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. Add or exclude more cell metadata with this option.
+- `notebook_metadata_filter`: By default, Jupytext only exports the `kernelspec` and `jupytext` metadata to the text files. Set `"jupytext": {"notebook_metadata_filter": "-all"}` if you want that the script has no notebook metadata at all. The value for `notebook_metadata_filter` is a comma separated list of additional/excluded (negated) entries, with `all` a keyword that allows to exclude all entries.
+- `cell_metadata_filter`: By default, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. Add or exclude more cell metadata with this option.
 
 ### Global configuration
 

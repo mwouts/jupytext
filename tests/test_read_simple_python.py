@@ -554,7 +554,8 @@ def test_round_trip_python_with_js_cell_no_cell_metadata():
 notebook.nbextensions.install_nbextension('jupytext.js', user=True)'''),
                                    new_code_cell('''%%javascript
 Jupyter.utils.load_extensions('jupytext')''')],
-                            metadata={'jupytext': {'metadata_filter': {'notebook': '-all', 'cells': '-all'}}})
+                            metadata={'jupytext': {'notebook_metadata_filter': '-all',
+                                                   'cell_metadata_filter':'-all'}})
     text = jupytext.writes(notebook, ext='.py')
     notebook2 = jupytext.reads(text, ext='.py')
     compare_notebooks(notebook, notebook2)

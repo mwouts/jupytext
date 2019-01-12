@@ -347,7 +347,7 @@ def test_load_save_percent_format(nb_file, tmpdir):
     # open python, save
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         nb = cm.get(tmp_py)['content']
-        del nb.metadata['jupytext']['metadata_filter']
+        del nb.metadata['jupytext']['notebook_metadata_filter']
         cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
 
     # compare the new file with original one
@@ -692,8 +692,8 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
         nb = cm.get(tmp_ipynb)['content']
 
-    assert nb.metadata['jupytext']['metadata_filter']['cells'] == '-all'
-    assert nb.metadata['jupytext']['metadata_filter']['notebook'] == 'jupytext,-all'
+    assert nb.metadata['jupytext']['cell_metadata_filter'] == '-all'
+    assert nb.metadata['jupytext']['notebook_metadata_filter'] == 'jupytext,-all'
 
     # save notebook again
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):

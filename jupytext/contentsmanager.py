@@ -42,7 +42,7 @@ def jupytext_formats_from_metadata(metadata, ext):
         return True
 
     notebook_metadata_filter = metadata_filter_as_dict(
-        metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook', ''))
+        metadata.get('jupytext', {}).get('notebook_metadata_filter', ''))
     if 'jupytext' in notebook_metadata_filter.get('additional', []):
         return True
     excluded = notebook_metadata_filter.get('excluded', [])
@@ -419,11 +419,9 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
             jupytext_metadata = model['content']['metadata'].get('jupytext', {})
             if self.default_notebook_metadata_filter:
-                (jupytext_metadata.setdefault('metadata_filter', {})
-                 .setdefault('notebook', self.default_notebook_metadata_filter))
+                jupytext_metadata.setdefault('notebook_metadata_filter', self.default_notebook_metadata_filter)
             if self.default_cell_metadata_filter:
-                (jupytext_metadata.setdefault('metadata_filter', {})
-                 .setdefault('cells', self.default_cell_metadata_filter))
+                jupytext_metadata.setdefault('cell_metadata_filter', self.default_cell_metadata_filter)
 
             if jupytext_metadata:
                 model['content']['metadata']['jupytext'] = jupytext_metadata

@@ -109,7 +109,7 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
     if 'jupytext' in metadata and not metadata['jupytext']:
         del metadata['jupytext']
 
-    notebook_metadata_filter = metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook')
+    notebook_metadata_filter = metadata.get('jupytext', {}).get('notebook_metadata_filter')
     metadata = filter_metadata(metadata, notebook_metadata_filter, _DEFAULT_NOTEBOOK_METADATA)
 
     if metadata:

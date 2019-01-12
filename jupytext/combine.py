@@ -29,7 +29,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
 
     nb_outputs_filtered_metadata = copy(nb_outputs.metadata)
     filter_metadata(nb_outputs_filtered_metadata,
-                    nb_source.metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook'),
+                    nb_source.metadata.get('jupytext', {}).get('notebook_metadata_filter'),
                     _DEFAULT_NOTEBOOK_METADATA)
 
     for key in nb_outputs.metadata:
@@ -54,7 +54,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
                     else:
                         ocell_filtered_metadata = copy(ocell.metadata)
                         filter_metadata(ocell_filtered_metadata,
-                                        nb_source.metadata.get('jupytext', {}).get('metadata_filter', {}).get('cells'),
+                                        nb_source.metadata.get('jupytext', {}).get('cell_metadata_filter'),
                                         _IGNORE_CELL_METADATA)
 
                     for key in ocell.metadata:
@@ -72,7 +72,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
                     else:
                         ocell_filtered_metadata = copy(ocell.metadata)
                         filter_metadata(ocell_filtered_metadata,
-                                        nb_source.metadata.get('jupytext', {}).get('metadata_filter', {}).get('cells'),
+                                        nb_source.metadata.get('jupytext', {}).get('cell_metadata_filter'),
                                         _IGNORE_CELL_METADATA)
 
                     for key in ocell.metadata:

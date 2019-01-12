@@ -60,8 +60,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         if not jupyter_md:
             # Set a metadata filter equal to the current metadata in script
             cell_metadata = [m for m in cell_metadata if m not in _JUPYTEXT_CELL_METADATA]
-            metadata.setdefault('jupytext', {})['metadata_filter'] = {
-                'notebook': '-all', 'cells': ','.join(cell_metadata + ['-all'])}
+            metadata.setdefault('jupytext', {})['notebook_metadata_filter'] = '-all'
+            metadata.setdefault('jupytext', {})['cell_metadata_filter'] = ','.join(cell_metadata + ['-all'])
 
         set_main_and_cell_language(metadata, cells, self.format.extension)
 
@@ -86,7 +86,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         nb = deepcopy(nb)
         default_language = default_language_from_metadata_and_ext(nb, self.format.extension)
         comment_magics = nb.metadata.get('jupytext', {}).get('comment_magics')
-        cell_metadata_filter = nb.metadata.get('jupytext', {}).get('metadata_filter', {}).get('cells')
+        cell_metadata_filter = nb.metadata.get('jupytext', {}).get('cell_metadata_filter')
         if 'main_language' in nb.metadata.get('jupytext', {}):
             del nb.metadata['jupytext']['main_language']
 
