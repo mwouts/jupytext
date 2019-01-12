@@ -8,7 +8,7 @@ title: Incomplete header
 1+1
 ```
 """):
-    nb = jupytext.reads(rmd, ext='.Rmd')
+    nb = jupytext.reads(rmd, 'Rmd')
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[0].source == '---\ntitle: Incomplete header'
@@ -28,7 +28,7 @@ a + b
 ls -l
 ```
 """):
-    nb = jupytext.reads(rmd, ext='.Rmd')
+    nb = jupytext.reads(rmd, 'Rmd')
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[0].source == 'a = 1\nb = 2\na + b'
@@ -54,7 +54,7 @@ title: Unterminated header
 ```{python not_terminated}
 1+5
 """):
-    nb = jupytext.reads(rmd, ext='.Rmd')
+    nb = jupytext.reads(rmd, 'Rmd')
     assert len(nb.cells) == 5
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[0].source == '---\ntitle: Unterminated header'

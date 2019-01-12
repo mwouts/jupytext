@@ -27,7 +27,7 @@ ls()
 cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 ```
 """):
-    nb = jupytext.reads(rmd, ext='.Rmd')
+    nb = jupytext.reads(rmd, 'Rmd')
     assert nb.cells == [{'cell_type': 'raw',
                          'source': '---\ntitle: Simple file\n---',
                          'metadata': {}},
@@ -54,7 +54,7 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
                                    "stri_rand_lipsum(3), sep='\n\n')",
                          'outputs': []}]
 
-    rmd2 = jupytext.writes(nb, ext='.Rmd')
+    rmd2 = jupytext.writes(nb, 'Rmd')
     rmd2 = re.sub(r'```{r ', '```{r, ', rmd2)
     rmd2 = re.sub(r'```{python ', '```{python, ', rmd2)
     compare(rmd, rmd2)
@@ -73,7 +73,7 @@ In markdown cells it is escaped like here:
 1 + 1
 ```
 """):
-    nb = jupytext.reads(rmd, ext='.Rmd')
+    nb = jupytext.reads(rmd, 'Rmd')
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[1].cell_type == 'markdown'
@@ -84,5 +84,5 @@ In markdown cells it is escaped like here:
             '''# In code cells like this one, it is also escaped
 ```{python cell_name}
 1 + 1''')
-    rmd2 = jupytext.writes(nb, ext='.Rmd')
+    rmd2 = jupytext.writes(nb, 'Rmd')
     compare(rmd, rmd2)

@@ -1,7 +1,6 @@
 import pytest
 from nbformat.v4.nbbase import new_code_cell, new_notebook
 from jupytext.magics import comment_magic, uncomment_magic, unesc
-from jupytext.formats import parse_one_format
 from jupytext.compare import compare_notebooks
 import jupytext
 
@@ -34,57 +33,53 @@ def test_force_noescape_with_gbl_esc_flag(line):
     assert comment_magic([line], global_escape_flag=True) == [line]
 
 
-@pytest.mark.parametrize('ext_and_format_name,commented',
+@pytest.mark.parametrize('fmt,commented',
                          zip(['md', 'Rmd', 'py:light', 'py:percent', 'py:sphinx', 'R', 'ss:light', 'ss:percent'],
                              [False, True, True, True, True, True, True, True]))
-def test_magics_commented_default(ext_and_format_name, commented):
-    ext, format_name = parse_one_format(ext_and_format_name)
+def test_magics_commented_default(fmt, commented):
     nb = new_notebook(cells=[new_code_cell('%pylab inline')])
 
-    text = jupytext.writes(nb, ext, format_name)
+    text = jupytext.writes(nb, fmt)
     assert ('%pylab inline' in text.splitlines()) != commented
-    nb2 = jupytext.reads(text, ext, format_name)
+    nb2 = jupytext.reads(text, fmt)
 
-    if format_name == 'sphinx':
+    if 'sphinx' in fmt:
         nb2.cells = nb2.cells[1:]
 
     compare_notebooks(nb, nb2)
 
 
-@pytest.mark.parametrize('ext_and_format_name',
-                         ['md', 'Rmd', 'py:light', 'py:percent', 'py:sphinx', 'R', 'ss:light', 'ss:percent'])
-def test_magics_are_commented(ext_and_format_name):
-    ext, format_name = parse_one_format(ext_and_format_name)
+@pytest.mark.parametrize('fmt', ['md', 'Rmd', 'py:light', 'py:percent', 'py:sphinx', 'R', 'ss:light', 'ss:percent'])
+def test_magics_are_commented(fmt):
     nb = new_notebook(cells=[new_code_cell('%pylab inline')],
                       metadata={'jupytext': {'comment_magics': True,
-                                             'main_language': 'R' if ext in ['.r', '.R']
-                                             else 'scheme' if ext == '.ss' else 'python'}})
+                                             'main_language': 'R' if fmt == 'R'
+                                             else 'scheme' if fmt.startswith('ss') else 'python'}})
 
-    text = jupytext.writes(nb, ext, format_name)
+    text = jupytext.writes(nb, fmt)
     assert '%pylab inline' not in text.splitlines()
-    nb2 = jupytext.reads(text, ext, format_name)
+    nb2 = jupytext.reads(text, fmt)
 
-    if format_name == 'sphinx':
+    if 'sphinx' in fmt:
         nb2.cells = nb2.cells[1:]
 
     compare_notebooks(nb, nb2)
 
 
-@pytest.mark.parametrize('ext_and_format_name',
-                         ['md', 'Rmd', 'py:light', 'py:percent', 'py:sphinx', 'R', 'ss:light', 'ss:percent'])
-def test_magics_are_not_commented(ext_and_format_name):
-    ext, format_name = parse_one_format(ext_and_format_name)
+@pytest.mark.parametrize('fmt', ['md', 'Rmd', 'py:light', 'py:percent', 'py:sphinx', 'R', 'ss:light', 'ss:percent'])
+def test_magics_are_not_commented(fmt):
     nb = new_notebook(cells=[new_code_cell('%pylab inline')],
                       metadata={'jupytext': {'comment_magics': False,
-                                             'main_language': 'R' if ext in ['.r', '.R']
-                                             else 'scheme' if ext == '.ss' else 'python'}})
+                                             'main_language': 'R' if fmt == 'R'
+                                             else 'scheme' if fmt.startswith('ss') else 'python'}})
 
-    text = jupytext.writes(nb, ext, format_name)
+    text = jupytext.writes(nb, fmt)
     assert '%pylab inline' in text.splitlines()
-    nb2 = jupytext.reads(text, ext, format_name)
+    nb2 = jupytext.reads(text, fmt)
 
-    if format_name == 'sphinx':
+    if 'sphinx' in fmt:
         nb2.cells = nb2.cells[1:]
+
     compare_notebooks(nb, nb2)
 
 

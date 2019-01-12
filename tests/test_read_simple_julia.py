@@ -21,7 +21,7 @@ cube(x)
 
 # And a markdown comment
 '''):
-    nb = jupytext.reads(julia, ext='.jl')
+    nb = jupytext.reads(julia, 'jl')
     assert nb.metadata['jupytext']['main_language'] == 'julia'
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'code'
@@ -44,5 +44,5 @@ end'''
     assert nb.cells[2].cell_type == 'markdown'
     compare(nb.cells[2].source, 'And a markdown comment')
 
-    julia2 = jupytext.writes(nb, ext='.jl')
+    julia2 = jupytext.writes(nb, 'jl')
     compare(julia, julia2)

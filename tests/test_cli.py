@@ -44,11 +44,10 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     compare_notebooks(nb1, nb2)
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb') +
-                         list_notebooks('Rmd'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb') + list_notebooks('Rmd'))
 def test_convert_single_file(nb_file, capsys):
     nb1 = readf(nb_file)
-    pynb = writes(nb1, ext='.py')
+    pynb = writes(nb1, 'py')
     convert_notebook_files([nb_file], fmt='py', output='-')
 
     out, err = capsys.readouterr()
@@ -67,7 +66,7 @@ def test_jupytext_version(capsys):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_cpp'))
 def test_to_cpluplus(nb_file, capsys):
     nb1 = readf(nb_file)
-    text_cpp = writes(nb1, ext='.cpp')
+    text_cpp = writes(nb1, 'cpp')
     jupytext([nb_file, '--to', 'c++', '--output', '-'])
 
     out, err = capsys.readouterr()

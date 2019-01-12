@@ -20,7 +20,7 @@ def f(x):
 def h(y):
     return y-1
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
     assert len(nb.cells) == 4
     assert nb.cells[0].cell_type == 'raw'
     assert nb.cells[0].source == '---\ntitle: Simple file\n---'
@@ -34,7 +34,7 @@ def h(y):
     compare(nb.cells[3].source, '''def h(y):
     return y-1''')
 
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -54,7 +54,7 @@ def f(x):
 def h(y):
     return y-1
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
 
     assert len(nb.cells) == 4
     assert nb.cells[0].cell_type == 'raw'
@@ -71,7 +71,7 @@ def h(y):
     compare(nb.cells[3].source,
             '''# And a comment on h\ndef h(y):\n    return y-1''')
 
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -87,7 +87,7 @@ def f(x):
 
     return x+1
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
 
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'raw'
@@ -102,7 +102,7 @@ def f(x):
             'def f(x):\n\n\n'
             '    return x+1')
 
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -116,7 +116,7 @@ a = 1
 
 a + 2
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
 
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == 'raw'
@@ -125,7 +125,7 @@ a + 2
     assert nb.cells[1].cell_type == 'code'
     assert nb.cells[1].source == 'a = 1\n\n\na + 2'
 
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -138,8 +138,8 @@ def data():
 
 data()
 '''):
-    nb = jupytext.reads(pynb, ext='.py')
-    pynb2 = jupytext.writes(nb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -172,7 +172,7 @@ data2()
 # -
 # --
 '''):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
     assert len(nb.cells) == 5
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[1].cell_type == 'code'
@@ -190,7 +190,7 @@ data2()
 # - item 2
 # -''')
 
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -204,21 +204,21 @@ def data():
 
 data()
 '''):
-    nb = jupytext.reads(pynb, ext='.py')
-    pynb2 = jupytext.writes(nb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 """):
-    nb = jupytext.reads(pynb, ext='.py')
-    pynb2 = jupytext.writes(nb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
 def test_read_cell_with_one_blank_line_end(pynb="""import pandas
 
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
     assert len(nb.cells) == 1
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -226,12 +226,12 @@ def test_read_code_cell_fully_commented(pynb="""# +
 # This is a code cell that
 # only contains comments
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
     assert len(nb.cells) == 1
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[0].source == """# This is a code cell that
 # only contains comments"""
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -239,8 +239,8 @@ def test_file_with_two_blank_line_end(pynb="""import pandas
 
 
 """):
-    nb = jupytext.reads(pynb, ext='.py')
-    pynb2 = jupytext.writes(nb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -254,7 +254,7 @@ def test_one_blank_lines_after_endofcell(pynb="""# +
 # This cell is a cell with implicit start
 1 + 1
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == 'code'
     assert (nb.cells[0].source ==
@@ -265,7 +265,7 @@ def test_one_blank_lines_after_endofcell(pynb="""# +
     assert nb.cells[1].cell_type == 'code'
     assert nb.cells[1].source == '''# This cell is a cell with implicit start
 1 + 1'''
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -281,7 +281,7 @@ def test_two_cells_with_explicit_start(pynb="""# +
 
 2 + 2
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[0].source == '''# Cell one
@@ -293,7 +293,7 @@ def test_two_cells_with_explicit_start(pynb="""# +
 2 + 2
 
 2 + 2'''
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -307,7 +307,7 @@ def test_escape_start_pattern(pynb="""# The code start pattern '# +' can
 # # + {"sample_metadata": "value"}
 1 + 1
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[1].cell_type == 'markdown'
@@ -318,7 +318,7 @@ def test_escape_start_pattern(pynb="""# The code start pattern '# +' can
             '''# In code cells like this one, it is also escaped
 # + {"sample_metadata": "value"}
 1 + 1''')
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -334,7 +334,7 @@ dictionary = {
     # and the end
     'z': 'Z'}
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[1].cell_type == 'code'
@@ -347,7 +347,7 @@ inside it'''
 
     # and the end
     'z': 'Z'}'''
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -370,7 +370,7 @@ def test_isolated_cell_with_magic(pynb="""# ---
 # %matplotlib inline
 1 + 1
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
 
     assert len(nb.cells) == 6
     assert nb.cells[0].cell_type == 'raw'
@@ -384,7 +384,7 @@ def test_isolated_cell_with_magic(pynb="""# ---
     assert nb.cells[5].cell_type == 'code'
     assert nb.cells[5].source == '%matplotlib inline\n1 + 1'
 
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -399,7 +399,7 @@ and it ends here'''
 
 1 + 1
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
 
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == 'code'
@@ -413,7 +413,7 @@ and it ends here'''"""
     assert nb.cells[1].cell_type == 'code'
     assert nb.cells[1].source == '1 + 1'
 
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -425,7 +425,7 @@ def f(x):
 
 # And a new cell, and non ascii contênt
 """):
-    nb = jupytext.reads(pynb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
 
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'markdown'
@@ -435,7 +435,7 @@ def f(x):
     assert nb.cells[2].cell_type == 'markdown'
     assert nb.cells[2].source == u'And a new cell, and non ascii contênt'
 
-    pynb2 = jupytext.writes(nb, ext='.py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -443,8 +443,8 @@ def test_read_write_script(pynb="""#!/usr/bin/env python
 # coding=utf-8
 print('Hello world')
 """):
-    nb = jupytext.reads(pynb, ext='.py')
-    pynb2 = jupytext.writes(nb, ext='.py')
+    nb = jupytext.reads(pynb, 'py')
+    pynb2 = jupytext.writes(nb, 'py')
     compare(pynb, pynb2)
 
 
@@ -484,7 +484,7 @@ def h(x):
 # variable
 d = 6
 """):
-    notebook = jupytext.reads(script, ext='.py')
+    notebook = jupytext.reads(script, 'py')
     assert len(notebook.cells) >= 6
     for cell in notebook.cells:
         lines = cell.source.splitlines()
@@ -492,7 +492,7 @@ d = 6
             assert lines[0]
             assert lines[-1]
 
-    script2 = jupytext.writes(notebook, ext='.py')
+    script2 = jupytext.writes(notebook, 'py')
 
     compare(script, script2)
 
@@ -518,7 +518,7 @@ def g(x):
 
 1 + 1
 """):
-    notebook = jupytext.reads(script, ext='.py')
+    notebook = jupytext.reads(script, 'py')
     assert len(notebook.cells) == 3
     for cell in notebook.cells:
         lines = cell.source.splitlines()
@@ -526,7 +526,7 @@ def g(x):
             assert lines[0]
             assert lines[-1]
 
-    script2 = jupytext.writes(notebook, ext='.py')
+    script2 = jupytext.writes(notebook, 'py')
 
     compare(script, script2)
 
@@ -534,8 +534,8 @@ def g(x):
 def test_round_trip_markdown_cell_with_magic():
     notebook = new_notebook(cells=[new_markdown_cell('IPython has magic commands like\n%quickref')],
                             metadata={'jupytext': {'main_language': 'python'}})
-    text = jupytext.writes(notebook, ext='.py')
-    notebook2 = jupytext.reads(text, ext='.py')
+    text = jupytext.writes(notebook, 'py')
+    notebook2 = jupytext.reads(text, 'py')
     compare_notebooks(notebook, notebook2)
 
 
@@ -544,8 +544,8 @@ def test_round_trip_python_with_js_cell():
 notebook.nbextensions.install_nbextension('jupytext.js', user=True)'''),
                                    new_code_cell('''%%javascript
 Jupyter.utils.load_extensions('jupytext')''')])
-    text = jupytext.writes(notebook, ext='.py')
-    notebook2 = jupytext.reads(text, ext='.py')
+    text = jupytext.writes(notebook, 'py')
+    notebook2 = jupytext.reads(text, 'py')
     compare_notebooks(notebook, notebook2)
 
 
@@ -556,6 +556,6 @@ notebook.nbextensions.install_nbextension('jupytext.js', user=True)'''),
 Jupyter.utils.load_extensions('jupytext')''')],
                             metadata={'jupytext': {'notebook_metadata_filter': '-all',
                                                    'cell_metadata_filter':'-all'}})
-    text = jupytext.writes(notebook, ext='.py')
-    notebook2 = jupytext.reads(text, ext='.py')
+    text = jupytext.writes(notebook, 'py')
+    notebook2 = jupytext.reads(text, 'py')
     compare_notebooks(notebook, notebook2)

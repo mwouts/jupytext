@@ -28,7 +28,7 @@ def test_read_simple_file(script="""# ---
 
 7
 """):
-    nb = jupytext.reads(script, ext='.py', format_name='hydrogen')
+    nb = jupytext.reads(script, 'py:hydrogen')
     assert len(nb.cells) == 6
     assert nb.cells[0].cell_type == 'raw'
     assert nb.cells[0].source == '---\ntitle: Simple file\n---'
@@ -51,7 +51,7 @@ def test_read_simple_file(script="""# ---
 7''')
     assert nb.cells[5].metadata == {'title': 'And now a code cell'}
 
-    script2 = jupytext.writes(nb, ext='.py', format_name='hydrogen')
+    script2 = jupytext.writes(nb, 'py:hydrogen')
     compare(script, script2)
 
 
@@ -59,7 +59,7 @@ def test_read_cell_with_metadata(
         script="""# %% a code cell with parameters {"tags": ["parameters"]}
 a = 3
 """):
-    nb = jupytext.reads(script, ext='.py', format_name='hydrogen')
+    nb = jupytext.reads(script, 'py:hydrogen')
     assert len(nb.cells) == 1
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[0].source == 'a = 3'
@@ -67,7 +67,7 @@ a = 3
         'title': 'a code cell with parameters',
         'tags': ['parameters']}
 
-    script2 = jupytext.writes(nb, ext='.py', format_name='hydrogen')
+    script2 = jupytext.writes(nb, 'py:hydrogen')
     compare(script, script2)
 
 
@@ -134,30 +134,30 @@ def f(x):
     return 42 * x
 
 """):
-    nb = jupytext.reads(script, ext='.py')
+    nb = jupytext.reads(script, 'py')
     assert len(nb.cells) == 5
     for i in range(5):
         assert nb.cells[i].cell_type == 'code'
         assert not nb.cells[i].source.startswith('\n')
         assert not nb.cells[i].source.endswith('\n')
 
-    script2 = jupytext.writes(nb, ext='.py', format_name='hydrogen')
+    script2 = jupytext.writes(nb, 'py:hydrogen')
     compare(script, script2)
 
 
 def test_no_crash_on_square_bracket(script="""# %% In [2]
 print('Hello')
 """):
-    nb = jupytext.reads(script, ext='.py')
-    script2 = jupytext.writes(nb, ext='.py', format_name='hydrogen')
+    nb = jupytext.reads(script, 'py')
+    script2 = jupytext.writes(nb, 'py:hydrogen')
     compare(script, script2)
 
 
 def test_nbconvert_cell(script="""# In[2]:
 print('Hello')
 """):
-    nb = jupytext.reads(script, ext='.py')
-    script2 = jupytext.writes(nb, ext='.py', format_name='hydrogen')
+    nb = jupytext.reads(script, 'py')
+    script2 = jupytext.writes(nb, 'py:hydrogen')
     expected = """# %%
 print('Hello')
 """
@@ -167,8 +167,8 @@ print('Hello')
 def test_nbformat_v3_nbpy_cell(script="""# <codecell>
 print('Hello')
 """):
-    nb = jupytext.reads(script, ext='.py')
-    script2 = jupytext.writes(nb, ext='.py', format_name='hydrogen')
+    nb = jupytext.reads(script, 'py')
+    script2 = jupytext.writes(nb, 'py:hydrogen')
     expected = """# %%
 print('Hello')
 """

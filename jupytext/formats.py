@@ -144,9 +144,7 @@ def get_format_implementation(ext, format_name=None):
 
     if formats_for_extension:
         raise TypeError("Format '{}' is not associated to extension '{}'. "
-                        "Please choose one of: {}."
-                        .format(format_name, ext,
-                                ', '.join(formats_for_extension)))
+                        "Please choose one of: {}.".format(format_name, ext, ', '.join(formats_for_extension)))
     raise TypeError("Not format associated to extension '{}'".format(ext))
 
 
@@ -339,24 +337,19 @@ def auto_ext_from_metadata(metadata):
 def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default=True):
     """Return the format name for that extension"""
 
-    # Current format: Don't change it unless an explicit instruction is given in the 'formats' field.
+    # Is the format information available in the text representation?
     text_repr = metadata.get('jupytext', {}).get('text_representation')
     if text_repr and text_repr.get('extension') == ext and text_repr.get('format_name'):
-        current_format = text_repr.get('format_name')
-    else:
-        current_format = None
+        return text_repr.get('format_name')
 
+    # Format from jupytext.formats
     auto_ext = auto_ext_from_metadata(metadata)
-
     formats = metadata.get('jupytext', {}).get('formats', '') or cm_default_formats
     formats = parse_formats(formats)
     for fmt_ext, ext_format_name in formats:
         if fmt_ext.endswith(ext) or (fmt_ext.endswith('.auto') and auto_ext and ext.endswith(auto_ext)):
             if (not explicit_default) or ext_format_name:
-                return ext_format_name or current_format
-
-    if current_format:
-        return current_format
+                return ext_format_name
 
     if (not explicit_default) or ext in ['.Rmd', '.md']:
         return None
@@ -438,3 +431,13 @@ def long_form_one_format(jupytext_format):
 
     jupytext_format['extension'] = ext
     return jupytext_format
+
+
+# TODO: remove this function
+def _fmt_from_ext_and_format_name(ext, format_name):
+    fmt = {'format_name': format_name}
+    if ext.rfind('.'):
+        suffix, ext = os.path.splitext(ext)
+        fmt['suffix'] = suffix
+    fmt['extension'] = ext
+    return fmt

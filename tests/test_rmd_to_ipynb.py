@@ -19,8 +19,8 @@ def test_identity_write_read(nb_file):
     with open(nb_file) as fp:
         rmd = fp.read()
 
-    nb = jupytext.reads(rmd, ext='.Rmd')
-    rmd2 = jupytext.writes(nb, ext='.Rmd')
+    nb = jupytext.reads(rmd, 'Rmd')
+    rmd2 = jupytext.writes(nb, 'Rmd')
 
     compare(rmd, rmd2)
 
@@ -33,7 +33,7 @@ text
 And a new cell
 """
 
-    nb = jupytext.reads(rmd, ext='.Rmd')
+    nb = jupytext.reads(rmd, 'Rmd')
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[1].cell_type == 'markdown'

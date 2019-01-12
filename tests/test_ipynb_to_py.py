@@ -17,7 +17,7 @@ def test_identity_source_write_read(nb_file):
     with open(nb_file) as fp:
         nb1 = nbformat.read(fp, as_version=4)
 
-    py = jupytext.writes(nb1, ext='.py')
-    nb2 = jupytext.reads(py, ext='.py')
+    py = jupytext.writes(nb1, 'py')
+    nb2 = jupytext.reads(py, 'py')
 
     compare_notebooks(nb1, nb2)

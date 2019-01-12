@@ -1,17 +1,8 @@
-"""Read and write notebooks as RStudio notebook files, with .Rmd extension.
-
-Raw and markdown cells are converted to markdown, while code cells are
-converted to code chunks. The transformation is reversible and all inputs
-are preserved (not outputs, though).
-
-Authors:
-
-* Marc Wouts
-"""
+"""Read and write Jupyter notebooks as text files"""
 
 import os
 import io
-from copy import deepcopy
+from copy import copy, deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 import nbformat
@@ -27,7 +18,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
     """A class that can read or write a Jupyter notebook as text"""
 
     def __init__(self, fmt):
-        self.fmt = long_form_one_format(fmt)
+        self.fmt = copy(long_form_one_format(fmt))
         self.ext = self.fmt['extension']
         self.implementation = get_format_implementation(self.ext, self.fmt.get('format_name'))
 
@@ -135,25 +126,33 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         return '\n'.join(lines)
 
 
-def reads(text, ext, format_name=None, rst2md=False, as_version=4, **kwargs):
+def reads(text, fmt, as_version=4, **kwargs):
     """Read a notebook from a string"""
-    if ext.endswith('.ipynb'):
+    fmt = copy(fmt)
+    fmt = long_form_one_format(fmt)
+    ext = fmt['extension']
+
+    if ext == '.ipynb':
         return nbformat.reads(text, as_version, **kwargs)
 
-    format_name = read_format_from_metadata(text, ext) or format_name
+    format_name = read_format_from_metadata(text, ext) or fmt.get('format_name')
 
     if not format_name:
         format_name = guess_format(text, ext)
-        if format_name == 'sphinx' and rst2md:
+        # TODO: remove this. (Drop the option when writing the notebook)
+        if format_name == 'sphinx' and fmt.get('rst2md'):
             format_name = 'sphinx-rst2md'
 
-    fmt = ext + ':' + format_name if format_name else ext
+    if format_name:
+        fmt['format_name'] = format_name
+
     reader = TextNotebookConverter(fmt)
     notebook = reader.reads(text, **kwargs)
     rearrange_jupytext_metadata(notebook.metadata)
 
     if format_name and insert_or_test_version_number():
-        if format_name == 'sphinx-rst2md' and rst2md:
+        # TODO: remove this
+        if format_name == 'sphinx-rst2md' and fmt.get('rst2md'):
             format_name = 'sphinx'
         update_jupytext_formats_metadata(notebook, ext, format_name)
         notebook.metadata.setdefault('jupytext', {}).setdefault('text_representation', {}).update(
@@ -162,28 +161,34 @@ def reads(text, ext, format_name=None, rst2md=False, as_version=4, **kwargs):
     return notebook
 
 
-def read(file_or_stream, ext, format_name=None, as_version=4, **kwargs):
+def read(file_or_stream, fmt, as_version=4, **kwargs):
     """Read a notebook from a file"""
-    if ext.endswith('.ipynb'):
+    if fmt['extension'] == '.ipynb':
         notebook = nbformat.read(file_or_stream, as_version, **kwargs)
         rearrange_jupytext_metadata(notebook.metadata)
         return notebook
 
-    return reads(file_or_stream.read(), ext=ext, format_name=format_name, **kwargs)
+    return reads(file_or_stream.read(), fmt, **kwargs)
 
 
-def readf(nb_file, format_name=None):
+def readf(nb_file, fmt={}):
     """Read a notebook from the file with given name"""
     _, ext = os.path.splitext(nb_file)
+    fmt = copy(fmt)
+    fmt.update({'extension': ext})
     with io.open(nb_file, encoding='utf-8') as stream:
-        return read(stream, as_version=4, ext=ext, format_name=format_name)
+        return read(stream, fmt, as_version=4)
 
 
-def writes(notebook, ext, format_name=None, version=nbformat.NO_CONVERT, **kwargs):
+def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a string"""
     rearrange_jupytext_metadata(notebook.metadata)
+    fmt = copy(fmt)
+    fmt = long_form_one_format(fmt)
+    ext = fmt['extension']
+    format_name = fmt.get('format_name')
 
-    if ext.endswith('.ipynb'):
+    if ext == '.ipynb':
         return nbformat.writes(notebook, version, **kwargs)
 
     if not format_name:
@@ -192,19 +197,19 @@ def writes(notebook, ext, format_name=None, version=nbformat.NO_CONVERT, **kwarg
     if format_name and insert_or_test_version_number():
         update_jupytext_formats_metadata(notebook, ext, format_name)
 
-    fmt = ext + ':' + format_name if format_name else ext
     writer = TextNotebookConverter(fmt)
     return writer.writes(notebook)
 
 
-def write(notebook, file_or_stream, ext, format_name=None, version=nbformat.NO_CONVERT, **kwargs):
+def write(notebook, file_or_stream, fmt, version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a file"""
-    file_or_stream.write(writes(notebook, ext, format_name, version, **kwargs))
+    file_or_stream.write(writes(notebook, fmt, version, **kwargs))
 
 
-def writef(notebook, nb_file, format_name=None):
+def writef(notebook, nb_file, fmt={}):
     """Write a notebook to the file with given name"""
     _, ext = os.path.splitext(nb_file)
+    fmt = copy(fmt)
+    fmt.update({'extension': ext})
     with io.open(nb_file, 'w', encoding='utf-8') as stream:
-        write(notebook, stream, version=nbformat.NO_CONVERT,
-              ext=ext, format_name=format_name)
+        write(notebook, stream, fmt)

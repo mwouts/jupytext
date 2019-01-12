@@ -240,15 +240,13 @@ def compare_notebooks(notebook_expected,
         raise NotebookDifference(' | '.join(error))
 
 
-def test_round_trip_conversion(notebook, ext, format_name, update,
-                               allow_expected_differences=True,
-                               stop_on_first_error=True):
+def test_round_trip_conversion(notebook, fmt, update, allow_expected_differences=True, stop_on_first_error=True):
     """Test round trip conversion for a Jupyter notebook"""
-    text = writes(notebook, ext=ext, format_name=format_name)
-    round_trip = reads(text, ext=ext, format_name=format_name)
+    text = writes(notebook, fmt)
+    round_trip = reads(text, fmt)
 
     if update:
         combine_inputs_with_outputs(round_trip, notebook)
 
-    compare_notebooks(notebook, round_trip, ext, format_name, allow_expected_differences,
+    compare_notebooks(notebook, round_trip, fmt['extension'], fmt.get('format_name'), allow_expected_differences,
                       raise_on_first_difference=stop_on_first_error)

@@ -47,7 +47,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
         for file in modified:
             dest_file = file[:-len(input_ext)] + ext
             notebook = readf(file)
-            writef(notebook, dest_file, format_name=format_name)
+            writef(notebook, dest_file, {'format_name': format_name})
             system('git', 'add', dest_file)
 
         for file in deleted:
@@ -89,11 +89,11 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
             input_format = None
 
         if not notebook:
-            notebook = readf(nb_file, format_name=format_name)
+            notebook = readf(nb_file, {'format_name': format_name})
 
         if test_round_trip or test_round_trip_strict:
             try:
-                test_round_trip_conversion(notebook, ext, format_name, update,
+                test_round_trip_conversion(notebook, {'extension': ext, 'format_name': format_name}, update,
                                            allow_expected_differences=not test_round_trip_strict,
                                            stop_on_first_error=stop_on_first_error)
             except NotebookDifference as error:
@@ -113,7 +113,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
             notebook.metadata.setdefault('jupytext', {})['comment_magics'] = comment_magics
 
         if output == '-':
-            sys.stdout.write(writes(notebook, ext=ext, format_name=format_name))
+            sys.stdout.write(writes(notebook, {'extension': ext, 'format_name': format_name}))
             continue
 
         if output:
@@ -165,7 +165,7 @@ def save_notebook_as(notebook, nb_file, nb_dest, format_name, combine):
         nb_outputs = readf(nb_dest)
         combine_inputs_with_outputs(notebook, nb_outputs)
 
-    writef(notebook, nb_dest, format_name=format_name)
+    writef(notebook, nb_dest, {'format_name': format_name})
 
 
 def canonize_format(format_or_ext, file_path=None):

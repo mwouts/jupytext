@@ -9,6 +9,7 @@ from nbformat.v4.nbbase import new_notebook
 from testfixtures import compare
 import jupytext
 from jupytext.compare import compare_notebooks, combine_inputs_with_outputs
+from jupytext.formats import _fmt_from_ext_and_format_name
 from .utils import list_notebooks, skip_if_dict_is_not_ordered
 
 jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
@@ -18,7 +19,8 @@ pytestmark = skip_if_dict_is_not_ordered
 
 def create_mirror_file_if_missing(mirror_file, notebook, format_name=None):
     if not os.path.isfile(mirror_file):
-        jupytext.writef(notebook, mirror_file, format_name=format_name)
+        fmt = {'format_name': format_name} if format_name else {}
+        jupytext.writef(notebook, mirror_file, fmt)
 
 
 def test_create_mirror_file_if_missing(tmpdir):
@@ -33,7 +35,7 @@ def assert_conversion_same_as_mirror(nb_file, ext, mirror_name, format_name=None
     file_name, org_ext = os.path.splitext(basename)
     mirror_file = os.path.join(dirname, '..', 'mirror', mirror_name, file_name + ext)
 
-    notebook = jupytext.readf(nb_file, format_name=format_name)
+    notebook = jupytext.readf(nb_file, {'format_name': format_name})
     create_mirror_file_if_missing(mirror_file, notebook, format_name=format_name)
 
     # Compare the text representation of the two notebooks
@@ -43,11 +45,11 @@ def assert_conversion_same_as_mirror(nb_file, ext, mirror_name, format_name=None
         return
     elif ext == '.ipynb':
         notebook = jupytext.readf(mirror_file)
-        actual = jupytext.writes(notebook, ext=org_ext, format_name=format_name)
+        actual = jupytext.writes(notebook, _fmt_from_ext_and_format_name(org_ext, format_name))
         with open(nb_file, encoding='utf-8') as fp:
             expected = fp.read()
     else:
-        actual = jupytext.writes(notebook, ext=ext, format_name=format_name)
+        actual = jupytext.writes(notebook, _fmt_from_ext_and_format_name(ext, format_name))
         with open(mirror_file, encoding='utf-8') as fp:
             expected = fp.read()
 
@@ -59,7 +61,7 @@ def assert_conversion_same_as_mirror(nb_file, ext, mirror_name, format_name=None
     # Compare the two notebooks
     if ext != '.ipynb':
         notebook = jupytext.readf(nb_file)
-        nb_mirror = jupytext.readf(mirror_file, format_name=format_name)
+        nb_mirror = jupytext.readf(mirror_file, {'format_name': format_name})
 
         if format_name == 'sphinx':
             nb_mirror.cells = nb_mirror.cells[1:]

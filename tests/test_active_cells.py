@@ -47,10 +47,10 @@ ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
 
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_all(ext):
-    nb = jupytext.reads(ACTIVE_ALL[ext], ext=ext)
+    nb = jupytext.reads(ACTIVE_ALL[ext], ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_ALL['.ipynb'])
-    compare(ACTIVE_ALL[ext], jupytext.writes(nb, ext=ext))
+    compare(ACTIVE_ALL[ext], jupytext.writes(nb, ext))
 
 
 ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
@@ -77,11 +77,11 @@ ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_ipynb(ext):
-    nb = jupytext.reads(HEADER[ext] + ACTIVE_IPYNB[ext], ext=ext)
+    nb = jupytext.reads(HEADER[ext] + ACTIVE_IPYNB[ext], ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_IPYNB['.ipynb'])
     if ext != '.R':
-        compare(ACTIVE_IPYNB[ext], jupytext.writes(nb, ext=ext))
+        compare(ACTIVE_IPYNB[ext], jupytext.writes(nb, ext))
 
 
 ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
@@ -105,11 +105,11 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_py_ipynb(ext):
-    nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_IPYNB[ext], ext=ext)
+    nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_IPYNB[ext], ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_PY_IPYNB['.ipynb'])
     if ext != '.R':
-        compare(ACTIVE_PY_IPYNB[ext], jupytext.writes(nb, ext=ext))
+        compare(ACTIVE_PY_IPYNB[ext], jupytext.writes(nb, ext))
 
 
 ACTIVE_PY_R_IPYNB = {'.py': """# + {"active": "ipynb,py,R"}
@@ -133,11 +133,11 @@ ACTIVE_PY_R_IPYNB = {'.py': """# + {"active": "ipynb,py,R"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_py_r_ipynb(ext):
-    nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_R_IPYNB[ext], ext=ext)
+    nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_R_IPYNB[ext], ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_PY_R_IPYNB['.ipynb'])
     if ext != '.R':
-        compare(ACTIVE_PY_R_IPYNB[ext], jupytext.writes(nb, ext=ext))
+        compare(ACTIVE_PY_R_IPYNB[ext], jupytext.writes(nb, ext))
 
 
 ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
@@ -158,11 +158,11 @@ ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_rmd(ext):
-    nb = jupytext.reads(HEADER[ext] + ACTIVE_RMD[ext], ext=ext)
+    nb = jupytext.reads(HEADER[ext] + ACTIVE_RMD[ext], ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_RMD['.ipynb'])
     if ext != '.R':
-        compare(ACTIVE_RMD[ext], jupytext.writes(nb, ext=ext))
+        compare(ACTIVE_RMD[ext], jupytext.writes(nb, ext))
 
 
 ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd"}
@@ -185,7 +185,7 @@ ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_not_include_rmd(ext):
-    nb = jupytext.reads(ACTIVE_NOT_INCLUDE_RMD[ext], ext=ext)
+    nb = jupytext.reads(ACTIVE_NOT_INCLUDE_RMD[ext], ext)
     assert len(nb.cells) == 1
     compare(nb.cells[0], ACTIVE_NOT_INCLUDE_RMD['.ipynb'])
-    compare(ACTIVE_NOT_INCLUDE_RMD[ext], jupytext.writes(nb, ext=ext))
+    compare(ACTIVE_NOT_INCLUDE_RMD[ext], jupytext.writes(nb, ext))
