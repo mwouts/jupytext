@@ -30,12 +30,15 @@ def test_create_mirror_file_if_missing(tmpdir):
     assert os.path.isfile(py_file)
 
 
-def assert_conversion_same_as_mirror(nb_file, ext, mirror_name, format_name=None, compare_notebook=False):
+def assert_conversion_same_as_mirror(nb_file, ext, mirror_name,
+                                     format_name=None, format_options={},
+                                     compare_notebook=False):
     dirname, basename = os.path.split(nb_file)
     file_name, org_ext = os.path.splitext(basename)
     mirror_file = os.path.join(dirname, '..', 'mirror', mirror_name, file_name + ext)
 
-    notebook = jupytext.readf(nb_file, {'format_name': format_name})
+    fmt = _fmt_from_ext_and_format_name(ext, format_name, format_options)
+    notebook = jupytext.readf(nb_file, fmt)
     create_mirror_file_if_missing(mirror_file, notebook, format_name=format_name)
 
     # Compare the text representation of the two notebooks
@@ -45,11 +48,12 @@ def assert_conversion_same_as_mirror(nb_file, ext, mirror_name, format_name=None
         return
     elif ext == '.ipynb':
         notebook = jupytext.readf(mirror_file)
-        actual = jupytext.writes(notebook, _fmt_from_ext_and_format_name(org_ext, format_name))
+        fmt.update({'extension': org_ext})
+        actual = jupytext.writes(notebook, fmt)
         with open(nb_file, encoding='utf-8') as fp:
             expected = fp.read()
     else:
-        actual = jupytext.writes(notebook, _fmt_from_ext_and_format_name(ext, format_name))
+        actual = jupytext.writes(notebook, fmt)
         with open(mirror_file, encoding='utf-8') as fp:
             expected = fp.read()
 
@@ -61,7 +65,7 @@ def assert_conversion_same_as_mirror(nb_file, ext, mirror_name, format_name=None
     # Compare the two notebooks
     if ext != '.ipynb':
         notebook = jupytext.readf(nb_file)
-        nb_mirror = jupytext.readf(mirror_file, {'format_name': format_name})
+        nb_mirror = jupytext.readf(mirror_file, fmt)
 
         if format_name == 'sphinx':
             nb_mirror.cells = nb_mirror.cells[1:]
@@ -183,7 +187,7 @@ def test_sphinx_to_ipynb(nb_file):
 @pytest.mark.parametrize('nb_file', list_notebooks('sphinx'))
 def test_sphinx_md_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, '.ipynb', 'sphinx-rst2md_to_ipynb',
-                                     format_name='sphinx-rst2md', compare_notebook=True)
+                                     format_name='sphinx', format_options={'rst2md': True}, compare_notebook=True)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('Rmd'))

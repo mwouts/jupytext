@@ -51,18 +51,15 @@ def jupytext_formats_from_metadata(metadata, ext):
     return True
 
 
-def _jupytext_writes(ext, format_name):
+def _jupytext_writes(fmt):
     def _writes(nbk, version=nbformat.NO_CONVERT, **kwargs):
-        return jupytext.writes(nbk, _fmt_from_ext_and_format_name(ext, format_name), version=version, **kwargs)
+        return jupytext.writes(nbk, fmt, version=version, **kwargs)
 
     return _writes
 
 
-def _jupytext_reads(ext, format_name, rst2md):
+def _jupytext_reads(fmt):
     def _reads(text, as_version, **kwargs):
-        fmt = _fmt_from_ext_and_format_name(ext, format_name)
-        if rst2md:
-            fmt['rst2md'] = True
         return jupytext.reads(text, fmt, as_version=as_version, **kwargs)
 
     return _reads
@@ -289,10 +286,13 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
-        _, fmt, ext = file_fmt_ext(os_path)
+        _, full_ext, ext = file_fmt_ext(os_path)
         if ext in self.nb_extensions:
-            format_name = self.preferred_format(fmt, self.preferred_jupytext_formats_read)
-            with mock.patch('nbformat.reads', _jupytext_reads(fmt, format_name, self.sphinx_convert_rst2md)):
+            format_name = self.preferred_format(full_ext, self.preferred_jupytext_formats_read)
+            fmt = _fmt_from_ext_and_format_name(full_ext, format_name)
+            if self.sphinx_convert_rst2md:
+                fmt['rst2md'] = True
+            with mock.patch('nbformat.reads', _jupytext_reads(fmt)):
                 return super(TextFileContentsManager, self)._read_notebook(os_path, as_version)
         else:
             return super(TextFileContentsManager, self)._read_notebook(os_path, as_version)
@@ -325,7 +325,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 format_name = format_name_for_ext(nb.metadata, alt_fmt, self.default_jupytext_formats,
                                                   explicit_default=False) or \
                               self.preferred_format(alt_fmt, self.preferred_jupytext_formats_save)
-                with mock.patch('nbformat.writes', _jupytext_writes(alt_fmt, format_name)):
+                fmt = _fmt_from_ext_and_format_name(alt_fmt, format_name)
+                with mock.patch('nbformat.writes', _jupytext_writes(fmt)):
                     super(TextFileContentsManager, self)._save_notebook(os_path_fmt, nb)
             else:
                 super(TextFileContentsManager, self)._save_notebook(os_path_fmt, nb)

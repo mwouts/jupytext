@@ -5,10 +5,11 @@ new formats here!
 
 import os
 import re
+from copy import copy
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
     LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, HydrogenCellReader, \
-    SphinxGalleryScriptCellReader, SphinxGalleryScriptRst2mdCellReader
+    SphinxGalleryScriptCellReader
 from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
     LightScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter, \
     HydrogenCellExporter, SphinxGalleryCellExporter
@@ -111,15 +112,7 @@ JUPYTEXT_FORMATS = \
             cell_reader_class=SphinxGalleryScriptCellReader,
             cell_exporter_class=SphinxGalleryCellExporter,
             # Version 1.0 on 2018-09-22 - jupytext v0.7.0rc0 : Initial version
-            current_version_number='1.1'),
-        NotebookFormatDescription(
-            format_name='sphinx-rst2md',
-            extension='.py',
-            header_prefix='#',
-            cell_reader_class=SphinxGalleryScriptRst2mdCellReader,
-            cell_exporter_class=None,
-            # Version 1.0 on 2018-09-22 - jupytext v0.7.0rc0 : Initial version
-            current_version_number='1.0')
+            current_version_number='1.1')
     ]
 
 NOTEBOOK_EXTENSIONS = list(dict.fromkeys(
@@ -434,8 +427,10 @@ def long_form_one_format(jupytext_format):
 
 
 # TODO: remove this function
-def _fmt_from_ext_and_format_name(ext, format_name):
-    fmt = {'format_name': format_name}
+def _fmt_from_ext_and_format_name(ext, format_name, format_options={}):
+    fmt = copy(format_options)
+    if format_name:
+        fmt['format_name'] = format_name
     if ext.rfind('.'):
         suffix, ext = os.path.splitext(ext)
         fmt['suffix'] = suffix

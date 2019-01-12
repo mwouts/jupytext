@@ -71,11 +71,6 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
     def writes(self, nb, **kwargs):
         """Return the text representation of the notebook"""
-        if not self.implementation.cell_exporter_class:
-            raise ValueError("Saving notebooks in format '{}' is not possible."
-                             " Please choose another format."
-                             .format(self.implementation.format_name))
-
         nb = deepcopy(nb)
         default_language = default_language_from_metadata_and_ext(nb, self.implementation.extension)
         for option in ['comment_magics', 'cell_metadata_filter']:

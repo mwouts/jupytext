@@ -331,6 +331,10 @@ class SphinxGalleryCellExporter(BaseCellExporter):
             if key in self.unfiltered_metadata:
                 self.metadata[key] = self.unfiltered_metadata[key]
 
+        if self.fmt.get('rst2md'):
+            raise ValueError("The 'rst2md' option is a read only option. The reverse conversion is not "
+                             "implemented. Please either deactivate the option, or save to another format.")
+
     def code_to_text(self):
         """Not used"""
         pass

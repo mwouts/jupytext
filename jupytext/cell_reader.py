@@ -495,7 +495,11 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
     twenty_hash = re.compile(r'^#( |)#{19,}\s*$')
     default_markdown_cell_marker = '#' * 79
     markdown_marker = None
-    rst2md = False
+
+    def __init__(self, fmt={}):
+        super(ScriptCellReader, self).__init__(fmt)
+        self.ext = '.py'
+        self.rst2md = fmt.get('rst2md', False)
 
     def start_of_new_markdown_cell(self, line):
         """Does this line starts a new markdown cell?
@@ -621,7 +625,3 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
         return next_cell_start
 
 
-class SphinxGalleryScriptRst2mdCellReader(SphinxGalleryScriptCellReader):
-    """Read notebook cells from Sphinx Gallery scripts, and convert
-    reStructuredText to markdown"""
-    rst2md = True
