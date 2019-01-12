@@ -15,7 +15,7 @@ from copy import deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 import nbformat
-from .formats import get_format, read_format_from_metadata, guess_format, \
+from .formats import get_format_implementation, read_format_from_metadata, guess_format, \
     update_jupytext_formats_metadata, format_name_for_ext, transition_to_jupytext_section_in_metadata
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable, insert_or_test_version_number
@@ -28,7 +28,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
     def __init__(self, ext, format_name=None):
         self.ext = ext
-        self.format = get_format(ext, format_name)
+        self.format = get_format_implementation(ext, format_name)
 
     def reads(self, s, **_):
         """Read a notebook represented as text"""

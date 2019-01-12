@@ -3,7 +3,7 @@ import mock
 from testfixtures import compare
 import jupytext
 from jupytext.header import uncomment_line, header_to_metadata_and_cell, metadata_and_cell_to_header
-from jupytext.formats import get_format
+from jupytext.formats import get_format_implementation
 
 jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
@@ -74,7 +74,7 @@ def test_metadata_and_cell_to_header():
     nb = new_notebook(
         metadata={'jupytext': {'mainlanguage': 'python'}},
         cells=[new_raw_cell(source="---\ntitle: Sample header\n---", metadata={'noskipline': True})])
-    header = metadata_and_cell_to_header(nb, get_format('.md'), '.md')
+    header = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
     assert '\n'.join(header) == """---
 title: Sample header
 jupyter:
@@ -86,7 +86,7 @@ jupyter:
 
 def test_metadata_and_cell_to_header2():
     nb = new_notebook(cells=[new_markdown_cell(source="Some markdown\ntext")])
-    header = metadata_and_cell_to_header(nb, get_format('.md'), '.md')
+    header = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
     assert header == []
     assert len(nb.cells) == 1
 
