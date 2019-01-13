@@ -17,6 +17,11 @@ from .stringparser import StringParser
 from .languages import _SCRIPT_EXTENSIONS
 
 
+class JupytextFormatError(ValueError):
+    """Error in the specification of the format for the text notebook"""
+    pass
+
+
 class NotebookFormatDescription:
     """Description of a notebook format"""
 
@@ -115,8 +120,7 @@ JUPYTEXT_FORMATS = \
             current_version_number='1.1')
     ]
 
-NOTEBOOK_EXTENSIONS = list(dict.fromkeys(
-    ['.ipynb'] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
+NOTEBOOK_EXTENSIONS = list(dict.fromkeys(['.ipynb'] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
 EXTENSION_PREFIXES = ['.lgt', '.spx', '.pct', '.hyd', '.nb']
 
 
@@ -424,6 +428,73 @@ def long_form_one_format(jupytext_format):
 
     jupytext_format['extension'] = ext
     return jupytext_format
+
+
+def long_form_multiple_formats(jupytext_formats):
+    """Convert a concise encoding of jupytext.formats to a list of formats, encoded as dictionaries"""
+    if not jupytext_formats:
+        return []
+
+    if isinstance(jupytext_formats, str):
+        jupytext_formats = [fmt for fmt in jupytext_formats.split(',') if fmt]
+
+    jupytext_formats = [long_form_one_format(fmt) for fmt in jupytext_formats]
+
+    for fmt in jupytext_formats:
+        validate_one_format(fmt)
+
+    return jupytext_formats
+
+
+_VALID_FORMAT_OPTIONS = ['extension', 'format_name', 'suffix', 'prefix', 'comment_magics',
+                         'split_at_heading', 'notebook_metadata_filter', 'cell_metadata_filter']
+_BINARY_FORMAT_OPTIONS = ['comment_magics', 'split_at_heading']
+
+
+def validate_one_format(jupytext_format):
+    """Validate extension and options for the given format"""
+    if not isinstance(jupytext_format, dict):
+        raise JupytextFormatError('Jupytext format should be a dictionary')
+
+    for key in jupytext_format:
+        if key not in _VALID_FORMAT_OPTIONS:
+            raise JupytextFormatError("Unknown format option '{}' - should be one of '{}'".format(
+                key, "', '".join(_VALID_FORMAT_OPTIONS)))
+        value = jupytext_format[key]
+        if key in _BINARY_FORMAT_OPTIONS:
+            if not isinstance(value, bool):
+                raise JupytextFormatError("Format option '{}' should be a bool, not '{}'".format(key, str(value)))
+        elif not isinstance(value, str):
+            raise JupytextFormatError("Format option '{}' should be a string, not '{}'".format(key, str(value)))
+
+    if 'extension' not in jupytext_format:
+        raise JupytextFormatError('Missing format extension')
+    ext = jupytext_format['extension']
+    if ext not in NOTEBOOK_EXTENSIONS + ['.auto']:
+        raise JupytextFormatError("Extension '{}' is not a notebook extension. Please use one of '{}'.".format(
+            ext, "', '".join(NOTEBOOK_EXTENSIONS + ['.auto'])))
+
+
+def set_auto_ext(jupytext_formats, metadata):
+    """Expend the format definition, and replaces extension .auto with that from the metadata"""
+    jupytext_formats = long_form_multiple_formats(jupytext_formats)
+    ext = auto_ext_from_metadata(metadata)
+
+    for fmt in jupytext_formats:
+        if fmt['extension'] == '.auto':
+            if not ext:
+                raise ValueError('No kernel information found, cannot save to .auto extension')
+            fmt['extension'] = ext
+
+    return jupytext_formats
+
+
+def identical_format_path(fmt1, fmt2):
+    """Do the two (long representation) of formats target the same file?"""
+    for key in ['extension', 'prefix', 'suffix']:
+        if fmt1.get(key) != fmt2.get(key):
+            return False
+    return True
 
 
 # TODO: remove this function

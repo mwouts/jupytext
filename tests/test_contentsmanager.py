@@ -131,7 +131,7 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_nbpy = 'notebook.nb.py'
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = 'ipynb,nb.py'
+    cm.default_jupytext_formats = 'ipynb,.nb.py'
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
@@ -213,7 +213,7 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     tmp_nbpy = 'notebook.nb.py'
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = 'ipynb'
+    cm.default_jupytext_formats = 'ipynb,.nb.py'
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
@@ -232,7 +232,7 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
-    # rename nbpy
+    # rename notebook.nb.py to new.nb.py
     cm.rename(tmp_nbpy, 'new.nb.py')
     assert not os.path.isfile(str(tmpdir.join(tmp_ipynb)))
     assert not os.path.isfile(str(tmpdir.join(tmp_nbpy)))
@@ -240,13 +240,13 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     assert os.path.isfile(str(tmpdir.join('new.ipynb')))
     assert os.path.isfile(str(tmpdir.join('new.nb.py')))
 
-    # rename ipynb
+    # rename new.ipynb to notebook.ipynb
     cm.rename('new.ipynb', tmp_ipynb)
     assert os.path.isfile(str(tmpdir.join(tmp_ipynb)))
-    assert not os.path.isfile(str(tmpdir.join(tmp_nbpy)))
+    assert os.path.isfile(str(tmpdir.join(tmp_nbpy)))
 
     assert not os.path.isfile(str(tmpdir.join('new.ipynb')))
-    assert os.path.isfile(str(tmpdir.join('new.nb.py')))
+    assert not os.path.isfile(str(tmpdir.join('new.nb.py')))
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
@@ -255,7 +255,7 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     tmp_nbpy = u'notebôk.nb.py'
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = 'ipynb'
+    cm.default_jupytext_formats = 'ipynb,.nb.py'
     tmpdir = u'' + str(tmpdir)
     cm.root_dir = tmpdir
 
@@ -275,7 +275,7 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
-    # rename nbpy
+    # rename notebôk.nb.py to nêw.nb.py
     cm.rename(tmp_nbpy, u'nêw.nb.py')
     assert not os.path.isfile(os.path.join(tmpdir, tmp_ipynb))
     assert not os.path.isfile(os.path.join(tmpdir, tmp_nbpy))
@@ -283,13 +283,13 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     assert os.path.isfile(os.path.join(tmpdir, u'nêw.ipynb'))
     assert os.path.isfile(os.path.join(tmpdir, u'nêw.nb.py'))
 
-    # rename ipynb
+    # rename nêw.ipynb to notebôk.ipynb
     cm.rename(u'nêw.ipynb', tmp_ipynb)
     assert os.path.isfile(os.path.join(tmpdir, tmp_ipynb))
-    assert not os.path.isfile(os.path.join(tmpdir, tmp_nbpy))
+    assert os.path.isfile(os.path.join(tmpdir, tmp_nbpy))
 
     assert not os.path.isfile(os.path.join(tmpdir, u'nêw.ipynb'))
-    assert os.path.isfile(os.path.join(tmpdir, u'nêw.nb.py'))
+    assert not os.path.isfile(os.path.join(tmpdir, u'nêw.nb.py'))
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
@@ -402,7 +402,7 @@ def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     nb = jupytext.readf(nb_file)
-    nb['metadata']['jupytext'] = {'formats': 'ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx'}
+    nb['metadata']['jupytext'] = {'formats': 'ipynb,.pct.py:percent,.lgt.py:light,.spx.py:sphinx'}
 
     # save to ipynb and three python flavors
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
@@ -410,28 +410,24 @@ def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
 
     # read files
     with open(str(tmpdir.join(tmp_pct_py))) as stream:
-        assert read_format_from_metadata(stream.read(), 'pct.py') == 'percent'
+        assert read_format_from_metadata(stream.read(), '.py') == 'percent'
 
     with open(str(tmpdir.join(tmp_lgt_py))) as stream:
-        assert read_format_from_metadata(stream.read(), 'lgt.py') == 'light'
+        assert read_format_from_metadata(stream.read(), '.py') == 'light'
 
     with open(str(tmpdir.join(tmp_spx_py))) as stream:
-        assert read_format_from_metadata(stream.read(), 'spx.py') == 'sphinx'
+        assert read_format_from_metadata(stream.read(), '.py') == 'sphinx'
 
     model = cm.get(path=tmp_pct_py)
-    assert model['name'] == 'notebook.pct'
     compare_notebooks(nb, model['content'])
 
     model = cm.get(path=tmp_lgt_py)
-    assert model['name'] == 'notebook.lgt'
     compare_notebooks(nb, model['content'])
 
     model = cm.get(path=tmp_spx_py)
-    assert model['name'] == 'notebook.spx'
     # (notebooks not equal as we insert %matplotlib inline in sphinx)
 
     model = cm.get(path=tmp_ipynb)
-    assert model['name'] == 'notebook.ipynb'
     compare_notebooks(nb, model['content'])
 
 
@@ -652,8 +648,8 @@ def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
 
     # create contents manager with default load format as percent
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = 'ipynb,pct.auto,lgt.auto'
-    cm.preferred_jupytext_formats_save = 'pct.auto:percent,lgt.auto:light'
+    cm.default_jupytext_formats = 'ipynb,.pct.auto,.lgt.auto'
+    cm.preferred_jupytext_formats_save = '.pct.auto:percent,.lgt.auto:light'
     cm.root_dir = str(tmpdir)
 
     # save notebook
