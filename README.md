@@ -181,17 +181,17 @@ Jupytext does not offer a merge driver. If a conflict occurs, solve it on the te
 Manipulate notebooks in a Python shell or script using `jupytext`'s main functions:
 
 ```python
-# Read notebook from file, given format name (guess format when `format_name` is None)
-readf(nb_file, format_name=None)
+# Read a notebook from a file. Format can be any of 'py', 'md', 'jl:percent', ...
+readf(nb_file, fmt=None)
 
-# Read notebook from text, given extension and format name
-reads(text, ext, format_name=None, [...])
+# Read a notebook from a string. Here, format should contain at least the file extension.
+reads(text, fmt)
 
-# Return the text representation for the notebook, given extension and format name
-writes(notebook, ext, format_name=None, [...])
+# Return the text representation for a notebook in the desired format.
+writes(notebook, fmt)
 
-# Write notebook to file in desired format
-writef(notebook, nb_file, format_name=None)
+# Write a notebook to a file in the desired format.
+writef(notebook, nb_file, fmt=None)
 ```
 
 ## Round-trip conversion
