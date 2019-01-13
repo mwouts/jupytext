@@ -13,8 +13,6 @@ from jupytext.formats import read_format_from_metadata, auto_ext_from_metadata
 from .utils import list_notebooks
 from .utils import skip_if_dict_is_not_ordered
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 def test_create_contentsmanager():
     jupytext.TextFileContentsManager()

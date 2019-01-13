@@ -5,13 +5,11 @@ import pytest
 from testfixtures import compare
 import mock
 from nbformat.v4.nbbase import new_notebook
-from jupytext import header, __version__
+from jupytext import __version__
 from jupytext import readf, writef, writes
 from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext, system
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
-
-header.INSERT_AND_CHECK_VERSION_NUMBER = False
 
 
 def test_cli_no_argument():

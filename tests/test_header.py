@@ -5,8 +5,6 @@ import jupytext
 from jupytext.header import uncomment_line, header_to_metadata_and_cell, metadata_and_cell_to_header
 from jupytext.formats import get_format_implementation
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 def test_uncomment():
     assert uncomment_line('# line one', '#') == 'line one'
