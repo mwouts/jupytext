@@ -26,13 +26,15 @@ class BaseCellExporter(object):
     default_comment_magics = None
     parse_cell_language = True
 
-    def __init__(self, cell, default_language, fmt={}):
-        self.fmt = fmt
-        self.ext = fmt.get('extension')
+    def __init__(self, cell, default_language, fmt=None):
+        self.fmt = fmt or {}
+        self.ext = self.fmt.get('extension')
         self.cell_type = cell.cell_type
         self.source = cell_source(cell)
         self.unfiltered_metadata = cell.metadata
-        self.metadata = filter_metadata(copy(cell.metadata), fmt.get('cell_metadata_filter'), _IGNORE_CELL_METADATA)
+        self.metadata = filter_metadata(copy(cell.metadata),
+                                        self.fmt.get('cell_metadata_filter'),
+                                        _IGNORE_CELL_METADATA)
         self.language, magic_args = cell_language(self.source) if self.parse_cell_language else (None, None)
 
         if self.language:
@@ -50,7 +52,8 @@ class BaseCellExporter(object):
         self.language = self.language or default_language
         self.default_language = default_language
         self.comment = _SCRIPT_EXTENSIONS.get(self.ext, {}).get('comment', '#')
-        self.comment_magics = fmt['comment_magics'] if 'comment_magics' in fmt else self.default_comment_magics
+        self.comment_magics = self.fmt['comment_magics'] if 'comment_magics' in self.fmt \
+            else self.default_comment_magics
 
         # how many blank lines before next cell
         self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', 1)

@@ -168,10 +168,10 @@ def read(file_or_stream, fmt, as_version=4, **kwargs):
     return reads(file_or_stream.read(), fmt, **kwargs)
 
 
-def readf(nb_file, fmt={}):
+def readf(nb_file, fmt=None):
     """Read a notebook from the file with given name"""
     _, ext = os.path.splitext(nb_file)
-    fmt = copy(fmt)
+    fmt = copy(fmt or {})
     fmt.update({'extension': ext})
     with io.open(nb_file, encoding='utf-8') as stream:
         return read(stream, fmt, as_version=4)
@@ -203,10 +203,10 @@ def write(notebook, file_or_stream, fmt, version=nbformat.NO_CONVERT, **kwargs):
     file_or_stream.write(writes(notebook, fmt, version, **kwargs))
 
 
-def writef(notebook, nb_file, fmt={}):
+def writef(notebook, nb_file, fmt=None):
     """Write a notebook to the file with given name"""
     _, ext = os.path.splitext(nb_file)
-    fmt = copy(fmt)
+    fmt = copy(fmt or {})
     fmt.update({'extension': ext})
     with io.open(nb_file, 'w', encoding='utf-8') as stream:
         write(notebook, stream, fmt)

@@ -9,6 +9,7 @@ import argparse
 import json
 from .jupytext import readf, reads, writef, writes
 from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version, one_format_as_string, parse_one_format
+from .formats import _fmt_from_ext_and_format_name
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
 from .languages import _SCRIPT_EXTENSIONS
@@ -71,7 +72,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
         if nb_file == sys.stdin:
             dest = None
             current_ext, _ = parse_one_format(input_format)
-            notebook = reads(nb_file.read(), ext=current_ext, format_name=format_name)
+            notebook = reads(nb_file.read(), _fmt_from_ext_and_format_name(current_ext, format_name))
         else:
             dest, current_ext = os.path.splitext(nb_file)
             notebook = None

@@ -498,8 +498,8 @@ def identical_format_path(fmt1, fmt2):
 
 
 # TODO: remove this function
-def _fmt_from_ext_and_format_name(ext, format_name, format_options={}):
-    fmt = copy(format_options)
+def _fmt_from_ext_and_format_name(ext, format_name, format_options=None):
+    fmt = copy(format_options) if format_options else {}
     if format_name:
         fmt['format_name'] = format_name
     if ext.rfind('.'):

@@ -51,6 +51,24 @@ def jupytext_formats_from_metadata(metadata, ext):
     return True
 
 
+def preferred_format(incomplete_format, preferred_formats):
+    """Return the preferred format for the given extension"""
+    incomplete_format = long_form_one_format(incomplete_format)
+    if 'format_name' in incomplete_format:
+        return incomplete_format
+
+    for fmt in long_form_multiple_formats(preferred_formats):
+        if ((incomplete_format['extension'] == fmt['extension'] or (
+                fmt['extension'] == '.auto' and
+                incomplete_format['extension'] not in ['.md', '.Rmd', '.ipynb'])) and
+                incomplete_format.get('suffix') == fmt.get('suffix') and
+                incomplete_format.get('prefix') == fmt.get('prefix')):
+            fmt.update(incomplete_format)
+            return fmt
+
+    return incomplete_format
+
+
 def _jupytext_writes(fmt):
     def _writes(nbk, version=nbformat.NO_CONVERT, **kwargs):
         return jupytext.writes(nbk, fmt, version=version, **kwargs)
@@ -149,58 +167,42 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         if path not in self.paired_notebooks:
             return
 
-        for alt_path, fmt in self.paired_notebooks.pop(path):
+        for alt_path, _ in self.paired_notebooks.pop(path):
             if alt_path in self.paired_notebooks:
                 self.drop_paired_notebook(alt_path)
 
-    def update_paired_notebooks(self, path, paired_paths):
+    def update_paired_notebooks(self, path, new_paired_paths):
         """Update the list of paired notebooks to include/update the current pair"""
-        if not paired_paths or len(paired_paths) <= 1:
+        if not new_paired_paths or len(new_paired_paths) <= 1:
             self.drop_paired_notebook(path)
             return
 
-        for alt_path, fmt in paired_paths:
+        for alt_path, _ in new_paired_paths:
             self.drop_paired_notebook(alt_path)
 
-        for alt_path, fmt in paired_paths:
-            self.paired_notebooks[alt_path] = paired_paths
+        for alt_path, _ in new_paired_paths:
+            self.paired_notebooks[alt_path] = new_paired_paths
 
-    def set_default_format_options(self, nb):
+    def set_default_format_options(self, metadata):
         """Set default format option"""
-        if self.comment_magics is not None and 'comment_magics' not in nb.metadata.get('jupytext', {}):
-            nb.metadata.setdefault('jupytext', {})['comment_magics'] = self.comment_magics
-        if self.split_at_heading and 'split_at_heading' not in nb.metadata.get('jupytext', {}):
-            nb.metadata.setdefault('jupytext', {})['split_at_heading'] = True
-
-    def preferred_format(self, incomplete_format, preferred_formats):
-        """Return the preferred format for the given extension"""
-        incomplete_format = long_form_one_format(incomplete_format)
-        if 'format_name' in incomplete_format:
-            return incomplete_format
-
-        for preferred_format in long_form_multiple_formats(preferred_formats):
-            if (incomplete_format['extension'] == preferred_format['extension'] or
-                    (preferred_format['extension'] == '.auto' and
-                     incomplete_format['extension'] not in ['.md', '.Rmd', '.ipynb'])):
-                if (incomplete_format.get('suffix') == preferred_format.get('suffix') and
-                        incomplete_format.get('prefix') == preferred_format.get('prefix')):
-                    preferred_format.update(incomplete_format)
-                    return preferred_format
-
-        return incomplete_format
+        if self.comment_magics is not None and 'comment_magics' not in metadata.get('jupytext', {}):
+            metadata.setdefault('jupytext', {})['comment_magics'] = self.comment_magics
+        if self.split_at_heading and 'split_at_heading' not in metadata.get('jupytext', {}):
+            metadata.setdefault('jupytext', {})['split_at_heading'] = True
 
     def save(self, model, path=''):
         """Save the file model and return the model with no content."""
         if model['type'] != 'notebook':
-            return super(TextFileContentsManager, self).save(model, path)
+            super(TextFileContentsManager, self).save(model, path)
+            return
 
-        nb = model['content']
+        nbk = model['content']
         try:
-            rearrange_jupytext_metadata(nb.metadata)
-            self.set_default_format_options(nb)
-            jupytext_formats = nb.metadata.get('jupytext', {}).get('formats', self.default_jupytext_formats)
+            rearrange_jupytext_metadata(nbk.metadata)
+            self.set_default_format_options(nbk.metadata)
+            jupytext_formats = nbk.metadata.get('jupytext', {}).get('formats', self.default_jupytext_formats)
             if not jupytext_formats:
-                text_representation = nb.metadata.get('jupytext', {}).get('text_representation', {})
+                text_representation = nbk.metadata.get('jupytext', {}).get('text_representation', {})
                 ext = os.path.splitext(path)[1]
                 fmt = {'extension': ext}
 
@@ -210,11 +212,10 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 jupytext_formats = [fmt]
 
             jupytext_formats = long_form_multiple_formats(jupytext_formats)
-            jupytext_formats = set_auto_ext(jupytext_formats, nb.metadata)
+            jupytext_formats = set_auto_ext(jupytext_formats, nbk.metadata)
 
             # Set preferred formats if not format name is given yet
-            jupytext_formats = [self.preferred_format(fmt, self.preferred_jupytext_formats_save)
-                                for fmt in jupytext_formats]
+            jupytext_formats = [preferred_format(fmt, self.preferred_jupytext_formats_save) for fmt in jupytext_formats]
 
             base, _ = find_base_path_and_format(path, jupytext_formats)
             self.update_paired_notebooks(path, paired_paths(path, jupytext_formats))
@@ -250,7 +251,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         if not self.exists(path) or (type != 'notebook' if type else ext not in self.all_nb_extensions()):
             return super(TextFileContentsManager, self).get(path, content, type, format)
 
-        fmt = self.preferred_format(ext, self.preferred_jupytext_formats_read)
+        fmt = preferred_format(ext, self.preferred_jupytext_formats_read)
         if ext == '.ipynb':
             model = self._notebook_model(path, content=content)
         else:
@@ -272,8 +273,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             return model
 
         # We will now read a second file if this is a paired notebooks.
-        nb = model['content']
-        jupytext_formats = nb.metadata.get('jupytext', {}).get('formats', self.default_jupytext_formats)
+        nbk = model['content']
+        jupytext_formats = nbk.metadata.get('jupytext', {}).get('formats', self.default_jupytext_formats)
         jupytext_formats = long_form_multiple_formats(jupytext_formats)
 
         # Compute paired notebooks from formats
@@ -281,8 +282,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             try:
                 _, _ = find_base_path_and_format(path, jupytext_formats)
                 alt_paths = paired_paths(path, jupytext_formats)
-            except InconsistentPath as e:
-                self.log.info("Unable to read paired notebook: %s", str(e))
+            except InconsistentPath as err:
+                self.log.info("Unable to read paired notebook: %s", str(err))
                 alt_paths = []
             self.update_paired_notebooks(path, alt_paths)
         else:
@@ -352,15 +353,15 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         if model_outputs:
             combine_inputs_with_outputs(model['content'], model_outputs['content'])
         elif not path.endswith('.ipynb'):
-            nb = model['content']
-            language = nb.metadata.get('jupytext', {}).get('main_language', 'python')
-            if 'kernelspec' not in nb.metadata and language != 'python':
+            nbk = model['content']
+            language = nbk.metadata.get('jupytext', {}).get('main_language', 'python')
+            if 'kernelspec' not in nbk.metadata and language != 'python':
                 kernelspec = kernelspec_from_language(language)
                 if kernelspec:
-                    nb.metadata['kernelspec'] = kernelspec
+                    nbk.metadata['kernelspec'] = kernelspec
 
-            self.notary.sign(nb)
-            self.mark_trusted_cells(nb, path)
+            self.notary.sign(nbk)
+            self.mark_trusted_cells(nbk, path)
 
         # Path and name of the notebook is the one of the original path
         model['path'] = org_model['path']
@@ -371,7 +372,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
     def trust_notebook(self, path):
         """Trust the current notebook"""
         if path.endswith('.ipynb'):
-            return super(TextFileContentsManager, self).trust_notebook(path)
+            super(TextFileContentsManager, self).trust_notebook(path)
+            return
 
         for alt_path, fmt in self.paired_notebooks.get(path):
             if fmt['extension'] == '.ipynb':
@@ -391,7 +393,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 break
 
         if not fmt:
-            return super(TextFileContentsManager, self).rename_file(old_path, new_path)
+            super(TextFileContentsManager, self).rename_file(old_path, new_path)
+            return
 
         # Is the new file name consistent with suffix?
         try:
