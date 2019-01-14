@@ -1,5 +1,6 @@
 import pytest
-from jupytext.formats import guess_format, read_format_from_metadata
+from testfixtures import compare
+from jupytext.formats import guess_format, read_format_from_metadata, rearrange_jupytext_metadata
 from .utils import list_notebooks
 
 
@@ -53,3 +54,11 @@ jupyter:
       jupytext_version: 0.8.0
 ---"""):
     assert read_format_from_metadata(script, '.Rmd') is None
+
+
+def test_rearrange_jupytext_metadata_metadata_filter():
+    metadata = {'jupytext': {'metadata_filter': {'notebook': {'additional': ['one', 'two'], 'excluded': 'all'},
+                                                 'cells': {'additional': 'all', 'excluded': ['three', 'four']}}}}
+    rearrange_jupytext_metadata(metadata)
+    compare({'jupytext': {'notebook_metadata_filter': 'one,two,-all',
+                          'cell_metadata_filter': 'all,-three,-four'}}, metadata)

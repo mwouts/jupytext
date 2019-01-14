@@ -389,14 +389,14 @@ def rearrange_jupytext_metadata(metadata):
         jupytext_metadata['cell_metadata_filter'] = filters['cells']
 
     for filter_level in ['notebook_metadata_filter', 'cell_metadata_filter']:
-        if isinstance(filters.get(filter_level), dict):
-            additional = filters.get(filter_level).get('additional', [])
+        if isinstance(jupytext_metadata.get(filter_level), dict):
+            additional = jupytext_metadata.get(filter_level).get('additional', [])
             if additional == 'all':
                 entries = ['all']
             else:
                 entries = additional
 
-            excluded = filters.get(filter_level).get('excluded', [])
+            excluded = jupytext_metadata.get(filter_level).get('excluded', [])
             if excluded == 'all':
                 entries.append('-all')
             else:
