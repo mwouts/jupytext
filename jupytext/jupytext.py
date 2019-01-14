@@ -132,13 +132,7 @@ def reads(text, fmt, as_version=4, **kwargs):
     if ext == '.ipynb':
         return nbformat.reads(text, as_version, **kwargs)
 
-    format_name = read_format_from_metadata(text, ext) or fmt.get('format_name')
-
-    if not format_name:
-        format_name = guess_format(text, ext)
-        # TODO: remove this. (Drop the option when writing the notebook)
-        if format_name == 'sphinx' and fmt.get('rst2md'):
-            format_name = 'sphinx-rst2md'
+    format_name = read_format_from_metadata(text, ext) or fmt.get('format_name') or guess_format(text, ext)
 
     if format_name:
         fmt['format_name'] = format_name
@@ -148,10 +142,6 @@ def reads(text, fmt, as_version=4, **kwargs):
     rearrange_jupytext_metadata(notebook.metadata)
 
     if format_name and insert_or_test_version_number():
-        # TODO: remove this
-        if format_name == 'sphinx-rst2md' and fmt.get('rst2md'):
-            format_name = 'sphinx'
-        update_jupytext_formats_metadata(notebook, ext, format_name)
         notebook.metadata.setdefault('jupytext', {}).setdefault('text_representation', {}).update(
             {'extension': ext, 'format_name': format_name})
 
