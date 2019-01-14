@@ -492,14 +492,6 @@ def set_auto_ext(jupytext_formats, metadata):
     return jupytext_formats
 
 
-def identical_format_path(fmt1, fmt2):
-    """Do the two (long representation) of formats target the same file?"""
-    for key in ['extension', 'prefix', 'suffix']:
-        if fmt1.get(key) != fmt2.get(key):
-            return False
-    return True
-
-
 # TODO: remove this function
 def _fmt_from_ext_and_format_name(ext, format_name, format_options=None):
     fmt = copy(format_options) if format_options else {}

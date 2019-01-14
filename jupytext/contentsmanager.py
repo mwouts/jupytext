@@ -37,20 +37,6 @@ def kernelspec_from_language(language):
     return None
 
 
-def jupytext_formats_from_metadata(metadata, ext):
-    """Are the paired formats stored in the metadata in the text representation?"""
-    if ext == '.ipynb':
-        return True
-
-    notebook_metadata_filter = metadata_filter_as_dict(metadata.get('jupytext', {}).get('notebook_metadata_filter', ''))
-    if 'jupytext' in notebook_metadata_filter.get('additional', []):
-        return True
-    excluded = notebook_metadata_filter.get('excluded', [])
-    if 'jupytext' in excluded or excluded == 'all':
-        return False
-    return True
-
-
 def preferred_format(incomplete_format, preferred_formats):
     """Return the preferred format for the given extension"""
     incomplete_format = long_form_one_format(incomplete_format)
