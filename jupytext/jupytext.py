@@ -84,8 +84,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         lines.extend(metadata_and_cell_to_header(nb, self.implementation, self.ext))
 
         cell_exporters = []
-        looking_for_first_markdown_cell = self.implementation.format_name and \
-                                          self.implementation.format_name.startswith('sphinx')
+        looking_for_first_markdown_cell = (self.implementation.format_name and
+                                           self.implementation.format_name.startswith('sphinx'))
         split_at_heading = self.fmt.get('split_at_heading', False)
 
         for cell in nb.cells:

@@ -37,7 +37,7 @@ def test_read_text_and_combine_with_outputs(tmpdir):
         fp.write("""# ---
 # jupyter:
 #   jupytext_formats: ipynb,py:light
-# --- 
+# ---
 
 1+1
 

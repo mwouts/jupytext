@@ -555,7 +555,7 @@ notebook.nbextensions.install_nbextension('jupytext.js', user=True)'''),
                                    new_code_cell('''%%javascript
 Jupyter.utils.load_extensions('jupytext')''')],
                             metadata={'jupytext': {'notebook_metadata_filter': '-all',
-                                                   'cell_metadata_filter':'-all'}})
+                                                   'cell_metadata_filter': '-all'}})
     text = jupytext.writes(notebook, 'py')
     notebook2 = jupytext.reads(text, 'py')
     compare_notebooks(notebook, notebook2)
