@@ -36,6 +36,13 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
         if key not in nb_outputs_filtered_metadata:
             nb_source.metadata[key] = nb_outputs.metadata[key]
 
+    if nb_source.metadata.get('jupytext', {}).get('formats') or ext in ['.md', '.Rmd'] or not \
+            nb_source.metadata.get('jupytext', {}).get('text_representation', {}).get('format_name'):
+        nb_source.metadata.get('jupytext', {}).pop('text_representation', None)
+
+    if not nb_source.metadata.get('jupytext', {}):
+        nb_source.metadata.pop('jupytext', {})
+
     for cell in nb_source.cells:
         # Remove outputs to warranty that trust of returned notebook is that of second notebook
         if cell.cell_type == 'code':
