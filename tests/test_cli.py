@@ -147,13 +147,12 @@ def test_combine_same_version_ok(tmpdir):
     nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
     writef(nb, tmp_ipynb)
 
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        # to jupyter notebook
-        jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
-        # test round trip
-        jupytext(args=[tmp_nbpy, '--to', 'notebook', '--test'])
-        # test ipynb to rmd
-        jupytext(args=[tmp_ipynb, '--to', 'rmarkdown'])
+    # to jupyter notebook
+    jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
+    # test round trip
+    jupytext(args=[tmp_nbpy, '--to', 'notebook', '--test'])
+    # test ipynb to rmd
+    jupytext(args=[tmp_ipynb, '--to', 'rmarkdown'])
 
     nb = readf(tmp_ipynb)
     cells = nb['cells']
@@ -186,8 +185,7 @@ def test_combine_lower_version_raises(tmpdir):
     writef(nb, tmp_ipynb)
 
     with pytest.raises(SystemExit):
-        with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-            jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
+        jupytext(args=[tmp_nbpy, '--to', 'ipynb', '--update'])
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
@@ -209,8 +207,7 @@ def test_convert_to_percent_format(nb_file, tmpdir):
 
     copyfile(nb_file, tmp_ipynb)
 
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        jupytext(['--to', 'py:percent', tmp_ipynb])
+    jupytext(['--to', 'py:percent', tmp_ipynb])
 
     with open(tmp_nbpy) as stream:
         py_script = stream.read()
@@ -229,8 +226,7 @@ def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
 
     copyfile(nb_file, tmp_ipynb)
 
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        jupytext(['--to', 'py:percent', '--comment-magics', 'no', tmp_ipynb])
+    jupytext(['--to', 'py:percent', '--comment-magics', 'no', tmp_ipynb])
 
     with open(tmp_nbpy) as stream:
         py_script = stream.read()
@@ -372,15 +368,13 @@ def test_update_metadata(py_file, tmpdir, capsys):
 
     copyfile(py_file, tmp_py)
 
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"jupytext":{"formats":"ipynb,py:light"}}'])
+    jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"jupytext":{"formats":"ipynb,py:light"}}'])
 
     nb = readf(tmp_ipynb)
     assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
     assert 'text_representation' in nb.metadata['jupytext']
 
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"jupytext":{"text_representation":null}}'])
+    jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"jupytext":{"text_representation":null}}'])
 
     nb = readf(tmp_ipynb)
     assert 'text_representation' not in nb.metadata['jupytext']

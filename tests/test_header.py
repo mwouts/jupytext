@@ -72,7 +72,8 @@ def test_metadata_and_cell_to_header():
     nb = new_notebook(
         metadata={'jupytext': {'mainlanguage': 'python'}},
         cells=[new_raw_cell(source="---\ntitle: Sample header\n---", metadata={'noskipline': True})])
-    header = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        header = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
     assert '\n'.join(header) == """---
 title: Sample header
 jupyter:
@@ -84,18 +85,17 @@ jupyter:
 
 def test_metadata_and_cell_to_header2():
     nb = new_notebook(cells=[new_markdown_cell(source="Some markdown\ntext")])
-    header = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        header = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
     assert header == []
     assert len(nb.cells) == 1
 
 
 def test_notebook_from_plain_script_has_metadata_filter(script="""print('Hello world")
 """):
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        nb = jupytext.reads(script, '.py')
+    nb = jupytext.reads(script, '.py')
     assert nb.metadata.get('jupytext', {}).get('notebook_metadata_filter') == '-all'
     assert nb.metadata.get('jupytext', {}).get('cell_metadata_filter') == '-all'
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        scripts2 = jupytext.writes(nb, '.py')
+    scripts2 = jupytext.writes(nb, '.py')
 
     compare(script, scripts2)

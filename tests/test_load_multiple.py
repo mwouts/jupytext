@@ -4,8 +4,6 @@ from tornado.web import HTTPError
 from nbformat.v4.nbbase import new_notebook
 import jupytext
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 def test_combine_same_version_ok(tmpdir):
     tmp_ipynb = 'notebook.ipynb'
@@ -28,8 +26,7 @@ def test_combine_same_version_ok(tmpdir):
     cm.default_jupytext_formats = 'ipynb,py'
     cm.root_dir = str(tmpdir)
 
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        nb = cm.get(tmp_ipynb)
+    nb = cm.get(tmp_ipynb)
     cells = nb['content']['cells']
     assert len(cells) == 1
     assert cells[0].cell_type == 'markdown'

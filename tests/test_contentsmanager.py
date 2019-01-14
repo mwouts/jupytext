@@ -3,7 +3,6 @@
 import os
 import time
 import pytest
-import mock
 from tornado.web import HTTPError
 from testfixtures import compare
 import jupytext
@@ -74,9 +73,10 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
     # open ipynb, save with cm, reopen
     nb = jupytext.readf(nb_file)
     nb.metadata['jupytext'] = {'formats': 'ipynb,md'}
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
-        nb_md = cm.get(tmp_md)
+
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    nb_md = cm.get(tmp_md)
+
     compare_notebooks(nb, nb_md['content'], ext='.md')
     assert nb_md['content'].metadata['jupytext']['formats'] == 'ipynb,md'
 
@@ -343,10 +343,9 @@ def test_load_save_percent_format(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # open python, save
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        nb = cm.get(tmp_py)['content']
-        del nb.metadata['jupytext']['notebook_metadata_filter']
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
+    nb = cm.get(tmp_py)['content']
+    del nb.metadata['jupytext']['notebook_metadata_filter']
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_py)
 
     # compare the new file with original one
     with open(str(tmpdir.join(tmp_py))) as stream:
@@ -376,8 +375,7 @@ def test_save_to_percent_format(nb_file, tmpdir):
     nb['metadata']['jupytext'] = {'formats': 'ipynb,jl'}
 
     # save to ipynb and jl
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # read jl file
     with open(str(tmpdir.join(tmp_jl))) as stream:
@@ -403,8 +401,7 @@ def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     nb['metadata']['jupytext'] = {'formats': 'ipynb,.pct.py:percent,.lgt.py:light,.spx.py:sphinx'}
 
     # save to ipynb and three python flavors
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # read files
     with open(str(tmpdir.join(tmp_pct_py))) as stream:
@@ -443,8 +440,7 @@ def test_pair_notebook_with_dot(nb_file, tmpdir):
     nb['metadata']['jupytext'] = {'formats': 'ipynb,py:percent'}
 
     # save to ipynb and three python flavors
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     assert os.path.isfile(str(tmpdir.join(tmp_ipynb)))
 
@@ -474,8 +470,7 @@ def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
     # load notebook and save it using the cm
     nb = jupytext.readf(nb_file)
     nb['metadata']['jupytext'] = {'formats': 'ipynb,py'}
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # Saving does not update the metadata, as 'save' makes a copy of the notebook
     # assert nb['metadata']['jupytext']['formats'] == 'ipynb,py:light'
@@ -484,8 +479,7 @@ def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
     cm.preferred_jupytext_formats_read = 'py:percent'
 
     # Read notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        model = cm.get(tmp_nbpy)
+    model = cm.get(tmp_nbpy)
 
     # Check that format is explicit
     assert model['content']['metadata']['jupytext']['formats'] == 'ipynb,py:light'
@@ -496,12 +490,10 @@ def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
     # Change save format and save
     model['content']['metadata']['jupytext']['formats'] == 'ipynb,py'
     cm.preferred_jupytext_formats_save = 'py:percent'
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # Read notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        model = cm.get(tmp_nbpy)
+    model = cm.get(tmp_nbpy)
     compare_notebooks(nb, model['content'])
 
     # Check that format is explicit
@@ -521,8 +513,7 @@ def test_preferred_formats_read_auto(tmpdir):
     cm.root_dir = str(tmpdir)
 
     # load notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        model = cm.get(tmp_py)
+    model = cm.get(tmp_py)
 
     # check that script is opened as percent
     assert 'percent' == model['content']['metadata']['jupytext']['text_representation']['format_name']
@@ -548,16 +539,14 @@ def test_save_in_auto_extension_global(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # save notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # check that text representation exists, and is in percent format
     with open(str(tmpdir.join(tmp_script))) as stream:
         assert read_format_from_metadata(stream.read(), auto_ext) == 'percent'
 
     # reload and compare with original notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        model = cm.get(path=tmp_script)
+    model = cm.get(path=tmp_script)
 
     # saving should not create a format entry #95
     assert 'formats' not in model['content'].metadata.get('jupytext', {})
@@ -584,16 +573,14 @@ def test_save_in_auto_extension_global_with_format(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # save notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # check that text representation exists, and is in percent format
     with open(str(tmpdir.join(tmp_script))) as stream:
         assert read_format_from_metadata(stream.read(), auto_ext) == 'percent'
 
     # reload and compare with original notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        model = cm.get(path=tmp_script)
+    model = cm.get(path=tmp_script)
 
     # saving should not create a format entry #95
     assert 'formats' not in model['content'].metadata.get('jupytext', {})
@@ -618,16 +605,14 @@ def test_save_in_auto_extension_local(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # save notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # check that text representation exists, and is in percent format
     with open(str(tmpdir.join(tmp_script))) as stream:
         assert read_format_from_metadata(stream.read(), auto_ext) == 'percent'
 
     # reload and compare with original notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        model = cm.get(path=tmp_script)
+    model = cm.get(path=tmp_script)
 
     compare_notebooks(nb, model['content'])
 
@@ -651,8 +636,7 @@ def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # save notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # check that text representation exists in percent format
     with open(str(tmpdir.join(tmp_pct_script))) as stream:
@@ -674,8 +658,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # save notebook to tmpdir
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # set config
     cm.default_jupytext_formats = 'ipynb,py'
@@ -683,19 +666,16 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     cm.default_cell_metadata_filter = '-all'
 
     # load notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        nb = cm.get(tmp_ipynb)['content']
+    nb = cm.get(tmp_ipynb)['content']
 
     assert nb.metadata['jupytext']['cell_metadata_filter'] == '-all'
     assert nb.metadata['jupytext']['notebook_metadata_filter'] == 'jupytext,-all'
 
     # save notebook again
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     # read text version
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        nb2 = jupytext.readf(str(tmpdir.join(tmp_script)))
+    nb2 = jupytext.readf(str(tmpdir.join(tmp_script)))
 
     # test no metadata
     assert set(nb2.metadata.keys()) <= {'jupytext'}
@@ -703,7 +683,6 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
         assert not cell.metadata
 
     # read paired notebook
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', True):
-        nb3 = cm.get(tmp_script)['content']
+    nb3 = cm.get(tmp_script)['content']
 
     compare_notebooks(nb, nb3)
