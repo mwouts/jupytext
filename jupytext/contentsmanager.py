@@ -193,16 +193,16 @@ class TextFileContentsManager(FileContentsManager, Configurable):
     def save(self, model, path=''):
         """Save the file model and return the model with no content."""
         if model['type'] != 'notebook':
-            super(TextFileContentsManager, self).save(model, path)
-            return
+            return super(TextFileContentsManager, self).save(model, path)
 
         nbk = model['content']
         try:
-            rearrange_jupytext_metadata(nbk.metadata)
-            self.set_default_format_options(nbk.metadata)
-            jupytext_formats = nbk.metadata.get('jupytext', {}).get('formats', self.default_jupytext_formats)
+            metadata = nbk.get('metadata')
+            rearrange_jupytext_metadata(metadata)
+            self.set_default_format_options(metadata)
+            jupytext_formats = metadata.get('jupytext', {}).get('formats', self.default_jupytext_formats)
             if not jupytext_formats:
-                text_representation = nbk.metadata.get('jupytext', {}).get('text_representation', {})
+                text_representation = metadata.get('jupytext', {}).get('text_representation', {})
                 ext = os.path.splitext(path)[1]
                 fmt = {'extension': ext}
 
@@ -212,7 +212,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 jupytext_formats = [fmt]
 
             jupytext_formats = long_form_multiple_formats(jupytext_formats)
-            jupytext_formats = set_auto_ext(jupytext_formats, nbk.metadata)
+            jupytext_formats = set_auto_ext(jupytext_formats, metadata)
 
             # Set preferred formats if not format name is given yet
             jupytext_formats = [preferred_format(fmt, self.preferred_jupytext_formats_save) for fmt in jupytext_formats]
@@ -221,13 +221,14 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             self.update_paired_notebooks(path, paired_paths(path, jupytext_formats))
 
             # Save as ipynb first
+            latest_result = None
             for fmt in jupytext_formats:
                 if fmt['extension'] != '.ipynb':
                     continue
 
                 alt_path = full_path(base, fmt)
                 self.log.info("Saving %s", os.path.basename(alt_path))
-                super(TextFileContentsManager, self).save(model, alt_path)
+                latest_result = super(TextFileContentsManager, self).save(model, alt_path)
 
             # And then to the other formats
             for fmt in jupytext_formats:
@@ -237,7 +238,9 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 alt_path = full_path(base, fmt)
                 self.log.info("Saving %s", os.path.basename(alt_path))
                 with mock.patch('nbformat.writes', _jupytext_writes(fmt)):
-                    super(TextFileContentsManager, self).save(model, alt_path)
+                    latest_result = super(TextFileContentsManager, self).save(model, alt_path)
+
+            return latest_result
 
         except JupytextFormatError as err:
             raise HTTPError(400, str(err))
