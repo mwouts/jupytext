@@ -33,7 +33,7 @@ def test_read_text_and_combine_with_outputs(tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_script = 'notebook.py'
 
-    with(open(tmpdir.join(tmp_script), 'w')) as fp:
+    with(open(str(tmpdir.join(tmp_script)), 'w')) as fp:
         fp.write("""# ---
 # jupyter:
 #   jupytext_formats: ipynb,py:light
@@ -46,7 +46,7 @@ def test_read_text_and_combine_with_outputs(tmpdir):
 3+3
 """)
 
-    with(open(tmpdir.join(tmp_ipynb), 'w')) as fp:
+    with(open(str(tmpdir.join(tmp_ipynb)), 'w')) as fp:
         fp.write("""{
  "cells": [
   {

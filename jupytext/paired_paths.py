@@ -18,11 +18,11 @@ def base_path(main_path, fmt):
 
     base, ext = os.path.splitext(main_path)
     if ext != fmt_ext:
-        raise InconsistentPath("Notebook path '{}' was expected to have extension '{}'".format(main_path, fmt_ext))
+        raise InconsistentPath(u"Notebook path '{}' was expected to have extension '{}'".format(main_path, fmt_ext))
 
     if suffix:
         if not base.endswith(suffix):
-            raise InconsistentPath("Notebook name '{}' was expected to end with suffix '{}'".format(base, suffix))
+            raise InconsistentPath(u"Notebook name '{}' was expected to end with suffix '{}'".format(base, suffix))
         base = base[:-len(suffix)]
 
     if prefix:
@@ -31,12 +31,12 @@ def base_path(main_path, fmt):
         sep = base[len(notebook_dir):-len(notebook_file_name)]
         if prefix_file_name:
             if not notebook_file_name.startswith(prefix_file_name):
-                raise InconsistentPath("Notebook name '{}' was expected to start with prefix '{}'"
+                raise InconsistentPath(u"Notebook name '{}' was expected to start with prefix '{}'"
                                        .format(notebook_file_name, prefix_file_name))
             notebook_file_name = notebook_file_name[len(prefix_file_name):]
         if prefix_dir:
             if not notebook_dir.endswith(prefix_dir):
-                raise InconsistentPath("Notebook directory '{}' was expected to end with directory prefix '{}'"
+                raise InconsistentPath(u"Notebook directory '{}' was expected to end with directory prefix '{}'"
                                        .format(notebook_dir, prefix_dir))
             notebook_dir = notebook_dir[:-len(prefix_dir)]
 
@@ -81,7 +81,7 @@ def find_base_path_and_format(main_path, formats):
         except InconsistentPath:
             continue
 
-    raise InconsistentPath("Path '{}' matches none of the export formats. "
+    raise InconsistentPath(u"Path '{}' matches none of the export formats. "
                            "Please make sure that jupytext.formats covers the current file "
                            "(e.g. add '{}' to the export formats)".format(main_path,
                                                                           os.path.splitext(main_path)[1][1:]))
@@ -99,6 +99,6 @@ def paired_paths(main_path, formats):
     paths = [full_path(base, fmt) for fmt in formats]
 
     if len(paths) > len(set(paths)):
-        raise InconsistentPath("Duplicate paired paths for this notebook. Please fix jupytext.formats.")
+        raise InconsistentPath(u"Duplicate paired paths for this notebook. Please fix jupytext.formats.")
 
     return list(zip(paths, formats))

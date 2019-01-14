@@ -415,7 +415,7 @@ def rearrange_jupytext_metadata(metadata):
 
 def long_form_one_format(jupytext_format):
     """Parse 'sfx.py:percent' into {'suffix':'sfx', 'extension':'py', 'format_name':'percent'}"""
-    if not isinstance(jupytext_format, str):
+    if isinstance(jupytext_format, dict):
         return jupytext_format
 
     if jupytext_format.find(':') >= 0:
@@ -440,7 +440,7 @@ def long_form_multiple_formats(jupytext_formats):
     if not jupytext_formats:
         return []
 
-    if isinstance(jupytext_formats, str):
+    if not isinstance(jupytext_formats, list):
         jupytext_formats = [fmt for fmt in jupytext_formats.split(',') if fmt]
 
     jupytext_formats = [long_form_one_format(fmt) for fmt in jupytext_formats]
@@ -469,8 +469,6 @@ def validate_one_format(jupytext_format):
         if key in _BINARY_FORMAT_OPTIONS:
             if not isinstance(value, bool):
                 raise JupytextFormatError("Format option '{}' should be a bool, not '{}'".format(key, str(value)))
-        elif not isinstance(value, str):
-            raise JupytextFormatError("Format option '{}' should be a string, not '{}'".format(key, str(value)))
 
     if 'extension' not in jupytext_format:
         raise JupytextFormatError('Missing format extension')
