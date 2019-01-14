@@ -335,8 +335,8 @@ def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default
     """Return the format name for that extension"""
 
     # Is the format information available in the text representation?
-    text_repr = metadata.get('jupytext', {}).get('text_representation')
-    if text_repr and text_repr.get('extension') == ext and text_repr.get('format_name'):
+    text_repr = metadata.get('jupytext', {}).get('text_representation', {})
+    if text_repr.get('extension', '').endswith(ext) and text_repr.get('format_name'):
         return text_repr.get('format_name')
 
     # Format from jupytext.formats
