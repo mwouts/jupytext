@@ -3,24 +3,14 @@
 #   jupytext:
 #     formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md,Rmd
 #     text_representation:
-#       extension: .pct.py
+#       extension: .py
 #       format_name: percent
-#       format_version: '1.1'
-#       jupytext_version: 0.8.4
+#       format_version: '1.2'
+#       jupytext_version: 1.0.0-dev
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
 #     name: python3
-#   language_info:
-#     codemirror_mode:
-#       name: ipython
-#       version: 3
-#     file_extension: .py
-#     mimetype: text/x-python
-#     name: python
-#     nbconvert_exporter: python
-#     pygments_lexer: ipython3
-#     version: 3.6.6
 # ---
 
 # %% [markdown]
