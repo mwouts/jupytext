@@ -199,6 +199,7 @@ def writef(notebook, nb_file, fmt=None):
     """Write a notebook to the file with given name"""
     _, ext = os.path.splitext(nb_file)
     fmt = copy(fmt or {})
+    fmt = long_form_one_format(fmt)
     fmt.update({'extension': ext})
     with io.open(nb_file, 'w', encoding='utf-8') as stream:
         write(notebook, stream, fmt)
