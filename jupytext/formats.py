@@ -404,6 +404,11 @@ def rearrange_jupytext_metadata(metadata):
 
             jupytext_metadata[filter_level] = ','.join(entries)
 
+    if jupytext_metadata.get('text_representation', {}).get('jupytext_version', '').startswith('0.'):
+        formats = jupytext_metadata.get('formats', '').split(',')
+        if formats:
+            jupytext_metadata['formats'] = ','.join(['.' + fmt if fmt.rfind('.') > 0 else fmt for fmt in formats])
+
     if jupytext_metadata:
         metadata['jupytext'] = jupytext_metadata
 

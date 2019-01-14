@@ -62,3 +62,11 @@ def test_rearrange_jupytext_metadata_metadata_filter():
     rearrange_jupytext_metadata(metadata)
     compare({'jupytext': {'notebook_metadata_filter': 'one,two,-all',
                           'cell_metadata_filter': 'all,-three,-four'}}, metadata)
+
+
+def test_rearrange_jupytext_metadata_add_dot_in_suffix():
+    metadata = {'jupytext': {'text_representation': {'jupytext_version': '0.8.6'},
+                             'formats': 'ipynb,pct.py,lgt.py'}}
+    rearrange_jupytext_metadata(metadata)
+    compare({'jupytext': {'text_representation': {'jupytext_version': '0.8.6'},
+                          'formats': 'ipynb,.pct.py,.lgt.py'}}, metadata)
