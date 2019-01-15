@@ -401,3 +401,38 @@ def test_paired_paths(nb_file, tmpdir, capsys):
 
     formats = nb.metadata.get('jupytext', {}).get('formats')
     assert set(out.splitlines()).union([tmp_ipynb]) == set([path for path, _ in paired_paths(tmp_ipynb, formats)])
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_sync(nb_file, tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+    tmp_rmd = str(tmpdir.join('notebook.Rmd'))
+    nb = readf(nb_file)
+    nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,py,Rmd'
+    writef(nb, tmp_ipynb)
+
+    # Test that missing files are created
+    jupytext(['--sync', tmp_ipynb])
+
+    assert os.path.isfile(tmp_py)
+    compare_notebooks(nb, readf(tmp_py))
+
+    assert os.path.isfile(tmp_rmd)
+    compare_notebooks(nb, readf(tmp_rmd), 'Rmd')
+
+    # Now we keep only the first four cells and save to Rmd
+    nb.cells = nb.cells[:4]
+    writef(nb, tmp_rmd, 'Rmd')
+    jupytext(['--sync', tmp_ipynb])
+
+    nb2 = readf(tmp_ipynb)
+    compare_notebooks(nb, nb2, 'Rmd', compare_outputs=True)
+
+    # Now we keep only the first two cells and save to py
+    nb.cells = nb.cells[:4]
+    writef(nb, tmp_py, 'py')
+    jupytext(['--sync', tmp_ipynb])
+
+    nb2 = readf(tmp_ipynb)
+    compare_notebooks(nb, nb2, compare_outputs=True)

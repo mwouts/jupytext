@@ -246,6 +246,11 @@ def cli_jupytext(args=None):
     parser.add_argument('--paired-paths', '-p',
                         help='Return the locations of the alternative representations for this notebook.',
                         action='store_true')
+    parser.add_argument('--sync', '-s',
+                        help='Synchronize the content of the paired representations of the given notebook. Input cells '
+                             'are taken from the file that was last modified, and outputs are read from the ipynb file,'
+                             ' if present.',
+                        action='store_true')
     parser.add_argument('--pre-commit', action='store_true',
                         help="""Run Jupytext on the ipynb files in the git index.
 Create a pre-commit hook with:
@@ -296,6 +301,11 @@ chmod +x .git/hooks/pre-commit""")
             raise ValueError('--paired-paths applies to a single notebook')
         return args
 
+    if args.sync:
+        if not args.notebooks:
+            raise ValueError('Please give the path to at least one notebook')
+        return args
+
     if not args.input_format:
         if not args.notebooks and not args.pre_commit:
             raise ValueError('Please specificy either --from, --pre-commit or notebooks')
@@ -314,6 +324,49 @@ chmod +x .git/hooks/pre-commit""")
     return args
 
 
+def sync_paired_notebooks(nb_file, nb_fmt):
+    """Read the notebook from the given file, read the inputs and outputs from the most recent text and ipynb
+    representation, and update all paired files."""
+    notebook = readf(nb_file, nb_fmt)
+    formats = notebook.metadata.get('jupytext', {}).get('formats')
+    if not formats:
+        sys.stderr.write("[jupytext] '{}' is not paired to any other file\n".format(nb_file))
+        return
+
+    max_mtime_inputs = None
+    max_mtime_outputs = None
+    latest_inputs = None
+    latest_outputs = None
+    for path, fmt in paired_paths(nb_file, formats):
+        if not os.path.isfile(path):
+            continue
+        info = os.lstat(path)
+        if not max_mtime_inputs or info.st_mtime > max_mtime_inputs:
+            max_mtime_inputs = info.st_mtime
+            latest_inputs, input_fmt = path, fmt
+
+        if path.endswith('.ipynb'):
+            if not max_mtime_outputs or info.st_mtime > max_mtime_outputs:
+                max_mtime_outputs = info.st_mtime
+                latest_outputs = path
+
+    if latest_outputs and latest_outputs != latest_inputs[0]:
+        sys.stdout.write("[jupytext] Loading input cells from '{}'\n".format(latest_inputs))
+        inputs = notebook if latest_inputs == nb_file else readf(latest_inputs, input_fmt)
+        sys.stdout.write("[jupytext] Loading output cells from '{}'\n".format(latest_outputs))
+        outputs = notebook if latest_outputs == nb_file else readf(latest_outputs)
+        notebook = combine_inputs_with_outputs(inputs, outputs)
+    else:
+        sys.stdout.write("[jupytext] Loading notebook from '{}'\n".format(latest_inputs))
+        notebook = notebook if latest_inputs == nb_file else readf(latest_inputs, input_fmt)
+
+    for path, fmt in paired_paths(nb_file, formats):
+        if path == latest_inputs and (path == latest_outputs or not path.endswith('.ipynb')):
+            continue
+        sys.stdout.write("[jupytext] Updating '{}'\n".format(path))
+        writef(notebook, path, fmt)
+
+
 def jupytext(args=None):
     """Entry point for the jupytext script"""
     try:
@@ -325,12 +378,17 @@ def jupytext(args=None):
 
         if args.paired_paths:
             main_path = args.notebooks[0]
-            nb = readf(main_path, args.input_format)
-            formats = nb.metadata.get('jupytext', {}).get('formats')
+            notebook = readf(main_path, args.input_format)
+            formats = notebook.metadata.get('jupytext', {}).get('formats')
             if formats:
                 for path, _ in paired_paths(main_path, formats):
                     if path != main_path:
                         sys.stdout.write(path + '\n')
+            return
+
+        if args.sync:
+            for nb_file in args.notebooks:
+                sync_paired_notebooks(nb_file, args.input_format)
             return
 
         convert_notebook_files(nb_files=args.notebooks,

@@ -88,3 +88,5 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
 
                     output_other_cells = output_other_cells[(i + 1):]
                     break
+
+    return nb_source
