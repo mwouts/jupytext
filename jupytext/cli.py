@@ -10,6 +10,7 @@ import json
 from .jupytext import readf, reads, writef, writes
 from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version
 from .formats import long_form_one_format
+from .paired_paths import paired_paths
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
 from .languages import _SCRIPT_EXTENSIONS
@@ -242,6 +243,9 @@ def cli_jupytext(args=None):
                         help='One or more notebook(s). Input is read from stdin when no notebook '
                              'is provided, but then the --from field is mandatory',
                         nargs='*')
+    parser.add_argument('--paired-paths', '-p',
+                        help='Return the locations of the alternative representations for this notebook.',
+                        action='store_true')
     parser.add_argument('--pre-commit', action='store_true',
                         help="""Run Jupytext on the ipynb files in the git index.
 Create a pre-commit hook with:
@@ -282,16 +286,21 @@ chmod +x .git/hooks/pre-commit""")
     if args.version:
         return args
 
-    args.to = canonize_format(args.to, args.output)
-
     if args.input_format:
         args.input_format = canonize_format(args.input_format)
         if not args.notebooks and not args.output:
             args.output = '-'
 
+    if args.paired_paths:
+        if len(args.notebooks) != 1:
+            raise ValueError('--paired-paths applies to a single notebook')
+        return args
+
     if not args.input_format:
         if not args.notebooks and not args.pre_commit:
             raise ValueError('Please specificy either --from, --pre-commit or notebooks')
+
+    args.to = canonize_format(args.to, args.output)
 
     if args.update and not (args.test or args.test_strict) and args.to != 'ipynb':
         raise ValueError('--update works exclusively with --to notebook ')
@@ -312,6 +321,16 @@ def jupytext(args=None):
 
         if args.version:
             sys.stdout.write(__version__ + '\n')
+            return
+
+        if args.paired_paths:
+            main_path = args.notebooks[0]
+            nb = readf(main_path, args.input_format)
+            formats = nb.metadata.get('jupytext', {}).get('formats')
+            if formats:
+                for path, _ in paired_paths(main_path, formats):
+                    if path != main_path:
+                        sys.stdout.write(path + '\n')
             return
 
         convert_notebook_files(nb_files=args.notebooks,

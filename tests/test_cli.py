@@ -9,6 +9,7 @@ from jupytext import __version__
 from jupytext import readf, writef, writes
 from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext, system
 from jupytext.compare import compare_notebooks
+from jupytext.paired_paths import paired_paths
 from .utils import list_notebooks
 
 
@@ -384,3 +385,19 @@ def test_update_metadata(py_file, tmpdir, capsys):
 
     out, err = capsys.readouterr()
     assert 'JSONDecodeError' in err
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_paired_paths(nb_file, tmpdir, capsys):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    nb = readf(nb_file)
+    nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,_light.py,_percent.py:percent'
+    writef(nb, tmp_ipynb)
+
+    jupytext(['--paired-paths', tmp_ipynb])
+
+    out, err = capsys.readouterr()
+    assert not err
+
+    formats = nb.metadata.get('jupytext', {}).get('formats')
+    assert set(out.splitlines()).union([tmp_ipynb]) == set([path for path, _ in paired_paths(tmp_ipynb, formats)])
