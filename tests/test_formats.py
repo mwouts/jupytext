@@ -1,6 +1,7 @@
 import pytest
 from testfixtures import compare
 from jupytext.formats import guess_format, read_format_from_metadata, rearrange_jupytext_metadata
+from jupytext.formats import long_form_multiple_formats, short_form_multiple_formats
 from .utils import list_notebooks
 
 
@@ -54,6 +55,31 @@ jupyter:
       jupytext_version: 0.8.0
 ---"""):
     assert read_format_from_metadata(script, '.Rmd') is None
+
+
+def test_decompress_formats():
+    assert long_form_multiple_formats('ipynb') == [{'extension': '.ipynb'}]
+    assert long_form_multiple_formats('ipynb,md') == [{'extension': '.ipynb'}, {'extension': '.md'}]
+    assert long_form_multiple_formats('ipynb,py:light') == [{'extension': '.ipynb'},
+                                                            {'extension': '.py', 'format_name': 'light'}]
+    assert long_form_multiple_formats(['ipynb', '.py:light']) == [{'extension': '.ipynb'},
+                                                                  {'extension': '.py', 'format_name': 'light'}]
+    assert long_form_multiple_formats('.pct.py:percent') == [
+        {'extension': '.py', 'suffix': '.pct', 'format_name': 'percent'}]
+
+
+def test_compress_formats():
+    assert short_form_multiple_formats([{'extension': '.ipynb'}]) == 'ipynb'
+    assert short_form_multiple_formats([{'extension': '.ipynb'}, {'extension': '.md'}]) == 'ipynb,md'
+    assert short_form_multiple_formats(
+        [{'extension': '.ipynb'}, {'extension': '.py', 'format_name': 'light'}]) == 'ipynb,py:light'
+    assert short_form_multiple_formats([{'extension': '.ipynb'},
+                                        {'extension': '.py', 'format_name': 'light'},
+                                        {'extension': '.md', 'comment_magics': True}]) == ['ipynb', 'py:light',
+                                                                                           {'extension': '.md',
+                                                                                            'comment_magics': True}]
+    assert short_form_multiple_formats(
+        [{'extension': '.py', 'suffix': '.pct', 'format_name': 'percent'}]) == '.pct.py:percent'
 
 
 def test_rearrange_jupytext_metadata_metadata_filter():
