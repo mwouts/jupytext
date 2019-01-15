@@ -5,7 +5,6 @@ new formats here!
 
 import os
 import re
-from copy import copy
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
     LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, HydrogenCellReader, \
@@ -262,38 +261,6 @@ def check_file_version(notebook, source_path, outputs_path):
                              os.path.basename(outputs_path)))
 
 
-def parse_one_format(ext_and_format_name):
-    """Parse "py:percent" into (".py", "percent"), etc"""
-    if ext_and_format_name.find(':') >= 0:
-        ext, format_name = ext_and_format_name.split(':', 1)
-    else:
-        ext = ext_and_format_name
-        format_name = None
-
-    if not ext.startswith('.'):
-        ext = '.' + ext
-
-    legitimate_extensions = NOTEBOOK_EXTENSIONS + ['.auto']
-    if ext in legitimate_extensions:
-        return ext, format_name
-
-    if ext.rfind('.') > 0:
-        pre, short_ext = os.path.splitext(ext)
-        if short_ext in legitimate_extensions and pre in EXTENSION_PREFIXES:
-            return ext, format_name
-
-    raise ValueError("Extension '{}' should have been one of '{}', with optional prefix among '{}'".format(
-        ext, "','".join(legitimate_extensions), "','".join(EXTENSION_PREFIXES)))
-
-
-def parse_formats(formats):
-    """Parse "md,py:percent" into [(".md", None), (".py", "percent")], etc"""
-    if not formats:
-        return []
-    return [parse_one_format(ext_and_format_name)
-            for ext_and_format_name in formats.split(',')]
-
-
 def update_formats(formats, ext, format_name):
     """Update the format list with the given format name"""
     updated_formats = []
@@ -308,29 +275,6 @@ def update_formats(formats, ext, format_name):
     return updated_formats
 
 
-def one_format_as_string(ext, format_name):
-    """('.py', None) to 'py', etc"""
-    if ext.startswith('.'):
-        ext = ext[1:]
-    if format_name and format_name not in ['markdown', 'rmarkdown']:
-        return ext + ':' + format_name
-    return ext
-
-
-def formats_as_string(formats):
-    """Concatenate all formats into a string"""
-    return ','.join([one_format_as_string(ext, format_name)
-                     for ext, format_name in formats])
-
-
-def auto_ext_from_metadata(metadata):
-    """Script extension from kernel information"""
-    auto_ext = metadata.get('language_info', {}).get('file_extension')
-    if auto_ext == '.r':
-        return '.R'
-    return auto_ext
-
-
 def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default=True):
     """Return the format name for that extension"""
 
@@ -342,11 +286,11 @@ def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default
     # Format from jupytext.formats
     auto_ext = auto_ext_from_metadata(metadata)
     formats = metadata.get('jupytext', {}).get('formats', '') or cm_default_formats
-    formats = parse_formats(formats)
-    for fmt_ext, ext_format_name in formats:
-        if fmt_ext.endswith(ext) or (fmt_ext.endswith('.auto') and auto_ext and ext.endswith(auto_ext)):
-            if (not explicit_default) or ext_format_name:
-                return ext_format_name
+    formats = long_form_multiple_formats(formats)
+    for fmt in formats:
+        if fmt['extension'] == ext or (fmt['extension'] == '.auto' and ext == auto_ext):
+            if (not explicit_default) or fmt.get('format_name'):
+                return fmt.get('format_name')
 
     if (not explicit_default) or ext in ['.Rmd', '.md']:
         return None
@@ -356,10 +300,16 @@ def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default
 
 def update_jupytext_formats_metadata(notebook, ext, format_name):
     """Update the jupytext_format metadata in the Jupyter notebook"""
-    formats = parse_formats(notebook.metadata.get('jupytext', {}).get('formats', ''))
-    formats = update_formats(formats, ext, format_name)
-    if formats:
-        notebook.metadata.setdefault('jupytext', {})['formats'] = formats_as_string(formats)
+    formats = long_form_multiple_formats(notebook.metadata.get('jupytext', {}).get('formats', ''))
+    if not formats:
+        return
+
+    for fmt in formats:
+        if fmt['extension'] == ext:
+            fmt['format_name'] = format_name
+            break
+
+    notebook.metadata.setdefault('jupytext', {})['formats'] = short_form_multiple_formats(formats)
 
 
 def rearrange_jupytext_metadata(metadata):
@@ -454,6 +404,32 @@ def long_form_multiple_formats(jupytext_formats):
     return jupytext_formats
 
 
+def short_form_one_format(jupytext_format):
+    """Represent one jupytext format as a string when possible"""
+    fmt = jupytext_format['extension']
+    if 'suffix' in jupytext_format:
+        fmt = jupytext_format['suffix'] + fmt
+    elif fmt.startswith('.'):
+        fmt = fmt[1:]
+
+    if 'format_name' in jupytext_format and jupytext_format['extension'] not in ['.md', '.Rmd']:
+        fmt = fmt + ':' + jupytext_format['format_name']
+
+    if set(jupytext_format) <= set(['extension', 'suffix', 'format_name']):
+        return fmt
+
+    return jupytext_format
+
+
+def short_form_multiple_formats(jupytext_formats):
+    """Convert jupytext formats, represented as a list of dictionaries, to a more concise form when possible"""
+    jupytext_formats = [short_form_one_format(fmt) for fmt in jupytext_formats]
+
+    if all([isinstance(fmt, str) for fmt in jupytext_formats]):
+        return ','.join(jupytext_formats)
+    return jupytext_formats
+
+
 _VALID_FORMAT_OPTIONS = ['extension', 'format_name', 'suffix', 'prefix', 'comment_magics',
                          'split_at_heading', 'notebook_metadata_filter', 'cell_metadata_filter']
 _BINARY_FORMAT_OPTIONS = ['comment_magics', 'split_at_heading']
@@ -481,6 +457,14 @@ def validate_one_format(jupytext_format):
             ext, "', '".join(NOTEBOOK_EXTENSIONS + ['.auto'])))
 
 
+def auto_ext_from_metadata(metadata):
+    """Script extension from kernel information"""
+    auto_ext = metadata.get('language_info', {}).get('file_extension')
+    if auto_ext == '.r':
+        return '.R'
+    return auto_ext
+
+
 def set_auto_ext(jupytext_formats, metadata):
     """Expend the format definition, and replaces extension .auto with that from the metadata"""
     jupytext_formats = long_form_multiple_formats(jupytext_formats)
@@ -493,15 +477,3 @@ def set_auto_ext(jupytext_formats, metadata):
             fmt['extension'] = ext
 
     return jupytext_formats
-
-
-# TODO: remove this function
-def _fmt_from_ext_and_format_name(ext, format_name, format_options=None):
-    fmt = copy(format_options) if format_options else {}
-    if format_name:
-        fmt['format_name'] = format_name
-    if ext.rfind('.'):
-        suffix, ext = os.path.splitext(ext)
-        fmt['suffix'] = suffix
-    fmt['extension'] = ext
-    return fmt

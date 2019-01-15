@@ -99,7 +99,7 @@ def test_error_not_notebook_ext_input(nb_file='notebook.ext'):
 
 
 def test_error_not_notebook_ext_dest1(nb_file=list_notebooks()[0]):
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         convert_notebook_files([nb_file], fmt='ext')
 
 

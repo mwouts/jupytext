@@ -8,8 +8,8 @@ import subprocess
 import argparse
 import json
 from .jupytext import readf, reads, writef, writes
-from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version, one_format_as_string, parse_one_format
-from .formats import _fmt_from_ext_and_format_name
+from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version
+from .formats import long_form_one_format
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
 from .languages import _SCRIPT_EXTENSIONS
@@ -36,19 +36,20 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
     :return:
     """
 
-    ext, format_name = parse_one_format(fmt)
+    fmt = long_form_one_format(fmt)
+    ext = fmt['extension']
     if ext not in NOTEBOOK_EXTENSIONS:
         raise TypeError('Destination extension {} is not a notebook'.format(ext))
 
     if pre_commit:
         input_format = input_format or 'ipynb'
-        input_ext, _ = parse_one_format(input_format)
+        input_ext = long_form_one_format(input_format)['extension']
         modified, deleted = modified_and_deleted_files(input_ext)
 
         for file in modified:
             dest_file = file[:-len(input_ext)] + ext
             notebook = readf(file)
-            writef(notebook, dest_file, {'format_name': format_name})
+            writef(notebook, dest_file, fmt)
             system('git', 'add', dest_file)
 
         for file in deleted:
@@ -60,7 +61,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
     if not nb_files:
         if not input_format:
             raise ValueError('Reading notebook from the standard input requires the --from field.')
-        parse_one_format(input_format)
+        input_format = long_form_one_format(input_format)
         nb_files = [sys.stdin]
 
     if len(nb_files) > 1 and output:
@@ -71,8 +72,8 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
     for nb_file in nb_files:
         if nb_file == sys.stdin:
             dest = None
-            current_ext, _ = parse_one_format(input_format)
-            notebook = reads(nb_file.read(), _fmt_from_ext_and_format_name(current_ext, format_name))
+            current_ext = long_form_one_format(input_format)['extension']
+            notebook = reads(nb_file.read(), input_format)
         else:
             dest, current_ext = os.path.splitext(nb_file)
             notebook = None
@@ -81,20 +82,19 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
             raise TypeError('File {} is not a notebook'.format(nb_file))
 
         if input_format:
-            format_ext, format_name = parse_one_format(input_format)
-            if current_ext != format_ext:
+            if current_ext != input_format['extension']:
                 raise ValueError("Format extension in --from field '{}' is "
                                  "not consistent with notebook extension "
-                                 "'{}'".format(format_name, current_ext))
+                                 "'{}'".format(input_format, current_ext))
         else:
             input_format = None
 
         if not notebook:
-            notebook = readf(nb_file, {'format_name': format_name})
+            notebook = readf(nb_file, input_format)
 
         if test_round_trip or test_round_trip_strict:
             try:
-                test_round_trip_conversion(notebook, {'extension': ext, 'format_name': format_name}, update,
+                test_round_trip_conversion(notebook, fmt, update,
                                            allow_expected_differences=not test_round_trip_strict,
                                            stop_on_first_error=stop_on_first_error)
             except NotebookDifference as error:
@@ -114,7 +114,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
             notebook.metadata.setdefault('jupytext', {})['comment_magics'] = comment_magics
 
         if output == '-':
-            sys.stdout.write(writes(notebook, {'extension': ext, 'format_name': format_name}))
+            sys.stdout.write(writes(notebook, fmt))
             continue
 
         if output:
@@ -134,10 +134,10 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
         sys.stdout.write("[jupytext] Converting '{org_file}' to '{dest_file}'{format}{action}\n"
                          .format(dest_file=dest + ext,
                                  org_file=nb_file,
-                                 format=" using format '{}'".format(format_name) if format_name else '',
+                                 format=" using format '{}'".format(fmt['format_name']) if 'format_name' in fmt else '',
                                  action=action))
 
-        save_notebook_as(notebook, nb_file, dest + ext, format_name, update)
+        save_notebook_as(notebook, nb_file, dest + ext, fmt, update)
 
     if notebooks_in_error:
         exit(notebooks_in_error)
@@ -159,14 +159,14 @@ def modified_and_deleted_files(ext):
     return re_modified.findall(files), re_deleted.findall(files)
 
 
-def save_notebook_as(notebook, nb_file, nb_dest, format_name, combine):
+def save_notebook_as(notebook, nb_file, nb_dest, fmt, combine):
     """Save notebook to file, in desired format"""
     if combine and os.path.isfile(nb_dest) and os.path.splitext(nb_dest)[1] == '.ipynb':
         check_file_version(notebook, nb_file, nb_dest)
         nb_outputs = readf(nb_dest)
         combine_inputs_with_outputs(notebook, nb_outputs)
 
-    writef(notebook, nb_dest, {'format_name': format_name})
+    writef(notebook, nb_dest, fmt)
 
 
 def canonize_format(format_or_ext, file_path=None):
@@ -229,8 +229,7 @@ def cli_jupytext(args=None):
     notebook_formats = (['notebook', 'rmarkdown', 'markdown'] +
                         [_SCRIPT_EXTENSIONS[ext]['language'] for ext in _SCRIPT_EXTENSIONS] +
                         [ext.replace('.', '') for ext in NOTEBOOK_EXTENSIONS] +
-                        [one_format_as_string(fmt.extension, fmt.format_name)
-                         for fmt in JUPYTEXT_FORMATS])
+                        [fmt.extension[1:] + ':' + fmt.format_name for fmt in JUPYTEXT_FORMATS])
 
     parser.add_argument('--to',
                         choices=notebook_formats,
