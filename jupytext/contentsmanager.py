@@ -22,7 +22,6 @@ from .combine import combine_inputs_with_outputs
 from .formats import rearrange_jupytext_metadata, check_file_version, set_auto_ext
 from .formats import NOTEBOOK_EXTENSIONS, JupytextFormatError, long_form_one_format, long_form_multiple_formats
 from .paired_paths import paired_paths, find_base_path_and_format, base_path, full_path, InconsistentPath
-from .metadata_filter import metadata_filter_as_dict
 
 
 def kernelspec_from_language(language):
