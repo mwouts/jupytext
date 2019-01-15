@@ -1,7 +1,8 @@
 import pytest
 from testfixtures import compare
+from nbformat.v4.nbbase import new_notebook
 from jupytext.formats import guess_format, read_format_from_metadata, rearrange_jupytext_metadata
-from jupytext.formats import long_form_multiple_formats, short_form_multiple_formats
+from jupytext.formats import long_form_multiple_formats, short_form_multiple_formats, update_jupytext_formats_metadata
 from .utils import list_notebooks
 
 
@@ -57,6 +58,16 @@ jupyter:
     assert read_format_from_metadata(script, '.Rmd') is None
 
 
+def test_update_jupytext_formats_metadata():
+    nb = new_notebook(metadata={'jupytext': {'formats': 'py'}})
+    update_jupytext_formats_metadata(nb, 'py:light')
+    assert nb.metadata['jupytext']['formats'] == 'py:light'
+
+    nb = new_notebook(metadata={'jupytext': {'formats': 'ipynb,py'}})
+    update_jupytext_formats_metadata(nb, 'py:light')
+    assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
+
+
 def test_decompress_formats():
     assert long_form_multiple_formats('ipynb') == [{'extension': '.ipynb'}]
     assert long_form_multiple_formats('ipynb,md') == [{'extension': '.ipynb'}, {'extension': '.md'}]
@@ -75,9 +86,7 @@ def test_compress_formats():
         [{'extension': '.ipynb'}, {'extension': '.py', 'format_name': 'light'}]) == 'ipynb,py:light'
     assert short_form_multiple_formats([{'extension': '.ipynb'},
                                         {'extension': '.py', 'format_name': 'light'},
-                                        {'extension': '.md', 'comment_magics': True}]) == ['ipynb', 'py:light',
-                                                                                           {'extension': '.md',
-                                                                                            'comment_magics': True}]
+                                        {'extension': '.md', 'comment_magics': True}]) == 'ipynb,py:light,md'
     assert short_form_multiple_formats(
         [{'extension': '.py', 'suffix': '.pct', 'format_name': 'percent'}]) == '.pct.py:percent'
 

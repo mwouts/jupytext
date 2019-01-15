@@ -261,23 +261,8 @@ def check_file_version(notebook, source_path, outputs_path):
                              os.path.basename(outputs_path)))
 
 
-def update_formats(formats, ext, format_name):
-    """Update the format list with the given format name"""
-    updated_formats = []
-    found_ext = False
-    for org_ext, org_format_name in formats:
-        if org_ext != ext:
-            updated_formats.append((org_ext, org_format_name))
-        elif not found_ext:
-            updated_formats.append((ext, format_name))
-            found_ext = True
-
-    return updated_formats
-
-
 def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default=True):
     """Return the format name for that extension"""
-
     # Is the format information available in the text representation?
     text_repr = metadata.get('jupytext', {}).get('text_representation', {})
     if text_repr.get('extension', '').endswith(ext) and text_repr.get('format_name'):
@@ -298,15 +283,27 @@ def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default
     return get_format_implementation(ext).format_name
 
 
-def update_jupytext_formats_metadata(notebook, ext, format_name):
+def identical_format_path(fmt1, fmt2):
+    """Do the two (long representation) of formats target the same file?"""
+    for key in ['extension', 'prefix', 'suffix']:
+        if fmt1.get(key) != fmt2.get(key):
+            return False
+    return True
+
+
+def update_jupytext_formats_metadata(notebook, new_format):
     """Update the jupytext_format metadata in the Jupyter notebook"""
+    new_format = long_form_one_format(new_format)
     formats = long_form_multiple_formats(notebook.metadata.get('jupytext', {}).get('formats', ''))
     if not formats:
         return
 
     for fmt in formats:
-        if fmt['extension'] == ext:
-            fmt['format_name'] = format_name
+        if identical_format_path(fmt, new_format):
+            if 'format_name' in new_format:
+                fmt['format_name'] = new_format['format_name']
+            else:
+                fmt.pop('format_name')
             break
 
     notebook.metadata.setdefault('jupytext', {})['formats'] = short_form_multiple_formats(formats)
@@ -405,7 +402,7 @@ def long_form_multiple_formats(jupytext_formats):
 
 
 def short_form_one_format(jupytext_format):
-    """Represent one jupytext format as a string when possible"""
+    """Represent one jupytext format as a string"""
     fmt = jupytext_format['extension']
     if 'suffix' in jupytext_format:
         fmt = jupytext_format['suffix'] + fmt
@@ -415,19 +412,13 @@ def short_form_one_format(jupytext_format):
     if 'format_name' in jupytext_format and jupytext_format['extension'] not in ['.md', '.Rmd']:
         fmt = fmt + ':' + jupytext_format['format_name']
 
-    if set(jupytext_format) <= set(['extension', 'suffix', 'format_name']):
-        return fmt
-
-    return jupytext_format
+    return fmt
 
 
 def short_form_multiple_formats(jupytext_formats):
-    """Convert jupytext formats, represented as a list of dictionaries, to a more concise form when possible"""
+    """Convert jupytext formats, represented as a list of dictionaries, to a comma separated list"""
     jupytext_formats = [short_form_one_format(fmt) for fmt in jupytext_formats]
-
-    if all([isinstance(fmt, str) for fmt in jupytext_formats]):
-        return ','.join(jupytext_formats)
-    return jupytext_formats
+    return ','.join(jupytext_formats)
 
 
 _VALID_FORMAT_OPTIONS = ['extension', 'format_name', 'suffix', 'prefix', 'comment_magics',

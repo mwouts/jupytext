@@ -179,10 +179,11 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
         return nbformat.writes(notebook, version, **kwargs)
 
     if not format_name:
-        format_name = format_name_for_ext(notebook.metadata, ext)
+        format_name = format_name_for_ext(notebook.metadata, ext, explicit_default=False)
 
-    if format_name and insert_or_test_version_number():
-        update_jupytext_formats_metadata(notebook, ext, format_name)
+    if format_name:
+        fmt['format_name'] = format_name
+        update_jupytext_formats_metadata(notebook, fmt)
 
     writer = TextNotebookConverter(fmt)
     return writer.writes(notebook)
