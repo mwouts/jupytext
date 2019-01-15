@@ -60,7 +60,7 @@ def test_all_files_created(nb_file, tmpdir):
     compare_notebooks(nb, nb2)
 
     nb3 = jupytext.readf(str(tmpdir.join(tmp_rmd)))
-    compare_notebooks(nb, nb3, ext='.Rmd')
+    compare_notebooks(nb, nb3, 'Rmd')
 
 
 def test_no_files_created_on_no_format(tmpdir):

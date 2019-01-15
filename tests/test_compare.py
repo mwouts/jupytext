@@ -9,42 +9,42 @@ def test_raise_on_different_metadata():
     test = new_notebook(metadata={'kernelspec': {'language': 'R', 'name': 'R', 'display_name': 'R'}},
                         cells=[new_markdown_cell('Cell one')])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, ext='.md')
+        compare_notebooks(ref, test, 'md')
 
 
 def test_raise_on_different_cell_count():
     ref = new_notebook(cells=[new_markdown_cell('Cell one'), new_code_cell('Cell two')])
     test = new_notebook(cells=[new_markdown_cell('Cell one')])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, ext='.md')
+        compare_notebooks(ref, test, 'md')
 
 
 def test_raise_on_different_cell_type():
     ref = new_notebook(cells=[new_markdown_cell('Cell one'), new_code_cell('Cell two')])
     test = new_notebook(cells=[new_markdown_cell('Cell one'), new_raw_cell('Cell two')])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, ext='.md')
+        compare_notebooks(ref, test, 'md')
 
 
 def test_raise_on_different_cell_content():
     ref = new_notebook(cells=[new_markdown_cell('Cell one'), new_code_cell('Cell two')])
     test = new_notebook(cells=[new_markdown_cell('Cell one'), new_code_cell('Modified cell two')])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, ext='.md')
+        compare_notebooks(ref, test, 'md')
 
 
 def test_raise_on_incomplete_markdown_cell():
     ref = new_notebook(cells=[new_markdown_cell('Cell one\n\n\nsecond line')])
     test = new_notebook(cells=[new_markdown_cell('Cell one')])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, ext='.md')
+        compare_notebooks(ref, test, 'md')
 
 
 def test_does_not_raise_on_split_markdown_cell():
     ref = new_notebook(cells=[new_markdown_cell('Cell one\n\n\nsecond line')])
     test = new_notebook(cells=[new_markdown_cell('Cell one'),
                                new_markdown_cell('second line')])
-    compare_notebooks(ref, test, ext='.md')
+    compare_notebooks(ref, test, 'md')
 
 
 def test_does_raise_on_split_markdown_cell():
@@ -52,27 +52,27 @@ def test_does_raise_on_split_markdown_cell():
     test = new_notebook(cells=[new_markdown_cell('Cell one'),
                                new_markdown_cell('second line')])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, ext='.md', allow_expected_differences=False)
+        compare_notebooks(ref, test, 'md', allow_expected_differences=False)
 
 
 def test_raise_on_different_cell_metadata():
     ref = new_notebook(cells=[new_code_cell('1+1')])
     test = new_notebook(cells=[new_code_cell('1+1', metadata={'metakey': 'value'})])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, ext='.py', format_name='light')
+        compare_notebooks(ref, test, 'py:light')
 
 
 def test_does_not_raise_on_blank_line_removed():
     ref = new_notebook(cells=[new_code_cell('1+1\n    ')])
     test = new_notebook(cells=[new_code_cell('1+1')])
-    compare_notebooks(ref, test, ext='.py', format_name='light')
+    compare_notebooks(ref, test, 'py:light')
 
 
 def test_strict_raise_on_blank_line_removed():
     ref = new_notebook(cells=[new_code_cell('1+1\n')])
     test = new_notebook(cells=[new_code_cell('1+1')])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, ext='.py', format_name='light', allow_expected_differences=False)
+        compare_notebooks(ref, test, 'py:light', allow_expected_differences=False)
 
 
 def test_dont_raise_on_different_outputs():
@@ -89,7 +89,7 @@ def test_dont_raise_on_different_outputs():
             "output_type": "execute_result"
         }
     ])])
-    compare_notebooks(ref, test, ext='.md')
+    compare_notebooks(ref, test, 'md')
 
 
 def test_raise_on_different_outputs():
@@ -107,7 +107,7 @@ def test_raise_on_different_outputs():
         }
     ])])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, ext='.md', compare_outputs=True)
+        compare_notebooks(ref, test, 'md', compare_outputs=True)
 
 
 def test_test_round_trip_conversion():

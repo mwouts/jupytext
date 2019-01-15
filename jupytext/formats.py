@@ -418,6 +418,9 @@ def long_form_one_format(jupytext_format):
     if isinstance(jupytext_format, dict):
         return jupytext_format
 
+    if not jupytext_format:
+        return {}
+
     if jupytext_format.find(':') >= 0:
         ext, format_name = jupytext_format.split(':', 1)
         jupytext_format = {'format_name': format_name}

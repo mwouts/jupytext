@@ -8,6 +8,7 @@ from .header import _DEFAULT_NOTEBOOK_METADATA
 from .metadata_filter import filter_metadata
 from .jupytext import reads, writes
 from .combine import combine_inputs_with_outputs
+from .formats import long_form_one_format
 
 _BLANK_LINE = re.compile(r'^\s*$')
 
@@ -68,13 +69,15 @@ def same_content(ref_source, test_source, allow_removed_final_blank_line):
 
 def compare_notebooks(notebook_expected,
                       notebook_actual,
-                      ext=None,
-                      format_name=None,
+                      fmt=None,
                       allow_expected_differences=True,
                       raise_on_first_difference=True,
                       compare_outputs=False):
     """Compare the two notebooks, and raise with a meaningful message
     that explains the differences, if any"""
+    fmt = long_form_one_format(fmt)
+    ext = fmt.get('extension')
+    format_name = fmt.get('format_name')
 
     # Expected differences
     allow_filtered_cell_metadata = allow_expected_differences
@@ -248,5 +251,5 @@ def test_round_trip_conversion(notebook, fmt, update, allow_expected_differences
     if update:
         combine_inputs_with_outputs(round_trip, notebook)
 
-    compare_notebooks(notebook, round_trip, fmt['extension'], fmt.get('format_name'), allow_expected_differences,
+    compare_notebooks(notebook, round_trip, fmt, allow_expected_differences,
                       raise_on_first_difference=stop_on_first_error)

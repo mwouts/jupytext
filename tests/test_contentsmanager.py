@@ -31,7 +31,7 @@ def test_load_save_rename(nb_file, tmpdir):
     nb = jupytext.readf(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_rmd)
     nb_rmd = cm.get(tmp_rmd)
-    compare_notebooks(nb, nb_rmd['content'], ext='.Rmd')
+    compare_notebooks(nb, nb_rmd['content'], 'Rmd')
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
@@ -77,7 +77,7 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
     nb_md = cm.get(tmp_md)
 
-    compare_notebooks(nb, nb_md['content'], ext='.md')
+    compare_notebooks(nb, nb_md['content'], 'md')
     assert nb_md['content'].metadata['jupytext']['formats'] == 'ipynb,md'
 
 
