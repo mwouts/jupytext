@@ -392,21 +392,24 @@ def long_form_one_format(jupytext_format):
     if not jupytext_format:
         return {}
 
-    if jupytext_format.find(':') >= 0:
-        ext, format_name = jupytext_format.split(':', 1)
-        jupytext_format = {'format_name': format_name}
+    fmt = {}
+
+    if jupytext_format.rfind('/') > 0:
+        fmt['prefix'], jupytext_format = jupytext_format.rsplit('/', 1)
+
+    if jupytext_format.rfind(':') >= 0:
+        ext, fmt['format_name'] = jupytext_format.rsplit(':', 1)
     else:
         ext = jupytext_format
-        jupytext_format = {}
 
     if ext.rfind('.') > 0:
-        jupytext_format['suffix'], ext = os.path.splitext(ext)
+        fmt['suffix'], ext = os.path.splitext(ext)
 
     if not ext.startswith('.'):
         ext = '.' + ext
 
-    jupytext_format['extension'] = ext
-    return jupytext_format
+    fmt['extension'] = ext
+    return fmt
 
 
 def long_form_multiple_formats(jupytext_formats):
@@ -432,6 +435,9 @@ def short_form_one_format(jupytext_format):
         fmt = jupytext_format['suffix'] + fmt
     elif fmt.startswith('.'):
         fmt = fmt[1:]
+
+    if 'prefix' in jupytext_format:
+        fmt = jupytext_format['prefix'] + '/' + fmt
 
     if 'format_name' in jupytext_format and jupytext_format['extension'] not in ['.md', '.Rmd']:
         fmt = fmt + ':' + jupytext_format['format_name']

@@ -25,28 +25,33 @@ def base_path(main_path, fmt):
             raise InconsistentPath(u"Notebook name '{}' was expected to end with suffix '{}'".format(base, suffix))
         base = base[:-len(suffix)]
 
-    if prefix:
-        prefix_dir, prefix_file_name = os.path.split(prefix)
-        notebook_dir, notebook_file_name = os.path.split(base)
-        sep = base[len(notebook_dir):-len(notebook_file_name)]
-        if prefix_file_name:
-            if not notebook_file_name.startswith(prefix_file_name):
-                raise InconsistentPath(u"Notebook name '{}' was expected to start with prefix '{}'"
-                                       .format(notebook_file_name, prefix_file_name))
-            notebook_file_name = notebook_file_name[len(prefix_file_name):]
-        if prefix_dir:
-            if not notebook_dir.endswith(prefix_dir):
-                raise InconsistentPath(u"Notebook directory '{}' was expected to end with directory prefix '{}'"
-                                       .format(notebook_dir, prefix_dir))
-            notebook_dir = notebook_dir[:-len(prefix_dir)]
+    if not prefix:
+        return base
 
-            # Does notebook_dir ends with a path separator?
-            if not os.path.split(notebook_dir)[1]:
-                notebook_dir = notebook_dir[:-1]
+    prefix_dir, prefix_file_name = os.path.split(prefix)
+    notebook_dir, notebook_file_name = os.path.split(base)
+    sep = base[len(notebook_dir):-len(notebook_file_name)]
 
-        base = notebook_dir + sep + notebook_file_name
+    if prefix_file_name:
+        if not notebook_file_name.startswith(prefix_file_name):
+            raise InconsistentPath(u"Notebook name '{}' was expected to start with prefix '{}'"
+                                   .format(notebook_file_name, prefix_file_name))
+        notebook_file_name = notebook_file_name[len(prefix_file_name):]
 
-    return base
+    if prefix_dir:
+        if not notebook_dir.endswith(prefix_dir):
+            raise InconsistentPath(u"Notebook directory '{}' was expected to end with directory prefix '{}'"
+                                   .format(notebook_dir, prefix_dir))
+        notebook_dir = notebook_dir[:-len(prefix_dir)]
+
+    if not notebook_dir:
+        return notebook_file_name
+
+    # Does notebook_dir ends with a path separator?
+    if notebook_dir[-1:] == sep:
+        return notebook_dir + notebook_file_name
+
+    return notebook_dir + sep + notebook_file_name
 
 
 def full_path(base, format_options):
