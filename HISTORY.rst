@@ -19,7 +19,7 @@ Release History
 **BugFixes**
 
 - Main language of scripts is inferred from script extension. Fixes a round trip conversion issue for Python notebooks with a Javascript cell.
-- Format extension must start prefix, if any, in ``.lgt``,``.pct``, ``.hyd``, ``.spx`` or ``.nb`` (#87,#138).
+- Jupyter magic commands like `ls` are commented in the light and R markdown format (#149).
 
 0.8.6 (2018-11-29)
 ++++++++++++++++++++++

@@ -15,8 +15,14 @@ _MAGIC_NOT_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
         _SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS}
 _COMMENT = {_SCRIPT_EXTENSIONS[ext]['language']: _SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS}
 
-# Commands starting with a question marks have to be escaped
-_HELP_RE = re.compile(r"^(# |#)*\?")
+# Commands starting with a question or exclamation mark have to be escaped
+_PYTHON_HELP_OR_BASH_CMD = re.compile(r"^(# |#)*(\?|!)")
+
+_PYTHON_MAGIC_CMD = re.compile(r"^(# |#)*({})(\s|$)".format('|'.join(
+    # posix
+    ['cat', 'cp', 'mv', 'rm', 'rmdir', 'mkdir'] +
+    # windows
+    ['copy', 'ddir', 'echo', 'ls', 'ldir', 'mkdir', 'ren', 'rmdir'])))
 
 
 def is_magic(line, language, global_escape_flag=True):
@@ -29,9 +35,11 @@ def is_magic(line, language, global_escape_flag=True):
         return False
     if _MAGIC_RE.get(language, _MAGIC_RE['python']).match(line):
         return True
-    if language == 'python':
-        return _HELP_RE.match(line)
-    return False
+    if language != 'python':
+        return False
+    if _PYTHON_HELP_OR_BASH_CMD.match(line):
+        return True
+    return _PYTHON_MAGIC_CMD.match(line)
 
 
 def comment_magic(source, language='python', global_escape_flag=True):
