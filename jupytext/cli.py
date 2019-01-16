@@ -82,7 +82,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
             raise TypeError('File {} is not a notebook'.format(nb_file))
 
         if input_format:
-            if current_ext != input_format['extension']:
+            if current_ext != long_form_one_format(input_format)['extension']:
                 raise ValueError("Format extension in --from field '{}' is "
                                  "not consistent with notebook extension "
                                  "'{}'".format(input_format, current_ext))

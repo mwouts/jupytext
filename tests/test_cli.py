@@ -1,21 +1,25 @@
 import os
 import stat
-from shutil import copyfile
-import pytest
-from testfixtures import compare
 import mock
+import pytest
+from shutil import copyfile
+from testfixtures import compare
+from argparse import ArgumentTypeError
 from nbformat.v4.nbbase import new_notebook
 from jupytext import __version__
 from jupytext import readf, writef, writes
-from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext, system
+from jupytext.cli import convert_notebook_files, cli_jupytext, jupytext, system, str2bool
 from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths
 from .utils import list_notebooks
 
 
-def test_cli_no_argument():
-    with pytest.raises(ValueError):
-        cli_jupytext([])
+def test_str2bool():
+    assert str2bool('d') is None
+    assert str2bool('TRUE') is True
+    assert str2bool('0') is False
+    with pytest.raises(ArgumentTypeError):
+        str2bool('UNEXPECTED')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks())
@@ -404,11 +408,19 @@ def test_paired_paths(nb_file, tmpdir, capsys):
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
-def test_sync(nb_file, tmpdir):
+def test_sync(nb_file, tmpdir, capsys):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_py = str(tmpdir.join('notebook.py'))
     tmp_rmd = str(tmpdir.join('notebook.Rmd'))
     nb = readf(nb_file)
+    writef(nb, tmp_ipynb)
+
+    # Test that sync works (does nothing) when notebook is not paired
+    jupytext(['--sync', tmp_ipynb])
+    out, err = capsys.readouterr()
+    assert 'not paired' in err
+
+    # Now with a pairing information
     nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,py,Rmd'
     writef(nb, tmp_ipynb)
 
@@ -490,3 +502,18 @@ def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir):
         jupytext(['-o', tmp_ipynb])
     nb2 = readf(tmp_ipynb)
     compare_notebooks(nb, nb2, 'Rmd')
+
+
+def test_cli_expect_errors():
+    with pytest.raises(ValueError):
+        cli_jupytext([])
+    with pytest.raises(ValueError):
+        cli_jupytext(['--sync'])
+    with pytest.raises(ValueError):
+        cli_jupytext(['--paired-paths'])
+    with pytest.raises(ValueError):
+        cli_jupytext(['--pre-commit', 'notebook.ipynb'])
+    with pytest.raises(ValueError):
+        cli_jupytext(['--pre-commit', '--test'])
+    with pytest.raises(SystemExit):
+        jupytext(['notebook.ipynb', '--from', 'py:percent', '--to', 'md'])
