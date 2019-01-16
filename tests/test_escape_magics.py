@@ -33,6 +33,11 @@ def test_force_noescape_with_gbl_esc_flag(line):
     assert comment_magic([line], global_escape_flag=True) == [line]
 
 
+@pytest.mark.parametrize('line', ['%matplotlib inline #escape'])
+def test_force_escape_with_gbl_esc_flag(line):
+    assert comment_magic([line], global_escape_flag=False) == ['# ' + line]
+
+
 @pytest.mark.parametrize('fmt,commented',
                          zip(['md', 'Rmd', 'py:light', 'py:percent', 'py:sphinx', 'R', 'ss:light', 'ss:percent'],
                              [False, True, True, True, True, True, True, True]))

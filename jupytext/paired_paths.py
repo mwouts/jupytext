@@ -94,9 +94,6 @@ def find_base_path_and_format(main_path, formats):
 
 def paired_paths(main_path, formats):
     """Return the list of paired notebooks, given main path, and the list of formats"""
-    if not formats:
-        return None
-
     formats = long_form_multiple_formats(formats)
 
     # Is there a format that matches the main path?

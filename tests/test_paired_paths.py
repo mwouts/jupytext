@@ -51,3 +51,9 @@ def test_prefix_and_suffix():
     # Not the expected extension
     with pytest.raises(InconsistentPath):
         paired_paths('notebook_folder/notebook_prefix_NOTEBOOK_NAME_notebook_suffix.py', formats)
+
+
+def test_duplicated_paths():
+    formats = long_form_multiple_formats('ipynb,py:percent,py:light')
+    with pytest.raises(InconsistentPath):
+        paired_paths('notebook.ipynb', formats)
