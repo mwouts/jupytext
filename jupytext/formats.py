@@ -129,9 +129,6 @@ def get_format_implementation(ext, format_name=None):
     # remove pre-extension if any
     ext = '.' + ext.split('.')[-1]
 
-    if ext.endswith('.ipynb'):
-        return None
-
     formats_for_extension = []
     for fmt in JUPYTEXT_FORMATS:
         if fmt.extension == ext:
@@ -271,10 +268,6 @@ def check_file_version(notebook, source_path, outputs_path):
     if (fmt.min_readable_version_number or current) <= version <= current:
         return
 
-        # Not merging? OK
-    if source_path == outputs_path:
-        return
-
     raise ValueError("File {} has jupytext_format_version={}, but "
                      "current version for that extension is {}.\n"
                      "It would not be safe to override the source of {} "
@@ -324,10 +317,7 @@ def update_jupytext_formats_metadata(notebook, new_format):
 
     for fmt in formats:
         if identical_format_path(fmt, new_format):
-            if 'format_name' in new_format:
-                fmt['format_name'] = new_format['format_name']
-            else:
-                fmt.pop('format_name')
+            fmt['format_name'] = new_format.get('format_name')
             break
 
     notebook.metadata.setdefault('jupytext', {})['formats'] = short_form_multiple_formats(formats)
@@ -439,7 +429,7 @@ def short_form_one_format(jupytext_format):
     if 'prefix' in jupytext_format:
         fmt = jupytext_format['prefix'] + '/' + fmt
 
-    if 'format_name' in jupytext_format and jupytext_format['extension'] not in ['.md', '.Rmd']:
+    if jupytext_format.get('format_name') and jupytext_format['extension'] not in ['.md', '.Rmd']:
         fmt = fmt + ':' + jupytext_format['format_name']
 
     return fmt

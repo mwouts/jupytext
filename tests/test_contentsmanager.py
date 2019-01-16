@@ -216,8 +216,6 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
 
     # open ipynb, save nb.py, reopen
     nb = jupytext.readf(nb_file)
-    if nb.metadata.get('jupytext', {}).get('formats'):
-        del nb.metadata['jupytext']['formats']
 
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
@@ -259,8 +257,6 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
 
     # open ipynb, save nb.py, reopen
     nb = jupytext.readf(nb_file)
-    if nb.metadata.get('jupytext', {}).get('formats'):
-        del nb.metadata['jupytext']['formats']
 
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
@@ -523,8 +519,6 @@ def test_preferred_formats_read_auto(tmpdir):
 def test_save_in_auto_extension_global(nb_file, tmpdir):
     # load notebook
     nb = jupytext.readf(nb_file)
-    if nb.metadata.get('jupytext', {}).get('formats'):
-        del nb.metadata['jupytext']['formats']
     if 'language_info' not in nb.metadata:
         return
 
@@ -558,8 +552,6 @@ def test_save_in_auto_extension_global(nb_file, tmpdir):
 def test_save_in_auto_extension_global_with_format(nb_file, tmpdir):
     # load notebook
     nb = jupytext.readf(nb_file)
-    if nb.metadata.get('jupytext', {}).get('formats'):
-        del nb.metadata['jupytext']['formats']
     if 'language_info' not in nb.metadata:
         return
 

@@ -58,9 +58,6 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
         with open(mirror_file, encoding='utf-8') as fp:
             expected = fp.read()
 
-    if 'format_name' in fmt and len(actual.splitlines()) > len(expected.splitlines()):
-        actual = '\n'.join(actual.splitlines()[-len(expected.splitlines()):] + [''])
-
     compare(expected, actual)
 
     # Compare the two notebooks
