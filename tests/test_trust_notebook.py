@@ -68,6 +68,9 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
 
         assert model['content'] == nb2['content']
 
+        # Just for coverage
+        cm.trust_notebook(file)
+
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(nb_file, tmpdir):

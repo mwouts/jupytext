@@ -18,6 +18,12 @@ def test_string_to_dict_conversion(metadata_filter_string, metadata_filter_dict)
     assert metadata_filter_as_dict(metadata_filter_string) == metadata_filter_dict
 
 
+def test_metadata_filter_as_dict():
+    assert metadata_filter_as_dict(True) == metadata_filter_as_dict('all')
+    assert metadata_filter_as_dict(False) == metadata_filter_as_dict('-all')
+    assert metadata_filter_as_dict({'excluded': 'all'}) == metadata_filter_as_dict('-all')
+
+
 def test_metadata_filter_default():
     assert filter_metadata(to_dict(['technical', 'user', 'preserve']), None, '-technical'
                            ) == to_dict(['user', 'preserve'])

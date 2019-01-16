@@ -17,6 +17,20 @@ def test_create_contentsmanager():
     jupytext.TextFileContentsManager()
 
 
+def test_rename(tmpdir):
+    org_file = str(tmpdir.join('notebook.ipynb'))
+    new_file = str(tmpdir.join('new.ipynb'))
+    with open(org_file, 'w') as fp:
+        fp.write('\n')
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.rename_file('notebook.ipynb', 'new.ipynb')
+
+    assert os.path.isfile(new_file)
+    assert not os.path.isfile(org_file)
+
+
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='66'))
 def test_load_save_rename(nb_file, tmpdir):
@@ -148,6 +162,10 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
 
     assert os.path.isfile(str(tmpdir.join('new.ipynb')))
     assert os.path.isfile(str(tmpdir.join('new.nb.py')))
+
+    # rename to a non-matching pattern
+    with pytest.raises(HTTPError):
+        cm.rename_file(tmp_nbpy, 'suffix_missing.py')
 
 
 @skip_if_dict_is_not_ordered
