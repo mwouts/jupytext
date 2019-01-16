@@ -436,3 +436,57 @@ def test_sync(nb_file, tmpdir):
 
     nb2 = readf(tmp_ipynb)
     compare_notebooks(nb, nb2, compare_outputs=True)
+
+
+@pytest.mark.parametrize('nb_file,ext',
+                         [(nb_file, '.py') for nb_file in list_notebooks('ipynb_py')] +
+                         [(nb_file, '.R') for nb_file in list_notebooks('ipynb_R')] +
+                         [(nb_file, '.jl') for nb_file in list_notebooks('ipynb_julia')])
+def test_cli_can_infer_jupytext_format(nb_file, ext, tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_text = str(tmpdir.join('notebook' + ext))
+    nb = readf(nb_file)
+
+    # Light format to Jupyter notebook
+    writef(nb, tmp_text)
+    jupytext(['--to', 'notebook', tmp_text])
+    nb2 = readf(tmp_ipynb)
+    compare_notebooks(nb, nb2)
+
+    # Percent format to Jupyter notebook
+    writef(nb, tmp_text, ext + ':percent')
+    jupytext(['--to', 'notebook', tmp_text])
+    nb2 = readf(tmp_ipynb)
+    compare_notebooks(nb, nb2)
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+    tmp_rmd = str(tmpdir.join('notebook.Rmd'))
+    nb = readf(nb_file)
+
+    # read ipynb notebook on stdin, write to python
+    with open(nb_file) as fp, mock.patch('sys.stdin', fp):
+        jupytext(['--to', 'py:percent', '-o', tmp_py])
+    nb2 = readf(tmp_py)
+    compare_notebooks(nb, nb2)
+
+    # read python notebook on stdin, write to ipynb
+    with open(tmp_py) as fp, mock.patch('sys.stdin', fp):
+        jupytext(['-o', tmp_ipynb])
+    nb2 = readf(tmp_ipynb)
+    compare_notebooks(nb, nb2)
+
+    # read ipynb notebook on stdin, write to R markdown
+    with open(nb_file) as fp, mock.patch('sys.stdin', fp):
+        jupytext(['-o', tmp_rmd])
+    nb2 = readf(tmp_rmd)
+    compare_notebooks(nb, nb2, 'Rmd')
+
+    # read markdown notebook on stdin, write to ipynb
+    with open(tmp_rmd) as fp, mock.patch('sys.stdin', fp):
+        jupytext(['-o', tmp_ipynb])
+    nb2 = readf(tmp_ipynb)
+    compare_notebooks(nb, nb2, 'Rmd')

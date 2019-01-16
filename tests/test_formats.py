@@ -1,7 +1,7 @@
 import pytest
 from testfixtures import compare
 from nbformat.v4.nbbase import new_notebook
-from jupytext.formats import guess_format, read_format_from_metadata, rearrange_jupytext_metadata
+from jupytext.formats import guess_format, divine_format, read_format_from_metadata, rearrange_jupytext_metadata
 from jupytext.formats import long_form_multiple_formats, short_form_multiple_formats, update_jupytext_formats_metadata
 from .utils import list_notebooks
 
@@ -22,6 +22,34 @@ def test_guess_format_percent(nb_file):
 def test_guess_format_sphinx(nb_file):
     with open(nb_file) as stream:
         assert guess_format(stream.read(), ext='.py') == 'sphinx'
+
+
+def test_divine_format():
+    assert divine_format('{"cells":[]}') == 'ipynb'
+    assert divine_format('''def f(x):
+    x + 1''') == 'py:light'
+    assert divine_format('''# %%
+def f(x):
+    x + 1
+
+# %%
+def g(x):
+    x + 2
+''') == 'py:percent'
+    assert divine_format('''This is a markdown file
+with one code block
+
+```
+1 + 1
+```
+''') == 'md'
+    assert divine_format(''';; ---
+;; jupyter:
+;;   jupytext:
+;;     text_representation:
+;;       extension: .ss
+;;       format_name: percent
+;; ---''') == 'ss:percent'
 
 
 def test_script_with_magics_not_percent(script="""# %%time

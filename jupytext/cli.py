@@ -9,7 +9,7 @@ import argparse
 import json
 from .jupytext import readf, reads, writef, writes
 from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version
-from .formats import long_form_one_format
+from .formats import long_form_one_format, divine_format
 from .paired_paths import paired_paths
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
@@ -60,9 +60,6 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
         return
 
     if not nb_files:
-        if not input_format:
-            raise ValueError('Reading notebook from the standard input requires the --from field.')
-        input_format = long_form_one_format(input_format)
         nb_files = [sys.stdin]
 
     if len(nb_files) > 1 and output:
@@ -72,9 +69,11 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
 
     for nb_file in nb_files:
         if nb_file == sys.stdin:
+            text = nb_file.read()
+            nb_fmt = input_format or divine_format(text)
             dest = None
-            current_ext = long_form_one_format(input_format)['extension']
-            notebook = reads(nb_file.read(), input_format)
+            current_ext = long_form_one_format(nb_fmt)['extension']
+            notebook = reads(text, nb_fmt)
         else:
             dest, current_ext = os.path.splitext(nb_file)
             notebook = None
@@ -305,10 +304,6 @@ chmod +x .git/hooks/pre-commit""")
         if not args.notebooks:
             raise ValueError('Please give the path to at least one notebook')
         return args
-
-    if not args.input_format:
-        if not args.notebooks and not args.pre_commit:
-            raise ValueError('Please specificy either --from, --pre-commit or notebooks')
 
     args.to = canonize_format(args.to, args.output)
 

@@ -5,6 +5,7 @@ new formats here!
 
 import os
 import re
+import nbformat
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
     LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, HydrogenCellReader, \
@@ -219,6 +220,29 @@ def guess_format(text, ext):
 
     # Default format
     return get_format_implementation(ext).format_name
+
+
+def divine_format(text):
+    """Guess the format of the notebook, based on its content #148"""
+    try:
+        nbformat.reads(text, as_version=4)
+        return 'ipynb'
+    except nbformat.reader.NotJSONError:
+        pass
+
+    lines = text.splitlines()
+    for comment in ['', '#', "#'", ';;', '//']:
+        metadata, _, _, _ = header_to_metadata_and_cell(lines, comment)
+        ext = metadata.get('jupytext', {}).get('text_representation', {}).get('extension')
+        if ext:
+            return ext[1:] + ':' + guess_format(text, ext)
+
+    # No metadata, but ``` on at least one line => markdown
+    for line in lines:
+        if line == '```':
+            return 'md'
+
+    return 'py:' + guess_format(text, '.py')
 
 
 def check_file_version(notebook, source_path, outputs_path):
