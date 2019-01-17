@@ -89,6 +89,8 @@ c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 jupyter notebook
 ```
 
+Note: if you are running jupyter with Jupyterhub, you must install jupytext with the Python environment that is used to start the notebook server on the hub, for instance: `/path/to/jupyter/environment/python -m pip install jupytext --upgrade --user`. You might need to ask your Jupyterhub administrator for the value of `/path/to/jupyter/environment/python`.
+
 ### <a name="paired-notebooks"></a> Per-notebook configuration
 
 Configure the multiple export formats for the current notebook by adding a `"jupytext": {"formats": "ipynb,py"},` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
