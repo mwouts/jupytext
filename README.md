@@ -77,6 +77,11 @@ or
 conda install -c conda-forge jupytext
 ```
 
+If you want to use Jupytext within Jupyter Notebook or JupyterLab, make sure to install Jupytext in the Python environment where the Jupyter server runs. If that environment is read-only, for instance if your server is started using JupyterHub, install Jupytext in user mode with:
+```
+/path_to_your_jupyter_environment/python -m pip install jupytext --upgrade --user
+```
+
 Then, configure Jupyter to use Jupytext:
 - generate a Jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit `.jupyter/jupyter_notebook_config.py` and append the following:
@@ -84,12 +89,10 @@ Then, configure Jupyter to use Jupytext:
 c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 ```
 (note that our contents manager accepts a few options: default formats, default metadata filter, etc &mdash; read more on this [below](#global-configuration)).
-- and restart Jupyter, i.e. run
+- and restart Jupyter Notebook or JupyterLab, either from the JupyterHub interface or from the command line with
 ```bash
-jupyter notebook
+jupyter notebook # or lab
 ```
-
-Note: if you are running jupyter with Jupyterhub, you must install jupytext with the Python environment that is used to start the notebook server on the hub, for instance: `/path/to/jupyter/environment/python -m pip install jupytext --upgrade --user`. You might need to ask your Jupyterhub administrator for the value of `/path/to/jupyter/environment/python`.
 
 ### <a name="paired-notebooks"></a> Per-notebook configuration
 
