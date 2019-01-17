@@ -1,10 +1,10 @@
 language: python
 python:
+  - "3.6"
   - "pypy"
   - "2.7"
   - "3.4"
   - "3.5"
-  - "3.6"
 matrix:
   include:
     - python: 3.7
@@ -23,7 +23,7 @@ before_script:
   # exit-zero treats all errors as warnings.  The GitHub editor is 127 chars wide
   - flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 script:
-  - coverage run --source=. -m py.test -s tests/
+  - coverage run --source=. -m py.test
 after_success:
   - coverage report -m
   - codecov
