@@ -1,6 +1,7 @@
 import pytest
 from testfixtures import compare
 from nbformat.v4.nbbase import new_notebook
+import jupytext
 from jupytext.formats import guess_format, divine_format, read_format_from_metadata, rearrange_jupytext_metadata
 from jupytext.formats import long_form_multiple_formats, short_form_multiple_formats, update_jupytext_formats_metadata
 from jupytext.formats import get_format_implementation, validate_one_format, set_auto_ext, JupytextFormatError
@@ -155,6 +156,32 @@ def test_rearrange_jupytext_metadata_add_dot_in_suffix():
     rearrange_jupytext_metadata(metadata)
     compare({'jupytext': {'text_representation': {'jupytext_version': '0.8.6'},
                           'formats': 'ipynb,.pct.py,.lgt.py'}}, metadata)
+
+
+def test_fix_139():
+    text = """# ---
+# jupyter:
+#   jupytext:
+#     metadata_filter:
+#       cells:
+#         additional:
+#           - "lines_to_next_cell"
+#         excluded:
+#           - "all"
+# ---
+
+# + {"lines_to_next_cell": 2}
+1 + 1
+# -
+
+
+1 + 1
+"""
+
+    nb = jupytext.reads(text, 'py:light')
+    text2 = jupytext.writes(nb, 'py:light')
+    assert 'cell_metadata_filter: -all' in text2
+    assert 'lines_to_next_cell' not in text2
 
 
 def test_validate_one_format():

@@ -306,6 +306,9 @@ def json_options_to_metadata(options, add_brackets=True):
 
 def metadata_to_json_options(metadata):
     """Represent metadata as json text"""
+    for key in _JUPYTEXT_CELL_METADATA:
+        metadata.pop(key, None)
+
     return json.dumps(metadata)
 
 
@@ -366,6 +369,7 @@ def metadata_to_double_percent_options(metadata):
         options.append(metadata.pop('title'))
     if 'cell_type' in metadata:
         options.append('[{}]'.format(metadata.pop('cell_type')))
-    if metadata:
-        options.append(metadata_to_json_options(metadata))
+    metadata = metadata_to_json_options(metadata)
+    if metadata != '{}':
+        options.append(metadata)
     return ' '.join(options)

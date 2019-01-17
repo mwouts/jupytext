@@ -13,6 +13,7 @@ from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
 from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
     LightScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter, \
     HydrogenCellExporter, SphinxGalleryCellExporter
+from .cell_metadata import _JUPYTEXT_CELL_METADATA
 from .stringparser import StringParser
 from .languages import _SCRIPT_EXTENSIONS
 
@@ -355,7 +356,7 @@ def rearrange_jupytext_metadata(metadata):
             if additional == 'all':
                 entries = ['all']
             else:
-                entries = additional
+                entries = [key for key in additional if key not in _JUPYTEXT_CELL_METADATA]
 
             excluded = jupytext_metadata.get(filter_level).get('excluded', [])
             if excluded == 'all':
