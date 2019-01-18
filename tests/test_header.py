@@ -71,7 +71,7 @@ title: Sample header
 def test_metadata_and_cell_to_header():
     nb = new_notebook(
         metadata={'jupytext': {'mainlanguage': 'python'}},
-        cells=[new_raw_cell(source="---\ntitle: Sample header\n---", metadata={'noskipline': True})])
+        cells=[new_raw_cell(source="---\ntitle: Sample header\n---")])
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
         header = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
     assert '\n'.join(header) == """---

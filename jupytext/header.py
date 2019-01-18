@@ -9,6 +9,7 @@ from nbformat.v4.nbbase import new_raw_cell
 from .version import __version__
 from .languages import _SCRIPT_EXTENSIONS, comment_lines
 from .metadata_filter import filter_metadata
+from .pep8 import pep8_lines_between_cells
 
 SafeRepresenter.add_representer(nbformat.NotebookNode, SafeRepresenter.represent_dict)
 
@@ -83,8 +84,8 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
     """
 
     header = []
-    skipline = True
 
+    lines_to_next_cell = None
     if notebook.cells:
         cell = notebook.cells[0]
         if cell.cell_type == 'raw':
@@ -93,7 +94,7 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
                     and _HEADER_RE.match(lines[0]) \
                     and _HEADER_RE.match(lines[-1]):
                 header = lines[1:-1]
-                skipline = not cell.metadata.get('noskipline', False)
+                lines_to_next_cell = cell.metadata.get('lines_to_next_cell')
                 notebook.cells = notebook.cells[1:]
 
     metadata = notebook.get('metadata', {})
@@ -118,14 +119,17 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
         header = ['---'] + header + ['---']
 
     header = comment_lines(header, text_format.header_prefix)
+    if lines_to_next_cell is None and notebook.cells:
+        lines_to_next_cell = pep8_lines_between_cells(header, notebook.cells[0], ext)
+    else:
+        lines_to_next_cell = 0
 
-    if header and skipline:
-        header += ['']
+    header.extend([''] * lines_to_next_cell)
 
     return header
 
 
-def header_to_metadata_and_cell(lines, header_prefix):
+def header_to_metadata_and_cell(lines, header_prefix, ext=None):
     """
     Return the metadata, a boolean to indicate if a jupyter section was found,
      the first cell of notebook if some metadata is found outside of the jupyter section, and next loc in text
@@ -186,20 +190,20 @@ def header_to_metadata_and_cell(lines, header_prefix):
         if jupyter:
             metadata.update(yaml.load('\n'.join(jupyter))['jupyter'])
 
-        skipline = True
+        lines_to_next_cell = 1
         if len(lines) > i + 1:
             line = uncomment_line(lines[i + 1], header_prefix)
             if not _BLANK_RE.match(line):
-                skipline = False
+                lines_to_next_cell = 0
             else:
                 i = i + 1
         else:
-            skipline = False
+            lines_to_next_cell = 0
 
         if header:
             cell = new_raw_cell(source='\n'.join(['---'] + header + ['---']),
-                                metadata={} if skipline else
-                                {'lines_to_next_cell': 0})
+                                metadata={} if lines_to_next_cell == pep8_lines_between_cells(
+                                    ['---'], lines[i + 1:], ext) else {'lines_to_next_cell': lines_to_next_cell})
         else:
             cell = None
 

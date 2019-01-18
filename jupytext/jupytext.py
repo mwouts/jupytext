@@ -12,6 +12,7 @@ from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable, insert_or_test_version_number
 from .languages import default_language_from_metadata_and_ext, set_main_and_cell_language
 from .cell_metadata import _JUPYTEXT_CELL_METADATA
+from .pep8 import pep8_lines_between_cells
 
 
 class TextNotebookConverter(NotebookReader, NotebookWriter):
@@ -27,7 +28,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         lines = s.splitlines()
 
         cells = []
-        metadata, jupyter_md, header_cell, pos = header_to_metadata_and_cell(lines, self.implementation.header_prefix)
+        metadata, jupyter_md, header_cell, pos = header_to_metadata_and_cell(lines,
+                                                                             self.implementation.header_prefix,
+                                                                             self.implementation.extension)
         if 'comment_magics' in metadata.get('jupytext', {}):
             self.fmt['comment_magics'] = metadata['jupytext']['comment_magics']
 
@@ -98,8 +101,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         texts = [cell.cell_to_text() for cell in cell_exporters]
 
         for i, cell in enumerate(cell_exporters):
-            text = cell.simplify_code_markers(
-                texts[i], texts[i + 1] if i + 1 < len(texts) else None, lines)
+            next_text = texts[i + 1] if i + 1 < len(texts) else None
+            text = cell.simplify_code_markers(texts[i], next_text, lines)
 
             if i == 0 and self.implementation.format_name and \
                     self.implementation.format_name.startswith('sphinx') and \
@@ -107,7 +110,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 continue
 
             lines.extend(text)
-            lines.extend([''] * cell.lines_to_next_cell)
+            lines.extend([''] * (cell.lines_to_next_cell if cell.lines_to_next_cell is not None else
+                                 pep8_lines_between_cells(text, next_text, self.implementation.extension)))
 
             # two blank lines between markdown cells in Rmd
             if self.ext in ['.Rmd', '.md'] and not cell.is_code():

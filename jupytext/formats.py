@@ -153,9 +153,9 @@ def read_metadata(text, ext):
     else:
         comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
 
-    metadata, _, _, _ = header_to_metadata_and_cell(lines, comment)
+    metadata, _, _, _ = header_to_metadata_and_cell(lines, comment, ext)
     if ext in ['.r', '.R'] and not metadata:
-        metadata, _, _, _ = header_to_metadata_and_cell(lines, "#'")
+        metadata, _, _, _ = header_to_metadata_and_cell(lines, "#'", ext)
 
     return metadata
 

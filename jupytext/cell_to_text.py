@@ -9,6 +9,7 @@ from .metadata_filter import filter_metadata
 from .magics import comment_magic, escape_code_start
 from .cell_reader import LightScriptCellReader
 from .languages import _SCRIPT_EXTENSIONS
+from .pep8 import pep8_lines_to_end_of_cell_marker
 
 
 def cell_source(cell):
@@ -56,14 +57,10 @@ class BaseCellExporter(object):
             else self.default_comment_magics
 
         # how many blank lines before next cell
-        self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', 1)
-        self.lines_to_end_of_cell_marker = cell.metadata.get('lines_to_end_of_cell_marker', 0)
-
-        # for compatibility with v0.5.4 and lower (to be removed)
-        if 'skipline' in cell.metadata:
-            self.lines_to_next_cell += 1
-        if 'noskipline' in cell.metadata:
-            self.lines_to_next_cell -= 1
+        self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', None)
+        self.lines_to_end_of_cell_marker = (cell.metadata['lines_to_end_of_cell_marker']
+                                            if 'lines_to_end_of_cell_marker' in cell.metadata
+                                            else pep8_lines_to_end_of_cell_marker(self.source, self.ext))
 
         if cell.cell_type == 'raw' and 'active' not in self.metadata:
             self.metadata['active'] = ''

@@ -13,6 +13,7 @@ from .cell_metadata import is_active, json_options_to_metadata, md_options_to_me
     double_percent_options_to_metadata
 from .stringparser import StringParser
 from .magics import uncomment_magic, is_magic, unescape_code_start
+from .pep8 import pep8_lines_to_end_of_cell_marker, pep8_lines_between_cells
 
 _BLANK_LINE = re.compile(r"^\s*$")
 _PY_COMMENT = re.compile(r"^\s*#")
@@ -95,6 +96,7 @@ class BaseCellReader(object):
         self.comment_magics = fmt['comment_magics'] if 'comment_magics' in fmt else self.default_comment_magics
         self.metadata = None
         self.content = []
+        self.explicit_eoc = None
         self.cell_type = None
         self.language = None
 
@@ -122,7 +124,11 @@ class BaseCellReader(object):
         if not self.metadata:
             self.metadata = {}
 
-        if self.lines_to_next_cell != 1:
+        org_lines = self.content
+        if self.ext == '.py' and self.cell_type != 'code' and self.content:
+            org_lines = ['#']  # cell was originally commented
+        if self.lines_to_next_cell != 1 if (self.explicit_eoc and self.cell_type == 'code' and self.ext == '.py') \
+                else self.lines_to_next_cell != pep8_lines_between_cells(org_lines, lines[pos_next_cell:], self.ext):
             self.metadata['lines_to_next_cell'] = self.lines_to_next_cell
 
         if self.language:
@@ -190,7 +196,7 @@ class BaseCellReader(object):
     def find_cell_content(self, lines):
         """Parse cell till its end and set content, lines_to_next_cell.
         Return the position of next cell start"""
-        cell_end_marker, next_cell_start, explicit_eoc = self.find_cell_end(lines)
+        cell_end_marker, next_cell_start, self.explicit_eoc = self.find_cell_end(lines)
 
         # Metadata to dict
         if self.metadata is None:
@@ -202,16 +208,22 @@ class BaseCellReader(object):
         # Cell content
         source = lines[cell_start:cell_end_marker]
 
+        # Exactly two empty lines at the end of cell (caused by PEP8)?
+        if self.ext == '.py' and self.explicit_eoc:
+            if last_two_lines_blank(source):
+                source = source[:-2]
+                lines_to_end_of_cell_marker = 2
+            else:
+                lines_to_end_of_cell_marker = 0
+
+            if lines_to_end_of_cell_marker != pep8_lines_to_end_of_cell_marker(source, self.ext):
+                self.metadata['lines_to_end_of_cell_marker'] = lines_to_end_of_cell_marker
+
         if not is_active(self.ext, self.metadata) or \
                 ('active' not in self.metadata and self.language and self.language != self.default_language):
             self.content = uncomment(source, self.comment if self.ext not in ['.r', '.R'] else '#')
         else:
             self.content = self.uncomment_code_and_magics(source)
-
-        # Exactly two empty lines at the end of cell (caused by PEP8)?
-        if self.ext == '.py' and explicit_eoc and last_two_lines_blank(source):
-            self.content = source[:-2]
-            self.metadata['lines_to_end_of_cell_marker'] = 2
 
         # Is this a raw cell?
         if ('active' in self.metadata and not is_active('ipynb', self.metadata)) or \
@@ -225,7 +237,7 @@ class BaseCellReader(object):
                 _BLANK_LINE.match(lines[next_cell_start]) and
                 not _BLANK_LINE.match(lines[next_cell_start + 1])):
             next_cell_start += 1
-        elif (explicit_eoc and next_cell_start + 2 < len(lines) and
+        elif (self.explicit_eoc and next_cell_start + 2 < len(lines) and
               _BLANK_LINE.match(lines[next_cell_start]) and
               _BLANK_LINE.match(lines[next_cell_start + 1]) and
               not _BLANK_LINE.match(lines[next_cell_start + 2])):
@@ -235,7 +247,7 @@ class BaseCellReader(object):
             cell_end_marker,
             next_cell_start,
             len(lines),
-            explicit_eoc)
+            self.explicit_eoc)
 
         return next_cell_start
 

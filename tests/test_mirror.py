@@ -11,6 +11,7 @@ from testfixtures import compare
 import jupytext
 from jupytext.compare import compare_notebooks, combine_inputs_with_outputs
 from jupytext.formats import long_form_one_format
+from jupytext.paired_paths import full_path
 from .utils import list_notebooks, skip_if_dict_is_not_ordered
 
 pytestmark = skip_if_dict_is_not_ordered
@@ -34,7 +35,7 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
     file_name, org_ext = os.path.splitext(basename)
     fmt = long_form_one_format(fmt)
     ext = fmt['extension']
-    mirror_file = os.path.join(dirname, '..', 'mirror', mirror_name, file_name + ext)
+    mirror_file = os.path.join(dirname, '..', 'mirror', mirror_name, full_path(file_name, fmt))
 
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
         notebook = jupytext.readf(nb_file, fmt)
@@ -105,7 +106,7 @@ def test_ipynb_to_R(nb_file):
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
 def test_ipynb_to_r(nb_file):
-    assert_conversion_same_as_mirror(nb_file, '_low.r', 'ipynb_to_script')
+    assert_conversion_same_as_mirror(nb_file, '.low.r', 'ipynb_to_script')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_scheme'))
@@ -140,7 +141,7 @@ def test_ipynb_to_R_percent(nb_file):
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
 def test_ipynb_to_r_percent(nb_file):
-    assert_conversion_same_as_mirror(nb_file, 'low.r:percent', 'ipynb_to_percent')
+    assert_conversion_same_as_mirror(nb_file, '.low.r:percent', 'ipynb_to_percent')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
@@ -150,7 +151,7 @@ def test_ipynb_to_R_spin(nb_file):
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
 def test_ipynb_to_r_spin(nb_file):
-    assert_conversion_same_as_mirror(nb_file, 'low.r', 'ipynb_to_spin')
+    assert_conversion_same_as_mirror(nb_file, '.low.r', 'ipynb_to_spin')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_cpp'))
