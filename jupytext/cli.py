@@ -103,12 +103,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
             continue
 
         if update_metadata:
-            try:
-                updated_metadata = json.loads(update_metadata)
-            except ValueError as exception:
-                raise ValueError("Could not parse --update-metadata {}. JSONDecodeError: {}".
-                                 format(update_metadata, str(exception)))
-            recursive_update(notebook.metadata, updated_metadata)
+            recursive_update(notebook.metadata, update_metadata)
 
         if comment_magics is not None:
             notebook.metadata.setdefault('jupytext', {})['comment_magics'] = comment_magics
@@ -271,8 +266,13 @@ chmod +x .git/hooks/pre-commit""")
                         nargs='?',
                         default=None,
                         help='Should Jupyter magic commands be commented? (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
+    parser.add_argument('--set-formats',
+                        type=str,
+                        help='Set jupytext.formats metadata to the given value. Use this to activate pairing on a '
+                             'notebook, with e.g. --set-formats ipynb,py:light')
     parser.add_argument('--update-metadata',
-                        default=None,
+                        default={},
+                        type=json.loads,
                         help='Update the notebook metadata with the desired dictionary. Argument must be given in JSON '
                              'format. For instance, if you want to activate a pairing in the generated file, '
                              """use e.g. '{"jupytext":{"formats":"ipynb,py:light"}}'""")
@@ -291,6 +291,9 @@ chmod +x .git/hooks/pre-commit""")
 
     if args.version:
         return args
+
+    if args.set_formats:
+        args.update_metadata = recursive_update(args.update_metadata, {'jupytext': {'formats': args.set_formats}})
 
     if args.input_format:
         args.input_format = canonize_format(args.input_format)

@@ -9,6 +9,7 @@ Release History
 **Improvements**
 
 - Jupytext command line has more arguments: ``--paired-paths`` to list the paths for the paired representations of the notebook, and ``--sync`` to synchronise the content of all paired paths based on the most recent file (#146). In addition, the ``--from`` argument is optional even when the notebook is read from stdin (#148).
+- The pairing information, and more generally the notebook metadata can be edited with the CLL, see the ``--set-formats`` and the ``--update-metadata`` arguments (#141).
 - Format specification allow prefix and suffix for path and file name (#138, #142). Use ``ipynb,prefix/suffix.py:percent`` to pair the current notebook named ``notebook.ipynb`` to a script named ``prefixnotebooksuffix.py``. Suffix and prefix can also be configured on the ``ipynb`` file, with the same syntax.
 - Introducing a new ``hydrogen`` format for scripts, which derives from ``percent``. In that format Jupyter magic commands are not commented (#59, #126, #132).
 - Python scripts or Markdown documents that have no Jupyter metadata receive a metadata filter that ensures that metadata is not exported back to the text representation (#124).

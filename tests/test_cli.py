@@ -367,6 +367,19 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
 
 
 @pytest.mark.parametrize('py_file', list_notebooks('python'))
+def test_set_formats(py_file, tmpdir):
+    tmp_py = str(tmpdir.join('notebook.py'))
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+
+    copyfile(py_file, tmp_py)
+
+    jupytext(['--to', 'ipynb', tmp_py, '--set-formats', 'ipynb,py:light'])
+
+    nb = readf(tmp_ipynb)
+    assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
+
+
+@pytest.mark.parametrize('py_file', list_notebooks('python'))
 def test_update_metadata(py_file, tmpdir, capsys):
     tmp_py = str(tmpdir.join('notebook.py'))
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
@@ -388,7 +401,7 @@ def test_update_metadata(py_file, tmpdir, capsys):
         jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"incorrect": "JSON"'])
 
     out, err = capsys.readouterr()
-    assert 'JSONDecodeError' in err
+    assert 'invalid' in err
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))

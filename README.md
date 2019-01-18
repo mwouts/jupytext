@@ -165,6 +165,8 @@ jupytext --to md --output - notebook.ipynb      # display the markdown version o
 jupytext --from ipynb --to py:percent           # read ipynb from stdin and write double percent script on stdout
 ```
 
+The `jupytext` command accepts many arguments. Execute `jupytext --help` to access the documentation. For instance, use the `--set-formats` and the `--update-metadata` arguments to edit the pairing information or more generally the notebook metadata.
+
 Jupytext is also available as a Git pre-commit hook. Use this if you want Jupytext to create and update the `.py` (or `.md`...) representation of the staged `.ipynb` notebooks. All you need is to create an executable `.git/hooks/pre-commit` file with the following content:
 ```bash
 #!/bin/sh
