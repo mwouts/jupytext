@@ -3,6 +3,7 @@
 import os
 import time
 import pytest
+import itertools
 from tornado.web import HTTPError
 from testfixtures import compare
 import jupytext
@@ -695,4 +696,33 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     # read paired notebook
     nb3 = cm.get(tmp_script)['content']
 
+    compare_notebooks(nb, nb3)
+
+
+@pytest.mark.parametrize('nb_file,ext', itertools.product(list_notebooks('ipynb_py'), ['.py', '.ipynb']))
+def test_local_format_can_deactivate_pairing(nb_file, ext, tmpdir):
+    """This is a test for #157: local format can be used to deactivate the """
+    nb = jupytext.readf(nb_file)
+    nb.metadata['jupytext_formats'] = ext[1:]  # py or ipynb
+
+    # create contents manager with default pairing
+    cm = jupytext.TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb,py'
+    cm.root_dir = str(tmpdir)
+
+    # save notebook
+    cm.save(model=dict(type='notebook', content=nb), path='notebook' + ext)
+
+    # check that only the text representation exists
+    assert os.path.isfile(str(tmpdir.join('notebook.py'))) == (ext == '.py')
+    assert os.path.isfile(str(tmpdir.join('notebook.ipynb'))) == (ext == '.ipynb')
+    nb2 = cm.get('notebook' + ext)['content']
+    compare_notebooks(nb, nb2)
+
+    # resave, check again
+    cm.save(model=dict(type='notebook', content=nb2), path='notebook' + ext)
+
+    assert os.path.isfile(str(tmpdir.join('notebook.py'))) == (ext == '.py')
+    assert os.path.isfile(str(tmpdir.join('notebook.ipynb'))) == (ext == '.ipynb')
+    nb3 = cm.get('notebook' + ext)['content']
     compare_notebooks(nb, nb3)
