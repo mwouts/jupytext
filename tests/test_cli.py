@@ -517,5 +517,5 @@ def test_cli_expect_errors():
         cli_jupytext(['--pre-commit', '--test'])
     with pytest.raises(SystemExit):
         jupytext(['notebook.ipynb', '--from', 'py:percent', '--to', 'md'])
-    with pytest.raises(SystemExit):
+    with pytest.raises((SystemExit, TypeError)):  # SystemExit on Windows, TypeError on Linux
         system('jupytext', ['notebook.ipynb', '--from', 'py:percent', '--to', 'md'])
