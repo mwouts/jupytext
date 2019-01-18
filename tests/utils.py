@@ -8,7 +8,7 @@ skip_if_dict_is_not_ordered = pytest.mark.skipif(
     reason="unordered dict result in changes in chunk options")
 
 
-def list_notebooks(path='ipynb', skip=''):
+def list_notebooks(path='ipynb', skip='World'):
     """All notebooks in the directory notebooks/path,
     or in the package itself"""
     if path == 'ipynb':
@@ -27,9 +27,6 @@ def list_notebooks(path='ipynb', skip=''):
         notebooks = [os.path.join(nb_path, nb_file) for nb_file in os.listdir(nb_path) if not skip_re.match(nb_file)]
     else:
         notebooks = [os.path.join(nb_path, nb_file) for nb_file in os.listdir(nb_path)]
-
-    # The world population notebook is quite large. Skipping it makes testing faster.
-    # notebooks = [nb_file for nb_file in notebooks if 'World' not in nb_file]
 
     assert notebooks
     return notebooks

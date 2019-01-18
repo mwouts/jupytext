@@ -94,7 +94,7 @@ def test_ipynb_to_julia(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'jl', 'ipynb_to_script')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip=''))
 def test_ipynb_to_python(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'py', 'ipynb_to_script')
 
@@ -129,7 +129,7 @@ def test_ipynb_to_julia_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'jl:percent', 'ipynb_to_percent')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip=''))
 def test_ipynb_to_python_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'py:percent', 'ipynb_to_percent')
 
