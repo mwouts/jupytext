@@ -132,7 +132,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
                                  format=" using format '{}'".format(fmt['format_name']) if 'format_name' in fmt else '',
                                  action=action))
 
-        save_notebook_as(notebook, nb_file, dest + ext, fmt, update)
+        save_notebook_as(notebook, nb_file, dest + ext, input_format, fmt, update)
 
     if notebooks_in_error:
         exit(notebooks_in_error)
@@ -156,12 +156,14 @@ def modified_and_deleted_files(ext):
     return re_modified.findall(files), re_deleted.findall(files)
 
 
-def save_notebook_as(notebook, nb_file, nb_dest, fmt, combine):
-    """Save notebook to file, in desired format"""
+def save_notebook_as(notebook, nb_file, nb_dest, input_fmt, fmt, combine):
+    """Save notebook to file, in desired format
+    :param input_fmt:
+    """
     if combine and os.path.isfile(nb_dest) and os.path.splitext(nb_dest)[1] == '.ipynb':
         check_file_version(notebook, nb_file, nb_dest)
         nb_outputs = readf(nb_dest)
-        combine_inputs_with_outputs(notebook, nb_outputs)
+        combine_inputs_with_outputs(notebook, nb_outputs, input_fmt)
 
     writef(notebook, nb_dest, fmt)
 
@@ -355,7 +357,7 @@ def sync_paired_notebooks(nb_file, nb_fmt):
         inputs = notebook if latest_inputs == nb_file else readf(latest_inputs, input_fmt)
         sys.stdout.write("[jupytext] Loading output cells from '{}'\n".format(latest_outputs))
         outputs = notebook if latest_outputs == nb_file else readf(latest_outputs)
-        notebook = combine_inputs_with_outputs(inputs, outputs)
+        notebook = combine_inputs_with_outputs(inputs, outputs, input_fmt)
     else:
         sys.stdout.write("[jupytext] Loading notebook from '{}'\n".format(latest_inputs))
         notebook = notebook if latest_inputs == nb_file else readf(latest_inputs, input_fmt)

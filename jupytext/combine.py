@@ -5,6 +5,7 @@ from copy import copy
 from .cell_metadata import _IGNORE_CELL_METADATA, _JUPYTEXT_CELL_METADATA
 from .header import _DEFAULT_NOTEBOOK_METADATA
 from .metadata_filter import filter_metadata
+from .formats import long_form_one_format
 
 _BLANK_LINE = re.compile(r'^\s*$')
 
@@ -16,16 +17,16 @@ def same_content(ref, test):
     return ref == test
 
 
-def combine_inputs_with_outputs(nb_source, nb_outputs):
+def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     """Copy outputs of the second notebook into
     the first one, for cells that have matching inputs"""
 
     output_code_cells = [cell for cell in nb_outputs.cells if cell.cell_type == 'code']
     output_other_cells = [cell for cell in nb_outputs.cells if cell.cell_type != 'code']
 
-    text_representation = nb_source.metadata.get('jupytext', {}).get('text_representation', {})
-    ext = text_representation.get('extension')
-    format_name = text_representation.get('format_name')
+    fmt = long_form_one_format(fmt)
+    ext = fmt.get('extension')
+    format_name = fmt.get('format_name')
 
     nb_outputs_filtered_metadata = copy(nb_outputs.metadata)
     filter_metadata(nb_outputs_filtered_metadata,
@@ -36,8 +37,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
         if key not in nb_outputs_filtered_metadata:
             nb_source.metadata[key] = nb_outputs.metadata[key]
 
-    if nb_source.metadata.get('jupytext', {}).get('formats') or ext in ['.md', '.Rmd'] or not \
-            nb_source.metadata.get('jupytext', {}).get('text_representation', {}).get('format_name'):
+    if nb_source.metadata.get('jupytext', {}).get('formats') or ext in ['.md', '.Rmd']:
         nb_source.metadata.get('jupytext', {}).pop('text_representation', None)
 
     if not nb_source.metadata.get('jupytext', {}):
@@ -56,7 +56,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
                     cell.outputs = ocell.outputs
 
                     # Append cell metadata that was filtered
-                    if (ext and ext.endswith('.md')) or format_name == 'sphinx':
+                    if (ext and ext.endswith('.md')) or format_name in ['bare', 'sphinx']:
                         ocell_filtered_metadata = {}
                     else:
                         ocell_filtered_metadata = copy(ocell.metadata)
@@ -74,7 +74,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
             for i, ocell in enumerate(output_other_cells):
                 if cell.cell_type == ocell.cell_type and same_content(cell.source, ocell.source):
                     if (ext and (ext.endswith('.md') or ext.endswith('.Rmd'))) \
-                            or format_name in ['spin', 'sphinx', 'sphinx']:
+                            or format_name in ['spin', 'bare', 'sphinx', 'sphinx']:
                         ocell_filtered_metadata = {}
                     else:
                         ocell_filtered_metadata = copy(ocell.metadata)

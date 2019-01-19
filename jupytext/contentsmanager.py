@@ -182,7 +182,6 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             try:
                 base_path(path, fmt)
                 return formats
-                break
             except InconsistentPath:
                 continue
 
@@ -295,15 +294,17 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             alt_paths = [(path, fmt)]
 
         org_model = model
+        fmt_inputs = fmt
         path_inputs = path_outputs = path
         model_outputs = None
 
         # Source format is first non ipynb format found on disk
         if path.endswith('.ipynb'):
-            for alt_path, _ in alt_paths:
+            for alt_path, alt_fmt in alt_paths:
                 if not alt_path.endswith('.ipynb') and self.exists(alt_path):
                     self.log.info(u'Reading SOURCE from {}'.format(alt_path))
                     path_inputs = alt_path
+                    fmt_inputs = alt_fmt
                     model_outputs = model
                     model = self.get(alt_path, content=content, type=type, format=format,
                                      load_alternative_format=False)
@@ -353,7 +354,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             model['content']['metadata']['jupytext'] = jupytext_metadata
 
         if model_outputs:
-            combine_inputs_with_outputs(model['content'], model_outputs['content'])
+            combine_inputs_with_outputs(model['content'], model_outputs['content'], fmt_inputs)
         elif not path.endswith('.ipynb'):
             nbk = model['content']
             language = nbk.metadata.get('jupytext', {}).get('main_language', 'python')
