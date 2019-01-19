@@ -1,4 +1,5 @@
 import pytest
+from jupytext import reads, writes
 from jupytext.metadata_filter import filter_metadata, metadata_filter_as_dict
 
 
@@ -45,3 +46,21 @@ def test_metadata_filter_user_overrides_default():
                            ) == to_dict(['technical', 'preserve'])
     assert filter_metadata(to_dict(['technical', 'user', 'preserve']), 'user,-all', 'preserve'
                            ) == to_dict(['user'])
+
+
+def test_cell_metadata_filter_is_updated():
+    text = """---
+jupyter:
+  jupytext:
+    cell_metadata_filter: -all
+---
+
+```{r cache=FALSE}
+1+1
+```
+"""
+    nb = reads(text, 'Rmd')
+    assert nb.metadata['jupytext']['cell_metadata_filter'] == 'cache,-all'
+
+    text2 = writes(nb, 'Rmd')
+    assert text.splitlines()[-3:] == text2.splitlines()[-3:]

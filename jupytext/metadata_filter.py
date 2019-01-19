@@ -1,5 +1,7 @@
 """Notebook and cell metadata filtering"""
 
+from .cell_metadata import _JUPYTEXT_CELL_METADATA
+
 
 def metadata_filter_as_dict(metadata_config):
     """Return the metadata filter represented as either None (no filter),
@@ -39,6 +41,49 @@ def metadata_filter_as_dict(metadata_config):
             metadata_config[section] = [key for key in metadata_config[section] if key]
 
     return metadata_config
+
+
+def metadata_filter_as_string(metadata_filter):
+    """Convert a filter, represented as a dictionary with 'additional' and 'excluded' entries, to a string"""
+    if not isinstance(metadata_filter, dict):
+        return metadata_filter
+
+    additional = metadata_filter.get('additional', [])
+    if additional == 'all':
+        entries = ['all']
+    else:
+        entries = [key for key in additional if key not in _JUPYTEXT_CELL_METADATA]
+
+    excluded = metadata_filter.get('excluded', [])
+    if excluded == 'all':
+        entries.append('-all')
+    else:
+        entries.extend(['-' + e for e in excluded])
+
+    return ','.join(entries)
+
+
+def update_metadata_filters(metadata, jupyter_md, cell_metadata):
+    """Update or set the notebook and cell metadata filters"""
+
+    cell_metadata = [m for m in cell_metadata if m not in ['language', 'magic_args']]
+
+    if 'cell_metadata_filter' in metadata.get('jupytext', {}):
+        metadata_filter = metadata_filter_as_dict(metadata.get('jupytext', {})['cell_metadata_filter'])
+        if isinstance(metadata_filter.get('excluded'), list):
+            metadata_filter['excluded'] = [key for key in metadata_filter['excluded'] if key not in cell_metadata]
+        metadata_filter.setdefault('additional', [])
+        if isinstance(metadata_filter.get('additional'), list):
+            for key in cell_metadata:
+                if key not in metadata_filter['additional']:
+                    metadata_filter['additional'].append(key)
+        metadata.setdefault('jupytext', {})['cell_metadata_filter'] = metadata_filter_as_string(metadata_filter)
+
+    if not jupyter_md:
+        # Set a metadata filter equal to the current metadata in script
+        cell_metadata = {'additional': cell_metadata, 'excluded': 'all'}
+        metadata.setdefault('jupytext', {})['notebook_metadata_filter'] = '-all'
+        metadata.setdefault('jupytext', {})['cell_metadata_filter'] = metadata_filter_as_string(cell_metadata)
 
 
 def apply_metadata_filter(metadata_config, actual_keys, filtered_keys=None):

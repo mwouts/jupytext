@@ -13,7 +13,7 @@ from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
 from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
     LightScriptCellExporter, BareScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter, \
     HydrogenCellExporter, SphinxGalleryCellExporter
-from .cell_metadata import _JUPYTEXT_CELL_METADATA
+from .metadata_filter import metadata_filter_as_string
 from .stringparser import StringParser
 from .languages import _SCRIPT_EXTENSIONS
 
@@ -360,20 +360,8 @@ def rearrange_jupytext_metadata(metadata):
         jupytext_metadata['cell_metadata_filter'] = filters['cells']
 
     for filter_level in ['notebook_metadata_filter', 'cell_metadata_filter']:
-        if isinstance(jupytext_metadata.get(filter_level), dict):
-            additional = jupytext_metadata.get(filter_level).get('additional', [])
-            if additional == 'all':
-                entries = ['all']
-            else:
-                entries = [key for key in additional if key not in _JUPYTEXT_CELL_METADATA]
-
-            excluded = jupytext_metadata.get(filter_level).get('excluded', [])
-            if excluded == 'all':
-                entries.append('-all')
-            else:
-                entries.extend(['-' + e for e in excluded])
-
-            jupytext_metadata[filter_level] = ','.join(entries)
+        if filter_level in jupytext_metadata:
+            jupytext_metadata[filter_level] = metadata_filter_as_string(jupytext_metadata[filter_level])
 
     if jupytext_metadata.get('text_representation', {}).get('jupytext_version', '').startswith('0.'):
         formats = jupytext_metadata.get('formats', '').split(',')

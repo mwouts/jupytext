@@ -10,8 +10,8 @@ from .formats import get_format_implementation, read_format_from_metadata, guess
     update_jupytext_formats_metadata, format_name_for_ext, rearrange_jupytext_metadata
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
     encoding_and_executable, insert_or_test_version_number
+from .metadata_filter import update_metadata_filters
 from .languages import default_language_from_metadata_and_ext, set_main_and_cell_language
-from .cell_metadata import _JUPYTEXT_CELL_METADATA
 from .pep8 import pep8_lines_between_cells
 
 
@@ -53,12 +53,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
             lines = lines[pos:]
 
-        if not jupyter_md:
-            # Set a metadata filter equal to the current metadata in script
-            cell_metadata = [m for m in cell_metadata if m not in _JUPYTEXT_CELL_METADATA]
-            metadata.setdefault('jupytext', {})['notebook_metadata_filter'] = '-all'
-            metadata.setdefault('jupytext', {})['cell_metadata_filter'] = ','.join(cell_metadata + ['-all'])
-
+        update_metadata_filters(metadata, jupyter_md, cell_metadata)
         set_main_and_cell_language(metadata, cells, self.implementation.extension)
 
         if self.implementation.format_name and self.implementation.format_name.startswith('sphinx'):
