@@ -122,7 +122,7 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
     if lines_to_next_cell is None and notebook.cells:
         lines_to_next_cell = pep8_lines_between_cells(header, notebook.cells[0], ext)
     else:
-        lines_to_next_cell = 0
+        lines_to_next_cell = 1
 
     header.extend([''] * lines_to_next_cell)
 

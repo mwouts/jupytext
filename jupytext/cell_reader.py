@@ -13,7 +13,7 @@ from .cell_metadata import is_active, json_options_to_metadata, md_options_to_me
     double_percent_options_to_metadata
 from .stringparser import StringParser
 from .magics import uncomment_magic, is_magic, unescape_code_start
-from .pep8 import pep8_lines_to_end_of_cell_marker, pep8_lines_between_cells
+from .pep8 import pep8_lines_between_cells
 
 _BLANK_LINE = re.compile(r"^\s*$")
 _PY_COMMENT = re.compile(r"^\s*#")
@@ -127,8 +127,12 @@ class BaseCellReader(object):
         org_lines = self.content
         if self.ext == '.py' and self.cell_type != 'code' and self.content:
             org_lines = ['#']  # cell was originally commented
-        if self.lines_to_next_cell != 1 if (self.explicit_eoc and self.cell_type == 'code' and self.ext == '.py') \
-                else self.lines_to_next_cell != pep8_lines_between_cells(org_lines, lines[pos_next_cell:], self.ext):
+        if self.cell_type == 'code' and self.ext == '.py' and not self.explicit_eoc:
+            expected_blank_lines = pep8_lines_between_cells(org_lines, lines[pos_next_cell:], self.ext)
+        else:
+            expected_blank_lines = 1
+
+        if self.lines_to_next_cell != expected_blank_lines:
             self.metadata['lines_to_next_cell'] = self.lines_to_next_cell
 
         if self.language:
@@ -170,8 +174,7 @@ class BaseCellReader(object):
                     return i - 1, i, False
                 return i, i, False
 
-            # Simple code pattern in LightScripts must be preceded with
-            # a blank line
+            # Simple code pattern in LightScripts must be preceded with a blank line
             if i > 0 and self.simple_start_code_re and _BLANK_LINE.match(lines[i - 1]) and \
                     self.simple_start_code_re.match(line):
                 return i - 1, i, False
@@ -216,7 +219,8 @@ class BaseCellReader(object):
             else:
                 lines_to_end_of_cell_marker = 0
 
-            if lines_to_end_of_cell_marker != pep8_lines_to_end_of_cell_marker(source, self.ext):
+            pep8_lines = pep8_lines_between_cells(source, lines[cell_end_marker:], self.ext)
+            if lines_to_end_of_cell_marker != (0 if pep8_lines == 1 else 2):
                 self.metadata['lines_to_end_of_cell_marker'] = lines_to_end_of_cell_marker
 
         if not is_active(self.ext, self.metadata) or \

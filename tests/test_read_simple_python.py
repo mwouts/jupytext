@@ -489,8 +489,8 @@ d = 6
     for cell in notebook.cells:
         lines = cell.source.splitlines()
         if len(lines) != 1:
-            assert lines[0]
-            assert lines[-1]
+            assert lines[0], cell.source
+            assert lines[-1], cell.source
 
     script2 = jupytext.writes(notebook, 'py')
 

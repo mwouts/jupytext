@@ -13,6 +13,7 @@ Release History
 - Format specification allow prefix and suffix for path and file name (#138, #142). Use ``ipynb,prefix/suffix.py:percent`` to pair the current notebook named ``notebook.ipynb`` to a script named ``prefixnotebooksuffix.py``. Suffix and prefix can also be configured on the ``ipynb`` file, with the same syntax.
 - Introducing a new ``hydrogen`` format for scripts, which derives from ``percent``. In that format Jupyter magic commands are not commented (#59, #126, #132).
 - Introducing a new ``bare`` format for scripts, which derives from ``light``. That format has no cell marker. Use a notebook metadata filter ``{"jupytext": {"notebook_metadata_filter":"-all"}}`` if you want no YAML header (#152).
+- The Python representation of notebooks containing PEP8 cells is now expected to be PEP8 compliant (#154).
 - Python scripts or Markdown documents that have no Jupyter metadata receive a metadata filter that ensures that metadata is not exported back to the text representation (#124).
 - Metadata filters are represented as strings rather than dictionaries to make YAML headers shorter. Previous syntax from #105 is still supported. They were also renamed to ``notebook_metadata_filter`` and ``cell_metadata_filter``.
 - Markdown and RMarkdown formats have a new option ``split_at_heading`` to split Markdown cells at heading (#130)

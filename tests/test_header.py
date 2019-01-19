@@ -79,7 +79,8 @@ title: Sample header
 jupyter:
   jupytext:
     mainlanguage: python
----"""
+---
+"""
     assert nb.cells == []
 
 

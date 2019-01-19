@@ -9,7 +9,7 @@ from .metadata_filter import filter_metadata
 from .magics import comment_magic, escape_code_start
 from .cell_reader import LightScriptCellReader
 from .languages import _SCRIPT_EXTENSIONS
-from .pep8 import pep8_lines_to_end_of_cell_marker
+from .pep8 import pep8_lines_between_cells
 
 
 def cell_source(cell):
@@ -57,10 +57,8 @@ class BaseCellExporter(object):
             else self.default_comment_magics
 
         # how many blank lines before next cell
-        self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', None)
-        self.lines_to_end_of_cell_marker = (cell.metadata['lines_to_end_of_cell_marker']
-                                            if 'lines_to_end_of_cell_marker' in cell.metadata
-                                            else pep8_lines_to_end_of_cell_marker(self.source, self.ext))
+        self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell')
+        self.lines_to_end_of_cell_marker = cell.metadata.get('lines_to_end_of_cell_marker')
 
         if cell.cell_type == 'raw' and 'active' not in self.metadata:
             self.metadata['active'] = ''
@@ -95,8 +93,13 @@ class BaseCellExporter(object):
         """Return the text representation of this cell as a code cell"""
         raise NotImplementedError('This method must be implemented in a sub-class')
 
-    def simplify_code_markers(self, text, next_text, lines):
-        """Simplify start code marker when possible"""
+    def remove_eoc_marker(self, text, next_text):
+        """Remove end-of-cell marker when possible"""
+        # pylint: disable=W0613,R0201
+        return text
+
+    def simplify_soc_marker(self, text, prev_text):
+        """Simplify start-of-cell marker when possible"""
         # pylint: disable=W0613,R0201
         return text
 
@@ -227,20 +230,34 @@ class LightScriptCellExporter(BaseCellExporter):
 
         return False
 
-    def simplify_code_markers(self, text, next_text, lines):
-        """Simplify cell marker when previous line is blank, remove end
-        of cell marker when next cell has an explicit marker"""
-        if text[0] == '{0} + {{}}'.format(self.comment) and (not lines or not lines[-1]):
-            text[0] = self.comment + ' +'
+    def remove_eoc_marker(self, text, next_text):
+        """Remove end of cell marker when next cell has an explicit start marker"""
 
-        # remove end of cell marker when redundant
-        # with next explicit marker
         if self.is_code() and text[-1] == self.comment + ' -':
-            if self.lines_to_end_of_cell_marker:
-                text = text[:-1] + \
-                       [''] * self.lines_to_end_of_cell_marker + [self.comment + ' -']
-            elif not next_text or next_text[0].startswith(self.comment + ' + {'):
+            # remove end of cell marker when redundant with next explicit marker
+            if not next_text or next_text[0].startswith(self.comment + ' + {'):
                 text = text[:-1]
+                # When we do not need the end of cell marker, number of blank lines is the max
+                # between that required at the end of the cell, and that required before the next cell.
+                if self.lines_to_end_of_cell_marker and (self.lines_to_next_cell is None or
+                                                         self.lines_to_end_of_cell_marker > self.lines_to_next_cell):
+                    self.lines_to_next_cell = self.lines_to_end_of_cell_marker
+            else:
+                # Insert blank lines at the end of the cell
+                blank_lines = self.lines_to_end_of_cell_marker
+                if blank_lines is None:
+                    # two blank lines when required by pep8
+                    blank_lines = pep8_lines_between_cells(text[:-1], next_text, self.ext)
+                    blank_lines = 0 if blank_lines < 2 else 2
+                text = text[:-1] + [''] * blank_lines + text[-1:]
+
+        return text
+
+    def simplify_soc_marker(self, text, prev_text):
+        """Simplify start of cell marker when previous line is blank"""
+        if self.is_code() and text and text[0] == self.comment + ' + {}':
+            if not prev_text or not prev_text[-1].strip():
+                text[0] = self.comment + ' +'
 
         return text
 

@@ -78,8 +78,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         if 'main_language' in nb.metadata.get('jupytext', {}):
             del nb.metadata['jupytext']['main_language']
 
-        lines = encoding_and_executable(nb, self.ext)
-        lines.extend(metadata_and_cell_to_header(nb, self.implementation, self.ext))
+        header = encoding_and_executable(nb, self.ext)
+        header.extend(metadata_and_cell_to_header(nb, self.implementation, self.ext))
 
         cell_exporters = []
         looking_for_first_markdown_cell = (self.implementation.format_name and
@@ -94,32 +94,42 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             cell_exporters.append(self.implementation.cell_exporter_class(cell, default_language, self.fmt))
 
         texts = [cell.cell_to_text() for cell in cell_exporters]
+        lines = []
 
-        for i, cell in enumerate(cell_exporters):
-            next_text = texts[i + 1] if i + 1 < len(texts) else None
-            text = cell.simplify_code_markers(texts[i], next_text, lines)
+        # concatenate cells in reverse order to determine how many blank lines (pep8)
+        for i, cell in reversed(list(enumerate(cell_exporters))):
+            text = cell.remove_eoc_marker(texts[i], lines)
 
             if i == 0 and self.implementation.format_name and \
                     self.implementation.format_name.startswith('sphinx') and \
                     (text in [['%matplotlib inline'], ['# %matplotlib inline']]):
                 continue
 
-            lines.extend(text)
-            lines.extend([''] * (cell.lines_to_next_cell if cell.lines_to_next_cell is not None else
-                                 pep8_lines_between_cells(text, next_text, self.implementation.extension)))
+            lines_to_next_cell = cell.lines_to_next_cell
+            if lines_to_next_cell is None:
+                lines_to_next_cell = pep8_lines_between_cells(text, lines, self.implementation.extension)
+
+            text.extend([''] * lines_to_next_cell)
 
             # two blank lines between markdown cells in Rmd
             if self.ext in ['.Rmd', '.md'] and not cell.is_code():
                 if i + 1 < len(cell_exporters) and not cell_exporters[i + 1].is_code() and (
                         not split_at_heading or not (texts[i + 1] and texts[i + 1][0].startswith('#'))):
-                    lines.append('')
+                    text.append('')
 
             # "" between two consecutive code cells in sphinx
             if self.implementation.format_name.startswith('sphinx') and cell.is_code():
                 if i + 1 < len(cell_exporters) and cell_exporters[i + 1].is_code():
-                    lines.append('""')
+                    text.append('""')
 
-        return '\n'.join(lines)
+            if i + 1 < len(cell_exporters):
+                lines = cell_exporters[i + 1].simplify_soc_marker(lines, text)
+            lines = text + lines
+
+        if cell_exporters:
+            lines = cell_exporters[0].simplify_soc_marker(lines, header)
+
+        return '\n'.join(header + lines)
 
 
 def reads(text, fmt, as_version=4, **kwargs):

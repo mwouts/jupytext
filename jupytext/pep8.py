@@ -1,13 +1,20 @@
 """Determine how many blank lines should be inserted between two cells"""
 
 
-def cell_starts_with_function_or_class(lines):
-    """Is the first non-commented line of the cell either a function or a class?"""
+def next_instruction_is_function_or_class(lines):
+    """Is the first non-empty, non-commented line of the cell either a function or a class?"""
+    prev_line_blank = False
     for line in lines:
-        if line.startswith('#'):
+        if not line.strip():  # empty line
+            if prev_line_blank:
+                return False
+            prev_line_blank = True
             continue
         if line.startswith('def ') or line.startswith('class '):
             return True
+        if line.startswith(('#', '@', ' ')):
+            prev_line_blank = False
+            continue
         return False
 
     return False
@@ -23,7 +30,14 @@ def cell_ends_with_function_or_class(lines):
         return False
 
     # find the first line, starting from the bottom, that is not indented
+    prev_line_blank = False
     for line in lines[::-1]:
+        if not line.strip():
+            if prev_line_blank:
+                return False
+            prev_line_blank = True
+            continue
+        prev_line_blank = False
         if line.startswith('#') or line.startswith(' '):
             continue
         if line.startswith('def ') or line.startswith('class '):
@@ -33,9 +47,15 @@ def cell_ends_with_function_or_class(lines):
     return False
 
 
-def pep8_lines_to_end_of_cell_marker(lines, ext):
-    """In case the cell has an end-of-cell marker, how many blank lines should be added to it?"""
-    return 2 if ext == '.py' and cell_ends_with_function_or_class(lines) else 0
+def cell_ends_with_code(lines):
+    """Is the last line of the cell a line with code?"""
+    if not lines:
+        return False
+    if not lines[-1].strip():
+        return False
+    if lines[-1].startswith('#'):
+        return False
+    return True
 
 
 def pep8_lines_between_cells(prev_lines, next_lines, ext):
@@ -48,6 +68,6 @@ def pep8_lines_between_cells(prev_lines, next_lines, ext):
         return 1
     if cell_ends_with_function_or_class(prev_lines):
         return 2
-    if cell_starts_with_function_or_class(next_lines):
+    if cell_ends_with_code(prev_lines) and next_instruction_is_function_or_class(next_lines):
         return 2
     return 1
