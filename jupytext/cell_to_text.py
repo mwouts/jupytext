@@ -167,6 +167,7 @@ def endofcell_marker(source, comment):
 class LightScriptCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as a Python or Julia script"""
     default_comment_magics = True
+    use_cell_markers = True
 
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
@@ -199,7 +200,7 @@ class LightScriptCellExporter(BaseCellExporter):
         if self.explicit_start_marker(source):
             self.metadata['endofcell'] = endofcell_marker(source, self.comment)
 
-        if not self.metadata:
+        if not self.metadata or not self.use_cell_markers:
             return source
 
         lines = []
@@ -215,6 +216,8 @@ class LightScriptCellExporter(BaseCellExporter):
     def explicit_start_marker(self, source):
         """Does the python representation of this cell requires an explicit
         start of cell marker?"""
+        if not self.use_cell_markers:
+            return False
         if self.metadata:
             return True
         if all([line.startswith(self.comment) for line in self.source]):
@@ -240,6 +243,11 @@ class LightScriptCellExporter(BaseCellExporter):
                 text = text[:-1]
 
         return text
+
+
+class BareScriptCellExporter(LightScriptCellExporter):
+    """A class that writes notebook cells as scripts with no cell markers"""
+    use_cell_markers = False
 
 
 class RScriptCellExporter(BaseCellExporter):

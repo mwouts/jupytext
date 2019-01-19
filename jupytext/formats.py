@@ -11,7 +11,7 @@ from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
     LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, HydrogenCellReader, \
     SphinxGalleryScriptCellReader
 from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
-    LightScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter, \
+    LightScriptCellExporter, BareScriptCellExporter, RScriptCellExporter, DoublePercentCellExporter, \
     HydrogenCellExporter, SphinxGalleryCellExporter
 from .cell_metadata import _JUPYTEXT_CELL_METADATA
 from .stringparser import StringParser
@@ -87,6 +87,15 @@ JUPYTEXT_FORMATS = \
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
             current_version_number='1.3',
             min_readable_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
+    [
+        NotebookFormatDescription(
+            format_name='bare',
+            extension=ext,
+            header_prefix=_SCRIPT_EXTENSIONS[ext]['comment'],
+            cell_reader_class=LightScriptCellReader,
+            cell_exporter_class=BareScriptCellExporter,
+            current_version_number='1.0',
+            min_readable_version_number='1.0') for ext in _SCRIPT_EXTENSIONS] + \
     [
         NotebookFormatDescription(
             format_name='percent',
