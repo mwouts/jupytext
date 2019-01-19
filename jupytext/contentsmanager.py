@@ -175,6 +175,19 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         if self.split_at_heading and 'split_at_heading' not in metadata.get('jupytext', {}):
             metadata.setdefault('jupytext', {})['split_at_heading'] = True
 
+    def default_formats(self, path):
+        """Return the default formats, if they apply to the current path #157"""
+        formats = long_form_multiple_formats(self.default_jupytext_formats)
+        for fmt in formats:
+            try:
+                base_path(path, fmt)
+                return formats
+                break
+            except InconsistentPath:
+                continue
+
+        return None
+
     def save(self, model, path=''):
         """Save the file model and return the model with no content."""
         if model['type'] != 'notebook':
@@ -185,7 +198,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             metadata = nbk.get('metadata')
             rearrange_jupytext_metadata(metadata)
             self.set_default_format_options(metadata)
-            jupytext_formats = metadata.get('jupytext', {}).get('formats', self.default_jupytext_formats)
+            jupytext_formats = metadata.get('jupytext', {}).get('formats') or self.default_formats(path)
+
             if not jupytext_formats:
                 text_representation = metadata.get('jupytext', {}).get('text_representation', {})
                 ext = os.path.splitext(path)[1]
@@ -262,7 +276,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
         # We will now read a second file if this is a paired notebooks.
         nbk = model['content']
-        jupytext_formats = nbk.metadata.get('jupytext', {}).get('formats', self.default_jupytext_formats)
+        jupytext_formats = nbk.metadata.get('jupytext', {}).get('formats') or self.default_formats(path)
         jupytext_formats = long_form_multiple_formats(jupytext_formats)
 
         # Compute paired notebooks from formats

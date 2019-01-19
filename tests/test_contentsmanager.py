@@ -701,7 +701,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
 
 @pytest.mark.parametrize('nb_file,ext', itertools.product(list_notebooks('ipynb_py'), ['.py', '.ipynb']))
 def test_local_format_can_deactivate_pairing(nb_file, ext, tmpdir):
-    """This is a test for #157: local format can be used to deactivate the """
+    """This is a test for #157: local format can be used to deactivate the global pairing"""
     nb = jupytext.readf(nb_file)
     nb.metadata['jupytext_formats'] = ext[1:]  # py or ipynb
 
@@ -726,3 +726,25 @@ def test_local_format_can_deactivate_pairing(nb_file, ext, tmpdir):
     assert os.path.isfile(str(tmpdir.join('notebook.ipynb'))) == (ext == '.ipynb')
     nb3 = cm.get('notebook' + ext)['content']
     compare_notebooks(nb, nb3)
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('Rmd'))
+def test_global_pairing_allows_to_save_other_file_types(nb_file, tmpdir):
+    """This is a another test for #157: local format can be used to deactivate the global pairing"""
+    nb = jupytext.readf(nb_file)
+
+    # create contents manager with default pairing
+    cm = jupytext.TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb,py'
+    cm.root_dir = str(tmpdir)
+
+    # save notebook
+    cm.save(model=dict(type='notebook', content=nb), path='notebook.Rmd')
+
+    # check that only the original file is saved
+    assert os.path.isfile(str(tmpdir.join('notebook.Rmd')))
+    assert not os.path.isfile(str(tmpdir.join('notebook.py')))
+    assert not os.path.isfile(str(tmpdir.join('notebook.ipynb')))
+
+    nb2 = cm.get('notebook.Rmd')['content']
+    compare_notebooks(nb, nb2)
