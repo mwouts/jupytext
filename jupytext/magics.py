@@ -29,9 +29,7 @@ def is_magic(line, language, global_escape_flag=True):
     """Is the current line a (possibly escaped) Jupyter magic, and should it be commented?"""
     if _MAGIC_FORCE_ESC_RE.get(language, _MAGIC_FORCE_ESC_RE['python']).match(line):
         return True
-    if _MAGIC_NOT_ESC_RE.get(language, _MAGIC_NOT_ESC_RE['python']).match(line):
-        return False
-    if not global_escape_flag:
+    if not global_escape_flag or _MAGIC_NOT_ESC_RE.get(language, _MAGIC_NOT_ESC_RE['python']).match(line):
         return False
     if _MAGIC_RE.get(language, _MAGIC_RE['python']).match(line):
         return True

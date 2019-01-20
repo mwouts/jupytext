@@ -22,11 +22,7 @@ def next_instruction_is_function_or_class(lines):
 
 def cell_ends_with_function_or_class(lines):
     """Does the last line of the cell belong to an indented code?"""
-    if not lines:
-        return False
-    if not lines[-1].startswith(' '):
-        return False
-    if not lines[-1].strip():
+    if not lines or not lines[-1].startswith(' ') or not lines[-1].strip():
         return False
 
     # find the first line, starting from the bottom, that is not indented
