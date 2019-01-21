@@ -127,7 +127,7 @@ c.ContentsManager.preferred_jupytext_formats_save = "py:percent"
 and then, Jupytext will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
 
 To disable global pairing for an individual notebook, set formats to a single format, e.g.:
-``"jupytext": {"formats": "ipynb"},`
+`"jupytext": {"formats": "ipynb"},`
 
 #### Default metadata filtering
 
