@@ -126,6 +126,9 @@ c.ContentsManager.preferred_jupytext_formats_save = "py:percent"
 ```
 and then, Jupytext will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
 
+To disable global pairing for an individual notebook, set formats to a single format, e.g.:
+``"jupytext": {"formats": "ipynb"},`
+
 #### Default metadata filtering
 
 You can specify which metadata to include or exclude in the text files created by Jupytext by default by setting `c.ContentsManager.default_notebook_metadata_filter` (notebook metadata) and `c.ContentsManager.default_cell_metadata_filter` (cell metadata). They accept a string of comma separated keywords. A minus sign `-` in font of a keyword means exclusion.
