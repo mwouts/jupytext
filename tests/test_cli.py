@@ -390,12 +390,11 @@ def test_update_metadata(py_file, tmpdir, capsys):
 
     nb = readf(tmp_ipynb)
     assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
-    assert 'text_representation' in nb.metadata['jupytext']
 
-    jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"jupytext":{"text_representation":null}}'])
+    jupytext(['--to', 'py', tmp_ipynb, '--update-metadata', '{"jupytext":{"formats":null}}'])
 
-    nb = readf(tmp_ipynb)
-    assert 'text_representation' not in nb.metadata['jupytext']
+    nb = readf(tmp_py)
+    assert 'formats' not in nb.metadata['jupytext']
 
     with pytest.raises(SystemExit):
         jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"incorrect": "JSON"'])

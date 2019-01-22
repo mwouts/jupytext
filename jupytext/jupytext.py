@@ -185,6 +185,10 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     format_name = fmt.get('format_name')
 
     if ext == '.ipynb':
+        # Remove jupytext section if empty
+        notebook.metadata.get('jupytext', {}).pop('text_representation', {})
+        if not notebook.metadata.get('jupytext', {}):
+            notebook.metadata.pop('jupytext', {})
         return nbformat.writes(notebook, version, **kwargs)
 
     if not format_name:
