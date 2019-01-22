@@ -71,5 +71,8 @@ x = 4
 def test_no_metadata_when_py_is_pep8(py_file):
     nb = readf(py_file)
 
-    for cell in nb.cells:
-        assert not cell.metadata, (py_file, cell.source)
+    for i, cell in enumerate(nb.cells):
+        if i == 0 and not cell.source:
+            assert cell.metadata == {'lines_to_next_cell': 0}, py_file
+        else:
+            assert not cell.metadata, (py_file, cell.source)

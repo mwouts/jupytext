@@ -186,8 +186,9 @@ class BaseCellReader(object):
                 if not next_code_is_indented(lines[i:]):
                     if i > 0:
                         return i, i + 1, False
-                    if len(lines) == 1 or _BLANK_LINE.match(lines[1]):
-                        return 1, 2, False
+                    if len(lines) > 1 and not _BLANK_LINE.match(lines[1]):
+                        return 1, 1, False
+                    return 1, 2, False
 
         return len(lines), len(lines), False
 

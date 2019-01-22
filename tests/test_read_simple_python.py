@@ -531,6 +531,23 @@ def g(x):
     compare(script, script2)
 
 
+def test_notebook_one_blank_line_before_first_markdown_cell(script="""
+# This is a markdown cell
+
+1 + 1
+"""):
+    notebook = jupytext.reads(script, 'py')
+    script2 = jupytext.writes(notebook, 'py')
+    compare(script, script2)
+
+    assert len(notebook.cells) == 3
+    for cell in notebook.cells:
+        lines = cell.source.splitlines()
+        if len(lines):
+            assert lines[0]
+            assert lines[-1]
+
+
 def test_round_trip_markdown_cell_with_magic():
     notebook = new_notebook(cells=[new_markdown_cell('IPython has magic commands like\n%quickref')],
                             metadata={'jupytext': {'main_language': 'python'}})
