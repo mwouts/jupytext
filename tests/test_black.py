@@ -9,7 +9,7 @@ from jupytext.cli import system, jupytext
 def black_version():
     try:
         return system('black', '--version')
-    except IOError:  # pragma: no cover
+    except OSError:  # pragma: no cover
         return None
 
 
