@@ -1,4 +1,5 @@
 flake8
+black
 pytest
 pytest-cov==2.5.1
 codecov
