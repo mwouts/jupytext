@@ -1,4 +1,5 @@
 """Determine how many blank lines should be inserted between two cells"""
+from .stringparser import StringParser
 
 
 def next_instruction_is_function_or_class(lines):
@@ -25,9 +26,16 @@ def cell_ends_with_function_or_class(lines):
     if not lines or not lines[-1].startswith(' ') or not lines[-1].strip():
         return False
 
+    non_quoted_lines = []
+    parser = StringParser('python')
+    for line in lines:
+        if not parser.is_quoted():
+            non_quoted_lines.append(line)
+        parser.read_line(line)
+
     # find the first line, starting from the bottom, that is not indented
     prev_line_blank = False
-    for line in lines[::-1]:
+    for line in non_quoted_lines[::-1]:
         if not line.strip():
             if prev_line_blank:
                 return False
