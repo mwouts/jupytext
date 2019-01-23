@@ -12,25 +12,20 @@ def test_raise_on_different_metadata():
         compare_notebooks(ref, test, 'md')
 
 
-def test_raise_on_different_cell_count():
-    ref = new_notebook(cells=[new_markdown_cell('Cell one'), new_code_cell('Cell two')])
-    test = new_notebook(cells=[new_markdown_cell('Cell one')])
-    with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, 'md')
-
-
-def test_raise_on_different_cell_type():
+@pytest.mark.parametrize('raise_on_first_difference', [True, False])
+def test_raise_on_different_cell_type(raise_on_first_difference):
     ref = new_notebook(cells=[new_markdown_cell('Cell one'), new_code_cell('Cell two')])
     test = new_notebook(cells=[new_markdown_cell('Cell one'), new_raw_cell('Cell two')])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, 'md')
+        compare_notebooks(ref, test, 'md', raise_on_first_difference=raise_on_first_difference)
 
 
-def test_raise_on_different_cell_content():
+@pytest.mark.parametrize('raise_on_first_difference', [True, False])
+def test_raise_on_different_cell_content(raise_on_first_difference):
     ref = new_notebook(cells=[new_markdown_cell('Cell one'), new_code_cell('Cell two')])
     test = new_notebook(cells=[new_markdown_cell('Cell one'), new_code_cell('Modified cell two')])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, 'md')
+        compare_notebooks(ref, test, 'md', raise_on_first_difference=raise_on_first_difference)
 
 
 def test_raise_on_incomplete_markdown_cell():
@@ -60,6 +55,18 @@ def test_raise_on_different_cell_metadata():
     test = new_notebook(cells=[new_code_cell('1+1', metadata={'metakey': 'value'})])
     with pytest.raises(NotebookDifference):
         compare_notebooks(ref, test, 'py:light')
+
+
+@pytest.mark.parametrize('raise_on_first_difference', [True, False])
+def test_raise_on_different_cell_count(raise_on_first_difference):
+    ref = new_notebook(cells=[new_code_cell('1')])
+    test = new_notebook(cells=[new_code_cell('1'),
+                               new_code_cell('2')])
+    with pytest.raises(NotebookDifference):
+        compare_notebooks(ref, test, 'py:light', raise_on_first_difference=raise_on_first_difference)
+
+    with pytest.raises(NotebookDifference):
+        compare_notebooks(test, ref, 'py:light', raise_on_first_difference=raise_on_first_difference)
 
 
 def test_does_not_raise_on_blank_line_removed():
@@ -92,7 +99,8 @@ def test_dont_raise_on_different_outputs():
     compare_notebooks(ref, test, 'md')
 
 
-def test_raise_on_different_outputs():
+@pytest.mark.parametrize('raise_on_first_difference', [True, False])
+def test_raise_on_different_outputs(raise_on_first_difference):
     ref = new_notebook(cells=[new_code_cell('1+1')])
     test = new_notebook(cells=[new_code_cell('1+1', outputs=[
         {
@@ -107,7 +115,7 @@ def test_raise_on_different_outputs():
         }
     ])])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, 'md', compare_outputs=True)
+        compare_notebooks(ref, test, 'md', compare_outputs=True, raise_on_first_difference=raise_on_first_difference)
 
 
 def test_test_round_trip_conversion():
@@ -125,3 +133,34 @@ def test_test_round_trip_conversion():
     ])], metadata={'main_language': 'python'})
 
     round_trip_conversion(notebook, {'extension': '.py'}, update=True)
+
+
+def test_mutiple_cells_differ():
+    nb1 = new_notebook(cells=[new_code_cell(''),
+                              new_code_cell('2')])
+    nb2 = new_notebook(cells=[new_code_cell('1+1'),
+                              new_code_cell('2\n2')])
+    with pytest.raises(NotebookDifference) as exception_info:
+        compare_notebooks(nb1, nb2, raise_on_first_difference=False)
+    assert 'Cells 1,2 differ' in exception_info.value.args[0]
+
+
+def test_cell_metadata_differ():
+    nb1 = new_notebook(cells=[new_code_cell('1'),
+                              new_code_cell('2', metadata={'additional': 'metadata1'})])
+    nb2 = new_notebook(cells=[new_code_cell('1'),
+                              new_code_cell('2', metadata={'additional': 'metadata2'})])
+    with pytest.raises(NotebookDifference) as exception_info:
+        compare_notebooks(nb1, nb2, raise_on_first_difference=False)
+    assert "Cell metadata 'additional' differ" in exception_info.value.args[0]
+
+
+def test_notebook_metadata_differ():
+    nb1 = new_notebook(cells=[new_code_cell('1'),
+                              new_code_cell('2')])
+    nb2 = new_notebook(cells=[new_code_cell('1'),
+                              new_code_cell('2')],
+                       metadata={'kernelspec': {'language': 'python', 'name': 'python', 'display_name': 'Python'}})
+    with pytest.raises(NotebookDifference) as exception_info:
+        compare_notebooks(nb1, nb2, raise_on_first_difference=False, )
+    assert "Notebook metadata differ" in exception_info.value.args[0]
