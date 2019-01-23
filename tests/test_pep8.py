@@ -1,7 +1,7 @@
 import pytest
 from testfixtures import compare
 from jupytext import readf, reads, writes
-from jupytext.pep8 import next_instruction_is_function_or_class, cell_ends_with_function_or_class
+from jupytext.pep8 import next_instruction_is_function_or_class, cell_ends_with_function_or_class, cell_ends_with_code
 from .utils import list_notebooks
 
 
@@ -15,6 +15,10 @@ def test_no_metadata_when_py_is_pep8(py_file):
     assert next_instruction_is_function_or_class(text.splitlines())
 
 
+def test_cell_ends_with_code():
+    assert not cell_ends_with_code([])
+
+
 def test_cell_ends_with_function_or_class():
     text = """class A:
     __init__():
@@ -23,6 +27,18 @@ with two lines or more'''
         self.a = 0
 """
     assert cell_ends_with_function_or_class(text.splitlines())
+
+    lines = ['#', '#']
+    assert not cell_ends_with_function_or_class(lines)
+
+    text = """# two blank line after this class
+class A:
+    pass
+
+
+# so we do not need to insert two blank lines below this cell
+    """
+    assert not cell_ends_with_function_or_class(text.splitlines())
 
 
 def test_pep8():

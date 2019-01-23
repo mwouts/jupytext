@@ -1,7 +1,7 @@
 import pytest
 from testfixtures import compare
-from jupytext.paired_paths import InconsistentPath, paired_paths
-from jupytext.formats import long_form_multiple_formats, short_form_multiple_formats
+from jupytext.paired_paths import InconsistentPath, paired_paths, base_path
+from jupytext.formats import long_form_one_format, long_form_multiple_formats, short_form_multiple_formats
 
 
 def test_simple_pair():
@@ -9,6 +9,13 @@ def test_simple_pair():
     expected_paths = ['notebook.ipynb', 'notebook.py']
     compare(zip(expected_paths, formats), paired_paths('notebook.ipynb', formats))
     compare(zip(expected_paths, formats), paired_paths('notebook.py', formats))
+
+
+def test_base_path():
+    fmt = long_form_one_format('dir/prefix_/ipynb')
+    assert base_path('dir/prefix_NAME.ipynb', fmt) == 'NAME'
+    with pytest.raises(InconsistentPath):
+        base_path('dir/incorrect_prefix_NAME.ipynb', fmt)
 
 
 def test_many_and_suffix():
