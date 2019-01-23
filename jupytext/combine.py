@@ -10,11 +10,15 @@ from .formats import long_form_one_format
 _BLANK_LINE = re.compile(r'^\s*$')
 
 
+def black_invariant(text, chars=[' ', '\n', ',', "'", '"']):
+    for char in chars:
+        text = text.replace(char, '')
+    return text
+
+
 def same_content(ref, test):
-    """Is the content of two cells the same, except for blank lines?"""
-    ref = [line for line in ref.splitlines() if not _BLANK_LINE.match(line)]
-    test = [line for line in test.splitlines() if not _BLANK_LINE.match(line)]
-    return ref == test
+    """Is the content of two cells the same, up to reformating by black"""
+    return black_invariant(ref) == black_invariant(test)
 
 
 def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):

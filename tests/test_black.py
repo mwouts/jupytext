@@ -4,6 +4,7 @@ from testfixtures import compare
 from .utils import list_notebooks
 from jupytext import readf
 from jupytext.cli import system, jupytext
+from jupytext.combine import black_invariant
 
 
 def black_version():
@@ -14,12 +15,6 @@ def black_version():
 
 
 requires_black = pytest.mark.skipif(not black_version(), reason='black not found')
-
-
-def remove_spaces_and_commas(text, chars=[' ', '\n', ',', "'", '"']):
-    for char in chars:
-        text = text.replace(char, '')
-    return text
 
 
 @requires_black
@@ -39,8 +34,12 @@ def test_apply_black_on_python_notebooks(nb_file, tmpdir):
     assert len(nb1.cells) == len(nb2.cells)
     for c1, c2 in zip(nb1.cells, nb2.cells):
         # same content (almost)
-        assert remove_spaces_and_commas(c1.source) == remove_spaces_and_commas(c2.source)
+        assert black_invariant(c1.source) == black_invariant(c2.source)
         # python representation is pep8
         assert 'lines_to_next_cell' not in c2.metadata
+        # outputs are preserved
+        assert c1.cell_type == c2.cell_type
+        if c1.cell_type == 'code':
+            compare(c1.outputs, c2.outputs)
 
     compare(nb1.metadata, nb2.metadata)
