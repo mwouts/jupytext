@@ -31,6 +31,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         metadata, jupyter_md, header_cell, pos = header_to_metadata_and_cell(lines,
                                                                              self.implementation.header_prefix,
                                                                              self.implementation.extension)
+        default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension)
+
         if 'comment_magics' in metadata.get('jupytext', {}):
             self.fmt['comment_magics'] = metadata['jupytext']['comment_magics']
 
@@ -45,7 +47,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         cell_metadata = set()
 
         while lines:
-            reader = self.implementation.cell_reader_class(self.fmt)
+            reader = self.implementation.cell_reader_class(self.fmt, default_language)
             cell, pos = reader.read(lines)
             cells.append(cell)
             cell_metadata.update(cell.metadata.keys())
@@ -70,7 +72,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
     def writes(self, nb, **kwargs):
         """Return the text representation of the notebook"""
         nb = deepcopy(nb)
-        default_language = default_language_from_metadata_and_ext(nb, self.implementation.extension)
+        default_language = default_language_from_metadata_and_ext(nb.metadata, self.implementation.extension)
         for option in ['comment_magics', 'cell_metadata_filter']:
             if option in nb.metadata.get('jupytext', {}):
                 self.fmt[option] = nb.metadata['jupytext'][option]

@@ -174,6 +174,11 @@ def test_percent_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ipynb:percent', 'script_to_ipynb')
 
 
+@pytest.mark.parametrize('nb_file', list_notebooks('R_spin'))
+def test_spin_to_ipynb(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'ipynb:spin', 'script_to_ipynb')
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='(raw|hash|frozen|magic)'))
 def test_ipynb_to_python_sphinx(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'py:sphinx', 'ipynb_to_sphinx')

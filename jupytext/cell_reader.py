@@ -87,12 +87,12 @@ class BaseCellReader(object):
     # Any specific prefix for lines in markdown cells (like in R spin format?)
     markdown_prefix = None
 
-    def __init__(self, fmt=None):
+    def __init__(self, fmt=None, default_language=None):
         """Create a cell reader with empty content"""
         if not fmt:
             fmt = {}
         self.ext = fmt.get('extension')
-        self.default_language = _SCRIPT_EXTENSIONS.get(self.ext, {}).get('language', 'python')
+        self.default_language = default_language or _SCRIPT_EXTENSIONS.get(self.ext, {}).get('language', 'python')
         self.comment_magics = fmt['comment_magics'] if 'comment_magics' in fmt else self.default_comment_magics
         self.metadata = None
         self.content = []
@@ -268,8 +268,8 @@ class MarkdownCellReader(BaseCellReader):
     end_code_re = re.compile(r"^```\s*$")
     default_comment_magics = False
 
-    def __init__(self, fmt=None):
-        super(MarkdownCellReader, self).__init__(fmt)
+    def __init__(self, fmt=None, default_language=None):
+        super(MarkdownCellReader, self).__init__(fmt, default_language)
         self.split_at_heading = (fmt or {}).get('split_at_heading', False)
 
     def options_to_metadata(self, options):
@@ -392,11 +392,11 @@ class LightScriptCellReader(ScriptCellReader):
     explicit marker '# +' """
     default_comment_magics = True
 
-    def __init__(self, fmt=None):
-        super(LightScriptCellReader, self).__init__(fmt)
+    def __init__(self, fmt=None, default_language=None):
+        super(LightScriptCellReader, self).__init__(fmt, default_language)
         self.ext = self.ext or '.py'
         script = _SCRIPT_EXTENSIONS[self.ext]
-        self.default_language = script['language']
+        self.default_language = default_language or script['language']
         self.comment = script['comment']
         self.start_code_re = re.compile("^({0}|{0} )".format(self.comment) + r"\+(\s*){(.*)}\s*$")
         self.simple_start_code_re = re.compile(r"^({0}|{0} )\+(\s*)$".format(self.comment))
@@ -434,10 +434,10 @@ class DoublePercentScriptCellReader(ScriptCellReader):
     """Read notebook cells from Spyder/VScode scripts (#59)"""
     default_comment_magics = True
 
-    def __init__(self, fmt):
-        ScriptCellReader.__init__(self, fmt)
+    def __init__(self, fmt, default_language=None):
+        ScriptCellReader.__init__(self, fmt, default_language)
         script = _SCRIPT_EXTENSIONS[self.ext]
-        self.default_language = script['language']
+        self.default_language = default_language or script['language']
         self.comment = script['comment']
         self.start_code_re = re.compile(r"^{}\s*%%(%*)\s(.*)$".format(self.comment))
         self.alternative_start_code_re = re.compile(r"^{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(self.comment))
@@ -520,8 +520,8 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
     default_markdown_cell_marker = '#' * 79
     markdown_marker = None
 
-    def __init__(self, fmt=None):
-        super(SphinxGalleryScriptCellReader, self).__init__(fmt)
+    def __init__(self, fmt=None, default_language='python'):
+        super(SphinxGalleryScriptCellReader, self).__init__(fmt, default_language)
         self.ext = '.py'
         self.rst2md = (fmt or {}).get('rst2md', False)
 

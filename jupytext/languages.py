@@ -14,13 +14,12 @@ _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.sh': {'language': 'bash', 'comment': '#'}}
 
 
-def default_language_from_metadata_and_ext(notebook, ext):
-    """Return the default language for a notebook that was read
-    from the given file extension"""
+def default_language_from_metadata_and_ext(metadata, ext):
+    """Return the default language given the notebook metadata, and a file extension"""
     default_from_ext = _SCRIPT_EXTENSIONS.get(ext, {}).get('language', 'python')
 
-    language = (notebook.metadata.get('jupytext', {}).get('main_language')
-                or notebook.metadata.get('kernelspec', {}).get('language')
+    language = (metadata.get('jupytext', {}).get('main_language')
+                or metadata.get('kernelspec', {}).get('language')
                 or default_from_ext)
 
     if language.startswith('C++'):

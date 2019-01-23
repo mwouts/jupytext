@@ -64,15 +64,6 @@ JUPYTEXT_FORMATS = \
             current_version_number='1.0')] + \
     [
         NotebookFormatDescription(
-            format_name='spin',
-            extension=ext,
-            header_prefix="#'",
-            cell_reader_class=RScriptCellReader,
-            cell_exporter_class=RScriptCellExporter,
-            # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
-            current_version_number='1.0') for ext in ['.r', '.R']] + \
-    [
-        NotebookFormatDescription(
             format_name='light',
             extension=ext,
             header_prefix=_SCRIPT_EXTENSIONS[ext]['comment'],
@@ -119,6 +110,15 @@ JUPYTEXT_FORMATS = \
             # Version 1.2 on 2018-12-14 - jupytext v0.9.0: same as percent - only magics are not commented by default
             current_version_number='1.2',
             min_readable_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
+    [
+        NotebookFormatDescription(
+            format_name='spin',
+            extension=ext,
+            header_prefix="#'",
+            cell_reader_class=RScriptCellReader,
+            cell_exporter_class=RScriptCellExporter,
+            # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
+            current_version_number='1.0') for ext in ['.r', '.R']] + \
     [
         NotebookFormatDescription(
             format_name='sphinx',
@@ -199,6 +199,7 @@ def guess_format(text, ext):
         twenty_hash_count = 0
         double_percent_count = 0
         magic_command_count = 0
+        rspin_comment_count = 0
 
         parser = StringParser(language='R' if ext in ['.r', '.R'] else 'python')
         for line in lines:
@@ -217,6 +218,9 @@ def guess_format(text, ext):
             if line.startswith(twenty_hash) and ext == '.py':
                 twenty_hash_count += 1
 
+            if line.startswith("#'") and ext in ['.R', '.r']:
+                rspin_comment_count += 1
+
         if double_percent_count >= 1:
             if magic_command_count:
                 return 'hydrogen'
@@ -224,6 +228,9 @@ def guess_format(text, ext):
 
         if twenty_hash_count >= 2:
             return 'sphinx'
+
+        if rspin_comment_count >= 1:
+            return 'spin'
 
     # Default format
     return get_format_implementation(ext).format_name
