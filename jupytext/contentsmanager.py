@@ -158,7 +158,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def update_paired_notebooks(self, path, new_paired_paths):
         """Update the list of paired notebooks to include/update the current pair"""
-        if not new_paired_paths or len(new_paired_paths) <= 1:
+        if not new_paired_paths:
             self.drop_paired_notebook(path)
             return
 

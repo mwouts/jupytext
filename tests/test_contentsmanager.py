@@ -4,6 +4,7 @@ import os
 import time
 import pytest
 import itertools
+from nbformat.v4.nbbase import new_notebook
 from tornado.web import HTTPError
 from testfixtures import compare
 import jupytext
@@ -21,8 +22,7 @@ def test_create_contentsmanager():
 def test_rename(tmpdir):
     org_file = str(tmpdir.join('notebook.ipynb'))
     new_file = str(tmpdir.join('new.ipynb'))
-    with open(org_file, 'w') as fp:
-        fp.write('\n')
+    jupytext.writef(new_notebook(), org_file)
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -30,6 +30,22 @@ def test_rename(tmpdir):
 
     assert os.path.isfile(new_file)
     assert not os.path.isfile(org_file)
+
+
+def test_rename_inconsistent_path(tmpdir):
+    org_file = str(tmpdir.join('notebook_suffix.ipynb'))
+    new_file = str(tmpdir.join('new.ipynb'))
+    jupytext.writef(new_notebook(metadata={'jupytext': {'formats': '_suffix.ipynb'}}), org_file)
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    # Read notebook, and learn about its format
+    cm.get('notebook_suffix.ipynb')
+    with pytest.raises(HTTPError):
+        cm.rename_file('notebook_suffix.ipynb', 'new.ipynb')
+
+    assert not os.path.isfile(new_file)
+    assert os.path.isfile(org_file)
 
 
 @skip_if_dict_is_not_ordered
