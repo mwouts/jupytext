@@ -231,7 +231,7 @@ def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
 
     copyfile(nb_file, tmp_ipynb)
 
-    jupytext(['--to', 'py:percent', '--comment-magics', 'no', tmp_ipynb])
+    jupytext(['--to', 'py:percent', '--opt', 'comment_magics=False', tmp_ipynb])
 
     with open(tmp_nbpy) as stream:
         py_script = stream.read()

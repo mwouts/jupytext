@@ -439,8 +439,8 @@ def short_form_multiple_formats(jupytext_formats):
     return ','.join(jupytext_formats)
 
 
-_VALID_FORMAT_OPTIONS = ['extension', 'format_name', 'suffix', 'prefix', 'comment_magics',
-                         'split_at_heading', 'notebook_metadata_filter', 'cell_metadata_filter']
+_VALID_FORMAT_INFO = ['extension', 'format_name', 'suffix', 'prefix']
+_VALID_FORMAT_OPTIONS = ['comment_magics', 'split_at_heading', 'notebook_metadata_filter', 'cell_metadata_filter']
 _BINARY_FORMAT_OPTIONS = ['comment_magics', 'split_at_heading']
 
 
@@ -450,7 +450,7 @@ def validate_one_format(jupytext_format):
         raise JupytextFormatError('Jupytext format should be a dictionary')
 
     for key in jupytext_format:
-        if key not in _VALID_FORMAT_OPTIONS:
+        if key not in _VALID_FORMAT_INFO + _VALID_FORMAT_OPTIONS:
             raise JupytextFormatError("Unknown format option '{}' - should be one of '{}'".format(
                 key, "', '".join(_VALID_FORMAT_OPTIONS)))
         value = jupytext_format[key]

@@ -1,5 +1,4 @@
-"""Command line conversion tools `jupytext` and `nbsrc`
-"""
+"""`jupytext` as a command line tool"""
 
 import os
 import re
@@ -8,7 +7,7 @@ import subprocess
 import argparse
 import json
 from .jupytext import readf, reads, writef, writes
-from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version
+from .formats import NOTEBOOK_EXTENSIONS, check_file_version, _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS
 from .formats import long_form_one_format, divine_format
 from .paired_paths import paired_paths
 from .combine import combine_inputs_with_outputs
@@ -17,9 +16,142 @@ from .languages import _SCRIPT_EXTENSIONS
 from .version import __version__
 
 
+def cli_jupytext(args=None):
+    """Command line parser for jupytext"""
+    parser = argparse.ArgumentParser(
+        description='Jupyter notebooks as markdown documents, Julia, Python or R scripts',
+        formatter_class=argparse.RawTextHelpFormatter)
+
+    # Input
+    parser.add_argument('notebooks',
+                        help='One or more notebook(s). Notebook is read from stdin when this argument is empty',
+                        nargs='*')
+    parser.add_argument('--from',
+                        dest='input_format',
+                        help='Optional: jupytext format of the input(s). '
+                             'Inferred from the file extension and content when missing.')
+    parser.add_argument('--pre-commit', action='store_true',
+                        help="""Run Jupytext on the ipynb files in the git index.
+    Create a pre-commit hook with:
+
+    echo '#!/bin/sh
+    jupytext --to py:light --pre-commit' > .git/hooks/pre-commit
+    chmod +x .git/hooks/pre-commit""")
+
+    # Destination format & act on metadata
+    parser.add_argument('--to',
+                        help="Destination format: either one of 'notebook', 'markdown', 'rmarkdown', any valid "
+                             "notebook extension, or a full format '[prefix_path//][suffix.]ext[:format_name]")
+    parser.add_argument('--format-options', '--opt',
+                        action='append',
+                        help='Set format options with e.g. --opt comment_magics=true '
+                             '--opt notebook_metadata_filter=-kernelspec.')
+    parser.add_argument('--set-formats',
+                        type=str,
+                        help='Set jupytext.formats metadata to the given value. Use this to activate pairing on a '
+                             'notebook, with e.g. --set-formats ipynb,py:light')
+    parser.add_argument('--update-metadata',
+                        default={},
+                        type=json.loads,
+                        help='Update the notebook metadata with the desired dictionary. Argument must be given in JSON '
+                             'format. For instance, if you want to activate a pairing in the generated file, '
+                             """use e.g. '{"jupytext":{"formats":"ipynb,py:light"}}'""")
+
+    # Destination file
+    parser.add_argument('-o', '--output',
+                        help="Destination file. Defaults to the original file, with its extension changed to "
+                             "the destination format. Use '-' to print the notebook on stdout.")
+    parser.add_argument('--update', action='store_true',
+                        help='Preserve outputs of .ipynb destination (when file exists and inputs match)')
+
+    # Action: convert(default)/version/list paired paths/sync/apply/test
+    action = parser.add_mutually_exclusive_group()
+    action.add_argument('--version',
+                        action='store_true',
+                        help="Show jupytext's version number and exit")
+    action.add_argument('--paired-paths', '-p',
+                        help='List the locations of the alternative representations for this notebook.',
+                        action='store_true')
+    action.add_argument('--sync', '-s',
+                        help='Synchronize the content of the paired representations of the given notebook. '
+                             'Input cells are taken from the file that was last modified, and outputs are read '
+                             'from the ipynb file, if present.',
+                        action='store_true')
+    # action.add_argument('--apply',
+    #                     action='append',
+    #                     help='Pipe the result of conversion into the given command, and update the original file.')
+    action.add_argument('--test',
+                        action='store_true',
+                        help='Test that notebook is stable under a round trip conversion, up to the expected changes')
+    action.add_argument('--test-strict',
+                        action='store_true',
+                        help='Test that notebook is strictly stable under a round trip conversion')
+    parser.add_argument('-x', '--stop', dest='stop_on_first_error', action='store_true',
+                        help='In --test mode, stop on first round trip conversion error, and report stack traceback')
+
+    args = parser.parse_args(args)
+
+    if args.version:
+        return args
+
+    prepare_update_metadata(args)
+
+    if args.input_format:
+        args.input_format = canonize_format(args.input_format)
+        if not args.notebooks and not args.output:
+            args.output = '-'
+
+    if args.paired_paths:
+        if len(args.notebooks) != 1:
+            raise ValueError('--paired-paths applies to a single notebook')
+        return args
+
+    if args.sync:
+        if not args.notebooks:
+            raise ValueError('Please give the path to at least one notebook')
+        return args
+
+    args.to = canonize_format(args.to, args.output)
+
+    if args.update and not (args.test or args.test_strict) and args.to != 'ipynb':
+        raise ValueError('--update works exclusively with --to notebook ')
+
+    if args.pre_commit:
+        if args.notebooks:
+            raise ValueError('--pre-commit takes notebooks from the git index. Do not pass any notebook here.')
+        if args.test or args.test_strict:
+            raise ValueError('--pre-commit cannot be used with --test or --test-strict')
+
+    return args
+
+
+def prepare_update_metadata(args):
+    """If either the set_formats or the format_options arguments are set, update the update_metadata dictionary"""
+    if args.set_formats:
+        args.update_metadata = recursive_update(args.update_metadata, {'jupytext': {'formats': args.set_formats}})
+
+    if not args.format_options:
+        return
+
+    for opt in args.format_options:
+        try:
+            key, value = opt.split('=')
+        except ValueError:
+            raise ValueError("Format options are expected to be of the form key=value, not '{}'".format(opt))
+
+        if key not in _VALID_FORMAT_OPTIONS:
+            raise ValueError("'{}' is not a valid format option. Expected one of '{}'"
+                             .format(key, "', '".join(_VALID_FORMAT_OPTIONS)))
+
+        if key in _BINARY_FORMAT_OPTIONS:
+            value = str2bool(value)
+
+        args.update_metadata = recursive_update(args.update_metadata, {'jupytext': {key: value}})
+
+
 def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_commit=False,
                            test_round_trip=False, test_round_trip_strict=False, stop_on_first_error=True,
-                           update=True, comment_magics=None, update_metadata=None):
+                           update=True, update_metadata=None):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
@@ -32,7 +164,6 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
     :param test_round_trip_strict: should round trip conversion be tested, with strict notebook comparison?
     :param stop_on_first_error: when testing, should we stop on first error, or compare the full notebook?
     :param update: preserve the current outputs of .ipynb file
-    :param comment_magics: comment, or not, Jupyter magics when possible
     :param update_metadata: update the notebook metadata with the given JSON dictionary
     :return:
     """
@@ -105,9 +236,6 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
         if update_metadata:
             recursive_update(notebook.metadata, update_metadata)
 
-        if comment_magics is not None:
-            notebook.metadata.setdefault('jupytext', {})['comment_magics'] = comment_magics
-
         if output == '-':
             sys.stdout.write(writes(notebook, fmt))
             continue
@@ -157,9 +285,7 @@ def modified_and_deleted_files(ext):
 
 
 def save_notebook_as(notebook, nb_file, nb_dest, input_fmt, fmt, combine):
-    """Save notebook to file, in desired format
-    :param input_fmt:
-    """
+    """Save notebook to file, in desired format"""
     if combine and os.path.isfile(nb_dest) and os.path.splitext(nb_dest)[1] == '.ipynb':
         check_file_version(notebook, nb_file, nb_dest)
         nb_outputs = readf(nb_dest)
@@ -217,113 +343,6 @@ def recursive_update(target, update):
         else:
             target[key] = value
     return target
-
-
-def cli_jupytext(args=None):
-    """Command line parser for jupytext"""
-    parser = argparse.ArgumentParser(
-        description='Jupyter notebooks as markdown documents, Julia, Python or R scripts',
-        formatter_class=argparse.RawTextHelpFormatter)
-
-    notebook_formats = (['notebook', 'rmarkdown', 'markdown'] +
-                        [_SCRIPT_EXTENSIONS[ext]['language'] for ext in _SCRIPT_EXTENSIONS] +
-                        [ext.replace('.', '') for ext in NOTEBOOK_EXTENSIONS] +
-                        [fmt.extension[1:] + ':' + fmt.format_name for fmt in JUPYTEXT_FORMATS])
-
-    parser.add_argument('--to',
-                        choices=notebook_formats,
-                        help="Destination format")
-    parser.add_argument('--from',
-                        dest='input_format',
-                        choices=notebook_formats,
-                        help="Input format")
-    parser.add_argument('notebooks',
-                        help='One or more notebook(s). Input is read from stdin when no notebook '
-                             'is provided, but then the --from field is mandatory',
-                        nargs='*')
-    parser.add_argument('--paired-paths', '-p',
-                        help='Return the locations of the alternative representations for this notebook.',
-                        action='store_true')
-    parser.add_argument('--sync', '-s',
-                        help='Synchronize the content of the paired representations of the given notebook. Input cells '
-                             'are taken from the file that was last modified, and outputs are read from the ipynb file,'
-                             ' if present.',
-                        action='store_true')
-    parser.add_argument('--pre-commit', action='store_true',
-                        help="""Run Jupytext on the ipynb files in the git index.
-Create a pre-commit hook with:
-
-echo '#!/bin/sh
-jupytext --to py:light --pre-commit' > .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit""")
-    parser.add_argument('-o', '--output',
-                        help='Destination file. Defaults to original file, '
-                             'with extension changed to destination format. '
-                             "Use '-' for printing the notebook on stdout.")
-    parser.add_argument('--update', action='store_true',
-                        help='Preserve outputs of .ipynb destination '
-                             '(when file exists and inputs match)')
-    parser.add_argument('--comment-magics',
-                        type=str2bool,
-                        nargs='?',
-                        default=None,
-                        help='Should Jupyter magic commands be commented? (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
-    parser.add_argument('--set-formats',
-                        type=str,
-                        help='Set jupytext.formats metadata to the given value. Use this to activate pairing on a '
-                             'notebook, with e.g. --set-formats ipynb,py:light')
-    parser.add_argument('--update-metadata',
-                        default={},
-                        type=json.loads,
-                        help='Update the notebook metadata with the desired dictionary. Argument must be given in JSON '
-                             'format. For instance, if you want to activate a pairing in the generated file, '
-                             """use e.g. '{"jupytext":{"formats":"ipynb,py:light"}}'""")
-    test = parser.add_mutually_exclusive_group()
-    test.add_argument('--test', dest='test', action='store_true',
-                      help='Test that notebook is stable under '
-                           'round trip conversion, up to expected changes')
-    test.add_argument('--test-strict', dest='test_strict', action='store_true',
-                      help='Test that notebook is strictly stable under '
-                           'round trip conversion')
-    parser.add_argument('-x', '--stop', dest='stop_on_first_error', action='store_true',
-                        help='Stop on first round trip conversion error, and report stack traceback')
-    parser.add_argument('--version', action='store_true',
-                        help="Show jupytext's version number and exit")
-    args = parser.parse_args(args)
-
-    if args.version:
-        return args
-
-    if args.set_formats:
-        args.update_metadata = recursive_update(args.update_metadata, {'jupytext': {'formats': args.set_formats}})
-
-    if args.input_format:
-        args.input_format = canonize_format(args.input_format)
-        if not args.notebooks and not args.output:
-            args.output = '-'
-
-    if args.paired_paths:
-        if len(args.notebooks) != 1:
-            raise ValueError('--paired-paths applies to a single notebook')
-        return args
-
-    if args.sync:
-        if not args.notebooks:
-            raise ValueError('Please give the path to at least one notebook')
-        return args
-
-    args.to = canonize_format(args.to, args.output)
-
-    if args.update and not (args.test or args.test_strict) and args.to != 'ipynb':
-        raise ValueError('--update works exclusively with --to notebook ')
-
-    if args.pre_commit:
-        if args.notebooks:
-            raise ValueError('--pre-commit takes notebooks from the git index. Do not pass any notebook here.')
-        if args.test or args.test_strict:
-            raise ValueError('--pre-commit cannot be used with --test or --test-strict')
-
-    return args
 
 
 def sync_paired_notebooks(nb_file, nb_fmt):
@@ -402,7 +421,6 @@ def jupytext(args=None):
                                test_round_trip_strict=args.test_strict,
                                stop_on_first_error=args.stop_on_first_error,
                                update=args.update,
-                               comment_magics=args.comment_magics,
                                update_metadata=args.update_metadata)
     except (ValueError, TypeError, IOError) as err:
         sys.stderr.write('jupytext: error: ' + str(err) + '\n')
