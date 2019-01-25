@@ -427,8 +427,9 @@ def test_sync(nb_file, tmpdir, capsys):
     nb = readf(nb_file)
     writef(nb, tmp_ipynb)
 
-    # Test that sync works (does nothing) when notebook is not paired
-    jupytext(['--sync', tmp_ipynb])
+    # Test that sync fails when notebook is not paired
+    with pytest.raises(SystemExit):
+        jupytext(['--sync', tmp_ipynb])
     out, err = capsys.readouterr()
     assert 'not paired' in err
 
