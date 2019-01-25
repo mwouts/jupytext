@@ -1,7 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
-#     formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md,Rmd
+#     formats: ipynb,.pct.py:percent,.lgt.py:light,.spx.py:sphinx,md,Rmd
 #     text_representation:
 #       extension: .py
 #       format_name: light
