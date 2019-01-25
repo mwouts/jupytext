@@ -41,6 +41,18 @@ class A:
     """
     assert not cell_ends_with_function_or_class(text.splitlines())
 
+    text = """# All lines
+# are commented"""
+    assert not cell_ends_with_function_or_class(text.splitlines())
+
+    text = """# Two blank lines after function
+def f(x):
+    return x
+
+
+# And a comment here"""
+    assert not cell_ends_with_function_or_class(text.splitlines())
+
 
 def test_pep8_lines_between_cells():
     prev_lines = """a = a_long_instruction(
