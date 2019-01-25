@@ -41,10 +41,8 @@ class BaseCellExporter(object):
         if self.language:
             if magic_args:
                 if self.ext.endswith('.Rmd'):
-                    if "'" in magic_args:
-                        magic_args = '"' + magic_args + '"'
-                    else:
-                        magic_args = "'" + magic_args + "'"
+                    quote = '"' if "'" in magic_args else "'"
+                    magic_args = quote + magic_args + quote
                 self.metadata['magic_args'] = magic_args
 
             if not self.ext.endswith('.Rmd'):
@@ -302,14 +300,12 @@ class RScriptCellExporter(BaseCellExporter):
         return lines
 
 
-class DoublePercentCellExporter(BaseCellExporter):
+class DoublePercentCellExporter(BaseCellExporter):#pylint: disable=W0223
     """A class that can represent a notebook cell as a Spyder/VScode script (#59)"""
     default_comment_magics = True
     parse_cell_language = True
 
-    def code_to_text(self):
-        """Not used"""
-        pass
+
 
     def cell_to_text(self):
         """Return the text representation for the cell"""
@@ -336,12 +332,12 @@ class DoublePercentCellExporter(BaseCellExporter):
         return lines + comment_lines(self.source, self.comment)
 
 
-class HydrogenCellExporter(DoublePercentCellExporter):
+class HydrogenCellExporter(DoublePercentCellExporter):  # pylint: disable=W0223
     """A class that can represent a notebook cell as a Hydrogen script (#59)"""
     default_comment_magics = False
 
 
-class SphinxGalleryCellExporter(BaseCellExporter):
+class SphinxGalleryCellExporter(BaseCellExporter):  # pylint: disable=W0223
     """A class that can represent a notebook cell as a
     Sphinx Gallery script (#80)"""
 
@@ -360,10 +356,6 @@ class SphinxGalleryCellExporter(BaseCellExporter):
             raise ValueError("The 'rst2md' option is a read only option. The reverse conversion is not "
                              "implemented. Please either deactivate the option, or save to another format.")
 
-    def code_to_text(self):
-        """Not used"""
-        pass
-
     def cell_to_text(self):
         """Return the text representation for the cell"""
         if self.cell_type == 'code':
@@ -376,9 +368,7 @@ class SphinxGalleryCellExporter(BaseCellExporter):
             cell_marker = self.default_cell_marker
 
         if self.source == ['']:
-            if cell_marker in ['""', "''"]:
-                return [cell_marker]
-            return ['""']
+            return [cell_marker] if cell_marker in ['""', "''"] else ['""']
 
         if cell_marker in ['"""', "'''"]:
             return [cell_marker] + self.source + [cell_marker]
