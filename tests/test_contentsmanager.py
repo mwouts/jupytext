@@ -767,6 +767,7 @@ def test_global_pairing_allows_to_save_other_file_types(nb_file, tmpdir):
     compare_notebooks(nb, nb2)
 
 
+@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('R'))
 def test_python_kernel_preserves_R_files(nb_file, tmpdir):
     """Opening a R file with a Jupyter server that has no R kernel should not modify the file"""
