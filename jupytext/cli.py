@@ -86,8 +86,15 @@ def cli_jupytext(args=None):
     action.add_argument('--test-strict',
                         action='store_true',
                         help='Test that notebook is strictly stable under a round trip conversion')
-    parser.add_argument('-x', '--stop', dest='stop_on_first_error', action='store_true',
+
+    parser.add_argument('--stop', '-x',
+                        dest='stop_on_first_error',
+                        action='store_true',
                         help='In --test mode, stop on first round trip conversion error, and report stack traceback')
+
+    parser.add_argument('--quiet', '-q',
+                        action='store_true',
+                        help='Quiet mode: no comment about files updated or created')
 
     args = parser.parse_args(args)
 
@@ -151,7 +158,7 @@ def prepare_update_metadata(args):
 
 def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_commit=False,
                            test_round_trip=False, test_round_trip_strict=False, stop_on_first_error=True,
-                           update=True, update_metadata=None):
+                           update=True, update_metadata=None, quiet=False):
     """
     Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
     to the opposite format
@@ -165,6 +172,7 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
     :param stop_on_first_error: when testing, should we stop on first error, or compare the full notebook?
     :param update: preserve the current outputs of .ipynb file
     :param update_metadata: update the notebook metadata with the given JSON dictionary
+    :param quiet: comment about created or updated files
     :return:
     """
 
@@ -254,11 +262,13 @@ def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_co
         else:
             action = ''
 
-        sys.stdout.write("[jupytext] Converting '{org_file}' to '{dest_file}'{format}{action}\n"
-                         .format(dest_file=dest + ext,
-                                 org_file=nb_file,
-                                 format=" using format '{}'".format(fmt['format_name']) if 'format_name' in fmt else '',
-                                 action=action))
+        if not quiet:
+            sys.stdout.write("[jupytext] Converting {org_file} to '{dest_file}'{format}{action}\n"
+                             .format(dest_file=dest + ext,
+                                     org_file='standard input' if nb_file == sys.stdin else "'{}'".format(nb_file),
+                                     format=" using format '{}'".format(
+                                         fmt['format_name']) if 'format_name' in fmt else '',
+                                     action=action))
 
         save_notebook_as(notebook, nb_file, dest + ext, input_format, fmt, update)
 
@@ -345,14 +355,17 @@ def recursive_update(target, update):
     return target
 
 
-def sync_paired_notebooks(nb_file, nb_fmt):
+def sync_paired_notebooks(nb_file, nb_fmt, quiet):
     """Read the notebook from the given file, read the inputs and outputs from the most recent text and ipynb
     representation, and update all paired files."""
     notebook = readf(nb_file, nb_fmt)
     formats = notebook.metadata.get('jupytext', {}).get('formats')
+
+    log = lambda s: None if quiet else sys.stdout.write
+
     if not formats:
         sys.stderr.write("[jupytext] '{}' is not paired to any other file\n".format(nb_file))
-        return
+        exit(10)
 
     max_mtime_inputs = None
     max_mtime_outputs = None
@@ -372,19 +385,19 @@ def sync_paired_notebooks(nb_file, nb_fmt):
                 latest_outputs = path
 
     if latest_outputs and latest_outputs != latest_inputs[0]:
-        sys.stdout.write("[jupytext] Loading input cells from '{}'\n".format(latest_inputs))
+        log("[jupytext] Loading input cells from '{}'\n".format(latest_inputs))
         inputs = notebook if latest_inputs == nb_file else readf(latest_inputs, input_fmt)
-        sys.stdout.write("[jupytext] Loading output cells from '{}'\n".format(latest_outputs))
+        log("[jupytext] Loading output cells from '{}'\n".format(latest_outputs))
         outputs = notebook if latest_outputs == nb_file else readf(latest_outputs)
         notebook = combine_inputs_with_outputs(inputs, outputs, input_fmt)
     else:
-        sys.stdout.write("[jupytext] Loading notebook from '{}'\n".format(latest_inputs))
+        log("[jupytext] Loading notebook from '{}'\n".format(latest_inputs))
         notebook = notebook if latest_inputs == nb_file else readf(latest_inputs, input_fmt)
 
     for path, fmt in paired_paths(nb_file, formats):
         if path == latest_inputs and (path == latest_outputs or not path.endswith('.ipynb')):
             continue
-        sys.stdout.write("[jupytext] Updating '{}'\n".format(path))
+        log("[jupytext] Updating '{}'\n".format(path))
         writef(notebook, path, fmt)
 
 
@@ -409,7 +422,7 @@ def jupytext(args=None):
 
         if args.sync:
             for nb_file in args.notebooks:
-                sync_paired_notebooks(nb_file, args.input_format)
+                sync_paired_notebooks(nb_file, args.input_format, args.quiet)
             return
 
         convert_notebook_files(nb_files=args.notebooks,
@@ -421,7 +434,8 @@ def jupytext(args=None):
                                test_round_trip_strict=args.test_strict,
                                stop_on_first_error=args.stop_on_first_error,
                                update=args.update,
-                               update_metadata=args.update_metadata)
+                               update_metadata=args.update_metadata,
+                               quiet=args.quiet)
     except (ValueError, TypeError, IOError) as err:
         sys.stderr.write('jupytext: error: ' + str(err) + '\n')
         exit(1)
