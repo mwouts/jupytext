@@ -19,8 +19,8 @@ def default_language_from_metadata_and_ext(notebook, ext):
     from the given file extension"""
     default_from_ext = _SCRIPT_EXTENSIONS.get(ext, {}).get('language', 'python')
 
-    language = (notebook.metadata.get('kernelspec', {}).get('language')
-                or notebook.metadata.get('jupytext', {}).get('main_language')
+    language = (notebook.metadata.get('jupytext', {}).get('main_language')
+                or notebook.metadata.get('kernelspec', {}).get('language')
                 or default_from_ext)
 
     if language.startswith('C++'):

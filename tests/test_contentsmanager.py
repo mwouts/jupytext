@@ -11,6 +11,7 @@ import jupytext
 from jupytext.compare import compare_notebooks
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.formats import read_format_from_metadata, auto_ext_from_metadata
+from jupytext.contentsmanager import kernelspec_from_language
 from .utils import list_notebooks
 from .utils import skip_if_dict_is_not_ordered
 
@@ -764,3 +765,27 @@ def test_global_pairing_allows_to_save_other_file_types(nb_file, tmpdir):
 
     nb2 = cm.get('notebook.Rmd')['content']
     compare_notebooks(nb, nb2)
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('R'))
+def test_python_kernel_preserves_R_files(nb_file, tmpdir):
+    """Opening a R file with a Jupyter server that has no R kernel should not modify the file"""
+    tmp_r_file = str(tmpdir.join('script.R'))
+    with open(nb_file) as fp:
+        script = fp.read()
+    with open(tmp_r_file, 'w') as fp:
+        fp.write(script)
+
+    # create contents manager
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # open notebook, set Python kernel and save
+    model = cm.get('script.R')
+    model['content'].metadata['kernelspec'] = kernelspec_from_language('python')
+    cm.save(model=model, path='script.R')
+
+    with open(tmp_r_file) as fp:
+        script2 = fp.read()
+
+    compare(script, script2)
