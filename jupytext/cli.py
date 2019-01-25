@@ -94,6 +94,7 @@ def cli_jupytext(args=None):
 
     parser.add_argument('--quiet', '-q',
                         action='store_true',
+                        default=False,
                         help='Quiet mode: no comment about files updated or created')
 
     args = parser.parse_args(args)
@@ -361,7 +362,7 @@ def sync_paired_notebooks(nb_file, nb_fmt, quiet):
     notebook = readf(nb_file, nb_fmt)
     formats = notebook.metadata.get('jupytext', {}).get('formats')
 
-    log = lambda s: None if quiet else sys.stdout.write
+    log = (lambda s: None) if quiet else sys.stdout.write
 
     if not formats:
         sys.stderr.write("[jupytext] '{}' is not paired to any other file\n".format(nb_file))
@@ -384,7 +385,7 @@ def sync_paired_notebooks(nb_file, nb_fmt, quiet):
                 max_mtime_outputs = info.st_mtime
                 latest_outputs = path
 
-    if latest_outputs and latest_outputs != latest_inputs[0]:
+    if latest_outputs and latest_outputs != latest_inputs:
         log("[jupytext] Loading input cells from '{}'\n".format(latest_inputs))
         inputs = notebook if latest_inputs == nb_file else readf(latest_inputs, input_fmt)
         log("[jupytext] Loading output cells from '{}'\n".format(latest_outputs))
