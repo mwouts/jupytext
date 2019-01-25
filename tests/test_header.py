@@ -73,23 +73,24 @@ def test_metadata_and_cell_to_header():
         metadata={'jupytext': {'mainlanguage': 'python'}},
         cells=[new_raw_cell(source="---\ntitle: Sample header\n---")])
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-        header = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
+        header, lines_to_next_cell = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
     assert '\n'.join(header) == """---
 title: Sample header
 jupyter:
   jupytext:
     mainlanguage: python
----
-"""
+---"""
     assert nb.cells == []
+    assert lines_to_next_cell is None
 
 
 def test_metadata_and_cell_to_header2():
     nb = new_notebook(cells=[new_markdown_cell(source="Some markdown\ntext")])
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-        header = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
+        header, lines_to_next_cell = metadata_and_cell_to_header(nb, get_format_implementation('.md'), '.md')
     assert header == []
     assert len(nb.cells) == 1
+    assert lines_to_next_cell is None
 
 
 def test_notebook_from_plain_script_has_metadata_filter(script="""print('Hello world")

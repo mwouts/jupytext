@@ -1,7 +1,8 @@
 import pytest
 from testfixtures import compare
 from jupytext import readf, reads, writes
-from jupytext.pep8 import next_instruction_is_function_or_class, cell_ends_with_function_or_class, cell_ends_with_code
+from jupytext.pep8 import next_instruction_is_function_or_class, cell_ends_with_function_or_class
+from jupytext.pep8 import cell_ends_with_code, cell_has_code, pep8_lines_between_cells
 from .utils import list_notebooks
 
 
@@ -41,6 +42,43 @@ class A:
     assert not cell_ends_with_function_or_class(text.splitlines())
 
 
+def test_pep8_lines_between_cells():
+    prev_lines = """a = a_long_instruction(
+    over_two_lines=True)""".splitlines()
+
+    next_lines = """def f(x):
+    return x""".splitlines()
+
+    assert cell_ends_with_code(prev_lines)
+    assert next_instruction_is_function_or_class(next_lines)
+    assert pep8_lines_between_cells(prev_lines, next_lines, '.py') == 2
+
+
+def test_pep8_lines_between_cells_bis():
+    prev_lines = """def f(x):
+    return x""".splitlines()
+
+    next_lines = """# A markdown cell
+
+# An instruction
+a = 5
+""".splitlines()
+
+    assert cell_ends_with_function_or_class(prev_lines)
+    assert cell_has_code(next_lines)
+    assert pep8_lines_between_cells(prev_lines, next_lines, '.py') == 2
+
+    next_lines = """# A markdown cell
+
+# Only markdown here
+# And here
+""".splitlines()
+
+    assert cell_ends_with_function_or_class(prev_lines)
+    assert not cell_has_code(next_lines)
+    assert pep8_lines_between_cells(prev_lines, next_lines, '.py') == 1
+
+
 def test_pep8():
     text = """import os
 
@@ -73,6 +111,25 @@ def g(x):
 
 # code cell #4
 x = 4
+"""
+    nb = reads(text, 'py')
+    for cell in nb.cells:
+        assert not cell.metadata
+
+    text2 = writes(nb, 'py')
+    compare(text, text2)
+
+
+def test_pep8_bis():
+    text = """# This is a markdown cell
+
+# a code cell
+def f(x):
+    return x + 1
+
+# And another markdown cell
+# Separated from f by just one line
+# As there is no code here
 """
     nb = reads(text, 'py')
     for cell in nb.cells:

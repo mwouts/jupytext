@@ -118,15 +118,7 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
     if header:
         header = ['---'] + header + ['---']
 
-    header = comment_lines(header, text_format.header_prefix)
-    if lines_to_next_cell is None and notebook.cells:
-        lines_to_next_cell = pep8_lines_between_cells(header, notebook.cells[0], ext)
-    else:
-        lines_to_next_cell = 1
-
-    header.extend([''] * lines_to_next_cell)
-
-    return header
+    return comment_lines(header, text_format.header_prefix), lines_to_next_cell
 
 
 def header_to_metadata_and_cell(lines, header_prefix, ext=None):

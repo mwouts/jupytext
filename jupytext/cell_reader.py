@@ -127,7 +127,7 @@ class BaseCellReader(object):
         org_lines = self.content
         if self.ext == '.py' and self.cell_type != 'code' and self.content:
             org_lines = ['#']  # cell was originally commented
-        if self.cell_type == 'code' and self.ext == '.py' and not self.explicit_eoc:
+        if self.ext == '.py' and not self.explicit_eoc:
             expected_blank_lines = pep8_lines_between_cells(org_lines, lines[pos_next_cell:], self.ext)
         else:
             expected_blank_lines = 1

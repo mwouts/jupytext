@@ -79,7 +79,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             del nb.metadata['jupytext']['main_language']
 
         header = encoding_and_executable(nb, self.ext)
-        header.extend(metadata_and_cell_to_header(nb, self.implementation, self.ext))
+        header_content, header_lines_to_next_cell = metadata_and_cell_to_header(nb, self.implementation, self.ext)
+        header.extend(header_content)
 
         cell_exporters = []
         looking_for_first_markdown_cell = (self.implementation.format_name and
@@ -125,6 +126,11 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             if i + 1 < len(cell_exporters):
                 lines = cell_exporters[i + 1].simplify_soc_marker(lines, text)
             lines = text + lines
+
+        if header_lines_to_next_cell is None:
+            header_lines_to_next_cell = pep8_lines_between_cells(header_content, lines, self.implementation.extension)
+
+        header.extend([''] * header_lines_to_next_cell)
 
         if cell_exporters:
             lines = cell_exporters[0].simplify_soc_marker(lines, header)
