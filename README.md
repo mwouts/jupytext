@@ -103,7 +103,7 @@ Configure the multiple export formats for the current notebook by adding a `"jup
   }
 }
 ```
-Accepted formats are composed of an extension, like `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`... and an optional format name among `light` (default for Julia, Python), `percent`, `sphinx`, `spin` (default for R) &mdash; see below for the [format specifications](#Format-specifications). Use `ipynb,py:percent` if you want to pair the `.ipynb` notebook with a `.py` script in the `percent` format. To have the script extension chosen according to the Jupyter kernel, use the `auto` extension.
+Accepted formats are composed of an extension, like `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`... and an optional format name among `light` (default for scripts), `percent`, `sphinx` (Python only), `spin` (R only) &mdash; see below for the [format specifications](#Format-specifications). Use `ipynb,py:percent` if you want to pair the `.ipynb` notebook with a `.py` script in the `percent` format. To have the script extension chosen according to the Jupyter kernel, use the `auto` extension.
 
 Jupytext accepts a few additional options:
 - `comment_magics`: By default, Jupyter magics are commented when notebooks are exported to any other format than markdown. If you prefer otherwise, use this boolean option, or is global counterpart (see below).
@@ -225,6 +225,10 @@ metadata to be added back to the script. Remove the filter if you want to store 
 
 ### Markdown and R Markdown
 
+Save Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) documents and edit them in one of the many editors with good Markdown support. 
+
+[R Markdown](https://rmarkdown.rstudio.com/authoring_quick_tour.html) is [RStudio](https://www.rstudio.com/)'s format for notebooks, with support for R, Python, and many [other languages](https://bookdown.org/yihui/rmarkdown/language-engines.html).
+
 Our implementation for Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) or [R Markdown](https://rmarkdown.rstudio.com/authoring_quick_tour.html) documents is straightforward:
 - A YAML header contains the notebook metadata (Jupyter kernel, etc)
 - Markdown cells are inserted verbatim, and separated with two blank lines
@@ -232,7 +236,7 @@ Our implementation for Jupyter notebooks as [Markdown](https://daringfireball.ne
 
 See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.md) or [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
 
-The Markdown and R Markdown notebook format have an option to split markdown cells on headings. Activate the option in a given notebook by adding the metadata `split_at_heading` in the jupytext section, and activate it by default in Jupyter with
+By default, consecutive Jupyter markdown cells are separated with two blank lines. If you prefer that cells starting with a Markdown header are separated from the previous cell with just one blank line, use the `split_at_heading` option. Set the option either on the command line, or by adding `"split_at_heading": true` to the jupytext section in the notebook metadata, or on Jupytext's content manager:
 
 ```python
 c.ContentsManager.split_at_heading = True
@@ -240,7 +244,7 @@ c.ContentsManager.split_at_heading = True
 
 ### The `light` format for notebooks as scripts
 
-The `light` format was created for this project. It is the default format for Python and Julia scripts. That format can read any script as a Jupyter notebook, even scripts which were never prepared to become a notebook. When a notebook is written as a script using this format, only a few cells markers are introduced—none if possible.
+The `light` format was created for this project. It is the default format for scripts. That format can read any script as a Jupyter notebook, even scripts which were never prepared to become a notebook. When a notebook is written as a script using this format, only a few cells markers are introduced—none if possible.
 
 The `light` format has:
 - A (commented) YAML header, that contains the notebook metadata.
@@ -271,7 +275,7 @@ Percent scripts created by Jupytext have a header with an explicit format inform
 
 The `percent` format is currently available for Python, Julia, R, Bash, Scheme and C++. Open our sample notebook in the `percent` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py).
 
-If the `percent` format is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
+If the `percent` format is your favorite one, add the following to your `.jupyter/jupyter_notebook_config.py` file:
 ```python
 c.ContentsManager.preferred_jupytext_formats_save = "py:percent" # or "auto:percent"
 ```
@@ -281,7 +285,7 @@ By default, Jupyter magics are commented in the `percent` representation. If you
 
 ### Sphinx-gallery scripts
 
-Another popular notebook-like format for Python script is the Sphinx-gallery [format](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-Gallery notebooks by Jupytext.
+Another popular notebook-like format for Python scripts is the Sphinx-gallery [format](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-Gallery notebooks by Jupytext.
 
 Comments in Sphinx-Gallery scripts are formatted using reStructuredText rather than markdown. They can be converted to markdown for a nicer display in Jupyter by adding a `c.ContentsManager.sphinx_convert_rst2md = True` line to your Jupyter configuration file. Please note that this is a non-reversible transformation—use this only with Binder. Revert to the default value `sphinx_convert_rst2md = False` when you edit Sphinx-Gallery files with Jupytext.
 
@@ -298,7 +302,7 @@ Our sample notebook is also represented in `sphinx` format [here](https://github
 
 ### R knitr::spin scripts
 
-The `spin` format implements these [specifications](https://rmarkdown.rstudio.com/articles_report_from_r_script.html):
+The `spin` format is specific to R scripts. These scripts can be compiled into reports using either `knitr::spin` or [RStudio](https://rmarkdown.rstudio.com/articles_report_from_r_script.html). The implementation of the format is as follows:
 - Jupyter metadata are in YAML format, in a `#' `-commented header.
 - Markdown cells are commented with `#' `.
 - Code cells are exported verbatim. Cell metadata are signalled with `#+`. Cells end with a blank line, an explicit start of cell marker, or a markdown cell.
