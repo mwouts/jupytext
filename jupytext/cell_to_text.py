@@ -300,12 +300,10 @@ class RScriptCellExporter(BaseCellExporter):
         return lines
 
 
-class DoublePercentCellExporter(BaseCellExporter):#pylint: disable=W0223
+class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
     """A class that can represent a notebook cell as a Spyder/VScode script (#59)"""
     default_comment_magics = True
     parse_cell_language = True
-
-
 
     def cell_to_text(self):
         """Return the text representation for the cell"""
