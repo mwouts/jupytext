@@ -13,7 +13,7 @@ Jupytext can save Jupyter notebooks as
 There are multiple ways to use `jupytext`:
 - on the [command line](https://github.com/mwouts/jupytext/blob/master/README.md#command-line-conversion)
 - through [jupytext.vim](https://github.com/goerz/jupytext.vim), a plugin for Vim that lets you edit Jupyter notebooks represented as markdown documents or Python scripts
-- directly from Jupyter Notebook or Jupyter Lab. Jupytext provides a _contents manager_ that allows Jupyter to save your notebook to your favorite format (`.py`, `.R`, `.jl`, `.md`, `.Rmd`...) in addition to (or in place of) the traditional `.ipynb` file. The text representation can be edited in your favorite editor. When you're done, refresh the notebook in Jupyter: inputs cells are loaded from the text file, while output cells are reloaded from the `.ipynb` file if present. Refreshing preserves kernel variables, so you can resume your work in the notebook and run the modified cells without having to rerun the notebook in full.
+- directly from Jupyter Notebook or JupyterLab. Jupytext provides a _contents manager_ that allows Jupyter to save your notebook to your favorite format (`.py`, `.R`, `.jl`, `.md`, `.Rmd`...) in addition to (or in place of) the traditional `.ipynb` file. The text representation can be edited in your favorite editor. When you're done, refresh the notebook in Jupyter: inputs cells are loaded from the text file, while output cells are reloaded from the `.ipynb` file if present. Refreshing preserves kernel variables, so you can resume your work in the notebook and run the modified cells without having to rerun the notebook in full.
 
 ## Demo time
 
@@ -77,6 +77,11 @@ or
 conda install -c conda-forge jupytext
 ```
 
+If you want to use Jupytext within Jupyter Notebook or JupyterLab, make sure you install Jupytext in the Python environment where the Jupyter server runs. If that environment is read-only, for instance if your server is started using JupyterHub, install Jupytext in user mode with:
+```
+/path_to_your_jupyter_environment/python -m pip install jupytext --upgrade --user
+```
+
 Then, configure Jupyter to use Jupytext:
 - generate a Jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
 - edit `.jupyter/jupyter_notebook_config.py` and append the following:
@@ -84,9 +89,9 @@ Then, configure Jupyter to use Jupytext:
 c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 ```
 (note that our contents manager accepts a few options: default formats, default metadata filter, etc &mdash; read more on this [below](#global-configuration)).
-- and restart Jupyter, i.e. run
+- and restart Jupyter Notebook or JupyterLab, either from the JupyterHub interface or from the command line with
 ```bash
-jupyter notebook
+jupyter notebook # or lab
 ```
 
 ### <a name="paired-notebooks"></a> Per-notebook configuration
@@ -307,15 +312,15 @@ The `spin` format is specific to R scripts. These scripts can be compiled into r
 - Markdown cells are commented with `#' `.
 - Code cells are exported verbatim. Cell metadata are signalled with `#+`. Cells end with a blank line, an explicit start of cell marker, or a markdown cell.
 
-## Jupyter Notebook or Jupyter Lab?
+## Jupyter Notebook or JupyterLab?
 
 Jupytext works very well with the Jupyter Notebook editor, and we recommend that you get used to Jupytext within `jupyter notebook` first.
 
-That being said, Jupytext also works well from Jupyter Lab. Please note that:
-- Jupytext's installation is identical in both Jupyter Notebook and Jupyter Lab
-- Jupyter Lab can open any [paired notebook](#paired-notebooks) with `.ipynb` extension. Paired notebooks work exactly as in Jupyter Notebook: input cells are taken from the text notebook, and outputs from the  `.ipynb` file. Both files are updated when the notebook is saved.
-- Pairing notebooks is slightly less convenient in Jupyter Lab than in Jupyter Notebook as Jupyter Lab has no notebook metadata editor [yet](https://github.com/jupyterlab/jupyterlab/issues/1308). You will have to open the JSON representation of the notebook in an editor, find the notebook metadata and add the `"jupytext" : {"formats": "ipynb,py"},` entry manually.
-- In Jupyter Lab, scripts or Markdown documents open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu (available in Jupyter Lab 0.35 and above) as shown below:
+That being said, Jupytext also works well from JupyterLab. Please note that:
+- Jupytext's installation is identical in both Jupyter Notebook and JupyterLab
+- JupyterLab can open any [paired notebook](#paired-notebooks) with `.ipynb` extension. Paired notebooks work exactly as in Jupyter Notebook: input cells are taken from the text notebook, and outputs from the  `.ipynb` file. Both files are updated when the notebook is saved.
+- Pairing notebooks is slightly less convenient in JupyterLab than in Jupyter Notebook as JupyterLab has no notebook metadata editor [yet](https://github.com/jupyterlab/jupyterlab/issues/1308). You will have to open the JSON representation of the notebook in an editor, find the notebook metadata and add the `"jupytext" : {"formats": "ipynb,py"},` entry manually.
+- In JupyterLab, scripts or Markdown documents open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu (available in JupyterLab 0.35 and above) as shown below:
 
 ![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/403b53ac5097446a15ea664579ba44cd1badcc57/ContextMenuLab.png)
 
