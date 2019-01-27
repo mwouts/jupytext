@@ -114,16 +114,16 @@ def parse_jupytext_args(args=None):
                              "    jupytext notebook.ipynb --pipe black"
                              'If you want to reformat it and sync the paired representation, execute:'
                              "    jupytext notebook.ipynb --sync --pipe black")
-    parser.add_argument('--exec',
+    parser.add_argument('--check',
                         action='append',
                         help='Pipe the text representation of the notebook into another program, and test that '
                              'the returned value is non zero. For instance, test that your notebook is pep8 compliant '
                              'with:'
-                             "    jupytext notebook.ipynb --exec flake8")
+                             "    jupytext notebook.ipynb --check flake8")
     parser.add_argument('--pipe-fmt',
                         default='auto:percent',
                         help='The format in which the notebook should be piped to other programs, when using the '
-                             '--pipe and/or --exec commands.')
+                             '--pipe and/or --check commands.')
 
     parser.add_argument('--quiet', '-q',
                         action='store_true',
@@ -181,7 +181,7 @@ def jupytext(args=None):
         return
 
     if not args.to and not args.output and not args.sync \
-            and not args.pipe and not args.exec \
+            and not args.pipe and not args.check \
             and not args.test and not args.test_strict \
             and not args.update_metadata:
         raise ValueError('Please select an action')
@@ -237,7 +237,7 @@ def jupytext(args=None):
             notebook = pipe_notebook(notebook, cmd, args.pipe_fmt)
 
         # and/or test the desired commands onto the notebook
-        for cmd in args.exec or []:
+        for cmd in args.check or []:
             pipe_notebook(notebook, cmd, args.pipe_fmt, update=False)
 
         # III. ### Possible actions ###
@@ -424,7 +424,7 @@ def pipe_notebook(notebook, command, fmt='py:percent', update=True, preserve_out
 
     if not cmd_output:
         sys.stderr.write("[jupytext] The command '{}' had no output. As a result, the notebook is empty. "
-                         "Is this expected? If not, use --exec rather than --pipe for this command.".format(command))
+                         "Is this expected? If not, use --check rather than --pipe for this command.".format(command))
 
     piped_notebook = reads(cmd_output.decode('utf-8'), fmt)
 
