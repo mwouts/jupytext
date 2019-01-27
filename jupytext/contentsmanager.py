@@ -168,12 +168,18 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         for alt_path, _ in new_paired_paths:
             self.paired_notebooks[alt_path] = new_paired_paths
 
-    def set_default_format_options(self, metadata):
+    def set_default_format_options(self, format_options, read=False):
         """Set default format option"""
-        if self.comment_magics is not None and 'comment_magics' not in metadata.get('jupytext', {}):
-            metadata.setdefault('jupytext', {})['comment_magics'] = self.comment_magics
-        if self.split_at_heading and 'split_at_heading' not in metadata.get('jupytext', {}):
-            metadata.setdefault('jupytext', {})['split_at_heading'] = True
+        if self.default_notebook_metadata_filter:
+            format_options.setdefault('notebook_metadata_filter', self.default_notebook_metadata_filter)
+        if self.default_cell_metadata_filter:
+            format_options.setdefault('cell_metadata_filter', self.default_cell_metadata_filter)
+        if self.comment_magics is not None:
+            format_options.setdefault('comment_magics', self.comment_magics)
+        if self.split_at_heading:
+            format_options.setdefault('split_at_heading', self.split_at_heading)
+        if read and self.sphinx_convert_rst2md:
+            format_options.setdefault('rst2md', self.sphinx_convert_rst2md)
 
     def default_formats(self, path):
         """Return the default formats, if they apply to the current path #157"""
@@ -196,7 +202,6 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         try:
             metadata = nbk.get('metadata')
             rearrange_jupytext_metadata(metadata)
-            self.set_default_format_options(metadata)
             jupytext_formats = metadata.get('jupytext', {}).get('formats') or self.default_formats(path)
 
             if not jupytext_formats:
@@ -234,6 +239,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                     continue
 
                 alt_path = full_path(base, fmt)
+                self.set_default_format_options(fmt)
                 self.log.info("Saving %s", os.path.basename(alt_path))
                 with mock.patch('nbformat.writes', _jupytext_writes(fmt)):
                     latest_result = super(TextFileContentsManager, self).save(model, alt_path)
@@ -256,6 +262,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         if ext == '.ipynb':
             model = self._notebook_model(path, content=content)
         else:
+            self.set_default_format_options(fmt, read=True)
             with mock.patch('nbformat.reads', _jupytext_reads(fmt)):
                 model = self._notebook_model(path, content=content)
 
@@ -292,6 +299,13 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
         if not alt_paths:
             alt_paths = [(path, fmt)]
+
+        if len(alt_paths) > 1 and ext == '.ipynb':
+            # Apply default options (like saving and reloading would do)
+            jupytext_metadata = model['content']['metadata'].get('jupytext', {})
+            self.set_default_format_options(jupytext_metadata, read=True)
+            if jupytext_metadata:
+                model['content']['metadata']['jupytext'] = jupytext_metadata
 
         org_model = model
         fmt_inputs = fmt
@@ -343,15 +357,6 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                                out=path_outputs, out_last=model_outputs['last_modified']))
         except OverflowError:
             pass
-
-        jupytext_metadata = model['content']['metadata'].get('jupytext', {})
-        if self.default_notebook_metadata_filter:
-            jupytext_metadata.setdefault('notebook_metadata_filter', self.default_notebook_metadata_filter)
-        if self.default_cell_metadata_filter:
-            jupytext_metadata.setdefault('cell_metadata_filter', self.default_cell_metadata_filter)
-
-        if jupytext_metadata:
-            model['content']['metadata']['jupytext'] = jupytext_metadata
 
         if model_outputs:
             combine_inputs_with_outputs(model['content'], model_outputs['content'], fmt_inputs)

@@ -632,11 +632,11 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
         if self.cell_type == 'markdown' and source:
             if self.markdown_marker.startswith(self.comment):
                 source = uncomment(source, self.comment)
-                if self.rst2md:
-                    if rst2md:
-                        source = rst2md('\n'.join(source)).splitlines()
-                    else:
-                        raise ImportError('Could not import rst2md from sphinx_gallery.notebook')
+            if self.rst2md:
+                if rst2md:
+                    source = rst2md('\n'.join(source)).splitlines()
+                else:
+                    raise ImportError('Could not import rst2md from sphinx_gallery.notebook')
 
         self.content = source
 

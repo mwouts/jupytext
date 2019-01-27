@@ -5,7 +5,7 @@ import pytest
 from shutil import copyfile
 from testfixtures import compare
 from argparse import ArgumentTypeError
-from nbformat.v4.nbbase import new_notebook
+from nbformat.v4.nbbase import new_notebook, new_markdown_cell
 from jupytext import __version__
 from jupytext import readf, writef, writes
 from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, str2bool
@@ -277,6 +277,7 @@ def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
     with open(tmp_nbpy) as stream:
         py_script = stream.read()
         assert 'format_name: percent' in py_script
+        assert 'comment_magics: false' in py_script
         assert '# %%time' not in py_script
 
     nb1 = readf(tmp_ipynb)
@@ -579,3 +580,25 @@ def test_format_prefix_suffix(tmpdir):
               '--from', 'notebooks/nb_prefix_/_nb_suffix.ipynb'])
     assert os.path.isfile(tmp_py)
     os.remove(tmp_py)
+
+
+def test_rst2md(tmpdir):
+    tmp_py = str(tmpdir.join('notebook.py'))
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+
+    # Write notebook in sphinx format
+    nb = new_notebook(cells=[new_markdown_cell('A short sphinx notebook'),
+                             new_markdown_cell(':math:`1+1`')])
+    writef(nb, tmp_py, 'py:sphinx')
+
+    jupytext([tmp_py, '--from', 'py:sphinx', '--to', 'ipynb',
+              '--opt', 'rst2md=True', '--opt', 'cell_metadata_filter=-all'])
+
+    assert os.path.isfile(tmp_ipynb)
+    nb = readf(tmp_ipynb)
+
+    assert nb.metadata['jupytext']['cell_metadata_filter'] == '-all'
+    assert nb.metadata['jupytext']['rst2md'] is False
+
+    # Was rst to md conversion effective?
+    assert nb.cells[2].source == '$1+1$'

@@ -6,6 +6,7 @@ import sys
 import subprocess
 import argparse
 import json
+from copy import copy
 from .jupytext import readf, reads, writef, writes
 from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, long_form_one_format, short_form_one_format
 from .formats import check_file_version
@@ -172,7 +173,10 @@ def jupytext(args=None):
         if not args.pre_commit:
             args.notebooks = ['-']
 
-    format_and_options_to_update_metadata(args)
+    if args.set_formats is not None:
+        # Replace empty string with None
+        args.update_metadata = recursive_update(args.update_metadata,
+                                                {'jupytext': {'formats': args.set_formats or None}})
 
     if args.paired_paths:
         if len(args.notebooks) != 1:
@@ -194,6 +198,7 @@ def jupytext(args=None):
 
     if args.to:
         args.to = long_form_one_format(args.to)
+        set_format_options(args.to, args.format_options)
 
     # Main loop
     round_trip_conversion_errors = 0
@@ -213,14 +218,15 @@ def jupytext(args=None):
             args.quiet = True
 
         # I. ### Read the notebook ###
-        fmt = args.input_format
-        log('[jupytext] Reading {}{}'.format(nb_file if nb_file != '-' else 'stdin',
-                                             ' in format {}'.format(fmt) if fmt else ''))
+        fmt = copy(args.input_format) or {}
+        set_format_options(fmt, args.format_options)
+        log('[jupytext] Reading {}{}'.format(
+            nb_file if nb_file != '-' else 'stdin',
+            ' in format {}'.format(short_form_one_format(fmt)) if 'extension' in fmt else ''))
 
         notebook = readf(nb_file, fmt)
         if not fmt:
-            fmt = short_form_one_format(
-                notebook.metadata.get('jupytext', {}).get('text_representation', {'extension': '.ipynb'}))
+            fmt = notebook.metadata.get('jupytext', {}).get('text_representation', {'extension': '.ipynb'})
 
         # Update the metadata
         if args.update_metadata:
@@ -338,17 +344,12 @@ def recursive_update(target, update):
     return target
 
 
-def format_and_options_to_update_metadata(args):
-    """If either the set_formats or the format_options arguments are set, update the update_metadata dictionary"""
-    if args.set_formats is not None:
-        # Replace empty string with None
-        args.update_metadata = recursive_update(args.update_metadata,
-                                                {'jupytext': {'formats': args.set_formats or None}})
-
-    if not args.format_options:
+def set_format_options(fmt, format_options):
+    """Apply the desired format options to the format description fmt"""
+    if not format_options:
         return
 
-    for opt in args.format_options:
+    for opt in format_options:
         try:
             key, value = opt.split('=')
         except ValueError:
@@ -361,7 +362,7 @@ def format_and_options_to_update_metadata(args):
         if key in _BINARY_FORMAT_OPTIONS:
             value = str2bool(value)
 
-        args.update_metadata = recursive_update(args.update_metadata, {'jupytext': {key: value}})
+        fmt[key] = value
 
 
 def load_paired_notebook(notebook, nb_file, log):

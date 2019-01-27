@@ -7,6 +7,7 @@ from copy import copy, deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 import nbformat
+from .formats import _VALID_FORMAT_OPTIONS
 from .formats import read_format_from_metadata, update_jupytext_formats_metadata, rearrange_jupytext_metadata
 from .formats import format_name_for_ext, guess_format, divine_format, get_format_implementation, long_form_one_format
 from .header import header_to_metadata_and_cell, metadata_and_cell_to_header
@@ -24,6 +25,16 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         self.ext = self.fmt['extension']
         self.implementation = get_format_implementation(self.ext, self.fmt.get('format_name'))
 
+    def update_fmt_with_notebook_options(self, metadata):
+        """Update format options with the values in the notebook metadata, and record those
+        options in the notebook metadata"""
+        # format options in notebook have precedence over that in fmt
+        for opt in _VALID_FORMAT_OPTIONS:
+            if opt in metadata.get('jupytext', {}):
+                self.fmt.setdefault(opt, metadata['jupytext'][opt])
+            if opt in self.fmt:
+                metadata.setdefault('jupytext', {}).setdefault(opt, self.fmt[opt])
+
     def reads(self, s, **_):
         """Read a notebook represented as text"""
         lines = s.splitlines()
@@ -33,9 +44,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                                                                              self.implementation.header_prefix,
                                                                              self.implementation.extension)
         default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension)
-
-        if 'comment_magics' in metadata.get('jupytext', {}):
-            self.fmt['comment_magics'] = metadata['jupytext']['comment_magics']
+        self.update_fmt_with_notebook_options(metadata)
 
         if header_cell:
             cells.append(header_cell)
@@ -68,15 +77,17 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 filtered_cells.append(cell)
             cells = filtered_cells
 
+        # The rst2md option applies just once
+        if self.fmt.get('rst2md'):
+            metadata['jupytext']['rst2md'] = False
+
         return new_notebook(cells=cells, metadata=metadata)
 
     def writes(self, nb, **kwargs):
         """Return the text representation of the notebook"""
         nb = deepcopy(nb)
         default_language = default_language_from_metadata_and_ext(nb.metadata, self.implementation.extension)
-        for option in ['comment_magics', 'cell_metadata_filter']:
-            if option in nb.metadata.get('jupytext', {}):
-                self.fmt[option] = nb.metadata['jupytext'][option]
+        self.update_fmt_with_notebook_options(nb.metadata)
 
         if 'main_language' in nb.metadata.get('jupytext', {}):
             del nb.metadata['jupytext']['main_language']
