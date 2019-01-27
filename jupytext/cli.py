@@ -291,7 +291,7 @@ def jupytext(args=None):
             for path, fmt in paired_paths(nb_file, formats):
                 if path == inputs_nb_file and (path == outputs_nb_file or not path.endswith('.ipynb')):
                     continue
-                log("[jupytext] Updating '{}'\n".format(path))
+                log("[jupytext] Updating '{}'".format(path))
                 writef_git_add(notebook, path, fmt)
 
     if round_trip_conversion_errors:
@@ -369,7 +369,7 @@ def load_paired_notebook(notebook, nb_file, log):
     formats = notebook.metadata.get('jupytext', {}).get('formats')
 
     if not formats:
-        raise ValueError("'{}' is not a paired notebook\n".format(nb_file))
+        raise ValueError("'{}' is not a paired notebook".format(nb_file))
 
     max_mtime_inputs = None
     max_mtime_outputs = None
@@ -389,15 +389,15 @@ def load_paired_notebook(notebook, nb_file, log):
                 latest_outputs = path
 
     if latest_outputs and latest_outputs != latest_inputs:
-        log("[jupytext] Loading input cells from '{}'\n".format(latest_inputs))
+        log("[jupytext] Loading input cells from '{}'".format(latest_inputs))
         inputs = notebook if latest_inputs == nb_file else readf(latest_inputs, input_fmt)
         check_file_version(inputs, latest_inputs, latest_outputs)
-        log("[jupytext] Loading output cells from '{}'\n".format(latest_outputs))
+        log("[jupytext] Loading output cells from '{}'".format(latest_outputs))
         outputs = notebook if latest_outputs == nb_file else readf(latest_outputs)
         combine_inputs_with_outputs(inputs, outputs, input_fmt)
         return inputs, latest_inputs, latest_outputs
 
-    log("[jupytext] Loading notebook from '{}'\n".format(latest_inputs))
+    log("[jupytext] Loading notebook from '{}'".format(latest_inputs))
     if latest_inputs != nb_file:
         notebook = readf(latest_inputs, input_fmt)
     return notebook, latest_inputs, latest_outputs
