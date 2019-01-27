@@ -23,7 +23,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/mwouts/jupytext',
     packages=find_packages(),
-    entry_points={'console_scripts': ['jupytext = jupytext.cli:jupytext']},
+    entry_points={'console_scripts': ['jupytext = jupytext.cli:jupytext_cli']},
     tests_require=['pytest'],
     install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml', 'testfixtures'],
     license='MIT',

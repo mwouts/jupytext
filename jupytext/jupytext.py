@@ -2,14 +2,15 @@
 
 import os
 import io
+import sys
 from copy import copy, deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 import nbformat
-from .formats import get_format_implementation, read_format_from_metadata, guess_format, long_form_one_format, \
-    update_jupytext_formats_metadata, format_name_for_ext, rearrange_jupytext_metadata
-from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, \
-    encoding_and_executable, insert_or_test_version_number
+from .formats import read_format_from_metadata, update_jupytext_formats_metadata, rearrange_jupytext_metadata
+from .formats import format_name_for_ext, guess_format, divine_format, get_format_implementation, long_form_one_format
+from .header import header_to_metadata_and_cell, metadata_and_cell_to_header
+from .header import encoding_and_executable, insert_or_test_version_number
 from .metadata_filter import update_metadata_filters
 from .languages import default_language_from_metadata_and_ext, set_main_and_cell_language
 from .pep8 import pep8_lines_between_cells
@@ -167,6 +168,7 @@ def reads(text, fmt, as_version=4, **kwargs):
 
 def read(file_or_stream, fmt, as_version=4, **kwargs):
     """Read a notebook from a file"""
+    fmt = long_form_one_format(fmt)
     if fmt['extension'] == '.ipynb':
         notebook = nbformat.read(file_or_stream, as_version, **kwargs)
         rearrange_jupytext_metadata(notebook.metadata)
@@ -177,6 +179,11 @@ def read(file_or_stream, fmt, as_version=4, **kwargs):
 
 def readf(nb_file, fmt=None):
     """Read a notebook from the file with given name"""
+    if nb_file == '-':
+        text = sys.stdin.read()
+        fmt = fmt or divine_format(text)
+        return reads(text, fmt)
+
     _, ext = os.path.splitext(nb_file)
     fmt = copy(fmt or {})
     fmt.update({'extension': ext})
@@ -188,7 +195,7 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a string"""
     rearrange_jupytext_metadata(notebook.metadata)
     fmt = copy(fmt)
-    fmt = long_form_one_format(fmt)
+    fmt = long_form_one_format(fmt, notebook.metadata)
     ext = fmt['extension']
     format_name = fmt.get('format_name')
 
@@ -219,6 +226,10 @@ def write(notebook, file_or_stream, fmt, version=nbformat.NO_CONVERT, **kwargs):
 
 def writef(notebook, nb_file, fmt=None):
     """Write a notebook to the file with given name"""
+    if nb_file == '-':
+        write(notebook, sys.stdout, fmt)
+        return
+
     _, ext = os.path.splitext(nb_file)
     fmt = copy(fmt or {})
     fmt = long_form_one_format(fmt)

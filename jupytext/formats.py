@@ -149,7 +149,7 @@ def get_format_implementation(ext, format_name=None):
     if formats_for_extension:
         raise TypeError("Format '{}' is not associated to extension '{}'. "
                         "Please choose one of: {}.".format(format_name, ext, ', '.join(formats_for_extension)))
-    raise TypeError("Not format associated to extension '{}'".format(ext))
+    raise TypeError("No format associated to extension '{}'".format(ext))
 
 
 def read_metadata(text, ext):
@@ -285,13 +285,11 @@ def check_file_version(notebook, source_path, outputs_path):
     if (fmt.min_readable_version_number or current) <= version <= current:
         return
 
-    raise ValueError("File {} has jupytext_format_version={}, but "
-                     "current version for that extension is {}.\n"
-                     "It would not be safe to override the source of {} "
-                     "with that file.\n"
+    raise ValueError("File {} is in format/version={}/{} (current version is {}). "
+                     "It would not be safe to override the source of {} with that file. "
                      "Please remove one or the other file."
                      .format(os.path.basename(source_path),
-                             version, current,
+                             format_name, version, current,
                              os.path.basename(outputs_path)))
 
 
@@ -379,13 +377,20 @@ def rearrange_jupytext_metadata(metadata):
         metadata['jupytext'] = jupytext_metadata
 
 
-def long_form_one_format(jupytext_format):
+def long_form_one_format(jupytext_format, metadata=None):
     """Parse 'sfx.py:percent' into {'suffix':'sfx', 'extension':'py', 'format_name':'percent'}"""
     if isinstance(jupytext_format, dict):
         return jupytext_format
 
     if not jupytext_format:
         return {}
+
+    common_name_to_ext = {'notebook': 'ipynb',
+                          'rmarkdown': 'Rmd',
+                          'markdown': 'md',
+                          'c++': 'cpp'}
+    if jupytext_format.lower() in common_name_to_ext:
+        jupytext_format = common_name_to_ext[jupytext_format.lower()]
 
     fmt = {}
 
@@ -402,6 +407,9 @@ def long_form_one_format(jupytext_format):
 
     if not ext.startswith('.'):
         ext = '.' + ext
+
+    if ext == '.auto' and metadata:
+        ext = auto_ext_from_metadata(metadata)
 
     fmt['extension'] = ext
     return fmt

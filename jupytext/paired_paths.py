@@ -1,7 +1,7 @@
 """List all the paths associated to a given notebook"""
 
 import os
-from .formats import long_form_multiple_formats
+from .formats import long_form_one_format, long_form_multiple_formats
 
 
 class InconsistentPath(ValueError):
@@ -12,6 +12,10 @@ class InconsistentPath(ValueError):
 
 def base_path(main_path, fmt):
     """Given a path and options for a format (ext, suffix, prefix), return the corresponding base path"""
+    if not fmt:
+        return os.path.splitext(main_path)[0]
+
+    fmt = long_form_one_format(fmt)
     fmt_ext = fmt['extension']
     suffix = fmt.get('suffix')
     prefix = fmt.get('prefix')
@@ -54,11 +58,11 @@ def base_path(main_path, fmt):
     return notebook_dir + sep + notebook_file_name
 
 
-def full_path(base, format_options):
+def full_path(base, fmt):
     """Return the full path for the notebook, given the base path"""
-    ext = format_options['extension']
-    suffix = format_options.get('suffix')
-    prefix = format_options.get('prefix')
+    ext = fmt['extension']
+    suffix = fmt.get('suffix')
+    prefix = fmt.get('prefix')
 
     full = base
 
