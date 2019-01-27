@@ -790,3 +790,45 @@ def test_python_kernel_preserves_R_files(nb_file, tmpdir):
         script2 = fp.read()
 
     compare(script, script2)
+
+
+def test_pair_notebook_in_another_folder(tmpdir):
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    os.makedirs(str(tmpdir.join('notebooks')))
+    os.makedirs(str(tmpdir.join('scripts')))
+    tmp_ipynb = str(tmpdir.join('notebooks/notebook_name.ipynb'))
+    tmp_py = str(tmpdir.join('scripts/notebook_name.py'))
+
+    cm.save(model=dict(type='notebook',
+                       content=new_notebook(
+                           metadata={'jupytext': {'formats': 'notebooks//ipynb,scripts//py'}})),
+            path=tmp_ipynb)
+
+    assert os.path.isfile(tmp_ipynb)
+    assert os.path.isfile(tmp_py)
+
+    cm.get(tmp_ipynb)
+    cm.get(tmp_py)
+
+
+def test_pair_notebook_in_dotdot_folder(tmpdir):
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    os.makedirs(str(tmpdir.join('notebooks')))
+    os.makedirs(str(tmpdir.join('scripts')))
+    tmp_ipynb = str(tmpdir.join('notebooks/notebook_name.ipynb'))
+    tmp_py = str(tmpdir.join('scripts/notebook_name.py'))
+
+    cm.save(model=dict(type='notebook',
+                       content=new_notebook(
+                           metadata={'jupytext': {'formats': 'ipynb,../scripts//py'}})),
+            path=tmp_ipynb)
+
+    assert os.path.isfile(tmp_ipynb)
+    assert os.path.isfile(tmp_py)
+
+    cm.get(tmp_ipynb)
+    cm.get(tmp_py)

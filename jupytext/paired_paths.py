@@ -69,7 +69,11 @@ def full_path(base, fmt):
     if prefix:
         prefix_dir, prefix_file_name = os.path.split(prefix)
         notebook_dir, notebook_file_name = os.path.split(base)
+
+        # Local path separator (\\ on windows)
         sep = base[len(notebook_dir):-len(notebook_file_name)] or '/'
+        prefix_dir = prefix_dir.replace('/', sep)
+
         if prefix_file_name:
             notebook_file_name = prefix_file_name + notebook_file_name
         if prefix_dir:
