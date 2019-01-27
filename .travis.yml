@@ -15,10 +15,11 @@ install:
   # command to install dependencies
   - pip install -r requirements-dev.txt
   - pip install -r requirements.txt
-  # install is required for the nbconvert exporters
+  # install is required for testing the pre-commit mode
   - pip install .
-  # install black if available (Python 3.6 and above)
+  # install black if available (Python 3.6 and above), and autopep8 for testing the pipe mode
   - pip install black || true
+  - pip install autopep8 || true
 before_script:
   # stop the build if there are Python syntax errors or undefined names
   - flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
