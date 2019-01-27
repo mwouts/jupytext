@@ -54,7 +54,7 @@ def test_pipe_into_black():
     nb_org = new_notebook(cells=[new_code_cell('1        +1')])
     nb_dest = new_notebook(cells=[new_code_cell('1 + 1')])
 
-    nb_pipe = pipe_notebook(nb_org, 'black -')
+    nb_pipe = pipe_notebook(nb_org, 'black')
     compare(nb_dest, nb_pipe)
 
 
@@ -71,12 +71,12 @@ def test_pipe_into_autopep8():
 def test_pipe_into_flake8():
     # Notebook OK
     nb = new_notebook(cells=[new_code_cell('# correct code\n1 + 1')])
-    pipe_notebook(nb, 'flake8 -', update=False)
+    pipe_notebook(nb, 'flake8', update=False)
 
     # Notebook not OK
     nb = new_notebook(cells=[new_code_cell('incorrect code')])
     with pytest.raises(SystemExit):
-        pipe_notebook(nb, 'flake8 -', update=False)
+        pipe_notebook(nb, 'flake8', update=False)
 
 
 @requires_black
@@ -96,14 +96,14 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
 
     # Black in place
     writef(nb_org, tmp_ipynb)
-    jupytext([tmp_ipynb, '--pipe', 'black -'])
+    jupytext([tmp_ipynb, '--pipe', 'black'])
     nb_now = readf(tmp_ipynb)
     compare(nb_black, nb_now)
 
     # Write to another folder using dots
     script_fmt = os.path.join('..', 'script_folder//py:percent')
     writef(nb_org, tmp_ipynb)
-    jupytext([tmp_ipynb, '--to', script_fmt, '--pipe', 'black -'])
+    jupytext([tmp_ipynb, '--to', script_fmt, '--pipe', 'black'])
     assert os.path.isfile(tmp_py)
     nb_now = readf(tmp_py)
     nb_now.metadata = metadata
@@ -113,7 +113,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     # Map to another folder based on file name
     writef(nb_org, tmp_ipynb)
     jupytext([tmp_ipynb, '--from', 'notebook_folder//ipynb', '--to', 'script_folder//py:percent',
-              '--pipe', 'black -', '--exec', 'flake8 -'])
+              '--pipe', 'black', '--exec', 'flake8'])
     assert os.path.isfile(tmp_py)
     nb_now = readf(tmp_py)
     nb_now.metadata = metadata
