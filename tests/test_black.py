@@ -113,7 +113,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     # Map to another folder based on file name
     writef(nb_org, tmp_ipynb)
     jupytext([tmp_ipynb, '--from', 'notebook_folder//ipynb', '--to', 'script_folder//py:percent',
-              '--pipe', 'black', '--exec', 'flake8'])
+              '--pipe', 'black', '--check', 'flake8'])
     assert os.path.isfile(tmp_py)
     nb_now = readf(tmp_py)
     nb_now.metadata = metadata
