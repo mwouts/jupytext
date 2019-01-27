@@ -804,13 +804,13 @@ def test_pair_notebook_in_another_folder(tmpdir):
     cm.save(model=dict(type='notebook',
                        content=new_notebook(
                            metadata={'jupytext': {'formats': 'notebooks//ipynb,scripts//py'}})),
-            path=tmp_ipynb)
+            path='notebooks/notebook_name.ipynb')
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
 
-    cm.get(tmp_ipynb)
-    cm.get(tmp_py)
+    cm.get('notebooks/notebook_name.ipynb')
+    cm.get('scripts/notebook_name.py')
 
 
 def test_pair_notebook_in_dotdot_folder(tmpdir):
@@ -825,10 +825,10 @@ def test_pair_notebook_in_dotdot_folder(tmpdir):
     cm.save(model=dict(type='notebook',
                        content=new_notebook(
                            metadata={'jupytext': {'formats': 'ipynb,../scripts//py'}})),
-            path=tmp_ipynb)
+            path='notebooks/notebook_name.ipynb')
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
 
-    cm.get(tmp_ipynb)
-    cm.get(tmp_py)
+    cm.get('notebooks/notebook_name.ipynb')
+    cm.get('scripts/notebook_name.py')
