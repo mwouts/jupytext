@@ -174,6 +174,11 @@ def test_ipynb_to_bash_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'sh:percent', 'ipynb_to_percent')
 
 
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_q'))
+def test_ipynb_to_q_percent(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'q:percent', 'ipynb_to_percent')
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('percent'))
 def test_percent_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ipynb:percent', 'script_to_ipynb')
