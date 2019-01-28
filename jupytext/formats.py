@@ -408,8 +408,8 @@ def long_form_one_format(jupytext_format, metadata=None):
     if not ext.startswith('.'):
         ext = '.' + ext
 
-    if ext == '.auto' and metadata:
-        ext = auto_ext_from_metadata(metadata)
+    if ext == '.auto':
+        ext = auto_ext_from_metadata(metadata) or '.py'
 
     fmt['extension'] = ext
     return fmt

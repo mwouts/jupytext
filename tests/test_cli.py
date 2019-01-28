@@ -5,13 +5,13 @@ import pytest
 from shutil import copyfile
 from testfixtures import compare
 from argparse import ArgumentTypeError
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell
+from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from jupytext import __version__
 from jupytext import readf, writef, writes
 from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, str2bool
 from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths
-from .utils import list_notebooks
+from .utils import list_notebooks, requires_black, requires_flake8
 
 
 def test_str2bool():
@@ -348,6 +348,47 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_md)
+
+
+@requires_black
+@requires_flake8
+def test_pre_commit_hook_sync_black_flake8(tmpdir):
+    def git(*args):
+        print(system('git', *args, cwd=str(tmpdir)))
+
+    git('init')
+    git('status')
+    hook = str(tmpdir.join('.git/hooks/pre-commit'))
+    with open(hook, 'w') as fp:
+        fp.write('#!/bin/sh\n'
+                 '# Pair ipynb notebooks to a python file, reformat content with black, and run flake8\n'
+                 '# Note: this hook only acts on ipynb files. When pulling, run jupytext --sync manually to '
+                 'update the ipynb file.\n'
+                 'jupytext --pre-commit --from ipynb --set-formats ipynb,py --sync --pipe black --check flake8\n')
+
+    st = os.stat(hook)
+    os.chmod(hook, st.st_mode | stat.S_IEXEC)
+
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+    nb = new_notebook(cells=[new_code_cell(source='1+    1')])
+
+    writef(nb, tmp_ipynb)
+    git('add', 'notebook.ipynb')
+    git('status')
+    git('commit', '-m', 'created')
+    git('status')
+    assert os.path.isfile(tmp_py)
+    assert os.path.isfile(tmp_ipynb)
+    with open(tmp_py) as fp:
+        assert fp.read().splitlines()[-1] == '1 + 1'
+
+    nb = new_notebook(cells=[new_code_cell(source='"""trailing   \nwhitespace"""')])
+    writef(nb, tmp_ipynb)
+    git('add', 'notebook.ipynb')
+    git('status')
+    with pytest.raises(SystemExit):  # not flake8
+        git('commit', '-m', 'created')
 
 
 def test_manual_call_of_pre_commit_hook(tmpdir):

@@ -3,22 +3,11 @@ import pytest
 from shutil import copyfile
 from testfixtures import compare
 from nbformat.v4.nbbase import new_notebook, new_code_cell
-from .utils import list_notebooks
+from .utils import list_notebooks, requires_black, requires_flake8, requires_autopep8
+
 from jupytext import readf, writef
 from jupytext.cli import system, jupytext, pipe_notebook
 from jupytext.combine import black_invariant
-
-
-def tool_version(tool):
-    try:
-        return system(tool, '--version')
-    except OSError:  # pragma: no cover
-        return None
-
-
-requires_black = pytest.mark.skipif(not tool_version('black'), reason='black not found')
-requires_flake8 = pytest.mark.skipif(not tool_version('flake8'), reason='flake8 not found')
-requires_autopep8 = pytest.mark.skipif(not tool_version('autopep8'), reason='autopep8 not found')
 
 
 @requires_black
