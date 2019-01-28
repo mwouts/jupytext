@@ -11,7 +11,8 @@ _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.jl': {'language': 'julia', 'comment': '#'},
                       '.cpp': {'language': 'c++', 'comment': '//'},
                       '.ss': {'language': 'scheme', 'comment': ';;'},
-                      '.sh': {'language': 'bash', 'comment': '#'}}
+                      '.sh': {'language': 'bash', 'comment': '#'},
+                      '.q': {'language': 'q', 'comment' : '/'}}
 
 
 def default_language_from_metadata_and_ext(notebook, ext):
