@@ -4,10 +4,11 @@ import os
 import time
 import pytest
 import itertools
-from nbformat.v4.nbbase import new_notebook
+from nbformat.v4.nbbase import new_notebook, new_markdown_cell
 from tornado.web import HTTPError
 from testfixtures import compare
 import jupytext
+from jupytext.jupytext import writes, writef
 from jupytext.compare import compare_notebooks
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.formats import read_format_from_metadata, auto_ext_from_metadata
@@ -832,3 +833,49 @@ def test_pair_notebook_in_dotdot_folder(tmpdir):
 
     cm.get('notebooks/notebook_name.ipynb')
     cm.get('scripts/notebook_name.py')
+
+
+def test_rst2md_option(tmpdir):
+    tmp_py = str(tmpdir.join('notebook.py'))
+
+    # Write notebook in sphinx format
+    nb = new_notebook(cells=[new_markdown_cell('A short sphinx notebook'),
+                             new_markdown_cell(':math:`1+1`')])
+    writef(nb, tmp_py, 'py:sphinx')
+
+    cm = jupytext.TextFileContentsManager()
+    cm.sphinx_convert_rst2md = True
+    cm.root_dir = str(tmpdir)
+
+    nb2 = cm.get('notebook.py')['content']
+
+    # Was rst to md conversion effective?
+    assert nb2.cells[2].source == '$1+1$'
+    assert nb2.metadata['jupytext']['rst2md'] is False
+
+
+def test_split_at_heading_option(tmpdir):
+    text = """Markdown text
+
+# Header one
+
+## Header two
+"""
+    tmp_md = str(tmpdir.join('notebook.md'))
+    with open(tmp_md, 'w') as fp:
+        fp.write(text)
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.split_at_heading = True
+
+    nb = cm.get('notebook.md')['content']
+
+    # Was rst to md conversion effective?
+    assert nb.cells[0].source == 'Markdown text'
+    assert nb.cells[1].source == '# Header one'
+    assert nb.cells[2].source == '## Header two'
+
+    nb.metadata['jupytext']['notebook_metadata_filter'] = '-all'
+    text2 = writes(nb, 'md')
+    compare(text, text2)
