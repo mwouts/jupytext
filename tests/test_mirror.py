@@ -124,6 +124,11 @@ def test_ipynb_to_cpp(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'cpp', 'ipynb_to_script')
 
 
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_q'))
+def test_ipynb_to_q(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'q', 'ipynb_to_script')
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_julia'))
 def test_ipynb_to_julia_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'jl:percent', 'ipynb_to_percent')
