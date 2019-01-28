@@ -661,3 +661,16 @@ def test_rst2md(tmpdir):
 
     # Was rst to md conversion effective?
     assert nb.cells[2].source == '$1+1$'
+
+
+def test_remove_jupytext_metadata(tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    nb = new_notebook(metadata={'jupytext': {
+        'formats': 'ipynb',
+        'text_representation': {'extension': '.py', 'format': 'light'}}})
+    writef(nb, tmp_ipynb)
+
+    jupytext([tmp_ipynb, '--update-metadata', '{"jupytext":null}'])
+
+    nb2 = readf(tmp_ipynb)
+    assert not nb2.metadata
