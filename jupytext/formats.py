@@ -15,7 +15,7 @@ from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
     HydrogenCellExporter, SphinxGalleryCellExporter
 from .metadata_filter import metadata_filter_as_string
 from .stringparser import StringParser
-from .languages import _SCRIPT_EXTENSIONS
+from .languages import _SCRIPT_EXTENSIONS, _COMMENT_CHARS
 
 
 class JupytextFormatError(ValueError):
@@ -245,7 +245,7 @@ def divine_format(text):
         pass
 
     lines = text.splitlines()
-    for comment in ['', '#', "#'", ';;', '//']:
+    for comment in ['', '#'] + _COMMENT_CHARS:
         metadata, _, _, _ = header_to_metadata_and_cell(lines, comment)
         ext = metadata.get('jupytext', {}).get('text_representation', {}).get('extension')
         if ext:

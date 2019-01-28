@@ -14,6 +14,9 @@ _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.sh': {'language': 'bash', 'comment': '#'},
                       '.q': {'language': 'q', 'comment': '/'}}
 
+_COMMENT_CHARS = [_SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS if
+                  _SCRIPT_EXTENSIONS[ext]['comment'] != '#']
+
 
 def default_language_from_metadata_and_ext(metadata, ext):
     """Return the default language given the notebook metadata, and a file extension"""
