@@ -8,7 +8,7 @@ Have you always wished Jupyter notebooks were plain text documents? Wished you c
 
 Jupytext can save Jupyter notebooks as
 - Markdown and R Markdown documents,
-- Julia, Python, R, Bash, Scheme and C++ scripts.
+- Julia, Python, R, Bash, Scheme, C++ and q/kdb+ scripts.
 
 There are multiple ways to use `jupytext`:
 - on the [command line](https://github.com/mwouts/jupytext/blob/master/README.md#command-line-conversion)
@@ -108,7 +108,7 @@ Configure the multiple export formats for the current notebook by adding a `"jup
   }
 }
 ```
-Accepted formats are composed of an extension, like `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`... and an optional format name among `light` (default for scripts), `percent`, `sphinx` (Python only), `spin` (R only) &mdash; see below for the [format specifications](#Format-specifications). Use `ipynb,py:percent` if you want to pair the `.ipynb` notebook with a `.py` script in the `percent` format. To have the script extension chosen according to the Jupyter kernel, use the `auto` extension.
+Accepted formats are composed of an extension, like `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`, `q`... and an optional format name among `light` (default for scripts), `percent`, `sphinx` (Python only), `spin` (R only) &mdash; see below for the [format specifications](#Format-specifications). Use `ipynb,py:percent` if you want to pair the `.ipynb` notebook with a `.py` script in the `percent` format. To have the script extension chosen according to the Jupyter kernel, use the `auto` extension.
 
 Jupytext accepts a few additional options:
 - `comment_magics`: By default, Jupyter magics are commented when notebooks are exported to any other format than markdown. If you prefer otherwise, use this boolean option, or is global counterpart (see below).
@@ -257,7 +257,7 @@ The `light` format has:
 - Code cells are exported verbatim (except for Jupyter magics, which are commented), and separated with blank lines. Code cells are reconstructed from consistent Python paragraphs (no function, class or multiline comment will be broken).
 - Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter `# +` (`// +` in C++, etc). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
-The `light` format is currently available for Python, Julia, R, Bash, Scheme and C++. Open our sample notebook in the `light` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.lgt.py).
+The `light` format is currently available for Python, Julia, R, Bash, Scheme, C++ and q/kdb+. Open our sample notebook in the `light` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.lgt.py).
 
 A variation of the `light` format is the `bare` format, with no cell marker at all. Please note that this format will split your code cells on code paragraphs. By default, this format still includes a YAML header - if you prefer to also remove the header, set `"notebook_metadata_filter": "-all"` in the jupytext section of your notebook metadata.  
 
@@ -278,7 +278,7 @@ where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The
 
 Percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least one `# %%` cell are identified as `percent` scripts. Scripts with at least one double percent cell, and an uncommented Jupyter magic command, are identified as `hydrogen` scripts.
 
-The `percent` format is currently available for Python, Julia, R, Bash, Scheme and C++. Open our sample notebook in the `percent` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py).
+The `percent` format is currently available for Python, Julia, R, Bash, Scheme, C++ and q/kdb+. Open our sample notebook in the `percent` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py).
 
 If the `percent` format is your favorite one, add the following to your `.jupyter/jupyter_notebook_config.py` file:
 ```python
