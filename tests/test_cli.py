@@ -352,7 +352,11 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
 
 @requires_black
 @requires_flake8
-def test_pre_commit_hook_sync_black_flake8(tmpdir):
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
+def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
+    # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
+    metadata = readf(nb_file).metadata
+
     def git(*args):
         print(system('git', *args, cwd=str(tmpdir)))
 
@@ -371,7 +375,7 @@ def test_pre_commit_hook_sync_black_flake8(tmpdir):
 
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_py = str(tmpdir.join('notebook.py'))
-    nb = new_notebook(cells=[new_code_cell(source='1+    1')])
+    nb = new_notebook(cells=[new_code_cell(source='1+    1')], metadata=metadata)
 
     writef(nb, tmp_ipynb)
     git('add', 'notebook.ipynb')
@@ -383,7 +387,7 @@ def test_pre_commit_hook_sync_black_flake8(tmpdir):
     with open(tmp_py) as fp:
         assert fp.read().splitlines()[-1] == '1 + 1'
 
-    nb = new_notebook(cells=[new_code_cell(source='"""trailing   \nwhitespace"""')])
+    nb = new_notebook(cells=[new_code_cell(source='"""trailing   \nwhitespace"""')], metadata=metadata)
     writef(nb, tmp_ipynb)
     git('add', 'notebook.ipynb')
     git('status')
