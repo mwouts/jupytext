@@ -173,6 +173,20 @@ def test_error_multiple_input(tmp_ipynb):
     assert 'Please input a single notebook when using --output' in str(info)
 
 
+def test_error_opt_missing_equal(tmp_ipynb):
+    with pytest.raises(ValueError) as info:
+        jupytext([tmp_ipynb, '--to', 'py', '--opt', 'missing_equal'])
+
+    assert 'key=value' in str(info)
+
+
+def test_error_unknown_opt(tmp_ipynb):
+    with pytest.raises(ValueError) as info:
+        jupytext([tmp_ipynb, '--to', 'py', '--opt', 'unknown=true'])
+
+    assert 'is not a valid format option' in str(info)
+
+
 def test_combine_same_version_ok(tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_nbpy = str(tmpdir.join('notebook.py'))
