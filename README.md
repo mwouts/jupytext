@@ -108,7 +108,18 @@ Configure the multiple export formats for the current notebook by adding a `"jup
   }
 }
 ```
-Accepted formats are composed of an extension, like `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`, `q`... and an optional format name among `light` (default for scripts), `percent`, `sphinx` (Python only), `spin` (R only) &mdash; see below for the [format specifications](#Format-specifications). Use `ipynb,py:percent` if you want to pair the `.ipynb` notebook with a `.py` script in the `percent` format. To have the script extension chosen according to the Jupyter kernel, use the `auto` extension.
+Alternatively, activate the pairing with the command line tool:
+```
+jupytext notebook.ipynb --set-formats ipynb,py
+```
+You can pair a notebook to as many text representations as you want (see our _World population_ notebook in the demo folder). Format specifications are of the form
+```
+[[path/][prefix]/][suffix.]ext[:format_name]
+```
+where
+- `ext` is one of `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`, `q`. Use the `auto` extension to have the script extension chosen according to the Jupyter kernel.
+- `format_name` (optional) is either `light` (default for scripts), `bare`, `percent`, `sphinx` (Python only), `spin` (R only) &mdash; see below for the [format specifications](#Format-specifications).
+- `path`, `prefix` and `suffix` allow to save the text representation tp files with different names, or in a different folder. For instance, if you want that your notebook is paired to a python script in a subfolder named `scripts`, set the formats metadata to `ipynb,scripts//py`. If the notebook is in a `notebooks` folder and you want the text representation to be in a `scripts` folder at the same level, use `notebooks//ipynb,scripts//py`.
 
 Jupytext accepts a few additional options:
 - `comment_magics`: By default, Jupyter magics are commented when notebooks are exported to any other format than markdown. If you prefer otherwise, use this boolean option, or is global counterpart (see below).
@@ -173,18 +184,35 @@ jupytext --to md --output - notebook.ipynb      # display the markdown version o
 jupytext --from ipynb --to py:percent           # read ipynb from stdin and write double percent script on stdout
 ```
 
-The `jupytext` command accepts many arguments. Execute `jupytext --help` to access the documentation. For instance, use the `--set-formats` and the `--update-metadata` arguments to edit the pairing information or more generally the notebook metadata.
+Jupytext has a `--sync` mode that updates all the paired representations of a notebook based on the file that was last modified. You may also find useful to `--pipe` the text representation of a notebook into tools like `black`:
+```bash
+jupytext --sync --pipe black notebook.ipynb    # read most recent version of notebook, reformat with black, save
+```
+
+The `jupytext` command accepts many arguments. Use the `--set-formats` and the `--update-metadata` arguments to edit the pairing information or more generally the notebook metadata. Execute `jupytext --help` to access the documentation.
 
 Jupytext is also available as a Git pre-commit hook. Use this if you want Jupytext to create and update the `.py` (or `.md`...) representation of the staged `.ipynb` notebooks. All you need is to create an executable `.git/hooks/pre-commit` file with the following content:
 ```bash
 #!/bin/sh
-jupytext --to py:light --pre-commit
+# For every ipynb file in the git index, add a Python representation
+jupytext --from ipynb --to py:light --pre-commit
 ```
+
+```bash
+#!/bin/sh
+# For every ipynb file in the git index:
+# - apply black and flake8
+# - export the notebook to a Python script in folder 'python'
+# - and add it to the git index
+jupytext --from ipynb --pipe black --check flake8 --pre-commit
+jupytext --from ipynb --to python//py:light --pre-commit
+```
+
 If you don't want notebooks to be committed (and only commit the representations), you can ask the pre-commit hook to unstage notebooks after conversion by adding the following line:
 ```bash
 git reset HEAD **/*.ipynb
 ```
-Jupytext does not offer a merge driver. If a conflict occurs, solve it on the text representation and then update or recreate the `.ipynb` notebook. Or give a try to nbdime and its [merge driver](https://nbdime.readthedocs.io/en/stable/vcs.html#merge-driver).
+Note that these hooks do not update the `.ipynb` notebook when you pull. Make sure to either run `jupytext` in the other direction, or to use our paired notebook and our contents manager for Jupyter. Also, Jupytext does not offer a merge driver. If a conflict occurs, solve it on the text representation and then update or recreate the `.ipynb` notebook. Or give a try to nbdime and its [merge driver](https://nbdime.readthedocs.io/en/stable/vcs.html#merge-driver).
 
 ## Reading notebooks in Python
 
@@ -230,7 +258,7 @@ metadata to be added back to the script. Remove the filter if you want to store 
 
 ### Markdown and R Markdown
 
-Save Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) documents and edit them in one of the many editors with good Markdown support. 
+Save Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) documents and edit them in one of the many editors with good Markdown support.
 
 [R Markdown](https://rmarkdown.rstudio.com/authoring_quick_tour.html) is [RStudio](https://www.rstudio.com/)'s format for notebooks, with support for R, Python, and many [other languages](https://bookdown.org/yihui/rmarkdown/language-engines.html).
 
@@ -314,19 +342,16 @@ The `spin` format is specific to R scripts. These scripts can be compiled into r
 
 ## Jupyter Notebook or JupyterLab?
 
-Jupytext works very well with the Jupyter Notebook editor, and we recommend that you get used to Jupytext within `jupyter notebook` first.
-
-That being said, Jupytext also works well from JupyterLab. Please note that:
-- Jupytext's installation is identical in both Jupyter Notebook and JupyterLab
-- JupyterLab can open any [paired notebook](#paired-notebooks) with `.ipynb` extension. Paired notebooks work exactly as in Jupyter Notebook: input cells are taken from the text notebook, and outputs from the  `.ipynb` file. Both files are updated when the notebook is saved.
-- Pairing notebooks is slightly less convenient in JupyterLab than in Jupyter Notebook as JupyterLab has no notebook metadata editor [yet](https://github.com/jupyterlab/jupyterlab/issues/1308). You will have to open the JSON representation of the notebook in an editor, find the notebook metadata and add the `"jupytext" : {"formats": "ipynb,py"},` entry manually.
+Jupytext works well in both. Just note that:
+- Pairing notebooks is slightly less convenient in JupyterLab than in Jupyter Notebook as JupyterLab has no notebook metadata editor [yet](https://github.com/jupyterlab/jupyterlab/issues/1308). You will have to open the JSON representation of the notebook in an editor, find the notebook metadata and add the `"jupytext" : {"formats": "ipynb,py"},` entry manually. Alternatively, set the pairing information the command line: `jupytext --set-formats ipynb,py notebook.ipynb`
+- JupyterLab can open any [paired notebook](#paired-notebooks) with extension `.ipynb`. Paired notebooks work exactly as in Jupyter Notebook: input cells are taken from the text notebook, and outputs from the  `.ipynb` file. Both files are updated when the notebook is saved.
 - In JupyterLab, scripts or Markdown documents open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu (available in JupyterLab 0.35 and above) as shown below:
 
 ![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/403b53ac5097446a15ea664579ba44cd1badcc57/ContextMenuLab.png)
 
-## Will my notebook really run in an IDE?
+## Fine tuning
 
-Well, that's what we expect. There's however a big difference in the python environments between Python IDEs and Jupyter: in most IDEs the code is executed with  `python` and not in a Jupyter kernel. For this reason, `jupytext` comments Jupyter magics found in your notebook when exporting to all format but the plain Markdown one. Change this by adding a `#escape` or `#noescape` flag on the same line as the magic, or a `"comment_magics": true` or `false` entry in the notebook metadata, in the `"jupytext"` section. Or set your preference globally on the contents manager by adding this line to `.jupyter/jupyter_notebook_config.py`:
+Jupyter magic commands are commented when exporting the notebook to text, except for the `markdown` and the `hydrogen` format. If you want to change this for a single line, add a `#escape` or `#noescape` flag on the same line as the magic, or a `"comment_magics": true` or `false` entry in the notebook metadata, in the `"jupytext"` section. Or set your preference globally on the contents manager by adding this line to `.jupyter/jupyter_notebook_config.py`:
 ```python
 c.ContentsManager.comment_magics = True # or False
 ```
@@ -335,20 +360,12 @@ Also, you may want some cells to be active only in the Python, or R Markdown rep
 
 ## Extending the `light` and `percent` formats to more languages
 
-You want to extend the `light` and `percent` format to another language? Please let us know! In principle that is easy, and you will only have to:
+You want to extend the `light` and `percent` format to another language? In principle that is easy, and you will only have to:
 - document the language extension and comment by adding one line to `_SCRIPT_EXTENSIONS` in `languages.py`.
 - contribute a sample notebook in `tests\notebooks\ipynb_[language]`.
 - add two tests in `test_mirror.py`: one for the `light` format, and another one for the `percent` format.
 - Make sure that the tests pass, and that the text representations of your notebook, found in  `tests\notebooks\mirror\ipynb_to_script` and `tests\notebooks\mirror\ipynb_to_percent`, are valid scripts.
 
-## Jupytext's releases and backward compatibility
+## Want to contribute?
 
-Jupytext will continue to evolve as we collect more feedback, and discover more ways to represent notebooks as text files. When a new release of Jupytext comes out, we make our best to ensure that it will not break your notebooks. Format changes will not happen often, and we try hard not to introduce breaking changes.
-
-Jupytext tests the version format for paired notebook only. If the format version of the text representation is not the current one, Jupytext will refuse to open the paired notebook. You may want to update Jupytext if the format version of the file is newer than the one available in the installed Jupytext. Otherwise, you will have to choose between deleting (or renaming) either the `.ipynb`, or its paired text representation. Keep the one that is up-to-date, re-open your notebook, and Jupytext will regenerate the other file.
-
-We also recommend that people who use Jupytext to collaborate on notebooks use identical versions of Jupytext.
-
-## I like this, how can I contribute?
-
-Your feedback is precious to us: please let us know how we can improve `jupytext`. With enough feedback we will be able to transition from the current beta phase to a stable phase. Thanks for staring the project on GitHub. Sharing it is also very helpful! By the way: stay tuned for announcements and demos on [medium](https://medium.com/@marc.wouts) and [twitter](https://twitter.com/marcwouts)!
+Contributions are welcome. Please let us know how you use `jupytext` and how we could improve it. You think the documentation could be improved? Go ahead! And stay tuned for more demos on [medium](https://medium.com/@marc.wouts) and [twitter](https://twitter.com/marcwouts)!
