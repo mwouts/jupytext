@@ -269,11 +269,13 @@ Our implementation for Jupyter notebooks as [Markdown](https://daringfireball.ne
 
 See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.md) or [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
 
-By default, consecutive Jupyter markdown cells are separated with two blank lines. If you prefer that cells starting with a Markdown header are separated from the previous cell with just one blank line, use the `split_at_heading` option. Set the option either on the command line, or by adding `"split_at_heading": true` to the jupytext section in the notebook metadata, or on Jupytext's content manager:
+When editing Jupyter Markdown, you can split text into markdown cells by adding two blank lines at the point you want the text to split.  This is the default rule, but you may want to modify the rule for the case of Markdown headers in text.  By default, a single blank line followed by a Markdown header will not cause the cell to split, so the header will appear in the middle of a text cell.  You may prefer to always split text cells at headers.  If so, use the `split_at_heading` option. Set the option either on the command line, or by adding `"split_at_heading": true` to the jupytext section in the notebook metadata, or on Jupytext's content manager:
 
 ```python
 c.ContentsManager.split_at_heading = True
 ```
+
+This will cause jupytext to split markdown text cells at heading prefixed by one blank line, so the heading appears at the top of a new cell.  Without this option, you would need two blank lines above the heading to cause the split.
 
 ### The `light` format for notebooks as scripts
 
