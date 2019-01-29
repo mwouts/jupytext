@@ -16,6 +16,7 @@ Release History
 - Introducing a new ``hydrogen`` format for scripts, which derives from ``percent``. In that format Jupyter magic commands are not commented (#59, #126, #132).
 - Introducing a new ``bare`` format for scripts, which derives from ``light``. That format has no cell marker. Use a notebook metadata filter ``{"jupytext": {"notebook_metadata_filter":"-all"}}`` if you want no YAML header (#152).
 - The default format for R script is now ``light``, as for the other languages.
+- Added support for q/kdb+ notebooks (#161).
 - Python scripts or Markdown documents that have no Jupyter metadata receive a metadata filter that ensures that metadata is not exported back to the text representation (#124).
 - Metadata filters are represented as strings rather than dictionaries to make YAML headers shorter. Previous syntax from #105 is still supported. They were also renamed to ``notebook_metadata_filter`` and ``cell_metadata_filter``.
 - Markdown and RMarkdown formats have a new option ``split_at_heading`` to split Markdown cells at heading (#130)
