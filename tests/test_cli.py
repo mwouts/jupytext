@@ -302,8 +302,8 @@ def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
 
 
 def test_pre_commit_hook(tmpdir):
-    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
-    tmp_py = str(tmpdir.join('notebook.py'))
+    tmp_ipynb = str(tmpdir.join('nb with spaces.ipynb'))
+    tmp_py = str(tmpdir.join('nb with spaces.py'))
     nb = new_notebook(cells=[])
 
     def git(*args):
@@ -323,7 +323,7 @@ def test_pre_commit_hook(tmpdir):
     assert os.path.isfile(tmp_ipynb)
     assert not os.path.isfile(tmp_py)
 
-    git('add', 'notebook.ipynb')
+    git('add', 'nb with spaces.ipynb')
     git('status')
     git('commit', '-m', 'created')
     git('status')
@@ -332,9 +332,9 @@ def test_pre_commit_hook(tmpdir):
 
 
 def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
-    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
-    tmp_py = str(tmpdir.join('notebook.py'))
-    tmp_md = str(tmpdir.join('notebook.md'))
+    tmp_ipynb = str(tmpdir.join('nb with spaces.ipynb'))
+    tmp_py = str(tmpdir.join('nb with spaces.py'))
+    tmp_md = str(tmpdir.join('nb with spaces.md'))
     nb = new_notebook(cells=[])
 
     def git(*args):
@@ -356,7 +356,7 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     assert not os.path.isfile(tmp_ipynb)
     assert not os.path.isfile(tmp_md)
 
-    git('add', 'notebook.py')
+    git('add', 'nb with spaces.py')
     git('status')
     git('commit', '-m', 'created')
     git('status')

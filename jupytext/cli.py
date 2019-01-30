@@ -317,6 +317,8 @@ def notebooks_in_git_index(fmt):
     modified_files_in_git_index = re_modified.findall(git_status)
     files = []
     for nb_file in modified_files_in_git_index:
+        if nb_file.startswith('"') and nb_file.endswith('"'):
+            nb_file = nb_file[1:-1]
         try:
             base_path(nb_file, fmt)
             files.append(nb_file)
