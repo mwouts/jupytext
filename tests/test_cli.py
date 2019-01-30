@@ -2,6 +2,7 @@ import os
 import stat
 import mock
 import pytest
+import nbformat
 from shutil import copyfile
 from testfixtures import compare
 from argparse import ArgumentTypeError
@@ -666,11 +667,22 @@ def test_rst2md(tmpdir):
 def test_remove_jupytext_metadata(tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     nb = new_notebook(metadata={'jupytext': {
-        'formats': 'ipynb',
-        'text_representation': {'extension': '.py', 'format': 'light'}}})
-    writef(nb, tmp_ipynb)
+        'main_language': 'python',
+        'text_representation': {
+            'extension': '.md',
+            'format_name': 'markdown',
+            'format_version': '1.0',
+            'jupytext_version': '0.8.6'
+        }}})
 
+    nbformat.write(nb, tmp_ipynb, version=nbformat.NO_CONVERT)
     jupytext([tmp_ipynb, '--update-metadata', '{"jupytext":null}'])
 
     nb2 = readf(tmp_ipynb)
     assert not nb2.metadata
+
+    nbformat.write(nb, tmp_ipynb, version=nbformat.NO_CONVERT)
+    jupytext([tmp_ipynb, '--set-formats', 'ipynb,py:light'])
+
+    nb2 = readf(tmp_ipynb)
+    assert nb2.metadata == {'jupytext': {'formats': 'ipynb,py:light', 'main_language': 'python'}}

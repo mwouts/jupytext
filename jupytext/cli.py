@@ -226,7 +226,13 @@ def jupytext(args=None):
 
         notebook = readf(nb_file, fmt)
         if not fmt:
-            fmt = notebook.metadata.get('jupytext', {}).get('text_representation', {'extension': '.ipynb'})
+            text_representation = notebook.metadata.get('jupytext', {}).get('text_representation', {})
+            ext = os.path.splitext(nb_file)[1]
+            if text_representation.get('extension') == ext:
+                fmt = {key: text_representation[key] for key in text_representation if
+                       key in ['extension', 'format_name']}
+            elif ext:
+                fmt = {'extension': ext}
 
         # Update the metadata
         if args.update_metadata:
