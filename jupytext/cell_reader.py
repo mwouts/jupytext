@@ -171,6 +171,8 @@ class BaseCellReader(object):
 
             if self.start_code_re.match(line) or (self.markdown_prefix and line.startswith(self.markdown_prefix)):
                 if i > 1 and _BLANK_LINE.match(lines[i - 1]):
+                    if i > 2 and _BLANK_LINE.match(lines[i - 2]):
+                        return i - 2, i, False
                     return i - 1, i, False
                 return i, i, False
 
