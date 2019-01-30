@@ -300,11 +300,16 @@ def jupytext(args=None):
             if modified:
                 inputs_nb_file = outputs_nb_file = None
             formats = notebook.metadata['jupytext']['formats']
-            for path, fmt in paired_paths(nb_file, formats):
-                if path == inputs_nb_file and (path == outputs_nb_file or not path.endswith('.ipynb')):
-                    continue
-                log("[jupytext] Updating '{}'".format(path))
-                writef_git_add(notebook, path, fmt)
+
+            for ipynb in [True, False]:
+                for path, fmt in paired_paths(nb_file, formats):
+                    # Write ipynb first for compatibility with our contents manager
+                    if path.endswith('.ipynb') != ipynb:
+                        continue
+                    if path == inputs_nb_file and (path == outputs_nb_file or not ipynb):
+                        continue
+                    log("[jupytext] Updating '{}'".format(path))
+                    writef_git_add(notebook, path, fmt)
 
     if round_trip_conversion_errors:
         exit(round_trip_conversion_errors)
