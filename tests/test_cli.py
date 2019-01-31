@@ -3,6 +3,7 @@ import stat
 import mock
 import pytest
 import nbformat
+import itertools
 from shutil import copyfile
 from testfixtures import compare
 from argparse import ArgumentTypeError
@@ -12,6 +13,7 @@ from jupytext import readf, writef, writes
 from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, str2bool
 from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths
+from jupytext.formats import long_form_one_format
 from .utils import list_notebooks, requires_black, requires_flake8
 
 
@@ -686,3 +688,22 @@ def test_remove_jupytext_metadata(tmpdir):
 
     nb2 = readf(tmp_ipynb)
     assert nb2.metadata == {'jupytext': {'formats': 'ipynb,py:light', 'main_language': 'python'}}
+
+
+@pytest.mark.parametrize('nb_file,fmt', itertools.product(list_notebooks('ipynb_py'), ['py:light', 'py:percent', 'md']))
+def test_convert_and_update_preserves_notebook(nb_file, fmt, tmpdir):
+    # cannot encode magic parameters in markdown yet
+    if 'magic' in nb_file and fmt == 'md':
+        return
+
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    copyfile(nb_file, tmp_ipynb)
+    ext = long_form_one_format(fmt)['extension']
+    tmp_text = str(tmpdir.join('notebook' + ext))
+
+    jupytext(['--to', fmt, tmp_ipynb])
+    jupytext(['--to', 'ipynb', '--update', tmp_text])
+
+    nb_org = readf(nb_file)
+    nb_now = readf(tmp_ipynb)
+    compare(nb_org, nb_now)

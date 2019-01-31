@@ -281,7 +281,7 @@ def jupytext(args=None):
                     raise ValueError('--update is only for ipynb files')
                 action = ' (destination file updated)'
                 check_file_version(notebook, nb_file, nb_dest)
-                combine_inputs_with_outputs(notebook, readf(nb_dest))
+                combine_inputs_with_outputs(notebook, readf(nb_dest), fmt)
             elif os.path.isfile(nb_dest):
                 action = ' (destination file replaced)'
             else:
