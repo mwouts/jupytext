@@ -512,7 +512,7 @@ class HydrogenCellReader(DoublePercentScriptCellReader):
     default_comment_magics = False
 
 
-class SphinxGalleryScriptCellReader(ScriptCellReader):
+class SphinxGalleryScriptCellReader(ScriptCellReader):  # pylint: disable=W0223
     """Read notebook cells from Sphinx Gallery scripts (#80)"""
 
     comment = '#'
@@ -551,9 +551,6 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
                 self.metadata = {'cell_marker': self.markdown_marker}
         else:
             self.cell_type = 'code'
-
-    def options_to_metadata(self, options):
-        pass
 
     def find_cell_end(self, lines):
         """Return position of end of cell, and position
