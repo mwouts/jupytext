@@ -4,17 +4,14 @@ from .stringparser import StringParser
 
 def next_instruction_is_function_or_class(lines):
     """Is the first non-empty, non-commented line of the cell either a function or a class?"""
-    prev_line_blank = False
-    for line in lines:
+    for i, line in enumerate(lines):
         if not line.strip():  # empty line
-            if prev_line_blank:
+            if i > 0 and not lines[i - 1].strip():
                 return False
-            prev_line_blank = True
             continue
         if line.startswith('def ') or line.startswith('class '):
             return True
         if line.startswith(('#', '@', ' ')):
-            prev_line_blank = False
             continue
         return False
 
@@ -23,9 +20,6 @@ def next_instruction_is_function_or_class(lines):
 
 def cell_ends_with_function_or_class(lines):
     """Does the last line of the cell belong to an indented code?"""
-    if not lines or not lines[-1].startswith(' ') or not lines[-1].strip():
-        return False
-
     non_quoted_lines = []
     parser = StringParser('python')
     for line in lines:
@@ -34,14 +28,13 @@ def cell_ends_with_function_or_class(lines):
         parser.read_line(line)
 
     # find the first line, starting from the bottom, that is not indented
-    prev_line_blank = False
-    for line in non_quoted_lines[::-1]:
+    lines = non_quoted_lines[::-1]
+    for i, line in enumerate(lines):
         if not line.strip():
-            if prev_line_blank:
+            # two blank lines? we won't need to insert more blank lines below this cell
+            if i > 0 and not lines[i - 1].strip():
                 return False
-            prev_line_blank = True
             continue
-        prev_line_blank = False
         if line.startswith('#') or line.startswith(' '):
             continue
         if line.startswith('def ') or line.startswith('class '):

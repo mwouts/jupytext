@@ -53,6 +53,8 @@ def f(x):
 # And a comment here"""
     assert not cell_ends_with_function_or_class(text.splitlines())
 
+    assert not cell_ends_with_function_or_class(['', '#'])
+
 
 def test_pep8_lines_between_cells():
     prev_lines = """a = a_long_instruction(
