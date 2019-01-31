@@ -325,6 +325,8 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
         if self.cell_type == 'code' and active:
             source = copy(self.source)
             comment_magic(source, self.language, self.comment_magics)
+            if source == ['']:
+                return lines
             return lines + source
 
         return lines + comment_lines(self.source, self.comment)

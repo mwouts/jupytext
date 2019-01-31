@@ -15,4 +15,3 @@ print('asdf')
 # Thanks for jupytext!
 
 # %%
-

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from nbformat.v4.nbbase import new_notebook, new_code_cell
 from testfixtures import compare
 import jupytext
 
@@ -172,3 +173,19 @@ print('Hello')
 print('Hello')
 """
     compare(expected, script2)
+
+
+def test_multiple_empty_cells():
+    nb = new_notebook(cells=[new_code_cell(), new_code_cell(), new_code_cell()],
+                      metadata={'jupytext': {'notebook_metadata_filter': '-all'}})
+    text = jupytext.writes(nb, 'py:percent')
+    expected = """# %%
+
+# %%
+
+# %%
+"""
+    compare(expected, text)
+    nb2 = jupytext.reads(text, 'py:percent')
+    nb2.metadata = nb.metadata
+    compare(nb, nb2)
