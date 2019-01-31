@@ -678,8 +678,8 @@ def test_remove_jupytext_metadata(tmpdir):
         }}})
 
     nbformat.write(nb, tmp_ipynb, version=nbformat.NO_CONVERT)
-    jupytext([tmp_ipynb, '--update-metadata', '{"jupytext":null}'])
-
+    # Jupytext removes the 'text_representation' information from the notebook
+    jupytext([tmp_ipynb, '--update-metadata', '{"jupytext":{"main_language":null}}'])
     nb2 = readf(tmp_ipynb)
     assert not nb2.metadata
 
