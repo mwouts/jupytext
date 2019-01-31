@@ -276,11 +276,6 @@ class RScriptCellExporter(BaseCellExporter):
     def code_to_text(self):
         """Return the text representation of a code cell"""
         active = is_active(self.ext, self.metadata)
-        if active and self.language != 'R':
-            active = False
-            self.metadata['active'] = 'ipynb'
-            self.metadata['language'] = self.language
-
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
 

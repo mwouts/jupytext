@@ -84,6 +84,27 @@ def test_active_ipynb(ext):
         compare(nb.cells[0], ACTIVE_IPYNB['.ipynb'])
 
 
+ACTIVE_IPYNB_RSPIN = {'.R': """#+ active="ipynb", eval=FALSE
+# # This cell is active only in ipynb
+# 1 + 1
+""",
+                      '.ipynb': {'cell_type': 'code',
+                                 'source': '# This cell is active only in ipynb\n'
+                                           '1 + 1',
+                                 'metadata': {'active': 'ipynb'},
+                                 'execution_count': None,
+                                 'outputs': []}}
+
+
+@skip_if_dict_is_not_ordered
+def test_active_ipynb_rspin():
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        nb = jupytext.reads(ACTIVE_IPYNB_RSPIN['.R'], 'R:spin')
+        assert len(nb.cells) == 1
+        compare(ACTIVE_IPYNB_RSPIN['.R'], jupytext.writes(nb, 'R:spin'))
+        compare(nb.cells[0], ACTIVE_IPYNB_RSPIN['.ipynb'])
+
+
 ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 # This cell is active in py and ipynb extensions
 """,
