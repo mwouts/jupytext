@@ -62,7 +62,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             cells.append(cell)
             cell_metadata.update(cell.metadata.keys())
             if pos <= 0:
-                raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))
+                raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))  # pragma: no cover
             lines = lines[pos:]
 
         update_metadata_filters(metadata, jupyter_md, cell_metadata)
