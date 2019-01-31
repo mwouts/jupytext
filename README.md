@@ -272,7 +272,21 @@ If the `percent` format is your favorite, add the following to your `.jupyter/ju
 ```python
 c.ContentsManager.preferred_jupytext_formats_save = "py:percent" # or "auto:percent"
 ```
-Then, Jupytext's content manager will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
+
+also you should Edit the Notebook Metadata to specify the `percent` format  by:
+```
+{
+  "jupytext": {"formats": "ipynb,py":percent},
+  "kernelspec": {
+    (...)
+  },
+  "language_info": {
+    (...)
+  }
+}
+```
+
+Then, Jupytext's content manager will understand `"jupytext": {"formats": "ipynb,py":percent},` as an instruction to create the paired Python script in the `percent` format.
 
 By default, Jupyter magics are commented in the `percent` representation. If you are using percent scripts in Hydrogen and you want to preserve Jupyter magics, then add a metadata `"jupytext": {"comment_magics": false},"` to your notebook, or add
 ```python
@@ -311,7 +325,7 @@ Jupytext works very well with the Jupyter Notebook editor, and we recommend that
 That being said, Jupytext also works well from JupyterLab. Please note that:
 - Jupytext's installation is identical in both Jupyter Notebook and JupyterLab
 - JupyterLab can open any [paired notebook](#paired-notebooks) with `.ipynb` extension. Paired notebooks work exactly as in Jupyter Notebook: input cells are taken from the text notebook, and outputs from the  `.ipynb` file. Both files are updated when the notebook is saved.
-- Pairing notebooks is slightly less convenient in JupyterLab than in Jupyter Notebook as JupyterLab has no notebook metadata editor [yet](https://github.com/jupyterlab/jupyterlab/issues/1308). You will have to open the JSON representation of the notebook in an editor, find the notebook metadata and add the `"jupytext" : {"formats": "ipynb,py"},` entry manually.
+- Pairing notebooks is slightly less convenient in JupyterLab than in Jupyter Notebook as JupyterLab has no notebook metadata editor [the metadata editor is on its way](https://github.com/jupyterlab/jupyterlab/issues/1308). You will have to open the JSON representation of the notebook in an editor, find the notebook metadata and add the `"jupytext" : {"formats": "ipynb,py"},` entry manually.
 - In JupyterLab, scripts or Markdown documents open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu (available in JupyterLab 0.35 and above) as shown below:
 
 ![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/403b53ac5097446a15ea664579ba44cd1badcc57/ContextMenuLab.png)
