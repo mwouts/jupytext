@@ -335,12 +335,9 @@ class RMarkdownCellReader(MarkdownCellReader):
         return lines
 
 
-class ScriptCellReader(BaseCellReader):
+class ScriptCellReader(BaseCellReader):  # pylint: disable=W0223
     """Read notebook cells from scripts
     (common base for R and Python scripts)"""
-
-    def options_to_metadata(self, options):
-        raise NotImplementedError()
 
     def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code' or self.comment != "#'":
