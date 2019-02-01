@@ -20,7 +20,7 @@ from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 import jupytext
 from .combine import combine_inputs_with_outputs
 from .formats import rearrange_jupytext_metadata, check_file_version, set_auto_ext
-from .formats import NOTEBOOK_EXTENSIONS, JupytextFormatError, long_form_one_format, long_form_multiple_formats
+from .formats import NOTEBOOK_EXTENSIONS, long_form_one_format, long_form_multiple_formats
 from .paired_paths import paired_paths, find_base_path_and_format, base_path, full_path, InconsistentPath
 
 
@@ -246,7 +246,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
             return latest_result
 
-        except JupytextFormatError as err:
+        except Exception as err:
             raise HTTPError(400, str(err))
 
     def get(self, path, content=True, type=None, format=None, load_alternative_format=True):
@@ -335,7 +335,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
         try:
             check_file_version(model['content'], path_inputs, path_outputs)
-        except ValueError as err:
+        except Exception as err:
             raise HTTPError(400, str(err))
 
         # Before we combine the two files, we make sure we're not overwriting ipynb cells
@@ -407,7 +407,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         # Is the new file name consistent with suffix?
         try:
             new_base = base_path(new_path, fmt)
-        except InconsistentPath as err:
+        except Exception as err:
             raise HTTPError(400, str(err))
 
         new_paired_paths = []
