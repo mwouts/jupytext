@@ -893,19 +893,19 @@ def test_load_then_change_formats(tmpdir):
     model = cm.get('nb.ipynb')
     assert model['content'].metadata['jupytext']['formats'] == 'ipynb,py:light'
 
-    cm.save(model, path=tmp_ipynb)
+    cm.save(model, path='nb.ipynb')
     assert os.path.isfile(tmp_py)
     assert readf(tmp_py).metadata['jupytext']['formats'] == 'ipynb,py:light'
     os.remove(tmp_py)
 
     model['content'].metadata['jupytext']['formats'] = 'ipynb,py:percent'
-    cm.save(model, path=tmp_ipynb)
+    cm.save(model, path='nb.ipynb')
     assert os.path.isfile(tmp_py)
     assert readf(tmp_py).metadata['jupytext']['formats'] == 'ipynb,py:percent'
     os.remove(tmp_py)
 
     del model['content'].metadata['jupytext']['formats']
-    cm.save(model, path=tmp_ipynb)
+    cm.save(model, path='nb.ipynb')
     assert not os.path.isfile(tmp_py)
 
 
