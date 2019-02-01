@@ -8,7 +8,7 @@ from nbformat.v4.nbbase import new_notebook, new_markdown_cell
 from tornado.web import HTTPError
 from testfixtures import compare
 import jupytext
-from jupytext.jupytext import writes, writef
+from jupytext.jupytext import writes, writef, readf
 from jupytext.compare import compare_notebooks
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.formats import read_format_from_metadata, auto_ext_from_metadata
@@ -879,3 +879,54 @@ def test_split_at_heading_option(tmpdir):
     nb.metadata['jupytext']['notebook_metadata_filter'] = '-all'
     text2 = writes(nb, 'md')
     compare(text, text2)
+
+
+def test_load_then_change_formats(tmpdir):
+    tmp_ipynb = str(tmpdir.join('nb.ipynb'))
+    tmp_py = str(tmpdir.join('nb.py'))
+    nb = new_notebook(metadata={'jupytext': {'formats': 'ipynb,py:light'}})
+    writef(nb, tmp_ipynb)
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    model = cm.get('nb.ipynb')
+    assert model['content'].metadata['jupytext']['formats'] == 'ipynb,py:light'
+
+    cm.save(model, path=tmp_ipynb)
+    assert os.path.isfile(tmp_py)
+    assert readf(tmp_py).metadata['jupytext']['formats'] == 'ipynb,py:light'
+    os.remove(tmp_py)
+
+    model['content'].metadata['jupytext']['formats'] = 'ipynb,py:percent'
+    cm.save(model, path=tmp_ipynb)
+    assert os.path.isfile(tmp_py)
+    assert readf(tmp_py).metadata['jupytext']['formats'] == 'ipynb,py:percent'
+    os.remove(tmp_py)
+
+    del model['content'].metadata['jupytext']['formats']
+    cm.save(model, path=tmp_ipynb)
+    assert not os.path.isfile(tmp_py)
+
+
+def test_set_then_change_formats(tmpdir):
+    tmp_py = str(tmpdir.join('nb.py'))
+    nb = new_notebook(metadata={'jupytext': {'formats': 'ipynb,py:light'}})
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
+    assert os.path.isfile(tmp_py)
+    assert readf(tmp_py).metadata['jupytext']['formats'] == 'ipynb,py:light'
+    os.remove(tmp_py)
+
+    nb.metadata['jupytext']['formats'] = 'ipynb,py:percent'
+    cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
+    assert os.path.isfile(tmp_py)
+    assert readf(tmp_py).metadata['jupytext']['formats'] == 'ipynb,py:percent'
+    os.remove(tmp_py)
+
+    del nb.metadata['jupytext']['formats']
+    cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
+    assert not os.path.isfile(tmp_py)
