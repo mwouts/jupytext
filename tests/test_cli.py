@@ -13,7 +13,7 @@ from jupytext import readf, writef, writes
 from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, str2bool
 from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths
-from jupytext.formats import long_form_one_format
+from jupytext.formats import long_form_one_format, JupytextFormatError
 from .utils import list_notebooks, requires_black, requires_flake8
 
 
@@ -113,7 +113,7 @@ def test_error_not_notebook_ext_input(tmpdir, capsys):
     with open(tmp_file, 'w') as fp:
         fp.write('\n')
 
-    with pytest.raises(TypeError) as info:
+    with pytest.raises(JupytextFormatError) as info:
         jupytext([tmp_file, '--to', 'py'])
 
     assert "No format associated to extension '.ext'" in str(info)
@@ -135,14 +135,14 @@ def tmp_py(tmpdir):
 
 
 def test_error_not_notebook_ext_to(tmp_ipynb):
-    with pytest.raises(TypeError) as info:
+    with pytest.raises(JupytextFormatError) as info:
         jupytext([tmp_ipynb, '--to', 'ext'])
 
     assert "No format associated to extension '.ext'" in str(info)
 
 
 def test_error_not_notebook_ext_output(tmp_ipynb, tmpdir):
-    with pytest.raises(TypeError) as info:
+    with pytest.raises(JupytextFormatError) as info:
         jupytext([tmp_ipynb, '-o', str(tmpdir.join('not.ext'))])
 
     assert "No format associated to extension '.ext'" in str(info)

@@ -147,9 +147,10 @@ def get_format_implementation(ext, format_name=None):
             formats_for_extension.append(fmt.format_name)
 
     if formats_for_extension:
-        raise TypeError("Format '{}' is not associated to extension '{}'. "
-                        "Please choose one of: {}.".format(format_name, ext, ', '.join(formats_for_extension)))
-    raise TypeError("No format associated to extension '{}'".format(ext))
+        raise JupytextFormatError("Format '{}' is not associated to extension '{}'. "
+                                  "Please choose one of: {}.".format(format_name, ext,
+                                                                     ', '.join(formats_for_extension)))
+    raise JupytextFormatError("No format associated to extension '{}'".format(ext))
 
 
 def read_metadata(text, ext):
@@ -285,12 +286,12 @@ def check_file_version(notebook, source_path, outputs_path):
     if (fmt.min_readable_version_number or current) <= version <= current:
         return
 
-    raise ValueError("File {} is in format/version={}/{} (current version is {}). "
-                     "It would not be safe to override the source of {} with that file. "
-                     "Please remove one or the other file."
-                     .format(os.path.basename(source_path),
-                             format_name, version, current,
-                             os.path.basename(outputs_path)))
+    raise JupytextFormatError("File {} is in format/version={}/{} (current version is {}). "
+                              "It would not be safe to override the source of {} with that file. "
+                              "Please remove one or the other file."
+                              .format(os.path.basename(source_path),
+                                      format_name, version, current,
+                                      os.path.basename(outputs_path)))
 
 
 def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default=True):
@@ -498,7 +499,7 @@ def set_auto_ext(jupytext_formats, metadata):
     for fmt in jupytext_formats:
         if fmt['extension'] == '.auto':
             if not ext:
-                raise ValueError('No kernel information found, cannot save to .auto extension')
+                raise JupytextFormatError('No kernel information found, cannot save to .auto extension')
             fmt['extension'] = ext
 
     return jupytext_formats

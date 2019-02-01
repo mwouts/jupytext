@@ -57,7 +57,7 @@ with one code block
 def test_get_format_implementation():
     assert get_format_implementation('.py').format_name == 'light'
     assert get_format_implementation('.py', 'percent').format_name == 'percent'
-    with pytest.raises(TypeError):
+    with pytest.raises(JupytextFormatError):
         get_format_implementation('.py', 'wrong_format')
 
 
