@@ -9,7 +9,7 @@ This extension adds a [Jupytext](https://github.com/mwouts/jupytext) menu to Jup
 Please [install Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. Then, install this extension with:
 
 ```bash
-jupyter nbextension install --user jupytext.js
+jupyter nbextension install --user https://raw.githubusercontent.com/mwouts/jupytext_nbextension/master/jupytext.js
 jupyter nbextension enable jupytext
 ```
 
