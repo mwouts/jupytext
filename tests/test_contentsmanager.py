@@ -424,9 +424,24 @@ def test_save_to_percent_format(nb_file, tmpdir):
 def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
     nb = readf(nb_file)
 
-    # Way 1: preferred_jupytext_formats_save + default_jupytext_formats
+    # Way 0: preferred_jupytext_formats_save, no prefix + default_jupytext_formats
     tmp_py = str(tmpdir.join('python/notebook.py'))
     os.makedirs(str(tmpdir.join('python')))
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.preferred_jupytext_formats_save = 'py:percent'
+    cm.default_jupytext_formats = "ipynb,python//py"
+
+    # save to ipynb and oy
+    cm.save(model=dict(type='notebook', content=nb), path='notebook.ipynb')
+
+    # read py file
+    nb_py = readf(tmp_py)
+    assert nb_py.metadata['jupytext']['text_representation']['format_name'] == 'percent'
+
+    # Way 1: preferred_jupytext_formats_save + default_jupytext_formats
+    tmp_py = str(tmpdir.join('python/notebook.py'))
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)

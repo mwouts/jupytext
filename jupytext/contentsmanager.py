@@ -47,8 +47,8 @@ def preferred_format(incomplete_format, preferred_formats):
         if ((incomplete_format['extension'] == fmt['extension'] or (
                 fmt['extension'] == '.auto' and
                 incomplete_format['extension'] not in ['.md', '.Rmd', '.ipynb'])) and
-                incomplete_format.get('suffix') == fmt.get('suffix') and
-                incomplete_format.get('prefix') == fmt.get('prefix')):
+                incomplete_format.get('suffix') == fmt.get('suffix', incomplete_format.get('suffix')) and
+                incomplete_format.get('prefix') == fmt.get('prefix', incomplete_format.get('prefix'))):
             fmt.update(incomplete_format)
             return fmt
 
