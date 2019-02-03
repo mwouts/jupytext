@@ -16,25 +16,28 @@ define([
 
         function checkSelectedJupytextFormat() {
 
-            var formats = Jupyter.notebook.metadata.jupytext.formats
-            var script_ext = Jupyter.notebook.metadata.language_info.file_extension;
-
+            var formats = Jupyter.notebook.metadata.jupytext ? Jupyter.notebook.metadata.jupytext.formats : null
             if (!formats)
                 formats = 'none'
-            else if (formats == 'ipynb,' + script_ext.substring(1) + ':light')
-                formats = 'ipynb,auto:light'
-            else if (formats == 'ipynb,' + script_ext.substring(1) + ':percent')
-                formats = 'ipynb,auto:percent'
-            else if (formats == 'ipynb,' + script_ext.substring(1) + ':hydrogen')
-                formats = 'ipynb,auto:hydrogen'
-            else if (!['ipynb,auto:light', 'ipynb,auto:percent', 'ipynb,auto:hydrogen',
-                'ipynb,md', 'ipynb,Rmd'].includes(formats))
-                formats = 'custom'
+
+            if (Jupyter.notebook.metadata.language_info) {
+                var script_ext = Jupyter.notebook.metadata.language_info.file_extension;
+
+                if (formats == 'ipynb,' + script_ext.substring(1) + ':light')
+                    formats = 'ipynb,auto:light'
+                else if (formats == 'ipynb,' + script_ext.substring(1) + ':percent')
+                    formats = 'ipynb,auto:percent'
+                else if (formats == 'ipynb,' + script_ext.substring(1) + ':hydrogen')
+                    formats = 'ipynb,auto:hydrogen'
+                else if (!['ipynb,auto:light', 'ipynb,auto:percent', 'ipynb,auto:hydrogen',
+                    'ipynb,md', 'ipynb,Rmd', 'none'].includes(formats))
+                    formats = 'custom'
+            }
 
             console.log('Jupytext.formats=' + formats)
 
-            //$('[id^=jupytext_pair_]' + '>.fa').toggleClass('fa-check', false)
-            $('#jupytext_pair_' + formats.replace(':', '_') + ' > .fa').toggleClass('fa-check', true)
+            $('[id^=jupytext_pair_]' + '>.fa').toggleClass('fa-check', false)
+            $('#jupytext_pair_' + formats.replace(':', '_').replace(',', '_') + ' > .fa').toggleClass('fa-check', true)
         }
 
         function onClickedJupytextPair(data) {
@@ -44,20 +47,24 @@ define([
                 return
             }
             if (formats == 'none') {
-                if (!('jupytext' in Jupyter.notebook.metadata))
+                if (!Jupyter.notebook.metadata.jupytext)
                     return
+            }
+            else if (Jupyter.notebook.metadata.jupytext && formats == Jupyter.notebook.metadata.jupytext.formats)
+                return
 
-                delete Jupyter.notebook.metadata.jupytext['formats'];
+            if (formats == 'none') {
+                if (Jupyter.notebook.metadata.jupytext.formats)
+                    delete Jupyter.notebook.metadata.jupytext['formats'];
                 if (Jupyter.notebook.metadata.jupytext == {})
                     delete Jupyter.notebook.metadata['jupytext']
-                if (!('jupytext' in Jupyter.notebook.metadata))
-                    Jupyter.notebook.metadata.jupytext = {};
-                return
             }
-            else if (formats == Jupyter.notebook.metadata.jupytext.formats)
-                return
+            else {
+                if (!Jupyter.notebook.metadata.jupytext)
+                    Jupyter.notebook.metadata.jupytext = {};
+                Jupyter.notebook.metadata.jupytext['formats'] = formats
+            }
 
-            Jupyter.notebook.metadata.jupytext['formats'] = formats
             checkSelectedJupytextFormat();
             Jupyter.notebook.set_dirty();
         }
@@ -74,19 +81,18 @@ define([
 
                 var JupytextActions = $('<ul/>')
                     .attr('id', 'jupytext_actions')
-                    .addClass("dropdown-menu")
-                    .attr('min-width', '300px')
+                    .addClass("dropdown-menu")                    
 
                 function jupytext_pair(formats, text) {
                     return $('<li/>').append($('<a/>')
-                        .attr('id', 'jupytext_pair_' + formats.replace(':', '_'))
+                        .attr('id', 'jupytext_pair_' + formats.replace(':', '_').replace(',', '_'))
                         .text(text)
                         .attr('title',
                             (formats == 'none') ? 'Jupytext not configured' :
                                 (formats == 'custom' ? 'Custom Jupytext configuration' :
                                     'jupytext.formats=' + formats))
                         .data('formats', formats)
-                        .css('width', '250px')
+                        .css('width', '280px')
                         .attr('href', '#')
                         .on('click', onClickedJupytextPair)
                         .prepend($('<i/>').addClass('fa menu-icon pull-right'))
@@ -96,10 +102,8 @@ define([
                 var jupytext_link = $('<li/>').append($('<a/>')
                     .text('Jupytext reference')
                     .attr('title', "Jupytext's documentation. Opens in a new window.")
-                    .css('width', '250px')
-                    .attr('href', '#')
                     .on('click', function () { window.open('https://jupytext.readthedocs.io/en/latest/') })
-                    .prepend($('<i/>').addClass('fa menu-icon pull-right')));
+                    .prepend($('<i/>').addClass('pull-right')));
 
                 $('#kernel_menu').parent().after('<li id="jupytext_menu"/>')
                 $('#jupytext_menu').addClass('dropdown').append(JupytextMenu).append(JupytextActions)
