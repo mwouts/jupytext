@@ -241,7 +241,7 @@ def jupytext(args=None):
 
         # Read paired notebooks
         if args.sync:
-            notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, nb_file, log)
+            notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
 
         # II. ### Apply commands onto the notebook ###
         # Pipe the notebook into the desired commands
@@ -302,14 +302,14 @@ def jupytext(args=None):
             formats = notebook.metadata['jupytext']['formats']
 
             for ipynb in [True, False]:
-                for path, fmt in paired_paths(nb_file, formats):
+                for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats):
                     # Write ipynb first for compatibility with our contents manager
-                    if path.endswith('.ipynb') != ipynb:
+                    if alt_path.endswith('.ipynb') != ipynb:
                         continue
-                    if path == inputs_nb_file and (path == outputs_nb_file or not ipynb):
+                    if alt_path == inputs_nb_file and (alt_path == outputs_nb_file or not ipynb):
                         continue
-                    log("[jupytext] Updating '{}'".format(path))
-                    writef_git_add(notebook, path, fmt)
+                    log("[jupytext] Updating '{}'".format(alt_path))
+                    writef_git_add(notebook, alt_path, alt_fmt)
 
     if round_trip_conversion_errors:
         exit(round_trip_conversion_errors)
@@ -337,7 +337,7 @@ def print_paired_paths(nb_file, fmt):
     notebook = readf(nb_file, fmt)
     formats = notebook.metadata.get('jupytext', {}).get('formats')
     if formats:
-        for path, _ in paired_paths(nb_file, formats):
+        for path, _ in paired_paths(nb_file, fmt, formats):
             if path != nb_file:
                 sys.stdout.write(path + '\n')
 
@@ -378,7 +378,7 @@ def set_format_options(fmt, format_options):
         fmt[key] = value
 
 
-def load_paired_notebook(notebook, nb_file, log):
+def load_paired_notebook(notebook, fmt, nb_file, log):
     """Update the notebook with the inputs and outputs of the most recent paired files"""
     formats = notebook.metadata.get('jupytext', {}).get('formats')
 
@@ -389,18 +389,18 @@ def load_paired_notebook(notebook, nb_file, log):
     max_mtime_outputs = None
     latest_inputs = None
     latest_outputs = None
-    for path, fmt in paired_paths(nb_file, formats):
-        if not os.path.isfile(path):
+    for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats):
+        if not os.path.isfile(alt_path):
             continue
-        info = os.lstat(path)
+        info = os.lstat(alt_path)
         if not max_mtime_inputs or info.st_mtime > max_mtime_inputs:
             max_mtime_inputs = info.st_mtime
-            latest_inputs, input_fmt = path, fmt
+            latest_inputs, input_fmt = alt_path, alt_fmt
 
-        if path.endswith('.ipynb'):
+        if alt_path.endswith('.ipynb'):
             if not max_mtime_outputs or info.st_mtime > max_mtime_outputs:
                 max_mtime_outputs = info.st_mtime
-                latest_outputs = path
+                latest_outputs = alt_path
 
     if latest_outputs and latest_outputs != latest_inputs:
         log("[jupytext] Loading input cells from '{}'".format(latest_inputs))

@@ -88,9 +88,9 @@ def full_path(base, fmt):
 
 def find_base_path_and_format(main_path, formats):
     """Return the base path and the format corresponding to the given path"""
-    for i, fmt in enumerate(formats):
+    for fmt in formats:
         try:
-            return base_path(main_path, fmt), i
+            return base_path(main_path, fmt), fmt
         except InconsistentPath:
             continue
 
@@ -100,15 +100,21 @@ def find_base_path_and_format(main_path, formats):
                                                                           os.path.splitext(main_path)[1][1:]))
 
 
-def paired_paths(main_path, formats):
+def paired_paths(main_path, fmt, formats):
     """Return the list of paired notebooks, given main path, and the list of formats"""
+    if not formats:
+        return [(main_path, {'extension': os.path.splitext(main_path)[1]})]
+
     formats = long_form_multiple_formats(formats)
 
     # Is there a format that matches the main path?
-    base, _ = find_base_path_and_format(main_path, formats)
+    base = base_path(main_path, fmt)
     paths = [full_path(base, fmt) for fmt in formats]
 
+    if main_path not in paths:
+        raise InconsistentPath(u'Format specifications should include the current notebook format')
+
     if len(paths) > len(set(paths)):
-        raise InconsistentPath(u"Duplicate paired paths for this notebook. Please fix jupytext.formats.")
+        raise InconsistentPath(u'Duplicate paired paths for this notebook. Please fix jupytext.formats.')
 
     return list(zip(paths, formats))

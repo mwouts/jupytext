@@ -21,6 +21,7 @@ import jupytext
 from .combine import combine_inputs_with_outputs
 from .formats import rearrange_jupytext_metadata, check_file_version, set_auto_ext
 from .formats import NOTEBOOK_EXTENSIONS, long_form_one_format, long_form_multiple_formats
+from .formats import short_form_one_format, short_form_multiple_formats
 from .paired_paths import paired_paths, find_base_path_and_format, base_path, full_path, InconsistentPath
 
 
@@ -77,8 +78,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     nb_extensions = [ext for ext in NOTEBOOK_EXTENSIONS if ext != '.ipynb']
 
-    # Dictionary: notebook path => list of associated (path, fmt) for the paired notebooks
-    paired_notebooks = {}
+    # Dictionary: notebook path => (fmt, formats) where fmt is the current format, and formats the paired formats.
+    paired_notebooks = dict()
 
     def all_nb_extensions(self):
         """
@@ -152,21 +153,29 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         if path not in self.paired_notebooks:
             return
 
-        for alt_path, _ in self.paired_notebooks.pop(path):
+        fmt, formats = self.paired_notebooks.pop(path)
+        prev_paired_paths = paired_paths(path, fmt, formats)
+        for alt_path, _ in prev_paired_paths:
             if alt_path in self.paired_notebooks:
                 self.drop_paired_notebook(alt_path)
 
-    def update_paired_notebooks(self, path, new_paired_paths):
+    def update_paired_notebooks(self, path, fmt, formats):
         """Update the list of paired notebooks to include/update the current pair"""
-        if not new_paired_paths:
+        if not formats:
             self.drop_paired_notebook(path)
             return
 
+        new_paired_paths = paired_paths(path, fmt, formats)
         for alt_path, _ in new_paired_paths:
             self.drop_paired_notebook(alt_path)
 
-        for alt_path, _ in new_paired_paths:
-            self.paired_notebooks[alt_path] = new_paired_paths
+        long_formats = long_form_multiple_formats(formats)
+        if len(long_formats) == 1 and set(long_formats[0]) <= {'extension'}:
+            return
+
+        short_formats = short_form_multiple_formats(formats)
+        for alt_path, alt_fmt in new_paired_paths:
+            self.paired_notebooks[alt_path] = short_form_one_format(alt_fmt), short_formats
 
     def set_default_format_options(self, format_options, read=False):
         """Set default format option"""
@@ -220,8 +229,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             # Set preferred formats if not format name is given yet
             jupytext_formats = [preferred_format(fmt, self.preferred_jupytext_formats_save) for fmt in jupytext_formats]
 
-            base, _ = find_base_path_and_format(path, jupytext_formats)
-            self.update_paired_notebooks(path, paired_paths(path, jupytext_formats))
+            base, fmt = find_base_path_and_format(path, jupytext_formats)
+            self.update_paired_notebooks(path, fmt, jupytext_formats)
 
             # Save as ipynb first
             latest_result = None
@@ -272,7 +281,11 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         if not content:
             # Modification time of a paired notebook, in this context - Jupyter is checking timestamp
             # before saving - is the most recent among all representations #118
-            for alt_path, _ in self.paired_notebooks.get(path, []):
+            if path not in self.paired_notebooks:
+                return model
+
+            fmt, formats = self.paired_notebooks.get(path)
+            for alt_path, _ in paired_paths(path, fmt, formats):
                 if alt_path != path and self.exists(alt_path):
                     alt_model = self._notebook_model(alt_path, content=False)
                     if alt_model['last_modified'] > model['last_modified']:
@@ -286,19 +299,18 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         jupytext_formats = long_form_multiple_formats(jupytext_formats)
 
         # Compute paired notebooks from formats
+        alt_paths = [(path, fmt)]
         if jupytext_formats:
             try:
-                _, _ = find_base_path_and_format(path, jupytext_formats)
-                alt_paths = paired_paths(path, jupytext_formats)
+                _, fmt = find_base_path_and_format(path, jupytext_formats)
+                alt_paths = paired_paths(path, fmt, jupytext_formats)
+                self.update_paired_notebooks(path, fmt, jupytext_formats)
             except InconsistentPath as err:
                 self.log.info("Unable to read paired notebook: %s", str(err))
-                alt_paths = []
-            self.update_paired_notebooks(path, alt_paths)
         else:
-            alt_paths = self.paired_notebooks.get(path)
-
-        if not alt_paths:
-            alt_paths = [(path, fmt)]
+            if path in self.paired_notebooks:
+                fmt, formats = self.paired_notebooks.get(path)
+                alt_paths = paired_paths(path, fmt, formats)
 
         if len(alt_paths) > 1 and ext == '.ipynb':
             # Apply default options (like saving and reloading would do)
@@ -379,30 +391,23 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def trust_notebook(self, path):
         """Trust the current notebook"""
-        if path.endswith('.ipynb'):
+        if path.endswith('.ipynb') or path not in self.paired_notebooks:
             super(TextFileContentsManager, self).trust_notebook(path)
             return
 
-        for alt_path, fmt in self.paired_notebooks.get(path):
-            if fmt['extension'] == '.ipynb':
+        fmt, formats = self.paired_notebooks[path]
+        for alt_path, alt_fmt in paired_paths(path, fmt, formats):
+            if alt_fmt['extension'] == '.ipynb':
                 super(TextFileContentsManager, self).trust_notebook(alt_path)
 
     def rename_file(self, old_path, new_path):
         """Rename the current notebook, as well as its alternative representations"""
-        old_alt_paths = self.paired_notebooks.get(old_path, [])
-        self.drop_paired_notebook(old_path)
-        self.drop_paired_notebook(new_path)
-
-        # Find the format for the current file (if any)
-        fmt = None
-        for old_alt_path, alt_fmt in old_alt_paths:
-            if old_alt_path == old_path:
-                fmt = alt_fmt
-                break
-
-        if not fmt:
+        if old_path not in self.paired_notebooks:
             super(TextFileContentsManager, self).rename_file(old_path, new_path)
             return
+
+        fmt, formats = self.paired_notebooks.get(old_path)
+        old_alt_paths = paired_paths(old_path, fmt, formats)
 
         # Is the new file name consistent with suffix?
         try:
@@ -410,11 +415,10 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         except Exception as err:
             raise HTTPError(400, str(err))
 
-        new_paired_paths = []
         for old_alt_path, alt_fmt in old_alt_paths:
             new_alt_path = full_path(new_base, alt_fmt)
-            new_paired_paths.append((new_alt_path, alt_fmt))
             if self.exists(old_alt_path):
                 super(TextFileContentsManager, self).rename_file(old_alt_path, new_alt_path)
 
-        self.update_paired_notebooks(new_path, new_paired_paths)
+        self.drop_paired_notebook(old_path)
+        self.update_paired_notebooks(new_path, fmt, formats)

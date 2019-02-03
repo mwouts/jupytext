@@ -494,7 +494,7 @@ def test_paired_paths(nb_file, tmpdir, capsys):
     assert not err
 
     formats = nb.metadata.get('jupytext', {}).get('formats')
-    assert set(out.splitlines()).union([tmp_ipynb]) == set([path for path, _ in paired_paths(tmp_ipynb, formats)])
+    assert set(out.splitlines()).union([tmp_ipynb]) == set([path for path, _ in paired_paths(tmp_ipynb, 'ipynb', formats)])
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
