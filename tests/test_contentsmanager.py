@@ -421,6 +421,42 @@ def test_save_to_percent_format(nb_file, tmpdir):
 
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
+    nb = readf(nb_file)
+
+    # Way 1: preferred_jupytext_formats_save + default_jupytext_formats
+    tmp_py = str(tmpdir.join('python/notebook.py'))
+    os.makedirs(str(tmpdir.join('python')))
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.preferred_jupytext_formats_save = 'python//py:percent'
+    cm.default_jupytext_formats = "ipynb,python//py"
+
+    # save to ipynb and oy
+    cm.save(model=dict(type='notebook', content=nb), path='notebook.ipynb')
+
+    # read py file
+    nb_py = readf(tmp_py)
+    assert nb_py.metadata['jupytext']['text_representation']['format_name'] == 'percent'
+
+    # Way 2: default_jupytext_formats
+    tmp_py = str(tmpdir.join('python/notebook.py'))
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.default_jupytext_formats = "ipynb,python//py:percent"
+
+    # save to ipynb and oy
+    cm.save(model=dict(type='notebook', content=nb), path='notebook.ipynb')
+
+    # read py file
+    nb_py = readf(tmp_py)
+    assert nb_py.metadata['jupytext']['text_representation']['format_name'] == 'percent'
+
+
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_lgt_py = 'notebook.lgt.py'
