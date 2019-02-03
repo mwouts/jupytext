@@ -233,6 +233,9 @@ def write(notebook, file_or_stream, fmt, version=nbformat.NO_CONVERT, **kwargs):
     # Python 2 compatibility
     text = u'' + writes(notebook, fmt, version, **kwargs)
     file_or_stream.write(text)
+    # Add final newline #165
+    if not text.endswith(u'\n'):
+        file_or_stream.write(u'\n')
 
 
 def writef(notebook, nb_file, fmt=None):
