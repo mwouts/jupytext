@@ -4,7 +4,7 @@ This extension adds a [Jupytext](https://github.com/mwouts/jupytext) menu to Jup
 
 ![Jupytext menu screenshot](jupytext_menu.png)
 
-# Installation
+## Installation
 
 Please [install Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. Make sure Jupyter is configured to use Jupytext's contents manager. Then, install the extension with:
 
@@ -15,7 +15,7 @@ jupyter nbextension enable jupytext
 
 and restart your notebook server.
 
-# How to develop this extension
+## How to develop this extension
 
 Clone this repository and install the extension as a symbolic link:
 
