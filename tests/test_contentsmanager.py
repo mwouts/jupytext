@@ -896,9 +896,15 @@ def test_load_then_change_formats(tmpdir):
     cm.save(model, path='nb.ipynb')
     assert os.path.isfile(tmp_py)
     assert readf(tmp_py).metadata['jupytext']['formats'] == 'ipynb,py:light'
+
+    time.sleep(0.5)
+    del model['content'].metadata['jupytext']['formats']
+    cm.save(model, path='nb.ipynb')
+    # test that we have not kept the 'ipynb/py' pairing info, and that we can read the ipynb
+    cm.get('nb.ipynb')
     os.remove(tmp_py)
 
-    model['content'].metadata['jupytext']['formats'] = 'ipynb,py:percent'
+    model['content'].metadata.setdefault('jupytext', {})['formats'] = 'ipynb,py:percent'
     cm.save(model, path='nb.ipynb')
     assert os.path.isfile(tmp_py)
     assert readf(tmp_py).metadata['jupytext']['formats'] == 'ipynb,py:percent'
@@ -930,3 +936,42 @@ def test_set_then_change_formats(tmpdir):
     del nb.metadata['jupytext']['formats']
     cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
     assert not os.path.isfile(tmp_py)
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
+def test_set_then_change_auto_formats(tmpdir, nb_file):
+    tmp_ipynb = str(tmpdir.join('nb.ipynb'))
+    tmp_py = str(tmpdir.join('nb.py'))
+    tmp_rmd = str(tmpdir.join('nb.Rmd'))
+    nb = new_notebook(metadata=readf(nb_file).metadata)
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # Pair ipynb/py and save
+    nb.metadata['jupytext'] = {'formats': 'ipynb,auto:light'}
+    cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
+    assert 'nb.py' in cm.paired_notebooks
+    assert 'nb.auto' not in cm.paired_notebooks
+    assert os.path.isfile(tmp_py)
+    assert readf(tmp_ipynb).metadata['jupytext']['formats'] == 'ipynb,auto:light'
+
+    # Pair ipynb/Rmd and save
+    time.sleep(0.5)
+    nb.metadata['jupytext'] = {'formats': 'ipynb,Rmd'}
+    cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
+    assert 'nb.Rmd' in cm.paired_notebooks
+    assert 'nb.py' not in cm.paired_notebooks
+    assert 'nb.auto' not in cm.paired_notebooks
+    assert os.path.isfile(tmp_rmd)
+    assert readf(tmp_ipynb).metadata['jupytext']['formats'] == 'ipynb,Rmd'
+    cm.get('nb.ipynb')
+
+    # Unpair and save
+    time.sleep(0.5)
+    del nb.metadata['jupytext']
+    cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
+    assert 'nb.Rmd' not in cm.paired_notebooks
+    assert 'nb.py' not in cm.paired_notebooks
+    assert 'nb.auto' not in cm.paired_notebooks
+    cm.get('nb.ipynb')
