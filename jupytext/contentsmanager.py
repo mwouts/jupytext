@@ -249,7 +249,11 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
                 alt_path = full_path(base, fmt)
                 self.set_default_format_options(fmt)
-                self.log.info("Saving %s", os.path.basename(alt_path))
+                if 'format_name' in fmt and fmt['extension'] not in ['.Rmd', '.md']:
+                    self.log.info("Saving %s in format %s:%s",
+                                  os.path.basename(alt_path), fmt['extension'][1:], fmt['format_name'])
+                else:
+                    self.log.info("Saving %s", os.path.basename(alt_path))
                 with mock.patch('nbformat.writes', _jupytext_writes(fmt)):
                     latest_result = super(TextFileContentsManager, self).save(model, alt_path)
 
