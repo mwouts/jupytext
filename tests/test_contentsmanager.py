@@ -1026,3 +1026,37 @@ def test_set_then_change_auto_formats(tmpdir, nb_file):
     assert 'nb.py' not in cm.paired_notebooks
     assert 'nb.auto' not in cm.paired_notebooks
     cm.get('nb.ipynb')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_share_py_recreate_ipynb(tmpdir, nb_file):
+    tmp_ipynb = str(tmpdir.join('nb.ipynb'))
+    tmp_py = str(tmpdir.join('nb.py'))
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # set default py format
+    cm.preferred_jupytext_formats_save = "py:percent"
+
+    # every new file is paired
+    cm.default_jupytext_formats = "ipynb,py"
+
+    # the text files don't need a YAML header
+    cm.default_notebook_metadata_filter = "-all"
+    cm.default_cell_metadata_filter = "-all"
+
+    nb = readf(nb_file)
+    cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
+
+    assert os.path.isfile(tmp_ipynb)
+    assert os.path.isfile(tmp_py)
+
+    os.remove(tmp_ipynb)
+
+    # reopen and save nb.py
+    model = cm.get('nb.py')
+    cm.save(model=model, path='nb.py')
+
+    # ipynb is re-created
+    assert os.path.isfile(tmp_ipynb)
