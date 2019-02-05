@@ -48,24 +48,17 @@ def uncomment_line(line, prefix):
     return line
 
 
-def encoding_and_executable(notebook, ext):
-    """
-    Return encoding and executable lines for a notebook, if applicable
-    :param self:
-    :param notebook:
-    :return:
-    """
+def encoding_and_executable(notebook, metadata, ext):
+    """Return encoding and executable lines for a notebook, if applicable"""
     lines = []
-    metadata = notebook.get('metadata', {}).get('jupytext', {})
     comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment')
+    jupytext_metadata = metadata.get('jupytext', {})
 
-    if ext not in ['.Rmd', '.md'] and 'executable' in metadata:
-        lines.append(comment + '!' + metadata['executable'])
-        del metadata['executable']
+    if ext not in ['.Rmd', '.md'] and 'executable' in jupytext_metadata:
+        lines.append(comment + '!' + jupytext_metadata.pop('executable'))
 
-    if 'encoding' in metadata:
-        lines.append(metadata['encoding'])
-        del metadata['encoding']
+    if 'encoding' in jupytext_metadata:
+        lines.append(jupytext_metadata.pop('encoding'))
     elif ext not in ['.Rmd', '.md']:
         for cell in notebook.cells:
             try:
@@ -77,7 +70,7 @@ def encoding_and_executable(notebook, ext):
     return lines
 
 
-def metadata_and_cell_to_header(notebook, text_format, ext):
+def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
     """
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
@@ -96,8 +89,6 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
                 header = lines[1:-1]
                 lines_to_next_cell = cell.metadata.get('lines_to_next_cell')
                 notebook.cells = notebook.cells[1:]
-
-    metadata = notebook.get('metadata', {})
 
     if insert_or_test_version_number():
         metadata.setdefault('jupytext', {})['text_representation'] = {

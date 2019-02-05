@@ -83,17 +83,19 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         return new_notebook(cells=cells, metadata=metadata)
 
-    def writes(self, nb, **kwargs):
+    def writes(self, nb, metadata=None, **kwargs):
         """Return the text representation of the notebook"""
-        nb = deepcopy(nb)
-        default_language = default_language_from_metadata_and_ext(nb.metadata, self.implementation.extension)
-        self.update_fmt_with_notebook_options(nb.metadata)
+        # Copy the notebook, in order to be sure we do not modify the original notebook
+        nb = new_notebook(cells=nb.cells, metadata=deepcopy(metadata or nb.metadata))
+        default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension)
+        self.update_fmt_with_notebook_options(metadata)
 
-        if 'main_language' in nb.metadata.get('jupytext', {}):
-            del nb.metadata['jupytext']['main_language']
+        if 'main_language' in metadata.get('jupytext', {}):
+            del metadata['jupytext']['main_language']
 
-        header = encoding_and_executable(nb, self.ext)
-        header_content, header_lines_to_next_cell = metadata_and_cell_to_header(nb, self.implementation, self.ext)
+        header = encoding_and_executable(nb, metadata, self.ext)
+        header_content, header_lines_to_next_cell = metadata_and_cell_to_header(nb, metadata,
+                                                                                self.implementation, self.ext)
         header.extend(header_content)
 
         cell_exporters = []
@@ -204,28 +206,29 @@ def readf(nb_file, fmt=None):
 
 def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     """Write a notebook to a string"""
-    rearrange_jupytext_metadata(notebook.metadata)
+    metadata = deepcopy(notebook.metadata)
+    rearrange_jupytext_metadata(metadata)
     fmt = copy(fmt)
-    fmt = long_form_one_format(fmt, notebook.metadata)
+    fmt = long_form_one_format(fmt, metadata)
     ext = fmt['extension']
     format_name = fmt.get('format_name')
 
     if ext == '.ipynb':
         # Remove jupytext section if empty
-        notebook.metadata.get('jupytext', {}).pop('text_representation', {})
-        if not notebook.metadata.get('jupytext', {}):
-            notebook.metadata.pop('jupytext', {})
-        return nbformat.writes(notebook, version, **kwargs)
+        metadata.get('jupytext', {}).pop('text_representation', {})
+        if not metadata.get('jupytext', {}):
+            metadata.pop('jupytext', {})
+        return nbformat.writes(new_notebook(cells=notebook.cells, metadata=metadata), version, **kwargs)
 
     if not format_name:
-        format_name = format_name_for_ext(notebook.metadata, ext, explicit_default=False)
+        format_name = format_name_for_ext(metadata, ext, explicit_default=False)
 
     if format_name:
         fmt['format_name'] = format_name
-        update_jupytext_formats_metadata(notebook, fmt)
+        update_jupytext_formats_metadata(metadata, fmt)
 
     writer = TextNotebookConverter(fmt)
-    return writer.writes(notebook)
+    return writer.writes(notebook, metadata)
 
 
 def write(notebook, file_or_stream, fmt, version=nbformat.NO_CONVERT, **kwargs):

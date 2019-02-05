@@ -324,10 +324,10 @@ def identical_format_path(fmt1, fmt2):
     return True
 
 
-def update_jupytext_formats_metadata(notebook, new_format):
+def update_jupytext_formats_metadata(metadata, new_format):
     """Update the jupytext_format metadata in the Jupyter notebook"""
     new_format = long_form_one_format(new_format)
-    formats = long_form_multiple_formats(notebook.metadata.get('jupytext', {}).get('formats', ''))
+    formats = long_form_multiple_formats(metadata.get('jupytext', {}).get('formats', ''))
     if not formats:
         return
 
@@ -336,7 +336,7 @@ def update_jupytext_formats_metadata(notebook, new_format):
             fmt['format_name'] = new_format.get('format_name')
             break
 
-    notebook.metadata.setdefault('jupytext', {})['formats'] = short_form_multiple_formats(formats)
+    metadata.setdefault('jupytext', {})['formats'] = short_form_multiple_formats(formats)
 
 
 def rearrange_jupytext_metadata(metadata):

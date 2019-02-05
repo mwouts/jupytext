@@ -97,11 +97,11 @@ jupyter:
 
 def test_update_jupytext_formats_metadata():
     nb = new_notebook(metadata={'jupytext': {'formats': 'py'}})
-    update_jupytext_formats_metadata(nb, 'py:light')
+    update_jupytext_formats_metadata(nb.metadata, 'py:light')
     assert nb.metadata['jupytext']['formats'] == 'py:light'
 
     nb = new_notebook(metadata={'jupytext': {'formats': 'ipynb,py'}})
-    update_jupytext_formats_metadata(nb, 'py:light')
+    update_jupytext_formats_metadata(nb.metadata, 'py:light')
     assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
 
 
