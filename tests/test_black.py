@@ -107,3 +107,31 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     nb_now = readf(tmp_py)
     nb_now.metadata = metadata
     compare(nb_black, nb_now)
+
+
+@requires_black
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
+def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
+    # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
+    metadata = readf(nb_file).metadata
+    metadata['jupytext'] = {'formats': 'ipynb,py'}
+    assert 'language_info' in metadata
+
+    nb_org = new_notebook(cells=[new_code_cell('1        +1')], metadata=metadata)
+    nb_black = new_notebook(cells=[new_code_cell('1 + 1')], metadata=metadata)
+
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+
+    # Black in place
+    writef(nb_org, tmp_ipynb)
+    jupytext([tmp_ipynb, '--pipe', 'black', '--sync'])
+
+    nb_now = readf(tmp_ipynb)
+    compare(nb_black, nb_now)
+    assert 'language_info' in nb_now.metadata
+
+    nb_now = readf(tmp_py)
+    nb_now.metadata['jupytext'].pop('text_representation')
+    nb_black.metadata.pop('language_info')
+    compare(nb_black, nb_now)
