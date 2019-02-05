@@ -165,6 +165,19 @@ c.ContentsManager.default_cell_metadata_filter = "-all"
 
 NB: All these global options (and more) are documented [here](https://github.com/mwouts/jupytext/blob/master/jupytext/contentsmanager.py).
 
+## How to edit the notebook simultaneously in Jupyter and a text editor?
+
+When editing a paired notebook using Jupytext's contents manager, Jupyter updates both the `.ipynb` and its text representation. The text representation can be edited outside of Jupyter. When the notebook is refreshed in Jupyter, the input cells are read from the text file, and the output cells from the `.ipynb` file.
+
+It is possible (and convenient) to leave the notebook open in Jupyter while you edit its text representation. However, you don't want that the two editors save the notebook simultaneously. To avoid this:
+- deactivate Jupyter's autosave, by running `%autosave 0` in a cell of the notebook
+- and refresh the notebook when you switch back from the editor to Jupyter.
+
+In case you forgot to refresh, and saved the Jupyter notebook while the text representation had changed, no worries: Jupyter will ask you which version you want to keep:
+![Notebook changed](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/fcbcd3c3fc1ec4a74669381b53753f9f783e10da/notebook_changed.png)
+
+When that occurs, please choose the version in which you made the latest changes. And give a second look to our advice to deactivate the autosaving of notebooks in Jupyter.
+
 ## Command line conversion
 
 The package provides a `jupytext` script for command line conversion between the various notebook extensions:
