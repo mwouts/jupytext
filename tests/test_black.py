@@ -8,6 +8,7 @@ from .utils import list_notebooks, requires_black, requires_flake8, requires_aut
 from jupytext import readf, writef
 from jupytext.cli import system, jupytext, pipe_notebook
 from jupytext.combine import black_invariant
+from jupytext.header import _DEFAULT_NOTEBOOK_METADATA
 
 
 @requires_black
@@ -110,7 +111,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
 
 
 @requires_black
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
     metadata = readf(nb_file).metadata
@@ -133,5 +134,6 @@ def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
 
     nb_now = readf(tmp_py)
     nb_now.metadata['jupytext'].pop('text_representation')
-    nb_black.metadata.pop('language_info')
+    nb_black.metadata = {key: nb_black.metadata[key] for key in nb_black.metadata
+                         if key in _DEFAULT_NOTEBOOK_METADATA}
     compare(nb_black, nb_now)
