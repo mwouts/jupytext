@@ -39,6 +39,18 @@ def test_apply_black_on_python_notebooks(nb_file, tmpdir):
     compare(nb1.metadata, nb2.metadata)
 
 
+def test_black_invariant():
+    text_org = """long_string = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" \\
+              "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+"""
+    text_black = """long_string = (
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+)
+"""
+    assert black_invariant(text_org) == black_invariant(text_black)
+
+
 @requires_black
 def test_pipe_into_black():
     nb_org = new_notebook(cells=[new_code_cell('1        +1')])
