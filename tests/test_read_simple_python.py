@@ -531,6 +531,59 @@ def g(x):
     compare(script, script2)
 
 
+def test_notebook_one_blank_line_between_cells(script="""# +
+1 + 1
+
+2 + 2
+
+# +
+3 + 3
+
+4 + 4
+
+# +
+5 + 5
+
+
+def g(x):
+    return 6
+
+
+# +
+7 + 7
+
+
+def h(x):
+    return 8
+
+
+# +
+def i(x):
+    return 9
+
+
+10 + 10
+
+
+# +
+def j(x):
+    return 11
+
+
+12 + 12
+"""):
+    notebook = jupytext.reads(script, 'py')
+    for cell in notebook.cells:
+        lines = cell.source.splitlines()
+        assert lines[0]
+        assert lines[-1]
+        assert not cell.metadata, cell.source
+
+    script2 = jupytext.writes(notebook, 'py')
+
+    compare(script, script2)
+
+
 def test_notebook_one_blank_line_before_first_markdown_cell(script="""
 # This is a markdown cell
 

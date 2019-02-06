@@ -170,16 +170,18 @@ class BaseCellReader(object):
             parser.read_line(line)
 
             if self.start_code_re.match(line) or (self.markdown_prefix and line.startswith(self.markdown_prefix)):
-                if i > 1 and _BLANK_LINE.match(lines[i - 1]):
-                    if i > 2 and _BLANK_LINE.match(lines[i - 2]):
+                if i > 0 and _BLANK_LINE.match(lines[i - 1]):
+                    if i > 1 and _BLANK_LINE.match(lines[i - 2]):
                         return i - 2, i, False
                     return i - 1, i, False
                 return i, i, False
 
             # Simple code pattern in LightScripts must be preceded with a blank line
-            if i > 0 and self.simple_start_code_re and _BLANK_LINE.match(lines[i - 1]) and \
-                    self.simple_start_code_re.match(line):
-                return i - 1, i, False
+            if self.simple_start_code_re and self.simple_start_code_re.match(line):
+                if i > 0 and _BLANK_LINE.match(lines[i - 1]):
+                    if i > 1 and _BLANK_LINE.match(lines[i - 2]):
+                        return i - 2, i, False
+                    return i - 1, i, False
 
             if self.end_code_re:
                 if self.end_code_re.match(line):
