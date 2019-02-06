@@ -302,11 +302,10 @@ def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default
         return text_repr.get('format_name')
 
     # Format from jupytext.formats
-    auto_ext = auto_ext_from_metadata(metadata)
     formats = metadata.get('jupytext', {}).get('formats', '') or cm_default_formats
     formats = long_form_multiple_formats(formats)
     for fmt in formats:
-        if fmt['extension'] == ext or (fmt['extension'] == '.auto' and ext == auto_ext):
+        if fmt['extension'] == ext:
             if (not explicit_default) or fmt.get('format_name'):
                 return fmt.get('format_name')
 
@@ -375,6 +374,11 @@ def rearrange_jupytext_metadata(metadata):
             jupytext_metadata['formats'] = ','.join(['.' + fmt if fmt.rfind('.') > 0 else fmt
                                                      for fmt in formats.split(',')])
 
+    # auto to actual extension
+    formats = jupytext_metadata.get('formats')
+    if formats:
+        jupytext_metadata['formats'] = short_form_multiple_formats(long_form_multiple_formats(formats, metadata))
+
     if jupytext_metadata:
         metadata['jupytext'] = jupytext_metadata
 
@@ -410,14 +414,17 @@ def long_form_one_format(jupytext_format, metadata=None):
     if not ext.startswith('.'):
         ext = '.' + ext
 
-    if ext == '.auto' and metadata:
-        ext = auto_ext_from_metadata(metadata)
+    if ext == '.auto':
+        ext = auto_ext_from_metadata(metadata) if metadata is not None else '.auto'
+        if not ext:
+            raise JupytextFormatError("No language information in this notebook. Please replace 'auto' with "
+                                      "an actual script extension.")
 
     fmt['extension'] = ext
     return fmt
 
 
-def long_form_multiple_formats(jupytext_formats):
+def long_form_multiple_formats(jupytext_formats, metadata=None):
     """Convert a concise encoding of jupytext.formats to a list of formats, encoded as dictionaries"""
     if not jupytext_formats:
         return []
@@ -425,7 +432,7 @@ def long_form_multiple_formats(jupytext_formats):
     if not isinstance(jupytext_formats, list):
         jupytext_formats = [fmt for fmt in jupytext_formats.split(',') if fmt]
 
-    jupytext_formats = [long_form_one_format(fmt) for fmt in jupytext_formats]
+    jupytext_formats = [long_form_one_format(fmt, metadata) for fmt in jupytext_formats]
 
     for fmt in jupytext_formats:
         validate_one_format(fmt)
@@ -492,17 +499,3 @@ def auto_ext_from_metadata(metadata):
     if auto_ext == '.r':
         return '.R'
     return auto_ext
-
-
-def set_auto_ext(jupytext_formats, metadata):
-    """Expend the format definition, and replaces extension .auto with that from the metadata"""
-    jupytext_formats = long_form_multiple_formats(jupytext_formats)
-    ext = auto_ext_from_metadata(metadata)
-
-    for fmt in jupytext_formats:
-        if fmt['extension'] == '.auto':
-            if not ext:
-                raise JupytextFormatError('No kernel information found, cannot save to .auto extension')
-            fmt['extension'] = ext
-
-    return jupytext_formats

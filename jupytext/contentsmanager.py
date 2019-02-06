@@ -19,7 +19,7 @@ from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 
 import jupytext
 from .combine import combine_inputs_with_outputs
-from .formats import rearrange_jupytext_metadata, check_file_version, set_auto_ext
+from .formats import rearrange_jupytext_metadata, check_file_version
 from .formats import NOTEBOOK_EXTENSIONS, long_form_one_format, long_form_multiple_formats
 from .formats import short_form_one_format, short_form_multiple_formats
 from .paired_paths import paired_paths, find_base_path_and_format, base_path, full_path, InconsistentPath
@@ -196,7 +196,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
         for fmt in formats:
             try:
                 base_path(path, fmt)
-                return formats
+                return self.default_jupytext_formats
             except InconsistentPath:
                 continue
 
@@ -223,8 +223,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
                 jupytext_formats = [fmt]
 
-            jupytext_formats = long_form_multiple_formats(jupytext_formats)
-            jupytext_formats = set_auto_ext(jupytext_formats, metadata)
+            jupytext_formats = long_form_multiple_formats(jupytext_formats, metadata)
 
             # Set preferred formats if not format name is given yet
             jupytext_formats = [preferred_format(fmt, self.preferred_jupytext_formats_save) for fmt in jupytext_formats]

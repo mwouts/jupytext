@@ -4,7 +4,7 @@ from nbformat.v4.nbbase import new_notebook
 import jupytext
 from jupytext.formats import guess_format, divine_format, read_format_from_metadata, rearrange_jupytext_metadata
 from jupytext.formats import long_form_multiple_formats, short_form_multiple_formats, update_jupytext_formats_metadata
-from jupytext.formats import get_format_implementation, validate_one_format, set_auto_ext, JupytextFormatError
+from jupytext.formats import get_format_implementation, validate_one_format, JupytextFormatError
 from .utils import list_notebooks
 
 
@@ -200,4 +200,4 @@ def test_validate_one_format():
 
 def test_set_auto_ext():
     with pytest.raises(ValueError):
-        set_auto_ext('ipynb,auto:percent', {})
+        long_form_multiple_formats('ipynb,auto:percent', {})

@@ -1005,7 +1005,7 @@ def test_set_then_change_auto_formats(tmpdir, nb_file):
     assert 'nb.py' in cm.paired_notebooks
     assert 'nb.auto' not in cm.paired_notebooks
     assert os.path.isfile(tmp_py)
-    assert readf(tmp_ipynb).metadata['jupytext']['formats'] == 'ipynb,auto:light'
+    assert readf(tmp_ipynb).metadata['jupytext']['formats'] == 'ipynb,py:light'
 
     # Pair ipynb/Rmd and save
     time.sleep(0.5)
