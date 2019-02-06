@@ -48,6 +48,10 @@ def test_metadata_filter_user_overrides_default():
                            ) == to_dict(['user'])
 
 
+def test_negative_cell_metadata_filter():
+    assert filter_metadata(to_dict(['exectime']), '-linesto', '-exectime') == to_dict([])
+
+
 def test_cell_metadata_filter_is_updated():
     text = """---
 jupyter:

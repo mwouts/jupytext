@@ -768,6 +768,45 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     compare_notebooks(nb, nb3)
 
 
+def test_no_metadata_added_to_scripts_139(tmpdir):
+    tmp_script = str(tmpdir.join('script.py'))
+    text = """import os
+
+
+print('hello1')
+
+
+
+print('hello2')
+"""
+
+    with open(tmp_script, 'w') as fp:
+        fp.write(text)
+
+    # create contents manager
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # Andre's config #139
+    cm.freeze_metadata = True
+    cm.default_notebook_metadata_filter = "-all"
+    cm.default_cell_metadata_filter = "-lines_to_next_cell"
+
+    # load notebook
+    model = cm.get('script.py')
+
+    # add cell metadata
+    for cell in model['content'].cells:
+        cell.metadata.update({
+            "ExecuteTime": {"start_time": "2019-02-06T11:53:21.208644Z", "end_time": "2019-02-06T11:53:21.213071Z"}})
+
+    # save notebook
+    cm.save(model=model, path='script.py')
+
+    with open(tmp_script) as fp:
+        compare(text, fp.read())
+
+
 @pytest.mark.parametrize('nb_file,ext', itertools.product(list_notebooks('ipynb_py'), ['.py', '.ipynb']))
 def test_local_format_can_deactivate_pairing(nb_file, ext, tmpdir):
     """This is a test for #157: local format can be used to deactivate the global pairing"""
