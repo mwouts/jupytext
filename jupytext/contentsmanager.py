@@ -234,7 +234,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
             # Save as ipynb first
             latest_result = None
-            for fmt in jupytext_formats:
+            for fmt in jupytext_formats[::-1]:
                 if fmt['extension'] != '.ipynb':
                     continue
 
@@ -242,8 +242,9 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 self.log.info("Saving %s", os.path.basename(alt_path))
                 latest_result = super(TextFileContentsManager, self).save(model, alt_path)
 
-            # And then to the other formats
-            for fmt in jupytext_formats:
+            # And then to the other formats, in reverse order so that
+            # the first format is the most recent
+            for fmt in jupytext_formats[::-1]:
                 if fmt['extension'] == '.ipynb':
                     continue
 

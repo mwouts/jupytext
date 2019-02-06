@@ -1,4 +1,5 @@
 import os
+import time
 import stat
 import mock
 import pytest
@@ -494,7 +495,8 @@ def test_paired_paths(nb_file, tmpdir, capsys):
     assert not err
 
     formats = nb.metadata.get('jupytext', {}).get('formats')
-    assert set(out.splitlines()).union([tmp_ipynb]) == set([path for path, _ in paired_paths(tmp_ipynb, 'ipynb', formats)])
+    assert set(out.splitlines()).union([tmp_ipynb]) == set(
+        [path for path, _ in paired_paths(tmp_ipynb, 'ipynb', formats)])
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
@@ -511,7 +513,7 @@ def test_sync(nb_file, tmpdir):
     assert 'is not a paired notebook' in str(info)
 
     # Now with a pairing information
-    nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,py,Rmd'
+    nb.metadata.setdefault('jupytext', {})['formats'] = 'py,Rmd,ipynb'
     writef(nb, tmp_ipynb)
 
     # Test that missing files are created
@@ -538,6 +540,18 @@ def test_sync(nb_file, tmpdir):
 
     nb2 = readf(tmp_ipynb)
     compare_notebooks(nb, nb2, compare_outputs=True)
+
+    # Finally we recreate the ipynb
+    os.remove(tmp_ipynb)
+
+    time.sleep(0.1)
+    jupytext(['--sync', tmp_py])
+
+    nb2 = readf(tmp_ipynb)
+    compare_notebooks(nb, nb2)
+
+    # ipynb must be older than py file, otherwise our Contents Manager will complain
+    assert os.path.getmtime(tmp_ipynb) < os.path.getmtime(tmp_py)
 
 
 @pytest.mark.parametrize('nb_file,ext',

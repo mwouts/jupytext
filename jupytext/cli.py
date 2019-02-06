@@ -302,11 +302,14 @@ def jupytext(args=None):
             formats = notebook.metadata['jupytext']['formats']
 
             for ipynb in [True, False]:
-                for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats):
+                # Write first format last so that it is the most recent file
+                for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats)[::-1]:
                     # Write ipynb first for compatibility with our contents manager
                     if alt_path.endswith('.ipynb') != ipynb:
                         continue
-                    if alt_path == inputs_nb_file and (alt_path == outputs_nb_file or not ipynb):
+                    # Do not write the ipynb file if it was not modified
+                    # But, always write text representations to make sure they are the most recent
+                    if alt_path == inputs_nb_file and alt_path == outputs_nb_file:
                         continue
                     log("[jupytext] Updating '{}'".format(alt_path))
                     writef_git_add(notebook, alt_path, alt_fmt)
