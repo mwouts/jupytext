@@ -6,6 +6,10 @@ import {
   ICommandPalette
 } from '@jupyterlab/apputils';
 
+import {
+  INotebookTracker
+} from '@jupyterlab/notebook';
+
 import '../style/index.css';
 
 const JUPYTEXT_FORMATS = [
@@ -41,20 +45,23 @@ const JUPYTEXT_FORMATS = [
 const extension: JupyterLabPlugin<void> = {
   id: 'jupyterlab-jupytext',
   autoStart: true,
-  requires: [ICommandPalette],
-  activate: (app: JupyterLab, palette: ICommandPalette) => {
+  requires: [ICommandPalette, INotebookTracker],
+  activate: (app: JupyterLab, palette: ICommandPalette, notebook_tracker: INotebookTracker) => {
     console.log('JupyterLab extension jupyterlab-jupytext is activated');
 
     // Jupytext formats
     JUPYTEXT_FORMATS.forEach((args, rank) => {
-      const command: string = 'jupytext:' + args['formats']
+      const formats: string = args['formats']
+      const command: string = 'jupytext:' + formats
       app.commands.addCommand(command, {
         label: args['label'],
         execute: args => {
-          // TODO: Replace the below with a code that sets/removes
-          // notebook.metadata.jupytext.formats=args['formats']
-          // when the focus is on a notebook.
-          console.log('Jupytext: executing command=' + command + ' with args=' + String(args))
+          console.log('Jupytext: executing command=' + command)
+
+          if (formats == 'unpair')
+            notebook_tracker.currentWidget.context.model.metadata.set('jupytext', {})
+          else
+            notebook_tracker.currentWidget.context.model.metadata.set('jupytext', { formats })
         }
       });
 
