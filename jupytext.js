@@ -105,8 +105,8 @@ define([
                     .on('click', function () { window.open('https://jupytext.readthedocs.io/en/latest/') })
                     .prepend($('<i/>').addClass('pull-right')));
 
-                $('#kernel_menu').parent().after('<li id="jupytext_menu"/>')
-                $('#jupytext_menu').addClass('dropdown').append(JupytextMenu).append(JupytextActions)
+                $('#trust_notebook').before('<li id="jupytext_sub_menu"/>');
+                $('#jupytext_sub_menu').addClass('dropdown-submenu').append(JupytextMenu).append(JupytextActions)
                 JupytextActions.append(jupytext_link)
                 JupytextActions.append($('<li/>').addClass('divider'))
                 JupytextActions.append(jupytext_pair('ipynb,auto:light', 'Pair Notebook with light Script'))
@@ -118,7 +118,9 @@ define([
                 JupytextActions.append($('<li/>').addClass('divider'))
                 JupytextActions.append(jupytext_pair('none', 'Unpair notebook'))
 
-                checkSelectedJupytextFormat()
+                $('#jupytext_sub_menu').after('<li class="divider"/>');
+
+                checkSelectedJupytextFormat();
             };
         }
 
