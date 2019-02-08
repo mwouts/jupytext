@@ -8,15 +8,9 @@ This extension adds a few [Jupytext](https://github.com/mwouts/jupytext) command
 
 Please [install Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. Make sure Jupyter is configured to use Jupytext's contents manager. Then, install the extension with:
 
-:construction:
-
-At this stage the extension is not functional. Thus we have not distributed it yet, so
-
 ```bash
 jupyter labextension install jupyterlab-jupytext
 ```
-
-won't work.
 
 # How to develop this extension
 
