@@ -658,6 +658,28 @@ def test_format_prefix_suffix(tmpdir):
     os.remove(tmp_py)
 
 
+def test_cli_sync_file_with_suffix(tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_pct_py = str(tmpdir.join('notebook.pct.py'))
+    tmp_lgt_py = str(tmpdir.join('notebook.lgt.py'))
+    tmp_rmd = str(tmpdir.join('notebook.Rmd'))
+    nb = new_notebook(cells=[new_code_cell(source='1+1')],
+                      metadata={'jupytext': {'formats': 'ipynb,.pct.py:percent,.lgt.py:light,Rmd'}})
+
+    writef(nb, tmp_pct_py, '.pct.py:percent')
+    jupytext(['--sync', tmp_pct_py])
+    assert os.path.isfile(tmp_lgt_py)
+    assert os.path.isfile(tmp_rmd)
+    assert os.path.isfile(tmp_ipynb)
+
+    jupytext(['--sync', tmp_lgt_py])
+    jupytext(['--sync', tmp_ipynb])
+
+    assert open(tmp_lgt_py).read().splitlines()[-2:] == ['', '1+1']
+    assert open(tmp_pct_py).read().splitlines()[-3:] == ['', '# %%', '1+1']
+    assert open(tmp_rmd).read().splitlines()[-4:] == ['', '```{python}', '1+1', '```']
+
+
 def test_rst2md(tmpdir):
     tmp_py = str(tmpdir.join('notebook.py'))
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))

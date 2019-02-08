@@ -8,8 +8,8 @@ import argparse
 import json
 from copy import copy
 from .jupytext import readf, reads, writef, writes
-from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, long_form_one_format, short_form_one_format
-from .formats import check_file_version
+from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, check_file_version
+from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format
 from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
@@ -241,6 +241,7 @@ def jupytext(args=None):
 
         # Read paired notebooks
         if args.sync:
+            set_prefix_and_suffix(fmt, notebook, nb_file)
             notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
 
         # II. ### Apply commands onto the notebook ###
@@ -379,6 +380,19 @@ def set_format_options(fmt, format_options):
             value = str2bool(value)
 
         fmt[key] = value
+
+
+def set_prefix_and_suffix(fmt, notebook, nb_file):
+    """Add prefix and suffix information from jupytext.formats if format and path matches"""
+    for alt_fmt in long_form_multiple_formats(notebook.metadata.get('jupytext', {}).get('formats')):
+        if (alt_fmt['extension'] == fmt['extension']
+                and fmt.get('format_name') == alt_fmt.get('format_name')):
+            try:
+                base_path(nb_file, alt_fmt)
+                fmt.update(alt_fmt)
+                return
+            except InconsistentPath:
+                continue
 
 
 def load_paired_notebook(notebook, fmt, nb_file, log):
