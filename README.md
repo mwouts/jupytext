@@ -64,6 +64,16 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 ![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/b8dd28f44678f8c91f262da2381276fc4d03b00a/JupyterPyCharm.gif)
 
+### Importing Jupyter Notebooks as modules
+
+Jupytext allows to import code from other Jupyter notebooks in a very simple manner. Indeed, all you need to do is to pair the notebook that you wish to import with a script, and import the resulting script.
+
+If the notebook contains demos and plots that you don't want to import, mark those cell as either
+- _active_ only in the `ipynb` format, with the `{"active": "ipynb"}` cell metadata
+- _frozen_, using the [freeze extension](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/freeze/readme.html) for Jupyter notebook.
+
+Inactive cells will be commented in the paired script, and consequently will not be executed when the script is imported.
+
 ## Installation
 
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/jupytext.svg)](https://anaconda.org/conda-forge/jupytext)
