@@ -11,8 +11,8 @@ Jupytext can save Jupyter notebooks as
 - Julia, Python, R, Bash, Scheme, C++ and q/kdb+ scripts.
 
 There are multiple ways to use `jupytext`:
-- on the [command line](https://github.com/mwouts/jupytext/blob/master/README.md#command-line-conversion)
-- through [jupytext.vim](https://github.com/goerz/jupytext.vim), a plugin for Vim that lets you edit Jupyter notebooks represented as markdown documents or Python scripts
+- On the [command line](#command-line-conversion). `jupytext` converts Jupyter notebooks to their text representation, and back. The command line tool can act on noteboks in many ways. It can synchronize multiple representations of a notebook, pipe a notebook into a reformatting tool like `black`, etc... It can also work as a [pre-commit hook](#jupytext-as-a-git-pre-commit-hook) if you wish to automatically update the text representation when you commit the `.ipynb` file.
+- in Vim: edit your Jupyter notebooks, represented as a Markdown document, or a Python script, with [jupytext.vim](https://github.com/goerz/jupytext.vim).
 - directly from Jupyter Notebook or JupyterLab. Jupytext provides a _contents manager_ that allows Jupyter to save your notebook to your favorite format (`.py`, `.R`, `.jl`, `.md`, `.Rmd`...) in addition to (or in place of) the traditional `.ipynb` file. The text representation can be edited in your favorite editor. When you're done, refresh the notebook in Jupyter: inputs cells are loaded from the text file, while output cells are reloaded from the `.ipynb` file if present. Refreshing preserves kernel variables, so you can resume your work in the notebook and run the modified cells without having to rerun the notebook in full.
 
 ## Demo time
@@ -42,8 +42,8 @@ The setup is straightforward:
 - Save the notebook, and put the Python script under Git control. Sharing the `.ipynb` file is possible, but not required.
 
 Collaborating then works as follows:
-- Your collaborator pulls your script. 
-- The script opens as a notebook in Jupyter, with no outputs (in JupyterLab this requires a [right-click](#jupyter-notebook-or-jupyterlab)). 
+- Your collaborator pulls your script.
+- The script opens as a notebook in Jupyter, with no outputs (in JupyterLab this requires a [right-click](#jupyter-notebook-or-jupyterlab)).
 - They run the notebook and save it. Outputs are regenerated, and a local `.ipynb` file is created.
 - Note that, alternatively, the `.ipynb` file could have been regenerated with `jupytext --sync notebook.py`.
 - They change the notebook, and push their updated script. The diff is nothing else than a standard diff on a Python script.
