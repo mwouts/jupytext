@@ -4,6 +4,7 @@ import os
 import time
 import pytest
 import itertools
+import shutil
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell
 from tornado.web import HTTPError
 from testfixtures import compare
@@ -462,12 +463,40 @@ def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
     cm.default_jupytext_formats = "ipynb,python//py:percent"
 
-    # save to ipynb and oy
+    # save to ipynb and py
     cm.save(model=dict(type='notebook', content=nb), path='notebook.ipynb')
 
     # read py file
     nb_py = readf(tmp_py)
     assert nb_py.metadata['jupytext']['text_representation']['format_name'] == 'percent'
+
+
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('python/notebook.py'))
+    os.makedirs(str(tmpdir.join('python')))
+    shutil.copyfile(nb_file, tmp_ipynb)
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.default_jupytext_formats = "ipynb,python//py:percent"
+    cm.default_notebook_metadata_filter = "all"
+    cm.default_cell_metadata_filter = "all"
+
+    # load notebook
+    model = cm.get('notebook.ipynb')
+
+    # save to ipynb and py
+    cm.save(model=model, path='notebook.ipynb')
+
+    assert os.path.isfile(tmp_py)
+    os.remove(tmp_ipynb)
+
+    # read py file
+    model2 = cm.get('python/notebook.py')
+    compare_notebooks(model['content'], model2['content'])
 
 
 @skip_if_dict_is_not_ordered
