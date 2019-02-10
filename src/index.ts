@@ -12,6 +12,10 @@ import {
 
 import '../style/index.css';
 
+interface JupytextSection {
+  formats?: string;
+}
+
 const JUPYTEXT_FORMATS = [
   {
     'formats': 'ipynb,auto:light',
@@ -34,7 +38,11 @@ const JUPYTEXT_FORMATS = [
     'label': 'Pair Notebook with R Markdown'
   },
   {
-    'formats': 'unpair',
+    'formats': 'custom',
+    'label': 'Custom pairing'
+  },
+  {
+    'formats': 'none',
     'label': 'Unpair Notebook'
   }
 ]
@@ -55,11 +63,49 @@ const extension: JupyterLabPlugin<void> = {
       const command: string = 'jupytext:' + formats
       app.commands.addCommand(command, {
         label: args['label'],
-        execute: args => {
-          console.log('Jupytext: executing command=' + command)
+        isToggled: () => {
+          if (!notebook_tracker.currentWidget)
+            return false;
 
-          if (formats == 'unpair')
-            notebook_tracker.currentWidget.context.model.metadata.set('jupytext', {})
+          if (!notebook_tracker.currentWidget.context.model.metadata.has('jupytext'))
+            return formats == 'none';
+
+          const jupytext: JupytextSection = notebook_tracker.currentWidget.context.model.metadata.get('jupytext') as unknown as JupytextSection;
+          if (!jupytext.formats)
+            return formats == 'none'
+
+          if (formats == 'custom')
+            return (jupytext.formats && ['ipynb,auto:light', 'ipynb,auto:percent', 'ipynb,auto:hydrogen', 'ipynb,md', 'ipynb,Rmd'].indexOf(jupytext.formats) < 0)
+
+          return jupytext.formats == formats
+        },
+        execute: () => {
+          console.log('Jupytext: executing command=' + command)
+          if (formats == 'custom') {
+            alert("Please edit the notebook metadata directly if you wish a custom configuration.")
+            return
+          }
+
+          const jupytext: JupytextSection = notebook_tracker.currentWidget.context.model.metadata.get('jupytext') as unknown as JupytextSection;
+
+          if (formats == 'none') {
+            if (!notebook_tracker.currentWidget.context.model.metadata.has('jupytext'))
+              return
+
+            if (jupytext.formats) {
+              delete jupytext.formats
+            }
+
+            // TODO: This is always true! How can we check that the JupytextSection is really empty, ie. no other
+            // field like 'comment_magics', 'split_at_heading', etc...
+            if (jupytext == {})
+              notebook_tracker.currentWidget.context.model.metadata.delete('jupytext')
+            return
+          }
+
+          // set desired format
+          if (jupytext)
+            jupytext.formats = formats
           else
             notebook_tracker.currentWidget.context.model.metadata.set('jupytext', { formats })
         }
