@@ -43,9 +43,8 @@ The setup is straightforward:
 
 Collaborating then works as follows:
 - Your collaborator pulls your script.
-- The script opens as a notebook in Jupyter, with no outputs (in JupyterLab this requires a [right-click](#jupyter-notebook-or-jupyterlab)).
+- If they only have the `.py` file, they open it as a notebook using either Jupyter Notebook (simple click) or JupyterLab (_Open as Notebook_ with a [right-click](#jupyter-notebook-or-jupyterlab)). Or, they regenerate the `.ipynb` file with `jupytext --sync notebook.py`.
 - They run the notebook and save it. Outputs are regenerated, and a local `.ipynb` file is created.
-- Note that, alternatively, the `.ipynb` file could have been regenerated with `jupytext --sync notebook.py`.
 - They change the notebook, and push their updated script. The diff is nothing else than a standard diff on a Python script.
 - You pull the changed script, and refresh your browser. Input cells are updated. The outputs from cells that were changed are removed. Your variables are untouched, so you have the option to run only the modified cells to get the new outputs.
 
