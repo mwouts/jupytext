@@ -66,13 +66,12 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 ### Importing Jupyter Notebooks as modules
 
-Jupytext allows to import code from other Jupyter notebooks in a very simple manner. Indeed, all you need to do is to pair the notebook that you wish to import with a script, and import the resulting script.
+Jupytext allows to import code from other Jupyter notebooks in a very simple manner. Indeed, all you need to do is to represent the notebook that you wish to import as a script.
 
-If the notebook contains demos and plots that you don't want to import, mark those cell as either
-- _active_ only in the `ipynb` format, with the `{"active": "ipynb"}` cell metadata
-- _frozen_, using the [freeze extension](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/freeze/readme.html) for Jupyter notebook.
-
-Inactive cells will be commented in the paired script, and consequently will not be executed when the script is imported.
+It may happen that the notebook contains demo cells or plots that you don't want to import. In that case, disable the execution of selected cells at import time using one of the following techniques:
+- move the cell content under an `if __main__ == "__main__":`. Such cells are still executed when the Jupyter notebook or the corresponding script are executed, but not when the script is imported.
+- mark the cell as active only in the `.ipynb` file, with the `{"active": "ipynb"}` cell metadata. In the script, inactive cells are commented.
+- or mark the cell as _frozen_, using the [freeze extension](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/freeze/readme.html) for Jupyter notebook. Again, frozen cells are commented when the notebook is represented as a script.
 
 ## Installation
 
