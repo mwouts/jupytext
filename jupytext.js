@@ -40,6 +40,11 @@ define([
             $('#jupytext_pair_' + formats.replace(':', '_').replace(',', '_') + ' > .fa').toggleClass('fa-check', true)
         }
 
+        function checkAutosave() {
+            console.log('Jupyter.notebook.autosave_interval=' + Jupyter.notebook.autosave_interval)
+            $('#autosave > .fa').toggleClass('fa-check', Jupyter.notebook.autosave_interval > 0)
+        }
+
         function onClickedJupytextPair(data) {
             var formats = $(this).data('formats')
             if (formats == 'custom') {
@@ -69,6 +74,11 @@ define([
             Jupyter.notebook.set_dirty();
         }
 
+        function onToggleAutosave() {
+            Jupyter.notebook.autosave_interval = Jupyter.notebook.autosave_interval > 0 ? 0 : 120000
+            checkAutosave()
+        }
+
         var jupytext_menu = function () {
             if ($('#jupytext_menu').length == 0) {
 
@@ -81,7 +91,7 @@ define([
 
                 var JupytextActions = $('<ul/>')
                     .attr('id', 'jupytext_actions')
-                    .addClass("dropdown-menu")                    
+                    .addClass("dropdown-menu")
 
                 function jupytext_pair(formats, text) {
                     return $('<li/>').append($('<a/>')
@@ -105,9 +115,20 @@ define([
                     .on('click', function () { window.open('https://jupytext.readthedocs.io/en/latest/') })
                     .prepend($('<i/>').addClass('pull-right')));
 
+                var toggle_autosave = $("<li/>").append(
+                    $("<a/>")
+                        .attr("id", "autosave")
+                        .text("Autosave notebook")
+                        .attr("title", "Toggle autosave for this notebook")
+                        .on("click", onToggleAutosave)
+                        .prepend($("<i/>").addClass("fa menu-icon pull-right"))
+                );
+
                 $('#trust_notebook').before('<li id="jupytext_sub_menu"/>');
                 $('#jupytext_sub_menu').addClass('dropdown-submenu').append(JupytextMenu).append(JupytextActions)
                 JupytextActions.append(jupytext_link)
+                JupytextActions.append($('<li/>').addClass('divider'))
+                JupytextActions.append(toggle_autosave)
                 JupytextActions.append($('<li/>').addClass('divider'))
                 JupytextActions.append(jupytext_pair('ipynb,auto:light', 'Pair Notebook with light Script'))
                 JupytextActions.append(jupytext_pair('ipynb,auto:percent', 'Pair Notebook with percent Script'))
@@ -121,6 +142,7 @@ define([
                 $('#jupytext_sub_menu').after('<li class="divider"/>');
 
                 checkSelectedJupytextFormat();
+                checkAutosave()
             };
         }
 
