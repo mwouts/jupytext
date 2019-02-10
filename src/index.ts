@@ -127,9 +127,7 @@ const extension: JupyterLabPlugin<void> = {
               delete jupytext.formats;
             }
 
-            // TODO: This is always true! How can we check that the JupytextSection is really empty, ie. no other
-            // field like 'comment_magics', 'split_at_heading', etc...
-            if (jupytext == {})
+            if (Object.keys(jupytext).length == 0)
               notebook_tracker.currentWidget.context.model.metadata.delete(
                 "jupytext"
               );
