@@ -442,6 +442,8 @@ def long_form_multiple_formats(jupytext_formats, metadata=None):
 
 def short_form_one_format(jupytext_format):
     """Represent one jupytext format as a string"""
+    if not isinstance(jupytext_format, dict):
+        return jupytext_format
     fmt = jupytext_format['extension']
     if 'suffix' in jupytext_format:
         fmt = jupytext_format['suffix'] + fmt

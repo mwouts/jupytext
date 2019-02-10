@@ -61,6 +61,17 @@ def test_prefix_and_suffix():
         paired_paths('notebook_folder/notebook_prefix_NOTEBOOK_NAME_notebook_suffix.py', formats[0], formats)
 
 
+def test_prefix_on_root_174():
+    short_formats = 'ipynb,python//py:percent'
+
+    formats = long_form_multiple_formats(short_formats)
+    assert short_form_multiple_formats(formats) == short_formats
+
+    expected_paths = ['/Untitled.ipynb', '/python/Untitled.py']
+    for fmt, path in zip(formats, expected_paths):
+        compare(zip(expected_paths, formats), paired_paths(path, fmt, formats))
+
+
 def test_duplicated_paths():
     formats = long_form_multiple_formats('ipynb,py:percent,py:light')
     with pytest.raises(InconsistentPath):

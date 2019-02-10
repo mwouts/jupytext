@@ -476,7 +476,9 @@ def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
 def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_py = str(tmpdir.join('python/notebook.py'))
+    tmp_py2 = str(tmpdir.join('other/notebook.py'))
     os.makedirs(str(tmpdir.join('python')))
+    os.makedirs(str(tmpdir.join('other')))
     shutil.copyfile(nb_file, tmp_ipynb)
 
     cm = jupytext.TextFileContentsManager()
@@ -497,6 +499,14 @@ def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
     # read py file
     model2 = cm.get('python/notebook.py')
     compare_notebooks(model['content'], model2['content'])
+
+    # move py file to the another folder
+    shutil.move(tmp_py, tmp_py2)
+    model2 = cm.get('other/notebook.py')
+    compare_notebooks(model['content'], model2['content'])
+    cm.save(model=model, path='other/notebook.py')
+    assert not os.path.isfile(tmp_ipynb)
+    assert not os.path.isfile(str(tmpdir.join('other/notebook.ipynb')))
 
 
 @skip_if_dict_is_not_ordered

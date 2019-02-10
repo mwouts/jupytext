@@ -2,6 +2,7 @@
 
 import os
 from .formats import long_form_one_format, long_form_multiple_formats
+from .formats import short_form_one_format, short_form_multiple_formats
 
 
 class InconsistentPath(ValueError):
@@ -76,9 +77,17 @@ def full_path(base, fmt):
 
         if prefix_file_name:
             notebook_file_name = prefix_file_name + notebook_file_name
+
         if prefix_dir:
-            notebook_dir = notebook_dir + sep + prefix_dir if notebook_dir else prefix_dir
-        full = notebook_dir + sep + notebook_file_name if notebook_dir else notebook_file_name
+            # Do not add a path separator when notebook_dir is '/'
+            if notebook_dir and not notebook_dir.endswith(sep):
+                notebook_dir = notebook_dir + sep
+            notebook_dir = notebook_dir + prefix_dir
+
+        if notebook_dir and not notebook_dir.endswith(sep):
+            notebook_dir = notebook_dir + sep
+
+        full = notebook_dir + notebook_file_name
 
     if suffix:
         full = full + suffix
@@ -112,7 +121,9 @@ def paired_paths(main_path, fmt, formats):
     paths = [full_path(base, fmt) for fmt in formats]
 
     if main_path not in paths:
-        raise InconsistentPath(u'Format specifications should include the current notebook format')
+        raise InconsistentPath(u"Paired paths '{}' do not include the current notebook path '{}'. "
+                               u"Current format is '{}', and paired formats are '{}'.".format(
+            "','".join(paths), main_path, short_form_one_format(fmt), short_form_multiple_formats(formats)))
 
     if len(paths) > len(set(paths)):
         raise InconsistentPath(u'Duplicate paired paths for this notebook. Please fix jupytext.formats.')
