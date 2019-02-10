@@ -4,6 +4,8 @@ import { ICommandPalette } from "@jupyterlab/apputils";
 
 import { INotebookTracker } from "@jupyterlab/notebook";
 
+import { nbformat } from "@jupyterlab/coreutils";
+
 import "../style/index.css";
 
 interface JupytextSection {
@@ -21,7 +23,7 @@ const JUPYTEXT_FORMATS = [
   },
   {
     formats: "ipynb,auto:hydrogen",
-    label: "Pair Notebook with hydrogen Script"
+    label: "Pair Notebook with Hydrogen Script"
   },
   {
     formats: "ipynb,md",
@@ -76,19 +78,29 @@ const extension: JupyterLabPlugin<void> = {
           ) as unknown) as JupytextSection;
           if (!jupytext.formats) return formats == "none";
 
+          const lang = notebook_tracker.currentWidget.context.model.metadata.get(
+            "language_info"
+          ) as nbformat.ILanguageInfoMetadata;
+          const jupytext_formats = lang
+            ? jupytext.formats.replace(
+                "," + lang.file_extension.substring(1) + ":",
+                ",auto:"
+              )
+            : jupytext.formats;
+
           if (formats == "custom")
             return (
-              jupytext.formats &&
+              jupytext_formats &&
               [
                 "ipynb,auto:light",
                 "ipynb,auto:percent",
                 "ipynb,auto:hydrogen",
                 "ipynb,md",
                 "ipynb,Rmd"
-              ].indexOf(jupytext.formats) < 0
+              ].indexOf(jupytext_formats) < 0
             );
 
-          return jupytext.formats == formats;
+          return jupytext_formats == formats;
         },
         execute: () => {
           console.log("Jupytext: executing command=" + command);
