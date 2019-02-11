@@ -132,7 +132,7 @@ define([
                 JupytextActions.append($('<li/>').addClass('divider'))
                 JupytextActions.append(jupytext_pair('ipynb,auto:light', 'Pair Notebook with light Script'))
                 JupytextActions.append(jupytext_pair('ipynb,auto:percent', 'Pair Notebook with percent Script'))
-                JupytextActions.append(jupytext_pair('ipynb,auto:hydrogen', 'Pair Notebook with hydrogen Script'))
+                JupytextActions.append(jupytext_pair('ipynb,auto:hydrogen', 'Pair Notebook with Hydrogen Script'))
                 JupytextActions.append(jupytext_pair('ipynb,md', 'Pair Notebook with Markdown'))
                 JupytextActions.append(jupytext_pair('ipynb,Rmd', 'Pair Notebook with R Markdown'))
                 JupytextActions.append(jupytext_pair('custom', 'Custom pairing'))
