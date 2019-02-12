@@ -23,6 +23,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/mwouts/jupytext',
     packages=find_packages(),
+    package_data={'jupytext': ['nbextension/*.*']},
     data_files=[('etc/jupyter/nbconfig/notebook.d', ['jupyter-config/nbconfig/notebook.d/jupytext.json']),
                 ('etc/jupyter/jupyter_notebook_config.d', ['jupyter-config/jupyter_notebook_config.d/jupytext.json']),
                 ('share/jupyter/nbextensions/jupytext', ['jupytext/nbextension/index.js']),
