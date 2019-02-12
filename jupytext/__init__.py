@@ -14,7 +14,8 @@ except ImportError as err:
         def __init__(self):
             raise self.err
 
-def _jupyter_nbextension_paths():
+
+def _jupyter_nbextension_paths():  # pragma: no cover
     """Allows commands like
      jupyter nbextension install --py jupytext
      jupyter nbextension enable --py jupytext

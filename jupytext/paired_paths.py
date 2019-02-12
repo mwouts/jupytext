@@ -122,8 +122,9 @@ def paired_paths(main_path, fmt, formats):
 
     if main_path not in paths:
         raise InconsistentPath(u"Paired paths '{}' do not include the current notebook path '{}'. "
-                               u"Current format is '{}', and paired formats are '{}'.".format(
-            "','".join(paths), main_path, short_form_one_format(fmt), short_form_multiple_formats(formats)))
+                               u"Current format is '{}', and paired formats are '{}'."
+                               .format("','".join(paths), main_path, short_form_one_format(fmt),
+                                       short_form_multiple_formats(formats)))
 
     if len(paths) > len(set(paths)):
         raise InconsistentPath(u'Duplicate paired paths for this notebook. Please fix jupytext.formats.')
