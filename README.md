@@ -11,9 +11,9 @@ Jupytext can save Jupyter notebooks as
 - Julia, Python, R, Bash, Scheme, C++ and q/kdb+ scripts.
 
 There are multiple ways to use `jupytext`:
+- Directly from Jupyter Notebook or JupyterLab. Jupytext provides a _contents manager_ that allows Jupyter to save your notebook to your favorite format (`.py`, `.R`, `.jl`, `.md`, `.Rmd`...) in addition to (or in place of) the traditional `.ipynb` file. The text representation can be edited in your favorite editor. When you're done, refresh the notebook in Jupyter: inputs cells are loaded from the text file, while output cells are reloaded from the `.ipynb` file if present. Refreshing preserves kernel variables, so you can resume your work in the notebook and run the modified cells without having to rerun the notebook in full.
 - On the [command line](#command-line-conversion). `jupytext` converts Jupyter notebooks to their text representation, and back. The command line tool can act on noteboks in many ways. It can synchronize multiple representations of a notebook, pipe a notebook into a reformatting tool like `black`, etc... It can also work as a [pre-commit hook](#jupytext-as-a-git-pre-commit-hook) if you wish to automatically update the text representation when you commit the `.ipynb` file.
 - in Vim: edit your Jupyter notebooks, represented as a Markdown document, or a Python script, with [jupytext.vim](https://github.com/goerz/jupytext.vim).
-- directly from Jupyter Notebook or JupyterLab. Jupytext provides a _contents manager_ that allows Jupyter to save your notebook to your favorite format (`.py`, `.R`, `.jl`, `.md`, `.Rmd`...) in addition to (or in place of) the traditional `.ipynb` file. The text representation can be edited in your favorite editor. When you're done, refresh the notebook in Jupyter: inputs cells are loaded from the text file, while output cells are reloaded from the `.ipynb` file if present. Refreshing preserves kernel variables, so you can resume your work in the notebook and run the modified cells without having to rerun the notebook in full.
 
 ## Demo time
 
@@ -43,8 +43,9 @@ The setup is straightforward:
 
 Collaborating then works as follows:
 - Your collaborator pulls your script.
-- If they only have the `.py` file, they open it as a notebook using either Jupyter Notebook (simple click) or JupyterLab (_Open as Notebook_ with a [right-click](#jupyter-notebook-or-jupyterlab)). Or, they regenerate the `.ipynb` file with `jupytext --sync notebook.py`.
+- The script opens as a notebook in Jupyter, with no outputs (in JupyterLab this requires a [right-click](#jupyter-notebook-or-jupyterlab)).
 - They run the notebook and save it. Outputs are regenerated, and a local `.ipynb` file is created.
+- Note that, alternatively, the `.ipynb` file could have been regenerated with `jupytext --sync notebook.py`.
 - They change the notebook, and push their updated script. The diff is nothing else than a standard diff on a Python script.
 - You pull the changed script, and refresh your browser. Input cells are updated. The outputs from cells that were changed are removed. Your variables are untouched, so you have the option to run only the modified cells to get the new outputs.
 
@@ -54,7 +55,7 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 - We start with a Jupyter notebook.
 - The notebook includes a plot of the world population. The plot legend is not in order of decreasing population, we'll fix this.
-- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we add a `"jupytext": {"formats": "ipynb,py"},` entry to the notebook metadata.
+- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we select _Pair Notebook with a light Script_ in the File/Jupytext menu, which has the effet to add a `"jupytext": {"formats": "ipynb,py:light"},` entry to the notebook metadata.
 - The Python script can be opened with PyCharm:
   - Navigating in the code and documentation is easier than in Jupyter.
   - The console is convenient for quick tests. We don't need to create cells for this.
@@ -65,12 +66,13 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 ### Importing Jupyter Notebooks as modules
 
-Jupytext allows to import code from other Jupyter notebooks in a very simple manner. Indeed, all you need to do is to represent the notebook that you wish to import as a script.
+Jupytext allows to import code from other Jupyter notebooks in a very simple manner. Indeed, all you need to do is to pair the notebook that you wish to import with a script, and import the resulting script.
 
-It may happen that the notebook contains demo cells or plots that you don't want to import. In that case, disable the execution of selected cells at import time using one of the following techniques:
-- move the cell content under an `if __main__ == "__main__":`. Such cells are still executed when the Jupyter notebook or the corresponding script are executed, but not when the script is imported.
-- mark the cell as active only in the `.ipynb` file, with the `{"active": "ipynb"}` cell metadata. In the script, inactive cells are commented.
-- or mark the cell as _frozen_, using the [freeze extension](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/freeze/readme.html) for Jupyter notebook. Again, frozen cells are commented when the notebook is represented as a script.
+If the notebook contains demos and plots that you don't want to import, mark those cell as either
+- _active_ only in the `ipynb` format, with the `{"active": "ipynb"}` cell metadata
+- _frozen_, using the [freeze extension](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/freeze/readme.html) for Jupyter notebook.
+
+Inactive cells will be commented in the paired script, and consequently will not be executed when the script is imported.
 
 ## Installation
 
@@ -92,35 +94,56 @@ If you want to use Jupytext within Jupyter Notebook or JupyterLab, make sure you
 /path_to_your_jupyter_environment/python -m pip install jupytext --upgrade --user
 ```
 
-Then, configure Jupyter to use Jupytext:
-- generate a Jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`
-- edit `.jupyter/jupyter_notebook_config.py` and append the following:
+### Jupytext's content manager
+
+Jupytext includes a contents manager for Jupyter that allows Jupyter to open and save notebooks as text files. When Jupytext's content manager is active in Jupyter, scripts and Markdown documents have a notebook icon.
+
+If you don't have the notebook icon on text documents after a fresh restart of your Jupyter server, install the contents manager manually. Append
 ```python
 c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 ```
-(note that our contents manager accepts a few options: default formats, default metadata filter, etc &mdash; read more on this [below](#global-configuration)).
-- and restart Jupyter Notebook or JupyterLab, either from the JupyterHub interface or from the command line with
+to your `.jupyter/jupyter_notebook_config.py` file (generate a Jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`). Our contents manager accepts a few options: default formats, default metadata filter, etc &mdash; read more on this [below](#global-configuration). Then, restart Jupyter Notebook or JupyterLab, either from the JupyterHub interface or from the command line with
 ```bash
 jupyter notebook # or lab
 ```
 
-### <a name="paired-notebooks"></a> Per-notebook configuration
+### Jupytext menu in Jupyter Notebook
 
-Configure the multiple export formats for the current notebook by adding a `"jupytext": {"formats": "ipynb,py"},` entry to the notebook metadata with *Edit/Edit Notebook Metadata* in Jupyter's menu:
+Jupytext includes an extensions for Jupyter Notebook that adds a Jupytext section in the File menu.
+
+![Jupyter notebook extension](https://raw.githubusercontent.com/mwouts/jupytext_nbextension/master/jupytext_menu.png)
+
+If the extension was not automatically installed, install and activate it with
 ```
-{
-  "jupytext": {"formats": "ipynb,py"},
-  "kernelspec": {
-    (...)
-  },
-  "language_info": {
-    (...)
-  }
-}
+jupyter nbextension install --py jupytext [--user]
+jupyter nbextension enable --py jupytext [--user]
 ```
-Alternatively, activate the pairing with the command line tool:
+
+### Jupytext commands in JupyterLab
+
+In JupyterLab, Jupytext adds a set of commands to the command palette:
+
+![JupyterLab extension](https://raw.githubusercontent.com/mwouts/jupyterlab-jupytext/master/jupytext_commands.png)
+
+If you don't see these commands, install the extension manually with
 ```
-jupytext notebook.ipynb --set-formats ipynb,py
+jupyter labextension install jupyterlab-jupytext
+```
+(the above requires `npm`, run `conda install nodejs` first if you don't have `npm`).
+
+## <a name="paired-notebooks"></a> Paired notebooks
+
+Jupytext can write a given notebook to multiple files. In addition to the original notebook file, Jupytext can save the input cells to a text file &mdash; either a script or a Markdown document. Put the text file under version control for a clear commit history. Or refactor the paired script, and reimport the updated input cells by simply refreshing the notebook in Jupyter.
+
+### Per-notebook configuration
+
+Select the pairing for a given notebook using either the Jupytext menu in Jupyter Notebook, or the Jupytext commands in JupyterLab.
+
+These command simply add a `"jupytext": {"formats": "ipynb,md"}`-like entry in the notebook metadata. You could also set that metadata yourself with _Edit/Edit Notebook Metadata_ in Jupyter Notebook. In JupyterLab, use [this extension](https://github.com/yuvipanda/jupyterlab-nbmetadata).
+
+The pairing information for one or multiple notebooks can be set on the command line:
+```
+jupytext --set-formats ipynb,py [--sync] notebook.ipynb
 ```
 You can pair a notebook to as many text representations as you want (see our _World population_ notebook in the demo folder). Format specifications are of the form
 ```
@@ -131,7 +154,7 @@ where
 - `format_name` (optional) is either `light` (default for scripts), `bare`, `percent`, `sphinx` (Python only), `spin` (R only) &mdash; see below for the [format specifications](#Format-specifications).
 - `path`, `prefix` and `suffix` allow to save the text representation tp files with different names, or in a different folder. For instance, if you want that your notebook is paired to a python script in a subfolder named `scripts`, set the formats metadata to `ipynb,scripts//py`. If the notebook is in a `notebooks` folder and you want the text representation to be in a `scripts` folder at the same level, use `notebooks//ipynb,scripts//py`.
 
-Jupytext accepts a few additional options:
+Jupytext accepts a few additional options. These options should be added to the `"jupytext"` section in the metadata &mdash; use either the metadata editor or the `--opt/--format-options` argument on the command line.
 - `comment_magics`: By default, Jupyter magics are commented when notebooks are exported to any other format than markdown. If you prefer otherwise, use this boolean option, or is global counterpart (see below).
 - `notebook_metadata_filter`: By default, Jupytext only exports the `kernelspec` and `jupytext` metadata to the text files. Set `"jupytext": {"notebook_metadata_filter": "-all"}` if you want that the script has no notebook metadata at all. The value for `notebook_metadata_filter` is a comma separated list of additional/excluded (negated) entries, with `all` a keyword that allows to exclude all entries.
 - `cell_metadata_filter`: By default, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. Add or exclude more cell metadata with this option.
@@ -150,14 +173,14 @@ In case the [`percent`](#the-percent-format) format is your favorite, add the fo
 # Use the percent format when saving as py
 c.ContentsManager.preferred_jupytext_formats_save = "py:percent"
 ```
-and then, Jupytext will understand `"jupytext": {"formats": "ipynb,py"},` as an instruction to create the paired Python script in the `percent` format.
+and then, Jupytext will understand `"jupytext": {"formats": "ipynb,py"}` as an instruction to create the paired Python script in the `percent` format.
 
 To disable global pairing for an individual notebook, set formats to a single format, e.g.:
-`"jupytext": {"formats": "ipynb"},`
+`"jupytext": {"formats": "ipynb"}`
 
-#### Default metadata filtering
+### Metadata filtering
 
-You can specify which metadata to include or exclude in the text files created by Jupytext by default by setting `c.ContentsManager.default_notebook_metadata_filter` (notebook metadata) and `c.ContentsManager.default_cell_metadata_filter` (cell metadata). They accept a string of comma separated keywords. A minus sign `-` in font of a keyword means exclusion.
+You can specify which metadata to include or exclude in the text files created by Jupytext by setting `c.ContentsManager.default_notebook_metadata_filter` (notebook metadata) and `c.ContentsManager.default_cell_metadata_filter` (cell metadata). They accept a string of comma separated keywords. A minus sign `-` in font of a keyword means exclusion.
 
 Suppose you want to keep all the notebook metadata but `widgets` and `varInspector` in the YAML header. For cell metadata, you want to allow `ExecuteTime` and `autoscroll`, but not `hide_output`. You can set
 ```python
@@ -178,7 +201,7 @@ NB: All these global options (and more) are documented [here](https://github.com
 When editing a paired notebook using Jupytext's contents manager, Jupyter updates both the `.ipynb` and its text representation. The text representation can be edited outside of Jupyter. When the notebook is refreshed in Jupyter, the input cells are read from the text file, and the output cells from the `.ipynb` file.
 
 It is possible (and convenient) to leave the notebook open in Jupyter while you edit its text representation. However, you don't want that the two editors save the notebook simultaneously. To avoid this:
-- deactivate Jupyter's autosave, by running `%autosave 0` in a cell of the notebook
+- deactivate Jupyter's autosave, by toggling the `"Autosave notebook"` menu entry (or run `%autosave 0` in a cell of the notebook)
 - and refresh the notebook when you switch back from the editor to Jupyter.
 
 In case you forgot to refresh, and saved the Jupyter notebook while the text representation had changed, no worries: Jupyter will ask you which version you want to keep:
@@ -370,9 +393,9 @@ The `spin` format is specific to R scripts. These scripts can be compiled into r
 ## Jupyter Notebook or JupyterLab?
 
 Jupytext works well in both. Just note that:
-- Pairing notebooks is slightly less convenient in JupyterLab than in Jupyter Notebook as JupyterLab has no notebook metadata editor [yet](https://github.com/jupyterlab/jupyterlab/issues/1308). You will have to open the JSON representation of the notebook in an editor, find the notebook metadata and add the `"jupytext" : {"formats": "ipynb,py"},` entry manually. Alternatively, set the pairing information the command line: `jupytext --set-formats ipynb,py notebook.ipynb`
+- A notebook metadata editor for JupyterLab is available [here](https://github.com/yuvipanda/jupyterlab-nbmetadata).
 - JupyterLab can open any [paired notebook](#paired-notebooks) with extension `.ipynb`. Paired notebooks work exactly as in Jupyter Notebook: input cells are taken from the text notebook, and outputs from the  `.ipynb` file. Both files are updated when the notebook is saved.
-- In JupyterLab, scripts or Markdown documents open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu (available in JupyterLab 0.35 and above) as shown below:
+- In JupyterLab, scripts or Markdown documents open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu (available in JupyterLab 0.35 and above) as shown below. If the text document is a paired notebook, then the associated `.ipynb` file will be regenerated when you save the document (alternatively, you could have recreated the missing `.ipynb` file with `jupytext --sync`).
 
 ![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/403b53ac5097446a15ea664579ba44cd1badcc57/ContextMenuLab.png)
 
