@@ -8,6 +8,7 @@ Release History
 
 **Improvements**
 
+- Jupytext now includes a Jupyter Notebook extension and a JupyterLab extension (#86).
 - Jupytext command line has more arguments: ``--paired-paths`` to list the paths for the paired representations of the notebook, and ``--sync`` to synchronise the content of all paired paths based on the most recent file (#146). In addition, the ``--from`` argument is optional even when the notebook is read from stdin (#148).
 - The pairing information, and more generally the notebook metadata can be edited with the CLL, see the ``--set-formats`` and the ``--update-metadata`` arguments (#141).
 - Jupytext can ``--pipe`` the text representation of a notebook to external programs like ``black`` or ``flake8`` (#154, #142)
