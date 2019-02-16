@@ -139,6 +139,11 @@ def test_ipynb_to_python_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'py:percent', 'ipynb_to_percent')
 
 
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_ipynb_to_python_hydrogen(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'py:hydrogen', 'ipynb_to_hydrogen')
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
 def test_ipynb_to_R_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'R:percent', 'ipynb_to_percent')
@@ -182,6 +187,11 @@ def test_ipynb_to_q_percent(nb_file):
 @pytest.mark.parametrize('nb_file', list_notebooks('percent'))
 def test_percent_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ipynb:percent', 'script_to_ipynb')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('hydrogen'))
+def test_hydrogen_to_ipynb(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'ipynb:hydrogen', 'script_to_ipynb')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('R_spin'))

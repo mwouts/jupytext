@@ -330,6 +330,7 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
 class HydrogenCellExporter(DoublePercentCellExporter):  # pylint: disable=W0223
     """A class that can represent a notebook cell as a Hydrogen script (#59)"""
     default_comment_magics = False
+    parse_cell_language = False
 
 
 class SphinxGalleryCellExporter(BaseCellExporter):  # pylint: disable=W0223
