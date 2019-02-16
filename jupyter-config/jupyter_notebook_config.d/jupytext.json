@@ -1,5 +1,7 @@
 {
   "NotebookApp": {
-    "contents_manager_class": "jupytext.TextFileContentsManager"
+    "nbserver_extensions": {
+      "jupytext": true
+    }
   }
 }
