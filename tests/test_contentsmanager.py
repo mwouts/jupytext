@@ -427,7 +427,6 @@ def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
 
     # Way 0: preferred_jupytext_formats_save, no prefix + default_jupytext_formats
     tmp_py = str(tmpdir.join('python/notebook.py'))
-    os.makedirs(str(tmpdir.join('python')))
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -477,7 +476,6 @@ def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_py = str(tmpdir.join('python/notebook.py'))
     tmp_py2 = str(tmpdir.join('other/notebook.py'))
-    os.makedirs(str(tmpdir.join('python')))
     os.makedirs(str(tmpdir.join('other')))
     shutil.copyfile(nb_file, tmp_ipynb)
 
@@ -927,7 +925,6 @@ def test_pair_notebook_in_another_folder(tmpdir):
     cm.root_dir = str(tmpdir)
 
     os.makedirs(str(tmpdir.join('notebooks')))
-    os.makedirs(str(tmpdir.join('scripts')))
     tmp_ipynb = str(tmpdir.join('notebooks/notebook_name.ipynb'))
     tmp_py = str(tmpdir.join('scripts/notebook_name.py'))
 
@@ -948,7 +945,6 @@ def test_pair_notebook_in_dotdot_folder(tmpdir):
     cm.root_dir = str(tmpdir)
 
     os.makedirs(str(tmpdir.join('notebooks')))
-    os.makedirs(str(tmpdir.join('scripts')))
     tmp_ipynb = str(tmpdir.join('notebooks/notebook_name.ipynb'))
     tmp_py = str(tmpdir.join('scripts/notebook_name.py'))
 

@@ -627,7 +627,6 @@ def test_cli_expect_errors(tmp_ipynb):
 
 def test_format_prefix_suffix(tmpdir):
     os.makedirs(str(tmpdir.join('notebooks')))
-    os.makedirs(str(tmpdir.join('scripts')))
     tmp_ipynb = str(tmpdir.join('notebooks/notebook_name.ipynb'))
     tmp_py = str(tmpdir.join('scripts/notebook_name.py'))
     writef(new_notebook(), tmp_ipynb)
