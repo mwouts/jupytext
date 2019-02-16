@@ -1,9 +1,7 @@
 """Determine notebook or cell language"""
 
-import re
-
-_JUPYTER_LANGUAGES = ['R', 'bash', 'sh', 'python', 'python2', 'python3', 'javascript', 'js', 'perl']
-_JUPYTER_LANGUAGES_RE = [re.compile(r"^%%{}\s*".format(lang)) for lang in _JUPYTER_LANGUAGES]
+_JUPYTER_LANGUAGES = ['R', 'bash', 'sh', 'python', 'python2', 'python3', 'javascript', 'js', 'perl',
+                      'html', 'latex', 'markdown', 'pypy', 'ruby', 'script', 'svg', 'writefile']
 
 _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.R': {'language': 'R', 'comment': '#'},
@@ -65,17 +63,19 @@ def set_main_and_cell_language(metadata, cells, ext):
 
 
 def cell_language(source):
-    """
-    Return cell language and language options, if any
-    :param source:
-    :return:
-    """
+    """Return cell language and language options, if any"""
     if source:
-        for lang, pattern in zip(_JUPYTER_LANGUAGES, _JUPYTER_LANGUAGES_RE):
-            line = source[0]
-            if pattern.match(source[0]):
+        line = source[0]
+        if line.startswith('%%'):
+            magic = line[2:]
+            if ' ' in magic:
+                lang, magic_args = magic.split(' ', 1)
+            else:
+                lang = magic
+                magic_args = ''
+
+            if lang in _JUPYTER_LANGUAGES:
                 source.pop(0)
-                magic_args = line[len(pattern.findall(line)[0]):].strip()
                 return lang, magic_args
 
     return None, None
