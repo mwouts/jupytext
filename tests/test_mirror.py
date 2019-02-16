@@ -199,7 +199,7 @@ def test_spin_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ipynb:spin', 'script_to_ipynb')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='(raw|hash|frozen|magic|164)'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='(raw|hash|frozen|magic|html|164)'))
 def test_ipynb_to_python_sphinx(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'py:sphinx', 'ipynb_to_sphinx')
 
