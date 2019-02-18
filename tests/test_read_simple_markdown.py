@@ -1,8 +1,6 @@
 from testfixtures import compare
 import jupytext
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 def test_read_mostly_py_markdown_file(markdown="""---
 title: Simple file
@@ -30,7 +28,7 @@ ls()
 cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 ```
 """):
-    nb = jupytext.reads(markdown, ext='.md')
+    nb = jupytext.reads(markdown, 'md')
     assert nb.metadata['jupytext']['main_language'] == 'python'
     compare(nb.cells, [{'cell_type': 'raw',
                         'source': '---\ntitle: Simple file\n---',
@@ -61,7 +59,7 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
                                   "stri_rand_lipsum(3), sep='\n\n')",
                         'outputs': []}])
 
-    markdown2 = jupytext.writes(nb, ext='.md')
+    markdown2 = jupytext.writes(nb, 'md')
     compare(markdown, markdown2)
 
 
@@ -79,7 +77,7 @@ In markdown cells it is escaped like here:
 %matplotlib inline
 ```
 """):
-    nb = jupytext.reads(markdown, ext='.md')
+    nb = jupytext.reads(markdown, 'md')
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[1].cell_type == 'markdown'
@@ -91,7 +89,7 @@ In markdown cells it is escaped like here:
 ```python cell_name
 1 + 1
 %matplotlib inline''')
-    markdown2 = jupytext.writes(nb, ext='.md')
+    markdown2 = jupytext.writes(nb, 'md')
     compare(markdown, markdown2)
 
 
@@ -99,8 +97,37 @@ def test_read_julia_notebook(markdown="""```julia
 1 + 1
 ```
 """):
-    nb = jupytext.reads(markdown, ext='.md')
+    nb = jupytext.reads(markdown, 'md')
     assert len(nb.cells) == 1
     assert nb.cells[0].cell_type == 'code'
-    markdown2 = jupytext.writes(nb, ext='.md')
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
+def test_split_on_header(markdown="""A paragraph
+
+# H1 Header
+
+## H2 Header
+
+Another paragraph
+"""):
+    fmt = {'extension': '.md', 'split_at_heading': True}
+    nb = jupytext.reads(markdown, fmt)
+    assert nb.cells[0].source == 'A paragraph'
+    assert nb.cells[1].source == '# H1 Header'
+    assert nb.cells[2].source == '## H2 Header\n\nAnother paragraph'
+    assert len(nb.cells) == 3
+    markdown2 = jupytext.writes(nb, fmt)
+    compare(markdown, markdown2)
+
+
+def test_split_on_header_after_two_blank_lines(markdown="""A paragraph
+
+
+# H1 Header
+"""):
+    fmt = {'extension': '.Rmd', 'split_at_heading': True}
+    nb = jupytext.reads(markdown, fmt)
+    markdown2 = jupytext.writes(nb, fmt)
     compare(markdown, markdown2)

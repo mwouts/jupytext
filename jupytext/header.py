@@ -7,9 +7,9 @@ from yaml.representer import SafeRepresenter
 import nbformat
 from nbformat.v4.nbbase import new_raw_cell
 from .version import __version__
-from .cell_to_text import comment_lines
-from .languages import _SCRIPT_EXTENSIONS
+from .languages import _SCRIPT_EXTENSIONS, comment_lines
 from .metadata_filter import filter_metadata
+from .pep8 import pep8_lines_between_cells
 
 SafeRepresenter.add_representer(nbformat.NotebookNode, SafeRepresenter.represent_dict)
 
@@ -48,24 +48,17 @@ def uncomment_line(line, prefix):
     return line
 
 
-def encoding_and_executable(notebook, ext):
-    """
-    Return encoding and executable lines for a notebook, if applicable
-    :param self:
-    :param notebook:
-    :return:
-    """
+def encoding_and_executable(notebook, metadata, ext):
+    """Return encoding and executable lines for a notebook, if applicable"""
     lines = []
-    metadata = notebook.get('metadata', {}).get('jupytext', {})
     comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment')
+    jupytext_metadata = metadata.get('jupytext', {})
 
-    if ext not in ['.Rmd', '.md'] and 'executable' in metadata:
-        lines.append(comment + '!' + metadata['executable'])
-        del metadata['executable']
+    if ext not in ['.Rmd', '.md'] and 'executable' in jupytext_metadata:
+        lines.append(comment + '!' + jupytext_metadata.pop('executable'))
 
-    if 'encoding' in metadata:
-        lines.append(metadata['encoding'])
-        del metadata['encoding']
+    if 'encoding' in jupytext_metadata:
+        lines.append(jupytext_metadata.pop('encoding'))
     elif ext not in ['.Rmd', '.md']:
         for cell in notebook.cells:
             try:
@@ -77,15 +70,15 @@ def encoding_and_executable(notebook, ext):
     return lines
 
 
-def metadata_and_cell_to_header(notebook, text_format, ext):
+def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
     """
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
     """
 
     header = []
-    skipline = True
 
+    lines_to_next_cell = None
     if notebook.cells:
         cell = notebook.cells[0]
         if cell.cell_type == 'raw':
@@ -94,10 +87,8 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
                     and _HEADER_RE.match(lines[0]) \
                     and _HEADER_RE.match(lines[-1]):
                 header = lines[1:-1]
-                skipline = not cell.metadata.get('noskipline', False)
+                lines_to_next_cell = cell.metadata.get('lines_to_next_cell')
                 notebook.cells = notebook.cells[1:]
-
-    metadata = notebook.get('metadata', {})
 
     if insert_or_test_version_number():
         metadata.setdefault('jupytext', {})['text_representation'] = {
@@ -109,7 +100,7 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
     if 'jupytext' in metadata and not metadata['jupytext']:
         del metadata['jupytext']
 
-    notebook_metadata_filter = metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook')
+    notebook_metadata_filter = metadata.get('jupytext', {}).get('notebook_metadata_filter')
     metadata = filter_metadata(metadata, notebook_metadata_filter, _DEFAULT_NOTEBOOK_METADATA)
 
     if metadata:
@@ -118,17 +109,13 @@ def metadata_and_cell_to_header(notebook, text_format, ext):
     if header:
         header = ['---'] + header + ['---']
 
-    header = comment_lines(header, text_format.header_prefix)
-
-    if header and skipline:
-        header += ['']
-
-    return header
+    return comment_lines(header, text_format.header_prefix), lines_to_next_cell
 
 
-def header_to_metadata_and_cell(lines, header_prefix):
+def header_to_metadata_and_cell(lines, header_prefix, ext=None):
     """
-    Return the metadata, first cell of notebook, and next loc in text
+    Return the metadata, a boolean to indicate if a jupyter section was found,
+     the first cell of notebook if some metadata is found outside of the jupyter section, and next loc in text
     """
 
     header = []
@@ -186,23 +173,23 @@ def header_to_metadata_and_cell(lines, header_prefix):
         if jupyter:
             metadata.update(yaml.load('\n'.join(jupyter))['jupyter'])
 
-        skipline = True
+        lines_to_next_cell = 1
         if len(lines) > i + 1:
             line = uncomment_line(lines[i + 1], header_prefix)
             if not _BLANK_RE.match(line):
-                skipline = False
+                lines_to_next_cell = 0
             else:
                 i = i + 1
         else:
-            skipline = False
+            lines_to_next_cell = 0
 
         if header:
             cell = new_raw_cell(source='\n'.join(['---'] + header + ['---']),
-                                metadata={} if skipline else
-                                {'lines_to_next_cell': 0})
+                                metadata={} if lines_to_next_cell == pep8_lines_between_cells(
+                                    ['---'], lines[i + 1:], ext) else {'lines_to_next_cell': lines_to_next_cell})
         else:
             cell = None
 
-        return metadata, cell, i + 1
+        return metadata, jupyter, cell, i + 1
 
-    return metadata, None, start
+    return metadata, False, None, start

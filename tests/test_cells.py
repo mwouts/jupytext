@@ -17,7 +17,7 @@ def test_text_to_code_cell():
 ```
 """
     lines = text.splitlines()
-    cell, pos = RMarkdownCellReader('.Rmd').read(lines)
+    cell, pos = RMarkdownCellReader().read(lines)
 
     assert cell.cell_type == 'code'
     assert cell.source == '1+2+3'
@@ -30,7 +30,7 @@ def test_text_to_code_cell_empty_code():
 ```
 """
     lines = text.splitlines()
-    cell, pos = RMarkdownCellReader('.Rmd').read(lines)
+    cell, pos = RMarkdownCellReader().read(lines)
 
     assert cell.cell_type == 'code'
     assert cell.source == ''
@@ -43,7 +43,7 @@ def test_text_to_code_cell_empty_code_no_blank_line():
 ```
 """
     lines = text.splitlines()
-    cell, pos = RMarkdownCellReader('.Rmd').read(lines)
+    cell, pos = RMarkdownCellReader().read(lines)
 
     assert cell.cell_type == 'code'
     assert cell.source == ''
@@ -60,7 +60,7 @@ a markdown cell
 ```
 """
     lines = text.splitlines()
-    cell, pos = RMarkdownCellReader('.Rmd').read(lines)
+    cell, pos = RMarkdownCellReader().read(lines)
 
     assert cell.cell_type == 'markdown'
     assert cell.source == 'This is\na markdown cell'
@@ -76,7 +76,7 @@ a markdown cell
 ```
 """
     lines = text.splitlines()
-    cell, pos = RMarkdownCellReader('.Rmd').read(lines)
+    cell, pos = RMarkdownCellReader().read(lines)
 
     assert cell.cell_type == 'markdown'
     assert cell.source == 'This is\na markdown cell'
@@ -92,7 +92,7 @@ def test_text_to_markdown_two_blank_line():
 ```
 """
     lines = text.splitlines()
-    cell, pos = RMarkdownCellReader('.Rmd').read(lines)
+    cell, pos = RMarkdownCellReader().read(lines)
 
     assert cell.cell_type == 'markdown'
     assert cell.source == ''
@@ -107,7 +107,7 @@ def test_text_to_markdown_one_blank_line():
 ```
 """
     lines = text.splitlines()
-    cell, pos = RMarkdownCellReader('.Rmd').read(lines)
+    cell, pos = RMarkdownCellReader().read(lines)
 
     assert cell.cell_type == 'markdown'
     assert cell.source == ''
@@ -117,14 +117,14 @@ def test_text_to_markdown_one_blank_line():
 
 def test_empty_markdown_to_text():
     cell = new_markdown_cell(source='')
-    text = RMarkdownCellExporter(cell, 'python', '.Rmd').cell_to_text()
+    text = RMarkdownCellExporter(cell, 'python').cell_to_text()
     assert text == ['']
 
 
 def test_text_to_cell_py():
     text = '1+1\n'
     lines = text.splitlines()
-    cell, pos = LightScriptCellReader('.py').read(lines)
+    cell, pos = LightScriptCellReader().read(lines)
     assert cell.cell_type == 'code'
     assert cell.source == '1+1'
     assert cell.metadata == {}
@@ -135,7 +135,7 @@ def test_text_to_cell_py2():
     text = '''def f(x):
     return x+1'''
     lines = text.splitlines()
-    cell, pos = LightScriptCellReader('.py').read(lines)
+    cell, pos = LightScriptCellReader().read(lines)
     assert cell.cell_type == 'code'
     assert cell.source == '''def f(x):\n    return x+1'''
     assert cell.metadata == {}
@@ -146,7 +146,7 @@ def test_code_to_cell():
     text = '''def f(x):
     return x+1'''
     lines = text.splitlines()
-    cell, pos = LightScriptCellReader('.py').read(lines)
+    cell, pos = LightScriptCellReader().read(lines)
     assert cell.cell_type == 'code'
     assert cell.source == '''def f(x):\n    return x+1'''
     assert cell.metadata == {}

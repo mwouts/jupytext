@@ -1,9 +1,31 @@
+import mock
 import pytest
 from testfixtures import compare
 import jupytext
 from .utils import skip_if_dict_is_not_ordered
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
+HEADER = {'.py': '''# ---
+# jupyter:
+#   jupytext:
+#     main_language: python
+# ---
+
+''',
+          '.R': '''# ---
+# jupyter:
+#   jupytext:
+#     main_language: python
+# ---
+
+''',
+
+          '.Rmd': '''---
+jupyter:
+  jupytext:
+    main_language: python
+---
+
+'''}
 
 ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
 # This cell is active in all extensions
@@ -12,7 +34,7 @@ ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
 # This cell is active in all extensions
 ```
 """,
-              '.R': """#+ active="ipynb,py,R,Rmd"
+              '.R': """# + {"active": "ipynb,py,R,Rmd"}
 # This cell is active in all extensions
 """,
               '.ipynb': {'cell_type': 'code',
@@ -24,10 +46,11 @@ ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
 
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_all(ext):
-    nb = jupytext.reads(ACTIVE_ALL[ext], ext=ext)
-    assert len(nb.cells) == 1
-    compare(nb.cells[0], ACTIVE_ALL['.ipynb'])
-    compare(ACTIVE_ALL[ext], jupytext.writes(nb, ext=ext))
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        nb = jupytext.reads(HEADER[ext] + ACTIVE_ALL[ext], ext)
+        assert len(nb.cells) == 1
+        compare(ACTIVE_ALL[ext], jupytext.writes(nb, ext))
+        compare(nb.cells[0], ACTIVE_ALL['.ipynb'])
 
 
 ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
@@ -39,7 +62,7 @@ ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
 %matplotlib inline
 ```
 """,
-                '.R': """#+ language="python", active="ipynb", eval=FALSE
+                '.R': """# + {"active": "ipynb"}
 # # This cell is active only in ipynb
 # %matplotlib inline
 """,
@@ -54,11 +77,32 @@ ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_ipynb(ext):
-    nb = jupytext.reads(ACTIVE_IPYNB[ext], ext=ext)
-    assert len(nb.cells) == 1
-    compare(nb.cells[0], ACTIVE_IPYNB['.ipynb'])
-    if ext != '.R':
-        compare(ACTIVE_IPYNB[ext], jupytext.writes(nb, ext=ext))
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        nb = jupytext.reads(HEADER[ext] + ACTIVE_IPYNB[ext], ext)
+        assert len(nb.cells) == 1
+        compare(ACTIVE_IPYNB[ext], jupytext.writes(nb, ext))
+        compare(nb.cells[0], ACTIVE_IPYNB['.ipynb'])
+
+
+ACTIVE_IPYNB_RSPIN = {'.R': """#+ active="ipynb", eval=FALSE
+# # This cell is active only in ipynb
+# 1 + 1
+""",
+                      '.ipynb': {'cell_type': 'code',
+                                 'source': '# This cell is active only in ipynb\n'
+                                           '1 + 1',
+                                 'metadata': {'active': 'ipynb'},
+                                 'execution_count': None,
+                                 'outputs': []}}
+
+
+@skip_if_dict_is_not_ordered
+def test_active_ipynb_rspin():
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        nb = jupytext.reads(ACTIVE_IPYNB_RSPIN['.R'], 'R:spin')
+        assert len(nb.cells) == 1
+        compare(ACTIVE_IPYNB_RSPIN['.R'], jupytext.writes(nb, 'R:spin'))
+        compare(nb.cells[0], ACTIVE_IPYNB_RSPIN['.ipynb'])
 
 
 ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
@@ -68,7 +112,7 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 # This cell is active in py and ipynb extensions
 ```
 """,
-                   '.R': """#+ language="python", active="ipynb,py", eval=FALSE
+                   '.R': """# + {"active": "ipynb,py"}
 # # This cell is active in py and ipynb extensions
 """,
                    '.ipynb': {'cell_type': 'code',
@@ -82,11 +126,11 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_py_ipynb(ext):
-    nb = jupytext.reads(ACTIVE_PY_IPYNB[ext], ext=ext)
-    assert len(nb.cells) == 1
-    compare(nb.cells[0], ACTIVE_PY_IPYNB['.ipynb'])
-    if ext != '.R':
-        compare(ACTIVE_PY_IPYNB[ext], jupytext.writes(nb, ext=ext))
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_IPYNB[ext], ext)
+        assert len(nb.cells) == 1
+        compare(ACTIVE_PY_IPYNB[ext], jupytext.writes(nb, ext))
+        compare(nb.cells[0], ACTIVE_PY_IPYNB['.ipynb'])
 
 
 ACTIVE_PY_R_IPYNB = {'.py': """# + {"active": "ipynb,py,R"}
@@ -96,7 +140,7 @@ ACTIVE_PY_R_IPYNB = {'.py': """# + {"active": "ipynb,py,R"}
 # This cell is active in py, R and ipynb extensions
 ```
 """,
-                     '.R': """#+ language="python", active="ipynb,py,R", eval=FALSE
+                     '.R': """# + {"active": "ipynb,py,R"}
 # This cell is active in py, R and ipynb extensions
 """,
                      '.ipynb': {'cell_type': 'code',
@@ -110,11 +154,11 @@ ACTIVE_PY_R_IPYNB = {'.py': """# + {"active": "ipynb,py,R"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_py_r_ipynb(ext):
-    nb = jupytext.reads(ACTIVE_PY_R_IPYNB[ext], ext=ext)
-    assert len(nb.cells) == 1
-    compare(nb.cells[0], ACTIVE_PY_R_IPYNB['.ipynb'])
-    if ext != '.R':
-        compare(ACTIVE_PY_R_IPYNB[ext], jupytext.writes(nb, ext=ext))
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_R_IPYNB[ext], ext)
+        assert len(nb.cells) == 1
+        compare(ACTIVE_PY_R_IPYNB[ext], jupytext.writes(nb, ext))
+        compare(nb.cells[0], ACTIVE_PY_R_IPYNB['.ipynb'])
 
 
 ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
@@ -124,7 +168,7 @@ ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
 # This cell is active in Rmd only
 ```
 """,
-              '.R': """#+ language="python", active="Rmd", eval=FALSE
+              '.R': """# + {"active": "Rmd"}
 # # This cell is active in Rmd only
 """,
               '.ipynb': {'cell_type': 'raw',
@@ -135,11 +179,11 @@ ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_rmd(ext):
-    nb = jupytext.reads(ACTIVE_RMD[ext], ext=ext)
-    assert len(nb.cells) == 1
-    compare(nb.cells[0], ACTIVE_RMD['.ipynb'])
-    if ext != '.R':
-        compare(ACTIVE_RMD[ext], jupytext.writes(nb, ext=ext))
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        nb = jupytext.reads(HEADER[ext] + ACTIVE_RMD[ext], ext)
+        assert len(nb.cells) == 1
+        compare(ACTIVE_RMD[ext], jupytext.writes(nb, ext))
+        compare(nb.cells[0], ACTIVE_RMD['.ipynb'])
 
 
 ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd"}
@@ -149,7 +193,7 @@ ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd"}
 # This cell is active in Rmd only
 ```
 """,
-                          '.R': """#+ include=FALSE, active="Rmd", eval=FALSE
+                          '.R': """# + {"hide_output": true, "active": "Rmd"}
 # # This cell is active in Rmd only
 """,
                           '.ipynb':
@@ -162,7 +206,8 @@ ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd"}
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_not_include_rmd(ext):
-    nb = jupytext.reads(ACTIVE_NOT_INCLUDE_RMD[ext], ext=ext)
-    assert len(nb.cells) == 1
-    compare(nb.cells[0], ACTIVE_NOT_INCLUDE_RMD['.ipynb'])
-    compare(ACTIVE_NOT_INCLUDE_RMD[ext], jupytext.writes(nb, ext=ext))
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        nb = jupytext.reads(ACTIVE_NOT_INCLUDE_RMD[ext], ext)
+        assert len(nb.cells) == 1
+        compare(ACTIVE_NOT_INCLUDE_RMD[ext], jupytext.writes(nb, ext))
+        compare(nb.cells[0], ACTIVE_NOT_INCLUDE_RMD['.ipynb'])

@@ -18,6 +18,6 @@ def test_notebook_contents_is_unicode(nb_file):
 
 
 def test_write_non_ascii(tmpdir):
-    nb = jupytext.reads(u'Non-ascii contênt', ext='.Rmd')
+    nb = jupytext.reads(u'Non-ascii contênt', 'Rmd')
     jupytext.writef(nb, str(tmpdir.join('notebook.Rmd')))
     jupytext.writef(nb, str(tmpdir.join('notebook.ipynb')))

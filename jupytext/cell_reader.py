@@ -13,6 +13,7 @@ from .cell_metadata import is_active, json_options_to_metadata, md_options_to_me
     double_percent_options_to_metadata
 from .stringparser import StringParser
 from .magics import uncomment_magic, is_magic, unescape_code_start
+from .pep8 import pep8_lines_between_cells
 
 _BLANK_LINE = re.compile(r"^\s*$")
 _PY_COMMENT = re.compile(r"^\s*#")
@@ -35,7 +36,7 @@ def paragraph_is_fully_commented(lines, comment, main_language):
     """Is the paragraph fully commented?"""
     for i, line in enumerate(lines):
         if line.startswith(comment):
-            if line.startswith((comment + ' %', comment + ' ?')) and is_magic(line, main_language):
+            if line.startswith((comment + ' %', comment + ' ?', comment + ' !')) and is_magic(line, main_language):
                 return False
             continue
         return i > 0 and _BLANK_LINE.match(line)
@@ -73,12 +74,7 @@ def last_two_lines_blank(source):
 
 class BaseCellReader(object):
     """A class that can read notebook cells from their text representation"""
-
-    cell_type = None
-    language = None
     default_comment_magics = None
-    metadata = None
-    content = []
     lines_to_next_cell = 1
 
     start_code_re = None
@@ -91,11 +87,19 @@ class BaseCellReader(object):
     # Any specific prefix for lines in markdown cells (like in R spin format?)
     markdown_prefix = None
 
-    def __init__(self, ext, comment_magics=None):
+    def __init__(self, fmt=None, default_language=None):
         """Create a cell reader with empty content"""
-        self.ext = ext
-        self.default_language = _SCRIPT_EXTENSIONS.get(ext, {}).get('language', 'python')
-        self.comment_magics = comment_magics if comment_magics is not None else self.default_comment_magics
+        if not fmt:
+            fmt = {}
+        self.ext = fmt.get('extension')
+        self.default_language = default_language or _SCRIPT_EXTENSIONS.get(self.ext, {}).get('language', 'python')
+        self.comment_magics = fmt['comment_magics'] if 'comment_magics' in fmt else self.default_comment_magics
+        self.metadata = None
+        self.org_content = []
+        self.content = []
+        self.explicit_eoc = None
+        self.cell_type = None
+        self.language = None
 
     def read(self, lines):
         """Read one cell from the given lines, and return the cell,
@@ -121,7 +125,12 @@ class BaseCellReader(object):
         if not self.metadata:
             self.metadata = {}
 
-        if self.lines_to_next_cell != 1:
+        if self.ext == '.py' and not self.explicit_eoc:
+            expected_blank_lines = pep8_lines_between_cells(self.org_content or [''], lines[pos_next_cell:], self.ext)
+        else:
+            expected_blank_lines = 1
+
+        if self.lines_to_next_cell != expected_blank_lines:
             self.metadata['lines_to_next_cell'] = self.lines_to_next_cell
 
         if self.language:
@@ -159,15 +168,18 @@ class BaseCellReader(object):
             parser.read_line(line)
 
             if self.start_code_re.match(line) or (self.markdown_prefix and line.startswith(self.markdown_prefix)):
-                if i > 1 and _BLANK_LINE.match(lines[i - 1]):
+                if i > 0 and _BLANK_LINE.match(lines[i - 1]):
+                    if i > 1 and _BLANK_LINE.match(lines[i - 2]):
+                        return i - 2, i, False
                     return i - 1, i, False
                 return i, i, False
 
-            # Simple code pattern in LightScripts must be preceded with
-            # a blank line
-            if i > 0 and self.simple_start_code_re and _BLANK_LINE.match(lines[i - 1]) and \
-                    self.simple_start_code_re.match(line):
-                return i - 1, i, False
+            # Simple code pattern in LightScripts must be preceded with a blank line
+            if self.simple_start_code_re and self.simple_start_code_re.match(line):
+                if i > 0 and _BLANK_LINE.match(lines[i - 1]):
+                    if i > 1 and _BLANK_LINE.match(lines[i - 2]):
+                        return i - 2, i, False
+                    return i - 1, i, False
 
             if self.end_code_re:
                 if self.end_code_re.match(line):
@@ -176,8 +188,9 @@ class BaseCellReader(object):
                 if not next_code_is_indented(lines[i:]):
                     if i > 0:
                         return i, i + 1, False
-                    if len(lines) == 1 or _BLANK_LINE.match(lines[1]):
-                        return 1, 2, False
+                    if len(lines) > 1 and not _BLANK_LINE.match(lines[1]):
+                        return 1, 1, False
+                    return 1, 2, False
 
         return len(lines), len(lines), False
 
@@ -189,7 +202,7 @@ class BaseCellReader(object):
     def find_cell_content(self, lines):
         """Parse cell till its end and set content, lines_to_next_cell.
         Return the position of next cell start"""
-        cell_end_marker, next_cell_start, explicit_eoc = self.find_cell_end(lines)
+        cell_end_marker, next_cell_start, self.explicit_eoc = self.find_cell_end(lines)
 
         # Metadata to dict
         if self.metadata is None:
@@ -200,17 +213,25 @@ class BaseCellReader(object):
 
         # Cell content
         source = lines[cell_start:cell_end_marker]
+        self.org_content = [line for line in source]
+
+        # Exactly two empty lines at the end of cell (caused by PEP8)?
+        if self.ext == '.py' and self.explicit_eoc:
+            if last_two_lines_blank(source):
+                source = source[:-2]
+                lines_to_end_of_cell_marker = 2
+            else:
+                lines_to_end_of_cell_marker = 0
+
+            pep8_lines = pep8_lines_between_cells(source, lines[cell_end_marker:], self.ext)
+            if lines_to_end_of_cell_marker != (0 if pep8_lines == 1 else 2):
+                self.metadata['lines_to_end_of_cell_marker'] = lines_to_end_of_cell_marker
 
         if not is_active(self.ext, self.metadata) or \
                 ('active' not in self.metadata and self.language and self.language != self.default_language):
             self.content = uncomment(source, self.comment if self.ext not in ['.r', '.R'] else '#')
         else:
             self.content = self.uncomment_code_and_magics(source)
-
-        # Exactly two empty lines at the end of cell (caused by PEP8)?
-        if self.ext == '.py' and explicit_eoc and last_two_lines_blank(source):
-            self.content = source[:-2]
-            self.metadata['lines_to_end_of_cell_marker'] = 2
 
         # Is this a raw cell?
         if ('active' in self.metadata and not is_active('ipynb', self.metadata)) or \
@@ -224,7 +245,7 @@ class BaseCellReader(object):
                 _BLANK_LINE.match(lines[next_cell_start]) and
                 not _BLANK_LINE.match(lines[next_cell_start + 1])):
             next_cell_start += 1
-        elif (explicit_eoc and next_cell_start + 2 < len(lines) and
+        elif (self.explicit_eoc and next_cell_start + 2 < len(lines) and
               _BLANK_LINE.match(lines[next_cell_start]) and
               _BLANK_LINE.match(lines[next_cell_start + 1]) and
               not _BLANK_LINE.match(lines[next_cell_start + 2])):
@@ -234,7 +255,7 @@ class BaseCellReader(object):
             cell_end_marker,
             next_cell_start,
             len(lines),
-            explicit_eoc)
+            self.explicit_eoc)
 
         return next_cell_start
 
@@ -249,6 +270,10 @@ class MarkdownCellReader(BaseCellReader):
     start_code_re = re.compile(r"^```(.*)")
     end_code_re = re.compile(r"^```\s*$")
     default_comment_magics = False
+
+    def __init__(self, fmt=None, default_language=None):
+        super(MarkdownCellReader, self).__init__(fmt, default_language)
+        self.split_at_heading = (fmt or {}).get('split_at_heading', False)
 
     def options_to_metadata(self, options):
         return md_options_to_metadata(options)
@@ -265,6 +290,8 @@ class MarkdownCellReader(BaseCellReader):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False
+                if self.split_at_heading and line.startswith('#') and prev_blank >= 1:
+                    return i - 1, i, False
                 if _BLANK_LINE.match(lines[i]):
                     prev_blank += 1
                 elif i > 2 and prev_blank >= 2:
@@ -301,21 +328,17 @@ class RMarkdownCellReader(MarkdownCellReader):
 
     def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code':
-            if is_active(self.ext, self.metadata) and self.comment_magics:
+            if is_active('.Rmd', self.metadata) and self.comment_magics:
                 uncomment_magic(lines, self.language or self.default_language)
 
-        unescape_code_start(lines, self.ext, self.language or
-                            self.default_language)
+        unescape_code_start(lines, '.Rmd', self.language or self.default_language)
 
         return lines
 
 
-class ScriptCellReader(BaseCellReader):
+class ScriptCellReader(BaseCellReader):  # pylint: disable=W0223
     """Read notebook cells from scripts
     (common base for R and Python scripts)"""
-
-    def options_to_metadata(self, options):
-        raise NotImplementedError()
 
     def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code' or self.comment != "#'":
@@ -369,10 +392,11 @@ class LightScriptCellReader(ScriptCellReader):
     explicit marker '# +' """
     default_comment_magics = True
 
-    def __init__(self, ext, comment_magics=None):
-        super(LightScriptCellReader, self).__init__(ext, comment_magics)
-        script = _SCRIPT_EXTENSIONS[ext]
-        self.default_language = script['language']
+    def __init__(self, fmt=None, default_language=None):
+        super(LightScriptCellReader, self).__init__(fmt, default_language)
+        self.ext = self.ext or '.py'
+        script = _SCRIPT_EXTENSIONS[self.ext]
+        self.default_language = default_language or script['language']
         self.comment = script['comment']
         self.start_code_re = re.compile("^({0}|{0} )".format(self.comment) + r"\+(\s*){(.*)}\s*$")
         self.simple_start_code_re = re.compile(r"^({0}|{0} )\+(\s*)$".format(self.comment))
@@ -407,13 +431,13 @@ class LightScriptCellReader(ScriptCellReader):
 
 
 class DoublePercentScriptCellReader(ScriptCellReader):
-    """Read notebook cells from Hydrogen/Spyder/VScode scripts (#59)"""
+    """Read notebook cells from Spyder/VScode scripts (#59)"""
     default_comment_magics = True
 
-    def __init__(self, ext, comment_magics=None):
-        ScriptCellReader.__init__(self, ext, comment_magics)
-        script = _SCRIPT_EXTENSIONS[ext]
-        self.default_language = script['language']
+    def __init__(self, fmt, default_language=None):
+        ScriptCellReader.__init__(self, fmt, default_language)
+        script = _SCRIPT_EXTENSIONS[self.ext]
+        self.default_language = default_language or script['language']
         self.comment = script['comment']
         self.start_code_re = re.compile(r"^{}\s*%%(%*)\s(.*)$".format(self.comment))
         self.alternative_start_code_re = re.compile(r"^{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(self.comment))
@@ -442,6 +466,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
 
         # Cell content
         source = lines[cell_start:cell_end_marker]
+        self.org_content = [line for line in source]
 
         if self.cell_type != 'code' or (self.metadata and not is_active('py', self.metadata)) \
                 or (self.language is not None and self.language != self.default_language):
@@ -481,7 +506,12 @@ class DoublePercentScriptCellReader(ScriptCellReader):
         return next_cell, next_cell, False
 
 
-class SphinxGalleryScriptCellReader(ScriptCellReader):
+class HydrogenCellReader(DoublePercentScriptCellReader):
+    """Read notebook cells from Hydrogen scripts (#59)"""
+    default_comment_magics = False
+
+
+class SphinxGalleryScriptCellReader(ScriptCellReader):  # pylint: disable=W0223
     """Read notebook cells from Sphinx Gallery scripts (#80)"""
 
     comment = '#'
@@ -490,7 +520,11 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
     twenty_hash = re.compile(r'^#( |)#{19,}\s*$')
     default_markdown_cell_marker = '#' * 79
     markdown_marker = None
-    rst2md = False
+
+    def __init__(self, fmt=None, default_language='python'):
+        super(SphinxGalleryScriptCellReader, self).__init__(fmt, default_language)
+        self.ext = '.py'
+        self.rst2md = (fmt or {}).get('rst2md', False)
 
     def start_of_new_markdown_cell(self, line):
         """Does this line starts a new markdown cell?
@@ -516,9 +550,6 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
                 self.metadata = {'cell_marker': self.markdown_marker}
         else:
             self.cell_type = 'code'
-
-    def options_to_metadata(self, options):
-        pass
 
     def find_cell_end(self, lines):
         """Return position of end of cell, and position
@@ -592,6 +623,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
 
         # Cell content
         source = lines[cell_start:cell_end_marker]
+        self.org_content = [line for line in source]
 
         if self.cell_type == 'code' and self.comment_magics:
             uncomment_magic(source, self.language or self.default_language)
@@ -599,11 +631,11 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
         if self.cell_type == 'markdown' and source:
             if self.markdown_marker.startswith(self.comment):
                 source = uncomment(source, self.comment)
-                if self.rst2md:
-                    if rst2md:
-                        source = rst2md('\n'.join(source)).splitlines()
-                    else:
-                        raise ImportError('Could not import rst2md from sphinx_gallery.notebook')
+            if self.rst2md:
+                if rst2md:
+                    source = rst2md('\n'.join(source)).splitlines()
+                else:
+                    raise ImportError('Could not import rst2md from sphinx_gallery.notebook')
 
         self.content = source
 
@@ -614,9 +646,3 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):
             explicit_eoc)
 
         return next_cell_start
-
-
-class SphinxGalleryScriptRst2mdCellReader(SphinxGalleryScriptCellReader):
-    """Read notebook cells from Sphinx Gallery scripts, and convert
-    reStructuredText to markdown"""
-    rst2md = True

@@ -2,13 +2,14 @@
 
 import re
 from copy import copy
-from .languages import cell_language
+from .languages import cell_language, comment_lines
 from .cell_metadata import is_active, _IGNORE_CELL_METADATA
 from .cell_metadata import metadata_to_rmd_options, metadata_to_json_options, metadata_to_double_percent_options
 from .metadata_filter import filter_metadata
 from .magics import comment_magic, escape_code_start
 from .cell_reader import LightScriptCellReader
 from .languages import _SCRIPT_EXTENSIONS
+from .pep8 import pep8_lines_between_cells
 
 
 def cell_source(cell):
@@ -21,52 +22,41 @@ def cell_source(cell):
     return source.splitlines()
 
 
-def comment_lines(lines, prefix):
-    """Return commented lines"""
-    if not prefix:
-        return lines
-    return [prefix + ' ' + line if line else prefix for line in lines]
-
-
 class BaseCellExporter(object):
     """A class that represent a notebook cell as text"""
     default_comment_magics = None
     parse_cell_language = True
 
-    def __init__(self, cell, default_language, ext, comment_magics=None, cell_metadata_filter=None):
-        self.ext = ext
+    def __init__(self, cell, default_language, fmt=None):
+        self.fmt = fmt or {}
+        self.ext = self.fmt.get('extension')
         self.cell_type = cell.cell_type
         self.source = cell_source(cell)
         self.unfiltered_metadata = cell.metadata
-        self.metadata = filter_metadata(copy(cell.metadata), cell_metadata_filter, _IGNORE_CELL_METADATA)
+        self.metadata = filter_metadata(copy(cell.metadata),
+                                        self.fmt.get('cell_metadata_filter'),
+                                        _IGNORE_CELL_METADATA)
         self.language, magic_args = cell_language(self.source) if self.parse_cell_language else (None, None)
 
         if self.language:
             if magic_args:
-                if ext.endswith('.Rmd'):
-                    if "'" in magic_args:
-                        magic_args = '"' + magic_args + '"'
-                    else:
-                        magic_args = "'" + magic_args + "'"
+                if self.ext.endswith('.Rmd'):
+                    quote = '"' if "'" in magic_args else "'"
+                    magic_args = quote + magic_args + quote
                 self.metadata['magic_args'] = magic_args
 
-            if not ext.endswith('.Rmd'):
+            if not self.ext.endswith('.Rmd'):
                 self.metadata['language'] = self.language
 
         self.language = self.language or default_language
         self.default_language = default_language
-        self.comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
-        self.comment_magics = comment_magics if comment_magics is not None else self.default_comment_magics
+        self.comment = _SCRIPT_EXTENSIONS.get(self.ext, {}).get('comment', '#')
+        self.comment_magics = self.fmt['comment_magics'] if 'comment_magics' in self.fmt \
+            else self.default_comment_magics
 
         # how many blank lines before next cell
-        self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell', 1)
-        self.lines_to_end_of_cell_marker = cell.metadata.get('lines_to_end_of_cell_marker', 0)
-
-        # for compatibility with v0.5.4 and lower (to be removed)
-        if 'skipline' in cell.metadata:
-            self.lines_to_next_cell += 1
-        if 'noskipline' in cell.metadata:
-            self.lines_to_next_cell -= 1
+        self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell')
+        self.lines_to_end_of_cell_marker = cell.metadata.get('lines_to_end_of_cell_marker')
 
         if cell.cell_type == 'raw' and 'active' not in self.metadata:
             self.metadata['active'] = ''
@@ -101,8 +91,13 @@ class BaseCellExporter(object):
         """Return the text representation of this cell as a code cell"""
         raise NotImplementedError('This method must be implemented in a sub-class')
 
-    def simplify_code_markers(self, text, next_text, lines):
-        """Simplify start code marker when possible"""
+    def remove_eoc_marker(self, text, next_text):
+        """Remove end-of-cell marker when possible"""
+        # pylint: disable=W0613,R0201
+        return text
+
+    def simplify_soc_marker(self, text, prev_text):
+        """Simplify start-of-cell marker when possible"""
         # pylint: disable=W0613,R0201
         return text
 
@@ -136,6 +131,7 @@ class RMarkdownCellExporter(BaseCellExporter):
 
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
+        self.ext = '.Rmd'
         self.comment = ''
 
     def code_to_text(self):
@@ -172,6 +168,7 @@ def endofcell_marker(source, comment):
 class LightScriptCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as a Python or Julia script"""
     default_comment_magics = True
+    use_cell_markers = True
 
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
@@ -204,7 +201,7 @@ class LightScriptCellExporter(BaseCellExporter):
         if self.explicit_start_marker(source):
             self.metadata['endofcell'] = endofcell_marker(source, self.comment)
 
-        if not self.metadata:
+        if not self.metadata or not self.use_cell_markers:
             return source
 
         lines = []
@@ -220,31 +217,52 @@ class LightScriptCellExporter(BaseCellExporter):
     def explicit_start_marker(self, source):
         """Does the python representation of this cell requires an explicit
         start of cell marker?"""
+        if not self.use_cell_markers:
+            return False
         if self.metadata:
             return True
         if all([line.startswith(self.comment) for line in self.source]):
             return True
-        if LightScriptCellReader(self.ext).read(source)[1] < len(source):
+        if LightScriptCellReader(self.fmt).read(source)[1] < len(source):
             return True
 
         return False
 
-    def simplify_code_markers(self, text, next_text, lines):
-        """Simplify cell marker when previous line is blank, remove end
-        of cell marker when next cell has an explicit marker"""
-        if text[0] == '{0} + {{}}'.format(self.comment) and (not lines or not lines[-1]):
-            text[0] = self.comment + ' +'
+    def remove_eoc_marker(self, text, next_text):
+        """Remove end of cell marker when next cell has an explicit start marker"""
 
-        # remove end of cell marker when redundant
-        # with next explicit marker
         if self.is_code() and text[-1] == self.comment + ' -':
-            if self.lines_to_end_of_cell_marker:
-                text = text[:-1] + \
-                       [''] * self.lines_to_end_of_cell_marker + [self.comment + ' -']
-            elif not next_text or next_text[0].startswith(self.comment + ' + {'):
+            # remove end of cell marker when redundant with next explicit marker
+            if not next_text or next_text[0].startswith(self.comment + ' + {'):
                 text = text[:-1]
+                # When we do not need the end of cell marker, number of blank lines is the max
+                # between that required at the end of the cell, and that required before the next cell.
+                if self.lines_to_end_of_cell_marker and (self.lines_to_next_cell is None or
+                                                         self.lines_to_end_of_cell_marker > self.lines_to_next_cell):
+                    self.lines_to_next_cell = self.lines_to_end_of_cell_marker
+            else:
+                # Insert blank lines at the end of the cell
+                blank_lines = self.lines_to_end_of_cell_marker
+                if blank_lines is None:
+                    # two blank lines when required by pep8
+                    blank_lines = pep8_lines_between_cells(text[:-1], next_text, self.ext)
+                    blank_lines = 0 if blank_lines < 2 else 2
+                text = text[:-1] + [''] * blank_lines + text[-1:]
 
         return text
+
+    def simplify_soc_marker(self, text, prev_text):
+        """Simplify start of cell marker when previous line is blank"""
+        if self.is_code() and text and text[0] == self.comment + ' + {}':
+            if not prev_text or not prev_text[-1].strip():
+                text[0] = self.comment + ' +'
+
+        return text
+
+
+class BareScriptCellExporter(LightScriptCellExporter):
+    """A class that writes notebook cells as scripts with no cell markers"""
+    use_cell_markers = False
 
 
 class RScriptCellExporter(BaseCellExporter):
@@ -258,11 +276,6 @@ class RScriptCellExporter(BaseCellExporter):
     def code_to_text(self):
         """Return the text representation of a code cell"""
         active = is_active(self.ext, self.metadata)
-        if active and self.language != 'R':
-            active = False
-            self.metadata['active'] = 'ipynb'
-            self.metadata['language'] = self.language
-
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
 
@@ -282,15 +295,10 @@ class RScriptCellExporter(BaseCellExporter):
         return lines
 
 
-class DoublePercentCellExporter(BaseCellExporter):
-    """A class that can represent a notebook cell as an
-    Hydrogen/Spyder/VScode script (#59)"""
+class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
+    """A class that can represent a notebook cell as a Spyder/VScode script (#59)"""
     default_comment_magics = True
     parse_cell_language = True
-
-    def code_to_text(self):
-        """Not used"""
-        pass
 
     def cell_to_text(self):
         """Return the text representation for the cell"""
@@ -312,12 +320,20 @@ class DoublePercentCellExporter(BaseCellExporter):
         if self.cell_type == 'code' and active:
             source = copy(self.source)
             comment_magic(source, self.language, self.comment_magics)
+            if source == ['']:
+                return lines
             return lines + source
 
         return lines + comment_lines(self.source, self.comment)
 
 
-class SphinxGalleryCellExporter(BaseCellExporter):
+class HydrogenCellExporter(DoublePercentCellExporter):  # pylint: disable=W0223
+    """A class that can represent a notebook cell as a Hydrogen script (#59)"""
+    default_comment_magics = False
+    parse_cell_language = False
+
+
+class SphinxGalleryCellExporter(BaseCellExporter):  # pylint: disable=W0223
     """A class that can represent a notebook cell as a
     Sphinx Gallery script (#80)"""
 
@@ -332,9 +348,9 @@ class SphinxGalleryCellExporter(BaseCellExporter):
             if key in self.unfiltered_metadata:
                 self.metadata[key] = self.unfiltered_metadata[key]
 
-    def code_to_text(self):
-        """Not used"""
-        pass
+        if self.fmt.get('rst2md'):
+            raise ValueError("The 'rst2md' option is a read only option. The reverse conversion is not "
+                             "implemented. Please either deactivate the option, or save to another format.")
 
     def cell_to_text(self):
         """Return the text representation for the cell"""
@@ -348,9 +364,7 @@ class SphinxGalleryCellExporter(BaseCellExporter):
             cell_marker = self.default_cell_marker
 
         if self.source == ['']:
-            if cell_marker in ['""', "''"]:
-                return [cell_marker]
-            return ['""']
+            return [cell_marker] if cell_marker in ['""', "''"] else ['""']
 
         if cell_marker in ['"""', "'''"]:
             return [cell_marker] + self.source + [cell_marker]

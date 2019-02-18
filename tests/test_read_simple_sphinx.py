@@ -3,8 +3,6 @@
 from testfixtures import compare
 import jupytext
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 def test_read_simple_file(script='''# -*- coding: utf-8 -*-
 """
@@ -25,7 +23,7 @@ def f(x):
    """Sample docstring"""
    return 4
 '''):
-    nb = jupytext.reads(script, ext='.py', format_name='sphinx')
+    nb = jupytext.reads(script, 'py:sphinx')
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[0].source == '%matplotlib inline'
 
@@ -49,7 +47,7 @@ def f(x):
    return 4'''
     assert len(nb.cells) == 6
 
-    script2 = jupytext.writes(nb, ext='.py', format_name='sphinx')
+    script2 = jupytext.writes(nb, 'py:sphinx')
     compare(script, script2)
 
 
@@ -74,7 +72,7 @@ Another markdown cell'''
 '''And a last one
 '''
 """):
-    nb = jupytext.reads(script, ext='.py', format_name='sphinx')
+    nb = jupytext.reads(script, 'py:sphinx')
 
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[0].source == '%matplotlib inline'
@@ -113,7 +111,7 @@ Markdown cell
 
 
 '''):
-    nb = jupytext.reads(script, ext='.py', format_name='sphinx')
+    nb = jupytext.reads(script, 'py:sphinx')
 
     assert nb.cells[0].cell_type == 'code'
     assert nb.cells[0].source == '%matplotlib inline'
@@ -126,4 +124,4 @@ Markdown cell
 
     assert len(nb.cells) == 3
 
-    assert jupytext.writes(nb, ext='.py', format_name='sphinx') == script
+    assert jupytext.writes(nb, 'py:sphinx') == script

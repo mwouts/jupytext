@@ -3,8 +3,6 @@
 from testfixtures import compare
 import jupytext
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 def test_read_simple_file(script=""";; ---
 ;; title: Simple file
@@ -15,7 +13,7 @@ def test_read_simple_file(script=""";; ---
 
 (define a 35)
 """):
-    nb = jupytext.reads(script, ext='.ss')
+    nb = jupytext.reads(script, 'ss')
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'raw'
     assert nb.cells[0].source == '---\ntitle: Simple file\n---'
@@ -25,5 +23,5 @@ def test_read_simple_file(script=""";; ---
     assert nb.cells[2].cell_type == 'code'
     compare(nb.cells[2].source, '(define a 35)')
 
-    script2 = jupytext.writes(nb, ext='.ss')
+    script2 = jupytext.writes(nb, 'ss')
     compare(script, script2)

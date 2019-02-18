@@ -4,3 +4,4 @@ pytest-cov==2.5.1
 codecov
 notebook
 sphinx_gallery
+recommonmark

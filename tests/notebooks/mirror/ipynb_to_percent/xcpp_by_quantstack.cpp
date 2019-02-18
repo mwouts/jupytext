@@ -436,4 +436,3 @@ arg2.reshape({2, 3, 3});
 std::cout << xt::linalg::dot(arg1, arg2) << std::endl;
 
 // %%
-

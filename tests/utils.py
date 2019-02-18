@@ -2,13 +2,26 @@ import os
 import sys
 import re
 import pytest
+from jupytext.cli import system
 
 skip_if_dict_is_not_ordered = pytest.mark.skipif(
     sys.version_info < (3, 6),
     reason="unordered dict result in changes in chunk options")
 
 
-def list_notebooks(path='ipynb', skip=''):
+def tool_version(tool):
+    try:
+        return system(tool, '--version')
+    except OSError:  # pragma: no cover
+        return None
+
+
+requires_black = pytest.mark.skipif(not tool_version('black'), reason='black not found')
+requires_flake8 = pytest.mark.skipif(not tool_version('flake8'), reason='flake8 not found')
+requires_autopep8 = pytest.mark.skipif(not tool_version('autopep8'), reason='autopep8 not found')
+
+
+def list_notebooks(path='ipynb', skip='World'):
     """All notebooks in the directory notebooks/path,
     or in the package itself"""
     if path == 'ipynb':

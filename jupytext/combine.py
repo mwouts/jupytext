@@ -5,36 +5,51 @@ from copy import copy
 from .cell_metadata import _IGNORE_CELL_METADATA, _JUPYTEXT_CELL_METADATA
 from .header import _DEFAULT_NOTEBOOK_METADATA
 from .metadata_filter import filter_metadata
+from .formats import long_form_one_format
 
 _BLANK_LINE = re.compile(r'^\s*$')
 
 
+def black_invariant(text, chars=None):
+    """Remove characters that may be changed when reformatting the text with black"""
+    if chars is None:
+        chars = [' ', '\n', ',', "'", '"', '(', ')', '\\']
+
+    for char in chars:
+        text = text.replace(char, '')
+    return text
+
+
 def same_content(ref, test):
-    """Is the content of two cells the same, except for blank lines?"""
-    ref = [line for line in ref.splitlines() if not _BLANK_LINE.match(line)]
-    test = [line for line in test.splitlines() if not _BLANK_LINE.match(line)]
-    return ref == test
+    """Is the content of two cells the same, up to reformating by black"""
+    return black_invariant(ref) == black_invariant(test)
 
 
-def combine_inputs_with_outputs(nb_source, nb_outputs):
+def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     """Copy outputs of the second notebook into
     the first one, for cells that have matching inputs"""
 
     output_code_cells = [cell for cell in nb_outputs.cells if cell.cell_type == 'code']
     output_other_cells = [cell for cell in nb_outputs.cells if cell.cell_type != 'code']
 
-    text_representation = nb_source.metadata.get('jupytext', {}).get('text_representation', {})
-    ext = text_representation.get('extension')
-    format_name = text_representation.get('format_name')
+    fmt = long_form_one_format(fmt)
+    ext = fmt.get('extension')
+    format_name = fmt.get('format_name')
 
     nb_outputs_filtered_metadata = copy(nb_outputs.metadata)
     filter_metadata(nb_outputs_filtered_metadata,
-                    nb_source.metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook'),
+                    nb_source.metadata.get('jupytext', {}).get('notebook_metadata_filter'),
                     _DEFAULT_NOTEBOOK_METADATA)
 
     for key in nb_outputs.metadata:
         if key not in nb_outputs_filtered_metadata:
             nb_source.metadata[key] = nb_outputs.metadata[key]
+
+    if nb_source.metadata.get('jupytext', {}).get('formats') or ext in ['.md', '.Rmd']:
+        nb_source.metadata.get('jupytext', {}).pop('text_representation', None)
+
+    if not nb_source.metadata.get('jupytext', {}):
+        nb_source.metadata.pop('jupytext', {})
 
     for cell in nb_source.cells:
         # Remove outputs to warranty that trust of returned notebook is that of second notebook
@@ -49,12 +64,12 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
                     cell.outputs = ocell.outputs
 
                     # Append cell metadata that was filtered
-                    if (ext and ext.endswith('.md')) or format_name == 'sphinx':
+                    if (ext and ext.endswith('.md')) or format_name in ['bare', 'sphinx']:
                         ocell_filtered_metadata = {}
                     else:
                         ocell_filtered_metadata = copy(ocell.metadata)
                         filter_metadata(ocell_filtered_metadata,
-                                        nb_source.metadata.get('jupytext', {}).get('metadata_filter', {}).get('cells'),
+                                        nb_source.metadata.get('jupytext', {}).get('cell_metadata_filter'),
                                         _IGNORE_CELL_METADATA)
 
                     for key in ocell.metadata:
@@ -67,12 +82,12 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
             for i, ocell in enumerate(output_other_cells):
                 if cell.cell_type == ocell.cell_type and same_content(cell.source, ocell.source):
                     if (ext and (ext.endswith('.md') or ext.endswith('.Rmd'))) \
-                            or format_name in ['spin', 'sphinx', 'sphinx']:
+                            or format_name in ['spin', 'bare', 'sphinx', 'sphinx']:
                         ocell_filtered_metadata = {}
                     else:
                         ocell_filtered_metadata = copy(ocell.metadata)
                         filter_metadata(ocell_filtered_metadata,
-                                        nb_source.metadata.get('jupytext', {}).get('metadata_filter', {}).get('cells'),
+                                        nb_source.metadata.get('jupytext', {}).get('cell_metadata_filter'),
                                         _IGNORE_CELL_METADATA)
 
                     for key in ocell.metadata:
@@ -81,3 +96,5 @@ def combine_inputs_with_outputs(nb_source, nb_outputs):
 
                     output_other_cells = output_other_cells[(i + 1):]
                     break
+
+    return nb_source

@@ -3,6 +3,32 @@
 Release History
 ---------------
 
+1.0.0 (2019-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Jupytext now includes a Jupyter Notebook extension and a JupyterLab extension (#86).
+- Jupytext command line has more arguments: ``--paired-paths`` to list the paths for the paired representations of the notebook, and ``--sync`` to synchronise the content of all paired paths based on the most recent file (#146). In addition, the ``--from`` argument is optional even when the notebook is read from stdin (#148).
+- The pairing information, and more generally the notebook metadata can be edited with the CLL, see the ``--set-formats`` and the ``--update-metadata`` arguments (#141).
+- Jupytext can ``--pipe`` the text representation of a notebook to external programs like ``black`` or ``flake8`` (#154, #142)
+- The Python representation of notebooks containing PEP8 cells is now expected to be PEP8 compliant (#154).
+- Format specification allow prefix and suffix for path and file name (#138, #142). Use ``ipynb,prefix/suffix.py:percent`` to pair the current notebook named ``notebook.ipynb`` to a script named ``prefixnotebooksuffix.py``. Suffix and prefix can also be configured on the ``ipynb`` file, with the same syntax.
+- Introducing a new ``hydrogen`` format for scripts, which derives from ``percent``. In that format Jupyter magic commands are not commented (#59, #126, #132).
+- Introducing a new ``bare`` format for scripts, which derives from ``light``. That format has no cell marker. Use a notebook metadata filter ``{"jupytext": {"notebook_metadata_filter":"-all"}}`` if you want no YAML header (#152).
+- The default format for R script is now ``light``, as for the other languages.
+- Added support for q/kdb+ notebooks (#161).
+- Python scripts or Markdown documents that have no Jupyter metadata receive a metadata filter that ensures that metadata is not exported back to the text representation (#124).
+- Metadata filters are represented as strings rather than dictionaries to make YAML headers shorter. Previous syntax from #105 is still supported. They were also renamed to ``notebook_metadata_filter`` and ``cell_metadata_filter``.
+- Markdown and RMarkdown formats have a new option ``split_at_heading`` to split Markdown cells at heading (#130)
+
+**BugFixes**
+
+- Main language of scripts is inferred from script extension. Fixes a round trip conversion issue for Python notebooks with a Javascript cell.
+- Non-Python scripts opened as notebooks in Jupyter are now correctly saved even when no matching kernel is found.
+- Jupyter magic commands like `ls` are commented in the light and R markdown format (#149).
+- Cell starting with `%%html`, `%%latex` are now commented out in the `light`, `percent` and `Rmd` formats (#179).
+
 0.8.6 (2018-11-29)
 ++++++++++++++++++++++
 

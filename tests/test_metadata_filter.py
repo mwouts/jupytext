@@ -1,4 +1,5 @@
 import pytest
+from jupytext import reads, writes
 from jupytext.metadata_filter import filter_metadata, metadata_filter_as_dict
 
 
@@ -16,6 +17,12 @@ def to_dict(keys):
                            {'additional': ['ExecuteTime', 'autoscroll'], 'excluded': ['hide_output']})])
 def test_string_to_dict_conversion(metadata_filter_string, metadata_filter_dict):
     assert metadata_filter_as_dict(metadata_filter_string) == metadata_filter_dict
+
+
+def test_metadata_filter_as_dict():
+    assert metadata_filter_as_dict(True) == metadata_filter_as_dict('all')
+    assert metadata_filter_as_dict(False) == metadata_filter_as_dict('-all')
+    assert metadata_filter_as_dict({'excluded': 'all'}) == metadata_filter_as_dict('-all')
 
 
 def test_metadata_filter_default():
@@ -39,3 +46,25 @@ def test_metadata_filter_user_overrides_default():
                            ) == to_dict(['technical', 'preserve'])
     assert filter_metadata(to_dict(['technical', 'user', 'preserve']), 'user,-all', 'preserve'
                            ) == to_dict(['user'])
+
+
+def test_negative_cell_metadata_filter():
+    assert filter_metadata(to_dict(['exectime']), '-linesto', '-exectime') == to_dict([])
+
+
+def test_cell_metadata_filter_is_updated():
+    text = """---
+jupyter:
+  jupytext:
+    cell_metadata_filter: -all
+---
+
+```{r cache=FALSE}
+1+1
+```
+"""
+    nb = reads(text, 'Rmd')
+    assert nb.metadata['jupytext']['cell_metadata_filter'] == 'cache,-all'
+
+    text2 = writes(nb, 'Rmd')
+    assert text.splitlines()[-3:] == text2.splitlines()[-3:]

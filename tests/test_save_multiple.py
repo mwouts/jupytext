@@ -8,8 +8,6 @@ from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 @pytest.mark.parametrize('nb_file', list_notebooks(skip='66'))
 def test_rmd_is_ok(nb_file, tmpdir):
@@ -22,13 +20,11 @@ def test_rmd_is_ok(nb_file, tmpdir):
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    cm.save(
-        model=dict(type='notebook', content=nb),
-        path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     nb2 = jupytext.readf(str(tmpdir.join(tmp_rmd)))
 
-    compare_notebooks(nb, nb2, ext='.Rmd')
+    compare_notebooks(nb, nb2, 'Rmd')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('Rmd'))
@@ -41,12 +37,9 @@ def test_ipynb_is_ok(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
     cm.default_jupytext_formats = 'ipynb,Rmd'
 
-    cm.save(
-        model=dict(type='notebook', content=nb),
-        path=tmp_rmd)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_rmd)
 
     nb2 = jupytext.readf(str(tmpdir.join(tmp_ipynb)))
-
     compare_notebooks(nb, nb2)
 
 
@@ -61,15 +54,13 @@ def test_all_files_created(nb_file, tmpdir):
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    cm.save(
-        model=dict(type='notebook', content=nb),
-        path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     nb2 = jupytext.readf(str(tmpdir.join(tmp_py)))
     compare_notebooks(nb, nb2)
 
     nb3 = jupytext.readf(str(tmpdir.join(tmp_rmd)))
-    compare_notebooks(nb, nb3, ext='.Rmd')
+    compare_notebooks(nb, nb3, 'Rmd')
 
 
 def test_no_files_created_on_no_format(tmpdir):
@@ -81,11 +72,7 @@ def test_no_files_created_on_no_format(tmpdir):
     cm.root_dir = str(tmpdir)
     cm.default_jupytext_formats = ''
 
-    cm.save(
-        model=dict(type='notebook',
-                   content=new_notebook(nbformat=4,
-                                        metadata=dict())),
-        path=tmp_ipynb)
+    cm.save(model=dict(type='notebook', content=new_notebook(nbformat=4, metadata=dict())), path=tmp_ipynb)
 
     assert not os.path.isfile(str(tmpdir.join(tmp_py)))
     assert not os.path.isfile(str(tmpdir.join(tmp_rmd)))
@@ -98,12 +85,9 @@ def test_raise_on_wrong_format(tmpdir):
     cm.root_dir = str(tmpdir)
 
     with pytest.raises(HTTPError):
-        cm.save(
-            model=dict(type='notebook',
-                       content=new_notebook(nbformat=4,
-                                            metadata=dict(
-                                                jupytext_formats=['.doc']))),
-            path=tmp_ipynb)
+        cm.save(path=tmp_ipynb, model=dict(
+            type='notebook',
+            content=new_notebook(nbformat=4, metadata=dict(jupytext_formats=['.doc']))))
 
 
 def test_no_rmd_on_not_notebook(tmpdir):
@@ -115,9 +99,7 @@ def test_no_rmd_on_not_notebook(tmpdir):
     cm.default_jupytext_formats = 'ipynb,Rmd'
 
     with pytest.raises(HTTPError):
-        cm.save(model=dict(type='not notebook',
-                           content=new_notebook()),
-                path=tmp_ipynb)
+        cm.save(model=dict(type='not notebook', content=new_notebook()), path=tmp_ipynb)
     assert not os.path.isfile(str(tmpdir.join(tmp_rmd)))
 
 
@@ -130,8 +112,6 @@ def test_no_rmd_on_not_v4(tmpdir):
     cm.default_jupytext_formats = 'ipynb,Rmd'
 
     with pytest.raises(NotebookValidationError):
-        cm.save(model=dict(type='notebook',
-                           content=new_notebook(nbformat=3)),
-                path=tmp_rmd)
+        cm.save(model=dict(type='notebook', content=new_notebook(nbformat=3)), path=tmp_rmd)
 
     assert not os.path.isfile(str(tmpdir.join(tmp_ipynb)))

@@ -1,139 +1,19 @@
-"""Command line conversion tools `jupytext` and `nbsrc`
-"""
+"""`jupytext` as a command line tool"""
 
 import os
 import re
 import sys
 import subprocess
 import argparse
+import json
+from copy import copy
 from .jupytext import readf, reads, writef, writes
-from .formats import NOTEBOOK_EXTENSIONS, JUPYTEXT_FORMATS, check_file_version, one_format_as_string, parse_one_format
+from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, check_file_version
+from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format
+from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
-from .languages import _SCRIPT_EXTENSIONS
 from .version import __version__
-
-
-def convert_notebook_files(nb_files, fmt, input_format=None, output=None, pre_commit=False,
-                           test_round_trip=False, test_round_trip_strict=False, stop_on_first_error=True,
-                           update=True, freeze_metadata=False, comment_magics=None):
-    """
-    Export R markdown notebooks, python or R scripts, or Jupyter notebooks,
-    to the opposite format
-    :param nb_files: one or more notebooks files
-    :param input_format: input format, e.g. "py:percent"
-    :param fmt: destination format, e.g. "py:percent"
-    :param output: None, destination file, or '-' for stdout
-    :param pre_commit: convert notebooks in the git index?
-    :param test_round_trip: should round trip conversion be tested?
-    :param test_round_trip_strict: should round trip conversion be tested, with strict notebook comparison?
-    :param stop_on_first_error: when testing, should we stop on first error, or compare the full notebook?
-    :param update: preserve the current outputs of .ipynb file
-    :param freeze_metadata: set metadata filters equal to the current script metadata
-    :param comment_magics: comment, or not, Jupyter magics
-    when possible
-    :return:
-    """
-
-    ext, format_name = parse_one_format(fmt)
-    if ext not in NOTEBOOK_EXTENSIONS:
-        raise TypeError('Destination extension {} is not a notebook'.format(ext))
-
-    if pre_commit:
-        input_format = input_format or 'ipynb'
-        input_ext, _ = parse_one_format(input_format)
-        modified, deleted = modified_and_deleted_files(input_ext)
-
-        for file in modified:
-            dest_file = file[:-len(input_ext)] + ext
-            nb = readf(file)
-            writef(nb, dest_file, format_name=format_name)
-            system('git', 'add', dest_file)
-
-        for file in deleted:
-            dest_file = file[:-len(input_ext)] + ext
-            system('git', 'rm', dest_file)
-
-        return
-
-    if not nb_files:
-        if not input_format:
-            raise ValueError('Reading notebook from the standard input requires the --from field.')
-        parse_one_format(input_format)
-        nb_files = [sys.stdin]
-
-    if len(nb_files) > 1 and output:
-        raise ValueError("Output argument can only be used with a single notebook")
-
-    notebooks_in_error = 0
-
-    for nb_file in nb_files:
-        if nb_file == sys.stdin:
-            dest = None
-            current_ext, _ = parse_one_format(input_format)
-            notebook = reads(nb_file.read(), ext=current_ext, format_name=format_name,
-                             freeze_metadata=freeze_metadata)
-        else:
-            dest, current_ext = os.path.splitext(nb_file)
-            notebook = None
-
-        if current_ext not in NOTEBOOK_EXTENSIONS:
-            raise TypeError('File {} is not a notebook'.format(nb_file))
-
-        if input_format:
-            format_ext, format_name = parse_one_format(input_format)
-            if current_ext != format_ext:
-                raise ValueError("Format extension in --from field '{}' is "
-                                 "not consistent with notebook extension "
-                                 "'{}'".format(format_name, current_ext))
-        else:
-            input_format = None
-
-        if not notebook:
-            notebook = readf(nb_file, format_name=format_name,
-                             freeze_metadata=freeze_metadata)
-
-        if test_round_trip or test_round_trip_strict:
-            try:
-                test_round_trip_conversion(notebook, ext, format_name, update,
-                                           allow_expected_differences=not test_round_trip_strict,
-                                           stop_on_first_error=stop_on_first_error)
-            except NotebookDifference as error:
-                notebooks_in_error += 1
-                print('{}: {}'.format(nb_file, str(error)))
-            continue
-
-        if comment_magics is not None:
-            notebook.metadata.setdefault('jupytext', {})['comment_magics'] = comment_magics
-
-        if output == '-':
-            sys.stdout.write(writes(notebook, ext=ext, format_name=format_name))
-            continue
-
-        if output:
-            dest, dest_ext = os.path.splitext(output)
-            if dest_ext != ext:
-                raise TypeError('Destination extension {} is not consistent'
-                                'with format {} '.format(dest_ext, ext))
-
-        if os.path.isfile(dest + ext):
-            if update:
-                action = ' (destination file updated)'
-            else:
-                action = ' (destination file replaced)'
-        else:
-            action = ''
-
-        sys.stdout.write("[jupytext] Converting '{org_file}' to '{dest_file}'{format}{action}\n"
-                         .format(dest_file=dest + ext,
-                                 org_file=nb_file,
-                                 format=" using format '{}'".format(format_name) if format_name else '',
-                                 action=action))
-
-        save_notebook_as(notebook, nb_file, dest + ext, format_name, update)
-
-    if notebooks_in_error:
-        exit(notebooks_in_error)
 
 
 def system(*args, **kwargs):
@@ -141,49 +21,9 @@ def system(*args, **kwargs):
     kwargs.setdefault('stdout', subprocess.PIPE)
     proc = subprocess.Popen(args, **kwargs)
     out, _ = proc.communicate()
+    if proc.returncode:
+        raise SystemExit(proc.returncode)
     return out
-
-
-def modified_and_deleted_files(ext):
-    """Return the list of modified and deleted ipynb files in the git index"""
-    re_modified = re.compile(r'^[AM]+\s+(?P<name>.*{})'.format(ext.replace('.', r'\.')), re.MULTILINE)
-    re_deleted = re.compile(r'^[D]+\s+(?P<name>.*{})'.format(ext.replace('.', r'\.')), re.MULTILINE)
-    files = system('git', 'status', '--porcelain').decode('utf-8')
-    return re_modified.findall(files), re_deleted.findall(files)
-
-
-def save_notebook_as(notebook, nb_file, nb_dest, format_name, combine):
-    """Save notebook to file, in desired format"""
-    if combine and os.path.isfile(nb_dest) and os.path.splitext(nb_dest)[1] == '.ipynb':
-        check_file_version(notebook, nb_file, nb_dest)
-        nb_outputs = readf(nb_dest)
-        combine_inputs_with_outputs(notebook, nb_outputs)
-
-    writef(notebook, nb_dest, format_name=format_name)
-
-
-def canonize_format(format_or_ext, file_path=None):
-    """Return the canonical form of the format"""
-    if not format_or_ext:
-        if file_path and file_path != '-':
-            _, ext = os.path.splitext(file_path)
-            if ext not in NOTEBOOK_EXTENSIONS:
-                raise TypeError('Output extensions should be in {}'.format(", ".join(NOTEBOOK_EXTENSIONS)))
-            return ext.replace('.', '')
-
-        raise ValueError('Please specificy either --to or --output')
-
-    if '.' + format_or_ext in NOTEBOOK_EXTENSIONS:
-        return format_or_ext
-
-    if ':' in format_or_ext:
-        return format_or_ext
-
-    for ext in _SCRIPT_EXTENSIONS:
-        if _SCRIPT_EXTENSIONS[ext]['language'] == format_or_ext:
-            return ext.replace('.', '')
-
-    return {'notebook': 'ipynb', 'markdown': 'md', 'rmarkdown': 'Rmd'}[format_or_ext]
 
 
 def str2bool(value):
@@ -198,111 +38,433 @@ def str2bool(value):
     raise argparse.ArgumentTypeError('Expected: (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
 
 
-def cli_jupytext(args=None):
+def parse_jupytext_args(args=None):
     """Command line parser for jupytext"""
     parser = argparse.ArgumentParser(
         description='Jupyter notebooks as markdown documents, Julia, Python or R scripts',
         formatter_class=argparse.RawTextHelpFormatter)
 
-    notebook_formats = (['notebook', 'rmarkdown', 'markdown'] +
-                        [_SCRIPT_EXTENSIONS[ext]['language'] for ext in _SCRIPT_EXTENSIONS] +
-                        [ext.replace('.', '') for ext in NOTEBOOK_EXTENSIONS] +
-                        [one_format_as_string(fmt.extension, fmt.format_name)
-                         for fmt in JUPYTEXT_FORMATS])
-
-    parser.add_argument('--to',
-                        choices=notebook_formats,
-                        help="Destination format")
+    # Input
+    parser.add_argument('notebooks',
+                        help='One or more notebook(s). Notebook is read from stdin when this argument is empty',
+                        nargs='*')
     parser.add_argument('--from',
                         dest='input_format',
-                        choices=notebook_formats,
-                        help="Input format")
-    parser.add_argument('notebooks',
-                        help='One or more notebook(s). Input is read from stdin when no notebook '
-                             'is provided, but then the --from field is mandatory',
-                        nargs='*')
-    parser.add_argument('--pre-commit', action='store_true',
-                        help="""Run Jupytext on the ipynb files in the git index.
-Create a pre-commit hook with:
+                        help='Optional: jupytext format for the input(s). '
+                             'Inferred from the file extension and content when missing.')
+    parser.add_argument('--pre-commit',
+                        action='store_true',
+                        help='Ignore the notebook argument, and instead apply Jupytext on the notebooks found '
+                             'in the git index, which have an extension that matches the (optional) --from argument.')
+    # Destination format & act on metadata
+    parser.add_argument('--to',
+                        help="Destination format: either one of 'notebook', 'markdown', 'rmarkdown', any valid "
+                             "notebook extension, or a full format '[prefix_path//][suffix.]ext[:format_name]")
+    parser.add_argument('--format-options', '--opt',
+                        action='append',
+                        help='Set format options with e.g. --opt comment_magics=true '
+                             '--opt notebook_metadata_filter=-kernelspec.')
+    parser.add_argument('--set-formats',
+                        type=str,
+                        help='Set jupytext.formats metadata to the given value. Use this to activate pairing on a '
+                             'notebook, with e.g. --set-formats ipynb,py:light')
+    parser.add_argument('--update-metadata',
+                        default={},
+                        type=json.loads,
+                        help='Update the notebook metadata with the desired dictionary. Argument must be given in JSON '
+                             'format. For instance, if you want to activate a pairing in the generated file, '
+                             """use e.g. '{"jupytext":{"formats":"ipynb,py:light"}}'""")
 
-echo '#!/bin/sh
-jupytext --to py:light --pre-commit' > .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit""")
+    # Destination file
     parser.add_argument('-o', '--output',
-                        help='Destination file. Defaults to original file, '
-                             'with extension changed to destination format. '
-                             "Use '-' for printing the notebook on stdout.")
+                        help="Destination file. Defaults to the original file, with prefix/suffix/extension changed"
+                             "according to the destination format. Use '-' to print the notebook on stdout.")
     parser.add_argument('--update', action='store_true',
-                        help='Preserve outputs of .ipynb destination '
-                             '(when file exists and inputs match)')
-    parser.add_argument('--comment-magics',
-                        type=str2bool,
-                        nargs='?',
-                        default=None,
-                        help='Should Jupyter magic commands be commented? (Y)es/(T)rue/(N)o/(F)alse/(D)efault')
-    parser.add_argument('--freeze-metadata', action='store_true',
-                        help='Set a metadata filter (unless one exists already) '
-                             'equal to the current metadata of the notebook. Use this '
-                             'to avoid creating a YAML header when editing text files.')
-    test = parser.add_mutually_exclusive_group()
-    test.add_argument('--test', dest='test', action='store_true',
-                      help='Test that notebook is stable under '
-                           'round trip conversion, up to expected changes')
-    test.add_argument('--test-strict', dest='test_strict', action='store_true',
-                      help='Test that notebook is strictly stable under '
-                           'round trip conversion')
-    parser.add_argument('-x', '--stop', dest='stop_on_first_error', action='store_true',
-                        help='Stop on first round trip conversion error, and report stack traceback')
-    parser.add_argument('--version', action='store_true',
+                        help='Preserve the output cells when the destination notebook is a .ipynb file '
+                             'that already exists')
+
+    # Action: convert(default)/version/list paired paths/sync/apply/test
+    action = parser.add_mutually_exclusive_group()
+    action.add_argument('--version',
+                        action='store_true',
                         help="Show jupytext's version number and exit")
-    args = parser.parse_args(args)
+    action.add_argument('--paired-paths', '-p',
+                        help='List the locations of the alternative representations for this notebook.',
+                        action='store_true')
+    action.add_argument('--sync', '-s',
+                        help='Synchronize the content of the paired representations of the given notebook. '
+                             'Input cells are taken from the file that was last modified, and outputs are read '
+                             'from the ipynb file, if present.',
+                        action='store_true')
+    action.add_argument('--test',
+                        action='store_true',
+                        help='Test that notebook is stable under a round trip conversion, up to the expected changes')
+    action.add_argument('--test-strict',
+                        action='store_true',
+                        help='Test that notebook is strictly stable under a round trip conversion')
+    parser.add_argument('--stop', '-x',
+                        dest='stop_on_first_error',
+                        action='store_true',
+                        help='In --test mode, stop on first round trip conversion error, and report stack traceback')
+
+    # Pipe notebook inputs into other commands
+    parser.add_argument('--pipe',
+                        action='append',
+                        help='Pipe the text representation of the notebook into another program, and read the'
+                             'notebook back. For instance, reformat your notebook with:'
+                             "    jupytext notebook.ipynb --pipe black"
+                             'If you want to reformat it and sync the paired representation, execute:'
+                             "    jupytext notebook.ipynb --sync --pipe black")
+    parser.add_argument('--check',
+                        action='append',
+                        help='Pipe the text representation of the notebook into another program, and test that '
+                             'the returned value is non zero. For instance, test that your notebook is pep8 compliant '
+                             'with:'
+                             "    jupytext notebook.ipynb --check flake8")
+    parser.add_argument('--pipe-fmt',
+                        default='auto:percent',
+                        help='The format in which the notebook should be piped to other programs, when using the '
+                             '--pipe and/or --check commands.')
+
+    parser.add_argument('--quiet', '-q',
+                        action='store_true',
+                        default=False,
+                        help='Quiet mode: do not comment about files being updated or created')
+
+    return parser.parse_args(args)
+
+
+def jupytext_cli(args=None):
+    """Entry point for the jupytext script"""
+    try:
+        jupytext(args)
+    except (ValueError, TypeError, IOError) as err:
+        sys.stderr.write('[jupytext] Error: ' + str(err) + '\n')
+        exit(1)
+
+
+def jupytext(args=None):
+    """Internal implementation of Jupytext command line"""
+    args = parse_jupytext_args(args)
+
+    def log(text):
+        if not args.quiet:
+            sys.stdout.write(text + '\n')
 
     if args.version:
-        return args
-
-    args.to = canonize_format(args.to, args.output)
-
-    if args.input_format:
-        args.input_format = canonize_format(args.input_format)
-        if not args.notebooks and not args.output:
-            args.output = '-'
-
-    if not args.input_format:
-        if not args.notebooks and not args.pre_commit:
-            raise ValueError('Please specificy either --from, --pre-commit or notebooks')
-
-    if args.update and not (args.test or args.test_strict) and args.to != 'ipynb':
-        raise ValueError('--update works exclusively with --to notebook ')
+        log(__version__)
+        return
 
     if args.pre_commit:
         if args.notebooks:
             raise ValueError('--pre-commit takes notebooks from the git index. Do not pass any notebook here.')
+        args.notebooks = notebooks_in_git_index(args.input_format)
+        log('[jupytext] Notebooks in git index are:')
+        for nb_file in args.notebooks:
+            log(nb_file)
+
+    def writef_git_add(notebook_, nb_file_, fmt_):
+        if args.pre_commit:
+            system('git', 'add', nb_file)
+        writef(notebook_, nb_file_, fmt_)
+
+    # Read notebook from stdin
+    if not args.notebooks:
+        if not args.pre_commit:
+            args.notebooks = ['-']
+
+    if args.set_formats is not None:
+        # Replace empty string with None
+        args.update_metadata = recursive_update(args.update_metadata,
+                                                {'jupytext': {'formats': args.set_formats or None}})
+
+    if args.paired_paths:
+        if len(args.notebooks) != 1:
+            raise ValueError('--paired-paths applies to a single notebook')
+        print_paired_paths(args.notebooks[0], args.input_format)
+        return
+
+    if not args.to and not args.output and not args.sync \
+            and not args.pipe and not args.check \
+            and not args.test and not args.test_strict \
+            and not args.update_metadata:
+        raise ValueError('Please select an action')
+
+    if args.output and len(args.notebooks) != 1:
+        raise ValueError('Please input a single notebook when using --output')
+
+    if args.input_format:
+        args.input_format = long_form_one_format(args.input_format)
+
+    if args.to:
+        args.to = long_form_one_format(args.to)
+        set_format_options(args.to, args.format_options)
+
+    # Main loop
+    round_trip_conversion_errors = 0
+    for nb_file in args.notebooks:
+        if nb_file == '-' and args.sync:
+            raise ValueError('Cannot sync a notebook on stdin')
+
+        nb_dest = args.output or (None if not args.to
+                                  else ('-' if nb_file == '-' else
+                                        full_path(base_path(nb_file, args.input_format), args.to)))
+
+        # Just acting on metadata / pipe => save in place
+        if not nb_dest and not args.sync:
+            nb_dest = nb_file
+
+        if nb_dest == '-':
+            args.quiet = True
+
+        # I. ### Read the notebook ###
+        fmt = copy(args.input_format) or {}
+        set_format_options(fmt, args.format_options)
+        log('[jupytext] Reading {}{}'.format(
+            nb_file if nb_file != '-' else 'stdin',
+            ' in format {}'.format(short_form_one_format(fmt)) if 'extension' in fmt else ''))
+
+        notebook = readf(nb_file, fmt)
+        if not fmt:
+            text_representation = notebook.metadata.get('jupytext', {}).get('text_representation', {})
+            ext = os.path.splitext(nb_file)[1]
+            if text_representation.get('extension') == ext:
+                fmt = {key: text_representation[key] for key in text_representation if
+                       key in ['extension', 'format_name']}
+            elif ext:
+                fmt = {'extension': ext}
+
+        # Update the metadata
+        if args.update_metadata:
+            log('[jupytext] Updating notebook metadata with {}'.format(args.update_metadata))
+            recursive_update(notebook.metadata, args.update_metadata)
+
+        # Read paired notebooks
+        if args.sync:
+            set_prefix_and_suffix(fmt, notebook, nb_file)
+            notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
+
+        # II. ### Apply commands onto the notebook ###
+        # Pipe the notebook into the desired commands
+        for cmd in args.pipe or []:
+            notebook = pipe_notebook(notebook, cmd, args.pipe_fmt)
+
+        # and/or test the desired commands onto the notebook
+        for cmd in args.check or []:
+            pipe_notebook(notebook, cmd, args.pipe_fmt, update=False)
+
+        # III. ### Possible actions ###
+        modified = args.update_metadata or args.pipe
+        # a. Test round trip conversion
         if args.test or args.test_strict:
-            raise ValueError('--pre-commit cannot be used with --test or --test-strict')
+            try:
+                test_round_trip_conversion(notebook, args.to,
+                                           update=args.update,
+                                           allow_expected_differences=not args.test_strict,
+                                           stop_on_first_error=args.stop_on_first_error)
+            except NotebookDifference as err:
+                round_trip_conversion_errors += 1
+                sys.stdout.write('{}: {}'.format(nb_file, str(err)))
+            continue
 
-    return args
+        # b. Output to the desired file or format
+        if nb_dest:
+            if nb_dest == nb_file and not args.to:
+                args.to = fmt
+
+            # Test consistency between dest name and output format
+            if args.to and nb_dest != '-':
+                base_path(nb_dest, args.to)
+
+            # Describe what jupytext is doing
+            if os.path.isfile(nb_dest) and args.update:
+                if not nb_dest.endswith('.ipynb'):
+                    raise ValueError('--update is only for ipynb files')
+                action = ' (destination file updated)'
+                check_file_version(notebook, nb_file, nb_dest)
+                combine_inputs_with_outputs(notebook, readf(nb_dest), fmt)
+            elif os.path.isfile(nb_dest):
+                action = ' (destination file replaced)'
+            else:
+                action = ''
+
+            log('[jupytext] Writing {nb_dest}{format}{action}'
+                .format(nb_dest=nb_dest,
+                        format=' in format ' + short_form_one_format(
+                            args.to) if args.to and 'format_name' in args.to else '',
+                        action=action))
+            writef_git_add(notebook, nb_dest, args.to)
+
+        # c. Synchronize paired notebooks
+        if args.sync:
+            # Also update the original notebook if the notebook was modified
+            if modified:
+                inputs_nb_file = outputs_nb_file = None
+            formats = notebook.metadata['jupytext']['formats']
+
+            for ipynb in [True, False]:
+                # Write first format last so that it is the most recent file
+                for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats)[::-1]:
+                    # Write ipynb first for compatibility with our contents manager
+                    if alt_path.endswith('.ipynb') != ipynb:
+                        continue
+                    # Do not write the ipynb file if it was not modified
+                    # But, always write text representations to make sure they are the most recent
+                    if alt_path == inputs_nb_file and alt_path == outputs_nb_file:
+                        continue
+                    log("[jupytext] Updating '{}'".format(alt_path))
+                    writef_git_add(notebook, alt_path, alt_fmt)
+
+    if round_trip_conversion_errors:
+        exit(round_trip_conversion_errors)
 
 
-def jupytext(args=None):
-    """Entry point for the jupytext script"""
-    try:
-        args = cli_jupytext(args)
+def notebooks_in_git_index(fmt):
+    """Return the list of modified and deleted ipynb files in the git index that match the given format"""
+    git_status = system('git', 'status', '--porcelain').decode('utf-8')
+    re_modified = re.compile(r'^[AM]+\s+(?P<name>.*)', re.MULTILINE)
+    modified_files_in_git_index = re_modified.findall(git_status)
+    files = []
+    for nb_file in modified_files_in_git_index:
+        if nb_file.startswith('"') and nb_file.endswith('"'):
+            nb_file = nb_file[1:-1]
+        try:
+            base_path(nb_file, fmt)
+            files.append(nb_file)
+        except InconsistentPath:
+            continue
+    return files
 
-        if args.version:
-            sys.stdout.write(__version__ + '\n')
-            return
 
-        convert_notebook_files(nb_files=args.notebooks,
-                               fmt=args.to,
-                               input_format=args.input_format,
-                               output=args.output,
-                               pre_commit=args.pre_commit,
-                               test_round_trip=args.test,
-                               test_round_trip_strict=args.test_strict,
-                               stop_on_first_error=args.stop_on_first_error,
-                               update=args.update,
-                               freeze_metadata=args.freeze_metadata,
-                               comment_magics=args.comment_magics)
-    except ValueError as err:  # (ValueError, TypeError, IOError) as err:
-        print('jupytext: error: ' + str(err))
-        exit(1)
+def print_paired_paths(nb_file, fmt):
+    """Display the paired paths for this notebook"""
+    notebook = readf(nb_file, fmt)
+    formats = notebook.metadata.get('jupytext', {}).get('formats')
+    if formats:
+        for path, _ in paired_paths(nb_file, fmt, formats):
+            if path != nb_file:
+                sys.stdout.write(path + '\n')
+
+
+def recursive_update(target, update):
+    """ Update recursively a (nested) dictionary with the content of another.
+    Inspired from https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
+    """
+    for key in update:
+        value = update[key]
+        if value is None:
+            del target[key]
+        elif isinstance(value, dict):
+            target[key] = recursive_update(target.get(key, {}), value)
+        else:
+            target[key] = value
+    return target
+
+
+def set_format_options(fmt, format_options):
+    """Apply the desired format options to the format description fmt"""
+    if not format_options:
+        return
+
+    for opt in format_options:
+        try:
+            key, value = opt.split('=')
+        except ValueError:
+            raise ValueError("Format options are expected to be of the form key=value, not '{}'".format(opt))
+
+        if key not in _VALID_FORMAT_OPTIONS:
+            raise ValueError("'{}' is not a valid format option. Expected one of '{}'"
+                             .format(key, "', '".join(_VALID_FORMAT_OPTIONS)))
+
+        if key in _BINARY_FORMAT_OPTIONS:
+            value = str2bool(value)
+
+        fmt[key] = value
+
+
+def set_prefix_and_suffix(fmt, notebook, nb_file):
+    """Add prefix and suffix information from jupytext.formats if format and path matches"""
+    for alt_fmt in long_form_multiple_formats(notebook.metadata.get('jupytext', {}).get('formats')):
+        if (alt_fmt['extension'] == fmt['extension']
+                and fmt.get('format_name') == alt_fmt.get('format_name')):
+            try:
+                base_path(nb_file, alt_fmt)
+                fmt.update(alt_fmt)
+                return
+            except InconsistentPath:
+                continue
+
+
+def load_paired_notebook(notebook, fmt, nb_file, log):
+    """Update the notebook with the inputs and outputs of the most recent paired files"""
+    formats = notebook.metadata.get('jupytext', {}).get('formats')
+
+    if not formats:
+        raise ValueError("'{}' is not a paired notebook".format(nb_file))
+
+    max_mtime_inputs = None
+    max_mtime_outputs = None
+    latest_inputs = None
+    latest_outputs = None
+    for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats):
+        if not os.path.isfile(alt_path):
+            continue
+        info = os.lstat(alt_path)
+        if not max_mtime_inputs or info.st_mtime > max_mtime_inputs:
+            max_mtime_inputs = info.st_mtime
+            latest_inputs, input_fmt = alt_path, alt_fmt
+
+        if alt_path.endswith('.ipynb'):
+            if not max_mtime_outputs or info.st_mtime > max_mtime_outputs:
+                max_mtime_outputs = info.st_mtime
+                latest_outputs = alt_path
+
+    if latest_outputs and latest_outputs != latest_inputs:
+        log("[jupytext] Loading input cells from '{}'".format(latest_inputs))
+        inputs = notebook if latest_inputs == nb_file else readf(latest_inputs, input_fmt)
+        check_file_version(inputs, latest_inputs, latest_outputs)
+        log("[jupytext] Loading output cells from '{}'".format(latest_outputs))
+        outputs = notebook if latest_outputs == nb_file else readf(latest_outputs)
+        combine_inputs_with_outputs(inputs, outputs, input_fmt)
+        return inputs, latest_inputs, latest_outputs
+
+    log("[jupytext] Loading notebook from '{}'".format(latest_inputs))
+    if latest_inputs != nb_file:
+        notebook = readf(latest_inputs, input_fmt)
+    return notebook, latest_inputs, latest_outputs
+
+
+def pipe_notebook(notebook, command, fmt='py:percent', update=True, preserve_outputs=True):
+    """Pipe the notebook, in the desired representation, to the given command. Update the notebook
+    with the returned content if desired."""
+    if command in ['black', 'flake8', 'autopep8']:
+        command = command + ' -'
+
+    fmt = long_form_one_format(fmt, notebook.metadata)
+    text = writes(notebook, fmt)
+    process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    cmd_output, err = process.communicate(input=text.encode('utf-8'))
+
+    if process.returncode:
+        sys.stderr.write("Command '{}' exited with code {}: {}"
+                         .format(command, process.returncode, err or cmd_output))
+        raise SystemExit(process.returncode)
+
+    if not update:
+        return notebook
+
+    if not cmd_output:
+        sys.stderr.write("[jupytext] The command '{}' had no output. As a result, the notebook is empty. "
+                         "Is this expected? If not, use --check rather than --pipe for this command.".format(command))
+
+    piped_notebook = reads(cmd_output.decode('utf-8'), fmt)
+
+    if preserve_outputs:
+        combine_inputs_with_outputs(piped_notebook, notebook, fmt)
+
+    # Remove jupytext / text_representation entry
+    piped_notebook.metadata.pop('jupytext')
+    if 'jupytext' in notebook.metadata:
+        piped_notebook.metadata['jupytext'] = notebook.metadata['jupytext']
+
+    return piped_notebook

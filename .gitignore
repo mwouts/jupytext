@@ -1,10 +1,11 @@
 .idea
+.build
 .cache
 .coverage
 .pytest_cache
 .eggs
 build
-dist
+/dist
 venv
 jupytext.egg-info
 future

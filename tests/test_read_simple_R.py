@@ -4,8 +4,6 @@ import pytest
 from testfixtures import compare
 import jupytext
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 @pytest.mark.parametrize('ext', ['.r', '.R'])
 def test_read_simple_file(ext, rnb="""#' ---
@@ -23,7 +21,7 @@ f <- function(x) {
 h <- function(y)
     y + 1
 """):
-    nb = jupytext.reads(rnb, ext=ext)
+    nb = jupytext.reads(rnb, ext)
     assert len(nb.cells) == 4
     assert nb.cells[0].cell_type == 'raw'
     assert nb.cells[0].source == '---\ntitle: Simple file\n---'
@@ -38,7 +36,7 @@ h <- function(y)
     compare(nb.cells[3].source, '''h <- function(y)
     y + 1''')
 
-    rnb2 = jupytext.writes(nb, ext=ext)
+    rnb2 = jupytext.writes(nb, ext)
     compare(rnb, rnb2)
 
 
@@ -61,7 +59,7 @@ h <- function(y) {
     return(y-1)
 }
 """):
-    nb = jupytext.reads(rnb, ext=ext)
+    nb = jupytext.reads(rnb, ext)
 
     assert len(nb.cells) == 4
     assert nb.cells[0].cell_type == 'raw'
@@ -82,7 +80,7 @@ h <- function(y) {
     return(y-1)
 }''')
 
-    rnb2 = jupytext.writes(nb, ext=ext)
+    rnb2 = jupytext.writes(nb, ext)
     compare(rnb, rnb2)
 
 
@@ -97,7 +95,7 @@ f <- function(x)
 
 #' And a new cell, and non ascii contênt
 """):
-    nb = jupytext.reads(rnb, ext=ext)
+    nb = jupytext.reads(rnb, ext)
 
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'markdown'
@@ -110,7 +108,7 @@ f <- function(x)
     assert nb.cells[2].cell_type == 'markdown'
     assert nb.cells[2].source == u'And a new cell, and non ascii contênt'
 
-    rnb2 = jupytext.writes(nb, ext=ext)
+    rnb2 = jupytext.writes(nb, ext)
     compare(rnb, rnb2)
 
 
@@ -119,8 +117,8 @@ def test_read_write_script(ext, rnb="""#!/usr/bin/env Rscript
 # coding=utf-8
 print('Hello world')
 """):
-    nb = jupytext.reads(rnb, ext=ext)
-    rnb2 = jupytext.writes(nb, ext=ext)
+    nb = jupytext.reads(rnb, ext)
+    rnb2 = jupytext.writes(nb, ext)
     compare(rnb, rnb2)
 
 
@@ -135,7 +133,7 @@ def test_escape_start_pattern(ext, rnb="""#' The code start pattern '#+' can
 # #+ cell_name language="python"
 1 + 1
 """):
-    nb = jupytext.reads(rnb, ext=ext)
+    nb = jupytext.reads(rnb, ext)
     assert len(nb.cells) == 3
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[1].cell_type == 'markdown'
@@ -146,5 +144,27 @@ def test_escape_start_pattern(ext, rnb="""#' The code start pattern '#+' can
             '''# In code cells like this one, it is also escaped
 #+ cell_name language="python"
 1 + 1''')
-    rnb2 = jupytext.writes(nb, ext=ext)
+    rnb2 = jupytext.writes(nb, ext)
     compare(rnb, rnb2)
+
+
+@pytest.mark.parametrize('ext', ['.r', '.R'])
+def test_read_simple_r(ext, text="""# This is a very simple R file
+# I expect to get three cells here.
+#
+# The first one is markdown. The two others
+# are code cells
+
+cars
+
+plot(cars)
+"""):
+    nb = jupytext.reads(text, ext)
+    assert len(nb.cells) == 3
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[1].source == 'cars'
+    assert nb.cells[2].source == 'plot(cars)'
+    text2 = jupytext.writes(nb, ext)
+    compare(text, text2)

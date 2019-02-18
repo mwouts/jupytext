@@ -8,6 +8,7 @@ from .header import _DEFAULT_NOTEBOOK_METADATA
 from .metadata_filter import filter_metadata
 from .jupytext import reads, writes
 from .combine import combine_inputs_with_outputs
+from .formats import long_form_one_format
 
 _BLANK_LINE = re.compile(r'^\s*$')
 
@@ -33,7 +34,7 @@ def filtered_notebook_metadata(notebook):
     """Notebook metadata, filtered for metadata added by Jupytext itself"""
     metadata = copy(notebook.metadata)
     metadata = filter_metadata(metadata,
-                               notebook.metadata.get('jupytext', {}).get('metadata_filter', {}).get('notebook'),
+                               notebook.metadata.get('jupytext', {}).get('notebook_metadata_filter'),
                                _DEFAULT_NOTEBOOK_METADATA)
     if 'jupytext' in metadata:
         del metadata['jupytext']
@@ -68,13 +69,15 @@ def same_content(ref_source, test_source, allow_removed_final_blank_line):
 
 def compare_notebooks(notebook_expected,
                       notebook_actual,
-                      ext=None,
-                      format_name=None,
+                      fmt=None,
                       allow_expected_differences=True,
                       raise_on_first_difference=True,
                       compare_outputs=False):
     """Compare the two notebooks, and raise with a meaningful message
     that explains the differences, if any"""
+    fmt = long_form_one_format(fmt)
+    ext = fmt.get('extension')
+    format_name = fmt.get('format_name')
 
     # Expected differences
     allow_filtered_cell_metadata = allow_expected_differences
@@ -84,7 +87,7 @@ def compare_notebooks(notebook_expected,
                                                                            or format_name in ['sphinx', 'spin'])
     allow_removed_final_blank_line = allow_expected_differences
 
-    cell_metadata_filter = notebook_actual.get('jupytext', {}).get('metadata_filter', {}).get('cells')
+    cell_metadata_filter = notebook_actual.get('jupytext', {}).get('cell_metadata_filter')
 
     if format_name == 'sphinx' and notebook_actual.cells and notebook_actual.cells[0].source == '%matplotlib inline':
         notebook_actual.cells = notebook_actual.cells[1:]
@@ -240,15 +243,13 @@ def compare_notebooks(notebook_expected,
         raise NotebookDifference(' | '.join(error))
 
 
-def test_round_trip_conversion(notebook, ext, format_name, update,
-                               allow_expected_differences=True,
-                               stop_on_first_error=True):
+def test_round_trip_conversion(notebook, fmt, update, allow_expected_differences=True, stop_on_first_error=True):
     """Test round trip conversion for a Jupyter notebook"""
-    text = writes(notebook, ext=ext, format_name=format_name)
-    round_trip = reads(text, ext=ext, format_name=format_name)
+    text = writes(notebook, fmt)
+    round_trip = reads(text, fmt)
 
     if update:
-        combine_inputs_with_outputs(round_trip, notebook)
+        combine_inputs_with_outputs(round_trip, notebook, fmt)
 
-    compare_notebooks(notebook, round_trip, ext, format_name, allow_expected_differences,
+    compare_notebooks(notebook, round_trip, fmt, allow_expected_differences,
                       raise_on_first_difference=stop_on_first_error)

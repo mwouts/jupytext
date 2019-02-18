@@ -4,8 +4,6 @@ from nbformat.v4.nbbase import new_notebook, new_code_cell, new_markdown_cell
 import jupytext
 from jupytext.compare import compare_notebooks
 
-jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER = False
-
 
 @pytest.mark.parametrize('blank_lines', range(1, 6))
 def test_file_with_blank_lines(blank_lines):
@@ -13,8 +11,8 @@ def test_file_with_blank_lines(blank_lines):
 # Another one{0}
 """.format('\n'.join([''] * blank_lines))
 
-    notebook = jupytext.reads(py_script, ext='.py')
-    py_script2 = jupytext.writes(notebook, ext='.py')
+    notebook = jupytext.reads(py_script, 'py')
+    py_script2 = jupytext.writes(notebook, 'py')
     compare(py_script, py_script2)
 
 
@@ -26,7 +24,7 @@ def test_notebook_with_empty_cells(blank_cells):
                                   [new_code_cell('')] * blank_cells,
                             metadata={'jupytext': {'main_language': 'python'}})
 
-    script = jupytext.writes(notebook, ext='.py')
-    notebook2 = jupytext.reads(script, ext='.py')
+    script = jupytext.writes(notebook, 'py')
+    notebook2 = jupytext.reads(script, 'py')
 
     compare_notebooks(notebook, notebook2)
