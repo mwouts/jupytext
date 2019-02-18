@@ -24,8 +24,10 @@ def test_apply_black_on_python_notebooks(nb_file, tmpdir):
 
     nb1 = readf(nb_file)
     nb2 = readf(tmp_ipynb)
+    nb3 = readf(tmp_py)
 
     assert len(nb1.cells) == len(nb2.cells)
+    assert len(nb1.cells) == len(nb3.cells)
     for c1, c2 in zip(nb1.cells, nb2.cells):
         # same content (almost)
         assert black_invariant(c1.source) == black_invariant(c2.source)

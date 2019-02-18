@@ -602,6 +602,22 @@ def test_notebook_with_magic_and_bash_cells(script="""# This is a test for issue
     compare(script, script2)
 
 
+def test_notebook_no_line_to_next_cell(nb=new_notebook(
+    cells=[new_markdown_cell('Markdown cell #1'),
+           new_code_cell('%load_ext line_profiler'),
+           new_markdown_cell('Markdown cell #2'),
+           new_code_cell('%lprun -f ...'),
+           new_markdown_cell('Markdown cell #3'),
+           new_code_cell('# And a function!\n'
+                         'def f(x):\n'
+                         '    return 5')])):
+    script = jupytext.writes(nb, 'py')
+    nb2 = jupytext.reads(script, 'py')
+    nb2.metadata.pop('jupytext')
+
+    compare(nb, nb2)
+
+
 def test_notebook_one_blank_line_before_first_markdown_cell(script="""
 # This is a markdown cell
 

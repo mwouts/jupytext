@@ -95,6 +95,7 @@ class BaseCellReader(object):
         self.default_language = default_language or _SCRIPT_EXTENSIONS.get(self.ext, {}).get('language', 'python')
         self.comment_magics = fmt['comment_magics'] if 'comment_magics' in fmt else self.default_comment_magics
         self.metadata = None
+        self.org_content = []
         self.content = []
         self.explicit_eoc = None
         self.cell_type = None
@@ -124,11 +125,8 @@ class BaseCellReader(object):
         if not self.metadata:
             self.metadata = {}
 
-        org_lines = self.content
-        if self.ext == '.py' and self.cell_type != 'code' and self.content:
-            org_lines = ['#']  # cell was originally commented
         if self.ext == '.py' and not self.explicit_eoc:
-            expected_blank_lines = pep8_lines_between_cells(org_lines or [''], lines[pos_next_cell:], self.ext)
+            expected_blank_lines = pep8_lines_between_cells(self.org_content or [''], lines[pos_next_cell:], self.ext)
         else:
             expected_blank_lines = 1
 
@@ -215,6 +213,7 @@ class BaseCellReader(object):
 
         # Cell content
         source = lines[cell_start:cell_end_marker]
+        self.org_content = [line for line in source]
 
         # Exactly two empty lines at the end of cell (caused by PEP8)?
         if self.ext == '.py' and self.explicit_eoc:
@@ -467,6 +466,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
 
         # Cell content
         source = lines[cell_start:cell_end_marker]
+        self.org_content = [line for line in source]
 
         if self.cell_type != 'code' or (self.metadata and not is_active('py', self.metadata)) \
                 or (self.language is not None and self.language != self.default_language):
@@ -623,6 +623,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):  # pylint: disable=W0223
 
         # Cell content
         source = lines[cell_start:cell_end_marker]
+        self.org_content = [line for line in source]
 
         if self.cell_type == 'code' and self.comment_magics:
             uncomment_magic(source, self.language or self.default_language)
