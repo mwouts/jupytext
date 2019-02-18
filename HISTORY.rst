@@ -26,8 +26,8 @@ Release History
 
 - Main language of scripts is inferred from script extension. Fixes a round trip conversion issue for Python notebooks with a Javascript cell.
 - Non-Python scripts opened as notebooks in Jupyter are now correctly saved even when no matching kernel is found.
-- Jupyter magic commands like `ls` are commented in the light and R markdown format (#149).
-- Cell starting with `%%html`, `%%latex` are now commented out in the `light`, `percent` and `Rmd` formats (#179).
+- Jupyter magic commands like ``ls`` are commented in the light and R markdown format (#149).
+- Cell starting with ``%%html``, ``%%latex`` are now commented out in the ``light``, ``percent`` and ``Rmd`` formats (#179).
 
 0.8.6 (2018-11-29)
 ++++++++++++++++++++++
