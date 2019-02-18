@@ -1,6 +1,6 @@
 import pytest
 from nbformat.v4.nbbase import new_code_cell, new_notebook
-from jupytext.magics import comment_magic, uncomment_magic, unesc
+from jupytext.magics import comment_magic, uncomment_magic, unesc, is_magic
 from jupytext.compare import compare_notebooks
 import jupytext
 
@@ -123,3 +123,8 @@ def test_do_not_comment_python_cmds(not_magic_cmd):
 def test_do_not_comment_bash_commands_in_R(magic_cmd):
     comment_magic([magic_cmd], language='R') == ['# ' + magic_cmd]
     uncomment_magic(['# ' + magic_cmd], language='R') == magic_cmd
+
+
+def test_markdown_image_is_not_magic():
+    assert is_magic('# !cmd', 'python')
+    assert not is_magic('# ![Image name](image.png', 'python')

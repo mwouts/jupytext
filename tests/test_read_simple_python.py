@@ -584,6 +584,24 @@ def j(x):
     compare(script, script2)
 
 
+def test_notebook_with_magic_and_bash_cells(script="""# This is a test for issue #181
+
+# %load_ext line_profiler
+
+# !head -4 data/president_heights.csv
+"""):
+    notebook = jupytext.reads(script, 'py')
+    for cell in notebook.cells:
+        lines = cell.source.splitlines()
+        assert lines[0]
+        assert lines[-1]
+        assert not cell.metadata, cell.source
+
+    script2 = jupytext.writes(notebook, 'py')
+
+    compare(script, script2)
+
+
 def test_notebook_one_blank_line_before_first_markdown_cell(script="""
 # This is a markdown cell
 
