@@ -264,5 +264,5 @@ def create_prefix_dir(nb_file, fmt):
     if 'prefix' in fmt:
         nb_dir = os.path.dirname(nb_file)
         if not os.path.isdir(nb_dir):
-            logging.log(logging.WARNING, "[jupytext] creating missing directory '{}'".format(nb_dir))
+            logging.log(logging.WARNING, "[jupytext] creating missing directory %s", nb_dir)
             os.makedirs(nb_dir)
