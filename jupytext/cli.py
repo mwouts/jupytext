@@ -264,7 +264,7 @@ def jupytext(args=None):
                                            stop_on_first_error=args.stop_on_first_error)
             except NotebookDifference as err:
                 round_trip_conversion_errors += 1
-                log('{}: {}'.format(nb_file, str(err)))
+                sys.stdout.write('{}: {}'.format(nb_file, str(err)))
             continue
 
         # b. Output to the desired file or format
