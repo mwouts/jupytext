@@ -1,2 +1,5 @@
+# Install the serverextension
+jupyter serverextension install jupytext
+
 # Install the bash kernel
 python -m bash_kernel.install
