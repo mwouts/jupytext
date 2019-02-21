@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+1.0.1 (2019-02-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+**BugFixes**
+
+- Exclude tests in package deployment (#184)
+
 1.0.0 (2019-02-19)
 ++++++++++++++++++++++
 
