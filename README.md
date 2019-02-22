@@ -94,7 +94,7 @@ If you want to use Jupytext within Jupyter Notebook or JupyterLab, make sure you
 /path_to_your_jupyter_environment/python -m pip install jupytext --upgrade --user
 ```
 
-### Jupytext's content manager
+### Jupytext's contents manager
 
 Jupytext includes a contents manager for Jupyter that allows Jupyter to open and save notebooks as text files. When Jupytext's content manager is active in Jupyter, scripts and Markdown documents have a notebook icon.
 
@@ -208,6 +208,18 @@ In case you forgot to refresh, and saved the Jupyter notebook while the text rep
 ![Notebook changed](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/fcbcd3c3fc1ec4a74669381b53753f9f783e10da/notebook_changed.png)
 
 When that occurs, please choose the version in which you made the latest changes. And give a second look to our advice to deactivate the autosaving of notebooks in Jupyter.
+
+## How to open scripts with either the text or notebook view in Jupyter?
+
+With Jupytext's contents manager for Jupyter, scripts and Markdown documents gain a notebook icon. If you don't see the notebook icon, double check the [contents manager configuration](https://github.com/mwouts/jupytext/blob/master/README.md#jupytexts-contents-manager).
+
+By default, Jupyter Notebook open scripts and Markdown documents as notebooks. If you want to open them with the text editor, select the document and click on _edit_:
+
+![Open as text](https://user-images.githubusercontent.com/29915202/53228364-42265400-3681-11e9-812d-46168c6e398c.png)
+
+In JupyterLab this is slightly different. Scripts and Markdown document also have a notebook icon. But they open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu (available in JupyterLab 0.35 and above):
+
+![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/403b53ac5097446a15ea664579ba44cd1badcc57/ContextMenuLab.png)
 
 ## Command line conversion
 
@@ -390,14 +402,6 @@ The `spin` format is specific to R scripts. These scripts can be compiled into r
 - Markdown cells are commented with `#' `.
 - Code cells are exported verbatim. Cell metadata are signalled with `#+`. Cells end with a blank line, an explicit start of cell marker, or a markdown cell.
 
-## Jupyter Notebook or JupyterLab?
-
-Jupytext works well in both. Just note that:
-- A notebook metadata editor for JupyterLab is available [here](https://github.com/yuvipanda/jupyterlab-nbmetadata).
-- JupyterLab can open any [paired notebook](#paired-notebooks) with extension `.ipynb`. Paired notebooks work exactly as in Jupyter Notebook: input cells are taken from the text notebook, and outputs from the  `.ipynb` file. Both files are updated when the notebook is saved.
-- In JupyterLab, scripts or Markdown documents open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu (available in JupyterLab 0.35 and above) as shown below. If the text document is a paired notebook, then the associated `.ipynb` file will be regenerated when you save the document (alternatively, you could have recreated the missing `.ipynb` file with `jupytext --sync`).
-
-![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/403b53ac5097446a15ea664579ba44cd1badcc57/ContextMenuLab.png)
 
 ## Fine tuning
 
