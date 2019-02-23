@@ -11,6 +11,7 @@ Release History
 **BugFixes**
 
 - Exclude tests in package deployment (#184)
+- Added an additional test for magic arguments (#111)
 
 1.0.0 (2019-02-19)
 ++++++++++++++++++++++
