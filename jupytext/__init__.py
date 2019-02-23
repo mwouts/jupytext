@@ -1,5 +1,6 @@
 """Read and write Jupyter notebooks as text files"""
 
+import traceback
 from .jupytext import readf, writef, writes, reads
 from .formats import NOTEBOOK_EXTENSIONS, guess_format, get_format_implementation
 from .version import __version__
@@ -30,19 +31,29 @@ def load_jupyter_server_extension(app):  # pragma: no cover
                  'from {} to jupytext.TextFileContentsManager'.format(app.contents_manager_class.__name__))
     app.contents_manager_class = TextFileContentsManager
 
-    # And rerun selected init steps from https://github.com/jupyter/notebook/blob/
-    # 132f27306522b32fa667a6b208034cb7a04025c9/notebook/notebookapp.py#L1634-L1638
+    try:
+        # And rerun selected init steps from https://github.com/jupyter/notebook/blob/
+        # 132f27306522b32fa667a6b208034cb7a04025c9/notebook/notebookapp.py#L1634-L1638
 
-    # app.init_configurables()
-    app.contents_manager = app.contents_manager_class(parent=app, log=app.log)
-    app.session_manager.contents_manager = app.contents_manager
+        # app.init_configurables()
+        app.contents_manager = app.contents_manager_class(parent=app, log=app.log)
+        app.session_manager.contents_manager = app.contents_manager
 
-    # app.init_components()
-    # app.init_webapp()
-    app.web_app.settings['contents_manager'] = app.contents_manager
+        # app.init_components()
+        # app.init_webapp()
+        app.web_app.settings['contents_manager'] = app.contents_manager
 
-    # app.init_terminals()
-    # app.init_signal()
+        # app.init_terminals()
+        # app.init_signal()
+
+    except Exception:
+        app.log.error("""[Jupytext Server Extension] An error occured. Please deactivate the server extension with
+    jupyter serverextension disable jupytext
+and configure the contents manager manually by adding
+    c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
+to your .jupyter/jupyter_notebook_config.py file.
+""")
+        raise
 
 
 def _jupyter_nbextension_paths():  # pragma: no cover
