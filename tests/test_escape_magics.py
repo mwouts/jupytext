@@ -107,22 +107,22 @@ def test_force_comment_using_contents_manager(tmpdir):
         assert '%pylab inline' in stream.read().splitlines()
 
 
-@pytest.mark.parametrize('magic_cmd', ['ls', '!ls', 'ls -al', '!whoami', '# ls', '# mv a b'])
+@pytest.mark.parametrize('magic_cmd', ['ls', '!ls', 'ls -al', '!whoami', '# ls', '# mv a b', '! mkdir tmp'])
 def test_comment_bash_commands_in_python(magic_cmd):
-    comment_magic([magic_cmd]) == ['# ' + magic_cmd]
-    uncomment_magic(['# ' + magic_cmd]) == magic_cmd
+    assert comment_magic([magic_cmd]) == ['# ' + magic_cmd]
+    assert uncomment_magic(['# ' + magic_cmd]) == [magic_cmd]
 
 
 @pytest.mark.parametrize('not_magic_cmd', ['copy(a)', 'copy.deepcopy'])
 def test_do_not_comment_python_cmds(not_magic_cmd):
-    comment_magic([not_magic_cmd]) == [not_magic_cmd]
-    uncomment_magic([not_magic_cmd]) == not_magic_cmd
+    assert comment_magic([not_magic_cmd]) == [not_magic_cmd]
+    assert uncomment_magic([not_magic_cmd]) == [not_magic_cmd]
 
 
 @pytest.mark.parametrize('magic_cmd', ['ls', '!ls', 'ls -al', '!whoami', '# ls', '# mv a b'])
 def test_do_not_comment_bash_commands_in_R(magic_cmd):
-    comment_magic([magic_cmd], language='R') == ['# ' + magic_cmd]
-    uncomment_magic(['# ' + magic_cmd], language='R') == magic_cmd
+    assert comment_magic([magic_cmd], language='R') == [magic_cmd]
+    assert uncomment_magic([magic_cmd], language='R') == [magic_cmd]
 
 
 def test_markdown_image_is_not_magic():

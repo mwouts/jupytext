@@ -3,6 +3,13 @@
 Release History
 ---------------
 
+1.0.2 (2019-02-??)
+++++++++++++++++++++++
+
+**BugFixes**
+- Allow spaces between ``?`` or ``!`` and python or bash command (#189)
+
+
 1.0.1 (2019-02-23)
 ++++++++++++++++++++++
 
