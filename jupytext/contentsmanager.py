@@ -414,6 +414,14 @@ class TextFileContentsManager(FileContentsManager, Configurable):
     def rename_file(self, old_path, new_path):
         """Rename the current notebook, as well as its alternative representations"""
         if old_path not in self.paired_notebooks:
+            try:
+                # we do not know yet if this is a paired notebook (#190)
+                # -> to get this information we open the notebook
+                self.get(old_path, content=True)
+            except Exception:
+                pass
+
+        if old_path not in self.paired_notebooks:
             super(TextFileContentsManager, self).rename_file(old_path, new_path)
             return
 
