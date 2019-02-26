@@ -16,7 +16,7 @@ _MAGIC_NOT_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
 _COMMENT = {_SCRIPT_EXTENSIONS[ext]['language']: _SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS}
 
 # Commands starting with a question or exclamation mark have to be escaped
-_PYTHON_HELP_OR_BASH_CMD = re.compile(r"^(# |#)*(\?|!)[A-Za-z]")
+_PYTHON_HELP_OR_BASH_CMD = re.compile(r"^(# |#)*(\?|!)\s*[A-Za-z]")
 
 _PYTHON_MAGIC_CMD = re.compile(r"^(# |#)*({})(\s|$)".format('|'.join(
     # posix
