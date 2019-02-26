@@ -189,3 +189,20 @@ def test_multiple_empty_cells():
     nb2 = jupytext.reads(text, 'py:percent')
     nb2.metadata = nb.metadata
     compare(nb, nb2)
+
+
+def test_first_cell_markdown_191():
+    text = """# %% [markdown]
+# Docstring
+
+# %%
+from math import pi
+
+# %% [markdown]
+# Another markdown cell
+"""
+
+    nb = jupytext.reads(text, 'py')
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[2].cell_type == 'markdown'
