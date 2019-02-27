@@ -10,6 +10,7 @@ _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.cpp': {'language': 'c++', 'comment': '//'},
                       '.ss': {'language': 'scheme', 'comment': ';;'},
                       '.clj': {'language': 'clojure', 'comment': ';;'},
+                      '.scm': {'language': 'scheme', 'comment': ';;'},
                       '.sh': {'language': 'bash', 'comment': '#'},
                       '.q': {'language': 'q', 'comment': '/'}}
 

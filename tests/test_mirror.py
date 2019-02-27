@@ -109,9 +109,12 @@ def test_ipynb_to_r(nb_file):
     assert_conversion_same_as_mirror(nb_file, '.low.r', 'ipynb_to_script')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_scheme'))
-def test_ipynb_to_scheme(nb_file):
-    assert_conversion_same_as_mirror(nb_file, 'ss', 'ipynb_to_script')
+@pytest.mark.parametrize('nb_file,extension',
+                         [(nb_file, extension)
+                          for nb_file in list_notebooks('ipynb_scheme')
+                          for extension in ('ss', 'scm')])
+def test_ipynb_to_scheme(nb_file, extension):
+    assert_conversion_same_as_mirror(nb_file, extension, 'ipynb_to_script')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_clojure'))
@@ -174,9 +177,14 @@ def test_ipynb_to_cpp_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'cpp:percent', 'ipynb_to_percent')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_scheme'))
-def test_ipynb_to_scheme_percent(nb_file):
-    assert_conversion_same_as_mirror(nb_file, 'ss:percent', 'ipynb_to_percent')
+@pytest.mark.parametrize('nb_file,extension',
+                         [(nb_file, extension)
+                          for nb_file in list_notebooks('ipynb_scheme')
+                          for extension in ('ss', 'scm')])
+def test_ipynb_to_scheme_percent(nb_file, extension):
+    assert_conversion_same_as_mirror(nb_file,
+                                     '{}:percent'.format(extension),
+                                     'ipynb_to_percent')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_clojure'))
