@@ -113,6 +113,9 @@ def test_ipynb_to_r(nb_file):
 def test_ipynb_to_scheme(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ss', 'ipynb_to_script')
 
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_clojure'))
+def test_ipynb_to_clojure(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'clj', 'ipynb_to_script')
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_bash'))
 def test_ipynb_to_bash(nb_file):
@@ -172,6 +175,10 @@ def test_ipynb_to_cpp_percent(nb_file):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_scheme'))
 def test_ipynb_to_scheme_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ss:percent', 'ipynb_to_percent')
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_clojure'))
+def test_ipynb_to_clojure_percent(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'clj:percent', 'ipynb_to_percent')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_bash'))
