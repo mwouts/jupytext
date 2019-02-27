@@ -3,8 +3,13 @@
 Release History
 ---------------
 
-1.0.2 (2019-02-??)
+1.0.2 (2019-02-27)
 ++++++++++++++++++++++
+
+**Improvements**
+- Rename notebooks in pairs in the tree view (#190)
+- Associate ``.scm`` file extension with Scheme scripts (#192)
+- Added support for Clojure, by bzinberg (#193)
 
 **BugFixes**
 - Allow spaces between ``?`` or ``!`` and python or bash command (#189)
