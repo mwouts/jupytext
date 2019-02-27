@@ -15,7 +15,7 @@ from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, st
 from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths
 from jupytext.formats import long_form_one_format, JupytextFormatError
-from .utils import list_notebooks, requires_black, requires_flake8
+from .utils import list_notebooks, requires_black, requires_flake8, skip_if_dict_is_not_ordered
 
 
 def test_str2bool():
@@ -304,6 +304,7 @@ def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
     compare_notebooks(nb1, nb2)
 
 
+@skip_if_dict_is_not_ordered
 def test_pre_commit_hook(tmpdir):
     tmp_ipynb = str(tmpdir.join('nb with spaces.ipynb'))
     tmp_py = str(tmpdir.join('nb with spaces.py'))
@@ -334,6 +335,7 @@ def test_pre_commit_hook(tmpdir):
     assert os.path.isfile(tmp_py)
 
 
+@skip_if_dict_is_not_ordered
 def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     tmp_ipynb = str(tmpdir.join('nb with spaces.ipynb'))
     tmp_py = str(tmpdir.join('nb with spaces.py'))
