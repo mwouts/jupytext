@@ -1,6 +1,5 @@
 """Read and write Jupyter notebooks as text files"""
 
-import traceback
 from .jupytext import readf, writef, writes, reads
 from .formats import NOTEBOOK_EXTENSIONS, guess_format, get_format_implementation
 from .version import __version__
