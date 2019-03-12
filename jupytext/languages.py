@@ -1,7 +1,7 @@
 """Determine notebook or cell language"""
 
 _JUPYTER_LANGUAGES = ['R', 'bash', 'sh', 'python', 'python2', 'python3', 'javascript', 'js', 'perl',
-                      'html', 'latex', 'markdown', 'pypy', 'ruby', 'script', 'svg', 'writefile', 'matlab']
+                      'html', 'latex', 'markdown', 'pypy', 'ruby', 'script', 'svg', 'writefile', 'matlab', 'octave']
 
 _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.R': {'language': 'R', 'comment': '#'},
