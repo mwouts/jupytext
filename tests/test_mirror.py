@@ -148,7 +148,7 @@ def test_ipynb_to_julia_percent(nb_file):
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_m'))
-def test_ipynb_to_julia_percent(nb_file):
+def test_ipynb_to_m_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'm:percent', 'ipynb_to_percent')
 
 
