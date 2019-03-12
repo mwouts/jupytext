@@ -27,6 +27,8 @@ _PYTHON_MAGIC_CMD = re.compile(r"^(# |#)*({})(\s|$)".format('|'.join(
 
 def is_magic(line, language, global_escape_flag=True):
     """Is the current line a (possibly escaped) Jupyter magic, and should it be commented?"""
+    if language in ['octave', 'matlab']:
+        return False
     if _MAGIC_FORCE_ESC_RE.get(language, _MAGIC_FORCE_ESC_RE['python']).match(line):
         return True
     if not global_escape_flag or _MAGIC_NOT_ESC_RE.get(language, _MAGIC_NOT_ESC_RE['python']).match(line):
