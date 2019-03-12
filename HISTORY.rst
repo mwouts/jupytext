@@ -3,6 +3,19 @@
 Release History
 ---------------
 
+1.0.3 (2019-03-13)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Matlab and Octave notebooks and scripts are now supported (#197)
+
+**BugFixes**
+
+- ``notebook_metadata_filter = "all"`` now works (#196)
+- Default pairing in subfolders fixed in Jupyter Lab (#180)
+
+
 1.0.2 (2019-02-27)
 ++++++++++++++++++++++
 
