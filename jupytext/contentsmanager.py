@@ -237,7 +237,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
             self.update_paired_notebooks(path, fmt, jupytext_formats)
 
             # Save as ipynb first
-            latest_result = None
+            return_value = None
             for fmt in jupytext_formats[::-1]:
                 if fmt['extension'] != '.ipynb':
                     continue
@@ -245,7 +245,9 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 alt_path = full_path(base, fmt)
                 self.create_prefix_dir(alt_path, fmt)
                 self.log.info("Saving %s", os.path.basename(alt_path))
-                latest_result = super(TextFileContentsManager, self).save(model, alt_path)
+                value = super(TextFileContentsManager, self).save(model, alt_path)
+                if alt_path == path:
+                    return_value = value
 
             # And then to the other formats, in reverse order so that
             # the first format is the most recent
@@ -262,9 +264,11 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 else:
                     self.log.info("Saving %s", os.path.basename(alt_path))
                 with mock.patch('nbformat.writes', _jupytext_writes(fmt)):
-                    latest_result = super(TextFileContentsManager, self).save(model, alt_path)
+                    value = super(TextFileContentsManager, self).save(model, alt_path)
+                    if alt_path == path:
+                        return_value = value
 
-            return latest_result
+            return return_value
 
         except Exception as err:
             raise HTTPError(400, str(err))
