@@ -110,7 +110,7 @@ def test_ipynb_to_r(nb_file):
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_m'))
-def test_ipynb_to_r(nb_file):
+def test_ipynb_to_m(nb_file):
     assert_conversion_same_as_mirror(nb_file, '.m', 'ipynb_to_script')
 
 
