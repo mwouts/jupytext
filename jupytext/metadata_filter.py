@@ -103,7 +103,7 @@ def apply_metadata_filters(user_filter, default_filter, actual_keys):
 
     # notebook default filter = only few metadata
     if default_filter.get('additional'):
-        if user_filter.get('excluded') == 'all':
+        if user_filter.get('additional') == 'all':
             return actual_keys.difference(user_filter.get('excluded'))
 
         return (actual_keys

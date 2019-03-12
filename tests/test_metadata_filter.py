@@ -1,4 +1,5 @@
 import pytest
+from nbformat.v4.nbbase import new_notebook
 from jupytext import reads, writes
 from jupytext.metadata_filter import filter_metadata, metadata_filter_as_dict
 
@@ -68,3 +69,16 @@ jupyter:
 
     text2 = writes(nb, 'Rmd')
     assert text.splitlines()[-3:] == text2.splitlines()[-3:]
+
+
+def test_notebook_metadata_all():
+    nb = new_notebook(metadata={'user_metadata': [1, 2, 3],
+                                'jupytext': {'notebook_metadata_filter': 'all'}})
+    text = writes(nb, 'md')
+    assert 'user_metadata' in text
+
+
+def test_notebook_metadata_none():
+    nb = new_notebook(metadata={'jupytext': {'notebook_metadata_filter': '-all'}})
+    text = writes(nb, 'md')
+    assert '---' not in text
