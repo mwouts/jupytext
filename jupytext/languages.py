@@ -13,7 +13,7 @@ _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.scm': {'language': 'scheme', 'comment': ';;'},
                       '.sh': {'language': 'bash', 'comment': '#'},
                       '.q': {'language': 'q', 'comment': '/'},
-                      '.m': {'language': 'matlab', 'comment': '%'}} 
+                      '.m': {'language': 'matlab', 'comment': '%'}}
 
 _COMMENT_CHARS = [_SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS if
                   _SCRIPT_EXTENSIONS[ext]['comment'] != '#']

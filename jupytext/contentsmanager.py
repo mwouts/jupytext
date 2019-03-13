@@ -18,7 +18,6 @@ from notebook.services.contents.filemanager import FileContentsManager
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 
 import jupytext
-from .jupytext import create_prefix_dir
 from .combine import combine_inputs_with_outputs
 from .formats import rearrange_jupytext_metadata, check_file_version
 from .formats import NOTEBOOK_EXTENSIONS, long_form_one_format, long_form_multiple_formats
@@ -205,7 +204,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def create_prefix_dir(self, path, fmt):
         """Create the prefix dir, if missing"""
-        create_prefix_dir(self._get_os_path(path.strip('/')), fmt)
+        jupytext.jupytext.create_prefix_dir(self._get_os_path(path.strip('/')), fmt)
 
     def save(self, model, path=''):
         """Save the file model and return the model with no content."""
