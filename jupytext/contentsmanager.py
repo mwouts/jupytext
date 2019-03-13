@@ -17,7 +17,7 @@ except ImportError:
 from notebook.services.contents.filemanager import FileContentsManager
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 
-import jupytext
+from .jupytext import reads, writes, create_prefix_dir
 from .combine import combine_inputs_with_outputs
 from .formats import rearrange_jupytext_metadata, check_file_version
 from .formats import NOTEBOOK_EXTENSIONS, long_form_one_format, long_form_multiple_formats
@@ -57,14 +57,14 @@ def preferred_format(incomplete_format, preferred_formats):
 
 def _jupytext_writes(fmt):
     def _writes(nbk, version=nbformat.NO_CONVERT, **kwargs):
-        return jupytext.writes(nbk, fmt, version=version, **kwargs)
+        return writes(nbk, fmt, version=version, **kwargs)
 
     return _writes
 
 
 def _jupytext_reads(fmt):
     def _reads(text, as_version, **kwargs):
-        return jupytext.reads(text, fmt, as_version=as_version, **kwargs)
+        return reads(text, fmt, as_version=as_version, **kwargs)
 
     return _reads
 
@@ -204,7 +204,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
     def create_prefix_dir(self, path, fmt):
         """Create the prefix dir, if missing"""
-        jupytext.jupytext.create_prefix_dir(self._get_os_path(path.strip('/')), fmt)
+        create_prefix_dir(self._get_os_path(path.strip('/')), fmt)
 
     def save(self, model, path=''):
         """Save the file model and return the model with no content."""
