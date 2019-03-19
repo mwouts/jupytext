@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+import glob
 import subprocess
 import argparse
 import json
@@ -202,7 +203,16 @@ def jupytext(args=None):
 
     # Main loop
     round_trip_conversion_errors = 0
-    for nb_file in args.notebooks:
+
+    # Wildcard extension on Windows #202
+    notebooks = []
+    for pattern in args.notebooks:
+        if '*' in pattern or '?' in pattern:
+            notebooks.extend(glob.glob(pattern))
+        else:
+            notebooks.append(pattern)
+
+    for nb_file in notebooks:
         if nb_file == '-' and args.sync:
             raise ValueError('Cannot sync a notebook on stdin')
 

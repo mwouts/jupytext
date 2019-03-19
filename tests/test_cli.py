@@ -74,6 +74,26 @@ def test_jupytext_version(capsys):
     compare(out, __version__ + '\n')
 
 
+def test_wildcard(tmpdir):
+    nb1_ipynb = str(tmpdir.join('nb1.ipynb'))
+    nb2_ipynb = str(tmpdir.join('nb2.ipynb'))
+
+    nb1_py = str(tmpdir.join('nb1.py'))
+    nb2_py = str(tmpdir.join('nb2.py'))
+
+    writef(new_notebook(metadata={'notebook': 1}), nb1_ipynb)
+    writef(new_notebook(metadata={'notebook': 2}), nb2_ipynb)
+
+    os.chdir(tmpdir)
+    jupytext(['nb*.ipynb', '--to', 'py'])
+
+    assert os.path.isfile(nb1_py)
+    assert os.path.isfile(nb2_py)
+
+    with pytest.raises(FileNotFoundError):
+        jupytext(['nb3.ipynb', '--to', 'py'])
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_cpp'))
 def test_to_cpluplus(nb_file, tmpdir, capsys):
     nb_org = str(tmpdir.join(os.path.basename(nb_file)))
