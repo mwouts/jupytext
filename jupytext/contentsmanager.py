@@ -394,8 +394,10 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                 if kernelspec:
                     nbk.metadata['kernelspec'] = kernelspec
 
-            self.notary.sign(nbk)
-            self.mark_trusted_cells(nbk, path)
+        # Trust code cells when they have no output
+        for cell in model['content'].cells:
+            if cell.cell_type == 'code' and not cell.outputs and cell.metadata.get('trusted') == False:
+                cell.metadata['trusted'] = True
 
         # Path and name of the notebook is the one of the original path
         model['path'] = org_model['path']
