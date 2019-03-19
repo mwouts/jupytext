@@ -15,6 +15,45 @@ There are multiple ways to use `jupytext`:
 - On the [command line](#command-line-conversion). `jupytext` converts Jupyter notebooks to their text representation, and back. The command line tool can act on noteboks in many ways. It can synchronize multiple representations of a notebook, pipe a notebook into a reformatting tool like `black`, etc... It can also work as a [pre-commit hook](#jupytext-as-a-git-pre-commit-hook) if you wish to automatically update the text representation when you commit the `.ipynb` file.
 - in Vim: edit your Jupyter notebooks, represented as a Markdown document, or a Python script, with [jupytext.vim](https://github.com/goerz/jupytext.vim).
 
+## Table of Contents
+
+<!-- TOC depthFrom:2 -->
+
+- [Table of Contents](#table-of-contents)
+- [Demo time](#demo-time)
+- [Example usage](#example-usage)
+    - [Writing notebooks as plain text](#writing-notebooks-as-plain-text)
+    - [Collaborating on Jupyter Notebooks](#collaborating-on-jupyter-notebooks)
+    - [Code refactoring](#code-refactoring)
+    - [Importing Jupyter Notebooks as modules](#importing-jupyter-notebooks-as-modules)
+- [Installation](#installation)
+    - [Jupytext's contents manager](#jupytexts-contents-manager)
+    - [Jupytext menu in Jupyter Notebook](#jupytext-menu-in-jupyter-notebook)
+    - [Jupytext commands in JupyterLab](#jupytext-commands-in-jupyterlab)
+- [Using Jupytext from within Jupyter](#using-jupytext-from-within-jupyter)
+    - [Paired notebooks](#paired-notebooks)
+    - [Per-notebook configuration](#per-notebook-configuration)
+    - [Global configuration](#global-configuration)
+    - [Metadata filtering](#metadata-filtering)
+    - [Can I edit a notebook simultaneously in Jupyter and in a text editor?](#can-i-edit-a-notebook-simultaneously-in-jupyter-and-in-a-text-editor)
+    - [How to open scripts with either the text or notebook view in Jupyter?](#how-to-open-scripts-with-either-the-text-or-notebook-view-in-jupyter)
+- [Scripting Jupytext](#scripting-jupytext)
+    - [Command line conversion](#command-line-conversion)
+    - [Jupytext as a Git pre-commit hook](#jupytext-as-a-git-pre-commit-hook)
+    - [Testing the round-trip conversion](#testing-the-round-trip-conversion)
+    - [Reading notebooks in Python](#reading-notebooks-in-python)
+- [Format specifications](#format-specifications)
+    - [Markdown and R Markdown](#markdown-and-r-markdown)
+    - [The `light` format for notebooks as scripts](#the-light-format-for-notebooks-as-scripts)
+    - [The `percent` format](#the-percent-format)
+    - [Sphinx-gallery scripts](#sphinx-gallery-scripts)
+    - [R knitr::spin scripts](#r-knitrspin-scripts)
+- [Fine tuning](#fine-tuning)
+- [Extending the `light` and `percent` formats to more languages](#extending-the-light-and-percent-formats-to-more-languages)
+- [Want to contribute?](#want-to-contribute)
+
+<!-- /TOC -->
+
 ## Demo time
 
 [![Introducing Jupytext](https://img.shields.io/badge/TDS-Introducing%20Jupytext-blue.svg)](https://towardsdatascience.com/introducing-jupytext-9234fdff6c57)
@@ -131,7 +170,9 @@ jupyter labextension install jupyterlab-jupytext
 ```
 (the above requires `npm`, run `conda install nodejs` first if you don't have `npm`).
 
-## <a name="paired-notebooks"></a> Paired notebooks
+## Using Jupytext from within Jupyter
+
+### Paired notebooks
 
 Jupytext can write a given notebook to multiple files. In addition to the original notebook file, Jupytext can save the input cells to a text file &mdash; either a script or a Markdown document. Put the text file under version control for a clear commit history. Or refactor the paired script, and reimport the updated input cells by simply refreshing the notebook in Jupyter.
 
@@ -198,9 +239,9 @@ c.ContentsManager.default_cell_metadata_filter = "-all"
 
 NB: All these global options (and more) are documented [here](https://github.com/mwouts/jupytext/blob/master/jupytext/contentsmanager.py).
 
-## How to edit the notebook simultaneously in Jupyter and a text editor?
+### Can I edit a notebook simultaneously in Jupyter and in a text editor?
 
-When editing a paired notebook using Jupytext's contents manager, Jupyter updates both the `.ipynb` and its text representation. The text representation can be edited outside of Jupyter. When the notebook is refreshed in Jupyter, the input cells are read from the text file, and the output cells from the `.ipynb` file.
+When saving a paired notebook using Jupytext's contents manager, Jupyter updates both the `.ipynb` and its text representation. The text representation can be edited outside of Jupyter. When the notebook is refreshed in Jupyter, the input cells are read from the text file, and the output cells from the `.ipynb` file.
 
 It is possible (and convenient) to leave the notebook open in Jupyter while you edit its text representation. However, you don't want that the two editors save the notebook simultaneously. To avoid this:
 - deactivate Jupyter's autosave, by toggling the `"Autosave notebook"` menu entry (or run `%autosave 0` in a cell of the notebook)
@@ -211,7 +252,7 @@ In case you forgot to refresh, and saved the Jupyter notebook while the text rep
 
 When that occurs, please choose the version in which you made the latest changes. And give a second look to our advice to deactivate the autosaving of notebooks in Jupyter.
 
-## How to open scripts with either the text or notebook view in Jupyter?
+### How to open scripts with either the text or notebook view in Jupyter?
 
 With Jupytext's contents manager for Jupyter, scripts and Markdown documents gain a notebook icon. If you don't see the notebook icon, double check the [contents manager configuration](https://github.com/mwouts/jupytext/blob/master/README.md#jupytexts-contents-manager).
 
@@ -223,7 +264,9 @@ In JupyterLab this is slightly different. Scripts and Markdown document also hav
 
 ![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/403b53ac5097446a15ea664579ba44cd1badcc57/ContextMenuLab.png)
 
-## Command line conversion
+## Scripting Jupytext
+
+### Command line conversion
 
 The package provides a `jupytext` script for command line conversion between the various notebook extensions:
 
@@ -251,7 +294,7 @@ jupytext --sync --pipe black notebook.ipynb    # read most recent version of not
 
 The `jupytext` command accepts many arguments. Use the `--set-formats` and the `--update-metadata` arguments to edit the pairing information or more generally the notebook metadata. Execute `jupytext --help` to access the documentation.
 
-## Jupytext as a Git pre-commit hook
+### Jupytext as a Git pre-commit hook
 
 Jupytext is also available as a Git pre-commit hook. Use this if you want Jupytext to create and update the `.py` (or `.md`...) representation of the staged `.ipynb` notebooks. All you need is to create an executable `.git/hooks/pre-commit` file with the following content:
 ```bash
@@ -276,25 +319,7 @@ git reset HEAD **/*.ipynb
 ```
 Note that these hooks do not update the `.ipynb` notebook when you pull. Make sure to either run `jupytext` in the other direction, or to use our paired notebook and our contents manager for Jupyter. Also, Jupytext does not offer a merge driver. If a conflict occurs, solve it on the text representation and then update or recreate the `.ipynb` notebook. Or give a try to nbdime and its [merge driver](https://nbdime.readthedocs.io/en/stable/vcs.html#merge-driver).
 
-## Reading notebooks in Python
-
-Manipulate notebooks in a Python shell or script using `jupytext`'s main functions:
-
-```python
-# Read a notebook from a file. Format can be any of 'py', 'md', 'jl:percent', ...
-readf(nb_file, fmt=None)
-
-# Read a notebook from a string. Here, format should contain at least the file extension.
-reads(text, fmt)
-
-# Return the text representation for a notebook in the desired format.
-writes(notebook, fmt)
-
-# Write a notebook to a file in the desired format.
-writef(notebook, nb_file, fmt=None)
-```
-
-## Round-trip conversion
+### Testing the round-trip conversion
 
 Representing Jupyter notebooks as scripts requires a solid round trip conversion. You don't want your notebooks (nor your scripts) to be modified because you are converting them to the other form. A few hundred tests ensure that round trip conversion is safe.
 
@@ -315,6 +340,24 @@ metadata to be added back to the script. Remove the filter if you want to store 
 - Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata.
 - By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in the sections for [notebook specific](#-per-notebook-configuration) and [global settings](#default-metadata-filtering) for metadata filtering.
 - Representing a Jupyter notebook as a Markdown or R Markdown document has the effect of splitting markdown cells with two consecutive blank lines into multiple cells (as the two blank line pattern is used to separate cells).
+
+### Reading notebooks in Python
+
+You can also manipulate notebooks in a Python shell or script using `jupytext`'s main functions:
+
+```python
+# Read a notebook from a file. Format can be any of 'py', 'md', 'jl:percent', ...
+readf(nb_file, fmt=None)
+
+# Read a notebook from a string. Here, format should contain at least the file extension.
+reads(text, fmt)
+
+# Return the text representation for a notebook in the desired format.
+writes(notebook, fmt)
+
+# Write a notebook to a file in the desired format.
+writef(notebook, nb_file, fmt=None)
+```
 
 ## Format specifications
 
