@@ -23,7 +23,7 @@ def system(*args, **kwargs):
     out, _ = proc.communicate()
     if proc.returncode:
         raise SystemExit(proc.returncode)
-    return out
+    return out.decode('utf-8')
 
 
 def str2bool(value):
@@ -164,9 +164,9 @@ def jupytext(args=None):
             log(nb_file)
 
     def writef_git_add(notebook_, nb_file_, fmt_):
-        if args.pre_commit:
-            system('git', 'add', nb_file)
         writef(notebook_, nb_file_, fmt_)
+        if args.pre_commit:
+            system('git', 'add', nb_file_)
 
     # Read notebook from stdin
     if not args.notebooks:
@@ -321,7 +321,7 @@ def jupytext(args=None):
 
 def notebooks_in_git_index(fmt):
     """Return the list of modified and deleted ipynb files in the git index that match the given format"""
-    git_status = system('git', 'status', '--porcelain').decode('utf-8')
+    git_status = system('git', 'status', '--porcelain')
     re_modified = re.compile(r'^[AM]+\s+(?P<name>.*)', re.MULTILINE)
     modified_files_in_git_index = re_modified.findall(git_status)
     files = []

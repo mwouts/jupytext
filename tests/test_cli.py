@@ -304,15 +304,24 @@ def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
     compare_notebooks(nb1, nb2)
 
 
+def git_in_tmpdir(tmpdir):
+    """Return a function that will execute git instruction in the desired directory"""
+
+    def git(*args):
+        out = system('git', *args, cwd=str(tmpdir))
+        print(out)
+        return out
+
+    return git
+
+
 @skip_if_dict_is_not_ordered
 def test_pre_commit_hook(tmpdir):
     tmp_ipynb = str(tmpdir.join('nb with spaces.ipynb'))
     tmp_py = str(tmpdir.join('nb with spaces.py'))
     nb = new_notebook(cells=[])
 
-    def git(*args):
-        print(system('git', *args, cwd=str(tmpdir)))
-
+    git = git_in_tmpdir(tmpdir)
     git('init')
     git('status')
     hook = str(tmpdir.join('.git/hooks/pre-commit'))
@@ -332,6 +341,37 @@ def test_pre_commit_hook(tmpdir):
     git('commit', '-m', 'created')
     git('status')
 
+    assert 'nb with spaces.py' in git('ls-tree', '-r', 'master', '--name-only')
+    assert os.path.isfile(tmp_py)
+
+
+@skip_if_dict_is_not_ordered
+def test_pre_commit_hook_in_subfolder(tmpdir):
+    tmp_ipynb = str(tmpdir.join('nb with spaces.ipynb'))
+    tmp_py = str(tmpdir.join('python', 'nb with spaces.py'))
+    nb = new_notebook(cells=[])
+
+    git = git_in_tmpdir(tmpdir)
+    git('init')
+    git('status')
+    hook = str(tmpdir.join('.git/hooks/pre-commit'))
+    with open(hook, 'w') as fp:
+        fp.write('#!/bin/sh\n'
+                 'jupytext --from ipynb --to python//py:light --pre-commit\n')
+
+    st = os.stat(hook)
+    os.chmod(hook, st.st_mode | stat.S_IEXEC)
+
+    writef(nb, tmp_ipynb)
+    assert os.path.isfile(tmp_ipynb)
+    assert not os.path.isfile(tmp_py)
+
+    git('add', 'nb with spaces.ipynb')
+    git('status')
+    git('commit', '-m', 'created')
+    git('status')
+
+    assert 'nb with spaces.py' in git('ls-tree', '-r', 'master', '--name-only')
     assert os.path.isfile(tmp_py)
 
 
@@ -342,9 +382,7 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     tmp_md = str(tmpdir.join('nb with spaces.md'))
     nb = new_notebook(cells=[])
 
-    def git(*args):
-        print(system('git', *args, cwd=str(tmpdir)))
-
+    git = git_in_tmpdir(tmpdir)
     git('init')
     git('status')
     hook = str(tmpdir.join('.git/hooks/pre-commit'))
@@ -366,6 +404,9 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     git('commit', '-m', 'created')
     git('status')
 
+    assert 'nb with spaces.ipynb' in git('ls-tree', '-r', 'master', '--name-only')
+    assert 'nb with spaces.md' in git('ls-tree', '-r', 'master', '--name-only')
+
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_md)
 
@@ -377,9 +418,7 @@ def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
     metadata = readf(nb_file).metadata
 
-    def git(*args):
-        print(system('git', *args, cwd=str(tmpdir)))
-
+    git = git_in_tmpdir(tmpdir)
     git('init')
     git('status')
     hook = str(tmpdir.join('.git/hooks/pre-commit'))
@@ -424,9 +463,7 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
     def system_in_tmpdir(*args):
         return system(*args, cwd=str(tmpdir))
 
-    def git(*args):
-        print(system_in_tmpdir('git', *args))
-
+    git = git_in_tmpdir(tmpdir)
     git('init')
     git('status')
 
@@ -444,6 +481,7 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
     git('commit', '-m', 'created')
     git('status')
 
+    assert 'notebook.py' in git('ls-tree', '-r', 'master', '--name-only')
     assert os.path.isfile(tmp_py)
 
 
