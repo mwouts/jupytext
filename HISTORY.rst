@@ -3,6 +3,19 @@
 Release History
 ---------------
 
+1.0.4 (2019-03-20)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Wildcard are now supported on Windows (#202)
+- Trusted notebooks remain trusted when inputs cells are modified (#203)
+
+**BugFixes**
+
+- Pre-commit mode adds the result of conversion to the commit (#200)
+
+
 1.0.3 (2019-03-13)
 ++++++++++++++++++++++
 
