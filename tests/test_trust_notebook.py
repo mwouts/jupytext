@@ -51,7 +51,7 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
 
         model = cm.get(file)
         for cell in model['content'].cells:
-            assert 'trusted' not in cell.metadata or not cell.metadata['trusted']
+            assert 'trusted' not in cell.metadata or not cell.metadata['trusted'] or not cell.outputs
 
         # Trust and reload
         cm.trust_notebook(py_file)
