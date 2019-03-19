@@ -61,7 +61,7 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 - We start with a Jupyter notebook.
 - The notebook includes a plot of the world population. The plot legend is not in order of decreasing population, we'll fix this.
-- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we select _Pair Notebook with a light Script_ in the File/Jupytext menu, which has the effet to add a `"jupytext": {"formats": "ipynb,py:light"},` entry to the notebook metadata.
+- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we select _Pair Notebook with a light Script_ in either the [Jupytext menu](#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or in the [Jupytext commands](#jupytext-commands-in-jupyterlab) in JupyterLab. This has the effet of adding a `"jupytext": {"formats": "ipynb,py:light"},` entry to the notebook metadata.
 - The Python script can be opened with PyCharm:
   - Navigating in the code and documentation is easier than in Jupyter.
   - The console is convenient for quick tests. We don't need to create cells for this.
@@ -145,7 +145,7 @@ Jupytext can write a given notebook to multiple files. In addition to the origin
 
 ### Per-notebook configuration
 
-Select the pairing for a given notebook using either the Jupytext menu in Jupyter Notebook, or the Jupytext commands in JupyterLab.
+Select the pairing for a given notebook using either the [Jupytext menu](#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or the [Jupytext commands](#jupytext-commands-in-jupyterlab) in JupyterLab.
 
 These command simply add a `"jupytext": {"formats": "ipynb,md"}`-like entry in the notebook metadata. You could also set that metadata yourself with _Edit/Edit Notebook Metadata_ in Jupyter Notebook. In JupyterLab, use [this extension](https://github.com/yuvipanda/jupyterlab-nbmetadata).
 
