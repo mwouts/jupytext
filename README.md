@@ -15,44 +15,11 @@ There are multiple ways to use `jupytext`:
 - On the [command line](#command-line-conversion). `jupytext` converts Jupyter notebooks to their text representation, and back. The command line tool can act on noteboks in many ways. It can synchronize multiple representations of a notebook, pipe a notebook into a reformatting tool like `black`, etc... It can also work as a [pre-commit hook](#jupytext-as-a-git-pre-commit-hook) if you wish to automatically update the text representation when you commit the `.ipynb` file.
 - in Vim: edit your Jupyter notebooks, represented as a Markdown document, or a Python script, with [jupytext.vim](https://github.com/goerz/jupytext.vim).
 
-## Table of Contents
+---
 
-<!-- TOC depthFrom:2 -->
+*Contents:* [Demo time](#demo-time) | [Example usage](#example|usage) | [Installation](#installation) | [Using Jupytext from within Jupyter](#using-jupytext-from-within-jupyter) | [Scripting Jupytext](#scripting-jupytext) | [Format specifications](#format-specifications) | [Want to contribute?](#want-to-contribute)
 
-- [Table of Contents](#table-of-contents)
-- [Demo time](#demo-time)
-- [Example usage](#example-usage)
-    - [Writing notebooks as plain text](#writing-notebooks-as-plain-text)
-    - [Collaborating on Jupyter Notebooks](#collaborating-on-jupyter-notebooks)
-    - [Code refactoring](#code-refactoring)
-    - [Importing Jupyter Notebooks as modules](#importing-jupyter-notebooks-as-modules)
-- [Installation](#installation)
-    - [Jupytext's contents manager](#jupytexts-contents-manager)
-    - [Jupytext menu in Jupyter Notebook](#jupytext-menu-in-jupyter-notebook)
-    - [Jupytext commands in JupyterLab](#jupytext-commands-in-jupyterlab)
-- [Using Jupytext from within Jupyter](#using-jupytext-from-within-jupyter)
-    - [Paired notebooks](#paired-notebooks)
-    - [Per-notebook configuration](#per-notebook-configuration)
-    - [Global configuration](#global-configuration)
-    - [Metadata filtering](#metadata-filtering)
-    - [Can I edit a notebook simultaneously in Jupyter and in a text editor?](#can-i-edit-a-notebook-simultaneously-in-jupyter-and-in-a-text-editor)
-    - [How to open scripts with either the text or notebook view in Jupyter?](#how-to-open-scripts-with-either-the-text-or-notebook-view-in-jupyter)
-- [Scripting Jupytext](#scripting-jupytext)
-    - [Command line conversion](#command-line-conversion)
-    - [Jupytext as a Git pre-commit hook](#jupytext-as-a-git-pre-commit-hook)
-    - [Testing the round-trip conversion](#testing-the-round-trip-conversion)
-    - [Reading notebooks in Python](#reading-notebooks-in-python)
-- [Format specifications](#format-specifications)
-    - [Markdown and R Markdown](#markdown-and-r-markdown)
-    - [The `light` format for notebooks as scripts](#the-light-format-for-notebooks-as-scripts)
-    - [The `percent` format](#the-percent-format)
-    - [Sphinx-gallery scripts](#sphinx-gallery-scripts)
-    - [R knitr::spin scripts](#r-knitrspin-scripts)
-- [Fine tuning](#fine-tuning)
-- [Extending the `light` and `percent` formats to more languages](#extending-the-light-and-percent-formats-to-more-languages)
-- [Want to contribute?](#want-to-contribute)
-
-<!-- /TOC -->
+---
 
 ## Demo time
 
