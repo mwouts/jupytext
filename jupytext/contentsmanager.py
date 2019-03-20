@@ -396,7 +396,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
         # Trust code cells when they have no output
         for cell in model['content'].cells:
-            if cell.cell_type == 'code' and not cell.outputs and cell.metadata.get('trusted') == False:
+            if cell.cell_type == 'code' and not cell.outputs and cell.metadata.get('trusted') is False:
                 cell.metadata['trusted'] = True
 
         # Path and name of the notebook is the one of the original path
