@@ -84,13 +84,13 @@ def test_wildcard(tmpdir):
     writef(new_notebook(metadata={'notebook': 1}), nb1_ipynb)
     writef(new_notebook(metadata={'notebook': 2}), nb2_ipynb)
 
-    os.chdir(tmpdir)
+    os.chdir(str(tmpdir))
     jupytext(['nb*.ipynb', '--to', 'py'])
 
     assert os.path.isfile(nb1_py)
     assert os.path.isfile(nb2_py)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(IOError):
         jupytext(['nb3.ipynb', '--to', 'py'])
 
 
