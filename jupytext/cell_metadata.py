@@ -1,16 +1,8 @@
 """
 Convert between text notebook metadata and jupyter cell metadata.
 
+Standard cell metadata are documented here:
 See also https://ipython.org/ipython-doc/3/notebook/nbformat.html#cell-metadata
-
-metadata.hide_input and metadata.hide_output are documented here:
-http://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html
-
-TODO: Update this if a standard gets defined at
-https://github.com/jupyter/notebook/issues/3700
-
-Note: Nteract uses "outputHidden" and "inputHidden". We may want to switch
-to those.
 """
 
 import ast
@@ -24,6 +16,9 @@ try:
 except NameError:
     unicode = str  # Python 3
 
+# Map R Markdown's "echo" and "include" to "hide_input" and "hide_output", that are understood by the `runtools`
+# extension for Jupyter notebook, and by nbconvert (use the `hide_input_output.tpl` template).
+# See http://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
 _JUPYTEXT_CELL_METADATA = [
