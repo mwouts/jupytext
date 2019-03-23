@@ -14,8 +14,7 @@ from jupytext.compare import compare_notebooks
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.formats import read_format_from_metadata, auto_ext_from_metadata
 from jupytext.contentsmanager import kernelspec_from_language
-from .utils import list_notebooks
-from .utils import skip_if_dict_is_not_ordered
+from .utils import list_notebooks, requires_sphinx_gallery, skip_if_dict_is_not_ordered
 
 
 def test_create_contentsmanager():
@@ -960,6 +959,7 @@ def test_pair_notebook_in_dotdot_folder(tmpdir):
     cm.get('scripts/notebook_name.py')
 
 
+@requires_sphinx_gallery
 def test_rst2md_option(tmpdir):
     tmp_py = str(tmpdir.join('notebook.py'))
 

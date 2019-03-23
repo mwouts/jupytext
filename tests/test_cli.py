@@ -15,7 +15,7 @@ from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, st
 from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths
 from jupytext.formats import long_form_one_format, JupytextFormatError
-from .utils import list_notebooks, requires_black, requires_flake8, skip_if_dict_is_not_ordered
+from .utils import list_notebooks, requires_black, requires_flake8, requires_sphinx_gallery, skip_if_dict_is_not_ordered
 
 
 def test_str2bool():
@@ -739,6 +739,7 @@ def test_cli_sync_file_with_suffix(tmpdir):
     assert open(tmp_rmd).read().splitlines()[-4:] == ['', '```{python}', '1+1', '```']
 
 
+@requires_sphinx_gallery
 def test_rst2md(tmpdir):
     tmp_py = str(tmpdir.join('notebook.py'))
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))

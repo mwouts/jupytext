@@ -20,6 +20,8 @@ install:
   # install black if available (Python 3.6 and above), and autopep8 for testing the pipe mode
   - pip install black || true
   - pip install autopep8 || true
+  # install sphinx_gallery and matplotlib if available (may not work on pypy)
+  - pip install sphinx_gallery || true
 before_script:
   # stop the build if there are Python syntax errors or undefined names
   - flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
