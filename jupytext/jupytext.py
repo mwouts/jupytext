@@ -129,10 +129,11 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
             text.extend([''] * lines_to_next_cell)
 
-            # two blank lines between markdown cells in Rmd
+            # two blank lines between markdown cells in Rmd when those do not have explicit region markers
             if self.ext in ['.Rmd', '.md'] and not cell.is_code():
-                if i + 1 < len(cell_exporters) and not cell_exporters[i + 1].is_code() and (
-                        not split_at_heading or not (texts[i + 1] and texts[i + 1][0].startswith('#'))):
+                if (i + 1 < len(cell_exporters) and not cell_exporters[i + 1].is_code() and
+                        not texts[i][0].startswith('[region') and not texts[i + 1][0].startswith('[region') and
+                        (not split_at_heading or not (texts[i + 1] and texts[i + 1][0].startswith('#')))):
                     text.append('')
 
             # "" between two consecutive code cells in sphinx
