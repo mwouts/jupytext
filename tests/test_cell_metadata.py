@@ -1,7 +1,9 @@
 import pytest
+from testfixtures import compare
 from jupytext.cell_metadata import rmd_options_to_metadata, metadata_to_rmd_options, parse_rmd_options
 from jupytext.cell_metadata import _IGNORE_CELL_METADATA, RMarkdownOptionParsingError, try_eval_metadata
-from jupytext.cell_metadata import json_options_to_metadata, metadata_to_json_options, md_options_to_metadata
+from jupytext.cell_metadata import json_options_to_metadata, metadata_to_json_options
+from jupytext.cell_metadata import md_options_to_metadata, metadata_to_md_options
 from jupytext.metadata_filter import filter_metadata
 from .utils import skip_if_dict_is_not_ordered
 
@@ -86,6 +88,19 @@ def test_parse_wrong_json():
 def test_parse_md_options():
     assert md_options_to_metadata('python') == ('python', {})
     assert md_options_to_metadata('not_a_language') == (None, {'not_a_language': None})
+
+
+def test_round_trip_md_options(metadata={'.class': None,
+                                         'long-and-str$ange.name': None,
+                                         'string': "Hello",
+                                         'number': .21,
+                                         'array': ['First', 'Second', 3, "string with single ' in it'"],
+                                         'dict': {"a": 5, "b": [1.2, "four"]},
+                                         '.another_class': None}):
+    options = metadata_to_md_options(metadata)
+    language, metadata2 = md_options_to_metadata('python ' + options)
+    assert language == 'python'
+    compare(metadata, metadata2)
 
 
 def test_write_parse_json():
