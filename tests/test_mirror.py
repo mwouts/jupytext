@@ -74,11 +74,6 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
             for cell in nb_mirror.cells:
                 cell.metadata = {}
 
-        if ext == '.md':
-            for cell in notebook.cells:
-                if cell.cell_type == 'markdown':
-                    cell.metadata = {}
-
         compare_notebooks(notebook, nb_mirror, ext)
 
         combine_inputs_with_outputs(nb_mirror, notebook)
@@ -228,7 +223,7 @@ def test_spin_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ipynb:spin', 'script_to_ipynb')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='(raw|hash|frozen|magic|html|164)'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='(raw|hash|frozen|magic|html|164|long)'))
 def test_ipynb_to_python_sphinx(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'py:sphinx', 'ipynb_to_sphinx')
 
