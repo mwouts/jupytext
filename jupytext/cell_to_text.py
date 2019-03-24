@@ -1,6 +1,7 @@
 """Export notebook cells as text"""
 
 import re
+import json
 from copy import copy
 from .languages import cell_language, comment_lines
 from .cell_metadata import is_active, _IGNORE_CELL_METADATA
@@ -8,7 +9,7 @@ from .cell_metadata import metadata_to_md_options, metadata_to_rmd_options
 from .cell_metadata import metadata_to_json_options, metadata_to_double_percent_options
 from .metadata_filter import filter_metadata
 from .magics import comment_magic, escape_code_start
-from .cell_reader import LightScriptCellReader
+from .cell_reader import LightScriptCellReader, MarkdownCellReader, RMarkdownCellReader
 from .languages import _SCRIPT_EXTENSIONS
 from .pep8 import pep8_lines_between_cells
 
@@ -106,15 +107,31 @@ class BaseCellExporter(object):
 class MarkdownCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as Markdown"""
     default_comment_magics = False
+    cell_reader = MarkdownCellReader
 
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
         self.comment = ''
 
+    def cell_to_text(self):
+        """Return the text representation of a cell"""
+        if self.cell_type == 'markdown':
+            # Is an explicit region required?
+            if self.metadata or self.cell_reader(self.fmt).read(self.source)[1] < len(self.source):
+                if self.metadata:
+                    region_start = '[region {}]: #'.format(
+                        re.sub(r'\[', u'\\[', re.sub(r'\]', u'\\]', json.dumps(self.metadata))))
+                else:
+                    region_start = '[region]: #'
+
+                return [region_start] + self.source + ['', '[endregion]: #']
+            return self.source
+
+        return self.code_to_text()
+
     def code_to_text(self):
         """Return the text representation of a code cell"""
         source = copy(self.source)
-        escape_code_start(source, self.ext, self.language)
         comment_magic(source, self.language, self.comment_magics)
 
         options = []
@@ -123,18 +140,20 @@ class MarkdownCellExporter(BaseCellExporter):
 
         filtered_metadata = {key: self.metadata[key] for key in self.metadata
                              if key not in ['active', 'language']}
+
         if filtered_metadata:
             options.append(metadata_to_md_options(filtered_metadata))
 
         return ['```{}'.format(' '.join(options))] + source + ['```']
 
 
-class RMarkdownCellExporter(BaseCellExporter):
-    """A class that represent a notebook cell as Markdown"""
+class RMarkdownCellExporter(MarkdownCellExporter):
+    """A class that represent a notebook cell as R Markdown"""
     default_comment_magics = True
+    cell_reader = RMarkdownCellReader
 
     def __init__(self, *args, **kwargs):
-        BaseCellExporter.__init__(self, *args, **kwargs)
+        MarkdownCellExporter.__init__(self, *args, **kwargs)
         self.ext = '.Rmd'
         self.comment = ''
 
@@ -142,7 +161,6 @@ class RMarkdownCellExporter(BaseCellExporter):
         """Return the text representation of a code cell"""
         active = is_active(self.ext, self.metadata)
         source = copy(self.source)
-        escape_code_start(source, self.ext, self.language)
 
         if active:
             comment_magic(source, self.language, self.comment_magics)

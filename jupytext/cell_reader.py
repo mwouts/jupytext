@@ -1,6 +1,7 @@
 """Read notebook cells from their text representation"""
 
 import re
+import json
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from .languages import _SCRIPT_EXTENSIONS
 
@@ -227,6 +228,11 @@ class BaseCellReader(object):
             if lines_to_end_of_cell_marker != (0 if pep8_lines == 1 else 2):
                 self.metadata['lines_to_end_of_cell_marker'] = lines_to_end_of_cell_marker
 
+        # Exactly one empty line at the end of markdown cell?
+        if self.ext in ['.md', '.Rmd'] and _BLANK_LINE.match(source[-1]) and \
+                cell_end_marker < len(lines) and MarkdownCellReader.end_region_re.match(lines[cell_end_marker]):
+            source = source[:-1]
+
         if not is_active(self.ext, self.metadata) or \
                 ('active' not in self.metadata and self.language and self.language != self.default_language):
             self.content = uncomment(source, self.comment if self.ext not in ['.r', '.R'] else '#')
@@ -269,11 +275,27 @@ class MarkdownCellReader(BaseCellReader):
     comment = ''
     start_code_re = re.compile(r"^```(.*)")
     end_code_re = re.compile(r"^```\s*$")
+    start_region_re = re.compile(r"^\[region(.*)\]:\s*#\s*$")
+    end_region_re = re.compile(r"^\[endregion\]:\s*#\s*$")
     default_comment_magics = False
 
     def __init__(self, fmt=None, default_language=None):
         super(MarkdownCellReader, self).__init__(fmt, default_language)
         self.split_at_heading = (fmt or {}).get('split_at_heading', False)
+        self.in_region = False
+
+    def metadata_and_language_from_option_line(self, line):
+        region = self.start_region_re.match(line)
+        if region:
+            self.in_region = True
+            options = region.groups()[0].strip()
+            if options:
+                options = re.sub(r'\\\[', u'[', re.sub(r'\\\]', u']', options))
+                self.metadata = json.loads(options)
+            else:
+                self.metadata = {}
+        elif self.start_code_re.match(line):
+            self.language, self.metadata = self.options_to_metadata(self.start_code_re.findall(line)[0])
 
     def options_to_metadata(self, options):
         return md_options_to_metadata(options)
@@ -281,12 +303,17 @@ class MarkdownCellReader(BaseCellReader):
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position
         of first line after cell"""
-        # markdown: (last) two consecutive blank lines
-        if self.metadata is None:
+        if self.in_region:
+            self.cell_type = 'markdown'
+            for i, line in enumerate(lines):
+                if self.end_region_re.match(line):
+                    return i, i + 1, True
+        elif self.metadata is None:
+            # default markdown: (last) two consecutive blank lines
             self.cell_type = 'markdown'
             prev_blank = 0
             for i, line in enumerate(lines):
-                if self.start_code_re.match(line):
+                if self.start_code_re.match(line) or self.start_region_re.match(line):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False
@@ -311,9 +338,9 @@ class MarkdownCellReader(BaseCellReader):
         return len(lines), len(lines), False
 
     def uncomment_code_and_magics(self, lines):
-        if self.comment_magics:
+        if self.cell_type == 'code' and self.comment_magics:
             lines = uncomment_magic(lines, self.language)
-        return unescape_code_start(lines, self.ext, self.language or self.default_language)
+        return lines
 
 
 class RMarkdownCellReader(MarkdownCellReader):
@@ -327,11 +354,8 @@ class RMarkdownCellReader(MarkdownCellReader):
         return rmd_options_to_metadata(options)
 
     def uncomment_code_and_magics(self, lines):
-        if self.cell_type == 'code':
-            if is_active('.Rmd', self.metadata) and self.comment_magics:
-                uncomment_magic(lines, self.language or self.default_language)
-
-        unescape_code_start(lines, '.Rmd', self.language or self.default_language)
+        if self.cell_type == 'code' and self.comment_magics and is_active('.Rmd', self.metadata):
+            uncomment_magic(lines, self.language or self.default_language)
 
         return lines
 
