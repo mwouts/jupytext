@@ -1,3 +1,4 @@
+from nbformat.v4.nbbase import new_code_cell, new_raw_cell
 from testfixtures import compare
 import jupytext
 
@@ -130,4 +131,25 @@ def test_split_on_header_after_two_blank_lines(markdown="""A paragraph
     fmt = {'extension': '.Rmd', 'split_at_heading': True}
     nb = jupytext.reads(markdown, fmt)
     markdown2 = jupytext.writes(nb, fmt)
+    compare(markdown, markdown2)
+
+
+def test_code_cell_with_metadata(markdown="""```python tags=["parameters"]
+a = 1
+b = 2
+```
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    compare(nb.cells[0], new_code_cell(source='a = 1\nb = 2', metadata={'tags': ['parameters']}))
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
+def test_raw_cell_with_metadata(markdown="""```key="value"
+raw content
+```
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    compare(nb.cells[0], new_raw_cell(source='raw content', metadata={'key': 'value'}))
+    markdown2 = jupytext.writes(nb, 'md')
     compare(markdown, markdown2)

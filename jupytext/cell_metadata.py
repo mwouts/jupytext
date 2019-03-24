@@ -248,27 +248,57 @@ def rmd_options_to_metadata(options):
     return metadata.get('language') or language, metadata
 
 
+def metadata_to_md_options(metadata):
+    """Encode {'class':None, 'key':'value'} into 'class key="value"' """
+
+    return ' '.join(["{}={}".format(key, json.dumps(metadata[key]))
+                     if metadata[key] is not None else key for key in metadata])
+
+
+def parse_md_code_options(options):
+    """Parse 'python class key="value"' into [('python', None), ('class', None), ('key', 'value')]"""
+
+    metadata = []
+    while options:
+        name_and_value = re.split(r'[\s=]+', options, maxsplit=1)
+        name = name_and_value[0]
+
+        # Equal sign in between name and what's next?
+        if len(name_and_value) == 2:
+            sep = options[len(name):-len(name_and_value[1])]
+            has_value = sep.find('=') >= 0
+            options = name_and_value[1]
+        else:
+            has_value = False
+            options = ''
+
+        if not has_value:
+            metadata.append((name, None))
+            continue
+
+        try:
+            value = json.loads(options)
+            options = ''
+        except json.JSONDecodeError as err:
+            value = json.loads(options[:(err.colno - 1)])
+            options = options[(err.colno - 1):]
+
+        metadata.append((name, value))
+
+    return metadata
+
+
 def md_options_to_metadata(options):
-    """Parse markdown options and return language and metadata (cell name)"""
-    language = None
-    name = None
+    """Parse markdown options and return language and metadata"""
+    metadata = parse_md_code_options(options)
 
-    options = [opt for opt in options.split(' ') if opt != '']
-    if len(options) >= 2:
-        language, name = options[:2]
-    elif options:
-        language = options[0]
-
-    if language:
+    if metadata:
+        language = metadata[0][0]
         for lang in _JUPYTER_LANGUAGES + ['julia', 'scheme', 'c++']:
             if language.lower() == lang.lower():
-                if name:
-                    return lang, {'name': name}
-                return lang, {}
+                return lang, dict(metadata[1:])
 
-        return None, {'name': language}
-
-    return None, {}
+    return None, dict(metadata)
 
 
 def try_eval_metadata(metadata, name):
