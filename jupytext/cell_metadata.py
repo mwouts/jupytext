@@ -6,8 +6,8 @@ See also https://ipython.org/ipython-doc/3/notebook/nbformat.html#cell-metadata
 """
 
 import ast
-import json
 import re
+import json
 
 try:
     from json import JSONDecodeError
@@ -289,8 +289,8 @@ def parse_md_code_options(options):
                 split = err.colno - 1
             except AttributeError:
                 # str(err) is like: "ValueError: Extra data: line 1 column 7 - line 1 column 50 (char 6 - 49)"
-                m = re.match(r'.*char ([0-9]*)', str(err))
-                split = int(m.groups()[0])
+                match = re.match(r'.*char ([0-9]*)', str(err))
+                split = int(match.groups()[0])
 
             value = json.loads(options[:split])
             options = options[split:]
