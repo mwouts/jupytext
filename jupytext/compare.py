@@ -82,7 +82,7 @@ def compare_notebooks(notebook_expected,
     # Expected differences
     allow_filtered_cell_metadata = allow_expected_differences
     allow_splitted_markdown_cells = allow_expected_differences and ext in ['.md', '.Rmd']
-    allow_missing_code_cell_metadata = allow_expected_differences and (ext in ['.md'] or format_name == 'sphinx')
+    allow_missing_code_cell_metadata = allow_expected_differences and format_name == 'sphinx'
     allow_missing_markdown_cell_metadata = allow_expected_differences and (ext in ['.md', '.Rmd']
                                                                            or format_name in ['sphinx', 'spin'])
     allow_removed_final_blank_line = allow_expected_differences

@@ -85,8 +85,7 @@ def test_parse_wrong_json():
 
 def test_parse_md_options():
     assert md_options_to_metadata('python') == ('python', {})
-    assert md_options_to_metadata('not_a_language') == (None, {
-        'name': 'not_a_language'})
+    assert md_options_to_metadata('not_a_language') == (None, {'not_a_language': None})
 
 
 def test_write_parse_json():

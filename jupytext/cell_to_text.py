@@ -4,7 +4,8 @@ import re
 from copy import copy
 from .languages import cell_language, comment_lines
 from .cell_metadata import is_active, _IGNORE_CELL_METADATA
-from .cell_metadata import metadata_to_rmd_options, metadata_to_json_options, metadata_to_double_percent_options
+from .cell_metadata import metadata_to_md_options, metadata_to_rmd_options
+from .cell_metadata import metadata_to_json_options, metadata_to_double_percent_options
 from .metadata_filter import filter_metadata
 from .magics import comment_magic, escape_code_start
 from .cell_reader import LightScriptCellReader
@@ -119,8 +120,11 @@ class MarkdownCellExporter(BaseCellExporter):
         options = []
         if self.cell_type == 'code' and self.language:
             options.append(self.language)
-        if 'name' in self.metadata:
-            options.append(self.metadata['name'])
+
+        filtered_metadata = {key: self.metadata[key] for key in self.metadata
+                             if key not in ['active', 'language']}
+        if filtered_metadata:
+            options.append(metadata_to_md_options(filtered_metadata))
 
         return ['```{}'.format(' '.join(options))] + source + ['```']
 

@@ -76,7 +76,8 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
 
         if ext == '.md':
             for cell in notebook.cells:
-                cell.metadata = {}
+                if cell.cell_type == 'markdown':
+                    cell.metadata = {}
 
         compare_notebooks(notebook, nb_mirror, ext)
 
@@ -253,6 +254,6 @@ def test_ipynb_to_Rmd(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'Rmd', 'ipynb_to_Rmd')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='(66|frozen|magic)'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
 def test_ipynb_to_md(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'md', 'ipynb_to_md')
