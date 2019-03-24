@@ -9,6 +9,11 @@ import ast
 import json
 import re
 
+try:
+    from json import JSONDecodeError
+except ImportError:
+    JSONDecodeError = ValueError
+
 from .languages import _JUPYTER_LANGUAGES
 
 try:
@@ -279,9 +284,16 @@ def parse_md_code_options(options):
         try:
             value = json.loads(options)
             options = ''
-        except json.JSONDecodeError as err:
-            value = json.loads(options[:(err.colno - 1)])
-            options = options[(err.colno - 1):]
+        except JSONDecodeError as err:
+            try:
+                split = err.colno - 1
+            except AttributeError:
+                # str(err) is like: "ValueError: Extra data: line 1 column 7 - line 1 column 50 (char 6 - 49)"
+                m = re.match(r'.*char ([0-9]*)', str(err))
+                split = int(m.groups()[0])
+
+            value = json.loads(options[:split])
+            options = options[split:]
 
         metadata.append((name, value))
 
