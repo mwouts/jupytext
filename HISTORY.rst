@@ -3,6 +3,16 @@
 Release History
 ---------------
 
+1.1.0 (2019-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- TODO: Markdown and R Markdown formats now support metadata (#66, #111, #188)
+- TODO: Light format for Scripts can use folding markers to mark cells (#199)
+- TODO: More languages (#201)
+
+
 1.0.4 (2019-03-20)
 ++++++++++++++++++++++
 
