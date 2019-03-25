@@ -1121,7 +1121,7 @@ def test_share_py_recreate_ipynb(tmpdir, nb_file):
     cm.default_cell_metadata_filter = "-all"
 
     nb = readf(nb_file)
-    cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
+    model_ipynb = cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
@@ -1134,3 +1134,6 @@ def test_share_py_recreate_ipynb(tmpdir, nb_file):
 
     # ipynb is re-created
     assert os.path.isfile(tmp_ipynb)
+
+    # save time of ipynb is that of py file
+    assert model_ipynb['last_modified'] == model['last_modified']

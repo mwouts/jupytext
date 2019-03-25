@@ -13,6 +13,14 @@ Release History
 - TODO: More languages (#201)
 
 
+1.0.5 (2019-03-26)
+++++++++++++++++++++++
+
+**BugFixes**
+
+- Fix the error 'notebook file has changed on disk' when saving large notebooks (#207)
+
+
 1.0.4 (2019-03-20)
 ++++++++++++++++++++++
 

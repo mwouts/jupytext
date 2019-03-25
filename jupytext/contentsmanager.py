@@ -237,6 +237,7 @@ class TextFileContentsManager(FileContentsManager, Configurable):
 
             # Save as ipynb first
             return_value = None
+            value = None
             for fmt in jupytext_formats[::-1]:
                 if fmt['extension'] != '.ipynb':
                     continue
@@ -267,6 +268,8 @@ class TextFileContentsManager(FileContentsManager, Configurable):
                     if alt_path == path:
                         return_value = value
 
+            # Update modified timestamp to match that of the pair #207
+            return_value['last_modified'] = value['last_modified']
             return return_value
 
         except Exception as err:
