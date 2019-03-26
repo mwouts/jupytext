@@ -274,6 +274,7 @@ class MarkdownCellReader(BaseCellReader):
     """Read notebook cells from Markdown documents"""
     comment = ''
     start_code_re = re.compile(r"^```(.*)")
+    non_jupyter_code_re = re.compile(r"^```\{")
     end_code_re = re.compile(r"^```\s*$")
     start_region_re = re.compile(r"^\[region(.*)\]:\s*#\s*$")
     end_region_re = re.compile(r"^\[endregion\]:\s*#\s*$")
@@ -309,16 +310,41 @@ class MarkdownCellReader(BaseCellReader):
                 if self.end_region_re.match(line):
                     return i, i + 1, True
         elif self.metadata is None:
-            # default markdown: (last) two consecutive blank lines
+            # default markdown: (last) two consecutive blank lines, except when in code blocks
             self.cell_type = 'markdown'
             prev_blank = 0
+            in_explicit_code_block = False
+            in_indented_code_block = False
+
             for i, line in enumerate(lines):
+                if in_explicit_code_block and self.end_code_re.match(line):
+                    in_explicit_code_block = False
+                    continue
+
+                if self.non_jupyter_code_re and self.non_jupyter_code_re.match(line):
+                    in_explicit_code_block = True
+                    prev_blank = 0
+                    continue
+
+                if prev_blank and line.startswith('    ') and not _BLANK_LINE.match(line):
+                    in_indented_code_block = True
+                    prev_blank = 0
+                    continue
+
+                if in_indented_code_block and not _BLANK_LINE.match(line) and not line.startswith('    '):
+                    in_indented_code_block = False
+
+                if in_indented_code_block or in_explicit_code_block:
+                    continue
+
                 if self.start_code_re.match(line) or self.start_region_re.match(line):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False
+
                 if self.split_at_heading and line.startswith('#') and prev_blank >= 1:
                     return i - 1, i, False
+
                 if _BLANK_LINE.match(lines[i]):
                     prev_blank += 1
                 elif i > 2 and prev_blank >= 2:
@@ -347,6 +373,7 @@ class RMarkdownCellReader(MarkdownCellReader):
     """Read notebook cells from R Markdown notebooks"""
     comment = ''
     start_code_re = re.compile(r"^```{(.*)}\s*$")
+    non_jupyter_code_re = re.compile(r"^```([^\{]|\s*$)")
     default_language = 'R'
     default_comment_magics = True
 
