@@ -194,3 +194,68 @@ a raw cell
     combine_inputs_with_outputs(nb_source, nb_meta)
     for cell in nb_source.cells:
         assert cell.metadata == {'key': 'value'}, cell.source
+
+
+def test_jupyter_cell_is_not_split():
+    text = """Here we have a markdown
+file with a jupyter code cell
+
+```python
+1 + 1
+
+
+2 + 2
+```
+
+the code cell should become a Jupyter cell.
+"""
+    nb = jupytext.reads(text, 'md')
+    assert nb.cells[0].cell_type == 'markdown'
+    compare("""Here we have a markdown
+file with a jupyter code cell""", nb.cells[0].source)
+
+    assert nb.cells[1].cell_type == 'code'
+    compare("""1 + 1
+
+
+2 + 2""", nb.cells[1].source)
+
+    assert nb.cells[2].cell_type == 'markdown'
+    compare("the code cell should become a Jupyter cell.", nb.cells[2].source)
+    assert len(nb.cells) == 3
+
+
+def test_indented_code_is_not_split():
+    text = """Here we have a markdown
+file with an indented code cell
+
+    1 + 1
+
+
+    2 + 2
+
+the code cell should not become a Jupyter cell,
+nor be split into two pieces."""
+    nb = jupytext.reads(text, 'md')
+    compare(text, nb.cells[0].source)
+    assert nb.cells[0].cell_type == 'markdown'
+    assert len(nb.cells) == 1
+
+
+def test_non_jupyter_code_is_not_split():
+    text = """Here we have a markdown
+file with a non-jupyter code cell
+
+```{.python}
+1 + 1
+
+
+2 + 2
+```
+
+the code cell should not become a Jupyter cell,
+nor be split into two pieces."""
+    nb = jupytext.reads(text, 'md')
+    compare(text, nb.cells[0].source)
+    assert nb.cells[0].cell_type == 'markdown'
+    assert len(nb.cells) == 1
