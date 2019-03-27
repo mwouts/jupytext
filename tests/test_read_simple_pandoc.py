@@ -30,5 +30,5 @@ bibendum felis dictum sodales.
 :::
 '''):
     nb = jupytext.reads(markdown, 'md')
-    markdown2 = jupytext.writes(nb, 'md').replace('\r\n', '\n')
+    markdown2 = jupytext.writes(nb, 'md')
     compare(markdown, markdown2)

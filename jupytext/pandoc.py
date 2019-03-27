@@ -38,5 +38,6 @@ def md_to_notebook(text):
 
 def notebook_to_md(notebook):
     """Convert a notebook to its Markdown representation, using Pandoc"""
-    text = nbformat.writes(notebook)
-    return pandoc(u'--from ipynb --to markdown', text)
+    json = nbformat.writes(notebook)
+    text = pandoc(u'--from ipynb --to markdown', json)
+    return u'\n'.join(text.splitlines())
