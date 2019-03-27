@@ -228,11 +228,6 @@ class BaseCellReader(object):
             if lines_to_end_of_cell_marker != (0 if pep8_lines == 1 else 2):
                 self.metadata['lines_to_end_of_cell_marker'] = lines_to_end_of_cell_marker
 
-        # Exactly one empty line at the end of markdown cell?
-        if self.ext in ['.md', '.Rmd'] and _BLANK_LINE.match(source[-1]) and \
-                cell_end_marker < len(lines) and MarkdownCellReader.end_region_re.match(lines[cell_end_marker]):
-            source = source[:-1]
-
         if not is_active(self.ext, self.metadata) or \
                 ('active' not in self.metadata and self.language and self.language != self.default_language):
             self.content = uncomment(source, self.comment if self.ext not in ['.r', '.R'] else '#')
@@ -276,8 +271,8 @@ class MarkdownCellReader(BaseCellReader):
     start_code_re = re.compile(r"^```(.*)")
     non_jupyter_code_re = re.compile(r"^```\{")
     end_code_re = re.compile(r"^```\s*$")
-    start_region_re = re.compile(r"^\[region(.*)\]:\s*#\s*$")
-    end_region_re = re.compile(r"^\[endregion\]:\s*#\s*$")
+    start_region_re = re.compile(r"^<!--\s*#region(.*)-->\s*$")
+    end_region_re = re.compile(r"^<!--\s*#endregion\s*-->\s*$")
     default_comment_magics = False
 
     def __init__(self, fmt=None, default_language=None):
@@ -291,8 +286,16 @@ class MarkdownCellReader(BaseCellReader):
             self.in_region = True
             options = region.groups()[0].strip()
             if options:
-                options = re.sub(r'\\\[', u'[', re.sub(r'\\\]', u']', options))
+                start = options.find('{')
+                if start >= 0:
+                    title = options[:start].strip()
+                    options = options[start:]
+                else:
+                    title = options.strip()
+                    options = "{}"
                 self.metadata = json.loads(options)
+                if title:
+                    self.metadata['title'] = title
             else:
                 self.metadata = {}
         elif self.start_code_re.match(line):

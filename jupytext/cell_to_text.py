@@ -119,12 +119,16 @@ class MarkdownCellExporter(BaseCellExporter):
             # Is an explicit region required?
             if self.metadata or self.cell_reader(self.fmt).read(self.source)[1] < len(self.source):
                 if self.metadata:
-                    region_start = '[region {}]: #'.format(
-                        re.sub(r'\[', u'\\[', re.sub(r'\]', u'\\]', json.dumps(self.metadata))))
+                    region_start = ['<!-- #region']
+                    if 'title' in self.metadata and '{' not in self.metadata['title']:
+                        region_start.append(self.metadata.pop('title'))
+                    region_start.append(json.dumps(self.metadata))
+                    region_start.append('-->')
+                    region_start = ' '.join(region_start)
                 else:
-                    region_start = '[region]: #'
+                    region_start = '<!-- #region -->'
 
-                return [region_start] + self.source + ['', '[endregion]: #']
+                return [region_start] + self.source + ['<!-- #endregion -->']
             return self.source
 
         return self.code_to_text()

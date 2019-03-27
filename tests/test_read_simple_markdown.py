@@ -126,13 +126,12 @@ raw content
     compare(markdown, markdown2)
 
 
-def test_markdown_cell_with_metadata(markdown="""[region {"key": "value"}]: #
+def test_markdown_cell_with_metadata(markdown="""<!-- #region {"key": "value"} -->
 A long
 
 
 markdown cell
-
-[endregion]: #
+<!-- #endregion -->
 """):
     nb = jupytext.reads(markdown, 'md')
     compare(nb.cells[0], new_markdown_cell(source='A long\n\n\nmarkdown cell',
@@ -143,13 +142,12 @@ markdown cell
 
 def test_two_markdown_cells(markdown="""# A header
 
-[region]: #
+<!-- #region -->
 A long
 
 
 markdown cell
-
-[endregion]: #
+<!-- #endregion -->
 """):
     nb = jupytext.reads(markdown, 'md')
     compare(nb.cells[0], new_markdown_cell(source='# A header'))
