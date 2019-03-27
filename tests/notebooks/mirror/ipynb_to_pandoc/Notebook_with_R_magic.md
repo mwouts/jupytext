@@ -1,6 +1,5 @@
 ::: {.cell .markdown}
-A notebook with R cells
-=======================
+# A notebook with R cells
 
 This notebook shows the use of R cells to generate plots
 :::

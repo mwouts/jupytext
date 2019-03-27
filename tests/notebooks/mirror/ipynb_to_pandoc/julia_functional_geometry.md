@@ -358,8 +358,7 @@ ia.hide()
 :::
 
 ::: {.cell .markdown}
-Functional Geometry
-===================
+# Functional Geometry
 
 *Functional Geometry* is a paper by Peter Henderson ([original
 (1982)](users.ecs.soton.ac.uk/peter/funcgeo.pdf), [revisited
@@ -390,8 +389,7 @@ Original at
 :::
 
 ::: {.cell .markdown}
-In conclusion
--------------
+## In conclusion
 
 We described Escher\'s *Square Limit* from the description of its
 smaller parts, which in turn were described in terms of their smaller

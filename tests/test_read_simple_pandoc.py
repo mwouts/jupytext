@@ -22,13 +22,11 @@ print("hello")
 
 
 def test_pandoc_explicit(markdown='''::: {.cell .markdown}
-Lorem
-=====
+# Lorem
 
 **Lorem ipsum** dolor sit amet, consectetur adipiscing elit. Nunc luctus
 bibendum felis dictum sodales.
-:::
-'''):
+:::'''):
     nb = jupytext.reads(markdown, 'md')
     markdown2 = jupytext.writes(nb, 'md')
     compare(markdown, markdown2)

@@ -1,6 +1,5 @@
 ::: {.cell .markdown}
-Part one - various cells
-========================
+# Part one - various cells
 :::
 
 ::: {.cell .markdown}
@@ -45,8 +44,7 @@ of the raw cell
 :::
 
 ::: {.cell .markdown}
-Part two - cell metadata
-========================
+# Part two - cell metadata
 :::
 
 ::: {.cell .markdown key="value"}

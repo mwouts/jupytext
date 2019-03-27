@@ -32,12 +32,12 @@ def pandoc_version():
 
 def md_to_notebook(text):
     """Convert a Markdown text to a Jupyter notebook, using Pandoc"""
-    json = pandoc(u'--from markdown --to ipynb', text)
+    json = pandoc(u'--from markdown --to ipynb --atx-headers', text)
     return nbformat.reads(json, as_version=4)
 
 
 def notebook_to_md(notebook):
     """Convert a notebook to its Markdown representation, using Pandoc"""
     json = nbformat.writes(notebook)
-    text = pandoc(u'--from ipynb --to markdown', json)
+    text = pandoc(u'--from ipynb --to markdown --atx-headers', json)
     return u'\n'.join(text.splitlines())
