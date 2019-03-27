@@ -59,6 +59,8 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
         with open(mirror_file, encoding='utf-8') as fp:
             expected = fp.read()
 
+    if not actual.endswith('\n'):
+        actual = actual + '\n'
     compare(expected, actual)
 
     # Compare the two notebooks
@@ -257,3 +259,8 @@ def test_ipynb_to_Rmd(nb_file):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
 def test_ipynb_to_md(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'md', 'ipynb_to_md')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
+def test_ipynb_to_pandoc(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'md:pandoc', 'ipynb_to_pandoc')
