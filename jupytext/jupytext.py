@@ -16,6 +16,7 @@ from .header import encoding_and_executable, insert_or_test_version_number
 from .metadata_filter import update_metadata_filters
 from .languages import default_language_from_metadata_and_ext, set_main_and_cell_language
 from .pep8 import pep8_lines_between_cells
+from .pandoc import md_to_notebook, notebook_to_md
 
 
 class TextNotebookConverter(NotebookReader, NotebookWriter):
@@ -38,6 +39,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
     def reads(self, s, **_):
         """Read a notebook represented as text"""
+        if self.fmt.get('format_name') == 'pandoc':
+            return md_to_notebook(s)
+
         lines = s.splitlines()
 
         cells = []
@@ -93,6 +97,10 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         if 'main_language' in metadata.get('jupytext', {}):
             del metadata['jupytext']['main_language']
+
+        if self.fmt.get('format_name') == 'pandoc':
+            # TODO: filter notebook metadata, cell metadata, and remove outputs (optional)
+            return notebook_to_md(nb)
 
         header = encoding_and_executable(nb, metadata, self.ext)
         header_content, header_lines_to_next_cell = metadata_and_cell_to_header(nb, metadata,

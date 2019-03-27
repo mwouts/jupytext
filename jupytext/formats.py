@@ -16,6 +16,7 @@ from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
 from .metadata_filter import metadata_filter_as_string
 from .stringparser import StringParser
 from .languages import _SCRIPT_EXTENSIONS, _COMMENT_CHARS
+from .pandoc import pandoc_version
 
 
 class JupytextFormatError(ValueError):
@@ -134,6 +135,21 @@ JUPYTEXT_FORMATS = \
             current_version_number='1.1')
     ]
 
+
+def pandoc_format():
+    """Jupytext's format description for Pandoc's Markdown"""
+
+    return NotebookFormatDescription(
+        format_name='pandoc',
+        extension='.md',
+        header_prefix='',
+        cell_reader_class=None,
+        cell_exporter_class=None,
+        current_version_number=pandoc_version())
+
+
+JUPYTEXT_FORMATS.append(pandoc_format())
+
 NOTEBOOK_EXTENSIONS = list(dict.fromkeys(['.ipynb'] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
 EXTENSION_PREFIXES = ['.lgt', '.spx', '.pct', '.hyd', '.nb']
 
@@ -151,6 +167,9 @@ def get_format_implementation(ext, format_name=None):
             formats_for_extension.append(fmt.format_name)
 
     if formats_for_extension:
+        if ext == '.md' and format_name == 'pandoc':
+            raise JupytextFormatError('Please install pandoc>=2.7.1')
+
         raise JupytextFormatError("Format '{}' is not associated to extension '{}'. "
                                   "Please choose one of: {}.".format(format_name, ext,
                                                                      ', '.join(formats_for_extension)))
@@ -236,6 +255,11 @@ def guess_format(text, ext):
 
         if rspin_comment_count >= 1:
             return 'spin'
+
+    if ext == '.md':
+        for line in lines:
+            if line.startswith(':::'):  # Pandoc div
+                return 'pandoc'
 
     # Default format
     return get_format_implementation(ext).format_name
