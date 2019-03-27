@@ -83,6 +83,7 @@ def compare_notebooks(notebook_expected,
     allow_missing_code_cell_metadata = allow_expected_differences and format_name == 'sphinx'
     allow_missing_markdown_cell_metadata = allow_expected_differences and format_name in ['sphinx', 'spin']
     allow_removed_final_blank_line = allow_expected_differences
+    allow_different_line_breaks_in_markdown_cells = format_name == 'pandoc'
 
     cell_metadata_filter = notebook_actual.get('jupytext', {}).get('cell_metadata_filter')
 
@@ -142,6 +143,10 @@ def compare_notebooks(notebook_expected,
         test_lines.extend([line for line in test_cell.source.splitlines() if not _BLANK_LINE.match(line)])
 
         # 3. test cell content
+        if allow_different_line_breaks_in_markdown_cells and ref_cell.cell_type == 'markdown':
+            ref_lines = [' '.join(ref_lines)]
+            test_lines = [' '.join(test_lines)]
+
         if ref_lines != test_lines:
             if raise_on_first_difference:
                 try:
@@ -153,7 +158,8 @@ def compare_notebooks(notebook_expected,
                 modified_cells.add(i)
 
         # 3. bis test entire cell content
-        if not same_content(ref_cell.source, test_cell.source, allow_removed_final_blank_line):
+        if not same_content(ref_cell.source, test_cell.source, allow_removed_final_blank_line) and \
+                not allow_different_line_breaks_in_markdown_cells:
             try:
                 compare(ref_cell.source, test_cell.source)
             except AssertionError as error:
