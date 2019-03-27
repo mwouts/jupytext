@@ -334,10 +334,11 @@ Save Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdow
 
 [R Markdown](https://rmarkdown.rstudio.com/authoring_quick_tour.html) is [RStudio](https://www.rstudio.com/)'s format for notebooks, with support for R, Python, and many [other languages](https://bookdown.org/yihui/rmarkdown/language-engines.html).
 
-Our implementation for Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) or [R Markdown](https://rmarkdown.rstudio.com/authoring_quick_tour.html) documents is straightforward:
-- A YAML header contains the notebook metadata (Jupyter kernel, etc)
-- Markdown cells are inserted verbatim and separated with two blank lines. When required (cells with metadata, cells that contain two blank lines or code blocks), Jupytext inserts explicit start and end region markers in the form of Markdown comments: `[region]: #` and `[endregion]: #`.
-- Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are encoded in JSON format. The [code cell options](https://yihui.name/knitr/options/) in the R Markdown format are mapped to the corresponding Jupyter cell metadata options, when available.
+
+Jupytext's implementation for Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) or [R Markdown](https://rmarkdown.rstudio.com/authoring_quick_tour.html) documents is as follows:
+- The notebook metadata (Jupyter kernel, etc) goes to a YAML header
+- Code and raw cells are encoded as Markdown code blocks with triple backticks. In a Python notebook, a code cell starts with ` ```python` and ends with ` ``` `. Cell metadata are found after the language information, with a `key=value` syntax, where `value` is encoded in JSON format (Markdown) or R format (R Markdown). R Markdown [code cell options](https://yihui.name/knitr/options/) are mapped to the corresponding Jupyter cell metadata options, when available.
+- Markdown cells are inserted verbatim and separated with two blank lines. When required (cells with metadata, cells that contain two blank lines or code blocks), Jupytext protects the cell boundary with HTML comments: `<!-- #region -->` and `<!-- #endregion -->`. Cells with explicit boundaries are [foldable](https://code.visualstudio.com/docs/editor/codebasics#_folding) in vscode, and can accept both a title and/or metadata in JSON format: `<!-- #region This is the title for my protected cell {"key": "value"}-->`.
 
 See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.md) or [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
 

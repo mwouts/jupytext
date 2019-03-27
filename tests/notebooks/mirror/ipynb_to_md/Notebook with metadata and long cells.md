@@ -8,15 +8,14 @@ jupyter:
 
 # Part one - various cells
 
-[region]: #
+<!-- #region -->
 Here we have a markdown cell
 
 
 with two blank lines
+<!-- #endregion -->
 
-[endregion]: #
-
-[region]: #
+<!-- #region -->
 Now we have a markdown cell
 with a code block inside it
 
@@ -25,8 +24,7 @@ with a code block inside it
 ```
 
 After that cell we'll have a code cell
-
-[endregion]: #
+<!-- #endregion -->
 
 ```python
 2 + 2
@@ -45,10 +43,9 @@ of the raw cell
 
 # Part two - cell metadata
 
-[region {"key": "value"}]: #
+<!-- #region {"key": "value"} -->
 This is a markdown cell with cell metadata `{"key": "value"}`
-
-[endregion]: #
+<!-- #endregion -->
 
 ```python .class tags=["parameters"]
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
