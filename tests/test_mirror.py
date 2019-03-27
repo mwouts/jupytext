@@ -239,6 +239,11 @@ def test_sphinx_md_to_ipynb(nb_file):
                                      'sphinx-rst2md_to_ipynb', compare_notebook=True)
 
 
+@pytest.mark.parametrize('nb_file', list_notebooks('md'))
+def test_md_to_ipynb(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'ipynb', 'md_to_ipynb')
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('Rmd'))
 def test_Rmd_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ipynb', 'Rmd_to_ipynb')
