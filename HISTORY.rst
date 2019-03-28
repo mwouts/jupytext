@@ -3,6 +3,13 @@
 Release History
 ---------------
 
+1.0.6 (2019-03-28)
+++++++++++++++++++++++
+
+**BugFixes**
+
+- Base Jupytext's contents manager on ``LargeFileManager`` to allow large file uploads (#210)
+
 1.0.5 (2019-03-26)
 ++++++++++++++++++++++
 

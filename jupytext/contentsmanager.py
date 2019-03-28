@@ -14,7 +14,7 @@ try:
 except ImportError:
     pass
 
-from notebook.services.contents.filemanager import FileContentsManager
+from notebook.services.contents.largefilemanager import LargeFileManager
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 
 from .jupytext import reads, writes, create_prefix_dir
@@ -69,7 +69,7 @@ def _jupytext_reads(fmt):
     return _reads
 
 
-class TextFileContentsManager(FileContentsManager, Configurable):
+class TextFileContentsManager(LargeFileManager, Configurable):
     """
     A FileContentsManager Class that reads and stores notebooks to classical
     Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd), Julia (.jl),
