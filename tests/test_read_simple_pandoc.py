@@ -1,4 +1,5 @@
 from testfixtures import compare
+from jupytext.compare import compare_notebooks
 import jupytext
 
 
@@ -15,7 +16,7 @@ print("hello")
     markdown2 = jupytext.writes(nb, 'md')
 
     nb2 = jupytext.reads(markdown2, 'md')
-    compare(nb, nb2)
+    compare_notebooks(nb, nb2)
 
     markdown3 = jupytext.writes(nb2, 'md')
     compare(markdown2, markdown3)
@@ -28,5 +29,6 @@ def test_pandoc_explicit(markdown='''::: {.cell .markdown}
 bibendum felis dictum sodales.
 :::'''):
     nb = jupytext.reads(markdown, 'md')
+
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown, '\n'.join(markdown2.splitlines()[12:]))

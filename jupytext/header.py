@@ -70,6 +70,23 @@ def encoding_and_executable(notebook, metadata, ext):
     return lines
 
 
+def insert_jupytext_info_and_filter_metadata(metadata, ext, text_format):
+    """Update the notebook metadata to include Jupytext information, and filter
+    the notebook metadata according to the default or user filter"""
+    if insert_or_test_version_number():
+        metadata.setdefault('jupytext', {})['text_representation'] = {
+            'extension': ext,
+            'format_name': text_format.format_name,
+            'format_version': text_format.current_version_number,
+            'jupytext_version': __version__}
+
+    if 'jupytext' in metadata and not metadata['jupytext']:
+        del metadata['jupytext']
+
+    notebook_metadata_filter = metadata.get('jupytext', {}).get('notebook_metadata_filter')
+    return filter_metadata(metadata, notebook_metadata_filter, _DEFAULT_NOTEBOOK_METADATA)
+
+
 def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
     """
     Return the text header corresponding to a notebook, and remove the
@@ -90,18 +107,7 @@ def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
                 lines_to_next_cell = cell.metadata.get('lines_to_next_cell')
                 notebook.cells = notebook.cells[1:]
 
-    if insert_or_test_version_number():
-        metadata.setdefault('jupytext', {})['text_representation'] = {
-            'extension': ext,
-            'format_name': text_format.format_name,
-            'format_version': text_format.current_version_number,
-            'jupytext_version': __version__}
-
-    if 'jupytext' in metadata and not metadata['jupytext']:
-        del metadata['jupytext']
-
-    notebook_metadata_filter = metadata.get('jupytext', {}).get('notebook_metadata_filter')
-    metadata = filter_metadata(metadata, notebook_metadata_filter, _DEFAULT_NOTEBOOK_METADATA)
+    metadata = insert_jupytext_info_and_filter_metadata(metadata, ext, text_format)
 
     if metadata:
         header.extend(yaml.safe_dump({'jupyter': metadata}, default_flow_style=False).splitlines())
