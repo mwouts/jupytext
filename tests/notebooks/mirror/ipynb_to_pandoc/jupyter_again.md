@@ -1,4 +1,14 @@
-::: {.cell .code execution_count="6"}
+---
+jupyter:
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  nbformat: 4
+  nbformat_minor: 2
+---
+
+::: {.cell .code}
 ``` {.python}
 c = '''
 title: "Quick test"
@@ -12,24 +22,14 @@ editor_options:
 ```
 :::
 
-::: {.cell .code execution_count="7"}
+::: {.cell .code}
 ``` {.python}
 import yaml
 print(yaml.dump(yaml.load(c)))
 ```
-
-::: {.output .stream .stdout}
-    author: Marc Wouts
-    date: June 15, 2018
-    editor_options: chunk_output_type console
-    output:
-      ioslides_presentation: {smaller: true, widescreen: true}
-    subtitle: Slides generated using R, python and ioslides
-    title: Quick ioslides
-:::
 :::
 
-::: {.cell .code execution_count="7"}
+::: {.cell .code}
 ``` {.python}
 ?next
 ```

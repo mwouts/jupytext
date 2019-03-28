@@ -1,25 +1,27 @@
+---
+jupyter:
+  kernelspec:
+    display_name: R
+    language: R
+    name: ir
+  nbformat: 4
+  nbformat_minor: 2
+---
+
 ::: {.cell .markdown}
 This is a jupyter notebook that uses the IR kernel.
 :::
 
-::: {.cell .code execution_count="8"}
+::: {.cell .code}
 ``` {.R}
 sum(1:10)
 ```
-
-::: {.output .display_data}
-55
-:::
 :::
 
-::: {.cell .code execution_count="9"}
+::: {.cell .code}
 ``` {.R}
 plot(cars)
 ```
-
-::: {.output .display_data}
-![](6816e48e6ab4ff95b3497067ec010f529f3ae4c5.png)
-:::
 :::
 
 ::: {.cell .code}

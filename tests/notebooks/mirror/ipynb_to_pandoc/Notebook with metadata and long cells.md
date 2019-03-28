@@ -1,3 +1,13 @@
+---
+jupyter:
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  nbformat: 4
+  nbformat_minor: 2
+---
+
 ::: {.cell .markdown}
 # Part one - various cells
 :::
@@ -9,7 +19,8 @@ with two blank lines
 :::
 
 ::: {.cell .markdown}
-Now we have a markdown cell with a code block inside it
+Now we have a markdown cell
+with a code block inside it
 
 ``` {.python}
 1 + 1
@@ -18,17 +29,13 @@ Now we have a markdown cell with a code block inside it
 After that cell we\'ll have a code cell
 :::
 
-::: {.cell .code execution_count="1"}
+::: {.cell .code}
 ``` {.python}
 2 + 2
 
 
 3 + 3
 ```
-
-::: {.output .execute_result execution_count="1"}
-    6
-:::
 :::
 
 ::: {.cell .markdown}
@@ -51,14 +58,10 @@ of the raw cell
 This is a markdown cell with cell metadata `{"key": "value"}`
 :::
 
-::: {.cell .code execution_count="2" .class="null" tags="["parameters"]"}
+::: {.cell .code .class="null" tags="["parameters"]"}
 ``` {.python}
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
 ```
-
-::: {.output .execute_result execution_count="2"}
-    'This is a code cell with metadata `{"tags":["parameters"], ".class":null}`'
-:::
 :::
 
 ::: {.cell .raw key="value"}

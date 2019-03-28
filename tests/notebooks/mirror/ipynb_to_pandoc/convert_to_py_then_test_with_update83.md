@@ -1,22 +1,26 @@
-::: {.cell .code execution_count="1" scrolled="false"}
+---
+jupyter:
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  nbformat: 4
+  nbformat_minor: 2
+---
+
+::: {.cell .code}
 ``` {.python}
 %%time
 
 print('asdf')
 ```
-
-::: {.output .stream .stdout}
-    asdf
-    CPU times: user 132 µs, sys: 57 µs, total: 189 µs
-    Wall time: 188 µs
-:::
 :::
 
 ::: {.cell .markdown}
 Thanks for jupytext!
 :::
 
-::: {.cell .code collapsed="true"}
+::: {.cell .code}
 ``` {.python}
 ```
 :::

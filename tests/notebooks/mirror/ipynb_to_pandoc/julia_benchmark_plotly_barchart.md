@@ -1,4 +1,14 @@
-::: {.cell .code execution_count="1" collapsed="true"}
+---
+jupyter:
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  nbformat: 4
+  nbformat_minor: 2
+---
+
+::: {.cell .code}
 ``` {.python}
 # IJulia rocks! So does Plotly. Check it out
 
@@ -10,7 +20,7 @@ Plotly.signin(username, api_key)
 ```
 :::
 
-::: {.cell .code execution_count="13"}
+::: {.cell .code}
 ``` {.python}
 # Following data taken from http://julialang.org/ frontpage 
 benchmarks = ["fib", "parse_int", "quicksort3", "mandel", "pi_sum", "rand_mat_stat", "rand_mat_mul"]
@@ -57,13 +67,9 @@ s = string("<iframe height='750' id='igraph' scrolling='no' seamless='seamless' 
             "/700/700' width='750'></iframe>")
 display("text/html", s)
 ```
-
-::: {.output .display_data}
-<iframe height='750' id='igraph' scrolling='no' seamless='seamless' src='http://plot.ly/~bpostlethwaiteb/24/700/700' width='750'></iframe>
-:::
 :::
 
-::: {.cell .code execution_count="15"}
+::: {.cell .code}
 ``` {.python}
 # checkout https://plot.ly/api/ for more Julia examples!
 # But to show off some other Plotly features:
@@ -104,8 +110,4 @@ s = string("<iframe height='750' id='igraph' scrolling='no' seamless='seamless' 
             "/700/700' width='750'></iframe>")
 display("text/html", s)
 ```
-
-::: {.output .display_data}
-<iframe height='750' id='igraph' scrolling='no' seamless='seamless' src='http://plot.ly/~bpostlethwaiteb/26/700/700' width='750'></iframe>
-:::
 :::

@@ -1,12 +1,18 @@
-::: {.cell .code execution_count="1" ExecuteTime="{"start_time":"2018-10-17T10:31:56.157308Z","end_time":"2018-10-17T10:31:56.160823Z"}"}
+---
+jupyter:
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  nbformat: 4
+  nbformat_minor: 2
+---
+
+::: {.cell .code}
 ``` {.python}
 # This is an unfrozen cell. Works as usual.
 print("I'm a regular cell so I run and print!")
 ```
-
-::: {.output .stream .stdout}
-    I'm a regular cell so I run and print!
-:::
 :::
 
 ::: {.cell .code deletable="false" editable="false" run_control="{"frozen":true}"}

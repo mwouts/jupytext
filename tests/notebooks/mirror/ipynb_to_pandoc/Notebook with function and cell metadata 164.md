@@ -1,45 +1,43 @@
-::: {.cell .code execution_count="1"}
+---
+jupyter:
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  nbformat: 4
+  nbformat_minor: 2
+---
+
+::: {.cell .code}
 ``` {.python}
 1 + 1
 ```
-
-::: {.output .execute_result execution_count="1"}
-    2
-:::
 :::
 
 ::: {.cell .markdown}
-A markdown cell And below, the cell for function f has non trivial cell
-metadata. And the next cell as well.
+A markdown cell
+And below, the cell for function f has non trivial cell metadata. And the next cell as well.
 :::
 
-::: {.cell .code execution_count="2" attributes="{"n":"10","id":"","classes":[]}"}
+::: {.cell .code attributes="{"n":"10","id":"","classes":[]}"}
 ``` {.python}
 def f(x):
     return x
 ```
 :::
 
-::: {.cell .code execution_count="3" attributes="{"n":"10","id":"","classes":[]}"}
+::: {.cell .code attributes="{"n":"10","id":"","classes":[]}"}
 ``` {.python}
 f(5)
 ```
-
-::: {.output .execute_result execution_count="3"}
-    5
-:::
 :::
 
 ::: {.cell .markdown}
 More text
 :::
 
-::: {.cell .code execution_count="4"}
+::: {.cell .code}
 ``` {.python}
 2 + 2
 ```
-
-::: {.output .execute_result execution_count="4"}
-    4
-:::
 :::

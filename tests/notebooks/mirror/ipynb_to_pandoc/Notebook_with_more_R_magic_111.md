@@ -1,4 +1,14 @@
-::: {.cell .code execution_count="1"}
+---
+jupyter:
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  nbformat: 4
+  nbformat_minor: 2
+---
+
+::: {.cell .code}
 ``` {.python}
 %load_ext rpy2.ipython
 import pandas as pd
@@ -14,19 +24,10 @@ df = pd.DataFrame(
 ```
 :::
 
-::: {.cell .code execution_count="2"}
+::: {.cell .code}
 ``` {.python}
 %%R -i df
 library("ggplot2")
 ggplot(data = df) + geom_point(aes(x = X, y = Y, color = Letter, size = Z))
 ```
-
-::: {.output .stream .stderr}
-    C:\Users\Marco\AppData\Local\conda\conda\envs\python3\lib\site-packages\rpy2-2.9.4-py3.6-win-amd64.egg\rpy2\robjects\pandas2ri.py:191: FutureWarning: from_items is deprecated. Please use DataFrame.from_dict(dict(items), ...) instead. DataFrame.from_dict(OrderedDict(items)) may be used to preserve the key order.
-      res = PandasDataFrame.from_items(items)
-:::
-
-::: {.output .display_data}
-![](7d03ea06cc5a2be89de49cf90faff680e9b93dfa.png)
-:::
 :::
