@@ -3,11 +3,11 @@
 import os
 import subprocess
 import tempfile
-import packaging.version
 import nbformat
+from pkg_resources import parse_version
 
 
-class PandocError(ChildProcessError):
+class PandocError(OSError):
     """An error related to Pandoc"""
     pass
 
@@ -35,8 +35,7 @@ def pandoc(args, filein=None, fileout=None):
 def pandoc_version():
     """Pandoc's version number"""
     version = pandoc(u'--version').splitlines()[0].split()[1]
-
-    if packaging.version.parse(version) < packaging.version.parse('2.7.1'):
+    if parse_version(version) < parse_version('2.7.1'):
         raise PandocError('Please install pandoc>=2.7.1 (found version {})'.format(version))
 
     return version
