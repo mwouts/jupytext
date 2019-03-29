@@ -4,6 +4,7 @@ import re
 import pytest
 from jupytext.cli import system
 from jupytext.cell_reader import rst2md
+from jupytext.pandoc import is_pandoc_available
 
 skip_if_dict_is_not_ordered = pytest.mark.skipif(
     sys.version_info < (3, 6),
@@ -21,6 +22,7 @@ requires_black = pytest.mark.skipif(not tool_version('black'), reason='black not
 requires_flake8 = pytest.mark.skipif(not tool_version('flake8'), reason='flake8 not found')
 requires_autopep8 = pytest.mark.skipif(not tool_version('autopep8'), reason='autopep8 not found')
 requires_sphinx_gallery = pytest.mark.skipif(not rst2md, reason='sphinx_gallery not available')
+requires_pandoc = pytest.mark.skipif(not is_pandoc_available(), reason='pandoc>=2.7.1 not available')
 
 
 def list_notebooks(path='ipynb', skip='World'):

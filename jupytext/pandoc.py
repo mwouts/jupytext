@@ -32,6 +32,15 @@ def pandoc(args, filein=None, fileout=None):
     return out.decode('utf-8')
 
 
+def is_pandoc_available():
+    """Is Pandoc>=2.7.1 available?"""
+    try:
+        pandoc_version()
+        return True
+    except (IOError, PandocError):
+        return False
+
+
 def pandoc_version():
     """Pandoc's version number"""
     version = pandoc(u'--version').splitlines()[0].split()[1]

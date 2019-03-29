@@ -1,8 +1,10 @@
 from testfixtures import compare
 from jupytext.compare import compare_notebooks
 import jupytext
+from .utils import requires_pandoc
 
 
+@requires_pandoc
 def test_pandoc_implicit(markdown='''# Lorem ipsum
 
 **Lorem ipsum** dolor sit amet, consectetur adipiscing elit. Nunc luctus
@@ -22,6 +24,7 @@ print("hello")
     compare(markdown2, markdown3)
 
 
+@requires_pandoc
 def test_pandoc_explicit(markdown='''::: {.cell .markdown}
 # Lorem
 

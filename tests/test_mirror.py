@@ -12,7 +12,7 @@ import jupytext
 from jupytext.compare import compare_notebooks, combine_inputs_with_outputs
 from jupytext.formats import long_form_one_format
 from jupytext.paired_paths import full_path
-from .utils import list_notebooks, skip_if_dict_is_not_ordered
+from .utils import list_notebooks, skip_if_dict_is_not_ordered, requires_pandoc
 
 pytestmark = skip_if_dict_is_not_ordered
 
@@ -261,6 +261,7 @@ def test_ipynb_to_md(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'md', 'ipynb_to_md')
 
 
+@requires_pandoc
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
 def test_ipynb_to_pandoc(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'md:pandoc', 'ipynb_to_pandoc')

@@ -16,7 +16,7 @@ from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
 from .metadata_filter import metadata_filter_as_string
 from .stringparser import StringParser
 from .languages import _SCRIPT_EXTENSIONS, _COMMENT_CHARS
-from .pandoc import pandoc_version
+from .pandoc import pandoc_version, is_pandoc_available
 
 
 class JupytextFormatError(ValueError):
@@ -135,20 +135,14 @@ JUPYTEXT_FORMATS = \
             current_version_number='1.1')
     ]
 
-
-def pandoc_format():
-    """Jupytext's format description for Pandoc's Markdown"""
-
-    return NotebookFormatDescription(
+if is_pandoc_available():
+    JUPYTEXT_FORMATS.append(NotebookFormatDescription(
         format_name='pandoc',
         extension='.md',
         header_prefix='',
         cell_reader_class=None,
         cell_exporter_class=None,
-        current_version_number=pandoc_version())
-
-
-JUPYTEXT_FORMATS.append(pandoc_format())
+        current_version_number=pandoc_version()))
 
 NOTEBOOK_EXTENSIONS = list(dict.fromkeys(['.ipynb'] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
 EXTENSION_PREFIXES = ['.lgt', '.spx', '.pct', '.hyd', '.nb']
