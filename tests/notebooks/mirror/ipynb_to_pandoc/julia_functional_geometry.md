@@ -68,8 +68,8 @@ end
 fish = compose(context(units=UnitBox(260, 260)), stroke("black"),
             read_path(strip(readall("fish.path"))))
 
-rotatable(pic) = @manipulate for Î¸=0:0.001:2Ï€
-    compose(context(rotation=Rotation(Î¸)), pic)
+rotatable(pic) = @manipulate for θ=0:0.001:2π
+    compose(context(rotation=Rotation(θ)), pic)
 end
 
 blank = compose(context())

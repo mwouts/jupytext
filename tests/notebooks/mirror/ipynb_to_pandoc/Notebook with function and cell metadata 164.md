@@ -19,14 +19,14 @@ A markdown cell
 And below, the cell for function f has non trivial cell metadata. And the next cell as well.
 :::
 
-::: {.cell .code attributes="{"n":"10","id":"","classes":[]}"}
+::: {.cell .code attributes="{\"n\":\"10\",\"id\":\"\",\"classes\":[]}"}
 ``` {.python}
 def f(x):
     return x
 ```
 :::
 
-::: {.cell .code attributes="{"n":"10","id":"","classes":[]}"}
+::: {.cell .code attributes="{\"n\":\"10\",\"id\":\"\",\"classes\":[]}"}
 ``` {.python}
 f(5)
 ```

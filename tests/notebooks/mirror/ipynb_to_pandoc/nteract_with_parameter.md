@@ -10,7 +10,7 @@ jupyter:
   nbformat_minor: 2
 ---
 
-::: {.cell .code inputHidden="false" outputHidden="false" tags="["parameters"]"}
+::: {.cell .code inputHidden="false" outputHidden="false" tags="[\"parameters\"]"}
 ``` {.python}
 param = 4
 ```

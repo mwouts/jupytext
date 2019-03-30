@@ -15,7 +15,7 @@ print("I'm a regular cell so I run and print!")
 ```
 :::
 
-::: {.cell .code deletable="false" editable="false" run_control="{"frozen":true}"}
+::: {.cell .code deletable="false" editable="false" run_control="{\"frozen\":true}"}
 ``` {.python}
 # This is an frozen cell
 print("I'm frozen so Im not executed :(")

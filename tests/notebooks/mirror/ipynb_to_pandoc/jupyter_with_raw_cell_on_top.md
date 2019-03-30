@@ -9,7 +9,6 @@ jupyter:
 ---
 
 ::: {.cell .raw}
-```{=}
 ---
 title: "Quick test"
 output:
@@ -19,7 +18,6 @@ output:
 editor_options:
      chunk_output_type console
 ---
-```
 :::
 
 ::: {.cell .code}

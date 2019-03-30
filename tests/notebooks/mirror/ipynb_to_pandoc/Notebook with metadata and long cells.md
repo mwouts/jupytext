@@ -43,11 +43,9 @@ Followed by a raw cell
 :::
 
 ::: {.cell .raw}
-```{=}
 This is 
 the content
 of the raw cell
-```
 :::
 
 ::: {.cell .markdown}
@@ -58,14 +56,12 @@ of the raw cell
 This is a markdown cell with cell metadata `{"key": "value"}`
 :::
 
-::: {.cell .code .class="null" tags="["parameters"]"}
+::: {.cell .code .class="null" tags="[\"parameters\"]"}
 ``` {.python}
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
 ```
 :::
 
 ::: {.cell .raw key="value"}
-```{=}
 This is a raw cell with cell metadata `{"key": "value"}`
-```
 :::

@@ -15,9 +15,7 @@ jupyter:
 :::
 
 ::: {.cell .raw}
-```{=}
 This is a raw cell
-```
 :::
 
 ::: {.cell .markdown}
