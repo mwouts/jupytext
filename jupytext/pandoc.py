@@ -73,7 +73,7 @@ def notebook_to_md(notebook):
 
     pandoc(u'--from ipynb --to markdown -s --atx-headers --wrap=preserve', tmp_file.name, tmp_file.name)
 
-    with open(tmp_file.name) as opened_file:
+    with open(tmp_file.name, encoding='utf-8') as opened_file:
         text = opened_file.read()
 
     os.unlink(tmp_file.name)
