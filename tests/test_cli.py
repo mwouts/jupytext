@@ -15,7 +15,8 @@ from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, st
 from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths
 from jupytext.formats import long_form_one_format, JupytextFormatError
-from .utils import list_notebooks, requires_black, requires_flake8, requires_sphinx_gallery, skip_if_dict_is_not_ordered
+from .utils import list_notebooks, skip_if_dict_is_not_ordered
+from .utils import requires_black, requires_flake8, requires_sphinx_gallery, requires_jupytext_installed
 
 
 def test_str2bool():
@@ -335,6 +336,7 @@ def git_in_tmpdir(tmpdir):
     return git
 
 
+@requires_jupytext_installed
 @skip_if_dict_is_not_ordered
 def test_pre_commit_hook(tmpdir):
     tmp_ipynb = str(tmpdir.join('nb with spaces.ipynb'))
@@ -365,6 +367,7 @@ def test_pre_commit_hook(tmpdir):
     assert os.path.isfile(tmp_py)
 
 
+@requires_jupytext_installed
 @skip_if_dict_is_not_ordered
 def test_pre_commit_hook_in_subfolder(tmpdir):
     tmp_ipynb = str(tmpdir.join('nb with spaces.ipynb'))
@@ -395,6 +398,7 @@ def test_pre_commit_hook_in_subfolder(tmpdir):
     assert os.path.isfile(tmp_py)
 
 
+@requires_jupytext_installed
 @skip_if_dict_is_not_ordered
 def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     tmp_ipynb = str(tmpdir.join('nb with spaces.ipynb'))
@@ -668,6 +672,7 @@ def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir):
     compare_notebooks(nb, nb2, 'Rmd')
 
 
+@requires_jupytext_installed
 def test_cli_expect_errors(tmp_ipynb):
     with pytest.raises(ValueError):
         jupytext([])
