@@ -37,7 +37,7 @@ def is_pandoc_available():
     try:
         pandoc_version()
         return True
-    except (IOError, PandocError):
+    except (IOError, OSError, PandocError):
         return False
 
 
