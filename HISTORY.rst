@@ -9,12 +9,12 @@ Release History
 **Improvements**
 
 - Markdown and R Markdown formats now support metadata (#66, #111, #188)
-- TODO: Light format for Scripts can use folding markers to mark cells (#199)
-- TODO: More languages (#201)
+- The ``light`` format for Scripts can use custom cell markers, e.g. Vim or VScode/PyCharm folding markers (#199)
 
 **BugFixes**
 
 - Base Jupytext's contents manager on ``LargeFileManager`` to allow large file uploads (#210)
+- Use yaml.safe_load rather than yaml.load
 
 1.0.5 (2019-03-26)
 ++++++++++++++++++++++
