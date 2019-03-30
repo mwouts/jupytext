@@ -95,6 +95,9 @@ def compare_notebooks(notebook_expected,
     modified_cells = set()
     modified_cell_metadata = set()
     for i, ref_cell in enumerate(notebook_expected.cells, 1):
+        if replace_tabs_with_spaces and '\t' in ref_cell.source:
+            ref_cell = copy(ref_cell)
+            ref_cell.source = ref_cell.source.replace('\t', '    ')
         try:
             test_cell = next(test_cell_iter)
         except StopIteration:
