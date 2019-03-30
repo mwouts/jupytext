@@ -1,11 +1,12 @@
 # coding: utf-8
 
 import os
+import re
 import time
 import pytest
 import itertools
 import shutil
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell
+from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from tornado.web import HTTPError
 from testfixtures import compare
 import jupytext
@@ -1137,3 +1138,97 @@ def test_share_py_recreate_ipynb(tmpdir, nb_file):
 
     # save time of ipynb is that of py file
     assert model_ipynb['last_modified'] == model['last_modified']
+
+
+def test_vim_folding_markers(tmpdir):
+    tmp_ipynb = str(tmpdir.join('nb.ipynb'))
+    tmp_py = str(tmpdir.join('nb.py'))
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # Default Vim folding markers
+    cm.default_cell_boundaries = '{{{,}}}'
+    cm.default_jupytext_formats = 'ipynb,py'
+
+    nb = new_notebook(cells=[new_code_cell("""# region
+'''Sample cell with region markers'''
+'''End of the cell'''
+# end region"""),
+                             new_code_cell('a = 1\n\n\nb = 1')])
+    cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
+
+    assert os.path.isfile(tmp_ipynb)
+    assert os.path.isfile(tmp_py)
+
+    nb2 = cm.get(tmp_ipynb)['content']
+    compare_notebooks(nb, nb2)
+
+    nb3 = readf(tmp_py)
+    assert nb3.metadata['jupytext']['cell_boundaries'] == ['{{{', '}}}']
+
+    with open(tmp_py) as fp:
+        text = fp.read()
+
+    # Remove YAML header
+    text = re.sub(re.compile(r'# ---.*# ---\n\n', re.DOTALL), '', text)
+
+    compare("""# region
+'''Sample cell with region markers'''
+'''End of the cell'''
+# end region
+
+# {{{
+a = 1
+
+
+b = 1
+# }}}
+""", text)
+
+
+def test_vscode_pycharm_folding_markers(tmpdir):
+    tmp_ipynb = str(tmpdir.join('nb.ipynb'))
+    tmp_py = str(tmpdir.join('nb.py'))
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # Default VScode/PyCharm folding markers
+    cm.default_cell_boundaries = 'region,endregion'
+    cm.default_jupytext_formats = 'ipynb,py'
+
+    nb = new_notebook(cells=[new_code_cell("""# {{{
+'''Sample cell with region markers'''
+'''End of the cell'''
+# }}}"""),
+                             new_code_cell('a = 1\n\n\nb = 1')])
+    cm.save(model=dict(content=nb, type='notebook'), path='nb.ipynb')
+
+    assert os.path.isfile(tmp_ipynb)
+    assert os.path.isfile(tmp_py)
+
+    nb2 = cm.get(tmp_ipynb)['content']
+    compare_notebooks(nb, nb2)
+
+    nb3 = readf(tmp_py)
+    assert nb3.metadata['jupytext']['cell_boundaries'] == ['region', 'endregion']
+
+    with open(tmp_py) as fp:
+        text = fp.read()
+
+    # Remove YAML header
+    text = re.sub(re.compile(r'# ---.*# ---\n\n', re.DOTALL), '', text)
+
+    compare("""# {{{
+'''Sample cell with region markers'''
+'''End of the cell'''
+# }}}
+
+# region
+a = 1
+
+
+b = 1
+# endregion
+""", text)

@@ -148,6 +148,12 @@ class TextFileContentsManager(LargeFileManager, Configurable):
              'the ipynb notebook',
         config=True)
 
+    default_cell_boundaries = Unicode(
+        u'',
+        help='Start and end cell markers for the light format, comma separated. Use "{{{,}}}" to mark cells'
+             'as foldable regions in Vim, and "region,endregion" to mark cells as Vscode/PyCharm regions',
+        config=True)
+
     def drop_paired_notebook(self, path):
         """Remove the current notebook from the list of paired notebooks"""
         if path not in self.paired_notebooks:
@@ -187,6 +193,11 @@ class TextFileContentsManager(LargeFileManager, Configurable):
             format_options.setdefault('comment_magics', self.comment_magics)
         if self.split_at_heading:
             format_options.setdefault('split_at_heading', self.split_at_heading)
+        if self.default_cell_boundaries:
+            cell_marker_start, cell_marker_end = self.default_cell_boundaries.split(',')
+            assert cell_marker_start
+            assert cell_marker_end
+            format_options.setdefault('cell_boundaries', [cell_marker_start, cell_marker_end])
         if read and self.sphinx_convert_rst2md:
             format_options.setdefault('rst2md', self.sphinx_convert_rst2md)
 
@@ -215,10 +226,11 @@ class TextFileContentsManager(LargeFileManager, Configurable):
         try:
             metadata = nbk.get('metadata')
             rearrange_jupytext_metadata(metadata)
-            jupytext_formats = metadata.get('jupytext', {}).get('formats') or self.default_formats(path)
+            jupytext_metadata = metadata.setdefault('jupytext', {})
+            jupytext_formats = jupytext_metadata.get('formats') or self.default_formats(path)
 
             if not jupytext_formats:
-                text_representation = metadata.get('jupytext', {}).get('text_representation', {})
+                text_representation = jupytext_metadata.get('text_representation', {})
                 ext = os.path.splitext(path)[1]
                 fmt = {'extension': ext}
 
@@ -234,6 +246,10 @@ class TextFileContentsManager(LargeFileManager, Configurable):
 
             base, fmt = find_base_path_and_format(path, jupytext_formats)
             self.update_paired_notebooks(path, fmt, jupytext_formats)
+            self.set_default_format_options(jupytext_metadata)
+
+            if not jupytext_metadata:
+                metadata.pop('jupytext')
 
             # Save as ipynb first
             return_value = None
@@ -257,7 +273,6 @@ class TextFileContentsManager(LargeFileManager, Configurable):
 
                 alt_path = full_path(base, fmt)
                 self.create_prefix_dir(alt_path, fmt)
-                self.set_default_format_options(fmt)
                 if 'format_name' in fmt and fmt['extension'] not in ['.Rmd', '.md']:
                     self.log.info("Saving %s in format %s:%s",
                                   os.path.basename(alt_path), fmt['extension'][1:], fmt['format_name'])

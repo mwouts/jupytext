@@ -181,8 +181,12 @@ def reads(text, fmt, as_version=4, **kwargs):
     notebook = reader.reads(text, **kwargs)
     rearrange_jupytext_metadata(notebook.metadata)
 
+    notebook.metadata.setdefault('jupytext', {}).update({opt: fmt[opt] for opt in fmt
+                                                         if opt not in ['extension', 'format_name']})
+
     if format_name and insert_or_test_version_number():
-        notebook.metadata.setdefault('jupytext', {}).setdefault('text_representation', {}).update(fmt)
+        notebook.metadata.setdefault('jupytext', {}).setdefault('text_representation', {}).update(
+            {'extension': ext, 'format_name': format_name})
 
     return notebook
 
@@ -221,15 +225,16 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     ext = fmt['extension']
     format_name = fmt.get('format_name')
 
-    alt_fmt = metadata.get('jupytext', {}).get('text_representation', {})
-    if ext == alt_fmt.get('extension') and (not format_name or format_name == alt_fmt.get('format_name')):
-        fmt.update({opt: alt_fmt[opt] for opt in alt_fmt if opt not in fmt and opt not in
-                    ['format_version', 'jupytext_version']})
+    jupytext_metadata = metadata.get('jupytext', {})
+    fmt.update({opt: jupytext_metadata[opt] for opt in jupytext_metadata
+                if opt not in fmt and opt not in ['formats', 'text_representation']})
+    jupytext_metadata.update({opt: fmt[opt] for opt in fmt
+                              if opt not in ['format_name', 'extension']})
 
     if ext == '.ipynb':
         # Remove jupytext section if empty
-        metadata.get('jupytext', {}).pop('text_representation', {})
-        if not metadata.get('jupytext', {}):
+        jupytext_metadata.pop('text_representation', {})
+        if not jupytext_metadata:
             metadata.pop('jupytext', {})
         return nbformat.writes(new_notebook(cells=notebook.cells, metadata=metadata), version, **kwargs)
 

@@ -16,7 +16,7 @@ c = 3
 # }}}
 """):
     nb = jupytext.reads(script, 'py')
-    assert nb.metadata['jupytext']['text_representation']['cell_boundaries'] == ['{{{', '}}}']
+    assert nb.metadata['jupytext']['cell_boundaries'] == ['{{{', '}}}']
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[0].source == 'This is a markdown cell'
