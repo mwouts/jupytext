@@ -107,7 +107,7 @@ pd.options.display.max_columns = 20
 
 3 + 3
 """):
-    assert jupytext.formats.guess_format(script, '.py') == 'percent'
+    assert jupytext.formats.guess_format(script, '.py')[0] == 'percent'
     nb = jupytext.reads(script, '.py')
     assert len(nb.cells) == 5
 

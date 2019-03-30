@@ -195,9 +195,13 @@ class LightScriptCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as a Python or Julia script"""
     default_comment_magics = True
     use_cell_markers = True
+    cell_marker_start = None
+    cell_marker_end = None
 
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
+        if 'cell_boundaries' in self.fmt:
+            self.cell_marker_start, self.cell_marker_end = self.fmt['cell_boundaries']
         for key in ['endofcell']:
             if key in self.unfiltered_metadata:
                 self.metadata[key] = self.unfiltered_metadata[key]
@@ -225,17 +229,26 @@ class LightScriptCellExporter(BaseCellExporter):
             source = [self.comment + ' ' + line if line else self.comment for line in source]
 
         if self.explicit_start_marker(source):
-            self.metadata['endofcell'] = endofcell_marker(source, self.comment)
+            self.metadata['endofcell'] = self.cell_marker_end or endofcell_marker(source, self.comment)
 
         if not self.metadata or not self.use_cell_markers:
             return source
 
         lines = []
         endofcell = self.metadata['endofcell']
-        if endofcell == '-':
+        if endofcell == '-' or self.cell_marker_end:
             del self.metadata['endofcell']
-        options = metadata_to_json_options(self.metadata)
-        lines.append(self.comment + ' + {}'.format(options))
+
+        cell_start = [self.comment, self.cell_marker_start or '+']
+        if not self.cell_marker_start:
+            cell_start.append(metadata_to_json_options(self.metadata))
+        elif self.metadata:
+            if 'title' in self.metadata:
+                cell_start.append(self.metadata.pop('title'))
+            if self.metadata:
+                cell_start.append(metadata_to_json_options(self.metadata))
+
+        lines.append(' '.join(cell_start))
         lines.extend(source)
         lines.append(self.comment + ' {}'.format(endofcell))
         return lines
@@ -256,6 +269,8 @@ class LightScriptCellExporter(BaseCellExporter):
 
     def remove_eoc_marker(self, text, next_text):
         """Remove end of cell marker when next cell has an explicit start marker"""
+        if self.cell_marker_start:
+            return text
 
         if self.is_code() and text[-1] == self.comment + ' -':
             # remove end of cell marker when redundant with next explicit marker
@@ -279,6 +294,9 @@ class LightScriptCellExporter(BaseCellExporter):
 
     def simplify_soc_marker(self, text, prev_text):
         """Simplify start of cell marker when previous line is blank"""
+        if self.cell_marker_start:
+            return text
+
         if self.is_code() and text and text[0] == self.comment + ' + {}':
             if not prev_text or not prev_text[-1].strip():
                 text[0] = self.comment + ' +'

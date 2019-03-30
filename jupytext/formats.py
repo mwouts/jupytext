@@ -73,6 +73,7 @@ JUPYTEXT_FORMATS = \
             header_prefix=_SCRIPT_EXTENSIONS[ext]['comment'],
             cell_reader_class=LightScriptCellReader,
             cell_exporter_class=LightScriptCellExporter,
+            # Version 1.4 on 2019-03-30 - jupytext v1.1.0 - custom cell markers allowed
             # Version 1.3 on 2018-09-22 - jupytext v0.7.0rc0 : Metadata are
             # allowed for all cell types (and then include 'cell_type')
             # Version 1.2 on 2018-09-05 - jupytext v0.6.3 : Metadata bracket
@@ -80,7 +81,7 @@ JUPYTEXT_FORMATS = \
             # Version 1.1 on 2018-08-25 - jupytext v0.6.0 : Cells separated
             # with one blank line #38
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
-            current_version_number='1.3',
+            current_version_number='1.4',
             min_readable_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
     [
         NotebookFormatDescription(
@@ -182,7 +183,7 @@ def read_format_from_metadata(text, ext):
 
 
 def guess_format(text, ext):
-    """Guess the format of the file, given its extension and content"""
+    """Guess the format and format options of the file, given its extension and content"""
     lines = text.splitlines()
 
     metadata = read_metadata(text, ext)
@@ -190,7 +191,7 @@ def guess_format(text, ext):
     if ('jupytext' in metadata and set(metadata['jupytext'])
             .difference(['encoding', 'executable', 'main_language'])) or \
             set(metadata).difference(['jupytext']):
-        return format_name_for_ext(metadata, ext)
+        return format_name_for_ext(metadata, ext), {}
 
     # Is this a Hydrogen-like script?
     # Or a Sphinx-gallery script?
@@ -201,10 +202,15 @@ def guess_format(text, ext):
         double_percent_re = re.compile(r'^{}( %%|%%)$'.format(comment))
         double_percent_and_space_re = re.compile(r'^{}( %%|%%)\s'.format(comment))
         nbconvert_script_re = re.compile(r'^{}( <codecell>| In\[[0-9 ]*\]:?)'.format(comment))
+        vim_folding_markers_re = re.compile(r'^{}\s*'.format(comment) + '{{{')
+        vscode_folding_markers_re = re.compile(r'^{}\s*region'.format(comment))
+
         twenty_hash_count = 0
         double_percent_count = 0
         magic_command_count = 0
         rspin_comment_count = 0
+        vim_folding_markers_count = 0
+        vscode_folding_markers_count = 0
 
         parser = StringParser(language='R' if ext in ['.r', '.R'] else 'python')
         for line in lines:
@@ -226,19 +232,31 @@ def guess_format(text, ext):
             if line.startswith("#'") and ext in ['.R', '.r']:
                 rspin_comment_count += 1
 
+            if vim_folding_markers_re.match(line):
+                vim_folding_markers_count += 1
+
+            if vscode_folding_markers_re.match(line):
+                vscode_folding_markers_count += 1
+
         if double_percent_count >= 1:
             if magic_command_count:
-                return 'hydrogen'
-            return 'percent'
+                return 'hydrogen', {}
+            return 'percent', {}
+
+        if vim_folding_markers_count:
+            return 'light', {'cell_boundaries': ['{{{', '}}}']}
+
+        if vscode_folding_markers_count:
+            return 'light', {'cell_boundaries': ['region', 'endregion']}
 
         if twenty_hash_count >= 2:
-            return 'sphinx'
+            return 'sphinx', {}
 
         if rspin_comment_count >= 1:
-            return 'spin'
+            return 'spin', {}
 
     # Default format
-    return get_format_implementation(ext).format_name
+    return get_format_implementation(ext).format_name, {}
 
 
 def divine_format(text):
@@ -254,14 +272,14 @@ def divine_format(text):
         metadata, _, _, _ = header_to_metadata_and_cell(lines, comment)
         ext = metadata.get('jupytext', {}).get('text_representation', {}).get('extension')
         if ext:
-            return ext[1:] + ':' + guess_format(text, ext)
+            return ext[1:] + ':' + guess_format(text, ext)[0]
 
     # No metadata, but ``` on at least one line => markdown
     for line in lines:
         if line == '```':
             return 'md'
 
-    return 'py:' + guess_format(text, '.py')
+    return 'py:' + guess_format(text, '.py')[0]
 
 
 def check_file_version(notebook, source_path, outputs_path):
