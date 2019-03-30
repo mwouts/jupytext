@@ -23,6 +23,7 @@ Release History
 
 - Fix the error 'notebook file has changed on disk' when saving large notebooks (#207)
 
+
 1.0.4 (2019-03-20)
 ++++++++++++++++++++++
 
