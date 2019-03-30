@@ -1,4 +1,5 @@
 from testfixtures import compare
+from nbformat.v4.nbbase import new_notebook, new_markdown_cell
 from jupytext.compare import compare_notebooks
 import jupytext
 from .utils import requires_pandoc
@@ -35,3 +36,25 @@ bibendum felis dictum sodales.
 
     markdown2 = jupytext.writes(nb, 'md')
     compare(markdown, '\n'.join(markdown2.splitlines()[12:]))
+
+
+@requires_pandoc
+def test_pandoc_utf8_in_md(markdown='''::: {.cell .markdown}
+# Utf-8 support
+
+This is the greek letter $\pi$: π
+:::'''):
+    nb = jupytext.reads(markdown, 'md')
+
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, '\n'.join(markdown2.splitlines()[12:]))
+
+
+@requires_pandoc
+def test_pandoc_utf8_in_nb(nb=new_notebook(cells=[new_markdown_cell('''# Utf-8 support
+
+This is the greek letter $\pi$: π''')])):
+    markdown = jupytext.writes(nb, 'md:pandoc')
+    nb2 = jupytext.reads(markdown, 'md:pandoc')
+    nb2.metadata.pop('jupytext')
+    compare_notebooks(nb2, nb, 'md:pandoc')
