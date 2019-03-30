@@ -12,7 +12,7 @@ import jupytext
 from jupytext.compare import compare_notebooks, combine_inputs_with_outputs
 from jupytext.formats import long_form_one_format
 from jupytext.paired_paths import full_path
-from .utils import list_notebooks, skip_if_dict_is_not_ordered, requires_pandoc
+from .utils import list_notebooks, skip_if_dict_is_not_ordered, requires_pandoc, requires_sphinx_gallery
 
 pytestmark = skip_if_dict_is_not_ordered
 
@@ -225,16 +225,19 @@ def test_spin_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ipynb:spin', 'script_to_ipynb')
 
 
+@requires_sphinx_gallery
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='(raw|hash|frozen|magic|html|164|long)'))
 def test_ipynb_to_python_sphinx(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'py:sphinx', 'ipynb_to_sphinx')
 
 
+@requires_sphinx_gallery
 @pytest.mark.parametrize('nb_file', list_notebooks('sphinx'))
 def test_sphinx_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ipynb:sphinx', 'sphinx_to_ipynb')
 
 
+@requires_sphinx_gallery
 @pytest.mark.parametrize('nb_file', list_notebooks('sphinx'))
 def test_sphinx_md_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, {'extension': '.ipynb', 'format_name': 'sphinx', 'rst2md': True},
