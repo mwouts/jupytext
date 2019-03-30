@@ -166,18 +166,23 @@ def reads(text, fmt, as_version=4, **kwargs):
     if ext == '.ipynb':
         return nbformat.reads(text, as_version, **kwargs)
 
-    format_name = read_format_from_metadata(text, ext) or fmt.get('format_name') or guess_format(text, ext)
+    format_name = read_format_from_metadata(text, ext) or fmt.get('format_name')
+
+    if format_name:
+        format_options = {}
+    else:
+        format_name, format_options = guess_format(text, ext)
 
     if format_name:
         fmt['format_name'] = format_name
 
+    fmt.update(format_options)
     reader = TextNotebookConverter(fmt)
     notebook = reader.reads(text, **kwargs)
     rearrange_jupytext_metadata(notebook.metadata)
 
     if format_name and insert_or_test_version_number():
-        notebook.metadata.setdefault('jupytext', {}).setdefault('text_representation', {}).update(
-            {'extension': ext, 'format_name': format_name})
+        notebook.metadata.setdefault('jupytext', {}).setdefault('text_representation', {}).update(fmt)
 
     return notebook
 
@@ -215,6 +220,11 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     fmt = long_form_one_format(fmt, metadata)
     ext = fmt['extension']
     format_name = fmt.get('format_name')
+
+    alt_fmt = metadata.get('jupytext', {}).get('text_representation', {})
+    if ext == alt_fmt.get('extension') and (not format_name or format_name == alt_fmt.get('format_name')):
+        fmt.update({opt: alt_fmt[opt] for opt in alt_fmt if opt not in fmt and opt not in
+                    ['format_version', 'jupytext_version']})
 
     if ext == '.ipynb':
         # Remove jupytext section if empty

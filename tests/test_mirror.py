@@ -12,7 +12,7 @@ import jupytext
 from jupytext.compare import compare_notebooks, combine_inputs_with_outputs
 from jupytext.formats import long_form_one_format
 from jupytext.paired_paths import full_path
-from .utils import list_notebooks, skip_if_dict_is_not_ordered
+from .utils import list_notebooks, skip_if_dict_is_not_ordered, requires_sphinx_gallery
 
 pytestmark = skip_if_dict_is_not_ordered
 
@@ -93,6 +93,18 @@ def test_ipynb_to_julia(nb_file):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip=''))
 def test_ipynb_to_python(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'py', 'ipynb_to_script')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip=''))
+def test_ipynb_to_python_vim(nb_file):
+    assert_conversion_same_as_mirror(nb_file, {'extension': '.py', 'cell_boundaries': ['{{{', '}}}']},
+                                     'ipynb_to_script_vim_folding_markers')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip=''))
+def test_ipynb_to_python_vscode(nb_file):
+    assert_conversion_same_as_mirror(nb_file, {'extension': '.py', 'cell_boundaries': ['region', 'endregion']},
+                                     'ipynb_to_script_vscode_folding_markers')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R'))
@@ -233,6 +245,7 @@ def test_sphinx_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ipynb:sphinx', 'sphinx_to_ipynb')
 
 
+@requires_sphinx_gallery
 @pytest.mark.parametrize('nb_file', list_notebooks('sphinx'))
 def test_sphinx_md_to_ipynb(nb_file):
     assert_conversion_same_as_mirror(nb_file, {'extension': '.ipynb', 'format_name': 'sphinx', 'rst2md': True},
