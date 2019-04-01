@@ -1161,7 +1161,7 @@ def test_vim_folding_markers(tmpdir):
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
 
-    nb2 = cm.get(tmp_ipynb)['content']
+    nb2 = cm.get('nb.ipynb')['content']
     compare_notebooks(nb, nb2)
 
     nb3 = readf(tmp_py)
@@ -1208,7 +1208,7 @@ def test_vscode_pycharm_folding_markers(tmpdir):
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
 
-    nb2 = cm.get(tmp_ipynb)['content']
+    nb2 = cm.get('nb.ipynb')['content']
     compare_notebooks(nb, nb2)
 
     nb3 = readf(tmp_py)
