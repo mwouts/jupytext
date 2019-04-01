@@ -224,12 +224,6 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     format_name = fmt.get('format_name')
 
     jupytext_metadata = metadata.get('jupytext', {})
-    fmt.update({opt: jupytext_metadata[opt] for opt in jupytext_metadata
-                if opt not in fmt and opt not in ['formats', 'text_representation']})
-    jupytext_metadata.update({opt: fmt[opt] for opt in fmt
-                              if opt not in ['format_name', 'extension']})
-    if jupytext_metadata.get('rst2md') is True:
-        jupytext_metadata['rst2md'] = False
 
     if ext == '.ipynb':
         # Remove jupytext section if empty
@@ -267,8 +261,7 @@ def writef(notebook, nb_file, fmt=None):
 
     _, ext = os.path.splitext(nb_file)
     fmt = copy(fmt or {})
-    fmt = long_form_one_format(fmt)
-    fmt.update({'extension': ext})
+    fmt = long_form_one_format(fmt, update={'extension': ext})
 
     create_prefix_dir(nb_file, fmt)
 

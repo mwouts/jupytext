@@ -405,10 +405,11 @@ def rearrange_jupytext_metadata(metadata):
         metadata['jupytext'] = jupytext_metadata
 
 
-def long_form_one_format(jupytext_format, metadata=None):
+def long_form_one_format(jupytext_format, metadata=None, update={}):
     """Parse 'sfx.py:percent' into {'suffix':'sfx', 'extension':'py', 'format_name':'percent'}"""
     if isinstance(jupytext_format, dict):
-        return jupytext_format
+        jupytext_format.update(update)
+        return validate_one_format(jupytext_format)
 
     if not jupytext_format:
         return {}
@@ -443,7 +444,8 @@ def long_form_one_format(jupytext_format, metadata=None):
                                       "an actual script extension.")
 
     fmt['extension'] = ext
-    return fmt
+    fmt.update(update)
+    return validate_one_format(fmt)
 
 
 def long_form_multiple_formats(jupytext_formats, metadata=None):
@@ -455,9 +457,6 @@ def long_form_multiple_formats(jupytext_formats, metadata=None):
         jupytext_formats = [fmt for fmt in jupytext_formats.split(',') if fmt]
 
     jupytext_formats = [long_form_one_format(fmt, metadata) for fmt in jupytext_formats]
-
-    for fmt in jupytext_formats:
-        validate_one_format(fmt)
 
     return jupytext_formats
 
@@ -515,6 +514,8 @@ def validate_one_format(jupytext_format):
     if ext not in NOTEBOOK_EXTENSIONS + ['.auto']:
         raise JupytextFormatError("Extension '{}' is not a notebook extension. Please use one of '{}'.".format(
             ext, "', '".join(NOTEBOOK_EXTENSIONS + ['.auto'])))
+
+    return jupytext_format
 
 
 def auto_ext_from_metadata(metadata):

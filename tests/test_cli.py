@@ -138,7 +138,7 @@ def test_error_not_notebook_ext_input(tmpdir, capsys):
     with pytest.raises(JupytextFormatError) as info:
         jupytext([tmp_file, '--to', 'py'])
 
-    assert "No format associated to extension '.ext'" in str(info)
+    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info)
 
 
 @pytest.fixture
@@ -160,14 +160,14 @@ def test_error_not_notebook_ext_to(tmp_ipynb):
     with pytest.raises(JupytextFormatError) as info:
         jupytext([tmp_ipynb, '--to', 'ext'])
 
-    assert "No format associated to extension '.ext'" in str(info)
+    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info)
 
 
 def test_error_not_notebook_ext_output(tmp_ipynb, tmpdir):
     with pytest.raises(JupytextFormatError) as info:
         jupytext([tmp_ipynb, '-o', str(tmpdir.join('not.ext'))])
 
-    assert "No format associated to extension '.ext'" in str(info)
+    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info)
 
 
 def test_error_not_same_ext(tmp_ipynb, tmpdir):
