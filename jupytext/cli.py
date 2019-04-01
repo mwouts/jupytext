@@ -154,7 +154,7 @@ def jupytext(args=None):
 
     if args.version:
         log(__version__)
-        sys.exit(0)
+        return 0
 
     if args.pre_commit:
         if args.notebooks:
