@@ -171,7 +171,7 @@ def header_to_metadata_and_cell(lines, header_prefix, ext=None):
 
     if ended:
         if jupyter:
-            metadata.update(yaml.load('\n'.join(jupyter))['jupyter'])
+            metadata.update(yaml.safe_load('\n'.join(jupyter))['jupyter'])
 
         lines_to_next_cell = 1
         if len(lines) > i + 1:

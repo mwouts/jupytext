@@ -16,6 +16,7 @@ Release History
 - Base Jupytext's contents manager on ``LargeFileManager`` to allow large file uploads (#210)
 - Use yaml.safe_load rather than yaml.load
 
+
 1.0.5 (2019-03-26)
 ++++++++++++++++++++++
 
