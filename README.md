@@ -304,9 +304,8 @@ Note that `jupytext --test` compares the resulting notebooks according to its ex
 Please note that
 - Scripts opened with Jupyter have a default [metadata filter](#default-metadata-filtering) that prevents additional notebook or cell
 metadata to be added back to the script. Remove the filter if you want to store Jupytext's settings, or the kernel information, in the text file.
-- Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata.
+- Cell metadata are available in the `light` and `percent` formats, as well as in the Markdown and R Markdown formats. R scripts in `spin` format support cell metadata for code cells only. Sphinx Gallery scripts in `sphinx` format do not support cell metadata.
 - By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in the sections for [notebook specific](#-per-notebook-configuration) and [global settings](#default-metadata-filtering) for metadata filtering.
-- Representing a Jupyter notebook as a Markdown or R Markdown document has the effect of splitting markdown cells with two consecutive blank lines into multiple cells (as the two blank line pattern is used to separate cells).
 
 ### Reading notebooks in Python
 
@@ -354,9 +353,9 @@ The `light` format was created for this project. It is the default format for sc
 
 The `light` format has:
 - A (commented) YAML header, that contains the notebook metadata.
-- Markdown cells are commented, and separated with a blank line.
+- Markdown cells are commented, and separated from other cells with a blank line.
 - Code cells are exported verbatim (except for Jupyter magics, which are commented), and separated with blank lines. Code cells are reconstructed from consistent Python paragraphs (no function, class or multiline comment will be broken).
-- Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter `# +` (`// +` in C++, etc). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
+- Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter that is, by default, `# +` (`// +` in C++, etc). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The default end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
 The `light` format is currently available for Python, Julia, R, Bash, Scheme, Clojure, Matlab, Octave, C++ and q/kdb+. Open our sample notebook in the `light` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.lgt.py).
 
