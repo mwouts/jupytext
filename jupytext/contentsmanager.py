@@ -194,10 +194,7 @@ class TextFileContentsManager(LargeFileManager, Configurable):
         if self.split_at_heading:
             format_options.setdefault('split_at_heading', self.split_at_heading)
         if self.default_cell_boundaries:
-            cell_marker_start, cell_marker_end = self.default_cell_boundaries.split(',')
-            assert cell_marker_start
-            assert cell_marker_end
-            format_options.setdefault('cell_boundaries', [cell_marker_start, cell_marker_end])
+            format_options.setdefault('cell_boundaries', self.default_cell_boundaries)
         if read and self.sphinx_convert_rst2md:
             format_options.setdefault('rst2md', self.sphinx_convert_rst2md)
 

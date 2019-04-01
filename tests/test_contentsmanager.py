@@ -1165,7 +1165,7 @@ def test_vim_folding_markers(tmpdir):
     compare_notebooks(nb, nb2)
 
     nb3 = readf(tmp_py)
-    assert nb3.metadata['jupytext']['cell_boundaries'] == ['{{{', '}}}']
+    assert nb3.metadata['jupytext']['cell_boundaries'] == '{{{,}}}'
 
     with open(tmp_py) as fp:
         text = fp.read()
@@ -1212,7 +1212,7 @@ def test_vscode_pycharm_folding_markers(tmpdir):
     compare_notebooks(nb, nb2)
 
     nb3 = readf(tmp_py)
-    assert nb3.metadata['jupytext']['cell_boundaries'] == ['region', 'endregion']
+    assert nb3.metadata['jupytext']['cell_boundaries'] == 'region,endregion'
 
     with open(tmp_py) as fp:
         text = fp.read()

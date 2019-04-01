@@ -244,10 +244,10 @@ def guess_format(text, ext):
             return 'percent', {}
 
         if vim_folding_markers_count:
-            return 'light', {'cell_boundaries': ['{{{', '}}}']}
+            return 'light', {'cell_boundaries': '{{{,}}}'}
 
         if vscode_folding_markers_count:
-            return 'light', {'cell_boundaries': ['region', 'endregion']}
+            return 'light', {'cell_boundaries': 'region,endregion'}
 
         if twenty_hash_count >= 2:
             return 'sphinx', {}

@@ -7,6 +7,8 @@
 # editor_options:
 #      chunk_output_type console
 # jupyter:
+#   jupytext:
+#     cell_boundaries: '{{{,}}}'
 #   kernelspec:
 #     display_name: Python 3
 #     language: python

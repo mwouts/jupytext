@@ -362,7 +362,7 @@ The `light` format is currently available for Python, Julia, R, Bash, Scheme, Cl
 
 A variation of the `light` format is the `bare` format, with no cell marker at all. Please note that this format will split your code cells on code paragraphs. By default, this format still includes a YAML header - if you prefer to also remove the header, set `"notebook_metadata_filter": "-all"` in the jupytext section of your notebook metadata.  
 
-The `light` format can use custom cell boundaries instead of `# +` or `# -`. If you prefer to mark cells with VScode/PyCharm (resp. Vim) folding markers, set `"cell_boundaries": ["region", "endregion"]` (resp. `["{{{", "}}}"]`) in the jupytext section of the notebook metadata. If you want to configure this as a global default, add either
+The `light` format can use custom cell boundaries instead of `# +` or `# -`. If you prefer to mark cells with VScode/PyCharm (resp. Vim) folding markers, set `"cell_boundaries": "region,endregion"` (resp. `"{{{,}}}"`) in the jupytext section of the notebook metadata. If you want to configure this as a global default, add either
 ```python
 c.ContentsManager.default_cell_boundaries = "region,endregion"  # Use VScode/PyCharm region folding delimiters
 ```

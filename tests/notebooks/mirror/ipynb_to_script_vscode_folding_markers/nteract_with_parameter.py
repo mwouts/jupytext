@@ -1,5 +1,7 @@
 # ---
 # jupyter:
+#   jupytext:
+#     cell_boundaries: region,endregion
 #   kernel_info:
 #     name: python3
 #   kernelspec:
