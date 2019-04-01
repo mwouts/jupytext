@@ -36,6 +36,10 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             if opt in self.fmt:
                 metadata.setdefault('jupytext', {}).setdefault(opt, self.fmt[opt])
 
+        # rST to md conversion should happen only once
+        if metadata.get('jupytext', {}).get('rst2md') is True:
+            metadata['jupytext']['rst2md'] = False
+
     def reads(self, s, **_):
         """Read a notebook represented as text"""
         lines = s.splitlines()
@@ -78,18 +82,15 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 filtered_cells.append(cell)
             cells = filtered_cells
 
-        # The rst2md option applies just once
-        if self.fmt.get('rst2md'):
-            metadata['jupytext']['rst2md'] = False
-
         return new_notebook(cells=cells, metadata=metadata)
 
     def writes(self, nb, metadata=None, **kwargs):
         """Return the text representation of the notebook"""
         # Copy the notebook, in order to be sure we do not modify the original notebook
         nb = new_notebook(cells=nb.cells, metadata=deepcopy(metadata or nb.metadata))
+        metadata = nb.metadata
         default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension)
-        self.update_fmt_with_notebook_options(metadata)
+        self.update_fmt_with_notebook_options(nb.metadata)
 
         if 'main_language' in metadata.get('jupytext', {}):
             del metadata['jupytext']['main_language']
@@ -181,9 +182,6 @@ def reads(text, fmt, as_version=4, **kwargs):
     notebook = reader.reads(text, **kwargs)
     rearrange_jupytext_metadata(notebook.metadata)
 
-    notebook.metadata.setdefault('jupytext', {}).update({opt: fmt[opt] for opt in fmt
-                                                         if opt not in ['extension', 'format_name']})
-
     if format_name and insert_or_test_version_number():
         notebook.metadata.setdefault('jupytext', {}).setdefault('text_representation', {}).update(
             {'extension': ext, 'format_name': format_name})
@@ -230,6 +228,8 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
                 if opt not in fmt and opt not in ['formats', 'text_representation']})
     jupytext_metadata.update({opt: fmt[opt] for opt in fmt
                               if opt not in ['format_name', 'extension']})
+    if jupytext_metadata.get('rst2md') is True:
+        jupytext_metadata['rst2md'] = False
 
     if ext == '.ipynb':
         # Remove jupytext section if empty
