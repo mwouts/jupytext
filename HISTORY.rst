@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-1.1.0 (2019-??)
+1.1.0 (2019-04-??)
 ++++++++++++++++++++++
 
 **Improvements**
@@ -13,8 +13,8 @@ Release History
 
 **BugFixes**
 
-- Base Jupytext's contents manager on ``LargeFileManager`` to allow large file uploads (#210)
-- Use yaml.safe_load rather than yaml.load
+- Jupytext's contents manager is now based on ``LargeFileManager`` to allow large file uploads (#210)
+- YAML header parsed with yaml.safe_load rather than yaml.load
 
 
 1.0.5 (2019-03-26)
