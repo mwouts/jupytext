@@ -43,9 +43,11 @@ Followed by a raw cell
 :::
 
 ::: {.cell .raw}
+```{=ipynb}
 This is 
 the content
 of the raw cell
+```
 :::
 
 ::: {.cell .markdown}
@@ -63,5 +65,7 @@ This is a markdown cell with cell metadata `{"key": "value"}`
 :::
 
 ::: {.cell .raw key="value"}
+```{=ipynb}
 This is a raw cell with cell metadata `{"key": "value"}`
+```
 :::

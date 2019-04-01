@@ -265,6 +265,6 @@ def test_ipynb_to_md(nb_file):
 
 
 @requires_pandoc
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='(functional|Notebook with|raw_cell)'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='(functional|Notebook with)'))
 def test_ipynb_to_pandoc(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'md:pandoc', 'ipynb_to_pandoc')

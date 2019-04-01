@@ -15,7 +15,9 @@ jupyter:
 :::
 
 ::: {.cell .raw}
+```{=ipynb}
 This is a raw cell
+```
 :::
 
 ::: {.cell .markdown}
