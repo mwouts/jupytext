@@ -43,7 +43,6 @@ def filtered_notebook_metadata(notebook):
 
 class NotebookDifference(Exception):
     """Report notebook differences"""
-    pass
 
 
 def same_content(ref_source, test_source, allow_removed_final_blank_line):
@@ -100,8 +99,7 @@ def compare_notebooks(notebook_expected,
             if raise_on_first_difference:
                 raise NotebookDifference('No cell corresponding to {} cell #{}:\n{}'
                                          .format(ref_cell.cell_type, i, ref_cell.source))
-            else:
-                modified_cells.update(range(i, len(notebook_expected.cells) + 1))
+            modified_cells.update(range(i, len(notebook_expected.cells) + 1))
             break
 
         ref_lines = [line for line in ref_cell.source.splitlines() if not _BLANK_LINE.match(line)]
@@ -112,8 +110,7 @@ def compare_notebooks(notebook_expected,
             if raise_on_first_difference:
                 raise NotebookDifference("Unexpected cell type '{}' for {} cell #{}:\n{}"
                                          .format(test_cell.cell_type, ref_cell.cell_type, i, ref_cell.source))
-            else:
-                modified_cells.add(i)
+            modified_cells.add(i)
 
         # 2. test cell metadata
         if (ref_cell.cell_type == 'code' and not allow_missing_code_cell_metadata) or \
@@ -160,8 +157,7 @@ def compare_notebooks(notebook_expected,
                 if raise_on_first_difference:
                     raise NotebookDifference("Cell content differ on {} cell #{}: {}"
                                              .format(test_cell.cell_type, i, str(error)))
-                else:
-                    modified_cells.add(i)
+                modified_cells.add(i)
 
         if not compare_outputs:
             continue
@@ -182,8 +178,7 @@ def compare_notebooks(notebook_expected,
             if raise_on_first_difference:
                 raise NotebookDifference("Cell outputs differ on {} cell #{}: {}"
                                          .format(test_cell['cell_type'], i, str(error)))
-            else:
-                modified_cells.add(i)
+            modified_cells.add(i)
 
     # More cells in the actual notebook?
     remaining_cell_count = 0
@@ -208,8 +203,7 @@ def compare_notebooks(notebook_expected,
     except AssertionError as error:
         if raise_on_first_difference:
             raise NotebookDifference("Notebook metadata differ: {}".format(str(error)))
-        else:
-            modified_metadata = True
+        modified_metadata = True
 
     error = []
     if modified_cells:

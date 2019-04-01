@@ -541,8 +541,7 @@ class LightScriptCellReader(ScriptCellReader):
                 if self.end_code_re.match(line):
                     if nested_regions <= 1:
                         return i, i + 1, True
-                    else:
-                        nested_regions -= 1
+                    nested_regions -= 1
             elif _BLANK_LINE.match(line):
                 if not next_code_is_indented(lines[i:]):
                     if i > 0:

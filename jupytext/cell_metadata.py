@@ -46,12 +46,10 @@ def _r_logical_values(pybool):
 
 class RLogicalValueError(Exception):
     """Incorrect value for R boolean"""
-    pass
 
 
 class RMarkdownOptionParsingError(Exception):
     """Error when parsing Rmd cell options"""
-    pass
 
 
 def _py_logical_values(rbool):

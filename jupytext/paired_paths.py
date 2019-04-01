@@ -8,7 +8,6 @@ from .formats import short_form_one_format, short_form_multiple_formats
 class InconsistentPath(ValueError):
     """An exception raised when the path of a notebook is not consistent with the jupytext.format
     information it contains"""
-    pass
 
 
 def base_path(main_path, fmt):

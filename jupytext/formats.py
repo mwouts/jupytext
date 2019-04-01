@@ -20,7 +20,6 @@ from .languages import _SCRIPT_EXTENSIONS, _COMMENT_CHARS
 
 class JupytextFormatError(ValueError):
     """Error in the specification of the format for the text notebook"""
-    pass
 
 
 class NotebookFormatDescription:
@@ -405,10 +404,11 @@ def rearrange_jupytext_metadata(metadata):
         metadata['jupytext'] = jupytext_metadata
 
 
-def long_form_one_format(jupytext_format, metadata=None, update={}):
+def long_form_one_format(jupytext_format, metadata=None, update=None):
     """Parse 'sfx.py:percent' into {'suffix':'sfx', 'extension':'py', 'format_name':'percent'}"""
     if isinstance(jupytext_format, dict):
-        jupytext_format.update(update)
+        if update:
+            jupytext_format.update(update)
         return validate_one_format(jupytext_format)
 
     if not jupytext_format:
@@ -444,7 +444,8 @@ def long_form_one_format(jupytext_format, metadata=None, update={}):
                                       "an actual script extension.")
 
     fmt['extension'] = ext
-    fmt.update(update)
+    if update:
+        fmt.update(update)
     return validate_one_format(fmt)
 
 

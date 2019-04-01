@@ -183,7 +183,7 @@ def jupytext(args=None):
         if len(args.notebooks) != 1:
             raise ValueError('--paired-paths applies to a single notebook')
         print_paired_paths(args.notebooks[0], args.input_format)
-        return
+        return 1
 
     if not args.to and not args.output and not args.sync \
             and not args.pipe and not args.check \
@@ -325,8 +325,7 @@ def jupytext(args=None):
                     log("[jupytext] Updating '{}'".format(alt_path))
                     writef_git_add(notebook, alt_path, alt_fmt)
 
-    if round_trip_conversion_errors:
-        exit(round_trip_conversion_errors)
+    return round_trip_conversion_errors
 
 
 def notebooks_in_git_index(fmt):
