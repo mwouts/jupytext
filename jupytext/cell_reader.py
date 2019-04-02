@@ -149,45 +149,6 @@ class BaseCellReader(object):
         """Return language (str) and metadata (dict) from the option line"""
         raise NotImplementedError("Option parsing must be implemented in a sub class")
 
-    def find_code_cell_end(self, lines):
-        """Given that this is a code cell, return position of
-        end of cell marker, and position of next cell start"""
-        if self.metadata and 'cell_type' in self.metadata:
-            self.cell_type = self.metadata.pop('cell_type')
-        else:
-            self.cell_type = 'code'
-        parser = StringParser(self.language or self.default_language)
-        for i, line in enumerate(lines):
-            # skip cell header
-            if self.metadata is not None and i == 0:
-                continue
-
-            if parser.is_quoted():
-                parser.read_line(line)
-                continue
-
-            parser.read_line(line)
-
-            if self.start_code_re.match(line) or (self.markdown_prefix and line.startswith(self.markdown_prefix)):
-                if i > 0 and _BLANK_LINE.match(lines[i - 1]):
-                    if i > 1 and _BLANK_LINE.match(lines[i - 2]):
-                        return i - 2, i, False
-                    return i - 1, i, False
-                return i, i, False
-
-            if self.end_code_re:
-                if self.end_code_re.match(line):
-                    return i, i + 1, True
-            elif _BLANK_LINE.match(line):
-                if not next_code_is_indented(lines[i:]):
-                    if i > 0:
-                        return i, i + 1, False
-                    if len(lines) > 1 and not _BLANK_LINE.match(lines[1]):
-                        return 1, 1, False
-                    return 1, 2, False
-
-        return len(lines), len(lines), False
-
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position
         of first line after cell"""
@@ -430,7 +391,39 @@ class RScriptCellReader(ScriptCellReader):
 
             return len(lines), len(lines), False
 
-        return self.find_code_cell_end(lines)
+        if self.metadata and 'cell_type' in self.metadata:
+            self.cell_type = self.metadata.pop('cell_type')
+        else:
+            self.cell_type = 'code'
+
+        parser = StringParser(self.language or self.default_language)
+        for i, line in enumerate(lines):
+            # skip cell header
+            if self.metadata is not None and i == 0:
+                continue
+
+            if parser.is_quoted():
+                parser.read_line(line)
+                continue
+
+            parser.read_line(line)
+
+            if self.start_code_re.match(line) or (self.markdown_prefix and line.startswith(self.markdown_prefix)):
+                if i > 0 and _BLANK_LINE.match(lines[i - 1]):
+                    if i > 1 and _BLANK_LINE.match(lines[i - 2]):
+                        return i - 2, i, False
+                    return i - 1, i, False
+                return i, i, False
+
+            if _BLANK_LINE.match(line):
+                if not next_code_is_indented(lines[i:]):
+                    if i > 0:
+                        return i, i + 1, False
+                    if len(lines) > 1 and not _BLANK_LINE.match(lines[1]):
+                        return 1, 1, False
+                    return 1, 2, False
+
+        return len(lines), len(lines), False
 
 
 class LightScriptCellReader(ScriptCellReader):
