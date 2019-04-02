@@ -304,9 +304,8 @@ Note that `jupytext --test` compares the resulting notebooks according to its ex
 Please note that
 - Scripts opened with Jupyter have a default [metadata filter](#default-metadata-filtering) that prevents additional notebook or cell
 metadata to be added back to the script. Remove the filter if you want to store Jupytext's settings, or the kernel information, in the text file.
-- Cell metadata are available in `light` and `percent` formats for all cell types. Sphinx Gallery scripts in `sphinx` format do not support cell metadata. R Markdown and R scripts in `spin` format support cell metadata for code cells only. Markdown documents do not support cell metadata.
+- Cell metadata are available in the `light` and `percent` formats, as well as in the Markdown and R Markdown formats. R scripts in `spin` format support cell metadata for code cells only. Sphinx Gallery scripts in `sphinx` format do not support cell metadata.
 - By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in the sections for [notebook specific](#-per-notebook-configuration) and [global settings](#default-metadata-filtering) for metadata filtering.
-- Representing a Jupyter notebook as a Markdown or R Markdown document has the effect of splitting markdown cells with two consecutive blank lines into multiple cells (as the two blank line pattern is used to separate cells).
 
 ### Reading notebooks in Python
 
@@ -334,20 +333,19 @@ Save Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdow
 
 [R Markdown](https://rmarkdown.rstudio.com/authoring_quick_tour.html) is [RStudio](https://www.rstudio.com/)'s format for notebooks, with support for R, Python, and many [other languages](https://bookdown.org/yihui/rmarkdown/language-engines.html).
 
-Our implementation for Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) or [R Markdown](https://rmarkdown.rstudio.com/authoring_quick_tour.html) documents is straightforward:
-- A YAML header contains the notebook metadata (Jupyter kernel, etc)
-- Markdown cells are inserted verbatim, and separated with two blank lines
-- Code and raw cells start with triple backticks collated with cell language, and end with triple backticks. Cell metadata are not available in the Markdown format. The [code cell options](https://yihui.name/knitr/options/) in the R Markdown format are mapped to the corresponding Jupyter cell metadata options, when available.
+
+Jupytext's implementation for Jupyter notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) or [R Markdown](https://rmarkdown.rstudio.com/authoring_quick_tour.html) documents is as follows:
+- The notebook metadata (Jupyter kernel, etc) goes to a YAML header
+- Code and raw cells are encoded as Markdown code blocks with triple backticks. In a Python notebook, a code cell starts with ` ```python` and ends with ` ``` `. Cell metadata are found after the language information, with a `key=value` syntax, where `value` is encoded in JSON format (Markdown) or R format (R Markdown). R Markdown [code cell options](https://yihui.name/knitr/options/) are mapped to the corresponding Jupyter cell metadata options, when available.
+- Markdown cells are inserted verbatim and separated with two blank lines. When required (cells with metadata, cells that contain two blank lines or code blocks), Jupytext protects the cell boundary with HTML comments: `<!-- #region -->` and `<!-- #endregion -->`. Cells with explicit boundaries are [foldable](https://code.visualstudio.com/docs/editor/codebasics#_folding) in vscode, and can accept both a title and/or metadata in JSON format: `<!-- #region This is the title for my protected cell {"key": "value"}-->`.
 
 See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.md) or [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
 
-When editing Jupyter Markdown, you can split text into markdown cells by adding two blank lines at the point you want the text to split.  This is the default rule, but you may want to modify the rule for the case of Markdown headers in text.  By default, a single blank line followed by a Markdown header will not cause the cell to split, so the header will appear in the middle of a text cell.  You may prefer to always split text cells at headers.  If so, use the `split_at_heading` option. Set the option either on the command line, or by adding `"split_at_heading": true` to the jupytext section in the notebook metadata, or on Jupytext's content manager:
+When you open a plain Markdown file in Jupytext, the Markdown text is rendered in Markdown cells. Cells breaks occur when the text contains two consecutive blank lines (or code cells). If you want to also split cells on Markdown headers, so that headers prefixed by one blank line appear at the top of a new cell, use the `split_at_heading` option. Set the option either on the command line, or by adding `"split_at_heading": true` to the jupytext section in the notebook metadata, or on Jupytext's content manager:
 
 ```python
 c.ContentsManager.split_at_heading = True
 ```
-
-This will cause jupytext to split markdown text cells at heading prefixed by one blank line, so the heading appears at the top of a new cell.  Without this option, you would need two blank lines above the heading to cause the split.
 
 ### The `light` format for notebooks as scripts
 
@@ -355,13 +353,24 @@ The `light` format was created for this project. It is the default format for sc
 
 The `light` format has:
 - A (commented) YAML header, that contains the notebook metadata.
-- Markdown cells are commented, and separated with a blank line.
+- Markdown cells are commented, and separated from other cells with a blank line.
 - Code cells are exported verbatim (except for Jupyter magics, which are commented), and separated with blank lines. Code cells are reconstructed from consistent Python paragraphs (no function, class or multiline comment will be broken).
-- Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter `# +` (`// +` in C++, etc). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
+- Cells that contain more than one Python paragraphs need an explicit start-of-cell delimiter that is, by default, `# +` (`// +` in C++, etc). Cells that have explicit metadata have a cell header `# + {JSON}` where the metadata is represented, in JSON format. The default end of cell delimiter is `# -`, and is omitted when followed by another explicit start of cell marker.
 
 The `light` format is currently available for Python, Julia, R, Bash, Scheme, Clojure, Matlab, Octave, C++ and q/kdb+. Open our sample notebook in the `light` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.lgt.py).
 
 A variation of the `light` format is the `bare` format, with no cell marker at all. Please note that this format will split your code cells on code paragraphs. By default, this format still includes a YAML header - if you prefer to also remove the header, set `"notebook_metadata_filter": "-all"` in the jupytext section of your notebook metadata.  
+
+The `light` format can use custom cell markers instead of `# +` or `# -`. If you prefer to mark cells with VScode/PyCharm (resp. Vim) folding markers, set `"cell_markers": "region,endregion"` (resp. `"{{{,}}}"`) in the jupytext section of the notebook metadata. If you want to configure this as a global default, add either
+```python
+c.ContentsManager.default_cell_markers = "region,endregion"  # Use VScode/PyCharm region folding delimiters
+```
+or 
+```python
+c.ContentsManager.default_cell_markers = "{{{,}}}"           # Use Vim region folding delimiters
+```
+to your `.jupyter/jupyter_notebook_config.py` file.
+
 
 ### The `percent` format
 

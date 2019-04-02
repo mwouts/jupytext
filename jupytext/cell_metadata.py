@@ -1,21 +1,18 @@
 """
 Convert between text notebook metadata and jupyter cell metadata.
 
+Standard cell metadata are documented here:
 See also https://ipython.org/ipython-doc/3/notebook/nbformat.html#cell-metadata
-
-metadata.hide_input and metadata.hide_output are documented here:
-http://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html
-
-TODO: Update this if a standard gets defined at
-https://github.com/jupyter/notebook/issues/3700
-
-Note: Nteract uses "outputHidden" and "inputHidden". We may want to switch
-to those.
 """
 
 import ast
-import json
 import re
+from json import loads, dumps
+
+try:
+    from json import JSONDecodeError
+except ImportError:
+    JSONDecodeError = ValueError
 
 from .languages import _JUPYTER_LANGUAGES
 
@@ -24,6 +21,9 @@ try:
 except NameError:
     unicode = str  # Python 3
 
+# Map R Markdown's "echo" and "include" to "hide_input" and "hide_output", that are understood by the `runtools`
+# extension for Jupyter notebook, and by nbconvert (use the `hide_input_output.tpl` template).
+# See http://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html
 _BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
                                ('hide_output', 'include', True)]
 _JUPYTEXT_CELL_METADATA = [
@@ -46,12 +46,10 @@ def _r_logical_values(pybool):
 
 class RLogicalValueError(Exception):
     """Incorrect value for R boolean"""
-    pass
 
 
 class RMarkdownOptionParsingError(Exception):
     """Error when parsing Rmd cell options"""
-    pass
 
 
 def _py_logical_values(rbool):
@@ -253,27 +251,64 @@ def rmd_options_to_metadata(options):
     return metadata.get('language') or language, metadata
 
 
+def metadata_to_md_options(metadata):
+    """Encode {'class':None, 'key':'value'} into 'class key="value"' """
+
+    return ' '.join(["{}={}".format(key, dumps(metadata[key]))
+                     if metadata[key] is not None else key for key in metadata])
+
+
+def parse_md_code_options(options):
+    """Parse 'python class key="value"' into [('python', None), ('class', None), ('key', 'value')]"""
+
+    metadata = []
+    while options:
+        name_and_value = re.split(r'[\s=]+', options, maxsplit=1)
+        name = name_and_value[0]
+
+        # Equal sign in between name and what's next?
+        if len(name_and_value) == 2:
+            sep = options[len(name):-len(name_and_value[1])]
+            has_value = sep.find('=') >= 0
+            options = name_and_value[1]
+        else:
+            has_value = False
+            options = ''
+
+        if not has_value:
+            metadata.append((name, None))
+            continue
+
+        try:
+            value = loads(options)
+            options = ''
+        except JSONDecodeError as err:
+            try:
+                split = err.colno - 1
+            except AttributeError:
+                # str(err) is like: "ValueError: Extra data: line 1 column 7 - line 1 column 50 (char 6 - 49)"
+                match = re.match(r'.*char ([0-9]*)', str(err))
+                split = int(match.groups()[0])
+
+            value = loads(options[:split])
+            options = options[split:]
+
+        metadata.append((name, value))
+
+    return metadata
+
+
 def md_options_to_metadata(options):
-    """Parse markdown options and return language and metadata (cell name)"""
-    language = None
-    name = None
+    """Parse markdown options and return language and metadata"""
+    metadata = parse_md_code_options(options)
 
-    options = [opt for opt in options.split(' ') if opt != '']
-    if len(options) >= 2:
-        language, name = options[:2]
-    elif options:
-        language = options[0]
-
-    if language:
+    if metadata:
+        language = metadata[0][0]
         for lang in _JUPYTER_LANGUAGES + ['julia', 'scheme', 'c++']:
             if language.lower() == lang.lower():
-                if name:
-                    return lang, {'name': name}
-                return lang, {}
+                return lang, dict(metadata[1:])
 
-        return None, {'name': language}
-
-    return None, {}
+    return None, dict(metadata)
 
 
 def try_eval_metadata(metadata, name):
@@ -298,7 +333,7 @@ def try_eval_metadata(metadata, name):
 def json_options_to_metadata(options, add_brackets=True):
     """Read metadata from its json representation"""
     try:
-        options = json.loads('{' + options + '}' if add_brackets else options)
+        options = loads('{' + options + '}' if add_brackets else options)
         return options
     except ValueError:
         return {}
@@ -309,7 +344,7 @@ def metadata_to_json_options(metadata):
     for key in _JUPYTEXT_CELL_METADATA:
         metadata.pop(key, None)
 
-    return json.dumps(metadata)
+    return dumps(metadata)
 
 
 def is_active(ext, metadata):

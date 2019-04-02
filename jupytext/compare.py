@@ -43,7 +43,6 @@ def filtered_notebook_metadata(notebook):
 
 class NotebookDifference(Exception):
     """Report notebook differences"""
-    pass
 
 
 def same_content(ref_source, test_source, allow_removed_final_blank_line):
@@ -76,15 +75,12 @@ def compare_notebooks(notebook_expected,
     """Compare the two notebooks, and raise with a meaningful message
     that explains the differences, if any"""
     fmt = long_form_one_format(fmt)
-    ext = fmt.get('extension')
     format_name = fmt.get('format_name')
 
     # Expected differences
     allow_filtered_cell_metadata = allow_expected_differences
-    allow_splitted_markdown_cells = allow_expected_differences and ext in ['.md', '.Rmd']
-    allow_missing_code_cell_metadata = allow_expected_differences and (ext in ['.md'] or format_name == 'sphinx')
-    allow_missing_markdown_cell_metadata = allow_expected_differences and (ext in ['.md', '.Rmd']
-                                                                           or format_name in ['sphinx', 'spin'])
+    allow_missing_code_cell_metadata = allow_expected_differences and format_name == 'sphinx'
+    allow_missing_markdown_cell_metadata = allow_expected_differences and format_name in ['sphinx', 'spin']
     allow_removed_final_blank_line = allow_expected_differences
 
     cell_metadata_filter = notebook_actual.get('jupytext', {}).get('cell_metadata_filter')
@@ -103,61 +99,44 @@ def compare_notebooks(notebook_expected,
             if raise_on_first_difference:
                 raise NotebookDifference('No cell corresponding to {} cell #{}:\n{}'
                                          .format(ref_cell.cell_type, i, ref_cell.source))
-            else:
-                modified_cells.update(range(i, len(notebook_expected.cells) + 1))
+            modified_cells.update(range(i, len(notebook_expected.cells) + 1))
             break
 
         ref_lines = [line for line in ref_cell.source.splitlines() if not _BLANK_LINE.match(line)]
         test_lines = []
 
-        while True:
-            # 1. test cell type
-            if ref_cell.cell_type != test_cell.cell_type:
+        # 1. test cell type
+        if ref_cell.cell_type != test_cell.cell_type:
+            if raise_on_first_difference:
+                raise NotebookDifference("Unexpected cell type '{}' for {} cell #{}:\n{}"
+                                         .format(test_cell.cell_type, ref_cell.cell_type, i, ref_cell.source))
+            modified_cells.add(i)
+
+        # 2. test cell metadata
+        if (ref_cell.cell_type == 'code' and not allow_missing_code_cell_metadata) or \
+                (ref_cell.cell_type != 'code' and not allow_missing_markdown_cell_metadata):
+
+            if allow_filtered_cell_metadata:
+                ref_cell.metadata = {key: ref_cell.metadata[key] for key in ref_cell.metadata
+                                     if key not in _IGNORE_CELL_METADATA}
+                test_cell.metadata = {key: test_cell.metadata[key] for key in test_cell.metadata
+                                      if key not in _IGNORE_CELL_METADATA}
+
+            if ref_cell.metadata != test_cell.metadata:
                 if raise_on_first_difference:
-                    raise NotebookDifference("Unexpected cell type '{}' for {} cell #{}:\n{}"
-                                             .format(test_cell.cell_type, ref_cell.cell_type, i, ref_cell.source))
+                    try:
+                        compare(ref_cell.metadata, test_cell.metadata)
+                    except AssertionError as error:
+                        raise NotebookDifference("Metadata differ on {} cell #{}: {}\nCell content:\n{}"
+                                                 .format(test_cell.cell_type, i, str(error), ref_cell.source))
                 else:
-                    modified_cells.add(i)
+                    modified_cell_metadata.update(set(test_cell.metadata).difference(ref_cell.metadata))
+                    modified_cell_metadata.update(set(ref_cell.metadata).difference(test_cell.metadata))
+                    for key in set(ref_cell.metadata).intersection(test_cell.metadata):
+                        if ref_cell.metadata[key] != test_cell.metadata[key]:
+                            modified_cell_metadata.add(key)
 
-            # 2. test cell metadata
-            if (ref_cell.cell_type == 'code' and not allow_missing_code_cell_metadata) or \
-                    (ref_cell.cell_type != 'code' and not allow_missing_markdown_cell_metadata):
-
-                if allow_filtered_cell_metadata:
-                    ref_cell.metadata = {key: ref_cell.metadata[key] for key in ref_cell.metadata
-                                         if key not in _IGNORE_CELL_METADATA}
-                    test_cell.metadata = {key: test_cell.metadata[key] for key in test_cell.metadata
-                                          if key not in _IGNORE_CELL_METADATA}
-
-                if ref_cell.metadata != test_cell.metadata:
-                    if raise_on_first_difference:
-                        try:
-                            compare(ref_cell.metadata, test_cell.metadata)
-                        except AssertionError as error:
-                            raise NotebookDifference("Metadata differ on {} cell #{}: {}\nCell content:\n{}"
-                                                     .format(test_cell.cell_type, i, str(error), ref_cell.source))
-                    else:
-                        modified_cell_metadata.update(set(test_cell.metadata).difference(ref_cell.metadata))
-                        modified_cell_metadata.update(set(ref_cell.metadata).difference(test_cell.metadata))
-                        for key in set(ref_cell.metadata).intersection(test_cell.metadata):
-                            if ref_cell.metadata[key] != test_cell.metadata[key]:
-                                modified_cell_metadata.add(key)
-
-            test_lines.extend([line for line in test_cell.source.splitlines() if not _BLANK_LINE.match(line)])
-
-            if ref_cell.cell_type != 'markdown':
-                break
-
-            if not allow_splitted_markdown_cells:
-                break
-
-            if len(test_lines) >= len(ref_lines):
-                break
-
-            try:
-                test_cell = next(test_cell_iter)
-            except StopIteration:
-                break
+        test_lines.extend([line for line in test_cell.source.splitlines() if not _BLANK_LINE.match(line)])
 
         # 3. test cell content
         if ref_lines != test_lines:
@@ -171,16 +150,14 @@ def compare_notebooks(notebook_expected,
                 modified_cells.add(i)
 
         # 3. bis test entire cell content
-        if ref_cell.cell_type != 'markdown' or not allow_splitted_markdown_cells:
-            if not same_content(ref_cell.source, test_cell.source, allow_removed_final_blank_line):
-                try:
-                    compare(ref_cell.source, test_cell.source)
-                except AssertionError as error:
-                    if raise_on_first_difference:
-                        raise NotebookDifference("Cell content differ on {} cell #{}: {}"
-                                                 .format(test_cell.cell_type, i, str(error)))
-                    else:
-                        modified_cells.add(i)
+        if not same_content(ref_cell.source, test_cell.source, allow_removed_final_blank_line):
+            try:
+                compare(ref_cell.source, test_cell.source)
+            except AssertionError as error:
+                if raise_on_first_difference:
+                    raise NotebookDifference("Cell content differ on {} cell #{}: {}"
+                                             .format(test_cell.cell_type, i, str(error)))
+                modified_cells.add(i)
 
         if not compare_outputs:
             continue
@@ -201,8 +178,7 @@ def compare_notebooks(notebook_expected,
             if raise_on_first_difference:
                 raise NotebookDifference("Cell outputs differ on {} cell #{}: {}"
                                          .format(test_cell['cell_type'], i, str(error)))
-            else:
-                modified_cells.add(i)
+            modified_cells.add(i)
 
     # More cells in the actual notebook?
     remaining_cell_count = 0
@@ -227,8 +203,7 @@ def compare_notebooks(notebook_expected,
     except AssertionError as error:
         if raise_on_first_difference:
             raise NotebookDifference("Notebook metadata differ: {}".format(str(error)))
-        else:
-            modified_metadata = True
+        modified_metadata = True
 
     error = []
     if modified_cells:

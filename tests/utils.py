@@ -13,10 +13,11 @@ skip_if_dict_is_not_ordered = pytest.mark.skipif(
 def tool_version(tool):
     try:
         return system(tool, '--version')
-    except OSError:  # pragma: no cover
+    except (OSError, SystemExit):  # pragma: no cover
         return None
 
 
+requires_jupytext_installed = pytest.mark.skipif(not tool_version('jupytext'), reason='jupytext not installed')
 requires_black = pytest.mark.skipif(not tool_version('black'), reason='black not found')
 requires_flake8 = pytest.mark.skipif(not tool_version('flake8'), reason='flake8 not found')
 requires_autopep8 = pytest.mark.skipif(not tool_version('autopep8'), reason='autopep8 not found')

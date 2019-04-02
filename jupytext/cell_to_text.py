@@ -1,13 +1,15 @@
 """Export notebook cells as text"""
 
 import re
+import json
 from copy import copy
 from .languages import cell_language, comment_lines
 from .cell_metadata import is_active, _IGNORE_CELL_METADATA
-from .cell_metadata import metadata_to_rmd_options, metadata_to_json_options, metadata_to_double_percent_options
+from .cell_metadata import metadata_to_md_options, metadata_to_rmd_options
+from .cell_metadata import metadata_to_json_options, metadata_to_double_percent_options
 from .metadata_filter import filter_metadata
 from .magics import comment_magic, escape_code_start
-from .cell_reader import LightScriptCellReader
+from .cell_reader import LightScriptCellReader, MarkdownCellReader, RMarkdownCellReader
 from .languages import _SCRIPT_EXTENSIONS
 from .pep8 import pep8_lines_between_cells
 
@@ -105,32 +107,57 @@ class BaseCellExporter(object):
 class MarkdownCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as Markdown"""
     default_comment_magics = False
+    cell_reader = MarkdownCellReader
 
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
         self.comment = ''
 
+    def cell_to_text(self):
+        """Return the text representation of a cell"""
+        if self.cell_type == 'markdown':
+            # Is an explicit region required?
+            if self.metadata or self.cell_reader(self.fmt).read(self.source)[1] < len(self.source):
+                if self.metadata:
+                    region_start = ['<!-- #region']
+                    if 'title' in self.metadata and '{' not in self.metadata['title']:
+                        region_start.append(self.metadata.pop('title'))
+                    region_start.append(json.dumps(self.metadata))
+                    region_start.append('-->')
+                    region_start = ' '.join(region_start)
+                else:
+                    region_start = '<!-- #region -->'
+
+                return [region_start] + self.source + ['<!-- #endregion -->']
+            return self.source
+
+        return self.code_to_text()
+
     def code_to_text(self):
         """Return the text representation of a code cell"""
         source = copy(self.source)
-        escape_code_start(source, self.ext, self.language)
         comment_magic(source, self.language, self.comment_magics)
 
         options = []
         if self.cell_type == 'code' and self.language:
             options.append(self.language)
-        if 'name' in self.metadata:
-            options.append(self.metadata['name'])
+
+        filtered_metadata = {key: self.metadata[key] for key in self.metadata
+                             if key not in ['active', 'language']}
+
+        if filtered_metadata:
+            options.append(metadata_to_md_options(filtered_metadata))
 
         return ['```{}'.format(' '.join(options))] + source + ['```']
 
 
-class RMarkdownCellExporter(BaseCellExporter):
-    """A class that represent a notebook cell as Markdown"""
+class RMarkdownCellExporter(MarkdownCellExporter):
+    """A class that represent a notebook cell as R Markdown"""
     default_comment_magics = True
+    cell_reader = RMarkdownCellReader
 
     def __init__(self, *args, **kwargs):
-        BaseCellExporter.__init__(self, *args, **kwargs)
+        MarkdownCellExporter.__init__(self, *args, **kwargs)
         self.ext = '.Rmd'
         self.comment = ''
 
@@ -138,7 +165,6 @@ class RMarkdownCellExporter(BaseCellExporter):
         """Return the text representation of a code cell"""
         active = is_active(self.ext, self.metadata)
         source = copy(self.source)
-        escape_code_start(source, self.ext, self.language)
 
         if active:
             comment_magic(source, self.language, self.comment_magics)
@@ -169,9 +195,13 @@ class LightScriptCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as a Python or Julia script"""
     default_comment_magics = True
     use_cell_markers = True
+    cell_marker_start = None
+    cell_marker_end = None
 
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
+        if 'cell_markers' in self.fmt:
+            self.cell_marker_start, self.cell_marker_end = self.fmt['cell_markers'].split(',', 1)
         for key in ['endofcell']:
             if key in self.unfiltered_metadata:
                 self.metadata[key] = self.unfiltered_metadata[key]
@@ -199,17 +229,26 @@ class LightScriptCellExporter(BaseCellExporter):
             source = [self.comment + ' ' + line if line else self.comment for line in source]
 
         if self.explicit_start_marker(source):
-            self.metadata['endofcell'] = endofcell_marker(source, self.comment)
+            self.metadata['endofcell'] = self.cell_marker_end or endofcell_marker(source, self.comment)
 
         if not self.metadata or not self.use_cell_markers:
             return source
 
         lines = []
         endofcell = self.metadata['endofcell']
-        if endofcell == '-':
+        if endofcell == '-' or self.cell_marker_end:
             del self.metadata['endofcell']
-        options = metadata_to_json_options(self.metadata)
-        lines.append(self.comment + ' + {}'.format(options))
+
+        cell_start = [self.comment, self.cell_marker_start or '+']
+        if not self.cell_marker_start:
+            cell_start.append(metadata_to_json_options(self.metadata))
+        elif self.metadata:
+            if 'title' in self.metadata:
+                cell_start.append(self.metadata.pop('title'))
+            if self.metadata:
+                cell_start.append(metadata_to_json_options(self.metadata))
+
+        lines.append(' '.join(cell_start))
         lines.extend(source)
         lines.append(self.comment + ' {}'.format(endofcell))
         return lines
@@ -230,6 +269,8 @@ class LightScriptCellExporter(BaseCellExporter):
 
     def remove_eoc_marker(self, text, next_text):
         """Remove end of cell marker when next cell has an explicit start marker"""
+        if self.cell_marker_start:
+            return text
 
         if self.is_code() and text[-1] == self.comment + ' -':
             # remove end of cell marker when redundant with next explicit marker
@@ -253,6 +294,9 @@ class LightScriptCellExporter(BaseCellExporter):
 
     def simplify_soc_marker(self, text, prev_text):
         """Simplify start of cell marker when previous line is blank"""
+        if self.cell_marker_start:
+            return text
+
         if self.is_code() and text and text[0] == self.comment + ' + {}':
             if not prev_text or not prev_text[-1].strip():
                 text[0] = self.comment + ' +'

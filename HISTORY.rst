@@ -3,12 +3,28 @@
 Release History
 ---------------
 
+1.1.0 (2019-04-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Markdown and R Markdown formats now support metadata (#66, #111, #188)
+- The ``light`` format for Scripts can use custom cell markers, e.g. Vim or VScode/PyCharm folding markers (#199)
+
+**BugFixes**
+
+- Jupytext's contents manager is now based on ``LargeFileManager`` to allow large file uploads (#210)
+- YAML header parsed with yaml.safe_load rather than yaml.load
+- IPython line magic can be split across lines (#209)
+
+
 1.0.5 (2019-03-26)
 ++++++++++++++++++++++
 
 **BugFixes**
 
 - Fix the error 'notebook file has changed on disk' when saving large notebooks (#207)
+
 
 1.0.4 (2019-03-20)
 ++++++++++++++++++++++

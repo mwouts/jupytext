@@ -11,19 +11,19 @@ from .utils import list_notebooks
 @pytest.mark.parametrize('nb_file', list_notebooks('python'))
 def test_guess_format_light(nb_file):
     with open(nb_file) as stream:
-        assert guess_format(stream.read(), ext='.py') == 'light'
+        assert guess_format(stream.read(), ext='.py')[0] == 'light'
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('percent'))
 def test_guess_format_percent(nb_file):
     with open(nb_file) as stream:
-        assert guess_format(stream.read(), ext='.py') == 'percent'
+        assert guess_format(stream.read(), ext='.py')[0] == 'percent'
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('sphinx'))
 def test_guess_format_sphinx(nb_file):
     with open(nb_file) as stream:
-        assert guess_format(stream.read(), ext='.py') == 'sphinx'
+        assert guess_format(stream.read(), ext='.py')[0] == 'sphinx'
 
 
 def test_divine_format():
@@ -63,23 +63,23 @@ def test_get_format_implementation():
 
 def test_script_with_magics_not_percent(script="""# %%time
 1 + 2"""):
-    assert guess_format(script, '.py') == 'light'
+    assert guess_format(script, '.py')[0] == 'light'
 
 
 def test_script_with_spyder_cell_is_percent(script="""#%%
 1 + 2"""):
-    assert guess_format(script, '.py') == 'percent'
+    assert guess_format(script, '.py')[0] == 'percent'
 
 
 def test_script_with_percent_cell_and_magic_is_hydrogen(script="""#%%
 %matplotlib inline
 """):
-    assert guess_format(script, '.py') == 'hydrogen'
+    assert guess_format(script, '.py')[0] == 'hydrogen'
 
 
 def test_script_with_spyder_cell_with_name_is_percent(script="""#%% cell name
 1 + 2"""):
-    assert guess_format(script, '.py') == 'percent'
+    assert guess_format(script, '.py')[0] == 'percent'
 
 
 def test_read_format_from_metadata(script="""---

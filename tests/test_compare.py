@@ -35,19 +35,12 @@ def test_raise_on_incomplete_markdown_cell():
         compare_notebooks(ref, test, 'md')
 
 
-def test_does_not_raise_on_split_markdown_cell():
-    ref = new_notebook(cells=[new_markdown_cell('Cell one\n\n\nsecond line')])
-    test = new_notebook(cells=[new_markdown_cell('Cell one'),
-                               new_markdown_cell('second line')])
-    compare_notebooks(ref, test, 'md')
-
-
 def test_does_raise_on_split_markdown_cell():
     ref = new_notebook(cells=[new_markdown_cell('Cell one\n\n\nsecond line')])
     test = new_notebook(cells=[new_markdown_cell('Cell one'),
                                new_markdown_cell('second line')])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(ref, test, 'md', allow_expected_differences=False)
+        compare_notebooks(ref, test, 'md')
 
 
 def test_raise_on_different_cell_metadata():

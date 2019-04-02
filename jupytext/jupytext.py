@@ -36,6 +36,10 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             if opt in self.fmt:
                 metadata.setdefault('jupytext', {}).setdefault(opt, self.fmt[opt])
 
+        # rST to md conversion should happen only once
+        if metadata.get('jupytext', {}).get('rst2md') is True:
+            metadata['jupytext']['rst2md'] = False
+
     def reads(self, s, **_):
         """Read a notebook represented as text"""
         lines = s.splitlines()
@@ -78,18 +82,15 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 filtered_cells.append(cell)
             cells = filtered_cells
 
-        # The rst2md option applies just once
-        if self.fmt.get('rst2md'):
-            metadata['jupytext']['rst2md'] = False
-
         return new_notebook(cells=cells, metadata=metadata)
 
     def writes(self, nb, metadata=None, **kwargs):
         """Return the text representation of the notebook"""
         # Copy the notebook, in order to be sure we do not modify the original notebook
         nb = new_notebook(cells=nb.cells, metadata=deepcopy(metadata or nb.metadata))
+        metadata = nb.metadata
         default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension)
-        self.update_fmt_with_notebook_options(metadata)
+        self.update_fmt_with_notebook_options(nb.metadata)
 
         if 'main_language' in metadata.get('jupytext', {}):
             del metadata['jupytext']['main_language']
@@ -129,10 +130,12 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
             text.extend([''] * lines_to_next_cell)
 
-            # two blank lines between markdown cells in Rmd
+            # two blank lines between markdown cells in Rmd when those do not have explicit region markers
             if self.ext in ['.Rmd', '.md'] and not cell.is_code():
-                if i + 1 < len(cell_exporters) and not cell_exporters[i + 1].is_code() and (
-                        not split_at_heading or not (texts[i + 1] and texts[i + 1][0].startswith('#'))):
+                if (i + 1 < len(cell_exporters) and not cell_exporters[i + 1].is_code() and
+                        not texts[i][0].startswith('<!-- #region') and
+                        not texts[i + 1][0].startswith('<!-- #region') and
+                        (not split_at_heading or not (texts[i + 1] and texts[i + 1][0].startswith('#')))):
                     text.append('')
 
             # "" between two consecutive code cells in sphinx
@@ -164,11 +167,17 @@ def reads(text, fmt, as_version=4, **kwargs):
     if ext == '.ipynb':
         return nbformat.reads(text, as_version, **kwargs)
 
-    format_name = read_format_from_metadata(text, ext) or fmt.get('format_name') or guess_format(text, ext)
+    format_name = read_format_from_metadata(text, ext) or fmt.get('format_name')
+
+    if format_name:
+        format_options = {}
+    else:
+        format_name, format_options = guess_format(text, ext)
 
     if format_name:
         fmt['format_name'] = format_name
 
+    fmt.update(format_options)
     reader = TextNotebookConverter(fmt)
     notebook = reader.reads(text, **kwargs)
     rearrange_jupytext_metadata(notebook.metadata)
@@ -214,10 +223,12 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     ext = fmt['extension']
     format_name = fmt.get('format_name')
 
+    jupytext_metadata = metadata.get('jupytext', {})
+
     if ext == '.ipynb':
         # Remove jupytext section if empty
-        metadata.get('jupytext', {}).pop('text_representation', {})
-        if not metadata.get('jupytext', {}):
+        jupytext_metadata.pop('text_representation', {})
+        if not jupytext_metadata:
             metadata.pop('jupytext', {})
         return nbformat.writes(new_notebook(cells=notebook.cells, metadata=metadata), version, **kwargs)
 
@@ -250,8 +261,7 @@ def writef(notebook, nb_file, fmt=None):
 
     _, ext = os.path.splitext(nb_file)
     fmt = copy(fmt or {})
-    fmt = long_form_one_format(fmt)
-    fmt.update({'extension': ext})
+    fmt = long_form_one_format(fmt, update={'extension': ext})
 
     create_prefix_dir(nb_file, fmt)
 

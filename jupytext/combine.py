@@ -33,8 +33,9 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     output_other_cells = [cell for cell in nb_outputs.cells if cell.cell_type != 'code']
 
     fmt = long_form_one_format(fmt)
-    ext = fmt.get('extension')
-    format_name = fmt.get('format_name')
+    text_repr = nb_source.metadata.get('jupytext', {}).get('text_representation', {})
+    ext = fmt.get('extension') or text_repr.get('extension')
+    format_name = fmt.get('format_name') or text_repr.get('format_name')
 
     nb_outputs_filtered_metadata = copy(nb_outputs.metadata)
     filter_metadata(nb_outputs_filtered_metadata,
@@ -45,6 +46,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
         if key not in nb_outputs_filtered_metadata:
             nb_source.metadata[key] = nb_outputs.metadata[key]
 
+    source_is_md_version_one = ext in ['.md', '.Rmd'] and text_repr.get('format_version') == '1.0'
     if nb_source.metadata.get('jupytext', {}).get('formats') or ext in ['.md', '.Rmd']:
         nb_source.metadata.get('jupytext', {}).pop('text_representation', None)
 
@@ -64,7 +66,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
                     cell.outputs = ocell.outputs
 
                     # Append cell metadata that was filtered
-                    if (ext and ext.endswith('.md')) or format_name in ['bare', 'sphinx']:
+                    if format_name in ['bare', 'sphinx'] or source_is_md_version_one:
                         ocell_filtered_metadata = {}
                     else:
                         ocell_filtered_metadata = copy(ocell.metadata)
@@ -81,8 +83,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
         else:
             for i, ocell in enumerate(output_other_cells):
                 if cell.cell_type == ocell.cell_type and same_content(cell.source, ocell.source):
-                    if (ext and (ext.endswith('.md') or ext.endswith('.Rmd'))) \
-                            or format_name in ['spin', 'bare', 'sphinx', 'sphinx']:
+                    if format_name in ['spin', 'bare', 'sphinx'] or source_is_md_version_one:
                         ocell_filtered_metadata = {}
                     else:
                         ocell_filtered_metadata = copy(ocell.metadata)

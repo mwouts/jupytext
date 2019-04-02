@@ -1,5 +1,7 @@
+from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from testfixtures import compare
 import jupytext
+from jupytext.combine import combine_inputs_with_outputs
 
 
 def test_read_mostly_py_markdown_file(markdown="""---
@@ -63,36 +65,6 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
     compare(markdown, markdown2)
 
 
-def test_escape_start_pattern(markdown="""The code start pattern '```{}' can
-appear in code and markdown cells.
-
-
-In markdown cells it is escaped like here:
-# ```r
-
-```python sample_python_cell
-# In code cells like this one, it is also escaped
-# ```python cell_name
-1 + 1
-%matplotlib inline
-```
-"""):
-    nb = jupytext.reads(markdown, 'md')
-    assert len(nb.cells) == 3
-    assert nb.cells[0].cell_type == 'markdown'
-    assert nb.cells[1].cell_type == 'markdown'
-    assert nb.cells[2].cell_type == 'code'
-    assert nb.cells[1].source == '''In markdown cells it is escaped like here:
-```r'''
-    assert (nb.cells[2].source ==
-            '''# In code cells like this one, it is also escaped
-```python cell_name
-1 + 1
-%matplotlib inline''')
-    markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
-
-
 def test_read_julia_notebook(markdown="""```julia
 1 + 1
 ```
@@ -131,3 +103,157 @@ def test_split_on_header_after_two_blank_lines(markdown="""A paragraph
     nb = jupytext.reads(markdown, fmt)
     markdown2 = jupytext.writes(nb, fmt)
     compare(markdown, markdown2)
+
+
+def test_code_cell_with_metadata(markdown="""```python tags=["parameters"]
+a = 1
+b = 2
+```
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    compare(nb.cells[0], new_code_cell(source='a = 1\nb = 2', metadata={'tags': ['parameters']}))
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
+def test_raw_cell_with_metadata(markdown="""```key="value"
+raw content
+```
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    compare(nb.cells[0], new_raw_cell(source='raw content', metadata={'key': 'value'}))
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
+def test_markdown_cell_with_metadata(markdown="""<!-- #region {"key": "value"} -->
+A long
+
+
+markdown cell
+<!-- #endregion -->
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    compare(nb.cells[0], new_markdown_cell(source='A long\n\n\nmarkdown cell',
+                                           metadata={'key': 'value'}))
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
+def test_two_markdown_cells(markdown="""# A header
+
+<!-- #region -->
+A long
+
+
+markdown cell
+<!-- #endregion -->
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    compare(nb.cells[0], new_markdown_cell(source='# A header'))
+    compare(nb.cells[1], new_markdown_cell(source='A long\n\n\nmarkdown cell'))
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
+def test_combine_md_version_one():
+    markdown = """---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.0'
+      jupytext_version: 1.0.0
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+A short markdown cell
+
+```
+a raw cell
+```
+
+```python
+1 + 1
+```
+"""
+    # notebook read from markdown file in version 1.0
+    nb_source = jupytext.reads(markdown, 'md')
+
+    # actual notebook has metadata
+    nb_meta = jupytext.reads(markdown, 'md')
+    for cell in nb_meta.cells:
+        cell.metadata = {'key': 'value'}
+
+    combine_inputs_with_outputs(nb_source, nb_meta)
+    for cell in nb_source.cells:
+        assert cell.metadata == {'key': 'value'}, cell.source
+
+
+def test_jupyter_cell_is_not_split():
+    text = """Here we have a markdown
+file with a jupyter code cell
+
+```python
+1 + 1
+
+
+2 + 2
+```
+
+the code cell should become a Jupyter cell.
+"""
+    nb = jupytext.reads(text, 'md')
+    assert nb.cells[0].cell_type == 'markdown'
+    compare("""Here we have a markdown
+file with a jupyter code cell""", nb.cells[0].source)
+
+    assert nb.cells[1].cell_type == 'code'
+    compare("""1 + 1
+
+
+2 + 2""", nb.cells[1].source)
+
+    assert nb.cells[2].cell_type == 'markdown'
+    compare("the code cell should become a Jupyter cell.", nb.cells[2].source)
+    assert len(nb.cells) == 3
+
+
+def test_indented_code_is_not_split():
+    text = """Here we have a markdown
+file with an indented code cell
+
+    1 + 1
+
+
+    2 + 2
+
+the code cell should not become a Jupyter cell,
+nor be split into two pieces."""
+    nb = jupytext.reads(text, 'md')
+    compare(text, nb.cells[0].source)
+    assert nb.cells[0].cell_type == 'markdown'
+    assert len(nb.cells) == 1
+
+
+def test_non_jupyter_code_is_not_split():
+    text = """Here we have a markdown
+file with a non-jupyter code cell
+
+```{.python}
+1 + 1
+
+
+2 + 2
+```
+
+the code cell should not become a Jupyter cell,
+nor be split into two pieces."""
+    nb = jupytext.reads(text, 'md')
+    compare(text, nb.cells[0].source)
+    assert nb.cells[0].cell_type == 'markdown'
+    assert len(nb.cells) == 1
