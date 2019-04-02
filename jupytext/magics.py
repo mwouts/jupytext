@@ -13,6 +13,7 @@ _MAGIC_FORCE_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
 _MAGIC_NOT_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
     r"^({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*noescape".format(
         _SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS}
+_LINE_CONTINUATION_RE = re.compile(r'.*\\\s*$')
 _COMMENT = {_SCRIPT_EXTENSIONS[ext]['language']: _SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS}
 
 # Commands starting with a question or exclamation mark have to be escaped
@@ -45,9 +46,11 @@ def is_magic(line, language, global_escape_flag=True):
 def comment_magic(source, language='python', global_escape_flag=True):
     """Escape Jupyter magics with '# '"""
     parser = StringParser(language)
+    next_is_magic = False
     for pos, line in enumerate(source):
-        if not parser.is_quoted() and is_magic(line, language, global_escape_flag):
+        if not parser.is_quoted() and (next_is_magic or is_magic(line, language, global_escape_flag)):
             source[pos] = _COMMENT[language] + ' ' + line
+            next_is_magic = language == 'python' and _LINE_CONTINUATION_RE.match(line)
         parser.read_line(line)
     return source
 
@@ -65,9 +68,11 @@ def unesc(line, language):
 def uncomment_magic(source, language='python', global_escape_flag=True):
     """Unescape Jupyter magics"""
     parser = StringParser(language)
+    next_is_magic = False
     for pos, line in enumerate(source):
-        if not parser.is_quoted() and is_magic(line, language, global_escape_flag):
+        if not parser.is_quoted() and (next_is_magic or is_magic(line, language, global_escape_flag)):
             source[pos] = unesc(line, language)
+            next_is_magic = language == 'python' and _LINE_CONTINUATION_RE.match(line)
         parser.read_line(line)
     return source
 

@@ -1,5 +1,7 @@
 import pytest
+import mock
 from nbformat.v4.nbbase import new_code_cell, new_notebook
+from testfixtures import compare
 from jupytext.magics import comment_magic, uncomment_magic, unesc, is_magic
 from jupytext.compare import compare_notebooks
 import jupytext
@@ -128,3 +130,24 @@ def test_do_not_comment_bash_commands_in_R(magic_cmd):
 def test_markdown_image_is_not_magic():
     assert is_magic('# !cmd', 'python')
     assert not is_magic('# ![Image name](image.png', 'python')
+
+
+def test_multiline_python_magic():
+    nb = new_notebook(cells=[new_code_cell("""%load_ext watermark
+%watermark -u -n -t -z \\
+    -p jupytext -v
+
+def g(x):
+    return x+1""")])
+
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        text = jupytext.writes(nb, 'py')
+    compare("""# +
+# %load_ext watermark
+# %watermark -u -n -t -z \\
+#     -p jupytext -v
+
+def g(x):
+    return x+1
+""", text)
+    compare_notebooks(nb, jupytext.reads(text, 'py'))

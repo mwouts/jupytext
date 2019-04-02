@@ -15,6 +15,7 @@ Release History
 
 - Jupytext's contents manager is now based on ``LargeFileManager`` to allow large file uploads (#210)
 - YAML header parsed with yaml.safe_load rather than yaml.load
+- IPython line magic can be split across lines (#209)
 
 
 1.0.5 (2019-03-26)
