@@ -7,7 +7,7 @@ See also https://ipython.org/ipython-doc/3/notebook/nbformat.html#cell-metadata
 
 import ast
 import re
-import json
+from json import loads, dumps
 
 try:
     from json import JSONDecodeError
@@ -254,7 +254,7 @@ def rmd_options_to_metadata(options):
 def metadata_to_md_options(metadata):
     """Encode {'class':None, 'key':'value'} into 'class key="value"' """
 
-    return ' '.join(["{}={}".format(key, json.dumps(metadata[key]))
+    return ' '.join(["{}={}".format(key, dumps(metadata[key]))
                      if metadata[key] is not None else key for key in metadata])
 
 
@@ -280,7 +280,7 @@ def parse_md_code_options(options):
             continue
 
         try:
-            value = json.loads(options)
+            value = loads(options)
             options = ''
         except JSONDecodeError as err:
             try:
@@ -290,7 +290,7 @@ def parse_md_code_options(options):
                 match = re.match(r'.*char ([0-9]*)', str(err))
                 split = int(match.groups()[0])
 
-            value = json.loads(options[:split])
+            value = loads(options[:split])
             options = options[split:]
 
         metadata.append((name, value))
@@ -333,7 +333,7 @@ def try_eval_metadata(metadata, name):
 def json_options_to_metadata(options, add_brackets=True):
     """Read metadata from its json representation"""
     try:
-        options = json.loads('{' + options + '}' if add_brackets else options)
+        options = loads('{' + options + '}' if add_brackets else options)
         return options
     except ValueError:
         return {}
@@ -344,7 +344,7 @@ def metadata_to_json_options(metadata):
     for key in _JUPYTEXT_CELL_METADATA:
         metadata.pop(key, None)
 
-    return json.dumps(metadata)
+    return dumps(metadata)
 
 
 def is_active(ext, metadata):
