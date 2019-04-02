@@ -200,8 +200,8 @@ class LightScriptCellExporter(BaseCellExporter):
 
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
-        if 'cell_boundaries' in self.fmt:
-            self.cell_marker_start, self.cell_marker_end = self.fmt['cell_boundaries'].split(',', 1)
+        if 'cell_markers' in self.fmt:
+            self.cell_marker_start, self.cell_marker_end = self.fmt['cell_markers'].split(',', 1)
         for key in ['endofcell']:
             if key in self.unfiltered_metadata:
                 self.metadata[key] = self.unfiltered_metadata[key]

@@ -440,8 +440,8 @@ class LightScriptCellReader(ScriptCellReader):
         script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = default_language or script['language']
         self.comment = script['comment']
-        if fmt and 'cell_boundaries' in fmt:
-            self.cell_marker_start, self.cell_marker_end = fmt['cell_boundaries'].split(',', 1)
+        if fmt and 'cell_markers' in fmt:
+            self.cell_marker_start, self.cell_marker_end = fmt['cell_markers'].split(',', 1)
             self.start_code_re = re.compile('^' + self.comment + r'\s*' + self.cell_marker_start + r'\s*(.*)$')
         else:
             self.start_code_re = re.compile('^' + self.comment + r'\s*\+\s*{(.*)}$')

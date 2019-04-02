@@ -148,7 +148,7 @@ class TextFileContentsManager(LargeFileManager, Configurable):
              'the ipynb notebook',
         config=True)
 
-    default_cell_boundaries = Unicode(
+    default_cell_markers = Unicode(
         u'',
         help='Start and end cell markers for the light format, comma separated. Use "{{{,}}}" to mark cells'
              'as foldable regions in Vim, and "region,endregion" to mark cells as Vscode/PyCharm regions',
@@ -193,8 +193,8 @@ class TextFileContentsManager(LargeFileManager, Configurable):
             format_options.setdefault('comment_magics', self.comment_magics)
         if self.split_at_heading:
             format_options.setdefault('split_at_heading', self.split_at_heading)
-        if self.default_cell_boundaries:
-            format_options.setdefault('cell_boundaries', self.default_cell_boundaries)
+        if self.default_cell_markers:
+            format_options.setdefault('cell_markers', self.default_cell_markers)
         if read and self.sphinx_convert_rst2md:
             format_options.setdefault('rst2md', self.sphinx_convert_rst2md)
 

@@ -1148,7 +1148,7 @@ def test_vim_folding_markers(tmpdir):
     cm.root_dir = str(tmpdir)
 
     # Default Vim folding markers
-    cm.default_cell_boundaries = '{{{,}}}'
+    cm.default_cell_markers = '{{{,}}}'
     cm.default_jupytext_formats = 'ipynb,py'
 
     nb = new_notebook(cells=[new_code_cell("""# region
@@ -1165,7 +1165,7 @@ def test_vim_folding_markers(tmpdir):
     compare_notebooks(nb, nb2)
 
     nb3 = readf(tmp_py)
-    assert nb3.metadata['jupytext']['cell_boundaries'] == '{{{,}}}'
+    assert nb3.metadata['jupytext']['cell_markers'] == '{{{,}}}'
 
     with open(tmp_py) as fp:
         text = fp.read()
@@ -1195,7 +1195,7 @@ def test_vscode_pycharm_folding_markers(tmpdir):
     cm.root_dir = str(tmpdir)
 
     # Default VScode/PyCharm folding markers
-    cm.default_cell_boundaries = 'region,endregion'
+    cm.default_cell_markers = 'region,endregion'
     cm.default_jupytext_formats = 'ipynb,py'
 
     nb = new_notebook(cells=[new_code_cell("""# {{{
@@ -1212,7 +1212,7 @@ def test_vscode_pycharm_folding_markers(tmpdir):
     compare_notebooks(nb, nb2)
 
     nb3 = readf(tmp_py)
-    assert nb3.metadata['jupytext']['cell_boundaries'] == 'region,endregion'
+    assert nb3.metadata['jupytext']['cell_markers'] == 'region,endregion'
 
     with open(tmp_py) as fp:
         text = fp.read()

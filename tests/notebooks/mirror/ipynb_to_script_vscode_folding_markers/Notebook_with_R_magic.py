@@ -1,7 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
-#     cell_boundaries: region,endregion
+#     cell_markers: region,endregion
 #   kernelspec:
 #     display_name: Python 2
 #     language: python

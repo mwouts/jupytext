@@ -97,13 +97,13 @@ def test_ipynb_to_python(nb_file):
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip=''))
 def test_ipynb_to_python_vim(nb_file):
-    assert_conversion_same_as_mirror(nb_file, {'extension': '.py', 'cell_boundaries': '{{{,}}}'},
+    assert_conversion_same_as_mirror(nb_file, {'extension': '.py', 'cell_markers': '{{{,}}}'},
                                      'ipynb_to_script_vim_folding_markers')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip=''))
 def test_ipynb_to_python_vscode(nb_file):
-    assert_conversion_same_as_mirror(nb_file, {'extension': '.py', 'cell_boundaries': 'region,endregion'},
+    assert_conversion_same_as_mirror(nb_file, {'extension': '.py', 'cell_markers': 'region,endregion'},
                                      'ipynb_to_script_vscode_folding_markers')
 
 

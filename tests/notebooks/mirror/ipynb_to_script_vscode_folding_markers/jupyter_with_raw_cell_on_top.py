@@ -8,7 +8,7 @@
 #      chunk_output_type console
 # jupyter:
 #   jupytext:
-#     cell_boundaries: region,endregion
+#     cell_markers: region,endregion
 #   kernelspec:
 #     display_name: Python 3
 #     language: python

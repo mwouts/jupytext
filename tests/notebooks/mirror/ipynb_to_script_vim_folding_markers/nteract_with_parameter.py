@@ -1,7 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
-#     cell_boundaries: '{{{,}}}'
+#     cell_markers: '{{{,}}}'
 #   kernel_info:
 #     name: python3
 #   kernelspec:

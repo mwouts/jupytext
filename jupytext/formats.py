@@ -243,10 +243,10 @@ def guess_format(text, ext):
             return 'percent', {}
 
         if vim_folding_markers_count:
-            return 'light', {'cell_boundaries': '{{{,}}}'}
+            return 'light', {'cell_markers': '{{{,}}}'}
 
         if vscode_folding_markers_count:
-            return 'light', {'cell_boundaries': 'region,endregion'}
+            return 'light', {'cell_markers': 'region,endregion'}
 
         if twenty_hash_count >= 2:
             return 'sphinx', {}
@@ -492,7 +492,7 @@ def short_form_multiple_formats(jupytext_formats):
 
 _VALID_FORMAT_INFO = ['extension', 'format_name', 'suffix', 'prefix']
 _BINARY_FORMAT_OPTIONS = ['comment_magics', 'split_at_heading', 'rst2md']
-_VALID_FORMAT_OPTIONS = _BINARY_FORMAT_OPTIONS + ['notebook_metadata_filter', 'cell_metadata_filter', 'cell_boundaries']
+_VALID_FORMAT_OPTIONS = _BINARY_FORMAT_OPTIONS + ['notebook_metadata_filter', 'cell_metadata_filter', 'cell_markers']
 
 
 def validate_one_format(jupytext_format):
