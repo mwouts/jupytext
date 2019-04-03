@@ -193,7 +193,7 @@ class TextFileContentsManager(LargeFileManager, Configurable):
             format_options.setdefault('comment_magics', self.comment_magics)
         if self.split_at_heading:
             format_options.setdefault('split_at_heading', self.split_at_heading)
-        if self.default_cell_markers:
+        if not read and self.default_cell_markers:
             format_options.setdefault('cell_markers', self.default_cell_markers)
         if read and self.sphinx_convert_rst2md:
             format_options.setdefault('rst2md', self.sphinx_convert_rst2md)

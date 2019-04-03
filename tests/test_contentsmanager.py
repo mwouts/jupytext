@@ -1232,3 +1232,77 @@ a = 1
 b = 1
 # endregion
 """, text)
+
+
+def test_open_file_with_default_cell_markers(tmpdir):
+    tmp_py = str(tmpdir.join('nb.py'))
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # Default VScode/PyCharm folding markers
+    cm.default_cell_markers = 'region,endregion'
+
+    text = """# +
+# this is a unique code cell
+1 + 1
+
+2 + 2
+"""
+
+    with open(tmp_py, 'w') as fp:
+        fp.write(text)
+
+    nb = cm.get('nb.py')['content']
+    assert len(nb.cells) == 1
+
+    cm.save(model=dict(type='notebook', content=nb), path='nb.py')
+
+    with open(tmp_py) as fp:
+        text2 = fp.read()
+
+    expected = """# region
+# this is a unique code cell
+1 + 1
+
+2 + 2
+# endregion
+"""
+
+    compare(expected, text2)
+
+
+def test_save_file_with_default_cell_markers(tmpdir):
+    tmp_py = str(tmpdir.join('nb.py'))
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # Default VScode/PyCharm folding markers
+    cm.default_cell_markers = 'region,endregion'
+
+    text = """# +
+# this is a unique code cell
+1 + 1
+
+2 + 2
+"""
+
+    with open(tmp_py, 'w') as fp:
+        fp.write(text)
+
+    nb = cm.get('nb.py')['content']
+    assert len(nb.cells) == 1
+
+    nb.metadata['jupytext']['cell_markers'] = '+,-'
+    del nb.metadata['jupytext']['notebook_metadata_filter']
+    cm.save(model=dict(type='notebook', content=nb), path='nb.py')
+
+    with open(tmp_py) as fp:
+        text2 = fp.read()
+
+    compare('\n'.join(text.splitlines()), '\n'.join(text2.splitlines()[-len(text.splitlines()):]))
+
+    nb2 = cm.get('nb.py')['content']
+    compare_notebooks(nb, nb2)
+    assert nb2.metadata['jupytext']['cell_markers'] == '+,-'
