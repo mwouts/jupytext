@@ -1,0 +1,31 @@
+---
+jupyter:
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python raw_mimetype=text/latex, active="", eval=FALSE}
+$1+1$
+```
+
+```{python raw_mimetype=text/restructuredtext, active="", eval=FALSE}
+:math:`1+1`
+```
+
+```{python raw_mimetype=text/html, active="", eval=FALSE}
+<b>Bold text<b>
+```
+
+```{python raw_mimetype=text/markdown, active="", eval=FALSE}
+**Bold text**
+```
+
+```{python raw_mimetype=text/x-python, active="", eval=FALSE}
+1 + 1
+```
+
+```{python active="", eval=FALSE}
+Not formatted
+```
