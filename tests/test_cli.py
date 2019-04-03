@@ -615,7 +615,7 @@ def test_sync(nb_file, tmpdir):
     compare_notebooks(nb, nb2)
 
     # ipynb must be older than py file, otherwise our Contents Manager will complain
-    assert os.path.getmtime(tmp_ipynb) < os.path.getmtime(tmp_py)
+    assert os.path.getmtime(tmp_ipynb) <= os.path.getmtime(tmp_py)
 
 
 @pytest.mark.parametrize('nb_file,ext',
