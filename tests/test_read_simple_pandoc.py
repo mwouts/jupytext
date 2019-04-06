@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from testfixtures import compare
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell
 from jupytext.compare import compare_notebooks

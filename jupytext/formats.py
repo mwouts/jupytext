@@ -162,7 +162,7 @@ def get_format_implementation(ext, format_name=None):
 
     if formats_for_extension:
         if ext == '.md' and format_name == 'pandoc':
-            raise JupytextFormatError('Please install pandoc>=2.7.1')
+            raise JupytextFormatError('Please install pandoc>=2.7.2')
 
         raise JupytextFormatError("Format '{}' is not associated to extension '{}'. "
                                   "Please choose one of: {}.".format(format_name, ext,
@@ -270,7 +270,7 @@ def guess_format(text, ext):
     if ext == '.md':
         for line in lines:
             if line.startswith(':::'):  # Pandoc div
-                return 'pandoc'
+                return 'pandoc', {}
 
     # Default format
     return get_format_implementation(ext).format_name, {}

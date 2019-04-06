@@ -18,12 +18,12 @@ def tool_version(tool):
         return None
 
 
-requires_jupytext_installed = pytest.mark.skipif(not tool_version('jupytext'), reason='jupytext not installed')
+requires_jupytext_installed = pytest.mark.skipif(not tool_version('jupytext'), reason='jupytext is not installed')
 requires_black = pytest.mark.skipif(not tool_version('black'), reason='black not found')
 requires_flake8 = pytest.mark.skipif(not tool_version('flake8'), reason='flake8 not found')
 requires_autopep8 = pytest.mark.skipif(not tool_version('autopep8'), reason='autopep8 not found')
-requires_sphinx_gallery = pytest.mark.skipif(not rst2md, reason='sphinx_gallery not available')
-requires_pandoc = pytest.mark.skipif(not is_pandoc_available(), reason='pandoc>=2.7.1 not available')
+requires_sphinx_gallery = pytest.mark.skipif(not rst2md, reason='sphinx_gallery is not available')
+requires_pandoc = pytest.mark.skipif(not is_pandoc_available(), reason='pandoc>=2.7.2 is not available')
 
 
 def list_notebooks(path='ipynb', skip='World'):

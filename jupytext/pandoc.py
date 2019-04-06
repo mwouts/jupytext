@@ -33,7 +33,7 @@ def pandoc(args, filein=None, fileout=None):
 
 
 def is_pandoc_available():
-    """Is Pandoc>=2.7.1 available?"""
+    """Is Pandoc>=2.7.2 available?"""
     try:
         pandoc_version()
         return True
@@ -44,8 +44,8 @@ def is_pandoc_available():
 def pandoc_version():
     """Pandoc's version number"""
     version = pandoc(u'--version').splitlines()[0].split()[1]
-    if parse_version(version) < parse_version('2.7.1'):
-        raise PandocError('Please install pandoc>=2.7.1 (found version {})'.format(version))
+    if parse_version(version) < parse_version('2.7.2'):
+        raise PandocError('Please install pandoc>=2.7.2 (found version {})'.format(version))
 
     return version
 
@@ -56,7 +56,7 @@ def md_to_notebook(text):
     tmp_file.write(text.encode('utf-8'))
     tmp_file.close()
 
-    pandoc(u'--from markdown --to ipynb -s --atx-headers --wrap=preserve', tmp_file.name, tmp_file.name)
+    pandoc(u'--from markdown --to ipynb -s --atx-headers --wrap=preserve --preserve-tabs', tmp_file.name, tmp_file.name)
 
     with open(tmp_file.name, encoding='utf-8') as opened_file:
         notebook = nbformat.read(opened_file, as_version=4)
@@ -71,7 +71,7 @@ def notebook_to_md(notebook):
     tmp_file.write(nbformat.writes(notebook).encode('utf-8'))
     tmp_file.close()
 
-    pandoc(u'--from ipynb --to markdown -s --atx-headers --wrap=preserve', tmp_file.name, tmp_file.name)
+    pandoc(u'--from ipynb --to markdown -s --atx-headers --wrap=preserve --preserve-tabs', tmp_file.name, tmp_file.name)
 
     with open(tmp_file.name, encoding='utf-8') as opened_file:
         text = opened_file.read()

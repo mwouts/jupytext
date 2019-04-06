@@ -82,7 +82,6 @@ def compare_notebooks(notebook_expected,
     allow_missing_code_cell_metadata = allow_expected_differences and format_name == 'sphinx'
     allow_missing_markdown_cell_metadata = allow_expected_differences and format_name in ['sphinx', 'spin']
     allow_removed_final_blank_line = allow_expected_differences
-    replace_tabs_with_spaces = format_name == 'pandoc'
 
     cell_metadata_filter = notebook_actual.get('jupytext', {}).get('cell_metadata_filter')
 
@@ -94,9 +93,6 @@ def compare_notebooks(notebook_expected,
     modified_cells = set()
     modified_cell_metadata = set()
     for i, ref_cell in enumerate(notebook_expected.cells, 1):
-        if replace_tabs_with_spaces and '\t' in ref_cell.source:
-            ref_cell = copy(ref_cell)
-            ref_cell.source = ref_cell.source.replace('\t', '    ')
         try:
             test_cell = next(test_cell_iter)
         except StopIteration:
