@@ -523,6 +523,15 @@ def test_set_formats(py_file, tmpdir):
 
 
 @pytest.mark.parametrize('py_file', list_notebooks('python'))
+def test_set_formats_py_file_only(py_file, tmpdir):
+    tmp_py = str(tmpdir.join('notebook.py'))
+    copyfile(py_file, tmp_py)
+    jupytext([tmp_py, '--set-formats', 'ipynb,py:light'])
+    nb = readf(tmp_py)
+    assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
+
+
+@pytest.mark.parametrize('py_file', list_notebooks('python'))
 def test_update_metadata(py_file, tmpdir, capsys):
     tmp_py = str(tmpdir.join('notebook.py'))
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))

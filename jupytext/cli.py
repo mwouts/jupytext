@@ -247,6 +247,9 @@ def jupytext(args=None):
         # Update the metadata
         if args.update_metadata:
             log('[jupytext] Updating notebook metadata with {}'.format(args.update_metadata))
+            # Are we updating a text file that has a metadata filter? #212
+            if ext != '.ipynb' and notebook.metadata.get('jupytext', {}).get('notebook_metadata_filter') == '-all':
+                notebook.metadata.get('jupytext', {}).pop('notebook_metadata_filter')
             recursive_update(notebook.metadata, args.update_metadata)
 
         # Read paired notebooks
