@@ -64,16 +64,55 @@ a = 1
 b = 2
 # endregion
 
-c = 3
+def f(x):
+    return x + 1
+
+
 # endregion
+
+
+d = 4
 """):
     nb = jupytext.reads(script, 'py')
-    assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == 'markdown'
     assert nb.cells[0].source == 'This is a markdown cell'
     assert nb.cells[1].cell_type == 'code'
-    assert nb.cells[1].metadata == {'key': 'value'}
+    assert nb.cells[1].source == '# region {"key": "value"}\na = 1'
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[2].metadata['title'] == 'An inner region'
+    assert nb.cells[2].source == 'b = 2'
+    assert nb.cells[3].cell_type == 'code'
+    assert nb.cells[3].source == 'def f(x):\n    return x + 1'
+    assert nb.cells[4].cell_type == 'code'
+    assert nb.cells[4].source == '# endregion'
+    assert nb.cells[5].cell_type == 'code'
+    assert nb.cells[5].source == 'd = 4'
+    assert len(nb.cells) == 6
 
     script2 = jupytext.writes(nb, 'py')
     compare(script, script2)
+
+
 # endregion
+
+
+def test_adjacent_regions(
+        script="""# region global
+# region innermost
+a = 1
+
+b = 2
+# endregion
+# endregion
+"""):
+    nb = jupytext.reads(script, 'py')
+    assert len(nb.cells) == 3
+    assert nb.cells[0].cell_type == 'code'
+    assert nb.cells[0].source == '# region global'
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[1].source == 'a = 1\n\nb = 2'
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[2].source == '# endregion'
+
+    script2 = jupytext.writes(nb, 'py')
+    compare(script, script2)

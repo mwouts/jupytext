@@ -126,7 +126,7 @@ class BaseCellReader(object):
         if not self.metadata:
             self.metadata = {}
 
-        if self.ext == '.py' and not self.explicit_eoc:
+        if self.ext == '.py':
             expected_blank_lines = pep8_lines_between_cells(self.org_content or [''], lines[pos_next_cell:], self.ext)
         else:
             expected_blank_lines = 1
@@ -440,9 +440,12 @@ class LightScriptCellReader(ScriptCellReader):
         script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = default_language or script['language']
         self.comment = script['comment']
+        self.ignore_end_marker = True
+        self.explicit_end_marker_required = False
         if fmt and 'cell_markers' in fmt and fmt['cell_markers'] != '+,-':
             self.cell_marker_start, self.cell_marker_end = fmt['cell_markers'].split(',', 1)
             self.start_code_re = re.compile('^' + self.comment + r'\s*' + self.cell_marker_start + r'\s*(.*)$')
+            self.end_code_re = re.compile('^' + self.comment + r'\s*' + self.cell_marker_end + r'\s*$')
         else:
             self.start_code_re = re.compile('^' + self.comment + r'\s*\+\s*{(.*)}$')
             self.simple_start_code_re = re.compile('^' + self.comment + r'\s*\+\s*$')
@@ -467,17 +470,28 @@ class LightScriptCellReader(ScriptCellReader):
 
     def metadata_and_language_from_option_line(self, line):
         if self.start_code_re.match(line):
+            # We want to parse inner most regions as cells.
+            # Thus, if we find another region start before the end for this region,
+            # we will have ignore the metadata that we found here, and move on to the next cell.
             groups = self.start_code_re.match(line).groups()
             self.metadata = self.options_to_metadata(groups[0])
+            self.ignore_end_marker = False
+            if self.cell_marker_start:
+                self.explicit_end_marker_required = True
         elif self.simple_start_code_re and self.simple_start_code_re.match(line):
             self.metadata = {}
+            self.ignore_end_marker = False
+        elif self.cell_marker_end and self.end_code_re.match(line):
+            self.metadata = None
+            self.cell_type = 'code'
 
         if self.metadata is not None:
             self.language = self.metadata.get('language', self.default_language)
 
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position of first line after cell"""
-        if self.metadata is None and paragraph_is_fully_commented(lines, self.comment, self.default_language):
+        if self.metadata is None and not (self.cell_marker_end and self.end_code_re.match(lines[0])) \
+                and paragraph_is_fully_commented(lines, self.comment, self.default_language):
             self.cell_type = 'markdown'
             for i, line in enumerate(lines):
                 if _BLANK_LINE.match(line):
@@ -489,8 +503,6 @@ class LightScriptCellReader(ScriptCellReader):
         elif not self.cell_marker_end:
             end_of_cell = self.metadata.get('endofcell', '-')
             self.end_code_re = re.compile('^' + self.comment + ' ' + end_of_cell + r'\s*$')
-        else:
-            self.end_code_re = re.compile('^' + self.comment + r'\s*' + self.cell_marker_end + r'\s*$')
 
         return self.find_region_end(lines)
 
@@ -502,11 +514,9 @@ class LightScriptCellReader(ScriptCellReader):
             self.cell_type = 'code'
 
         parser = StringParser(self.language or self.default_language)
-        nested_regions = 0
         for i, line in enumerate(lines):
             # skip cell header
             if self.metadata is not None and i == 0:
-                nested_regions = 1
                 continue
 
             if parser.is_quoted():
@@ -517,12 +527,15 @@ class LightScriptCellReader(ScriptCellReader):
 
             # New code region
             # Simple code pattern in LightScripts must be preceded with a blank line
-            if self.start_code_re.match(line) or \
-                    (self.simple_start_code_re and self.simple_start_code_re.match(line) and
-                     (self.cell_marker_start or i == 0 or _BLANK_LINE.match(lines[i - 1]))):
-                if self.cell_marker_start and nested_regions > 0:
-                    nested_regions += 1
-                    continue
+            if self.start_code_re.match(line) or (
+                    self.simple_start_code_re and self.simple_start_code_re.match(line) and
+                    (self.cell_marker_start or i == 0 or _BLANK_LINE.match(lines[i - 1]))):
+
+                if self.explicit_end_marker_required:
+                    # Metadata here was conditioned on finding an explicit end marker
+                    # before the next start marker. So we dismiss it.
+                    self.metadata = None
+                    self.language = None
 
                 if i > 0 and _BLANK_LINE.match(lines[i - 1]):
                     if i > 1 and _BLANK_LINE.match(lines[i - 2]):
@@ -530,11 +543,9 @@ class LightScriptCellReader(ScriptCellReader):
                     return i - 1, i, False
                 return i, i, False
 
-            if self.end_code_re:
+            if not self.ignore_end_marker and self.end_code_re:
                 if self.end_code_re.match(line):
-                    if nested_regions <= 1:
-                        return i, i + 1, True
-                    nested_regions -= 1
+                    return i, i + 1, True
             elif _BLANK_LINE.match(line):
                 if not next_code_is_indented(lines[i:]):
                     if i > 0:

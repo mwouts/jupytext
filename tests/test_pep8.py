@@ -154,7 +154,7 @@ def f(x):
 
 
 @pytest.mark.parametrize('py_file', [py_file for py_file in list_notebooks('../jupytext') + list_notebooks('.') if
-                                     py_file.endswith('.py')])
+                                     py_file.endswith('.py') and 'folding_markers' not in py_file])
 def test_no_metadata_when_py_is_pep8(py_file):
     nb = readf(py_file)
 
