@@ -6,16 +6,18 @@ import sys
 import logging
 from copy import copy, deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
-from nbformat.v4.nbbase import new_notebook, new_code_cell
+from nbformat.v4.nbbase import new_notebook, new_code_cell, NotebookNode
 import nbformat
 from .formats import _VALID_FORMAT_OPTIONS
 from .formats import read_format_from_metadata, update_jupytext_formats_metadata, rearrange_jupytext_metadata
 from .formats import format_name_for_ext, guess_format, divine_format, get_format_implementation, long_form_one_format
-from .header import header_to_metadata_and_cell, metadata_and_cell_to_header
+from .header import header_to_metadata_and_cell, metadata_and_cell_to_header, insert_jupytext_info_and_filter_metadata
 from .header import encoding_and_executable, insert_or_test_version_number
-from .metadata_filter import update_metadata_filters
+from .metadata_filter import update_metadata_filters, filter_metadata
+from .cell_metadata import _IGNORE_CELL_METADATA
 from .languages import default_language_from_metadata_and_ext, set_main_and_cell_language
 from .pep8 import pep8_lines_between_cells
+from .pandoc import md_to_notebook, notebook_to_md
 
 
 class TextNotebookConverter(NotebookReader, NotebookWriter):
@@ -42,6 +44,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
     def reads(self, s, **_):
         """Read a notebook represented as text"""
+        if self.fmt.get('format_name') == 'pandoc':
+            return md_to_notebook(s)
+
         lines = s.splitlines()
 
         cells = []
@@ -86,6 +91,21 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
     def writes(self, nb, metadata=None, **kwargs):
         """Return the text representation of the notebook"""
+        if self.fmt.get('format_name') == 'pandoc':
+            metadata = insert_jupytext_info_and_filter_metadata(metadata, self.ext, self.implementation)
+
+            cells = []
+            for cell in nb.cells:
+                cell_metadata = filter_metadata(copy(cell.metadata),
+                                                self.fmt.get('cell_metadata_filter'),
+                                                _IGNORE_CELL_METADATA)
+                if cell.cell_type == 'code':
+                    cells.append(new_code_cell(source=cell.source, metadata=cell_metadata))
+                else:
+                    cells.append(NotebookNode(source=cell.source, metadata=cell_metadata, cell_type=cell.cell_type))
+
+            return notebook_to_md(new_notebook(metadata=metadata, cells=cells))
+
         # Copy the notebook, in order to be sure we do not modify the original notebook
         nb = new_notebook(cells=nb.cells, metadata=deepcopy(metadata or nb.metadata))
         metadata = nb.metadata
