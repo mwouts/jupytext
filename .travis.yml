@@ -23,7 +23,6 @@ install:
   # install sphinx_gallery and matplotlib if available (may not work on pypy)
   - pip install sphinx_gallery || true
   # download and install pandoc 2.7.2
-  - pandoc -v
   - wget https://github.com/jgm/pandoc/releases/download/2.7.2/pandoc-2.7.2-linux.tar.gz
   - tar xvzf pandoc-2.7.2-linux.tar.gz
   - export PATH=pandoc-2.7.2/bin:$PATH
