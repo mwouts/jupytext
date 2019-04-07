@@ -347,6 +347,14 @@ When you open a plain Markdown file in Jupytext, the Markdown text is rendered i
 c.ContentsManager.split_at_heading = True
 ```
 
+### Pandoc's Markdown
+
+Pandoc, the _Universal document converter_, now has the ability to read Jupyter notebooks. Have a look at how notebooks are [represented](https://pandoc.org/MANUAL.html#creating-jupyter-notebooks-with-pandoc) in that format. This format is also available in Jupytext under the name `md:pandoc` when `jupytext` finds `pandoc` in version 2.7.2 or above.
+
+Please pay attention to the fact that `pandoc`, while preserving the HTML rendering, may reformat the text in some of your Markdown cells. If that is an issue for you, please wait for [jgm/pandoc#5408](https://github.com/jgm/pandoc/issues/5408).
+
+As for the other formats, the `md:pandoc` format in Jupytext can be paired to an `.ipynb` file. For this reason, `jupytext` discards the output cells before calling `pandoc`. If you would like to see the outputs cells in the Markdown file, please use `pandoc` directly.
+
 ### The `light` format for notebooks as scripts
 
 The `light` format was created for this project. It is the default format for scripts. That format can read any script as a Jupyter notebook, even scripts which were never prepared to become a notebook. When a notebook is written as a script using this format, only a few cells markers are introduced—none if possible.
