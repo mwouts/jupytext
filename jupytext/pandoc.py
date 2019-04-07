@@ -9,7 +9,6 @@ from pkg_resources import parse_version
 
 class PandocError(OSError):
     """An error related to Pandoc"""
-    pass
 
 
 def pandoc(args, filein=None, fileout=None):
