@@ -349,9 +349,9 @@ c.ContentsManager.split_at_heading = True
 
 ### Pandoc's Markdown
 
-Pandoc, the _Universal document converter_, now has the ability to read Jupyter notebooks. Have a look at how notebooks are [represented](https://pandoc.org/MANUAL.html#creating-jupyter-notebooks-with-pandoc) in that format. This format is also available in Jupytext under the name `md:pandoc` when `jupytext` finds `pandoc` in version 2.7.2 or above.
+Pandoc, the _Universal document converter_,  can now read and write Jupyter notebooks - see [Pandoc's documentation](https://pandoc.org/MANUAL.html#creating-jupyter-notebooks-with-pandoc). The format name for Pandoc's Markdown in Jupytext is `md:pandoc` (requires `pandoc` in version 2.7.2 or above).
 
-Please pay attention to the fact that `pandoc`, while preserving the HTML rendering, may reformat the text in some of your Markdown cells. If that is an issue for you, please wait for [jgm/pandoc#5408](https://github.com/jgm/pandoc/issues/5408).
+Pandoc's format has explicit cell markers. See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pandoc.md) in that format. Please also note that `pandoc`, while preserving the HTML rendering, may reformat the text in some of the Markdown cells. If that is an issue for you, please wait until [jgm/pandoc#5408](https://github.com/jgm/pandoc/issues/5408) gets implemented.
 
 As for the other formats, the `md:pandoc` format in Jupytext can be paired to an `.ipynb` file. For this reason, `jupytext` discards the output cells before calling `pandoc`. If you would like to see the outputs cells in the Markdown file, please use `pandoc` directly.
 
