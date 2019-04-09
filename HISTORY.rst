@@ -10,6 +10,7 @@ Release History
 
 - Markdown and R Markdown formats now support metadata (#66, #111, #188)
 - The ``light`` format for Scripts can use custom cell markers, e.g. Vim or VScode/PyCharm folding markers (#199)
+- Pandoc's Markdown format for Jupyter notebooks is available in Jupytext as ``md:pandoc`` (#208)
 
 **BugFixes**
 
