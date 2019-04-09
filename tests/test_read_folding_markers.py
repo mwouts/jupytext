@@ -116,3 +116,20 @@ b = 2
 
     script2 = jupytext.writes(nb, 'py')
     compare(script, script2)
+
+
+def test_indented_markers_are_ignored(
+        script="""# region global
+    # region indented
+a = 1
+
+b = 2
+    # endregion
+# endregion
+"""):
+    nb = jupytext.reads(script, 'py')
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == 'code'
+
+    script2 = jupytext.writes(nb, 'py')
+    compare(script, script2)
