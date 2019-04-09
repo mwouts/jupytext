@@ -201,3 +201,11 @@ def test_validate_one_format():
 def test_set_auto_ext():
     with pytest.raises(ValueError):
         long_form_multiple_formats('ipynb,auto:percent', {})
+
+
+def test_pandoc_format_is_preserved():
+    formats_org = 'ipynb,md,.pandoc.md:pandoc,py:light'
+    long = long_form_multiple_formats(formats_org)
+    formats_new = short_form_multiple_formats(long)
+
+    compare(formats_org, formats_new)

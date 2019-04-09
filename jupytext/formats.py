@@ -493,8 +493,9 @@ def short_form_one_format(jupytext_format):
     if 'prefix' in jupytext_format:
         fmt = jupytext_format['prefix'] + '/' + fmt
 
-    if jupytext_format.get('format_name') and jupytext_format['extension'] not in ['.md', '.Rmd']:
-        fmt = fmt + ':' + jupytext_format['format_name']
+    if jupytext_format.get('format_name'):
+        if jupytext_format['extension'] not in ['.md', '.Rmd'] or jupytext_format['format_name'] == 'pandoc':
+            fmt = fmt + ':' + jupytext_format['format_name']
 
     return fmt
 

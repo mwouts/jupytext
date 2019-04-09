@@ -16,7 +16,8 @@ from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths
 from jupytext.formats import long_form_one_format, JupytextFormatError
 from .utils import list_notebooks, skip_if_dict_is_not_ordered
-from .utils import requires_black, requires_flake8, requires_sphinx_gallery, requires_jupytext_installed
+from .utils import requires_black, requires_flake8, requires_sphinx_gallery
+from .utils import requires_jupytext_installed, requires_pandoc
 
 
 def test_str2bool():
@@ -598,16 +599,12 @@ def test_sync(nb_file, tmpdir):
     assert os.path.isfile(tmp_rmd)
     compare_notebooks(nb, readf(tmp_rmd), 'Rmd')
 
-    # Now we keep only the first four cells and save to Rmd
-    nb.cells = nb.cells[:4]
     writef(nb, tmp_rmd, 'Rmd')
     jupytext(['--sync', tmp_ipynb])
 
     nb2 = readf(tmp_ipynb)
     compare_notebooks(nb, nb2, 'Rmd', compare_outputs=True)
 
-    # Now we keep only the first two cells and save to py
-    nb.cells = nb.cells[:4]
     writef(nb, tmp_py, 'py')
     jupytext(['--sync', tmp_ipynb])
 
@@ -625,6 +622,33 @@ def test_sync(nb_file, tmpdir):
 
     # ipynb must be older than py file, otherwise our Contents Manager will complain
     assert os.path.getmtime(tmp_ipynb) <= os.path.getmtime(tmp_py)
+
+
+@requires_pandoc
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='(Notebook with|flavors)'))
+def test_sync_pandoc(nb_file, tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_md = str(tmpdir.join('notebook.md'))
+    nb = readf(nb_file)
+    writef(nb, tmp_ipynb)
+
+    # Test that sync fails when notebook is not paired
+    with pytest.raises(ValueError) as info:
+        jupytext(['--sync', tmp_ipynb])
+    assert 'is not a paired notebook' in str(info)
+
+    # Now with a pairing information
+    nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,md:pandoc'
+    writef(nb, tmp_ipynb)
+
+    # Test that missing files are created
+    jupytext(['--sync', tmp_ipynb])
+
+    assert os.path.isfile(tmp_md)
+    compare_notebooks(nb, readf(tmp_md), 'md:pandoc')
+
+    with open(tmp_md) as fp:
+        assert 'pandoc' in fp.read()
 
 
 @pytest.mark.parametrize('nb_file,ext',
