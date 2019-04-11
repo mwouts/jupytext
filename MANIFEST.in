@@ -1,19 +1,9 @@
 include LICENSE
 include *.md
 include *.txt
-include *.ini
 include *.rst
-exclude .gitignore
-exclude .gitreview
-
-global-exclude *.pyc
 
 recursive-include jupyter-config *.json
 recursive-include jupytext/nbextension *.js
 
 graft packages
-prune packages/*/coverage
-prune packages/*/lib
-prune packages/*/build
-prune packages/*/node_modules
-prune packages/*/test/build

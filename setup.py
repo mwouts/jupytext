@@ -32,7 +32,7 @@ setup(
     tests_require=['pytest'],
     install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml', 'testfixtures'],
     license='MIT',
-    classifiers=('Development Status :: 5 - Production/Stable',
+    classifiers=['Development Status :: 5 - Production/Stable',
                  'License :: OSI Approved :: MIT License',
                  'Environment :: Console',
                  'Framework :: Jupyter',
@@ -45,5 +45,5 @@ setup(
                  'Programming Language :: Python :: 3.4',
                  'Programming Language :: Python :: 3.5',
                  'Programming Language :: Python :: 3.6',
-                 'Programming Language :: Python :: 3.7')
+                 'Programming Language :: Python :: 3.7']
 )
