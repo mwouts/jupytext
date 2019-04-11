@@ -3,7 +3,8 @@
 import os
 import subprocess
 import tempfile
-import nbformat
+# Copy nbformat reads and writes to avoid them being patched in the contents manager!!
+from nbformat import reads as ipynb_reads, writes as ipynb_writes
 from pkg_resources import parse_version
 
 
@@ -58,7 +59,7 @@ def md_to_notebook(text):
     pandoc(u'--from markdown --to ipynb -s --atx-headers --wrap=preserve --preserve-tabs', tmp_file.name, tmp_file.name)
 
     with open(tmp_file.name, encoding='utf-8') as opened_file:
-        notebook = nbformat.read(opened_file, as_version=4)
+        notebook = ipynb_reads(opened_file.read(), as_version=4)
     os.unlink(tmp_file.name)
 
     return notebook
@@ -67,7 +68,7 @@ def md_to_notebook(text):
 def notebook_to_md(notebook):
     """Convert a notebook to its Markdown representation, using Pandoc"""
     tmp_file = tempfile.NamedTemporaryFile(delete=False)
-    tmp_file.write(nbformat.writes(notebook).encode('utf-8'))
+    tmp_file.write(ipynb_writes(notebook).encode('utf-8'))
     tmp_file.close()
 
     pandoc(u'--from ipynb --to markdown -s --atx-headers --wrap=preserve --preserve-tabs', tmp_file.name, tmp_file.name)

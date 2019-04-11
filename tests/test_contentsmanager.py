@@ -15,7 +15,7 @@ from jupytext.compare import compare_notebooks
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.formats import read_format_from_metadata, auto_ext_from_metadata
 from jupytext.contentsmanager import kernelspec_from_language
-from .utils import list_notebooks, requires_sphinx_gallery, skip_if_dict_is_not_ordered
+from .utils import list_notebooks, requires_sphinx_gallery, requires_pandoc, skip_if_dict_is_not_ordered
 
 
 def test_create_contentsmanager():
@@ -113,6 +113,27 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
 
     compare_notebooks(nb, nb_md['content'], 'md')
     assert nb_md['content'].metadata['jupytext']['formats'] == 'ipynb,md'
+
+
+@requires_pandoc
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='(functional|Notebook with|flavors)'))
+def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
+    tmp_ipynb = 'notebook.ipynb'
+    tmp_md = 'notebook.md'
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # open ipynb, save with cm, reopen
+    nb = jupytext.readf(nb_file)
+    nb.metadata['jupytext'] = {'formats': 'ipynb,md:pandoc'}
+
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    nb_md = cm.get(tmp_md)
+
+    compare_notebooks(nb, nb_md['content'], 'md:pandoc')
+    assert nb_md['content'].metadata['jupytext']['formats'] == 'ipynb,md:pandoc'
 
 
 @skip_if_dict_is_not_ordered
