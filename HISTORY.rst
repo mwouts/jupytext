@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-1.1.0 (2019-04-??)
+1.1.0 (2019-04-14)
 ++++++++++++++++++++++
 
 **Improvements**
@@ -15,8 +15,9 @@ Release History
 **BugFixes**
 
 - Jupytext's contents manager is now based on ``LargeFileManager`` to allow large file uploads (#210)
-- YAML header parsed with yaml.safe_load rather than yaml.load
+- YAML header parsed with yaml.safe_load rather than yaml.load (#215)
 - IPython line magic can be split across lines (#209)
+- ``jupytext --to py`` rather than ``--to python`` in the README (#216)
 
 
 1.0.5 (2019-03-26)
