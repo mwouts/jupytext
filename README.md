@@ -238,7 +238,7 @@ In JupyterLab this is slightly different. Scripts and Markdown document also hav
 The package provides a `jupytext` script for command line conversion between the various notebook extensions:
 
 ```bash
-jupytext --to python notebook.ipynb             # create a notebook.py file
+jupytext --to py notebook.ipynb                 # create a notebook.py file in the light format
 jupytext --to py:percent notebook.ipynb         # create a notebook.py file in the double percent format
 jupytext --to py:percent --comment-magics false notebook.ipynb   # create a notebook.py file in the double percent format, and do not comment magic commands
 jupytext --to markdown notebook.ipynb           # create a notebook.md file
