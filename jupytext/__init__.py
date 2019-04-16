@@ -11,7 +11,7 @@ except ImportError as err:
         """A class that raises the previous ImportError"""
         err = err
 
-        def __init__(self):
+        def __init__(self, parent=None, log=None):  # noqa
             raise self.err
 
 
