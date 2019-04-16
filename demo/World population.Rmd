@@ -1,12 +1,13 @@
 ---
 jupyter:
   jupytext:
+    cell_markers: region,endregion
     formats: ipynb,.pct.py:percent,.lgt.py:light,.spx.py:sphinx,md,Rmd,.pandoc.md:pandoc
     text_representation:
       extension: .Rmd
       format_name: rmarkdown
       format_version: '1.1'
-      jupytext_version: 1.1.0-rc1
+      jupytext_version: 1.1.0
   kernelspec:
     display_name: Python 3
     language: python
