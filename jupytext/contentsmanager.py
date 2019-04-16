@@ -14,7 +14,12 @@ try:
 except ImportError:
     pass
 
-from notebook.services.contents.largefilemanager import LargeFileManager
+try:
+    from notebook.services.contents.largefilemanager import LargeFileManager
+except ImportError:
+    # Older versions of notebook do not have the LargeFileManager #217
+    from notebook.services.contents.filemanager import FileContentsManager as LargeFileManager
+
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 
 from .jupytext import reads, writes, create_prefix_dir
