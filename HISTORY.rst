@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+1.1.1 (2019-04-16)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Jupytext server extension leaves the contents manager unchanged when it is already a subclass of TextFileContentsManager (#218)
+- The base class for TextFileContentsManager defaults to FileContentsManager when LargeFileManager is not available (#217)
+
+
 1.1.0 (2019-04-14)
 ++++++++++++++++++++++
 
