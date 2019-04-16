@@ -1,12 +1,13 @@
 # ---
 # jupyter:
 #   jupytext:
+#     cell_markers: region,endregion
 #     formats: ipynb,.pct.py:percent,.lgt.py:light,.spx.py:sphinx,md,Rmd,.pandoc.md:pandoc
 #     text_representation:
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.0-rc1
+#       jupytext_version: 1.1.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -21,13 +22,13 @@
 # [World Bank](http://www.worldbank.org/)
 # using the [wbdata](https://github.com/OliverSherouse/wbdata) python package
 
-# +
+# region
 import pandas as pd
 import wbdata as wb
 
 pd.options.display.max_rows = 6
 pd.options.display.max_columns = 20
-# -
+# endregion
 
 # Corresponding indicator is found using search method - or, directly,
 # the World Bank site.
@@ -80,12 +81,12 @@ plt.show()
 
 # ## Stacked bar plot with plotly
 
-# +
+# region
 import plotly.offline as offline
 import plotly.graph_objs as go
 
 offline.init_notebook_mode()
-# -
+# endregion
 
 data = [go.Scatter(x=population.index, y=population[zone], name=zone, stackgroup='World')
         for zone in zones]
