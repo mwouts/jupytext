@@ -4,15 +4,17 @@
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=master)](https://codecov.io/github/mwouts/jupytext?branch=master)
 [![Language grade: Python](https://img.shields.io/badge/lgtm-A+-brightgreen.svg)](https://lgtm.com/projects/g/mwouts/jupytext/context:python)
 
-Have you always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningfull diffs when doing version control? Then... Jupytext may well be the tool you're looking for!
+Have you always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningful diffs when doing version control? Then... Jupytext may well be the tool you're looking for!
 
 Jupytext can save Jupyter notebooks as
 - Markdown and R Markdown documents,
 - Julia, Python, R, Bash, Scheme, Clojure, Matlab, Octave, C++ and q/kdb+ scripts.
 
+The plain text formatting of the notebook cell divisions is configurable. Popular choices include the `percent` format [`# %%`] used by Spyder, VSCode, and others, and the `light` format which was developed to support this project. `light` uses as few cell markers as possible and is particularly suited for importing a pre-existing python script as a notebook with cell divisions automatically inferred from paragraph breaks in the source code.
+
 There are multiple ways to use `jupytext`:
 - Directly from Jupyter Notebook or JupyterLab. Jupytext provides a _contents manager_ that allows Jupyter to save your notebook to your favorite format (`.py`, `.R`, `.jl`, `.md`, `.Rmd`...) in addition to (or in place of) the traditional `.ipynb` file. The text representation can be edited in your favorite editor. When you're done, refresh the notebook in Jupyter: inputs cells are loaded from the text file, while output cells are reloaded from the `.ipynb` file if present. Refreshing preserves kernel variables, so you can resume your work in the notebook and run the modified cells without having to rerun the notebook in full.
-- On the [command line](#command-line-conversion). `jupytext` converts Jupyter notebooks to their text representation, and back. The command line tool can act on noteboks in many ways. It can synchronize multiple representations of a notebook, pipe a notebook into a reformatting tool like `black`, etc... It can also work as a [pre-commit hook](#jupytext-as-a-git-pre-commit-hook) if you wish to automatically update the text representation when you commit the `.ipynb` file.
+- On the [command line](#command-line-conversion). `jupytext` converts Jupyter notebooks to their text representation, and back. The command line tool can act on notebooks in many ways. It can synchronize multiple representations of a notebook, pipe a notebook into a reformatting tool like `black`, etc... It can also work as a [pre-commit hook](#jupytext-as-a-git-pre-commit-hook) if you wish to automatically update the text representation when you commit the `.ipynb` file.
 - in Vim: edit your Jupyter notebooks, represented as a Markdown document, or a Python script, with [jupytext.vim](https://github.com/goerz/jupytext.vim).
 
 ---
@@ -49,7 +51,7 @@ The setup is straightforward:
 
 Collaborating then works as follows:
 - Your collaborator pulls your script.
-- The script opens as a notebook in Jupyter, with no outputs (in JupyterLab this requires a [right-click](#jupyter-notebook-or-jupyterlab)).
+- The script opens as a notebook in Jupyter, with no outputs (in JupyterLab right-click the script and use the open-with context menu).
 - They run the notebook and save it. Outputs are regenerated, and a local `.ipynb` file is created.
 - Note that, alternatively, the `.ipynb` file could have been regenerated with `jupytext --sync notebook.py`.
 - They change the notebook, and push their updated script. The diff is nothing else than a standard diff on a Python script.
@@ -61,7 +63,7 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 - We start with a Jupyter notebook.
 - The notebook includes a plot of the world population. The plot legend is not in order of decreasing population, we'll fix this.
-- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we select _Pair Notebook with a light Script_ in either the [Jupytext menu](#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or in the [Jupytext commands](#jupytext-commands-in-jupyterlab) in JupyterLab. This has the effet of adding a `"jupytext": {"formats": "ipynb,py:light"},` entry to the notebook metadata.
+- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we select _Pair Notebook with a light Script_ in either the [Jupytext menu](#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or in the [Jupytext commands](#jupytext-commands-in-jupyterlab) in JupyterLab. This has the effect of adding a `"jupytext": {"formats": "ipynb,py:light"},` entry to the notebook metadata.
 - The Python script can be opened with PyCharm:
   - Navigating in the code and documentation is easier than in Jupyter.
   - The console is convenient for quick tests. We don't need to create cells for this.
@@ -74,7 +76,7 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 Jupytext allows to import code from other Jupyter notebooks in a very simple manner. Indeed, all you need to do is to pair the notebook that you wish to import with a script, and import the resulting script.
 
-If the notebook contains demos and plots that you don't want to import, mark those cell as either
+If the notebook contains demos and plots that you don't want to import, mark those cells as either
 - _active_ only in the `ipynb` format, with the `{"active": "ipynb"}` cell metadata
 - _frozen_, using the [freeze extension](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/freeze/readme.html) for Jupyter notebook.
 
@@ -288,7 +290,7 @@ Note that these hooks do not update the `.ipynb` notebook when you pull. Make su
 
 ### Testing the round-trip conversion
 
-Representing Jupyter notebooks as scripts requires a solid round trip conversion. You don't want your notebooks (nor your scripts) to be modified because you are converting them to the other form. A few hundred tests ensure that round trip conversion is safe.
+Representing Jupyter notebooks as scripts requires a solid round trip conversion. You don't want your notebooks (nor your scripts) to be modified because you are converting them to the other form. Our test suite includes a few hundred tests to ensure that round trip conversion is safe.
 
 You can easily test that the round trip conversion preserves your Jupyter notebooks and scripts. Run for instance:
 ```bash
@@ -309,7 +311,7 @@ metadata to be added back to the script. Remove the filter if you want to store 
 
 ### Reading notebooks in Python
 
-You can also manipulate notebooks in a Python shell or script using `jupytext`'s main functions:
+You can also manipulate notebooks in a Python shell or script using Jupytext's main functions:
 
 ```python
 # Read a notebook from a file. Format can be any of 'py', 'md', 'jl:percent', ...
