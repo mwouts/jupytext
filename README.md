@@ -10,7 +10,7 @@ Jupytext can save Jupyter notebooks as
 - Markdown and R Markdown documents,
 - Julia, Python, R, Bash, Scheme, Clojure, Matlab, Octave, C++ and q/kdb+ scripts.
 
-The plain text formatting of the notebook cell divisions is configurable. Popular choices include the `percent` format [`# %%`] used by Spyder, VSCode, and others, and the `light` format which was developed to support this project. `light` uses as few cell markers as possible and is particularly suited for importing a pre-existing python script as a notebook with cell divisions automatically inferred from paragraph breaks in the source code.
+The plain text formatting of the notebook cell divisions in scripts is configurable. Popular choices include the `percent` format [`# %%`] used by Spyder, VSCode, and others, and the `light` format which was developed to support this project. `light` uses as few cell markers as possible and is particularly suited for importing a pre-existing python script as a notebook with cell divisions automatically inferred from paragraph breaks in the source code.
 
 There are multiple ways to use `jupytext`:
 - Directly from Jupyter Notebook or JupyterLab. Jupytext provides a _contents manager_ that allows Jupyter to save your notebook to your favorite format (`.py`, `.R`, `.jl`, `.md`, `.Rmd`...) in addition to (or in place of) the traditional `.ipynb` file. The text representation can be edited in your favorite editor. When you're done, refresh the notebook in Jupyter: inputs cells are loaded from the text file, while output cells are reloaded from the `.ipynb` file if present. Refreshing preserves kernel variables, so you can resume your work in the notebook and run the modified cells without having to rerun the notebook in full.
