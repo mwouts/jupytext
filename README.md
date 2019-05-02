@@ -173,7 +173,12 @@ Jupytext accepts a few additional options. These options should be added to the 
 
 ### Global configuration
 
-Jupytext's contents manager also accepts global options. We start with the default format pairing. Say you want to always associate every `.ipynb` notebook with a `.md` file  (and reciprocally). This is simply done by adding the following to your Jupyter configuration file:
+Jupytext's contents manager also accepts global options. These options have to be set on Jupytext's contents manager, so please first include the following line in your `.jupyter/jupyter_notebook_config.py` file:
+```python
+c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
+```
+
+We start with the default format pairing. Say you want to always associate every `.ipynb` notebook with a `.md` file  (and reciprocally). This is simply done by adding the following to your Jupyter configuration file:
 ```python
 # Always pair ipynb notebooks to md files
 c.ContentsManager.default_jupytext_formats = "ipynb,md"
