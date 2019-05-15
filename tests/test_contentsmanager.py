@@ -1327,3 +1327,27 @@ def test_save_file_with_default_cell_markers(tmpdir):
     nb2 = cm.get('nb.py')['content']
     compare_notebooks(nb, nb2)
     assert nb2.metadata['jupytext']['cell_markers'] == '+,-'
+
+
+def test_notebook_extensions(tmpdir):
+    tmp_py = str(tmpdir.join('script.py'))
+    tmp_rmd = str(tmpdir.join('notebook.Rmd'))
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+
+    nb = new_notebook()
+    writef(nb, tmp_py)
+    writef(nb, tmp_rmd)
+    writef(nb, tmp_ipynb)
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    cm.notebook_extensions = 'ipynb,Rmd'
+    model = cm.get('notebook.ipynb')
+    assert model['type'] == 'notebook'
+
+    model = cm.get('notebook.Rmd')
+    assert model['type'] == 'notebook'
+
+    model = cm.get('script.py')
+    assert model['type'] == 'file'
