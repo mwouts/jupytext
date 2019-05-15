@@ -9,6 +9,7 @@ Release History
 **Improvements**
 
 - Jupytext's content manager has a new option `notebook_extensions` (#224, #183)
+- Cells can be made inactive in scripts with the `active-ipynb` cell tag (#226)
 
 **BugFixes*
 
