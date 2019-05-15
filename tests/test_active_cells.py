@@ -84,6 +84,37 @@ def test_active_ipynb(ext):
         compare(nb.cells[0], ACTIVE_IPYNB['.ipynb'])
 
 
+ACTIVE_IPYNB_RMD_USING_TAG = {'.py': """# + {"tags": ["active-ipynb-Rmd"]}
+# # This cell is active only in ipynb and Rmd
+# %matplotlib inline
+""",
+                              '.Rmd': """```{python tags=c("active-ipynb-Rmd")}
+# This cell is active only in ipynb and Rmd
+# %matplotlib inline
+```
+""",
+                              '.R': """# + {"tags": ["active-ipynb-Rmd"]}
+# # This cell is active only in ipynb and Rmd
+# %matplotlib inline
+""",
+                              '.ipynb': {'cell_type': 'code',
+                                         'source': '# This cell is active only in ipynb and Rmd\n'
+                                                   '%matplotlib inline',
+                                         'metadata': {'tags': ['active-ipynb-Rmd']},
+                                         'execution_count': None,
+                                         'outputs': []}}
+
+
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
+def test_active_ipynb_rmd_using_tags(ext):
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        nb = jupytext.reads(HEADER[ext] + ACTIVE_IPYNB_RMD_USING_TAG[ext], ext)
+        assert len(nb.cells) == 1
+        compare(ACTIVE_IPYNB_RMD_USING_TAG[ext], jupytext.writes(nb, ext))
+        compare(nb.cells[0], ACTIVE_IPYNB_RMD_USING_TAG['.ipynb'])
+
+
 ACTIVE_IPYNB_RSPIN = {'.R': """#+ active="ipynb", eval=FALSE
 # # This cell is active only in ipynb
 # 1 + 1
