@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+1.1.2 (2019-05-15)
+++++++++++++++++++++++
+
+**BugFixes*
+
+- Directories ending in .jl (or .ipynb) are not notebooks (#228)
+
+
 1.1.1 (2019-04-16)
 ++++++++++++++++++++++
 

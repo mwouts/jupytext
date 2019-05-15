@@ -295,10 +295,12 @@ class TextFileContentsManager(LargeFileManager, Configurable):
     def get(self, path, content=True, type=None, format=None, load_alternative_format=True):
         """ Takes a path for an entity and returns its model"""
         path = path.strip('/')
+        os_path = self._get_os_path(path)
         ext = os.path.splitext(path)[1]
 
         # Not a notebook?
-        if not self.exists(path) or (type != 'notebook' if type else ext not in self.all_nb_extensions()):
+        if (not self.exists(path) or os.path.isdir(os_path) or
+                (type != 'notebook' if type else ext not in self.all_nb_extensions())):
             return super(TextFileContentsManager, self).get(path, content, type, format)
 
         fmt = preferred_format(ext, self.preferred_jupytext_formats_read)
