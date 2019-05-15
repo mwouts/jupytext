@@ -9,6 +9,7 @@ Release History
 **BugFixes*
 
 - Directories ending in .jl (or .ipynb) are not notebooks (#228)
+- Empty notebooks have no language (#227)
 
 
 1.1.1 (2019-04-16)

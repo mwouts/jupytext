@@ -50,7 +50,7 @@ def set_main_and_cell_language(metadata, cells, ext):
         main_language = max(languages, key=languages.get)
 
     # save main language when no kernel is set
-    if 'language' not in metadata.get('kernelspec', {}):
+    if 'language' not in metadata.get('kernelspec', {}) and cells:
         metadata.setdefault('jupytext', {})['main_language'] = main_language
 
     # Remove 'language' meta data and add a magic if not main language
