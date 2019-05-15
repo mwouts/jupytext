@@ -8,10 +8,10 @@ Release History
 
 **Improvements**
 
-- Jupytext's content manager has a new option `notebook_extensions` (#224, #183)
-- Cells can be made inactive in scripts with the `active-ipynb` cell tag (#226)
+- Jupytext's content manager has a new ``notebook_extensions`` option (#224, #183)
+- Cells can be made inactive in scripts with the ``active-ipynb`` cell tag (#226)
 
-**BugFixes*
+**BugFixes**
 
 - Directories ending in .jl (or .ipynb) are not notebooks (#228)
 - Empty notebooks have no language (#227)
