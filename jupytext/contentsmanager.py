@@ -81,17 +81,12 @@ class TextFileContentsManager(LargeFileManager, Configurable):
     Python (.py) or R scripts (.R)
     """
 
-    nb_extensions = [ext for ext in NOTEBOOK_EXTENSIONS if ext != '.ipynb']
-
     # Dictionary: notebook path => (fmt, formats) where fmt is the current format, and formats the paired formats.
     paired_notebooks = dict()
 
     def all_nb_extensions(self):
-        """
-        Notebook extensions, including ipynb
-        :return:
-        """
-        return ['.ipynb'] + self.nb_extensions
+        """All extensions that should be classified as notebooks"""
+        return [ext if ext.startswith('.') else '.' + ext for ext in self.notebook_extensions.split(',')]
 
     default_jupytext_formats = Unicode(
         u'',
@@ -157,6 +152,11 @@ class TextFileContentsManager(LargeFileManager, Configurable):
         u'',
         help='Start and end cell markers for the light format, comma separated. Use "{{{,}}}" to mark cells'
              'as foldable regions in Vim, and "region,endregion" to mark cells as Vscode/PyCharm regions',
+        config=True)
+
+    notebook_extensions = Unicode(
+        u','.join(NOTEBOOK_EXTENSIONS),
+        help='A comma separated list of notebook extensions',
         config=True)
 
     def drop_paired_notebook(self, path):

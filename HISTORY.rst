@@ -6,6 +6,10 @@ Release History
 1.1.2 (2019-05-15)
 ++++++++++++++++++++++
 
+**Improvements**
+
+- Jupytext's content manager has a new option `notebook_extensions` (#224, #183)
+
 **BugFixes*
 
 - Directories ending in .jl (or .ipynb) are not notebooks (#228)

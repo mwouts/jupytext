@@ -238,6 +238,14 @@ In JupyterLab this is slightly different. Scripts and Markdown document also hav
 
 ![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/403b53ac5097446a15ea664579ba44cd1badcc57/ContextMenuLab.png)
 
+If do not want to classify scripts or Markdown documents as notebooks, please use the `notebook_extension` option. For instance, if you want to get the notebook icon only for `.ipynb` and `.Rmd` files, set
+
+```python
+c.ContentsManager.notebook_extensions = "ipynb,Rmd"
+``` 
+
+Please note that, with the above setting, Jupyter will not let you open scripts as notebooks. If you still want to do so, use Jupytext command line (see below) to first convert or pair the script to an `.ipynb` notebook.
+
 ## Scripting Jupytext
 
 ### Command line conversion
