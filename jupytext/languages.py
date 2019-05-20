@@ -1,7 +1,8 @@
 """Determine notebook or cell language"""
 
 _JUPYTER_LANGUAGES = ['R', 'bash', 'sh', 'python', 'python2', 'python3', 'javascript', 'js', 'perl',
-                      'html', 'latex', 'markdown', 'pypy', 'ruby', 'script', 'svg', 'writefile', 'matlab', 'octave']
+                      'html', 'latex', 'markdown', 'pypy', 'ruby', 'script', 'svg', 'writefile', 
+                      'matlab', 'octave', 'idl']
 
 _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.R': {'language': 'R', 'comment': '#'},
@@ -13,7 +14,8 @@ _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.scm': {'language': 'scheme', 'comment': ';;'},
                       '.sh': {'language': 'bash', 'comment': '#'},
                       '.q': {'language': 'q', 'comment': '/'},
-                      '.m': {'language': 'matlab', 'comment': '%'}}
+                      '.m': {'language': 'matlab', 'comment': '%'},
+                      '.pro': {'language': 'idl', 'comment': ';'}}
 
 _COMMENT_CHARS = [_SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS if
                   _SCRIPT_EXTENSIONS[ext]['comment'] != '#']
