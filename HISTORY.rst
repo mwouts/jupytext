@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+1.1.3 (2019-05-22)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Support for IDL notebooks and .pro scripts (#232)
+
+
 1.1.2 (2019-05-16)
 ++++++++++++++++++++++
 
