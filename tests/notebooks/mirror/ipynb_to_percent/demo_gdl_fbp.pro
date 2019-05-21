@@ -1,8 +1,6 @@
 ; -*- coding: utf-8 -*-
 ; ---
 ; jupyter:
-;   jupytext:
-;     formats: ipynb,pro:percent
 ;   kernelspec:
 ;     display_name: IDL [conda env:gdl] *
 ;     language: IDL
