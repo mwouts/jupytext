@@ -25,7 +25,10 @@ _DEFAULT_NOTEBOOK_METADATA = ','.join([
     # Preserve kernel specs
     'kernelspec',
     # Kernel_info found in Nteract notebooks
-    'kernel_info'])
+    'kernel_info',
+    # Colab attributes
+    'colab',
+    'accelerator'])
 
 # Change this to False in tests
 INSERT_AND_CHECK_VERSION_NUMBER = True
