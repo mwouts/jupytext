@@ -13,3 +13,4 @@ future
 *.pyc
 gits*
 .ipynb_checkpoints
+docs/_build
