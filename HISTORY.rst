@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+1.1.4 (2019-05-25)
+++++++++++++++++++++++
+
+**Improvements**
+
+**BugFixes**
+- Invalid notebooks may cause a warning, but not a fatal error (#234)
+
+
 1.1.3 (2019-05-22)
 ++++++++++++++++++++++
 

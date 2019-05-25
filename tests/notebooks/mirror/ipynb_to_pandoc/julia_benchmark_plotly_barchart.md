@@ -5,7 +5,7 @@ jupyter:
     language: python
     name: python3
   nbformat: 4
-  nbformat_minor: 2
+  nbformat_minor: 1
 ---
 
 ::: {.cell .code}

@@ -104,10 +104,19 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 else:
                     cells.append(NotebookNode(source=cell.source, metadata=cell_metadata, cell_type=cell.cell_type))
 
-            return notebook_to_md(new_notebook(metadata=metadata, cells=cells))
+            return notebook_to_md(NotebookNode(
+                nbformat=nb.nbformat,
+                nbformat_minor=nb.nbformat_minor,
+                metadata=metadata,
+                cells=cells))
 
         # Copy the notebook, in order to be sure we do not modify the original notebook
-        nb = new_notebook(cells=nb.cells, metadata=deepcopy(metadata or nb.metadata))
+        nb = NotebookNode(
+            nbformat=nb.nbformat,
+            nbformat_minor=nb.nbformat_minor,
+            metadata=deepcopy(metadata or nb.metadata),
+            cells=nb.cells)
+
         metadata = nb.metadata
         default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension)
         self.update_fmt_with_notebook_options(nb.metadata)
@@ -250,7 +259,12 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
         jupytext_metadata.pop('text_representation', {})
         if not jupytext_metadata:
             metadata.pop('jupytext', {})
-        return nbformat.writes(new_notebook(cells=notebook.cells, metadata=metadata), version, **kwargs)
+        return nbformat.writes(
+            NotebookNode(
+                nbformat=notebook.nbformat,
+                nbformat_minor=notebook.nbformat_minor,
+                metadata=metadata,
+                cells=notebook.cells), version, **kwargs)
 
     if not format_name:
         format_name = format_name_for_ext(metadata, ext, explicit_default=False)
