@@ -117,7 +117,7 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
 
 @requires_pandoc
 @skip_if_dict_is_not_ordered
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='(functional|Notebook with|flavors)'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='(functional|Notebook with|flavors|invalid)'))
 def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_md = 'notebook.md'
