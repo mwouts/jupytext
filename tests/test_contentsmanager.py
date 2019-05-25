@@ -1351,3 +1351,11 @@ def test_notebook_extensions(tmpdir):
 
     model = cm.get('script.py')
     assert model['type'] == 'file'
+
+
+def test_server_extension_issubclass():
+    class SubClassTextFileContentsManager(jupytext.TextFileContentsManager):
+        pass
+
+    assert not isinstance(SubClassTextFileContentsManager, jupytext.TextFileContentsManager)
+    assert issubclass(SubClassTextFileContentsManager, jupytext.TextFileContentsManager)
