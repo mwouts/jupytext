@@ -71,9 +71,9 @@ def parse_jupytext_args(args=None):
                         type=str,
                         help='Set jupytext.formats metadata to the given value. Use this to activate pairing on a '
                              'notebook, with e.g. --set-formats ipynb,py:light')
-    parser.add_argument('--kernel', '-k',
+    parser.add_argument('--set-kernel', '-k',
                         type=str,
-                        help="Set the kernel with the given name on the notebook. Use '--kernel -' to set "
+                        help="Set the kernel with the given name on the notebook. Use '--set-kernel -' to set "
                              "a kernel matching the current environment on Python notebooks, and matching the "
                              "notebook language otherwise "
                              "(get the list of available kernels with 'jupyter kernelspec list')")
@@ -267,7 +267,7 @@ def jupytext(args=None):
             notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
 
         # Set the kernel
-        if args.kernel == '-':
+        if args.set_kernel == '-':
             language = notebook.metadata.get('jupytext', {})['main_language'] \
                        or notebook.metadata['kernelspec']['language']
             if not language:
@@ -278,13 +278,13 @@ def jupytext(args=None):
             notebook.metadata['kernelspec'] = kernelspec
             if 'main_language' in notebook.metadata.get('jupytext', {}):
                 notebook.metadata['jupytext'].pop('main_language')
-        elif args.kernel:
+        elif args.set_kernel:
             try:
-                kernelspec = get_kernel_spec(args.kernel)
+                kernelspec = get_kernel_spec(args.set_kernel)
             except KeyError:
                 raise KeyError('Please choose a kernel name among {}'
                                .format([name for name in find_kernel_specs()]))
-            notebook.metadata['kernelspec'] = {'name': args.kernel,
+            notebook.metadata['kernelspec'] = {'name': args.set_kernel,
                                                'language': kernelspec.language,
                                                'display_name': kernelspec.display_name}
 
@@ -298,7 +298,7 @@ def jupytext(args=None):
             pipe_notebook(notebook, cmd, args.pipe_fmt, update=False)
 
         # III. ### Possible actions ###
-        modified = args.update_metadata or args.pipe or args.kernel
+        modified = args.update_metadata or args.pipe or args.set_kernel
         # a. Test round trip conversion
         if args.test or args.test_strict:
             try:

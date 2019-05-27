@@ -565,7 +565,7 @@ def test_set_kernel_auto(py_file, tmpdir):
 
     copyfile(py_file, tmp_py)
 
-    jupytext(['--to', 'ipynb', tmp_py, '--kernel', '-'])
+    jupytext(['--to', 'ipynb', tmp_py, '--set-kernel', '-'])
 
     nb = readf(tmp_ipynb)
     kernel_name = nb.metadata['kernelspec']['name']
@@ -580,13 +580,13 @@ def test_set_kernel_with_name(py_file, tmpdir):
     copyfile(py_file, tmp_py)
 
     for kernel in find_kernel_specs():
-        jupytext(['--to', 'ipynb', tmp_py, '--kernel', kernel])
+        jupytext(['--to', 'ipynb', tmp_py, '--set-kernel', kernel])
 
         nb = readf(tmp_ipynb)
         assert nb.metadata['kernelspec']['name'] == kernel
 
     with pytest.raises(KeyError) as info:
-        jupytext(['--to', 'ipynb', tmp_py, '--kernel', 'non_existing_env'])
+        jupytext(['--to', 'ipynb', tmp_py, '--set-kernel', 'non_existing_env'])
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
