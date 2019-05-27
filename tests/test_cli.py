@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import stat
 import mock
@@ -9,6 +10,7 @@ from shutil import copyfile
 from testfixtures import compare
 from argparse import ArgumentTypeError
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
+from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from jupytext import __version__
 from jupytext import readf, writef, writes
 from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, str2bool
@@ -554,6 +556,37 @@ def test_update_metadata(py_file, tmpdir, capsys):
 
     out, err = capsys.readouterr()
     assert 'invalid' in err
+
+
+@pytest.mark.parametrize('py_file', list_notebooks('python'))
+def test_set_kernel_auto(py_file, tmpdir):
+    tmp_py = str(tmpdir.join('notebook.py'))
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+
+    copyfile(py_file, tmp_py)
+
+    jupytext(['--to', 'ipynb', tmp_py, '--kernel', '-'])
+
+    nb = readf(tmp_ipynb)
+    kernel_name = nb.metadata['kernelspec']['name']
+    assert get_kernel_spec(kernel_name).argv[0] == sys.executable
+
+
+@pytest.mark.parametrize('py_file', list_notebooks('python'))
+def test_set_kernel_with_name(py_file, tmpdir):
+    tmp_py = str(tmpdir.join('notebook.py'))
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+
+    copyfile(py_file, tmp_py)
+
+    for kernel in find_kernel_specs():
+        jupytext(['--to', 'ipynb', tmp_py, '--kernel', kernel])
+
+        nb = readf(tmp_ipynb)
+        assert nb.metadata['kernelspec']['name'] == kernel
+
+    with pytest.raises(KeyError) as info:
+        jupytext(['--to', 'ipynb', tmp_py, '--kernel', 'non_existing_env'])
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
