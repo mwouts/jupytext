@@ -8,12 +8,14 @@ import subprocess
 import argparse
 import json
 from copy import copy
+from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from .jupytext import readf, reads, writef, writes
 from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, check_file_version
 from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format
 from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
+from .kernels import kernelspec_from_language
 from .version import __version__
 
 
@@ -69,6 +71,12 @@ def parse_jupytext_args(args=None):
                         type=str,
                         help='Set jupytext.formats metadata to the given value. Use this to activate pairing on a '
                              'notebook, with e.g. --set-formats ipynb,py:light')
+    parser.add_argument('--kernel', '-k',
+                        type=str,
+                        help="Set the kernel with the given name on the notebook. Use '--kernel -' to set "
+                             "a kernel matching the current environment on Python notebooks, and matching the "
+                             "notebook language otherwise "
+                             "(get the list of available kernels with 'jupyter kernelspec list')")
     parser.add_argument('--update-metadata',
                         default={},
                         type=json.loads,
@@ -86,7 +94,7 @@ def parse_jupytext_args(args=None):
 
     # Action: convert(default)/version/list paired paths/sync/apply/test
     action = parser.add_mutually_exclusive_group()
-    action.add_argument('--version',
+    action.add_argument('--version', '-v',
                         action='store_true',
                         help="Show jupytext's version number and exit")
     action.add_argument('--paired-paths', '-p',
@@ -258,6 +266,28 @@ def jupytext(args=None):
             set_prefix_and_suffix(fmt, notebook, nb_file)
             notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
 
+        # Set the kernel
+        if args.kernel == '-':
+            language = notebook.metadata.get('jupytext', {})['main_language'] \
+                       or notebook.metadata['kernelspec']['language']
+            if not language:
+                raise ValueError('Cannot infer a kernel as notebook language is not defined')
+            kernelspec = kernelspec_from_language(language)
+            if not kernelspec:
+                raise ValueError('Found no kernel for {}'.format(language))
+            notebook.metadata['kernelspec'] = kernelspec
+            if 'main_language' in notebook.metadata.get('jupytext', {}):
+                notebook.metadata['jupytext'].pop('main_language')
+        elif args.kernel:
+            try:
+                kernelspec = get_kernel_spec(args.kernel)
+            except KeyError:
+                raise KeyError('Please choose a kernel name among {}'
+                               .format([name for name in find_kernel_specs()]))
+            notebook.metadata['kernelspec'] = {'name': args.kernel,
+                                               'language': kernelspec.language,
+                                               'display_name': kernelspec.display_name}
+
         # II. ### Apply commands onto the notebook ###
         # Pipe the notebook into the desired commands
         for cmd in args.pipe or []:
@@ -268,7 +298,7 @@ def jupytext(args=None):
             pipe_notebook(notebook, cmd, args.pipe_fmt, update=False)
 
         # III. ### Possible actions ###
-        modified = args.update_metadata or args.pipe
+        modified = args.update_metadata or args.pipe or args.kernel
         # a. Test round trip conversion
         if args.test or args.test_strict:
             try:
