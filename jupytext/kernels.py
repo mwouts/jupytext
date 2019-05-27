@@ -21,7 +21,7 @@ def kernelspec_from_language(language):
             # Return the kernel that matches the current Python executable
             for name in find_kernel_specs():
                 kernel_specs = get_kernel_spec(name)
-                if kernel_specs.argv[0] == sys.executable:
+                if kernel_specs.language == 'python' and kernel_specs.argv[0] == sys.executable:
                     return {'name': name, 'language': language, 'display_name': kernel_specs.display_name}
 
         for name in find_kernel_specs():
