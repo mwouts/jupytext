@@ -7,6 +7,7 @@ Release History
 ++++++++++++++++++++++
 
 **Improvements**
+- New argument ``--set-kernel`` in Jupytext command line (#230)
 
 **BugFixes**
 - Invalid notebooks may cause a warning, but not a fatal error (#234)

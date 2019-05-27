@@ -20,26 +20,13 @@ except ImportError:
     # Older versions of notebook do not have the LargeFileManager #217
     from notebook.services.contents.filemanager import FileContentsManager as LargeFileManager
 
-from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
-
 from .jupytext import reads, writes, create_prefix_dir
 from .combine import combine_inputs_with_outputs
 from .formats import rearrange_jupytext_metadata, check_file_version
 from .formats import NOTEBOOK_EXTENSIONS, long_form_one_format, long_form_multiple_formats
 from .formats import short_form_one_format, short_form_multiple_formats
 from .paired_paths import paired_paths, find_base_path_and_format, base_path, full_path, InconsistentPath
-
-
-def kernelspec_from_language(language):
-    """Return the kernel specification for the first kernel with a matching language"""
-    try:
-        for name in find_kernel_specs():
-            kernel_specs = get_kernel_spec(name)
-            if kernel_specs.language == language or (language == 'c++' and kernel_specs.language.startswith('C++')):
-                return {'name': name, 'language': language, 'display_name': kernel_specs.display_name}
-    except (KeyError, ValueError):
-        pass
-    return None
+from .kernels import set_kernelspec_from_language
 
 
 def preferred_format(incomplete_format, preferred_formats):
@@ -409,12 +396,7 @@ class TextFileContentsManager(LargeFileManager, Configurable):
         if model_outputs:
             combine_inputs_with_outputs(model['content'], model_outputs['content'], fmt_inputs)
         elif not path.endswith('.ipynb'):
-            nbk = model['content']
-            language = nbk.metadata.get('jupytext', {}).get('main_language', 'python')
-            if 'kernelspec' not in nbk.metadata and language != 'python':
-                kernelspec = kernelspec_from_language(language)
-                if kernelspec:
-                    nbk.metadata['kernelspec'] = kernelspec
+            set_kernelspec_from_language(model['content'])
 
         # Trust code cells when they have no output
         for cell in model['content'].cells:

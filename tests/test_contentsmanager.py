@@ -14,7 +14,7 @@ from jupytext.jupytext import writes, writef, readf
 from jupytext.compare import compare_notebooks
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.formats import read_format_from_metadata, auto_ext_from_metadata
-from jupytext.contentsmanager import kernelspec_from_language
+from jupytext.kernels import kernelspec_from_language
 from .utils import list_notebooks, requires_sphinx_gallery, requires_pandoc, skip_if_dict_is_not_ordered
 
 
@@ -529,6 +529,33 @@ def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
 
 
 @skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='many hash'))
+def test_kernelspec_are_preserved(nb_file, tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+    shutil.copyfile(nb_file, tmp_ipynb)
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.default_jupytext_formats = "ipynb,py"
+    cm.default_notebook_metadata_filter = "-all"
+
+    # load notebook
+    model = cm.get('notebook.ipynb')
+    model['content'].metadata['kernelspec'] = {'display_name': 'Kernel name',
+                                               'language': 'python',
+                                               'name': 'custom'}
+
+    # save to ipynb and py
+    cm.save(model=model, path='notebook.ipynb')
+    assert os.path.isfile(tmp_py)
+
+    # read ipynb
+    model2 = cm.get('notebook.ipynb')
+    compare_notebooks(model['content'], model2['content'])
+
+
+@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
@@ -816,7 +843,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     nb2 = jupytext.readf(str(tmpdir.join(tmp_script)))
 
     # test no metadata
-    assert set(nb2.metadata.keys()) <= {'jupytext'}
+    assert set(nb2.metadata.keys()) <= {'jupytext', 'kernelspec'}
     for cell in nb2.cells:
         assert not cell.metadata
 
