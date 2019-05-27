@@ -11,6 +11,7 @@ Release History
 
 **BugFixes**
 - Invalid notebooks may cause a warning, but not a fatal error (#234)
+- Jupyter server extension leaves the contents manager unchanged if it is a sub-class of Jupytext's CM (#236)
 
 
 1.1.3 (2019-05-22)
