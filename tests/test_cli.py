@@ -569,7 +569,7 @@ def test_set_kernel_auto(py_file, tmpdir):
 
     nb = readf(tmp_ipynb)
     kernel_name = nb.metadata['kernelspec']['name']
-    assert get_kernel_spec(kernel_name).argv[0] == sys.executable
+    assert get_kernel_spec(kernel_name).argv[0] in ['python', sys.executable]
 
 
 @pytest.mark.parametrize('py_file', list_notebooks('python'))
