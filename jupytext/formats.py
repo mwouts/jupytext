@@ -200,9 +200,7 @@ def guess_format(text, ext):
 
     metadata = read_metadata(text, ext)
 
-    if ('jupytext' in metadata and set(metadata['jupytext'])
-            .difference(['encoding', 'executable', 'main_language'])) or \
-            set(metadata).difference(['jupytext']):
+    if 'text_representation' in metadata.get('jupytext', {}):
         return format_name_for_ext(metadata, ext), {}
 
     # Is this a Hydrogen-like script?
