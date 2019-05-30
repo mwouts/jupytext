@@ -1,12 +1,12 @@
 ---
 jupyter:
   kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
+    display_name: Julia 1.1.1
+    language: julia
+    name: julia-1.1
 ---
 
-```{python}
+```{julia}
 # IJulia rocks! So does Plotly. Check it out
 
 using Plotly
@@ -16,7 +16,7 @@ username = ""
 Plotly.signin(username, api_key)
 ```
 
-```{python}
+```{julia}
 # Following data taken from http://julialang.org/ frontpage 
 benchmarks = ["fib", "parse_int", "quicksort3", "mandel", "pi_sum", "rand_mat_stat", "rand_mat_mul"]
 platforms = ["Fortran", "Julia", "Python", "R", "Matlab", "Mathematica", "Javascript", "Go"]
@@ -63,7 +63,7 @@ s = string("<iframe height='750' id='igraph' scrolling='no' seamless='seamless' 
 display("text/html", s)
 ```
 
-```{python}
+```{julia}
 # checkout https://plot.ly/api/ for more Julia examples!
 # But to show off some other Plotly features:
 x = 1:1500
