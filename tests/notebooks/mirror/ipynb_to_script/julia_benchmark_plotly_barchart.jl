@@ -1,9 +1,9 @@
 # ---
 # jupyter:
 #   kernelspec:
-#     display_name: Python 3
-#     language: python
-#     name: python3
+#     display_name: Julia 1.1.1
+#     language: julia
+#     name: julia-1.1
 # ---
 
 # +

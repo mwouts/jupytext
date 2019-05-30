@@ -1,15 +1,15 @@
 ---
 jupyter:
   kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
+    display_name: 'Julia 1.1.1'
+    language: julia
+    name: 'julia-1.1'
   nbformat: 4
   nbformat_minor: 1
 ---
 
 ::: {.cell .code}
-``` {.python}
+``` {.julia}
 # IJulia rocks! So does Plotly. Check it out
 
 using Plotly
@@ -21,7 +21,7 @@ Plotly.signin(username, api_key)
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` {.julia}
 # Following data taken from http://julialang.org/ frontpage 
 benchmarks = ["fib", "parse_int", "quicksort3", "mandel", "pi_sum", "rand_mat_stat", "rand_mat_mul"]
 platforms = ["Fortran", "Julia", "Python", "R", "Matlab", "Mathematica", "Javascript", "Go"]
@@ -70,7 +70,7 @@ display("text/html", s)
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` {.julia}
 # checkout https://plot.ly/api/ for more Julia examples!
 # But to show off some other Plotly features:
 x = 1:1500

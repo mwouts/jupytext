@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
-# + {}
+# ---
+# jupyter:
+#   kernelspec:
+#     display_name: Julia 1.1.1
+#     language: julia
+#     name: julia-1.1
+# ---
+
+# +
 # This notebook is a semi top-down explanation. This cell needs to be
 # executed first so that the operators and helper functions are defined
 # All of this is explained in the later half of the notebook
