@@ -26,7 +26,7 @@ def test_rmd_notebooks_are_trusted(nb_file):
         assert cell.metadata.get('trusted', True)
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='hash sign'))
 def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
         cm = TextFileContentsManager()
@@ -72,7 +72,7 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir):
         cm.trust_notebook(file)
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='hash sign'))
 def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(nb_file, tmpdir):
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
         cm = TextFileContentsManager()

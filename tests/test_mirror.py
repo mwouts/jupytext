@@ -92,7 +92,7 @@ def test_ipynb_to_julia(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'jl', 'ipynb_to_script')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip=''))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='many hash'))
 def test_ipynb_to_python(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'py', 'ipynb_to_script')
 

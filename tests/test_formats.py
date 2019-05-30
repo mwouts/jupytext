@@ -77,6 +77,20 @@ def test_script_with_percent_cell_and_magic_is_hydrogen(script="""#%%
     assert guess_format(script, '.py')[0] == 'hydrogen'
 
 
+def test_script_with_percent_cell_and_kernelspec(script="""# ---
+# jupyter:
+#   kernelspec:
+#     display_name: Python3
+#     language: python
+#     name: python3
+# ---
+
+# %%
+a = 1
+"""):
+    assert guess_format(script, '.py')[0] == 'percent'
+
+
 def test_script_with_spyder_cell_with_name_is_percent(script="""#%% cell name
 1 + 2"""):
     assert guess_format(script, '.py')[0] == 'percent'
