@@ -11,7 +11,7 @@ from copy import copy
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from .jupytext import readf, reads, writef, writes
 from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, check_file_version
-from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format
+from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format, auto_ext_from_metadata
 from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
@@ -61,8 +61,8 @@ def parse_jupytext_args(args=None):
                              'in the git index, which have an extension that matches the (optional) --from argument.')
     # Destination format & act on metadata
     parser.add_argument('--to',
-                        help="Destination format: either one of 'notebook', 'markdown', 'rmarkdown', any valid "
-                             "notebook extension, or a full format '[prefix_path//][suffix.]ext[:format_name]")
+                        help="Destination format: either one of 'notebook', 'markdown', 'rmarkdown', 'script', any "
+                             "valid notebook extension, or a full format '[prefix_path//][suffix.]ext[:format_name]")
     parser.add_argument('--format-options', '--opt',
                         action='append',
                         help='Set format options with e.g. --opt comment_magics=true '
@@ -252,7 +252,18 @@ def jupytext(args=None):
             elif ext:
                 fmt = {'extension': ext}
 
-        # Set the kernel
+        # Compute actual extension when using script/auto, and update nb_dest if necessary
+        dest_fmt = args.to
+        if dest_fmt and dest_fmt['extension'] == '.auto':
+            auto_ext = auto_ext_from_metadata(notebook.metadata)
+            if not auto_ext:
+                raise ValueError('The notebook has no language information. '
+                                 'Please provide an explicit script extension.')
+            dest_fmt['extension'] = auto_ext
+            if not args.output and nb_file != '-':
+                nb_dest = full_path(base_path(nb_file, args.input_format), dest_fmt)
+
+            # Set the kernel
         if args.set_kernel:
             if args.set_kernel == '-':
                 language = notebook.metadata.get('jupytext', {}).get('main_language') \
@@ -306,7 +317,7 @@ def jupytext(args=None):
         # a. Test round trip conversion
         if args.test or args.test_strict:
             try:
-                test_round_trip_conversion(notebook, args.to,
+                test_round_trip_conversion(notebook, dest_fmt,
                                            update=args.update,
                                            allow_expected_differences=not args.test_strict,
                                            stop_on_first_error=args.stop_on_first_error)
@@ -317,12 +328,12 @@ def jupytext(args=None):
 
         # b. Output to the desired file or format
         if nb_dest:
-            if nb_dest == nb_file and not args.to:
-                args.to = fmt
+            if nb_dest == nb_file and not dest_fmt:
+                dest_fmt = fmt
 
             # Test consistency between dest name and output format
-            if args.to and nb_dest != '-':
-                base_path(nb_dest, args.to)
+            if dest_fmt and nb_dest != '-':
+                base_path(nb_dest, dest_fmt)
 
             # Describe what jupytext is doing
             if os.path.isfile(nb_dest) and args.update:
@@ -339,9 +350,9 @@ def jupytext(args=None):
             log('[jupytext] Writing {nb_dest}{format}{action}'
                 .format(nb_dest=nb_dest,
                         format=' in format ' + short_form_one_format(
-                            args.to) if args.to and 'format_name' in args.to else '',
+                            dest_fmt) if dest_fmt and 'format_name' in dest_fmt else '',
                         action=action))
-            writef_git_add(notebook, nb_dest, args.to)
+            writef_git_add(notebook, nb_dest, dest_fmt)
 
         # c. Synchronize paired notebooks
         if args.sync:

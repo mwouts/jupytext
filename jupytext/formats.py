@@ -435,6 +435,7 @@ def long_form_one_format(jupytext_format, metadata=None, update=None):
     common_name_to_ext = {'notebook': 'ipynb',
                           'rmarkdown': 'Rmd',
                           'markdown': 'md',
+                          'script': 'auto',
                           'c++': 'cpp'}
     if jupytext_format.lower() in common_name_to_ext:
         jupytext_format = common_name_to_ext[jupytext_format.lower()]
