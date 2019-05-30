@@ -559,6 +559,19 @@ def test_update_metadata(py_file, tmpdir, capsys):
 
 
 @pytest.mark.parametrize('py_file', list_notebooks('python'))
+def test_set_kernel_inplace(py_file, tmpdir):
+    tmp_py = str(tmpdir.join('notebook.py'))
+
+    copyfile(py_file, tmp_py)
+
+    jupytext([tmp_py, '--set-kernel', '-'])
+
+    nb = readf(tmp_py)
+    kernel_name = nb.metadata['kernelspec']['name']
+    assert get_kernel_spec(kernel_name).argv[0] in ['python', sys.executable]
+
+
+@pytest.mark.parametrize('py_file', list_notebooks('python'))
 def test_set_kernel_auto(py_file, tmpdir):
     tmp_py = str(tmpdir.join('notebook.py'))
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))

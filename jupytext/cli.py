@@ -196,7 +196,7 @@ def jupytext(args=None):
     if not args.to and not args.output and not args.sync \
             and not args.pipe and not args.check \
             and not args.test and not args.test_strict \
-            and not args.update_metadata:
+            and not args.update_metadata and not args.set_kernel:
         raise ValueError('Please select an action')
 
     if args.output and len(args.notebooks) != 1:
@@ -252,41 +252,45 @@ def jupytext(args=None):
             elif ext:
                 fmt = {'extension': ext}
 
+        # Set the kernel
+        if args.set_kernel:
+            if args.set_kernel == '-':
+                language = notebook.metadata.get('jupytext', {}).get('main_language') \
+                           or notebook.metadata['kernelspec']['language']
+                if not language:
+                    raise ValueError('Cannot infer a kernel as notebook language is not defined')
+
+                kernelspec = kernelspec_from_language(language)
+                if not kernelspec:
+                    raise ValueError('Found no kernel for {}'.format(language))
+            else:
+                try:
+                    kernelspec = get_kernel_spec(args.set_kernel)
+                except KeyError:
+                    raise KeyError('Please choose a kernel name among {}'
+                                   .format([name for name in find_kernel_specs()]))
+                kernelspec = {'name': args.set_kernel,
+                              'language': kernelspec.language,
+                              'display_name': kernelspec.display_name}
+
+            args.update_metadata['kernelspec'] = kernelspec
+
         # Update the metadata
         if args.update_metadata:
-            log('[jupytext] Updating notebook metadata with {}'.format(args.update_metadata))
+            log("[jupytext] Updating notebook metadata with '{}'".format(json.dumps(args.update_metadata)))
             # Are we updating a text file that has a metadata filter? #212
             if fmt['extension'] != '.ipynb' and \
                     notebook.metadata.get('jupytext', {}).get('notebook_metadata_filter') == '-all':
                 notebook.metadata.get('jupytext', {}).pop('notebook_metadata_filter')
             recursive_update(notebook.metadata, args.update_metadata)
 
+            if 'kernelspec' in args.update_metadata and 'main_language' in notebook.metadata.get('jupytext', {}):
+                notebook.metadata['jupytext'].pop('main_language')
+
         # Read paired notebooks
         if args.sync:
             set_prefix_and_suffix(fmt, notebook, nb_file)
             notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
-
-        # Set the kernel
-        if args.set_kernel == '-':
-            language = notebook.metadata.get('jupytext', {})['main_language'] \
-                       or notebook.metadata['kernelspec']['language']
-            if not language:
-                raise ValueError('Cannot infer a kernel as notebook language is not defined')
-            kernelspec = kernelspec_from_language(language)
-            if not kernelspec:
-                raise ValueError('Found no kernel for {}'.format(language))
-            notebook.metadata['kernelspec'] = kernelspec
-            if 'main_language' in notebook.metadata.get('jupytext', {}):
-                notebook.metadata['jupytext'].pop('main_language')
-        elif args.set_kernel:
-            try:
-                kernelspec = get_kernel_spec(args.set_kernel)
-            except KeyError:
-                raise KeyError('Please choose a kernel name among {}'
-                               .format([name for name in find_kernel_specs()]))
-            notebook.metadata['kernelspec'] = {'name': args.set_kernel,
-                                               'language': kernelspec.language,
-                                               'display_name': kernelspec.display_name}
 
         # II. ### Apply commands onto the notebook ###
         # Pipe the notebook into the desired commands
