@@ -8,10 +8,12 @@ Release History
 
 **Improvements**
 - New argument ``--set-kernel`` in Jupytext command line (#230)
+- Jupytext now accepts ``--to script`` or ``--to auto`` (#240)
 
 **BugFixes**
 - Invalid notebooks may cause a warning, but not a fatal error (#234)
 - Jupyter server extension leaves the contents manager unchanged if it is a sub-class of Jupytext's CM (#236)
+- Fixed format inference when metadata is present but not format information (#239)
 
 
 1.1.3 (2019-05-22)
