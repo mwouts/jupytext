@@ -1,3 +1,5 @@
+# Jupytext
+
 # Introduction
 
 [![](https://travis-ci.com/mwouts/jupytext.svg?branch=master)](https://travis-ci.com/mwouts/jupytext)
@@ -10,9 +12,12 @@ Jupytext can save Jupyter notebooks as
 - Markdown and R Markdown documents,
 - Julia, Python, R, Bash, Scheme, Clojure, Matlab, Octave, C++ and q/kdb+ scripts.
 
-The plain text formatting of the notebook cell divisions in scripts is configurable. Popular choices include the `percent` format [`# %%`] used by Spyder, VSCode, and others, and the `light` format which was developed to support this project. `light` uses as few cell markers as possible and is particularly suited for importing a pre-existing python script as a notebook with cell divisions automatically inferred from paragraph breaks in the source code.
+Jupytext can also convert these formats **into Jupyter Notebooks**, allowing
+for two-directional syncing between formats. See below for a quick demo.
 
-## Quickstart
+![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/b8dd28f44678f8c91f262da2381276fc4d03b00a/JupyterPyCharm.gif)
+
+## How to use Jupytext
 
 There are multiple ways to use `jupytext`:
 - **Directly from Jupyter Notebook or JupyterLab.** Jupytext provides a _contents manager_ that allows Jupyter to save your notebook to your favorite format (`.py`, `.R`, `.jl`, `.md`, `.Rmd`...) in addition to (or in place of) the traditional `.ipynb` file. The text representation can be edited in your favorite editor. When you're done, refresh the notebook in Jupyter: inputs cells are loaded from the text file, while output cells are reloaded from the `.ipynb` file if present. Refreshing preserves kernel variables, so you can resume your work in the notebook and run the modified cells without having to rerun the notebook in full.
@@ -30,7 +35,14 @@ Looking for a demo?
 - Watch the [PyParis talk](https://github.com/mwouts/jupytext_pyparis_2018/blob/master/README.md),
 - or, try Jupytext online with [binder](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)!
 
+## Contents
 
+* [Install Jupytext](install)
+* [Usecases for Jupytext](examples)
+* [Using with the Jupyter server](using-server)
+* [Using at the command line](using-cli)
+* [Supported document formats](formats)
+* [Advanced configuration and use](advanced)
 
 ## Want to contribute?
 
