@@ -8,7 +8,7 @@ Have you always wished Jupyter notebooks were plain text documents? Wished you c
 
 Jupytext can save Jupyter notebooks as
 - Markdown and R Markdown documents,
-- Julia, Python, R, Bash, Scheme, Clojure, Matlab, Octave, C++ and q/kdb+ scripts.
+- Julia, Python, R, Bash, Scheme, Clojure, Matlab, Octave, C++, q/kdb+ and IDL scripts.
 
 It can also convert these documents **into** Jupyter
 Notebooks, allowing you to synchronize content in both
@@ -108,6 +108,7 @@ The package provides a `jupytext` script for command line conversion between the
 ```bash
 jupytext --to py notebook.ipynb                 # create a notebook.py file in the light format
 jupytext --to notebook notebook.py              # overwrite notebook.ipynb (remove outputs)
+jupytext --update --to notebook notebook.py     # update notebook.ipynb (preserve outputs and metadata)
 ```
 
 For more examples, see the [jupytext documentation](https://jupytext.readthedocs.io)
