@@ -9,6 +9,7 @@ Release History
 **Improvements**
 - New argument ``--set-kernel`` in Jupytext command line (#230)
 - Jupytext now accepts ``--to script`` or ``--to auto`` (#240)
+- Jupytext has a real Sphinx documentation on readthedocs.orgs, thanks to Chris Holdgraf (#237)
 
 **BugFixes**
 - Invalid notebooks may cause a warning, but not a fatal error (#234)
