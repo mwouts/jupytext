@@ -12,6 +12,7 @@ from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from .jupytext import readf, reads, writef, writes
 from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, check_file_version
 from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format, auto_ext_from_metadata
+from .header import recursive_update
 from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
@@ -402,21 +403,6 @@ def print_paired_paths(nb_file, fmt):
         for path, _ in paired_paths(nb_file, fmt, formats):
             if path != nb_file:
                 sys.stdout.write(path + '\n')
-
-
-def recursive_update(target, update):
-    """ Update recursively a (nested) dictionary with the content of another.
-    Inspired from https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
-    """
-    for key in update:
-        value = update[key]
-        if value is None:
-            del target[key]
-        elif isinstance(value, dict):
-            target[key] = recursive_update(target.get(key, {}), value)
-        else:
-            target[key] = value
-    return target
 
 
 def set_format_options(fmt, format_options):
