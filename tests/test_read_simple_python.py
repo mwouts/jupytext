@@ -448,6 +448,38 @@ print('Hello world')
     compare(pynb, pynb2)
 
 
+def test_read_write_script_with_metadata_241(pynb="""#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.4'
+#       jupytext_version: 1.1.2
+#   kernelspec:
+#     display_name: Python 3
+#     language: python
+#     name: python3
+# ---
+
+a = 2
+
+a + 1
+"""):
+    nb = jupytext.reads(pynb, 'py')
+    assert 'executable' in nb.metadata['jupytext']
+    assert 'encoding' in nb.metadata['jupytext']
+    pynb2 = jupytext.writes(nb, 'py')
+
+    # remove version information
+    def remove_version_info(text):
+        return '\n'.join([line for line in text.splitlines() if 'version' not in line])
+
+    compare(remove_version_info(pynb), remove_version_info(pynb2))
+
+
 def test_notebook_blank_lines(script="""# +
 # This is a comment
 # followed by two variables

@@ -118,6 +118,21 @@ def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
     return comment_lines(header, text_format.header_prefix), lines_to_next_cell
 
 
+def recursive_update(target, update):
+    """ Update recursively a (nested) dictionary with the content of another.
+    Inspired from https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
+    """
+    for key in update:
+        value = update[key]
+        if value is None:
+            del target[key]
+        elif isinstance(value, dict):
+            target[key] = recursive_update(target.get(key, {}), value)
+        else:
+            target[key] = value
+    return target
+
+
 def header_to_metadata_and_cell(lines, header_prefix, ext=None):
     """
     Return the metadata, a boolean to indicate if a jupyter section was found,
@@ -177,7 +192,7 @@ def header_to_metadata_and_cell(lines, header_prefix, ext=None):
 
     if ended:
         if jupyter:
-            metadata.update(yaml.safe_load('\n'.join(jupyter))['jupyter'])
+            recursive_update(metadata, yaml.safe_load('\n'.join(jupyter))['jupyter'])
 
         lines_to_next_cell = 1
         if len(lines) > i + 1:
