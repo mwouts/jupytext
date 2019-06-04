@@ -1,4 +1,4 @@
-# Using Jupytext from within Jupyter
+# Using Jupytext in Jupyter
 
 ## Paired notebooks
 
@@ -6,7 +6,7 @@ Jupytext can write a given notebook to multiple files. In addition to the origin
 
 ## Per-notebook configuration
 
-Select the pairing for a given notebook using either the [Jupytext menu](#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or the [Jupytext commands](#jupytext-commands-in-jupyterlab) in JupyterLab.
+Select the pairing for a given notebook using either the [Jupytext menu](install.html#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or the [Jupytext commands](install.html#jupytext-commands-in-jupyterlab) in JupyterLab.
 
 These command simply add a `"jupytext": {"formats": "ipynb,md"}`-like entry in the notebook metadata. You could also set that metadata yourself with _Edit/Edit Notebook Metadata_ in Jupyter Notebook. In JupyterLab, use [this extension](https://github.com/yuvipanda/jupyterlab-nbmetadata).
 
@@ -20,7 +20,7 @@ You can pair a notebook to as many text representations as you want (see our _Wo
 ```
 where
 - `ext` is one of `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`, `q`. Use the `auto` extension to have the script extension chosen according to the Jupyter kernel.
-- `format_name` (optional) is either `light` (default for scripts), `bare`, `percent`, `hydrogen`, `sphinx` (Python only), `spin` (R only) &mdash; see below for the [format specifications](#Format-specifications).
+- `format_name` (optional) is either `light` (default for scripts), `bare`, `percent`, `hydrogen`, `sphinx` (Python only), `spin` (R only) &mdash; see the [format specifications](formats.md).
 - `path`, `prefix` and `suffix` allow to save the text representation to files with different names, or in a different folder.
 
 If you want to pair a notebook to a python script in a subfolder named `scripts`, set the formats metadata to `ipynb,scripts//py`. If the notebook is in a `notebooks` folder and you want the text representation to be in a `scripts` folder at the same level, set the Jupytext formats to `notebooks//ipynb,scripts//py`.
@@ -44,7 +44,7 @@ c.ContentsManager.default_jupytext_formats = "ipynb,md"
 ```
 (and similarly for the other formats).
 
-In case the [`percent`](#the-percent-format) format is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
+In case the [`percent`](formats.html#the-percent-format) format is your favorite, add the following to your `.jupyter/jupyter_notebook_config.py` file:
 ```python
 # Use the percent format when saving as py
 c.ContentsManager.preferred_jupytext_formats_save = "py:percent"

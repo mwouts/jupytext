@@ -1,8 +1,8 @@
-# Example usage
+# Usecases for Jupytext
 
 ## Writing notebooks as plain text
 
-You like to work with scripts? The good news is that plain scripts, which you can draft and test in your favorite IDE, open transparently as notebooks in Jupyter when using Jupytext. Run the notebook in Jupyter to generate the outputs, [associate](#paired-notebooks) an `.ipynb` representation, save and share your research as either a plain script or as a traditional Jupyter notebook with outputs.
+You like to work with scripts? The good news is that plain scripts, which you can draft and test in your favorite IDE, open transparently as notebooks in Jupyter when using Jupytext. Run the notebook in Jupyter to generate the outputs, [associate](using-server.html#paired-notebooks) an `.ipynb` representation, save and share your research as either a plain script or as a traditional Jupyter notebook with outputs.
 
 ## Collaborating on Jupyter Notebooks
 
@@ -10,7 +10,7 @@ With Jupytext, collaborating on Jupyter notebooks with Git becomes as easy as co
 
 The setup is straightforward:
 - Open your favorite notebook in Jupyter notebook
-- [Associate](#paired-notebooks) a `.py` representation (for instance) to that notebook
+- [Associate](using-server.html#paired-notebooks) a `.py` representation (for instance) to that notebook
 - Save the notebook, and put the Python script under Git control. Sharing the `.ipynb` file is possible, but not required.
 
 Collaborating then works as follows:
@@ -27,7 +27,7 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 - We start with a Jupyter notebook.
 - The notebook includes a plot of the world population. The plot legend is not in order of decreasing population, we'll fix this.
-- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we select _Pair Notebook with a light Script_ in either the [Jupytext menu](#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or in the [Jupytext commands](#jupytext-commands-in-jupyterlab) in JupyterLab. This has the effect of adding a `"jupytext": {"formats": "ipynb,py:light"},` entry to the notebook metadata.
+- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we select _Pair Notebook with a light Script_ in either the [Jupytext menu](install.html#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or in the [Jupytext commands](install.html#jupytext-commands-in-jupyterlab) in JupyterLab. This has the effect of adding a `"jupytext": {"formats": "ipynb,py:light"},` entry to the notebook metadata.
 - The Python script can be opened with PyCharm:
   - Navigating in the code and documentation is easier than in Jupyter.
   - The console is convenient for quick tests. We don't need to create cells for this.

@@ -26,7 +26,7 @@ If you don't have the notebook icon on text documents after a fresh restart of y
 ```python
 c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 ```
-to your `.jupyter/jupyter_notebook_config.py` file (generate a Jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`). Our contents manager accepts a few options: default formats, default metadata filter, etc &mdash; read more on this [below](#global-configuration). Then, restart Jupyter Notebook or JupyterLab, either from the JupyterHub interface or from the command line with
+to your `.jupyter/jupyter_notebook_config.py` file (generate a Jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`). Our contents manager accepts a few options: default formats, default metadata filter, etc &mdash; read more on this [below](using-server.html#global-configuration). Then, restart Jupyter Notebook or JupyterLab, either from the JupyterHub interface or from the command line with
 ```bash
 jupyter notebook # or lab
 ```

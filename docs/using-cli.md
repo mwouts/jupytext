@@ -1,4 +1,4 @@
-# Using Jupytext with the command line
+# Using Jupytext at the command line
 
 ## Command line conversion
 
@@ -69,10 +69,10 @@ jupytext --test --update notebook.ipynb --to py:percent
 Note that `jupytext --test` compares the resulting notebooks according to its expectations. If you wish to proceed to a strict comparison of the two notebooks, use `jupytext --test-strict`, and use the flag `-x` to report with more details on the first difference, if any.
 
 Please note that
-- Scripts opened with Jupyter have a default [metadata filter](#default-metadata-filtering) that prevents additional notebook or cell
+- Scripts opened with Jupyter have a default [metadata filter](using-server.html#metadata-filtering) that prevents additional notebook or cell
 metadata to be added back to the script. Remove the filter if you want to store Jupytext's settings, or the kernel information, in the text file.
 - Cell metadata are available in the `light` and `percent` formats, as well as in the Markdown and R Markdown formats. R scripts in `spin` format support cell metadata for code cells only. Sphinx Gallery scripts in `sphinx` format do not support cell metadata.
-- By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in the sections for [notebook specific](#-per-notebook-configuration) and [global settings](#default-metadata-filtering) for metadata filtering.
+- By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in the sections for [notebook specific](using-server.html#per-notebook-configuration) and [global settings](using-server.html#metadata-filtering) for metadata filtering.
 
 ## Reading notebooks in Python
 
