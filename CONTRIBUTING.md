@@ -41,7 +41,7 @@ conda activate jupytext-dev
 pip install -r requirements*.txt
 ```
 
-Tests are executed with `pytest` (use `pytest -n 3` if you want them to run in parallel). If you develop `jupytext` command line, you can install Jupytext in dev mode with
+Tests are executed with `pytest` (install `pytest-xdist` and then run `pytest -n 3` if you want them to run in parallel). If you develop `jupytext` command line, you can install Jupytext in dev mode with
 ```
 pip install -e .
 ````
