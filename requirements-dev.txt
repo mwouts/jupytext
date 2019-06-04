@@ -1,6 +1,5 @@
 flake8
 pytest
-pytest-xdist
 pytest-cov==2.5.1
 codecov
 notebook
