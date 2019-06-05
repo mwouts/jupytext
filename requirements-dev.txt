@@ -3,3 +3,4 @@ pytest
 pytest-cov==2.5.1
 codecov
 notebook
+jupyter_client
