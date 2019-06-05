@@ -8,7 +8,6 @@ import subprocess
 import argparse
 import json
 from copy import copy
-from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from .jupytext import readf, reads, writef, writes
 from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, check_file_version
 from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format, auto_ext_from_metadata
@@ -16,7 +15,7 @@ from .header import recursive_update
 from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
-from .kernels import kernelspec_from_language
+from .kernels import kernelspec_from_language, find_kernel_specs, get_kernel_spec
 from .version import __version__
 
 
