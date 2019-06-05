@@ -9,6 +9,7 @@ Release History
 **Improvements**
 
 - Jupytext now supports Javascript and Typescript, thanks to Hatem Hosny (#250)
+- Jupytext works with Python 3.8 as well
 
 **BugFixes**
 
