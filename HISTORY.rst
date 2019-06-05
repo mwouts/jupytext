@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+1.1.5 (2019-06-06)
+++++++++++++++++++++++
+
+**BugFixes**
+
+- Fixed implicit dependency on ``jupyter_client`` (#245)
+
+
 1.1.4 (2019-06-05)
 ++++++++++++++++++++++
 
