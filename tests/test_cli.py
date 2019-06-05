@@ -598,7 +598,7 @@ def test_set_kernel_with_name(py_file, tmpdir):
         nb = readf(tmp_ipynb)
         assert nb.metadata['kernelspec']['name'] == kernel
 
-    with pytest.raises(KeyError) as info:
+    with pytest.raises(KeyError):
         jupytext(['--to', 'ipynb', tmp_py, '--set-kernel', 'non_existing_env'])
 
 
