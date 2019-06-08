@@ -290,3 +290,22 @@ def test_ipynb_to_pro_percent(nb_file):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='(functional|Notebook with|flavors|invalid)'))
 def test_ipynb_to_pandoc(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'md:pandoc', 'ipynb_to_pandoc')
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_js'))
+def test_ipynb_to_js(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'js', 'ipynb_to_script')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_js'))
+def test_ipynb_to_js_percent(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'js:percent', 'ipynb_to_percent')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_ts'))
+def test_ipynb_to_ts(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'ts', 'ipynb_to_script')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_ts'))
+def test_ipynb_to_ts_percent(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'ts:percent', 'ipynb_to_percent')

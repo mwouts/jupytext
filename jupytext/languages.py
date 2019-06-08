@@ -15,7 +15,9 @@ _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.sh': {'language': 'bash', 'comment': '#'},
                       '.q': {'language': 'q', 'comment': '/'},
                       '.m': {'language': 'matlab', 'comment': '%'},
-                      '.pro': {'language': 'idl', 'comment': ';'}}
+                      '.pro': {'language': 'idl', 'comment': ';'},
+                      '.js': {'language': 'javascript', 'comment': '//'},
+                      '.ts': {'language': 'typescript', 'comment': '//'}}
 
 _COMMENT_CHARS = [_SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS if
                   _SCRIPT_EXTENSIONS[ext]['comment'] != '#']
