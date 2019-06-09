@@ -39,6 +39,11 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
 
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
         notebook = jupytext.readf(nb_file, fmt)
+        # it's better not to have Jupytext metadata in test notebooks:
+        if fmt == 'ipynb' and 'jupytext' in notebook.metadata:  # pragma: no cover
+            notebook.metadata.pop('jupytext')
+            jupytext.writef(nb_file, fmt)
+
     create_mirror_file_if_missing(mirror_file, notebook, fmt)
 
     # Compare the text representation of the two notebooks
