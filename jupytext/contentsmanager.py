@@ -228,7 +228,8 @@ class TextFileContentsManager(LargeFileManager, Configurable):
 
                 jupytext_formats = [fmt]
 
-            jupytext_formats = long_form_multiple_formats(jupytext_formats, metadata)
+            jupytext_formats = long_form_multiple_formats(jupytext_formats, metadata,
+                                                          auto_ext_requires_language_info=False)
 
             # Set preferred formats if not format name is given yet
             jupytext_formats = [preferred_format(f, self.preferred_jupytext_formats_save) for f in jupytext_formats]
@@ -319,7 +320,8 @@ class TextFileContentsManager(LargeFileManager, Configurable):
         # We will now read a second file if this is a paired notebooks.
         nbk = model['content']
         jupytext_formats = nbk.metadata.get('jupytext', {}).get('formats') or self.default_formats(path)
-        jupytext_formats = long_form_multiple_formats(jupytext_formats)
+        jupytext_formats = long_form_multiple_formats(jupytext_formats, nbk.metadata,
+                                                      auto_ext_requires_language_info=False)
 
         # Compute paired notebooks from formats
         alt_paths = [(path, fmt)]
