@@ -14,7 +14,6 @@ except ImportError as err:
 
         return local_function
 
-
     find_kernel_specs = raise_error(err)
     get_kernel_spec = raise_error(err)
 
