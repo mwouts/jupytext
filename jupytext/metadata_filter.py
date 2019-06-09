@@ -38,7 +38,7 @@ def metadata_filter_as_dict(metadata_config):
         if 'all' in metadata_config[section]:
             metadata_config[section] = 'all'
         else:
-            metadata_config[section] = [key for key in metadata_config[section] if key]
+            metadata_config[section] = [k for k in metadata_config[section] if k]
 
     return metadata_config
 
