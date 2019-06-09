@@ -3,6 +3,18 @@
 Release History
 ---------------
 
+1.1.6 (2019-06-10)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Jupytext now supports Javascript and Typescript, thanks to Hatem Hosny (#250)
+
+**BugFixes**
+
+- Allow to create new notebooks in JupyterLab when using ``auto`` global pairing (#249)
+
+
 1.1.5 (2019-06-06)
 ++++++++++++++++++++++
 
