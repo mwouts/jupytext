@@ -1,9 +1,12 @@
 """Determine notebook or cell language"""
 
+# Languages that may appear as magic instructions in Python notebooks
 _JUPYTER_LANGUAGES = ['R', 'bash', 'sh', 'python', 'python2', 'python3', 'javascript', 'js', 'perl',
                       'html', 'latex', 'markdown', 'pypy', 'ruby', 'script', 'svg', 'writefile',
                       'matlab', 'octave', 'idl']
 
+# Supported file extensions (and languages)
+# Please add more languages here (and add a few tests) - see CONTRIBUTING.md
 _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.R': {'language': 'R', 'comment': '#'},
                       '.r': {'language': 'R', 'comment': '#'},
