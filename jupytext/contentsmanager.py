@@ -231,7 +231,7 @@ class TextFileContentsManager(LargeFileManager, Configurable):
             jupytext_formats = long_form_multiple_formats(jupytext_formats, metadata)
 
             # Set preferred formats if not format name is given yet
-            jupytext_formats = [preferred_format(fmt, self.preferred_jupytext_formats_save) for fmt in jupytext_formats]
+            jupytext_formats = [preferred_format(f, self.preferred_jupytext_formats_save) for f in jupytext_formats]
 
             base, fmt = find_base_path_and_format(path, jupytext_formats)
             self.update_paired_notebooks(path, fmt, jupytext_formats)

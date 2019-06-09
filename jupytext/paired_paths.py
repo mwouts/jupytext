@@ -117,7 +117,7 @@ def paired_paths(main_path, fmt, formats):
 
     # Is there a format that matches the main path?
     base = base_path(main_path, fmt)
-    paths = [full_path(base, fmt) for fmt in formats]
+    paths = [full_path(base, f) for f in formats]
 
     if main_path not in paths:
         raise InconsistentPath(u"Paired paths '{}' do not include the current notebook path '{}'. "
