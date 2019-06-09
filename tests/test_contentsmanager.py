@@ -721,6 +721,62 @@ def test_save_in_auto_extension_global(nb_file, tmpdir):
     compare_notebooks(nb, model['content'])
 
 
+def test_global_auto_pairing_works_with_empty_notebook(tmpdir):
+    nb = new_notebook()
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+    tmp_auto = str(tmpdir.join('notebook.auto'))
+
+    # create contents manager with default load format as percent
+    cm = jupytext.TextFileContentsManager()
+    cm.default_jupytext_formats = 'ipynb,auto'
+    cm.preferred_jupytext_formats_save = 'auto:percent'
+    cm.root_dir = str(tmpdir)
+
+    # save notebook
+    cm.save(model=dict(type='notebook', content=nb), path='notebook.ipynb')
+
+    # check that only the ipynb representation exists
+    assert os.path.isfile(tmp_ipynb)
+    assert not os.path.isfile(tmp_py)
+    assert not os.path.isfile(tmp_auto)
+    assert 'notebook.ipynb' not in cm.paired_notebooks
+
+    model = cm.get(path=tmp_ipynb)
+    compare_notebooks(nb, model['content'])
+
+    # add language information to the notebook
+    nb.metadata['language_info'] = {
+        "codemirror_mode": {
+            "name": "ipython",
+            "version": 3
+        },
+        "file_extension": ".py",
+        "mimetype": "text/x-python",
+        "name": "python",
+        "nbconvert_exporter": "python",
+        "pygments_lexer": "ipython3",
+        "version": "3.7.3"
+    }
+
+    # save again
+    cm.save(model=dict(type='notebook', content=nb), path='notebook.ipynb')
+
+    # check that ipynb + py representations exists
+    assert os.path.isfile(tmp_ipynb)
+    assert os.path.isfile(tmp_py)
+    assert not os.path.isfile(tmp_auto)
+    assert len(cm.paired_notebooks['notebook.ipynb']) == 2
+
+    # add a cell in the py file
+    with open(tmp_py, 'a') as fp:
+        fp.write('# %%\n2+2\n')
+
+    nb2 = cm.get(path=tmp_ipynb)['content']
+    assert len(nb2.cells) == 1
+    assert nb2.cells[0].source == '2+2'
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
 def test_save_in_auto_extension_global_with_format(nb_file, tmpdir):
     # load notebook
