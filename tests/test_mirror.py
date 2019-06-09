@@ -291,6 +291,7 @@ def test_ipynb_to_pro_percent(nb_file):
 def test_ipynb_to_pandoc(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'md:pandoc', 'ipynb_to_pandoc')
 
+
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_js'))
 def test_ipynb_to_js(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'js', 'ipynb_to_script')
