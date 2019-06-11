@@ -742,7 +742,7 @@ def test_global_auto_pairing_works_with_empty_notebook(tmpdir):
     assert not os.path.isfile(tmp_auto)
     assert 'notebook.ipynb' not in cm.paired_notebooks
 
-    model = cm.get(path=tmp_ipynb)
+    model = cm.get(path='notebook.ipynb')
     compare_notebooks(nb, model['content'])
 
     # add language information to the notebook
@@ -772,7 +772,7 @@ def test_global_auto_pairing_works_with_empty_notebook(tmpdir):
     with open(tmp_py, 'a') as fp:
         fp.write('# %%\n2+2\n')
 
-    nb2 = cm.get(path=tmp_ipynb)['content']
+    nb2 = cm.get(path='notebook.ipynb')['content']
     assert len(nb2.cells) == 1
     assert nb2.cells[0].source == '2+2'
 
