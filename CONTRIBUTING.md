@@ -1,7 +1,7 @@
 # Contributing to Jupytext
 
-Thanks for reading this! Contributions to this project are welcome.
-There are many ways you can contribute...
+Thanks for reading this. Contributions to this project are welcome.
+And there are many ways you can contribute...
 
 ## Spread the word
 
@@ -12,7 +12,7 @@ By the way, we're also interested to know how you use Jupytext! There may well b
 
 ## Improve the documentation
 
-You think the documentation could be improved? You've spotted a typo, or you think you can rephrase a paragraph to make is easier to follow? Please follow the _Edit on Github_ link, edit the document, and submit a pull request!
+You think the documentation could be improved? You've spotted a typo, or you think you can rephrase a paragraph to make is easier to follow? Please follow the _Edit on Github_ link, edit the document, and submit a pull request.
 
 ## Report an issue
 
@@ -53,7 +53,7 @@ pip install dist/jupytext-XXX.tar.gz
 
 ## Jupytext's extension for Jupyter Notebook
 
-Our extension for Jupyter Notebook adds a Jupytext entry to Jupyter Notebook. The code is found at `jupytext/nbextension/index.js`. Instructions to develop that extension are found [here](https://github.com/mwouts/jupytext_nbextension).
+Our extension for Jupyter Notebook adds a Jupytext entry to Jupyter Notebook Menu. The code is found at `jupytext/nbextension/index.js`. Instructions to develop that extension are at `jupytext/nbextension/README.md`.
 
 ## Jupytext's extension for JupyterLab
 
