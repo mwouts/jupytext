@@ -9,6 +9,7 @@ Release History
 **Improvements**
 
 - Added support for Scala notebook, by Tobias Frischholz (#253)
+- Markdown and R Markdown representations are now tested on all languages
 
 
 1.1.6 (2019-06-11)
