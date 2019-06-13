@@ -14,7 +14,7 @@ Release History
 **BugFixes**
 
 - The Jupytext Menu in Jupyter Notebook is now compatible with ``jupyter_nbextensions_configurator`` (#178)
-
+- Entries in the Jupytext menu are updated when the menu is hovered on (#248)
 
 1.1.6 (2019-06-11)
 ++++++++++++++++++++++

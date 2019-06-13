@@ -78,6 +78,11 @@ define([
         checkAutosave();
     }
 
+    function updateJupytextMenu() {
+        checkSelectedJupytextFormat();
+        checkAutosave();
+    }
+
     function jupytext_pair(formats, text) {
         return $('<li/>').append($('<a/>')
             .attr('id', 'jupytext_pair_' + formats.replace(':', '_').replace(',', '_'))
@@ -102,7 +107,8 @@ define([
                 .attr('data-toggle', 'dropdown')
                 .attr('aria-expanded', 'false')
                 .text('Jupytext')
-                .attr('title', 'Jupyter notebooks as Markdown documents, Julia, Python or R scripts');
+                .attr('title', 'Jupyter notebooks as Markdown documents, Julia, Python or R scripts')
+                .on('mouseover', updateJupytextMenu);
 
             var JupytextActions = $('<ul/>')
                 .attr('id', 'jupytext_actions')
