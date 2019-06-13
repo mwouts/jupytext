@@ -4,10 +4,12 @@ change on new releases.
 """
 
 import os
+
 import mock
 import pytest
 from nbformat.v4.nbbase import new_notebook
 from testfixtures import compare
+
 import jupytext
 from jupytext.compare import compare_notebooks, combine_inputs_with_outputs
 from jupytext.formats import long_form_one_format
@@ -315,3 +317,13 @@ def test_ipynb_to_ts(nb_file):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_ts'))
 def test_ipynb_to_ts_percent(nb_file):
     assert_conversion_same_as_mirror(nb_file, 'ts:percent', 'ipynb_to_percent')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_scala'))
+def test_ipynb_to_scala(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'scala', 'ipynb_to_script')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_scala'))
+def test_ipynb_to_scala_percent(nb_file):
+    assert_conversion_same_as_mirror(nb_file, 'scala:percent', 'ipynb_to_percent')
