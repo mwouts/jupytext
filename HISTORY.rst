@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+1.1.7 (2019-06-..)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Added support for Scala notebook, by Tobias Frischholz (#253)
+
+
 1.1.6 (2019-06-11)
 ++++++++++++++++++++++
 
