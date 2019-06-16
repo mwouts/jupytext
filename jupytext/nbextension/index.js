@@ -83,8 +83,10 @@ define([
         checkAutosave();
     }
 
-    function jupytext_pair(formats, text) {
-        return $('<li/>').append($('<a/>')
+    function jupytext_pair(formats, text, active) {
+        return $('<li/>')
+            .addClass(active ? null : 'disabled')
+            .append($('<a/>')
             .attr('id', 'jupytext_pair_' + formats.replace(':', '_').replace(',', '_'))
             .text(text)
             .attr('title',
@@ -137,14 +139,22 @@ define([
             JupytextActions.append($('<li/>').addClass('divider'));
             JupytextActions.append(toggle_autosave);
             JupytextActions.append($('<li/>').addClass('divider'));
-            JupytextActions.append(jupytext_pair('ipynb,auto:light', 'Pair Notebook with light Script'));
-            JupytextActions.append(jupytext_pair('ipynb,auto:percent', 'Pair Notebook with percent Script'));
-            JupytextActions.append(jupytext_pair('ipynb,auto:hydrogen', 'Pair Notebook with Hydrogen Script'));
-            JupytextActions.append(jupytext_pair('ipynb,md', 'Pair Notebook with Markdown'));
-            JupytextActions.append(jupytext_pair('ipynb,Rmd', 'Pair Notebook with R Markdown'));
-            JupytextActions.append(jupytext_pair('custom', 'Custom pairing'));
+
+            var notebook_extension = Jupyter.notebook.notebook_path.split('.').pop();
+            var active = (notebook_extension === 'ipynb' || (notebook_extension != 'md' && notebook_extension != 'Rmd'));
+            JupytextActions.append(jupytext_pair('ipynb,auto:light', 'Pair Notebook with light Script', active));
+            JupytextActions.append(jupytext_pair('ipynb,auto:percent', 'Pair Notebook with percent Script', active));
+            JupytextActions.append(jupytext_pair('ipynb,auto:hydrogen', 'Pair Notebook with Hydrogen Script', active));
+
+            active = (notebook_extension === 'ipynb' || notebook_extension === 'md');
+            JupytextActions.append(jupytext_pair('ipynb,md', 'Pair Notebook with Markdown', active));
+
+            active = (notebook_extension === 'ipynb' || notebook_extension === 'Rmd');
+            JupytextActions.append(jupytext_pair('ipynb,Rmd', 'Pair Notebook with R Markdown', active));
+
+            JupytextActions.append(jupytext_pair('custom', 'Custom pairing', true));
             JupytextActions.append($('<li/>').addClass('divider'));
-            JupytextActions.append(jupytext_pair('none', 'Unpair notebook'));
+            JupytextActions.append(jupytext_pair('none', 'Unpair notebook', true));
 
             $('#jupytext_sub_menu').after('<li class="divider"/>');
 
