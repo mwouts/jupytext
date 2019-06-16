@@ -29,6 +29,7 @@ setup(
                 ('share/jupyter/nbextensions/jupytext', ['jupytext/nbextension/index.js',
                                                          'jupytext/nbextension/README.md',
                                                          'jupytext/nbextension/jupytext_menu.png',
+                                                         'jupytext/nbextension/jupytext_menu_zoom.png',
                                                          'jupytext/nbextension/jupytext.yml']),
                 ('share/jupyter/lab/extensions', ['packages/labextension/dist/jupyterlab-jupytext-0.1.0.tgz'])],
     entry_points={'console_scripts': ['jupytext = jupytext.cli:jupytext_cli']},
