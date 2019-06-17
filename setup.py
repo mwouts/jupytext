@@ -31,7 +31,7 @@ setup(
                                                          'jupytext/nbextension/jupytext_menu.png',
                                                          'jupytext/nbextension/jupytext_menu_zoom.png',
                                                          'jupytext/nbextension/jupytext.yml']),
-                ('share/jupyter/lab/extensions', ['packages/labextension/dist/jupyterlab-jupytext-0.1.0.tgz'])],
+                ('share/jupyter/lab/extensions', ['packages/labextension/jupyterlab-jupytext-0.1.1.tgz'])],
     entry_points={'console_scripts': ['jupytext = jupytext.cli:jupytext_cli']},
     tests_require=['pytest'],
     install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml', 'testfixtures'],
