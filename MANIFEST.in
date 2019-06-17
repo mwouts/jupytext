@@ -2,8 +2,3 @@ include LICENSE
 include *.md
 include *.txt
 include *.rst
-
-recursive-include jupyter-config *.json
-recursive-include jupytext/nbextension *.js
-
-graft packages
