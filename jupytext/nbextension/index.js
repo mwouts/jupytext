@@ -46,6 +46,23 @@ define([
         $('#autosave > .fa').toggleClass('fa-check', Jupyter.notebook.autosave_interval > 0);
     }
 
+    function checkIncludeMetadata() {
+        if (!Jupyter.notebook.metadata.jupytext || !Jupyter.notebook.metadata.jupytext.notebook_metadata_filter) {
+            $('#jupytext_metadata > .fa').toggleClass('fa-check', true);
+            $('#jupytext_metadata').remove('disabled');
+            return;
+        }
+        if (Jupyter.notebook.metadata.jupytext.notebook_metadata_filter === "-all") {
+            $('#jupytext_metadata > .fa').toggleClass('fa-check', false);
+            $('#jupytext_metadata').remove('disabled');
+            return;
+        }
+
+        // Custom metadata filter => we disable the option
+        $('#jupytext_metadata > .fa').toggleClass('fa-check', true);
+        $('#jupytext_metadata').addClass('disabled');
+    }
+
     function onClickedJupytextPair(data) {
         var formats = $(this).data('formats');
         if (formats === 'custom') {
@@ -73,6 +90,30 @@ define([
         Jupyter.notebook.set_dirty();
     }
 
+    function onToggleMetadata(data) {
+        if (!Jupyter.notebook.metadata.jupytext) {
+            Jupyter.notebook.metadata.jupytext = {
+                "notebook_metadata_filter": "-all",
+                "cell_metadata_filter": "-all"
+            };
+        } else {
+            if (!Jupyter.notebook.metadata.jupytext.notebook_metadata_filter) {
+                Jupyter.notebook.metadata.jupytext.notebook_metadata_filter = "-all";
+                if (!Jupyter.notebook.metadata.jupytext.cell_metadata_filter)
+                    Jupyter.notebook.metadata.jupytext.cell_metadata_filter = "-all";
+            } else {
+                delete Jupyter.notebook.metadata.jupytext['notebook_metadata_filter'];
+                if (Jupyter.notebook.metadata.jupytext.cell_metadata_filter === "-all")
+                    delete Jupyter.notebook.metadata.jupytext['cell_metadata_filter'];
+                if (Jupyter.notebook.metadata.jupytext == {})
+                    delete Jupyter.notebook.metadata['jupytext'];
+            }
+        }
+
+        checkIncludeMetadata();
+        Jupyter.notebook.set_dirty();
+    }
+
     function onToggleAutosave() {
         Jupyter.notebook.autosave_interval = Jupyter.notebook.autosave_interval > 0 ? 0 : 120000;
         checkAutosave();
@@ -81,6 +122,7 @@ define([
     function updateJupytextMenu() {
         checkSelectedJupytextFormat();
         checkAutosave();
+        checkIncludeMetadata();
     }
 
     function jupytext_pair(formats, text, active) {
@@ -133,6 +175,15 @@ define([
                     .prepend($("<i/>").addClass("fa menu-icon pull-right"))
             );
 
+            var toggle_metadata = $("<li/>").append(
+                $("<a/>")
+                    .attr("id", "jupytext_metadata")
+                    .text("Include metadata")
+                    .attr("title", "Include notebook and cell metadata in the text file")
+                    .on("click", onToggleMetadata)
+                    .prepend($("<i/>").addClass("fa menu-icon pull-right"))
+            );
+
             $('#trust_notebook').before('<li id="jupytext_sub_menu"/>');
             $('#jupytext_sub_menu').addClass('dropdown-submenu').append(JupytextMenu).append(JupytextActions);
             JupytextActions.append(jupytext_link);
@@ -153,6 +204,8 @@ define([
             JupytextActions.append(jupytext_pair('ipynb,Rmd', 'Pair Notebook with R Markdown', active));
 
             JupytextActions.append(jupytext_pair('custom', 'Custom pairing', true));
+            JupytextActions.append($('<li/>').addClass('divider'));
+            JupytextActions.append(toggle_metadata);
             JupytextActions.append($('<li/>').addClass('divider'));
             JupytextActions.append(jupytext_pair('none', 'Unpair notebook', true));
 
