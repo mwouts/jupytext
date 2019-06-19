@@ -1,3 +1,4 @@
+import mock
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from testfixtures import compare
 import jupytext
@@ -257,3 +258,53 @@ nor be split into two pieces."""
     compare(text, nb.cells[0].source)
     assert nb.cells[0].cell_type == 'markdown'
     assert len(nb.cells) == 1
+
+
+def test_read_markdown_idl(text='''---
+jupyter:
+  kernelspec:
+    display_name: IDL [conda env:gdl] *
+    language: IDL
+    name: conda-env-gdl-idl
+---
+
+# A sample IDL Markdown notebook
+
+```idl
+a = 1
+```
+'''):
+    nb = jupytext.reads(text, 'md')
+    assert len(nb.cells) == 2
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[1].source == 'a = 1'
+
+    nb.metadata.pop('jupytext')
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        text2 = jupytext.writes(nb, 'md')
+    compare(text, text2)
+
+
+def test_read_markdown_IDL(text='''---
+jupyter:
+  kernelspec:
+    display_name: IDL [conda env:gdl] *
+    language: IDL
+    name: conda-env-gdl-idl
+---
+
+# A sample IDL Markdown notebook
+
+```IDL
+a = 1
+```
+'''):
+    nb = jupytext.reads(text, 'md')
+    assert len(nb.cells) == 2
+    assert nb.cells[1].cell_type == 'code'
+    assert nb.cells[1].source == 'a = 1'
+
+    nb.metadata.pop('jupytext')
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        text2 = jupytext.writes(nb, 'md')
+    compare(text.replace('```IDL', '```idl'), text2)
