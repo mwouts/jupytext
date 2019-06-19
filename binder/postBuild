@@ -3,3 +3,8 @@ python -m bash_kernel.install
 
 # Trust our notebook
 jupyter trust demo/World\ population.ipynb
+
+# Set up extensions for JupyterLab and Notebook
+jupyter labextension install jupyterlab-jupytext
+jupyter nbextension install --py jupytext --user
+jupyter nbextension enable --py jupytext --user
