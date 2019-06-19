@@ -30,7 +30,7 @@ The languages that are currently supported by Jupytext are: Julia, Python, R, Ba
 Looking for a demo?
 - Read the original [announcement](https://towardsdatascience.com/introducing-jupytext-9234fdff6c57) in Towards Data Science,
 - Watch the [PyParis talk](https://github.com/mwouts/jupytext_pyparis_2018/blob/master/README.md),
-- or, try Jupytext online with [binder](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)!
+- or, try Jupytext online with [binder](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo/get_started.ipynb)!
 
 ## Installation
 
