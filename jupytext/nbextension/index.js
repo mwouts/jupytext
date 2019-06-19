@@ -3,12 +3,10 @@
 // https://github.com/mwouts/jupytext/blob/master/jupytext/nbextension/README.md
 
 define([
-    'require',
     'jquery',
     'base/js/namespace',
     'base/js/events'
 ], function (
-    requirejs,
     $,
     Jupyter,
     events
@@ -24,11 +22,11 @@ define([
         if (Jupyter.notebook.metadata.language_info) {
             var script_ext = Jupyter.notebook.metadata.language_info.file_extension;
 
-            if (formats == 'ipynb,' + script_ext.substring(1) + ':light')
+            if (formats === 'ipynb,' + script_ext.substring(1) + ':light')
                 formats = 'ipynb,auto:light';
-            else if (formats == 'ipynb,' + script_ext.substring(1) + ':percent')
+            else if (formats === 'ipynb,' + script_ext.substring(1) + ':percent')
                 formats = 'ipynb,auto:percent';
-            else if (formats == 'ipynb,' + script_ext.substring(1) + ':hydrogen')
+            else if (formats === 'ipynb,' + script_ext.substring(1) + ':hydrogen')
                 formats = 'ipynb,auto:hydrogen';
             else if (!['ipynb,auto:light', 'ipynb,auto:percent', 'ipynb,auto:hydrogen',
                 'ipynb,md', 'ipynb,Rmd', 'none'].includes(formats))
@@ -73,12 +71,12 @@ define([
             if (!Jupyter.notebook.metadata.jupytext)
                 return;
         } else if (Jupyter.notebook.metadata.jupytext && formats === Jupyter.notebook.metadata.jupytext.formats)
-            return;
+            formats = 'none';
 
         if (formats === 'none') {
             if (Jupyter.notebook.metadata.jupytext.formats)
                 delete Jupyter.notebook.metadata.jupytext['formats'];
-            if (Jupyter.notebook.metadata.jupytext == {})
+            if (Jupyter.notebook.metadata.jupytext === {})
                 delete Jupyter.notebook.metadata['jupytext'];
         } else {
             if (!Jupyter.notebook.metadata.jupytext)
@@ -90,7 +88,7 @@ define([
         Jupyter.notebook.set_dirty();
     }
 
-    function onToggleMetadata(data) {
+    function onToggleMetadata() {
         if (!Jupyter.notebook.metadata.jupytext) {
             Jupyter.notebook.metadata.jupytext = {
                 "notebook_metadata_filter": "-all",
@@ -105,7 +103,7 @@ define([
                 delete Jupyter.notebook.metadata.jupytext['notebook_metadata_filter'];
                 if (Jupyter.notebook.metadata.jupytext.cell_metadata_filter === "-all")
                     delete Jupyter.notebook.metadata.jupytext['cell_metadata_filter'];
-                if (Jupyter.notebook.metadata.jupytext == {})
+                if (Jupyter.notebook.metadata.jupytext === {})
                     delete Jupyter.notebook.metadata['jupytext'];
             }
         }
@@ -129,19 +127,19 @@ define([
         return $('<li/>')
             .addClass(active ? null : 'disabled')
             .append($('<a/>')
-            .attr('id', 'jupytext_pair_' + formats.replace(':', '_').replace(',', '_'))
-            .text(text)
-            .attr('title',
-                (formats == 'none') ? 'Jupytext not configured' :
-                    (formats == 'custom' ? 'Custom Jupytext configuration' :
-                        'jupytext.formats=' + formats))
-            .data('formats', formats)
-            .css('width', '280px')
-            .attr('href', '#')
-            .on('click', onClickedJupytextPair)
-            .prepend($('<i/>').addClass('fa menu-icon pull-right'))
-        );
-    };
+                .attr('id', 'jupytext_pair_' + formats.replace(':', '_').replace(',', '_'))
+                .text(text)
+                .attr('title',
+                    (formats === 'none') ? 'Jupytext not configured' :
+                        (formats === 'custom' ? 'Custom Jupytext configuration' :
+                            'jupytext.formats=' + formats))
+                .data('formats', formats)
+                .css('width', '280px')
+                .attr('href', '#')
+                .on('click', onClickedJupytextPair)
+                .prepend($('<i/>').addClass('fa menu-icon pull-right'))
+            );
+    }
 
     var jupytext_menu = function () {
         if ($('#jupytext_menu').length === 0) {
@@ -192,7 +190,7 @@ define([
             JupytextActions.append($('<li/>').addClass('divider'));
 
             var notebook_extension = Jupyter.notebook.notebook_path.split('.').pop();
-            var active = (notebook_extension === 'ipynb' || (notebook_extension != 'md' && notebook_extension != 'Rmd'));
+            var active = (notebook_extension === 'ipynb' || (notebook_extension !== 'md' && notebook_extension !== 'Rmd'));
             JupytextActions.append(jupytext_pair('ipynb,auto:light', 'Pair Notebook with light Script', active));
             JupytextActions.append(jupytext_pair('ipynb,auto:percent', 'Pair Notebook with percent Script', active));
             JupytextActions.append(jupytext_pair('ipynb,auto:hydrogen', 'Pair Notebook with Hydrogen Script', active));
@@ -214,7 +212,7 @@ define([
             checkSelectedJupytextFormat();
             checkAutosave();
         }
-    }
+    };
 
     var load_ipython_extension = function () {
         // Wait for the notebook to be fully loaded
