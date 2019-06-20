@@ -15,7 +15,7 @@ Jupytext's implementation for Jupyter notebooks as [Markdown](https://daringfire
 - Code and raw cells are encoded as Markdown code blocks with triple backticks. In a Python notebook, a code cell starts with ` ```python` and ends with ` ``` `. Cell metadata are found after the language information, with a `key=value` syntax, where `value` is encoded in JSON format (Markdown) or R format (R Markdown). R Markdown [code cell options](https://yihui.name/knitr/options/) are mapped to the corresponding Jupyter cell metadata options, when available.
 - Markdown cells are inserted verbatim and separated with two blank lines. When required (cells with metadata, cells that contain two blank lines or code blocks), Jupytext protects the cell boundary with HTML comments: `<!-- #region -->` and `<!-- #endregion -->`. Cells with explicit boundaries are [foldable](https://code.visualstudio.com/docs/editor/codebasics#_folding) in vscode, and can accept both a title and/or metadata in JSON format: `<!-- #region This is the title for my protected cell {"key": "value"}-->`.
 
-See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.md) or [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
+See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.md#) or [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
 
 When you open a plain Markdown file in Jupytext, the Markdown text is rendered in Markdown cells. Cells breaks occur when the text contains two consecutive blank lines (or code cells). If you want to also split cells on Markdown headers, so that headers prefixed by one blank line appear at the top of a new cell, use the `split_at_heading` option. Set the option either on the command line, or by adding `"split_at_heading": true` to the jupytext section in the notebook metadata, or on Jupytext's content manager:
 
@@ -25,14 +25,14 @@ c.ContentsManager.split_at_heading = True
 
 ## Pandoc's Markdown
 
-Pandoc, the _Universal document converter_,  can now read and write Jupyter notebooks - see [Pandoc's documentation](https://pandoc.org/MANUAL.html#creating-jupyter-notebooks-with-pandoc). 
+Pandoc, the _Universal document converter_,  can now read and write Jupyter notebooks - see [Pandoc's documentation](https://pandoc.org/MANUAL.html#creating-jupyter-notebooks-with-pandoc).
 
 Pandoc's Markdown format is available in Jupytext as `md:pandoc`. This requires `pandoc` in version 2.7.2 or above - please check Pandoc's version number with `pandoc -v` before running either `jupytext` command line, or before you start your Jupyter notebook or Lab server. Note that you can get the latest version of `pandoc` in a conda environment with
 ```
 conda install pandoc -c conda-forge
 ```
 
-Pandoc's format uses Pandoc divs (`:::`) as explicit cell markers. See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pandoc.md) in that format. Please also note that `pandoc`, while preserving the HTML rendering, may reformat the text in some of the Markdown cells. If that is an issue for you, please wait until [jgm/pandoc#5408](https://github.com/jgm/pandoc/issues/5408) gets implemented.
+Pandoc's format uses Pandoc divs (`:::`) as explicit cell markers. See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pandoc.md#) in that format. Please also note that `pandoc`, while preserving the HTML rendering, may reformat the text in some of the Markdown cells. If that is an issue for you, please wait until [jgm/pandoc#5408](https://github.com/jgm/pandoc/issues/5408) gets implemented.
 
 Jupytext currently strips the output cells before calling `pandoc`. As for the other formats, outputs cells can be preserved in paired notebooks. In the case of the pandoc format, paired notebooks are available with the metadata `"jupytext": {"formats": "md:pandoc,ipynb"}`.
 
@@ -48,13 +48,13 @@ The `light` format has:
 
 The `light` format is available for these [languages](https://github.com/mwouts/jupytext/blob/master/jupytext/languages.py). Open our sample notebook in the `light` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.lgt.py).
 
-A variation of the `light` format is the `bare` format, with no cell marker at all. Please note that this format will split your code cells on code paragraphs. By default, this format still includes a YAML header - if you prefer to also remove the header, set `"notebook_metadata_filter": "-all"` in the jupytext section of your notebook metadata.  
+A variation of the `light` format is the `bare` format, with no cell marker at all. Please note that this format will split your code cells on code paragraphs. By default, this format still includes a YAML header - if you prefer to also remove the header, set `"notebook_metadata_filter": "-all"` in the jupytext section of your notebook metadata.
 
 The `light` format can use custom cell markers instead of `# +` or `# -`. If you prefer to mark cells with VScode/PyCharm (resp. Vim) folding markers, set `"cell_markers": "region,endregion"` (resp. `"{{{,}}}"`) in the jupytext section of the notebook metadata. If you want to configure this as a global default, add either
 ```python
 c.ContentsManager.default_cell_markers = "region,endregion"  # Use VScode/PyCharm region folding delimiters
 ```
-or 
+or
 ```python
 c.ContentsManager.default_cell_markers = "{{{,}}}"           # Use Vim region folding delimiters
 ```

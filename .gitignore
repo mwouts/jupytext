@@ -14,3 +14,6 @@ future
 gits*
 .ipynb_checkpoints
 docs/_build
+
+# Will be created by postBuild
+demo/get_started.ipynb
