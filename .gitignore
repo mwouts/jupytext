@@ -17,12 +17,3 @@ docs/_build
 
 # Will be created by postBuild
 demo/get_started.ipynb
-
-# Files that will be created by saving the World population notebook
-demo/Paired Jupyter notebook and python script.py
-demo/World population.Rmd
-demo/World population.lgt.py
-demo/World population.md
-demo/World population.pandoc.md
-demo/World population.pct.py
-demo/World population.spx.py

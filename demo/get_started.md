@@ -26,7 +26,7 @@ Binder, it should already work.**
 ## Enabling Jupytext in a new notebook
 
 This notebook is brand new - it hasn't had any special extra metadata added
-to it. 
+to it.
 
 If we want Jupytext to save files in multiple formats automatically,
 we can use the JupyterLab **command palette** to do so.
@@ -46,7 +46,7 @@ After you've done this, save the notebook. You should now see a new file called
 
 ## How does Jupytext know to do this?
 
-Jupytext uses notebook-level metadata to keep track of what languages are paired
+Jupytext uses notebook-level metadata to keep track of what formats are paired
 with a notebook. Below we'll print the metadata of this notebook so you can see
 what the Jupytext metadata looks like.
 
@@ -57,7 +57,7 @@ notebook = nbf.read('./get_started.ipynb', nbf.NO_CONVERT)
 JSON(notebook['metadata'])
 ```
 
-As you select different languages from the command palette (following the instructions
+As you select different formats from the command palette (following the instructions
 above) and save the notebook, you'll see this metadata change.
 
 
@@ -78,4 +78,4 @@ plt.scatter(*np.random.randn(2, 100), c=np.random.randn(100), s=np.random.rand(1
 
 In the "demo" folder for `jupytext` there is a notebook called **`World population.ipynb`**.
 By default, saving the demo notebook will also create *many* possible Jupytext
-outputs so you can see what each looks like and which you prefer. 
+outputs so you can see what each looks like and which you prefer.
