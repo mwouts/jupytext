@@ -6,5 +6,7 @@ jupyter trust demo/World\ population.ipynb
 
 # Set up extensions for JupyterLab and Notebook
 jupyter labextension install jupyterlab-jupytext
-jupyter nbextension install --py jupytext --user
-jupyter nbextension enable --py jupytext --user
+
+# Create the notebook for our jupytext demo
+jupytext demo/get_started.md --to ipynb --update-metadata '{"jupytext":null}'
+rm demo/get_started.md
