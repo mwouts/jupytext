@@ -10,6 +10,8 @@ import "../style/index.css";
 
 interface JupytextSection {
   formats?: string;
+  notebook_metadata_filter?: string;
+  cell_metadata_filter?: string;
 }
 
 const JUPYTEXT_FORMATS = [
@@ -83,9 +85,9 @@ const extension: JupyterLabPlugin<void> = {
           ) as nbformat.ILanguageInfoMetadata;
           const jupytext_formats = lang
             ? jupytext.formats.replace(
-                "," + lang.file_extension.substring(1) + ":",
-                ",auto:"
-              )
+              "," + lang.file_extension.substring(1) + ":",
+              ",auto:"
+            )
             : jupytext.formats;
 
           if (formats == "custom")
@@ -168,8 +170,67 @@ const extension: JupyterLabPlugin<void> = {
       },
       command: "help:open",
       category: "Jupytext",
-      rank: JUPYTEXT_FORMATS.length
+      rank: JUPYTEXT_FORMATS.length + 1
     });
+
+    // Metadata in text representation    
+    app.commands.addCommand("jupytext_metadata", {
+      label: "Include Metadata",
+      isToggled: () => {
+        if (!notebook_tracker.currentWidget)
+          return true;
+
+        if (!notebook_tracker.currentWidget.context.model.metadata.has("jupytext"))
+          return true;
+
+        const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
+
+        if (jupytext.notebook_metadata_filter === '-all')
+          return false;
+
+        return true;
+      },
+      isEnabled: () => {
+        if (!notebook_tracker.currentWidget)
+          return false;
+
+        if (!notebook_tracker.currentWidget.context.model.metadata.has("jupytext"))
+          return false;
+
+        const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
+
+        if (jupytext.notebook_metadata_filter === undefined)
+          return true;
+
+        if (jupytext.notebook_metadata_filter === '-all')
+          return true;
+
+        return false;
+      },
+      execute: () => {
+        console.log("Jupytext: toggling YAML header");
+        if (!notebook_tracker.currentWidget)
+          return;
+
+        if (!notebook_tracker.currentWidget.context.model.metadata.has("jupytext"))
+          return;
+
+        const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
+
+        if (jupytext.notebook_metadata_filter) {
+          delete jupytext.notebook_metadata_filter;
+          if (jupytext.cell_metadata_filter === '-all')
+            delete jupytext.cell_metadata_filter;
+          return
+        }
+
+        jupytext.notebook_metadata_filter = '-all'
+        if (jupytext.cell_metadata_filter === undefined)
+          jupytext.cell_metadata_filter = '-all';
+      }
+    });
+
+    palette.addItem({ command: "jupytext_metadata", rank: JUPYTEXT_FORMATS.length + 1, category: "Jupytext" });
   }
 };
 

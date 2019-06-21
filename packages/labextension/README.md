@@ -6,15 +6,26 @@ This extension adds a few [Jupytext](https://github.com/mwouts/jupytext) command
 
 ## Installation
 
-Please [install Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. Make sure Jupyter is configured to use Jupytext's contents manager. Then, install the extension with:
+Please [install Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. The lab extension is bundled with the Python package.
+
+If you prefer to use the extension that is distributed on npm, run:
 
 ```bash
 jupyter labextension install jupyterlab-jupytext
 ```
 
+In all cases, the extension will work only if Jupytext's content manager is active in Jupyter - make sure Markdown documents and scripts have a notebook icon.
+
 # How to develop this extension
 
-We started developping the extension following the [xkcd extension tutorial](https://jupyterlab.readthedocs.io/en/stable/developer/xkcd_extension_tutorial.html). Follow the instructions there to create a conda environment in which you will be able to develop the extension. In that environment, install JupyterLab's plugin manager, and the extension with
+We started developping the extension following the [xkcd extension tutorial](https://jupyterlab.readthedocs.io/en/stable/developer/xkcd_extension_tutorial.html). Follow the instructions there to create a conda environment in which you will be able to develop the extension. 
+
+We also recommend to use `node` in version 11 at least. To this aim, you can use node from `conda-forge`:
+```bash
+conda install nodejs -c conda-forge
+```
+
+In that environment, install JupyterLab's plugin manager, and the extension with
 ```bash
 jlpm install
 jupyter labextension install . --no-build
@@ -36,13 +47,13 @@ Refresh the JupyterLab interface and see your changes in action.
 
 Bump the version in `package.json`. 
 
-Build the new version of `jupyterlab-jupytext-xxx.tgz` with
+Build the new version of `jupyterlab-jupytext-xxx.tgz` with 
 
 ```bash
 npm pack
 ```
 
-and remove any previous version. That package will be included in the Jupytext Python package.
+Remove any previous version. And update the link to the new version in `setup.py` at the project root.
 
 If you wish, you may also update the package on npm with
 
