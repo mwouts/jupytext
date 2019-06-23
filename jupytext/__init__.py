@@ -1,6 +1,6 @@
 """Read and write Jupyter notebooks as text files"""
 
-from .jupytext import readf, writef, writes, reads
+from .jupytext import read, write, readf, writef, writes, reads
 from .formats import NOTEBOOK_EXTENSIONS, guess_format, get_format_implementation
 from .version import __version__
 
@@ -70,6 +70,6 @@ def _jupyter_nbextension_paths():  # pragma: no cover
         require="jupytext/index")]
 
 
-__all__ = ['readf', 'writef', 'writes', 'reads',
+__all__ = ['read', 'write', 'readf', 'writef', 'writes', 'reads',
            'NOTEBOOK_EXTENSIONS', 'guess_format', 'get_format_implementation',
            'TextFileContentsManager', '__version__']

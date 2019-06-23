@@ -4,6 +4,8 @@ import os
 import io
 import sys
 import logging
+import warnings
+from ipython_genutils import py3compat
 from copy import copy, deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell, NotebookNode
@@ -218,29 +220,27 @@ def reads(text, fmt, as_version=4, **kwargs):
     return notebook
 
 
-def read(file_or_stream, fmt, as_version=4, **kwargs):
+def read(fp, as_version=4, fmt=None, **kwargs):
     """Read a notebook from a file"""
-    fmt = long_form_one_format(fmt)
-    if fmt['extension'] == '.ipynb':
-        notebook = nbformat.read(file_or_stream, as_version, **kwargs)
-        rearrange_jupytext_metadata(notebook.metadata)
-        return notebook
-
-    return reads(file_or_stream.read(), fmt, **kwargs)
-
-
-def readf(nb_file, fmt=None):
-    """Read a notebook from the file with given name"""
-    if nb_file == '-':
+    if fp == '-':
         text = sys.stdin.read()
         fmt = fmt or divine_format(text)
         return reads(text, fmt)
 
-    _, ext = os.path.splitext(nb_file)
-    fmt = copy(fmt or {})
-    fmt.update({'extension': ext})
-    with io.open(nb_file, encoding='utf-8') as stream:
-        return read(stream, fmt, as_version=4)
+    if isinstance(fp, (py3compat.unicode_type, bytes)):
+        _, ext = os.path.splitext(fp)
+        fmt = copy(fmt or {})
+        fmt.update({'extension': ext})
+        with io.open(fp, encoding='utf-8') as f:
+            return read(f, as_version=as_version, fmt=fmt, **kwargs)
+
+    fmt = long_form_one_format(fmt)
+    if fmt['extension'] == '.ipynb':
+        notebook = nbformat.read(fp, as_version, **kwargs)
+        rearrange_jupytext_metadata(notebook.metadata)
+        return notebook
+
+    return reads(fp.read(), fmt, **kwargs)
 
 
 def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
@@ -277,30 +277,29 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     return writer.writes(notebook, metadata)
 
 
-def write(notebook, file_or_stream, fmt, version=nbformat.NO_CONVERT, **kwargs):
+def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
     """Write a notebook to a file"""
-    # Python 2 compatibility
-    text = u'' + writes(notebook, fmt, version, **kwargs)
-    file_or_stream.write(text)
-    # Add final newline #165
-    if not text.endswith(u'\n'):
-        file_or_stream.write(u'\n')
-
-
-def writef(notebook, nb_file, fmt=None):
-    """Write a notebook to the file with given name"""
-    if nb_file == '-':
-        write(notebook, sys.stdout, fmt)
+    if fp == '-':
+        write(nb, sys.stdout, version=version, fmt=fmt, **kwargs)
         return
 
-    _, ext = os.path.splitext(nb_file)
-    fmt = copy(fmt or {})
-    fmt = long_form_one_format(fmt, update={'extension': ext})
+    if isinstance(fp, (py3compat.unicode_type, bytes)):
+        fmt = copy(fmt or {})
+        _, ext = os.path.splitext(fp)
+        fmt = long_form_one_format(fmt, update={'extension': ext})
+        create_prefix_dir(fp, fmt)
 
-    create_prefix_dir(nb_file, fmt)
+        with io.open(fp, 'w', encoding='utf-8') as f:
+            return write(nb, f, version=version, fmt=fmt, **kwargs)
+    else:
+        assert fmt is not None, "'fmt' argument in jupytext.write is mandatory unless fp is a file name"
 
-    with io.open(nb_file, 'w', encoding='utf-8') as stream:
-        write(notebook, stream, fmt)
+    s = writes(nb, version=version, fmt=fmt, **kwargs)
+    if isinstance(s, bytes):
+        s = s.decode('utf8')
+    fp.write(s)
+    if not s.endswith(u'\n'):
+        fp.write(u'\n')
 
 
 def create_prefix_dir(nb_file, fmt):
@@ -310,3 +309,21 @@ def create_prefix_dir(nb_file, fmt):
         if not os.path.isdir(nb_dir):
             logging.log(logging.WARNING, "[jupytext] creating missing directory %s", nb_dir)
             os.makedirs(nb_dir)
+
+
+def readf(nb_file, fmt=None):
+    """Read a notebook from the file with given name"""
+    warnings.warn(
+        "readf is deprecated, use read instead (see https://github.com/mwouts/jupytext/issues/262)",
+        DeprecationWarning)
+
+    return read(fp=nb_file, fmt=fmt)
+
+
+def writef(notebook, nb_file, fmt=None):
+    """Write a notebook to the file with given name"""
+    warnings.warn(
+        'writef is deprecated. use write instead (see https://github.com/mwouts/jupytext/issues/262)',
+        DeprecationWarning)
+
+    return write(nb=notebook, fp=nb_file, fmt=fmt)

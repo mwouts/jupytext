@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+1.2.0 (2019-06-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- ``jupytext``'s ``read`` and ``write`` functions can be used as drop-in remplacements for ``nbformat``'s ones (#262).
+
+
 1.1.7 (2019-06-23)
 ++++++++++++++++++++++
 
