@@ -1,6 +1,6 @@
 import pytest
 from testfixtures import compare
-from jupytext import readf, reads, writes
+from jupytext import read, reads, writes
 from jupytext.pep8 import next_instruction_is_function_or_class, cell_ends_with_function_or_class
 from jupytext.pep8 import cell_ends_with_code, cell_has_code, pep8_lines_between_cells
 from .utils import list_notebooks
@@ -157,7 +157,7 @@ def f(x):
                                      py_file.endswith('.py') and 'folding_markers' not in py_file])
 def test_no_metadata_when_py_is_pep8(py_file):
     """This test assumes that all Python files in the jupytext folder follow PEP8 rules"""
-    nb = readf(py_file)
+    nb = read(py_file)
 
     for i, cell in enumerate(nb.cells):
         if 'title' in cell.metadata:

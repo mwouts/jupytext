@@ -22,7 +22,7 @@ pytestmark = skip_if_dict_is_not_ordered
 def create_mirror_file_if_missing(mirror_file, notebook, fmt):
     if not os.path.isfile(mirror_file):
         with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-            jupytext.writef(notebook, mirror_file, fmt)
+            jupytext.write(notebook, mirror_file, fmt=fmt)
 
 
 def test_create_mirror_file_if_missing(tmpdir):
@@ -40,21 +40,21 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
     mirror_file = os.path.join(dirname, '..', 'mirror', mirror_name, full_path(file_name, fmt))
 
     with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-        notebook = jupytext.readf(nb_file, fmt)
+        notebook = jupytext.read(nb_file, fmt=fmt)
         # it's better not to have Jupytext metadata in test notebooks:
         if fmt == 'ipynb' and 'jupytext' in notebook.metadata:  # pragma: no cover
             notebook.metadata.pop('jupytext')
-            jupytext.writef(nb_file, fmt)
+            jupytext.write(nb_file, fmt=fmt)
 
     create_mirror_file_if_missing(mirror_file, notebook, fmt)
 
     # Compare the text representation of the two notebooks
     if compare_notebook:
-        nb_mirror = jupytext.readf(mirror_file)
+        nb_mirror = jupytext.read(mirror_file)
         compare(nb_mirror, notebook)
         return
     elif ext == '.ipynb':
-        notebook = jupytext.readf(mirror_file)
+        notebook = jupytext.read(mirror_file)
         fmt.update({'extension': org_ext})
         with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
             actual = jupytext.writes(notebook, fmt)
@@ -73,8 +73,8 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
     # Compare the two notebooks
     if ext != '.ipynb':
         with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-            notebook = jupytext.readf(nb_file)
-            nb_mirror = jupytext.readf(mirror_file, fmt)
+            notebook = jupytext.read(nb_file)
+            nb_mirror = jupytext.read(mirror_file, fmt=fmt)
 
         if fmt.get('format_name') == 'sphinx':
             nb_mirror.cells = nb_mirror.cells[1:]
