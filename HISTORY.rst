@@ -3,6 +3,24 @@
 Release History
 ---------------
 
+1.1.7 (2019-06-23)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Added support for Scala notebook, by Tobias Frischholz (#253)
+- Added a getting started notebook for jupytext (and Binder), by Chris Holdgraf (#257)
+- The Markdown and R Markdown representations are now tested for all the languages
+- The Jupytext notebook extension also works when the notebook is a text file (#213)
+
+
+**BugFixes**
+
+- The Jupytext Menu in Jupyter Notebook is now compatible with ``jupyter_nbextensions_configurator`` (#178)
+- Entries in the Jupytext menu are updated when the menu is hovered on (#248)
+- Fixed link to ``.md`` files in the documentation (#255)
+
+
 1.1.6 (2019-06-11)
 ++++++++++++++++++++++
 

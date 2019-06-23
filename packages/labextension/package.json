@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-jupytext",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A JupyterLab extension for Jupytext",
   "keywords": [
     "jupyter",
@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/mwouts/jupyterlab-jupytext/issues"
   },
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "author": "Marc Wouts",
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",

@@ -34,6 +34,16 @@ def list_notebooks(path='ipynb', skip='World'):
                list_notebooks('ipynb_py', skip=skip) + \
                list_notebooks('ipynb_R', skip=skip)
 
+    if path == 'ipynb_all':
+        all_notebooks = []
+
+        nb_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'notebooks')
+        for dir in os.listdir(nb_path):
+            if dir.startswith('ipynb_'):
+                all_notebooks.extend(list_notebooks(dir, skip=skip))
+
+        return all_notebooks
+
     nb_path = os.path.dirname(os.path.abspath(__file__))
     if path.startswith('.'):
         nb_path = os.path.join(nb_path, path)
@@ -46,5 +56,4 @@ def list_notebooks(path='ipynb', skip='World'):
     else:
         notebooks = [os.path.join(nb_path, nb_file) for nb_file in os.listdir(nb_path)]
 
-    assert notebooks
     return notebooks

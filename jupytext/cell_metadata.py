@@ -304,7 +304,7 @@ def md_options_to_metadata(options):
 
     if metadata:
         language = metadata[0][0]
-        for lang in _JUPYTER_LANGUAGES + ['julia', 'scheme', 'c++']:
+        for lang in _JUPYTER_LANGUAGES:
             if language.lower() == lang.lower():
                 return lang, dict(metadata[1:])
 

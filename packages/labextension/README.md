@@ -31,3 +31,22 @@ jlpm run build
 ```
 
 Refresh the JupyterLab interface and see your changes in action.
+
+# How to publish a new version of the extension
+
+Bump the version in `package.json`. 
+
+Build the new version of `jupyterlab-jupytext-xxx.tgz` with
+
+```bash
+npm pack
+```
+
+and remove any previous version. That package will be included in the Jupytext Python package.
+
+If you wish, you may also update the package on npm with
+
+```bash
+npm publish --access=public
+```
+

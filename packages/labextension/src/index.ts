@@ -102,6 +102,18 @@ const extension: JupyterLabPlugin<void> = {
 
           return jupytext_formats == formats;
         },
+        isEnabled: () => {
+          if (formats == "custom" || formats == "none")
+            return true;
+          const notebook_extension: string = notebook_tracker.currentWidget.context.path.split('.').pop();
+          if (notebook_extension == "ipynb")
+            return true;
+          if (notebook_extension == "md")
+            return formats == "ipynb,md";
+          if (notebook_extension == "Rmd")
+            return formats == "ipynb,Rmd";
+          return formats != "ipynb,md" && formats != "ipynb,Rmd";
+        },
         execute: () => {
           console.log("Jupytext: executing command=" + command);
           if (formats == "custom") {
