@@ -859,7 +859,7 @@ def test_rst2md(tmpdir):
     # Write notebook in sphinx format
     nb = new_notebook(cells=[new_markdown_cell('A short sphinx notebook'),
                              new_markdown_cell(':math:`1+1`')])
-    write(nb, tmp_py, 'py:sphinx')
+    write(nb, tmp_py, fmt='py:sphinx')
 
     jupytext([tmp_py, '--from', 'py:sphinx', '--to', 'ipynb',
               '--opt', 'rst2md=True', '--opt', 'cell_metadata_filter=-all'])
