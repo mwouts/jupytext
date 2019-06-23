@@ -314,7 +314,8 @@ def create_prefix_dir(nb_file, fmt):
 def readf(nb_file, fmt=None):
     """Read a notebook from the file with given name"""
     warnings.warn(
-        "readf is deprecated, use read instead (see https://github.com/mwouts/jupytext/issues/262)",
+        "readf is deprecated. Please use read instead, and pass the fmt "
+        "argument with an explicit fmt=... (see https://github.com/mwouts/jupytext/issues/262)",
         DeprecationWarning)
 
     return read(fp=nb_file, fmt=fmt)
@@ -323,7 +324,8 @@ def readf(nb_file, fmt=None):
 def writef(notebook, nb_file, fmt=None):
     """Write a notebook to the file with given name"""
     warnings.warn(
-        'writef is deprecated. use write instead (see https://github.com/mwouts/jupytext/issues/262)',
+        'writef is deprecated. Please use write instead, and pass the fmt '
+        'argument with an explicit fmt=... (see https://github.com/mwouts/jupytext/issues/262)',
         DeprecationWarning)
 
     return write(nb=notebook, fp=nb_file, fmt=fmt)
