@@ -1071,7 +1071,7 @@ def test_rst2md_option(tmpdir):
     # Write notebook in sphinx format
     nb = new_notebook(cells=[new_markdown_cell('A short sphinx notebook'),
                              new_markdown_cell(':math:`1+1`')])
-    write(nb, tmp_py, 'py:sphinx')
+    write(nb, tmp_py, fmt='py:sphinx')
 
     cm = jupytext.TextFileContentsManager()
     cm.sphinx_convert_rst2md = True
