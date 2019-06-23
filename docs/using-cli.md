@@ -76,18 +76,21 @@ metadata to be added back to the script. Remove the filter if you want to store 
 
 ## Reading notebooks in Python
 
-You can also manipulate notebooks in a Python shell or script using Jupytext's main functions:
+Jupytext provides the same `read`, `write`, `reads` and `writes` functions as `nbformat`. You can use `jupytext`'s functions as drop-in replacements for `nbformat`'s ones. Jupytext's implementation provides an additional `fmt` argument, which can be any of `py`, `md`, `jl:percent`, etc. If not explicitly provided, the argument is inferred from the file extension.
 
 ```python
-# Read a notebook from a file. Format can be any of 'py', 'md', 'jl:percent', ...
-readf(nb_file, fmt=None)
+import jupytext
 
-# Read a notebook from a string. Here, format should contain at least the file extension.
-reads(text, fmt)
+# Read a notebook from a file 
+jupytext.read('notebook.md')
 
-# Return the text representation for a notebook in the desired format.
-writes(notebook, fmt)
+# Read a notebook from a string
+jupytext.reads(text, fmt='md')
 
-# Write a notebook to a file in the desired format.
-writef(notebook, nb_file, fmt=None)
+# Return the text representation of a notebook
+jupytext.writes(notebook, fmt='py:percent')
+
+# Write a notebook to a file in the desired format
+jupytext.write(notebook, 'notebook.py')
+jupytext.write(notebook, 'notebook.py', fmt='py:percent')
 ```
