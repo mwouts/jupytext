@@ -1,12 +1,12 @@
 import pytest
-from jupytext import readf, reads, writes
+from jupytext import read, reads, writes
 from jupytext.formats import JupytextFormatError, auto_ext_from_metadata
 from .utils import list_notebooks
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R') + list_notebooks('ipynb_py'))
 def test_auto_in_fmt(nb_file):
-    nb = readf(nb_file)
+    nb = read(nb_file)
     auto_ext = auto_ext_from_metadata(nb.metadata)
     fmt = auto_ext[1:] + ':percent'
     text = writes(nb, 'auto:percent')
@@ -24,7 +24,7 @@ def test_auto_in_fmt(nb_file):
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R') + list_notebooks('ipynb_py'))
 def test_auto_in_formats(nb_file):
-    nb = readf(nb_file)
+    nb = read(nb_file)
     nb.metadata['jupytext'] = {'formats': 'ipynb,auto:percent'}
     fmt = auto_ext_from_metadata(nb.metadata)[1:] + ':percent'
     expected_formats = 'ipynb,' + fmt

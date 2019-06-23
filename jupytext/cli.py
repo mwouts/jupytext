@@ -8,7 +8,7 @@ import subprocess
 import argparse
 import json
 from copy import copy
-from .jupytext import readf, reads, writef, writes
+from .jupytext import read, reads, write, writes
 from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, check_file_version
 from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format, auto_ext_from_metadata
 from .header import recursive_update
@@ -173,7 +173,7 @@ def jupytext(args=None):
             log(nb_file)
 
     def writef_git_add(notebook_, nb_file_, fmt_):
-        writef(notebook_, nb_file_, fmt_)
+        write(notebook_, nb_file_, fmt=fmt_)
         if args.pre_commit:
             system('git', 'add', nb_file_)
 
@@ -242,7 +242,7 @@ def jupytext(args=None):
             nb_file if nb_file != '-' else 'stdin',
             ' in format {}'.format(short_form_one_format(fmt)) if 'extension' in fmt else ''))
 
-        notebook = readf(nb_file, fmt)
+        notebook = read(nb_file, fmt=fmt)
         if not fmt:
             text_representation = notebook.metadata.get('jupytext', {}).get('text_representation', {})
             ext = os.path.splitext(nb_file)[1]
@@ -341,7 +341,7 @@ def jupytext(args=None):
                     raise ValueError('--update is only for ipynb files')
                 action = ' (destination file updated)'
                 check_file_version(notebook, nb_file, nb_dest)
-                combine_inputs_with_outputs(notebook, readf(nb_dest), fmt)
+                combine_inputs_with_outputs(notebook, read(nb_dest), fmt=fmt)
             elif os.path.isfile(nb_dest):
                 action = ' (destination file replaced)'
             else:
@@ -396,7 +396,7 @@ def notebooks_in_git_index(fmt):
 
 def print_paired_paths(nb_file, fmt):
     """Display the paired paths for this notebook"""
-    notebook = readf(nb_file, fmt)
+    notebook = read(nb_file, fmt=fmt)
     formats = notebook.metadata.get('jupytext', {}).get('formats')
     if formats:
         for path, _ in paired_paths(nb_file, fmt, formats):
@@ -464,16 +464,16 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
 
     if latest_outputs and latest_outputs != latest_inputs:
         log("[jupytext] Loading input cells from '{}'".format(latest_inputs))
-        inputs = notebook if latest_inputs == nb_file else readf(latest_inputs, input_fmt)
+        inputs = notebook if latest_inputs == nb_file else read(latest_inputs, fmt=input_fmt)
         check_file_version(inputs, latest_inputs, latest_outputs)
         log("[jupytext] Loading output cells from '{}'".format(latest_outputs))
-        outputs = notebook if latest_outputs == nb_file else readf(latest_outputs)
-        combine_inputs_with_outputs(inputs, outputs, input_fmt)
+        outputs = notebook if latest_outputs == nb_file else read(latest_outputs)
+        combine_inputs_with_outputs(inputs, outputs, fmt=input_fmt)
         return inputs, latest_inputs, latest_outputs
 
     log("[jupytext] Loading notebook from '{}'".format(latest_inputs))
     if latest_inputs != nb_file:
-        notebook = readf(latest_inputs, input_fmt)
+        notebook = read(latest_inputs, fmt=input_fmt)
     return notebook, latest_inputs, latest_outputs
 
 

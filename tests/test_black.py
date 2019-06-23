@@ -5,7 +5,7 @@ from testfixtures import compare
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 from .utils import list_notebooks, requires_black, requires_flake8, requires_autopep8
 
-from jupytext import readf, writef
+from jupytext import read, write
 from jupytext.cli import system, jupytext, pipe_notebook
 from jupytext.combine import black_invariant
 from jupytext.header import _DEFAULT_NOTEBOOK_METADATA
@@ -22,9 +22,9 @@ def test_apply_black_on_python_notebooks(nb_file, tmpdir):
     system('black', tmp_py)
     jupytext(args=[tmp_py, '--to', 'ipynb', '--update'])
 
-    nb1 = readf(nb_file)
-    nb2 = readf(tmp_ipynb)
-    nb3 = readf(tmp_py)
+    nb1 = read(nb_file)
+    nb2 = read(tmp_ipynb)
+    nb3 = read(tmp_py)
 
     assert len(nb1.cells) == len(nb2.cells)
     assert len(nb1.cells) == len(nb3.cells)
@@ -87,7 +87,7 @@ def test_pipe_into_flake8():
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
 def test_apply_black_through_jupytext(tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
-    metadata = readf(nb_file).metadata
+    metadata = read(nb_file).metadata
 
     nb_org = new_notebook(cells=[new_code_cell('1        +1')], metadata=metadata)
     nb_black = new_notebook(cells=[new_code_cell('1 + 1')], metadata=metadata)
@@ -99,27 +99,27 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     tmp_py = str(tmpdir.join('script_folder').join('notebook.py'))
 
     # Black in place
-    writef(nb_org, tmp_ipynb)
+    write(nb_org, tmp_ipynb)
     jupytext([tmp_ipynb, '--pipe', 'black'])
-    nb_now = readf(tmp_ipynb)
+    nb_now = read(tmp_ipynb)
     compare(nb_black, nb_now)
 
     # Write to another folder using dots
     script_fmt = os.path.join('..', 'script_folder//py:percent')
-    writef(nb_org, tmp_ipynb)
+    write(nb_org, tmp_ipynb)
     jupytext([tmp_ipynb, '--to', script_fmt, '--pipe', 'black'])
     assert os.path.isfile(tmp_py)
-    nb_now = readf(tmp_py)
+    nb_now = read(tmp_py)
     nb_now.metadata = metadata
     compare(nb_black, nb_now)
     os.remove(tmp_py)
 
     # Map to another folder based on file name
-    writef(nb_org, tmp_ipynb)
+    write(nb_org, tmp_ipynb)
     jupytext([tmp_ipynb, '--from', 'notebook_folder//ipynb', '--to', 'script_folder//py:percent',
               '--pipe', 'black', '--check', 'flake8'])
     assert os.path.isfile(tmp_py)
-    nb_now = readf(tmp_py)
+    nb_now = read(tmp_py)
     nb_now.metadata = metadata
     compare(nb_black, nb_now)
 
@@ -128,7 +128,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
-    metadata = readf(nb_file).metadata
+    metadata = read(nb_file).metadata
     metadata['jupytext'] = {'formats': 'ipynb,py'}
     assert 'language_info' in metadata
 
@@ -139,14 +139,14 @@ def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
     tmp_py = str(tmpdir.join('notebook.py'))
 
     # Black in place
-    writef(nb_org, tmp_ipynb)
+    write(nb_org, tmp_ipynb)
     jupytext([tmp_ipynb, '--pipe', 'black', '--sync'])
 
-    nb_now = readf(tmp_ipynb)
+    nb_now = read(tmp_ipynb)
     compare(nb_black, nb_now)
     assert 'language_info' in nb_now.metadata
 
-    nb_now = readf(tmp_py)
+    nb_now = read(tmp_py)
     nb_now.metadata['jupytext'].pop('text_representation')
     nb_black.metadata = {key: nb_black.metadata[key] for key in nb_black.metadata
                          if key in _DEFAULT_NOTEBOOK_METADATA}

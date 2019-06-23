@@ -12,7 +12,7 @@ from argparse import ArgumentTypeError
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from jupytext import __version__
-from jupytext import readf, writef, writes
+from jupytext import read, write, writes
 from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, str2bool
 from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths
@@ -50,8 +50,8 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
 
     jupytext([nb_org, '--to', 'py'])
 
-    nb1 = readf(nb_org)
-    nb2 = readf(nb_other)
+    nb1 = read(nb_org)
+    nb2 = read(nb_other)
 
     compare_notebooks(nb1, nb2)
 
@@ -61,7 +61,7 @@ def test_convert_single_file(nb_file, tmpdir, capsys):
     nb_org = str(tmpdir.join(os.path.basename(nb_file)))
     copyfile(nb_file, nb_org)
 
-    nb1 = readf(nb_file)
+    nb1 = read(nb_file)
     pynb = writes(nb1, 'py')
     jupytext([nb_org, '--to', 'py', '-o', '-'])
 
@@ -85,8 +85,8 @@ def test_wildcard(tmpdir):
     nb1_py = str(tmpdir.join('nb1.py'))
     nb2_py = str(tmpdir.join('nb2.py'))
 
-    writef(new_notebook(metadata={'notebook': 1}), nb1_ipynb)
-    writef(new_notebook(metadata={'notebook': 2}), nb2_ipynb)
+    write(new_notebook(metadata={'notebook': 1}), nb1_ipynb)
+    write(new_notebook(metadata={'notebook': 2}), nb2_ipynb)
 
     os.chdir(str(tmpdir))
     jupytext(['nb*.ipynb', '--to', 'py'])
@@ -102,7 +102,7 @@ def test_wildcard(tmpdir):
 def test_to_cpluplus(nb_file, tmpdir, capsys):
     nb_org = str(tmpdir.join(os.path.basename(nb_file)))
     copyfile(nb_file, nb_org)
-    nb1 = readf(nb_org)
+    nb1 = read(nb_org)
 
     text_cpp = writes(nb1, 'cpp')
     jupytext([nb_org, '--to', 'c++', '--output', '-'])
@@ -128,8 +128,8 @@ def test_convert_multiple_file(nb_files, tmpdir):
     jupytext(nb_orgs + ['--to', 'py'])
 
     for nb_org, nb_other in zip(nb_orgs, nb_others):
-        nb1 = readf(nb_org)
-        nb2 = readf(nb_other)
+        nb1 = read(nb_org)
+        nb2 = read(nb_other)
         compare_notebooks(nb1, nb2)
 
 
@@ -147,7 +147,7 @@ def test_error_not_notebook_ext_input(tmpdir, capsys):
 @pytest.fixture
 def tmp_ipynb(tmpdir):
     tmp_file = str(tmpdir.join('notebook.ipynb'))
-    writef(new_notebook(), tmp_file)
+    write(new_notebook(), tmp_file)
     return tmp_file
 
 
@@ -231,7 +231,7 @@ def test_combine_same_version_ok(tmpdir):
 """)
 
     nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
 
     # to jupyter notebook
     jupytext([tmp_nbpy, '--to', 'ipynb', '--update'])
@@ -240,13 +240,13 @@ def test_combine_same_version_ok(tmpdir):
     # test ipynb to rmd
     jupytext([tmp_ipynb, '--to', 'rmarkdown'])
 
-    nb = readf(tmp_ipynb)
+    nb = read(tmp_ipynb)
     cells = nb['cells']
     assert len(cells) == 1
     assert cells[0].cell_type == 'markdown'
     assert cells[0].source == 'New cell'
 
-    nb = readf(tmp_rmd)
+    nb = read(tmp_rmd)
     cells = nb['cells']
     assert len(cells) == 1
     assert cells[0].cell_type == 'markdown'
@@ -268,7 +268,7 @@ def test_combine_lower_version_raises(tmpdir):
 """)
 
     nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
 
     with pytest.raises(ValueError) as info:
         jupytext([tmp_nbpy, '--to', 'ipynb', '--update'])
@@ -301,8 +301,8 @@ def test_convert_to_percent_format(nb_file, tmpdir):
         py_script = stream.read()
         assert 'format_name: percent' in py_script
 
-    nb1 = readf(tmp_ipynb)
-    nb2 = readf(tmp_nbpy)
+    nb1 = read(tmp_ipynb)
+    nb2 = read(tmp_nbpy)
 
     compare_notebooks(nb1, nb2)
 
@@ -322,8 +322,8 @@ def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
         assert 'comment_magics: false' in py_script
         assert '# %%time' not in py_script
 
-    nb1 = readf(tmp_ipynb)
-    nb2 = readf(tmp_nbpy)
+    nb1 = read(tmp_ipynb)
+    nb2 = read(tmp_nbpy)
 
     compare_notebooks(nb1, nb2)
 
@@ -357,7 +357,7 @@ def test_pre_commit_hook(tmpdir):
     st = os.stat(hook)
     os.chmod(hook, st.st_mode | stat.S_IEXEC)
 
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
     assert os.path.isfile(tmp_ipynb)
     assert not os.path.isfile(tmp_py)
 
@@ -388,7 +388,7 @@ def test_pre_commit_hook_in_subfolder(tmpdir):
     st = os.stat(hook)
     os.chmod(hook, st.st_mode | stat.S_IEXEC)
 
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
     assert os.path.isfile(tmp_ipynb)
     assert not os.path.isfile(tmp_py)
 
@@ -421,7 +421,7 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     st = os.stat(hook)
     os.chmod(hook, st.st_mode | stat.S_IEXEC)
 
-    writef(nb, tmp_py)
+    write(nb, tmp_py)
     assert os.path.isfile(tmp_py)
     assert not os.path.isfile(tmp_ipynb)
     assert not os.path.isfile(tmp_md)
@@ -443,7 +443,7 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
 def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
-    metadata = readf(nb_file).metadata
+    metadata = read(nb_file).metadata
 
     git = git_in_tmpdir(tmpdir)
     git('init')
@@ -463,7 +463,7 @@ def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
     tmp_py = str(tmpdir.join('notebook.py'))
     nb = new_notebook(cells=[new_code_cell(source='1+    1')], metadata=metadata)
 
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
     git('add', 'notebook.ipynb')
     git('status')
     git('commit', '-m', 'created')
@@ -474,7 +474,7 @@ def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
         assert fp.read().splitlines()[-1] == '1 + 1'
 
     nb = new_notebook(cells=[new_code_cell(source='"""trailing   \nwhitespace"""')], metadata=metadata)
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
     git('add', 'notebook.ipynb')
     git('status')
     with pytest.raises(SystemExit):  # not flake8
@@ -498,7 +498,7 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
         with mock.patch('jupytext.cli.system', system_in_tmpdir):
             jupytext(['--to', 'py', '--pre-commit'])
 
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
     assert os.path.isfile(tmp_ipynb)
     assert not os.path.isfile(tmp_py)
 
@@ -521,7 +521,7 @@ def test_set_formats(py_file, tmpdir):
 
     jupytext(['--to', 'ipynb', tmp_py, '--set-formats', 'ipynb,py:light'])
 
-    nb = readf(tmp_ipynb)
+    nb = read(tmp_ipynb)
     assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
 
 
@@ -530,7 +530,7 @@ def test_set_formats_py_file_only(py_file, tmpdir):
     tmp_py = str(tmpdir.join('notebook.py'))
     copyfile(py_file, tmp_py)
     jupytext([tmp_py, '--set-formats', 'ipynb,py:light'])
-    nb = readf(tmp_py)
+    nb = read(tmp_py)
     assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
 
 
@@ -543,12 +543,12 @@ def test_update_metadata(py_file, tmpdir, capsys):
 
     jupytext(['--to', 'ipynb', tmp_py, '--update-metadata', '{"jupytext":{"formats":"ipynb,py:light"}}'])
 
-    nb = readf(tmp_ipynb)
+    nb = read(tmp_ipynb)
     assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
 
     jupytext(['--to', 'py', tmp_ipynb, '--update-metadata', '{"jupytext":{"formats":null}}'])
 
-    nb = readf(tmp_py)
+    nb = read(tmp_py)
     assert 'formats' not in nb.metadata['jupytext']
 
     with pytest.raises(SystemExit):
@@ -566,7 +566,7 @@ def test_set_kernel_inplace(py_file, tmpdir):
 
     jupytext([tmp_py, '--set-kernel', '-'])
 
-    nb = readf(tmp_py)
+    nb = read(tmp_py)
     kernel_name = nb.metadata['kernelspec']['name']
     assert get_kernel_spec(kernel_name).argv[0] in ['python', sys.executable]
 
@@ -580,7 +580,7 @@ def test_set_kernel_auto(py_file, tmpdir):
 
     jupytext(['--to', 'ipynb', tmp_py, '--set-kernel', '-'])
 
-    nb = readf(tmp_ipynb)
+    nb = read(tmp_ipynb)
     kernel_name = nb.metadata['kernelspec']['name']
     assert get_kernel_spec(kernel_name).argv[0] in ['python', sys.executable]
 
@@ -595,7 +595,7 @@ def test_set_kernel_with_name(py_file, tmpdir):
     for kernel in find_kernel_specs():
         jupytext(['--to', 'ipynb', tmp_py, '--set-kernel', kernel])
 
-        nb = readf(tmp_ipynb)
+        nb = read(tmp_ipynb)
         assert nb.metadata['kernelspec']['name'] == kernel
 
     with pytest.raises(KeyError):
@@ -605,9 +605,9 @@ def test_set_kernel_with_name(py_file, tmpdir):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_paired_paths(nb_file, tmpdir, capsys):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
-    nb = readf(nb_file)
+    nb = read(nb_file)
     nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,_light.py,_percent.py:percent'
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
 
     jupytext(['--paired-paths', tmp_ipynb])
 
@@ -624,8 +624,8 @@ def test_sync(nb_file, tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_py = str(tmpdir.join('notebook.py'))
     tmp_rmd = str(tmpdir.join('notebook.Rmd'))
-    nb = readf(nb_file)
-    writef(nb, tmp_ipynb)
+    nb = read(nb_file)
+    write(nb, tmp_ipynb)
 
     # Test that sync fails when notebook is not paired
     with pytest.raises(ValueError) as info:
@@ -634,27 +634,27 @@ def test_sync(nb_file, tmpdir):
 
     # Now with a pairing information
     nb.metadata.setdefault('jupytext', {})['formats'] = 'py,Rmd,ipynb'
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
 
     # Test that missing files are created
     jupytext(['--sync', tmp_ipynb])
 
     assert os.path.isfile(tmp_py)
-    compare_notebooks(nb, readf(tmp_py))
+    compare_notebooks(nb, read(tmp_py))
 
     assert os.path.isfile(tmp_rmd)
-    compare_notebooks(nb, readf(tmp_rmd), 'Rmd')
+    compare_notebooks(nb, read(tmp_rmd), 'Rmd')
 
-    writef(nb, tmp_rmd, 'Rmd')
+    write(nb, tmp_rmd, 'Rmd')
     jupytext(['--sync', tmp_ipynb])
 
-    nb2 = readf(tmp_ipynb)
+    nb2 = read(tmp_ipynb)
     compare_notebooks(nb, nb2, 'Rmd', compare_outputs=True)
 
-    writef(nb, tmp_py, 'py')
+    write(nb, tmp_py, 'py')
     jupytext(['--sync', tmp_ipynb])
 
-    nb2 = readf(tmp_ipynb)
+    nb2 = read(tmp_ipynb)
     compare_notebooks(nb, nb2, compare_outputs=True)
 
     # Finally we recreate the ipynb
@@ -663,7 +663,7 @@ def test_sync(nb_file, tmpdir):
     time.sleep(0.1)
     jupytext(['--sync', tmp_py])
 
-    nb2 = readf(tmp_ipynb)
+    nb2 = read(tmp_ipynb)
     compare_notebooks(nb, nb2)
 
     # ipynb must be older than py file, otherwise our Contents Manager will complain
@@ -675,8 +675,8 @@ def test_sync(nb_file, tmpdir):
 def test_sync_pandoc(nb_file, tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_md = str(tmpdir.join('notebook.md'))
-    nb = readf(nb_file)
-    writef(nb, tmp_ipynb)
+    nb = read(nb_file)
+    write(nb, tmp_ipynb)
 
     # Test that sync fails when notebook is not paired
     with pytest.raises(ValueError) as info:
@@ -685,13 +685,13 @@ def test_sync_pandoc(nb_file, tmpdir):
 
     # Now with a pairing information
     nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,md:pandoc'
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
 
     # Test that missing files are created
     jupytext(['--sync', tmp_ipynb])
 
     assert os.path.isfile(tmp_md)
-    compare_notebooks(nb, readf(tmp_md), 'md:pandoc')
+    compare_notebooks(nb, read(tmp_md), 'md:pandoc')
 
     with open(tmp_md) as fp:
         assert 'pandoc' in fp.read()
@@ -704,18 +704,18 @@ def test_sync_pandoc(nb_file, tmpdir):
 def test_cli_can_infer_jupytext_format(nb_file, ext, tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_text = str(tmpdir.join('notebook' + ext))
-    nb = readf(nb_file)
+    nb = read(nb_file)
 
     # Light format to Jupyter notebook
-    writef(nb, tmp_text)
+    write(nb, tmp_text)
     jupytext(['--to', 'notebook', tmp_text])
-    nb2 = readf(tmp_ipynb)
+    nb2 = read(tmp_ipynb)
     compare_notebooks(nb, nb2)
 
     # Percent format to Jupyter notebook
-    writef(nb, tmp_text, ext + ':percent')
+    write(nb, tmp_text, ext + ':percent')
     jupytext(['--to', 'notebook', tmp_text])
-    nb2 = readf(tmp_ipynb)
+    nb2 = read(tmp_ipynb)
     compare_notebooks(nb, nb2)
 
 
@@ -725,11 +725,11 @@ def test_cli_can_infer_jupytext_format(nb_file, ext, tmpdir):
 def test_cli_to_script(nb_file, ext, tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_text = str(tmpdir.join('notebook' + ext))
-    nb = readf(nb_file)
+    nb = read(nb_file)
 
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
     jupytext(['--to', 'script', tmp_ipynb])
-    nb2 = readf(tmp_text)
+    nb2 = read(tmp_text)
     compare_notebooks(nb, nb2)
 
 
@@ -739,11 +739,11 @@ def test_cli_to_script(nb_file, ext, tmpdir):
 def test_cli_to_auto(nb_file, ext, tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_text = str(tmpdir.join('notebook' + ext))
-    nb = readf(nb_file)
+    nb = read(nb_file)
 
-    writef(nb, tmp_ipynb)
+    write(nb, tmp_ipynb)
     jupytext(['--to', 'auto', tmp_ipynb])
-    nb2 = readf(tmp_text)
+    nb2 = read(tmp_text)
     compare_notebooks(nb, nb2)
 
 
@@ -752,30 +752,30 @@ def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_py = str(tmpdir.join('notebook.py'))
     tmp_rmd = str(tmpdir.join('notebook.Rmd'))
-    nb = readf(nb_file)
+    nb = read(nb_file)
 
     # read ipynb notebook on stdin, write to python
     with open(nb_file) as fp, mock.patch('sys.stdin', fp):
         jupytext(['--to', 'py:percent', '-o', tmp_py])
-    nb2 = readf(tmp_py)
+    nb2 = read(tmp_py)
     compare_notebooks(nb, nb2)
 
     # read python notebook on stdin, write to ipynb
     with open(tmp_py) as fp, mock.patch('sys.stdin', fp):
         jupytext(['-o', tmp_ipynb])
-    nb2 = readf(tmp_ipynb)
+    nb2 = read(tmp_ipynb)
     compare_notebooks(nb, nb2)
 
     # read ipynb notebook on stdin, write to R markdown
     with open(nb_file) as fp, mock.patch('sys.stdin', fp):
         jupytext(['-o', tmp_rmd])
-    nb2 = readf(tmp_rmd)
+    nb2 = read(tmp_rmd)
     compare_notebooks(nb, nb2, 'Rmd')
 
     # read markdown notebook on stdin, write to ipynb
     with open(tmp_rmd) as fp, mock.patch('sys.stdin', fp):
         jupytext(['-o', tmp_ipynb])
-    nb2 = readf(tmp_ipynb)
+    nb2 = read(tmp_ipynb)
     compare_notebooks(nb, nb2, 'Rmd')
 
 
@@ -801,7 +801,7 @@ def test_format_prefix_suffix(tmpdir):
     os.makedirs(str(tmpdir.join('notebooks')))
     tmp_ipynb = str(tmpdir.join('notebooks/notebook_name.ipynb'))
     tmp_py = str(tmpdir.join('scripts/notebook_name.py'))
-    writef(new_notebook(), tmp_ipynb)
+    write(new_notebook(), tmp_ipynb)
 
     jupytext([tmp_ipynb, '--to', os.path.join('..', 'scripts//py')])
     assert os.path.isfile(tmp_py)
@@ -813,7 +813,7 @@ def test_format_prefix_suffix(tmpdir):
 
     tmp_ipynb = str(tmpdir.join('notebooks/nb_prefix_notebook_name.ipynb'))
     tmp_py = str(tmpdir.join('scripts/script_prefix_notebook_name.py'))
-    writef(new_notebook(), tmp_ipynb)
+    write(new_notebook(), tmp_ipynb)
 
     jupytext([tmp_ipynb, '--to', 'scripts/script_prefix_/py', '--from', 'notebooks/nb_prefix_/ipynb'])
     assert os.path.isfile(tmp_py)
@@ -821,7 +821,7 @@ def test_format_prefix_suffix(tmpdir):
 
     tmp_ipynb = str(tmpdir.join('notebooks/nb_prefix_notebook_name_nb_suffix.ipynb'))
     tmp_py = str(tmpdir.join('scripts/script_prefix_notebook_name_script_suffix.py'))
-    writef(new_notebook(), tmp_ipynb)
+    write(new_notebook(), tmp_ipynb)
 
     jupytext([tmp_ipynb, '--to', 'scripts/script_prefix_/_script_suffix.py',
               '--from', 'notebooks/nb_prefix_/_nb_suffix.ipynb'])
@@ -837,7 +837,7 @@ def test_cli_sync_file_with_suffix(tmpdir):
     nb = new_notebook(cells=[new_code_cell(source='1+1')],
                       metadata={'jupytext': {'formats': 'ipynb,.pct.py:percent,.lgt.py:light,Rmd'}})
 
-    writef(nb, tmp_pct_py, '.pct.py:percent')
+    write(nb, tmp_pct_py, '.pct.py:percent')
     jupytext(['--sync', tmp_pct_py])
     assert os.path.isfile(tmp_lgt_py)
     assert os.path.isfile(tmp_rmd)
@@ -859,13 +859,13 @@ def test_rst2md(tmpdir):
     # Write notebook in sphinx format
     nb = new_notebook(cells=[new_markdown_cell('A short sphinx notebook'),
                              new_markdown_cell(':math:`1+1`')])
-    writef(nb, tmp_py, 'py:sphinx')
+    write(nb, tmp_py, 'py:sphinx')
 
     jupytext([tmp_py, '--from', 'py:sphinx', '--to', 'ipynb',
               '--opt', 'rst2md=True', '--opt', 'cell_metadata_filter=-all'])
 
     assert os.path.isfile(tmp_ipynb)
-    nb = readf(tmp_ipynb)
+    nb = read(tmp_ipynb)
 
     assert nb.metadata['jupytext']['cell_metadata_filter'] == '-all'
     assert nb.metadata['jupytext']['rst2md'] is False
@@ -888,13 +888,13 @@ def test_remove_jupytext_metadata(tmpdir):
     nbformat.write(nb, tmp_ipynb, version=nbformat.NO_CONVERT)
     # Jupytext removes the 'text_representation' information from the notebook
     jupytext([tmp_ipynb, '--update-metadata', '{"jupytext":{"main_language":null}}'])
-    nb2 = readf(tmp_ipynb)
+    nb2 = read(tmp_ipynb)
     assert not nb2.metadata
 
     nbformat.write(nb, tmp_ipynb, version=nbformat.NO_CONVERT)
     jupytext([tmp_ipynb, '--set-formats', 'ipynb,py:light'])
 
-    nb2 = readf(tmp_ipynb)
+    nb2 = read(tmp_ipynb)
     assert nb2.metadata == {'jupytext': {'formats': 'ipynb,py:light', 'main_language': 'python'}}
 
 
@@ -912,6 +912,6 @@ def test_convert_and_update_preserves_notebook(nb_file, fmt, tmpdir):
     jupytext(['--to', fmt, tmp_ipynb])
     jupytext(['--to', 'ipynb', '--update', tmp_text])
 
-    nb_org = readf(nb_file)
-    nb_now = readf(tmp_ipynb)
+    nb_org = read(nb_file)
+    nb_now = read(tmp_ipynb)
     compare(nb_org, nb_now)
