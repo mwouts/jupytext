@@ -915,3 +915,43 @@ def test_convert_and_update_preserves_notebook(nb_file, fmt, tmpdir):
     nb_org = read(nb_file)
     nb_now = read(tmp_ipynb)
     compare(nb_org, nb_now)
+
+
+def test_incorrect_notebook_causes_early_exit(tmpdir):
+    incorrect_ipynb = str(tmpdir.join('incorrect.ipynb'))
+    incorrect_md = str(tmpdir.join('incorrect.md'))
+    with open(incorrect_ipynb, 'w') as fp:
+        fp.write('{"nbformat": 4, "nbformat_minor": 2, "metadata": {INCORRECT}, "cells": []}')
+
+    correct_ipynb = str(tmpdir.join('correct.ipynb'))
+    correct_md = str(tmpdir.join('correct.md'))
+    with open(correct_ipynb, 'w') as fp:
+        fp.write('{"nbformat": 4, "nbformat_minor": 2, "metadata": {}, "cells": []}')
+
+    with pytest.raises(nbformat.reader.NotJSONError) as error:
+        jupytext([incorrect_ipynb, correct_ipynb, '--to', 'md'])
+
+    assert "Notebook does not appear to be JSON" in str(error)
+
+    assert not os.path.exists(incorrect_md)
+    assert not os.path.exists(correct_md)
+
+
+def test_warn_only_skips_incorrect_notebook(tmpdir, capsys):
+    incorrect_ipynb = str(tmpdir.join('incorrect.ipynb'))
+    incorrect_md = str(tmpdir.join('incorrect.md'))
+    with open(incorrect_ipynb, 'w') as fp:
+        fp.write('{"nbformat": 4, "nbformat_minor": 2, "metadata": {INCORRECT}, "cells": []}')
+
+    correct_ipynb = str(tmpdir.join('correct.ipynb'))
+    correct_md = str(tmpdir.join('correct.md'))
+    with open(correct_ipynb, 'w') as fp:
+        fp.write('{"nbformat": 4, "nbformat_minor": 2, "metadata": {}, "cells": []}')
+
+    jupytext([incorrect_ipynb, correct_ipynb, '--to', 'md', '--warn-only'])
+
+    _, err = capsys.readouterr()
+    assert "Notebook does not appear to be JSON" in str(err)
+
+    assert not os.path.exists(incorrect_md)
+    assert os.path.exists(correct_md)
