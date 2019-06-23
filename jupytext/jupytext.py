@@ -5,8 +5,8 @@ import io
 import sys
 import logging
 import warnings
-from ipython_genutils import py3compat
 from copy import copy, deepcopy
+from ipython_genutils import py3compat
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell, NotebookNode
 import nbformat
@@ -231,8 +231,8 @@ def read(fp, as_version=4, fmt=None, **kwargs):
         _, ext = os.path.splitext(fp)
         fmt = copy(fmt or {})
         fmt.update({'extension': ext})
-        with io.open(fp, encoding='utf-8') as f:
-            return read(f, as_version=as_version, fmt=fmt, **kwargs)
+        with io.open(fp, encoding='utf-8') as stream:
+            return read(stream, as_version=as_version, fmt=fmt, **kwargs)
 
     fmt = long_form_one_format(fmt)
     if fmt['extension'] == '.ipynb':
@@ -289,16 +289,17 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
         fmt = long_form_one_format(fmt, update={'extension': ext})
         create_prefix_dir(fp, fmt)
 
-        with io.open(fp, 'w', encoding='utf-8') as f:
-            return write(nb, f, version=version, fmt=fmt, **kwargs)
+        with io.open(fp, 'w', encoding='utf-8') as stream:
+            write(nb, stream, version=version, fmt=fmt, **kwargs)
+            return
     else:
         assert fmt is not None, "'fmt' argument in jupytext.write is mandatory unless fp is a file name"
 
-    s = writes(nb, version=version, fmt=fmt, **kwargs)
-    if isinstance(s, bytes):
-        s = s.decode('utf8')
-    fp.write(s)
-    if not s.endswith(u'\n'):
+    content = writes(nb, version=version, fmt=fmt, **kwargs)
+    if isinstance(content, bytes):
+        content = content.decode('utf8')
+    fp.write(content)
+    if not content.endswith(u'\n'):
         fp.write(u'\n')
 
 
