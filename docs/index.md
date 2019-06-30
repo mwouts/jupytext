@@ -8,3 +8,4 @@
 * [Using Jupytext in Jupyter](using-server)
 * [Using at the command line](using-cli)
 * [Supported document formats](formats)
+* [Frequently Asked Questions](faq)
