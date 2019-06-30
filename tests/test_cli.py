@@ -15,7 +15,7 @@ from jupytext import __version__
 from jupytext import read, write, writes
 from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, str2bool
 from jupytext.compare import compare_notebooks
-from jupytext.paired_paths import paired_paths
+from jupytext.paired_paths import paired_paths, InconsistentPath
 from jupytext.formats import long_form_one_format, JupytextFormatError
 from .utils import list_notebooks, skip_if_dict_is_not_ordered
 from .utils import requires_black, requires_flake8, requires_sphinx_gallery
@@ -138,10 +138,8 @@ def test_error_not_notebook_ext_input(tmpdir, capsys):
     with open(tmp_file, 'w') as fp:
         fp.write('\n')
 
-    with pytest.raises(JupytextFormatError) as info:
+    with pytest.raises(JupytextFormatError, match="Extension '.ext' is not a notebook extension. Please use one of"):
         jupytext([tmp_file, '--to', 'py'])
-
-    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info.value)
 
 
 @pytest.fixture
@@ -160,59 +158,43 @@ def tmp_py(tmpdir):
 
 
 def test_error_not_notebook_ext_to(tmp_ipynb):
-    with pytest.raises(JupytextFormatError) as info:
+    with pytest.raises(JupytextFormatError, match="Extension '.ext' is not a notebook extension. Please use one of"):
         jupytext([tmp_ipynb, '--to', 'ext'])
-
-    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info.value)
 
 
 def test_error_not_notebook_ext_output(tmp_ipynb, tmpdir):
-    with pytest.raises(JupytextFormatError) as info:
+    with pytest.raises(JupytextFormatError, match="Extension '.ext' is not a notebook extension. Please use one of"):
         jupytext([tmp_ipynb, '-o', str(tmpdir.join('not.ext'))])
-
-    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info.value)
 
 
 def test_error_not_same_ext(tmp_ipynb, tmpdir):
-    with pytest.raises(ValueError) as info:
+    with pytest.raises(InconsistentPath):
         jupytext([tmp_ipynb, '--to', 'py', '-o', str(tmpdir.join('not.md'))])
-
-    assert 'InconsistentPath' in str(info)
 
 
 def test_error_no_action(tmp_ipynb):
-    with pytest.raises(ValueError) as info:
+    with pytest.raises(ValueError, match="Please select an action"):
         jupytext([tmp_ipynb])
-
-    assert "Please select an action" in str(info.value)
 
 
 def test_error_update_not_ipynb(tmp_py):
-    with pytest.raises(ValueError) as info:
+    with pytest.raises(ValueError, match='--update is only for ipynb files'):
         jupytext([tmp_py, '--to', 'py', '--update'])
-
-    assert '--update is only for ipynb files' in str(info.value)
 
 
 def test_error_multiple_input(tmp_ipynb):
-    with pytest.raises(ValueError) as info:
+    with pytest.raises(ValueError, match='Please input a single notebook when using --output'):
         jupytext([tmp_ipynb, tmp_ipynb, '--to', 'py', '-o', 'notebook.py'])
-
-    assert 'Please input a single notebook when using --output' in str(info.value)
 
 
 def test_error_opt_missing_equal(tmp_ipynb):
-    with pytest.raises(ValueError) as info:
+    with pytest.raises(ValueError, match='key=value'):
         jupytext([tmp_ipynb, '--to', 'py', '--opt', 'missing_equal'])
-
-    assert 'key=value' in str(info.value)
 
 
 def test_error_unknown_opt(tmp_ipynb):
-    with pytest.raises(ValueError) as info:
+    with pytest.raises(ValueError, match='is not a valid format option'):
         jupytext([tmp_ipynb, '--to', 'py', '--opt', 'unknown=true'])
-
-    assert 'is not a valid format option' in str(info.value)
 
 
 def test_combine_same_version_ok(tmpdir):
@@ -270,10 +252,8 @@ def test_combine_lower_version_raises(tmpdir):
     nb = new_notebook(metadata={'jupytext_formats': 'ipynb,py'})
     write(nb, tmp_ipynb)
 
-    with pytest.raises(ValueError) as info:
+    with pytest.raises(ValueError, match='Please remove one or the other file'):
         jupytext([tmp_nbpy, '--to', 'ipynb', '--update'])
-
-    assert 'Please remove one or the other file' in str(info.value)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
@@ -628,9 +608,8 @@ def test_sync(nb_file, tmpdir):
     write(nb, tmp_ipynb)
 
     # Test that sync fails when notebook is not paired
-    with pytest.raises(ValueError) as info:
+    with pytest.raises(ValueError, match='is not a paired notebook'):
         jupytext(['--sync', tmp_ipynb])
-    assert 'is not a paired notebook' in str(info.value)
 
     # Now with a pairing information
     nb.metadata.setdefault('jupytext', {})['formats'] = 'py,Rmd,ipynb'
@@ -679,9 +658,8 @@ def test_sync_pandoc(nb_file, tmpdir):
     write(nb, tmp_ipynb)
 
     # Test that sync fails when notebook is not paired
-    with pytest.raises(ValueError) as info:
+    with pytest.raises(ValueError, match='is not a paired notebook'):
         jupytext(['--sync', tmp_ipynb])
-    assert 'is not a paired notebook' in str(info.value)
 
     # Now with a pairing information
     nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,md:pandoc'
@@ -928,10 +906,8 @@ def test_incorrect_notebook_causes_early_exit(tmpdir):
     with open(correct_ipynb, 'w') as fp:
         fp.write('{"nbformat": 4, "nbformat_minor": 2, "metadata": {}, "cells": []}')
 
-    with pytest.raises(nbformat.reader.NotJSONError) as error:
+    with pytest.raises(nbformat.reader.NotJSONError, match='Notebook does not appear to be JSON'):
         jupytext([incorrect_ipynb, correct_ipynb, '--to', 'md'])
-
-    assert "Notebook does not appear to be JSON" in str(error.value)
 
     assert not os.path.exists(incorrect_md)
     assert not os.path.exists(correct_md)
