@@ -432,9 +432,9 @@ def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
     with open(hook, 'w') as fp:
         fp.write('#!/bin/sh\n'
                  '# Pair ipynb notebooks to a python file, reformat content with black, and run flake8\n'
-                 '# Note: this hook only acts on ipynb files. When pulling, run jupytext --sync manually to '
+                 "# Note: this hook only acts on ipynb files. When pulling, run 'jupytext --sync' to "
                  'update the ipynb file.\n'
-                 'jupytext --pre-commit --from ipynb --set-formats ipynb,py --sync --pipe black --check flake8\n')
+                 'jupytext --pre-commit --from ipynb --set-formats ipynb,py --pipe black --check flake8\n')
 
     st = os.stat(hook)
     os.chmod(hook, st.st_mode | stat.S_IEXEC)
@@ -499,18 +499,8 @@ def test_set_formats(py_file, tmpdir):
 
     copyfile(py_file, tmp_py)
 
-    jupytext(['--to', 'ipynb', tmp_py, '--set-formats', 'ipynb,py:light'])
-
-    nb = read(tmp_ipynb)
-    assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
-
-
-@pytest.mark.parametrize('py_file', list_notebooks('python'))
-def test_set_formats_py_file_only(py_file, tmpdir):
-    tmp_py = str(tmpdir.join('notebook.py'))
-    copyfile(py_file, tmp_py)
     jupytext([tmp_py, '--set-formats', 'ipynb,py:light'])
-    nb = read(tmp_py)
+    nb = read(tmp_ipynb)
     assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
 
 

@@ -70,7 +70,8 @@ def parse_jupytext_args(args=None):
     parser.add_argument('--set-formats',
                         type=str,
                         help='Set jupytext.formats metadata to the given value. Use this to activate pairing on a '
-                             'notebook, with e.g. --set-formats ipynb,py:light')
+                             'notebook, with e.g. --set-formats ipynb,py:light. The --set-formats option also triggers '
+                             'the creation/update of all paired files')
     parser.add_argument('--set-kernel', '-k',
                         type=str,
                         help="Set the kernel with the given name on the notebook. Use '--set-kernel -' to set "
@@ -195,6 +196,7 @@ def jupytext(args=None):
         # Replace empty string with None
         args.update_metadata = recursive_update(args.update_metadata,
                                                 {'jupytext': {'formats': args.set_formats or None}})
+        args.sync = True
 
     if args.paired_paths:
         if len(args.notebooks) != 1:
