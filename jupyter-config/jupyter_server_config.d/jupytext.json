@@ -1,0 +1,7 @@
+{
+  "ServerApp": {
+    "nbserver_extensions": {
+      "jupytext": true
+    }
+  }
+}
