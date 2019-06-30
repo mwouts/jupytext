@@ -931,7 +931,7 @@ def test_incorrect_notebook_causes_early_exit(tmpdir):
     with pytest.raises(nbformat.reader.NotJSONError) as error:
         jupytext([incorrect_ipynb, correct_ipynb, '--to', 'md'])
 
-    assert "Notebook does not appear to be JSON" in str(error)
+    assert "Notebook does not appear to be JSON" in str(error.value)
 
     assert not os.path.exists(incorrect_md)
     assert not os.path.exists(correct_md)
