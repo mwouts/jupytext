@@ -13,7 +13,9 @@ skip_if_dict_is_not_ordered = pytest.mark.skipif(
 
 def tool_version(tool):
     try:
-        return system(*tool.split(' '), '--version')
+        args = tool.split(' ')
+        args.append('--version')
+        return system(*args)
     except (OSError, SystemExit):  # pragma: no cover
         return None
 
