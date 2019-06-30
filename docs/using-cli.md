@@ -34,7 +34,7 @@ jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipy
 
 If you wanted to convert a collection of Markdown files to paired notebooks, and execute them in the current Python environment, you could run:
 ```bash
-jupytext --set-formats ipynb,md --execute --sync *.md 
+jupytext --set-formats ipynb,md --execute *.md 
 ```
 
 You may also find useful to `--pipe` the text representation of a notebook into tools like `black`:

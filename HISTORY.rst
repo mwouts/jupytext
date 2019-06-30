@@ -9,7 +9,8 @@ Release History
 **Improvements**
 
 - ``jupytext``'s ``read`` and ``write`` functions can be used as drop-in remplacements for ``nbformat``'s ones (#262).
-
+- New ``--execute`` option in Jupytext CLI (#231)
+- The ``--set-formats`` option in Jupytext CLI also triggers ``--sync``, allowing shorter commands.
 
 1.1.7 (2019-06-23)
 ++++++++++++++++++++++
