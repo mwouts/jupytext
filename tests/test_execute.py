@@ -71,7 +71,7 @@ def test_execute_sync(tmpdir):
 
 @requires_nbconvert
 @requires_ir_kernel
-def test_execute_r(tmpdir):
+def test_execute_r(tmpdir):  # pragma: no cover
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_md = str(tmpdir.join('notebook.md'))
 

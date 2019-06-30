@@ -692,8 +692,6 @@ def test_preferred_formats_read_auto(tmpdir):
 def test_save_in_auto_extension_global(nb_file, tmpdir):
     # load notebook
     nb = jupytext.read(nb_file)
-    if 'language_info' not in nb.metadata:
-        return
 
     auto_ext = auto_ext_from_metadata(nb.metadata)
     tmp_ipynb = 'notebook.ipynb'
@@ -781,8 +779,6 @@ def test_global_auto_pairing_works_with_empty_notebook(tmpdir):
 def test_save_in_auto_extension_global_with_format(nb_file, tmpdir):
     # load notebook
     nb = jupytext.read(nb_file)
-    if 'language_info' not in nb.metadata:
-        return
 
     auto_ext = auto_ext_from_metadata(nb.metadata)
     tmp_ipynb = 'notebook.ipynb'
@@ -814,8 +810,6 @@ def test_save_in_auto_extension_local(nb_file, tmpdir):
     # load notebook
     nb = jupytext.read(nb_file)
     nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,auto:percent'
-    if 'language_info' not in nb.metadata:
-        return
 
     auto_ext = auto_ext_from_metadata(nb.metadata)
     tmp_ipynb = 'notebook.ipynb'
@@ -842,8 +836,6 @@ def test_save_in_auto_extension_local(nb_file, tmpdir):
 def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
     # load notebook
     nb = jupytext.read(nb_file)
-    if 'language_info' not in nb.metadata:
-        return
 
     auto_ext = auto_ext_from_metadata(nb.metadata)
     tmp_ipynb = 'notebook.ipynb'

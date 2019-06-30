@@ -312,7 +312,7 @@ def create_prefix_dir(nb_file, fmt):
             os.makedirs(nb_dir)
 
 
-def readf(nb_file, fmt=None):
+def readf(nb_file, fmt=None):  # pragma: no cover
     """Read a notebook from the file with given name"""
     warnings.warn(
         "readf is deprecated. Please use read instead, and pass the fmt "
@@ -322,7 +322,7 @@ def readf(nb_file, fmt=None):
     return read(fp=nb_file, fmt=fmt)
 
 
-def writef(notebook, nb_file, fmt=None):
+def writef(notebook, nb_file, fmt=None):  # pragma: no cover
     """Write a notebook to the file with given name"""
     warnings.warn(
         'writef is deprecated. Please use write instead, and pass the fmt '

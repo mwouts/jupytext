@@ -339,8 +339,8 @@ def jupytext(args=None):
             if args.execute:
                 log("[jupytext] Executing notebook")
                 kernel_name = notebook.metadata.get('kernelspec', {}).get('name')
-                ep = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
-                ep.preprocess(notebook, resources={})
+                exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
+                exec_proc.preprocess(notebook, resources={})
 
             # III. ### Possible actions ###
             modified = args.update_metadata or args.pipe or args.execute
