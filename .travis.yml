@@ -11,9 +11,6 @@ matrix:
     - python: 3.7
       dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
       sudo: required  # required for Python 3.7 (travis-ci/travis-ci#9069)
-    - python: 3.8-dev
-      dist: xenial
-      sudo: required
 
 install:
   # We use conda in order to install pandoc
