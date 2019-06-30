@@ -6,6 +6,11 @@ from .reraise import reraise
 from .version import __version__
 
 try:
+    from .contentsmanager import build_jupytext_contents_manager_class
+except ImportError as err:
+    build_jupytext_contents_manager = reraise(err)
+
+try:
     from .contentsmanager import TextFileContentsManager
 except ImportError as err:
     TextFileContentsManager = reraise(err)
@@ -13,7 +18,7 @@ except ImportError as err:
 
 def load_jupyter_server_extension(app):  # pragma: no cover
     """Use Jupytext's contents manager"""
-    if issubclass(app.contents_manager_class, TextFileContentsManager):
+    if hasattr(app.contents_manager_class, 'default_jupytext_formats'):
         app.log.info("[Jupytext Server Extension] NotebookApp.contents_manager_class is "
                      "(a subclass of) jupytext.TextFileContentsManager already - OK")
         return
@@ -22,9 +27,9 @@ def load_jupyter_server_extension(app):  # pragma: no cover
     # The contents manager was set at NotebookApp.init_configurables
 
     # Let's change the contents manager class
-    app.log.info('[Jupytext Server Extension] Changing NotebookApp.contents_manager_class '
-                 'from {} to jupytext.TextFileContentsManager'.format(app.contents_manager_class.__name__))
-    app.contents_manager_class = TextFileContentsManager
+    app.log.info('[Jupytext Server Extension] Deriving a JupytextContentsManager '
+                 'from {}'.format(app.contents_manager_class.__name__))
+    app.contents_manager_class = build_jupytext_contents_manager_class(app.contents_manager_class)
 
     try:
         # And rerun selected init steps from https://github.com/jupyter/notebook/blob/
