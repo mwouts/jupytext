@@ -2,17 +2,13 @@
 
 from .jupytext import read, write, readf, writef, writes, reads
 from .formats import NOTEBOOK_EXTENSIONS, guess_format, get_format_implementation
+from .reraise import reraise
 from .version import __version__
 
 try:
     from .contentsmanager import TextFileContentsManager
 except ImportError as err:
-    class TextFileContentsManager:
-        """A class that raises the previous ImportError"""
-        err = err
-
-        def __init__(self, parent=None, log=None):  # noqa
-            raise self.err
+    TextFileContentsManager = reraise(err)
 
 
 def load_jupyter_server_extension(app):  # pragma: no cover

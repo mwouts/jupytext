@@ -1,28 +1,14 @@
 """Find kernel specifications for a given language"""
 
 import sys
-
-
-def raise_error(error):
-    """Return a function that raises the given error when evaluated"""
-
-    def local_function(*args, **kwargs):
-        raise error
-
-    return local_function
-
+from .reraise import reraise
 
 try:
     # I prefer not to take a dependency on jupyter_client
     from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 except ImportError as err:
-    find_kernel_specs = raise_error(err)
-    get_kernel_spec = raise_error(err)
-
-try:
-    from nbconvert.preprocessors import ExecutePreprocessor
-except ImportError as err:
-    ExecutePreprocessor = raise_error(err)
+    find_kernel_specs = reraise(err)
+    get_kernel_spec = reraise(err)
 
 
 def set_kernelspec_from_language(notebook):

@@ -15,8 +15,14 @@ from .header import recursive_update
 from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
-from .kernels import kernelspec_from_language, find_kernel_specs, get_kernel_spec, ExecutePreprocessor
+from .kernels import kernelspec_from_language, find_kernel_specs, get_kernel_spec
+from .reraise import reraise
 from .version import __version__
+
+try:
+    from nbconvert.preprocessors import ExecutePreprocessor
+except ImportError as ep_err:
+    ExecutePreprocessor = reraise(ep_err)
 
 
 def system(*args, **kwargs):
