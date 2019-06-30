@@ -111,9 +111,12 @@ For more information see [the jupytext documentation](https://jupytext.readthedo
 The package provides a `jupytext` script for command line conversion between the various notebook extensions:
 
 ```bash
-jupytext --to py notebook.ipynb                 # create a notebook.py file in the light format
-jupytext --to notebook notebook.py              # overwrite notebook.ipynb (remove outputs)
-jupytext --update --to notebook notebook.py     # update notebook.ipynb (preserve outputs and metadata)
+jupytext --to py notebook.ipynb                 # convert notebook.ipynb to a .py file
+jupytext --to notebook notebook.py              # convert notebook.py to an .ipynb file with no outputs
+jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipynb file and run it 
+jupytext --update --to notebook notebook.py     # update the input cells in the .ipynb file and preserve outputs and metadata
+jupytext --set-formats --ipynb,py notebook.ipynb  # Turn notebook.ipynb into a paired ipynb/py notebook
+jupytext --sync notebook.ipynb                  # Update all paired representations of notebook.ipynb
 ```
 
 For more examples, see the [jupytext documentation](https://jupytext.readthedocs.io)
