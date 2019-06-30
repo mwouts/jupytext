@@ -487,7 +487,7 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
     return notebook, latest_inputs, latest_outputs
 
 
-def pipe_notebook(notebook, command, fmt='py:percent', update=True, preserve_outputs=True):
+def pipe_notebook(notebook, command, fmt='py:percent', update=True):
     """Pipe the notebook, in the desired representation, to the given command. Update the notebook
     with the returned content if desired."""
     if command in ['black', 'flake8', 'autopep8']:
@@ -512,7 +512,7 @@ def pipe_notebook(notebook, command, fmt='py:percent', update=True, preserve_out
 
     piped_notebook = reads(cmd_output.decode('utf-8'), fmt)
 
-    if preserve_outputs:
+    if fmt['extension'] != '.ipynb':
         combine_inputs_with_outputs(piped_notebook, notebook, fmt)
 
     # Remove jupytext / text_representation entry

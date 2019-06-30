@@ -13,7 +13,7 @@ skip_if_dict_is_not_ordered = pytest.mark.skipif(
 
 def tool_version(tool):
     try:
-        return system(tool, '--version')
+        return system(*tool.split(' '), '--version')
     except (OSError, SystemExit):  # pragma: no cover
         return None
 
@@ -22,6 +22,7 @@ requires_jupytext_installed = pytest.mark.skipif(not tool_version('jupytext'), r
 requires_black = pytest.mark.skipif(not tool_version('black'), reason='black not found')
 requires_flake8 = pytest.mark.skipif(not tool_version('flake8'), reason='flake8 not found')
 requires_autopep8 = pytest.mark.skipif(not tool_version('autopep8'), reason='autopep8 not found')
+requires_nbconvert = pytest.mark.skipif(not tool_version('jupyter nbconvert'), reason='nbconvert not found')
 requires_sphinx_gallery = pytest.mark.skipif(not rst2md, reason='sphinx_gallery is not available')
 requires_pandoc = pytest.mark.skipif(not is_pandoc_available(), reason='pandoc>=2.7.2 is not available')
 
