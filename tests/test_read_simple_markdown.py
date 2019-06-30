@@ -66,11 +66,50 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
     compare(markdown, markdown2)
 
 
+def test_read_mostly_R_markdown_file(markdown="""```R
+ls()
+```
+
+```R
+cat(stringi::stri_rand_lipsum(3), sep='\n\n')
+```
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    assert nb.metadata['jupytext']['main_language'] == 'R'
+    compare(nb.cells, [{'cell_type': 'code',
+                        'metadata': {},
+                        'execution_count': None,
+                        'source': 'ls()',
+                        'outputs': []},
+                       {'cell_type': 'code',
+                        'metadata': {},
+                        'execution_count': None,
+                        'source': "cat(stringi::stri_rand_lipsum(3), sep='\n\n')",
+                        'outputs': []}])
+
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
+def test_read_markdown_file_no_language(markdown="""```
+ls
+```
+
+```
+echo 'Hello World'
+```
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
 def test_read_julia_notebook(markdown="""```julia
 1 + 1
 ```
 """):
     nb = jupytext.reads(markdown, 'md')
+    assert nb.metadata['jupytext']['main_language'] == 'julia'
     assert len(nb.cells) == 1
     assert nb.cells[0].cell_type == 'code'
     markdown2 = jupytext.writes(nb, 'md')

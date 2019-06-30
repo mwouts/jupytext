@@ -120,7 +120,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             cells=nb.cells)
 
         metadata = nb.metadata
-        default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension)
+        default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension) or 'python'
         self.update_fmt_with_notebook_options(nb.metadata)
 
         if 'main_language' in metadata.get('jupytext', {}):
