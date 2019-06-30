@@ -141,7 +141,7 @@ def test_error_not_notebook_ext_input(tmpdir, capsys):
     with pytest.raises(JupytextFormatError) as info:
         jupytext([tmp_file, '--to', 'py'])
 
-    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info)
+    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info.value)
 
 
 @pytest.fixture
@@ -163,14 +163,14 @@ def test_error_not_notebook_ext_to(tmp_ipynb):
     with pytest.raises(JupytextFormatError) as info:
         jupytext([tmp_ipynb, '--to', 'ext'])
 
-    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info)
+    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info.value)
 
 
 def test_error_not_notebook_ext_output(tmp_ipynb, tmpdir):
     with pytest.raises(JupytextFormatError) as info:
         jupytext([tmp_ipynb, '-o', str(tmpdir.join('not.ext'))])
 
-    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info)
+    assert "Extension '.ext' is not a notebook extension. Please use one of" in str(info.value)
 
 
 def test_error_not_same_ext(tmp_ipynb, tmpdir):
@@ -184,35 +184,35 @@ def test_error_no_action(tmp_ipynb):
     with pytest.raises(ValueError) as info:
         jupytext([tmp_ipynb])
 
-    assert "Please select an action" in str(info)
+    assert "Please select an action" in str(info.value)
 
 
 def test_error_update_not_ipynb(tmp_py):
     with pytest.raises(ValueError) as info:
         jupytext([tmp_py, '--to', 'py', '--update'])
 
-    assert '--update is only for ipynb files' in str(info)
+    assert '--update is only for ipynb files' in str(info.value)
 
 
 def test_error_multiple_input(tmp_ipynb):
     with pytest.raises(ValueError) as info:
         jupytext([tmp_ipynb, tmp_ipynb, '--to', 'py', '-o', 'notebook.py'])
 
-    assert 'Please input a single notebook when using --output' in str(info)
+    assert 'Please input a single notebook when using --output' in str(info.value)
 
 
 def test_error_opt_missing_equal(tmp_ipynb):
     with pytest.raises(ValueError) as info:
         jupytext([tmp_ipynb, '--to', 'py', '--opt', 'missing_equal'])
 
-    assert 'key=value' in str(info)
+    assert 'key=value' in str(info.value)
 
 
 def test_error_unknown_opt(tmp_ipynb):
     with pytest.raises(ValueError) as info:
         jupytext([tmp_ipynb, '--to', 'py', '--opt', 'unknown=true'])
 
-    assert 'is not a valid format option' in str(info)
+    assert 'is not a valid format option' in str(info.value)
 
 
 def test_combine_same_version_ok(tmpdir):
@@ -273,7 +273,7 @@ def test_combine_lower_version_raises(tmpdir):
     with pytest.raises(ValueError) as info:
         jupytext([tmp_nbpy, '--to', 'ipynb', '--update'])
 
-    assert 'Please remove one or the other file' in str(info)
+    assert 'Please remove one or the other file' in str(info.value)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
@@ -630,7 +630,7 @@ def test_sync(nb_file, tmpdir):
     # Test that sync fails when notebook is not paired
     with pytest.raises(ValueError) as info:
         jupytext(['--sync', tmp_ipynb])
-    assert 'is not a paired notebook' in str(info)
+    assert 'is not a paired notebook' in str(info.value)
 
     # Now with a pairing information
     nb.metadata.setdefault('jupytext', {})['formats'] = 'py,Rmd,ipynb'
@@ -681,7 +681,7 @@ def test_sync_pandoc(nb_file, tmpdir):
     # Test that sync fails when notebook is not paired
     with pytest.raises(ValueError) as info:
         jupytext(['--sync', tmp_ipynb])
-    assert 'is not a paired notebook' in str(info)
+    assert 'is not a paired notebook' in str(info.value)
 
     # Now with a pairing information
     nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,md:pandoc'
