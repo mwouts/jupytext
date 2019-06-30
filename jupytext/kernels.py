@@ -2,20 +2,27 @@
 
 import sys
 
+
+def raise_error(error):
+    """Return a function that raises the given error when evaluated"""
+
+    def local_function(*args, **kwargs):
+        raise error
+
+    return local_function
+
+
 try:
     # I prefer not to take a dependency on jupyter_client
     from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 except ImportError as err:
-    def raise_error(error):
-        """Return a function that raises the given error when evaluated"""
-
-        def local_function(*args, **kwargs):
-            raise error
-
-        return local_function
-
     find_kernel_specs = raise_error(err)
     get_kernel_spec = raise_error(err)
+
+try:
+    from nbconvert.preprocessors import ExecutePreprocessor
+except ImportError as err:
+    ExecutePreprocessor = raise_error(err)
 
 
 def set_kernelspec_from_language(notebook):

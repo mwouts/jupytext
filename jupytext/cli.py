@@ -15,7 +15,7 @@ from .header import recursive_update
 from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference
-from .kernels import kernelspec_from_language, find_kernel_specs, get_kernel_spec
+from .kernels import kernelspec_from_language, find_kernel_specs, get_kernel_spec, ExecutePreprocessor
 from .version import __version__
 
 
@@ -138,6 +138,11 @@ def parse_jupytext_args(args=None):
                         default='auto:percent',
                         help='The format in which the notebook should be piped to other programs, when using the '
                              '--pipe and/or --check commands.')
+
+    # Execute the notebook
+    parser.add_argument('--execute',
+                        action='store_true',
+                        help='Execute the notebook with the given kernel')
 
     parser.add_argument('--quiet', '-q',
                         action='store_true',
@@ -268,9 +273,14 @@ def jupytext(args=None):
                 if not args.output and nb_file != '-':
                     nb_dest = full_path(base_path(nb_file, args.input_format), dest_fmt)
 
-                # Set the kernel
-            if args.set_kernel:
-                if args.set_kernel == '-':
+            # Set the kernel
+            set_kernel = args.set_kernel
+            if args.execute and notebook.metadata.get('kernelspec', {}).get('name') is None:
+                log("[jupytext] Setting default kernel with --set-kernel -")
+                set_kernel = '-'
+
+            if set_kernel:
+                if set_kernel == '-':
                     language = notebook.metadata.get('jupytext', {}).get('main_language') \
                                or notebook.metadata['kernelspec']['language']
                     if not language:
@@ -281,7 +291,7 @@ def jupytext(args=None):
                         raise ValueError('Found no kernel for {}'.format(language))
                 else:
                     try:
-                        kernelspec = get_kernel_spec(args.set_kernel)
+                        kernelspec = get_kernel_spec(set_kernel)
                     except KeyError:
                         raise KeyError('Please choose a kernel name among {}'
                                        .format([name for name in find_kernel_specs()]))
@@ -317,8 +327,15 @@ def jupytext(args=None):
             for cmd in args.check or []:
                 pipe_notebook(notebook, cmd, args.pipe_fmt, update=False)
 
+            # Execute the notebook
+            if args.execute:
+                log("[jupytext] Executing notebook")
+                kernel_name = notebook.metadata.get('kernelspec', {}).get('name')
+                ep = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
+                ep.preprocess(notebook, resources={})
+
             # III. ### Possible actions ###
-            modified = args.update_metadata or args.pipe or args.set_kernel
+            modified = args.update_metadata or args.pipe or args.execute
             # a. Test round trip conversion
             if args.test or args.test_strict:
                 try:
