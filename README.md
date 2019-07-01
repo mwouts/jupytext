@@ -84,11 +84,10 @@ In JupyterLab, Jupytext adds a set of commands to the command palette:
 
 ![JupyterLab extension](https://raw.githubusercontent.com/mwouts/jupyterlab-jupytext/master/jupytext_commands.png)
 
-If you don't see these commands, install the extension manually with
+The Jupytext extension for JupyterLab is bundled with Jupytext. Installing Jupytext will trigger a build of JupyterLab the next time you open it. If you prefer, you can trigger the build manually with
 ```
-jupyter labextension install jupyterlab-jupytext
+jupyter lab build
 ```
-(the above requires `npm`, run `conda install nodejs` first if you don't have `npm`).
 
 ## Using Jupytext
 
