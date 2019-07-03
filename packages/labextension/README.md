@@ -14,7 +14,7 @@ jupyter labextension install jupyterlab-jupytext
 
 # How to develop this extension
 
-We started developping the extension following the [xkcd extension tutorial](https://jupyterlab.readthedocs.io/en/stable/developer/xkcd_extension_tutorial.html). Follow the instructions there to create a conda environment in which you will be able to develop the extension. In that environment, install JupyterLab's plugin manager, and the extension with
+We developed the extension following the [xkcd extension tutorial](https://jupyterlab.readthedocs.io/en/stable/developer/xkcd_extension_tutorial.html). Follow the instructions there to create a conda environment in which you will be able to develop the extension. In that environment, install JupyterLab's plugin manager, and the extension with
 ```bash
 jlpm install
 jupyter labextension install . --no-build
