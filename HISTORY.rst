@@ -16,6 +16,7 @@ Release History
   ``jupyter labextension install jupyterlab-jupytext@0.19`` (#276, #278)
 - The JupyterLab extension filters the available pairing options on text files (#213)
 - And has a new option to include (or not) the metadata in text files
+- Jupytext's content manager is built as a function of the current CM for compatibility with ``jupyter_server`` (#270)
 
 **BugFixes**
 
