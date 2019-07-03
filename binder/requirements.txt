@@ -1,4 +1,4 @@
-jupytext
+jupytext>=1.2.0rc0
 plotly
 matplotlib
 pandas
