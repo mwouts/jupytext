@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-1.2.0 (2019-06-??)
+1.2.0 (2019-07-??)
 ++++++++++++++++++++++
 
 **Improvements**
@@ -11,6 +11,13 @@ Release History
 - ``jupytext``'s ``read`` and ``write`` functions can be used as drop-in remplacements for ``nbformat``'s ones (#262).
 - New ``--execute`` option in Jupytext CLI (#231)
 - The ``--set-formats`` option in Jupytext CLI also triggers ``--sync``, allowing shorter commands.
+- The JupyterLab extension filters the available pairing options on text files (#213)
+- And has a new option to include (or not) the metadata in text files
+
+**BugFixes**
+
+- Updated version of the JupyterLab extension allows it to work with current npm packages (#276)
+
 
 1.1.7 (2019-06-23)
 ++++++++++++++++++++++
