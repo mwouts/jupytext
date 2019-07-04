@@ -1,6 +1,6 @@
 {
   "ServerApp": {
-    "nbserver_extensions": {
+    "jpserver_extensions": {
       "jupytext": true
     }
   }
