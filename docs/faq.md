@@ -6,7 +6,7 @@ Jupytext is a Python package that provides _two-way_ conversion between Jupyter 
 
 ## Why would I want to convert my notebooks to text?
 
-The text representation have much cleaner diffs than the original notebook format. Merging multiple contributions to a notebook in any of these text formats is easier than with the JSON format. Last but not least, acting on a notebook represented as text (spell check, reformat, ...) is sometimes more comfortable than in Jupyter.
+The text representation only contains the part of the notebook that you wrote (not the outputs). You get a cleaner diff history. Thanks to the _two-way_ conversion, you can also act on the text file and then propagate the changes to the original `.ipynb` file. Refactor your code or merge multiple contributions easily!
 
 ## How do I use Jupytext?
 
