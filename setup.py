@@ -26,6 +26,7 @@ setup(
     package_data={'jupytext': ['nbextension/*.*']},
     data_files=[('etc/jupyter/nbconfig/notebook.d', ['jupyter-config/nbconfig/notebook.d/jupytext.json']),
                 ('etc/jupyter/jupyter_notebook_config.d', ['jupyter-config/jupyter_notebook_config.d/jupytext.json']),
+                ('etc/jupyter/jupyter_server_config.d', ['jupyter-config/jupyter_server_config.d/jupytext.json']),
                 ('share/jupyter/nbextensions/jupytext', ['jupytext/nbextension/index.js',
                                                          'jupytext/nbextension/README.md',
                                                          'jupytext/nbextension/jupytext_menu.png',
