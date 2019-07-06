@@ -162,7 +162,7 @@ const extension: JupyterLabPlugin<void> = {
       palette.addItem({ command, rank, category: "Jupytext" });
     });
 
-    // Jupytext README
+    // Jupytext's documentation
     palette.addItem({
       args: {
         text: "Jupytext Reference",
@@ -170,7 +170,17 @@ const extension: JupyterLabPlugin<void> = {
       },
       command: "help:open",
       category: "Jupytext",
-      rank: JUPYTEXT_FORMATS.length + 1
+      rank: 0
+    });
+
+    palette.addItem({
+      args: {
+        text: "Jupytext FAQ",
+        url: "https://jupytext.readthedocs.io/en/latest/faq.html"
+      },
+      command: "help:open",
+      category: "Jupytext",
+      rank: 1
     });
 
     // Metadata in text representation    

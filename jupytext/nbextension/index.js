@@ -164,6 +164,14 @@ define([
                 })
                 .prepend($('<i/>').addClass('pull-right')));
 
+            var jupytext_faq = $('<li/>').append($('<a/>')
+                .text('Jupytext FAQ')
+                .attr('title', "Frequently Asked Questions. Opens in a new window.")
+                .on('click', function () {
+                    window.open('https://jupytext.readthedocs.io/en/latest/faq.html')
+                })
+                .prepend($('<i/>').addClass('pull-right')));
+
             var toggle_autosave = $("<li/>").append(
                 $("<a/>")
                     .attr("id", "autosave")
@@ -185,6 +193,8 @@ define([
             $('#trust_notebook').before('<li id="jupytext_sub_menu"/>');
             $('#jupytext_sub_menu').addClass('dropdown-submenu').append(JupytextMenu).append(JupytextActions);
             JupytextActions.append(jupytext_link);
+            JupytextActions.append($('<li/>').addClass('divider'));
+            JupytextActions.append(jupytext_faq);
             JupytextActions.append($('<li/>').addClass('divider'));
             JupytextActions.append(toggle_autosave);
             JupytextActions.append($('<li/>').addClass('divider'));
