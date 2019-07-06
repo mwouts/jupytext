@@ -158,8 +158,8 @@ const extension: JupyterLabPlugin<void> = {
         }
       });
 
-      console.log("Jupytext: adding command=" + command + " with rank=" + rank);
-      palette.addItem({ command, rank, category: "Jupytext" });
+      console.log("Jupytext: adding command=" + command + " with rank=" + (rank + 1));
+      palette.addItem({ command, rank: rank + 2, category: "Jupytext" });
     });
 
     // Jupytext's documentation
@@ -240,7 +240,7 @@ const extension: JupyterLabPlugin<void> = {
       }
     });
 
-    palette.addItem({ command: "jupytext_metadata", rank: JUPYTEXT_FORMATS.length + 1, category: "Jupytext" });
+    palette.addItem({ command: "jupytext_metadata", rank: JUPYTEXT_FORMATS.length + 3, category: "Jupytext" });
   }
 };
 
