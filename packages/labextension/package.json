@@ -1,15 +1,16 @@
 {
   "name": "jupyterlab-jupytext",
-  "version": "0.2.0",
+  "version": "0.19.0",
   "description": "A JupyterLab extension for Jupytext",
   "keywords": [
     "jupyter",
+    "jupytext",
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://github.com/mwouts/jupyterlab-jupytext",
+  "homepage": "https://github.com/mwouts/jupytext/tree/master/packages/labextension",
   "bugs": {
-    "url": "https://github.com/mwouts/jupyterlab-jupytext/issues"
+    "url": "https://github.com/mwouts/jupytext/issues"
   },
   "license": "MIT",
   "author": "Marc Wouts",
@@ -21,7 +22,7 @@
   "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mwouts/jupyterlab-jupytext.git"
+    "url": "https://github.com/mwouts/jupytext.git"
   },
   "scripts": {
     "build": "tsc",
@@ -30,9 +31,9 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@jupyterlab/application": ">=0.16",
-    "@jupyterlab/apputils": ">=0.16",
-    "@jupyterlab/notebook": ">=0.16"
+    "@jupyterlab/application": "^0.19",
+    "@jupyterlab/apputils": "^0.19",
+    "@jupyterlab/notebook": "^0.19"
   },
   "devDependencies": {
     "rimraf": "^2.6.1",
