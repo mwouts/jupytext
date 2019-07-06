@@ -8,19 +8,19 @@ Release History
 
 **Improvements**
 
-- ``jupytext``'s ``read`` and ``write`` functions can be used as drop-in remplacements for ``nbformat``'s ones (#262).
 - New ``--execute`` option in Jupytext CLI (#231)
 - The ``--set-formats`` option in Jupytext CLI also triggers ``--sync``, allowing shorter commands.
-- Jupytext ships the Jupytext extension for JupyterLab in version 1.0, that is compatible only with JupyterLab >= 1.0.
-  If you use a previous version of JupyterLab, please install the previous version of the extension with
-  ``jupyter labextension install jupyterlab-jupytext@0.19`` (#276, #278)
-- The JupyterLab extension filters the available pairing options on text files (#213)
-- And has a new option to include (or not) the metadata in text files
-- Jupytext's content manager is built as a function of the current CM for compatibility with ``jupyter_server`` (#270)
+- ``jupytext``'s ``read`` and ``write`` functions can be used as drop-in replacements for ``nbformat``'s ones (#262).
+- The JupyterLab extension was updated. It now works on on text files (#213) and has a new option to include
+(or not) the metadata in the text representation of the notebook.
+- Jupytext's contents manager class is derived dynamically from the default CM class for compatibility with
+``jupyter_server`` (#270)
 
 **BugFixes**
 
-- Updated version of the JupyterLab extension allows it to work with current npm packages (#276)
+- The ``jupyterlab-jupytext`` extension shipped with the python package is in version 1.0, and is compatible only
+with JupyterLab >= 1.0. If you use an earlier version of JupyterLab, please install the version 0.19 of the extension
+with ``jupyter labextension install jupyterlab-jupytext@0.19`` (#276, #278)
 
 
 1.1.7 (2019-06-23)
