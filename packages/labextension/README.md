@@ -6,10 +6,16 @@ This extension adds a few [Jupytext](https://github.com/mwouts/jupytext) command
 
 ## Installation
 
-Please [install Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. Make sure Jupyter is configured to use Jupytext's contents manager. Then, install the extension with:
+Please [install Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. Then, rebuild JupyterLab with
 
 ```bash
-jupyter labextension install jupyterlab-jupytext
+jupyter lab build
+```
+
+In case you're not using JupyterLab 1.0, you may have to install another version of the extension that is compatible with your version. For instance, install the last version of the extension compatible with Jupyter 0.35 with
+
+```bash
+jupyter labextension install jupyterlab-jupytext@0.19
 ```
 
 # How to develop this extension

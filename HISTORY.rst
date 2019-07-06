@@ -11,6 +11,9 @@ Release History
 - ``jupytext``'s ``read`` and ``write`` functions can be used as drop-in remplacements for ``nbformat``'s ones (#262).
 - New ``--execute`` option in Jupytext CLI (#231)
 - The ``--set-formats`` option in Jupytext CLI also triggers ``--sync``, allowing shorter commands.
+- Jupytext ships the Jupytext extension for JupyterLab in version 1.0, that is compatible only with JupyterLab >= 1.0.
+  If you use a previous version of JupyterLab, please install the previous version of the extension with
+  ``jupyter labextension install jupyterlab-jupytext@0.19`` (#276, #278)
 - The JupyterLab extension filters the available pairing options on text files (#213)
 - And has a new option to include (or not) the metadata in text files
 
