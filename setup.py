@@ -34,7 +34,7 @@ setup(
                 ('share/jupyter/lab/extensions', ['packages/labextension/jupyterlab-jupytext-0.2.0.tgz'])],
     entry_points={'console_scripts': ['jupytext = jupytext.cli:jupytext_cli']},
     tests_require=['pytest'],
-    install_requires=['nbformat>=4.0.0', 'mock', 'pyyaml', 'testfixtures'],
+    install_requires=['nbformat>=4.0.0', 'mock;python_version<"3"', 'pyyaml', 'testfixtures'],
     license='MIT',
     classifiers=['Development Status :: 5 - Production/Stable',
                  'License :: OSI Approved :: MIT License',
