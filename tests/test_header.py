@@ -1,5 +1,4 @@
 from nbformat.v4.nbbase import new_notebook, new_raw_cell, new_markdown_cell
-import mock
 from jupytext.compare import compare
 import jupytext
 from jupytext.header import uncomment_line, header_to_metadata_and_cell, metadata_and_cell_to_header
@@ -68,13 +67,12 @@ title: Sample header
     assert pos == len(lines)
 
 
-def test_metadata_and_cell_to_header():
+def test_metadata_and_cell_to_header(header_insert_and_check_version_number_patch):
     metadata = {'jupytext': {'mainlanguage': 'python'}}
     nb = new_notebook(
         metadata=metadata,
         cells=[new_raw_cell(source="---\ntitle: Sample header\n---")])
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-        header, lines_to_next_cell = metadata_and_cell_to_header(nb, metadata, get_format_implementation('.md'), '.md')
+    header, lines_to_next_cell = metadata_and_cell_to_header(nb, metadata, get_format_implementation('.md'), '.md')
     assert '\n'.join(header) == """---
 title: Sample header
 jupyter:
@@ -85,10 +83,9 @@ jupyter:
     assert lines_to_next_cell is None
 
 
-def test_metadata_and_cell_to_header2():
+def test_metadata_and_cell_to_header2(header_insert_and_check_version_number_patch):
     nb = new_notebook(cells=[new_markdown_cell(source="Some markdown\ntext")])
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-        header, lines_to_next_cell = metadata_and_cell_to_header(nb, {}, get_format_implementation('.md'), '.md')
+    header, lines_to_next_cell = metadata_and_cell_to_header(nb, {}, get_format_implementation('.md'), '.md')
     assert header == []
     assert len(nb.cells) == 1
     assert lines_to_next_cell is None
