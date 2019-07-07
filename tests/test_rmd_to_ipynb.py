@@ -1,4 +1,3 @@
-import mock
 import pytest
 from jupytext.compare import compare
 import jupytext
@@ -8,15 +7,14 @@ from .utils import skip_if_dict_is_not_ordered
 
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('nb_file', list_notebooks('Rmd'))
-def test_identity_write_read(nb_file):
+def test_identity_write_read(nb_file, header_insert_and_check_version_number_patch):
     """Test that writing the notebook with ipynb, and read again, yields identity"""
 
     with open(nb_file) as fp:
         rmd = fp.read()
 
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-        nb = jupytext.reads(rmd, 'Rmd')
-        rmd2 = jupytext.writes(nb, 'Rmd')
+    nb = jupytext.reads(rmd, 'Rmd')
+    rmd2 = jupytext.writes(nb, 'Rmd')
 
     compare(rmd, rmd2)
 

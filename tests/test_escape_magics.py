@@ -1,5 +1,4 @@
 import pytest
-import mock
 from nbformat.v4.nbbase import new_code_cell, new_notebook
 from jupytext.compare import compare
 from jupytext.magics import comment_magic, uncomment_magic, unesc, is_magic
@@ -132,7 +131,7 @@ def test_markdown_image_is_not_magic():
     assert not is_magic('# ![Image name](image.png', 'python')
 
 
-def test_multiline_python_magic():
+def test_multiline_python_magic(header_insert_and_check_version_number_patch):
     nb = new_notebook(cells=[new_code_cell("""%load_ext watermark
 %watermark -u -n -t -z \\
     -p jupytext -v
@@ -140,8 +139,7 @@ def test_multiline_python_magic():
 def g(x):
     return x+1""")])
 
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-        text = jupytext.writes(nb, 'py')
+    text = jupytext.writes(nb, 'py')
     compare("""# +
 # %load_ext watermark
 # %watermark -u -n -t -z \\
