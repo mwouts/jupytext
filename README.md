@@ -101,7 +101,7 @@ Select the pairing for a given notebook using either the [Jupytext menu](#jupyte
 
 Alternatively, the pairing information for one or multiple notebooks can be set on the command line:
 ```
-jupytext --set-formats ipynb,py [--sync] notebook.ipynb
+jupytext --set-formats ipynb,py notebook.ipynb
 ```
 
 For more information see [the jupytext documentation](https://jupytext.readthedocs.io).
