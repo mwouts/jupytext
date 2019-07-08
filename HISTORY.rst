@@ -11,6 +11,7 @@ Release History
 - New ``--execute`` option in Jupytext CLI (#231)
 - The ``--set-formats`` option in Jupytext CLI also triggers ``--sync``, allowing shorter commands.
 - ``jupytext``'s ``read`` and ``write`` functions can be used as drop-in replacements for ``nbformat``'s ones (#262).
+- ``jupytext --sync`` will now skip unpaired notebooks (#281).
 - The JupyterLab extension was updated. It now works on on text files (#213) and has a new option to include
 (or not) the metadata in the text representation of the notebook.
 - Jupytext's contents manager class is derived dynamically from the default CM class for compatibility with
