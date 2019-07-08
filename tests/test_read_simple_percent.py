@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from nbformat.v4.nbbase import new_notebook, new_code_cell
-from testfixtures import compare
+from jupytext.compare import compare
 import jupytext
 
 

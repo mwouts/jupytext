@@ -1,6 +1,6 @@
 import mock
 import pytest
-from testfixtures import compare
+from jupytext.compare import compare
 import jupytext
 from .utils import skip_if_dict_is_not_ordered
 

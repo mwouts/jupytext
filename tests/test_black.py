@@ -1,7 +1,7 @@
 import os
 import pytest
 from shutil import copyfile
-from testfixtures import compare
+from jupytext.compare import compare
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 from .utils import list_notebooks, requires_black, requires_flake8, requires_autopep8
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from testfixtures import compare
+from jupytext.compare import compare
 import jupytext
 
 

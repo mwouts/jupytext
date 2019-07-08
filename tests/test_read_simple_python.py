@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from nbformat.v4.nbbase import new_markdown_cell, new_code_cell, new_notebook
-from testfixtures import compare
+from jupytext.compare import compare
 import jupytext
 from jupytext.compare import compare_notebooks
 
