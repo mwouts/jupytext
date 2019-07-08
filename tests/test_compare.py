@@ -1,6 +1,89 @@
 import pytest
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell, new_raw_cell
+from jupytext.compare import compare
 from jupytext.compare import compare_notebooks, NotebookDifference, test_round_trip_conversion as round_trip_conversion
+
+
+def notebook_metadata():
+    return {
+        "kernelspec": {
+            "display_name": "Python 3",
+            "language": "python",
+            "name": "python3"
+        },
+        "language_info": {
+            "codemirror_mode": {
+                "name": "ipython",
+                "version": 3
+            },
+            "file_extension": ".py",
+            "mimetype": "text/x-python",
+            "name": "python",
+            "nbconvert_exporter": "python",
+            "pygments_lexer": "ipython3",
+            "version": "3.7.3"
+        },
+        "toc": {
+            "base_numbering": 1,
+            "nav_menu": {},
+            "number_sections": True,
+            "sideBar": True,
+            "skip_h1_title": False,
+            "title_cell": "Table of Contents",
+            "title_sidebar": "Contents",
+            "toc_cell": False,
+            "toc_position": {},
+            "toc_section_display": True,
+            "toc_window_display": False
+        }
+    }
+
+
+@pytest.fixture()
+def notebook_1():
+    return new_notebook(
+        metadata=notebook_metadata(),
+        cells=[new_markdown_cell('First markdown cell'),
+               new_code_cell('1 + 1'),
+               new_markdown_cell('Second markdown cell')])
+
+
+@pytest.fixture()
+def notebook_2():
+    metadata = notebook_metadata()
+    metadata['language_info']['version'] = '3.6.8'
+    return new_notebook(
+        metadata=metadata,
+        cells=[new_markdown_cell('First markdown cell'),
+               new_code_cell('1 + 1'),
+               new_markdown_cell('Modified markdown cell')])
+
+
+def test_compare_on_notebooks(notebook_1, notebook_2):
+    with pytest.raises(AssertionError) as err:
+        compare(notebook_1, notebook_2)
+
+    assert str(err.value) == """
+--- first
++++ second
+@@ -15,7 +15,7 @@
+   {
+    "cell_type": "markdown",
+    "metadata": {},
+-   "source": "Second markdown cell"
++   "source": "Modified markdown cell"
+   }
+  ],
+  "metadata": {
+@@ -34,7 +34,7 @@
+    "name": "python",
+    "nbconvert_exporter": "python",
+    "pygments_lexer": "ipython3",
+-   "version": "3.7.3"
++   "version": "3.6.8"
+   },
+   "toc": {
+    "base_numbering": 1,"""
 
 
 def test_raise_on_different_metadata():
