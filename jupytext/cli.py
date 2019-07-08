@@ -324,7 +324,11 @@ def jupytext(args=None):
             # Read paired notebooks
             if args.sync:
                 set_prefix_and_suffix(fmt, notebook, nb_file)
-                notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
+                try:
+                    notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
+                except NotAPairedNotebook as err:
+                    sys.stderr.write('[jupytext] Warning: ' + str(err) + '\n')
+                    continue
 
             # II. ### Apply commands onto the notebook ###
             # Pipe the notebook into the desired commands
@@ -473,12 +477,17 @@ def set_prefix_and_suffix(fmt, notebook, nb_file):
                 continue
 
 
+class NotAPairedNotebook(ValueError):
+    """An error raised when a notebook is not a paired notebook"""
+    pass
+
+
 def load_paired_notebook(notebook, fmt, nb_file, log):
     """Update the notebook with the inputs and outputs of the most recent paired files"""
     formats = notebook.metadata.get('jupytext', {}).get('formats')
 
     if not formats:
-        raise ValueError("'{}' is not a paired notebook".format(nb_file))
+        raise NotAPairedNotebook("'{}' is not a paired notebook".format(nb_file))
 
     max_mtime_inputs = None
     max_mtime_outputs = None

@@ -590,16 +590,17 @@ def test_paired_paths(nb_file, tmpdir, capsys):
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
-def test_sync(nb_file, tmpdir):
+def test_sync(nb_file, tmpdir, capsys):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_py = str(tmpdir.join('notebook.py'))
     tmp_rmd = str(tmpdir.join('notebook.Rmd'))
     nb = read(nb_file)
     write(nb, tmp_ipynb)
 
-    # Test that sync fails when notebook is not paired
-    with pytest.raises(ValueError, match='is not a paired notebook'):
-        jupytext(['--sync', tmp_ipynb])
+    # Test that sync issues a warning when the notebook is not paired
+    jupytext(['--sync', tmp_ipynb])
+    _, err = capsys.readouterr()
+    assert 'is not a paired notebook' in err
 
     # Now with a pairing information
     nb.metadata.setdefault('jupytext', {})['formats'] = 'py,Rmd,ipynb'
@@ -641,15 +642,16 @@ def test_sync(nb_file, tmpdir):
 
 @requires_pandoc
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='(Notebook with|flavors)'))
-def test_sync_pandoc(nb_file, tmpdir):
+def test_sync_pandoc(nb_file, tmpdir, capsys):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_md = str(tmpdir.join('notebook.md'))
     nb = read(nb_file)
     write(nb, tmp_ipynb)
 
-    # Test that sync fails when notebook is not paired
-    with pytest.raises(ValueError, match='is not a paired notebook'):
-        jupytext(['--sync', tmp_ipynb])
+    # Test that sync issues a warning when the notebook is not paired
+    jupytext(['--sync', tmp_ipynb])
+    _, err = capsys.readouterr()
+    assert 'is not a paired notebook' in err
 
     # Now with a pairing information
     nb.metadata.setdefault('jupytext', {})['formats'] = 'ipynb,md:pandoc'
