@@ -1,5 +1,5 @@
 import pytest
-from testfixtures import compare
+from jupytext.compare import compare
 from nbformat.v4.nbbase import new_notebook
 import jupytext
 from jupytext.formats import guess_format, divine_format, read_format_from_metadata, rearrange_jupytext_metadata

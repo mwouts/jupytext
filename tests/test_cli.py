@@ -7,7 +7,7 @@ import pytest
 import nbformat
 import itertools
 from shutil import copyfile
-from testfixtures import compare
+from jupytext.compare import compare
 from argparse import ArgumentTypeError
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec

@@ -1,6 +1,6 @@
 from nbformat.v4.nbbase import new_notebook, new_raw_cell, new_markdown_cell
 import mock
-from testfixtures import compare
+from jupytext.compare import compare
 import jupytext
 from jupytext.header import uncomment_line, header_to_metadata_and_cell, metadata_and_cell_to_header
 from jupytext.formats import get_format_implementation

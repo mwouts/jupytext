@@ -1,7 +1,7 @@
 import pytest
 import mock
 from nbformat.v4.nbbase import new_code_cell, new_notebook
-from testfixtures import compare
+from jupytext.compare import compare
 from jupytext.magics import comment_magic, uncomment_magic, unesc, is_magic
 from jupytext.compare import compare_notebooks
 import jupytext

@@ -1,5 +1,5 @@
 from nbformat.v4.nbbase import new_notebook, new_code_cell, new_markdown_cell
-from testfixtures import compare
+from jupytext.compare import compare
 from jupytext import reads, writes
 from jupytext.combine import combine_inputs_with_outputs
 

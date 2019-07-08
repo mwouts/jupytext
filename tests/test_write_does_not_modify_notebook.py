@@ -1,6 +1,6 @@
 import pytest
 from copy import deepcopy
-from testfixtures import compare
+from jupytext.compare import compare
 from itertools import product
 from jupytext import read, write, writes
 from jupytext.formats import long_form_one_format

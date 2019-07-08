@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from testfixtures import compare
+from jupytext.compare import compare
 import jupytext
 
 

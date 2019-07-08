@@ -1,5 +1,5 @@
 import pytest
-from testfixtures import compare
+from jupytext.compare import compare
 from jupytext.cell_metadata import rmd_options_to_metadata, metadata_to_rmd_options, parse_rmd_options
 from jupytext.cell_metadata import _IGNORE_CELL_METADATA, RMarkdownOptionParsingError, try_eval_metadata
 from jupytext.cell_metadata import json_options_to_metadata, metadata_to_json_options

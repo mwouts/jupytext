@@ -8,7 +8,7 @@ import itertools
 import shutil
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from tornado.web import HTTPError
-from testfixtures import compare
+from jupytext.compare import compare
 import jupytext
 from jupytext.jupytext import writes, write, read
 from jupytext.compare import compare_notebooks
@@ -49,6 +49,51 @@ def test_rename_inconsistent_path(tmpdir):
 
     assert not os.path.isfile(new_file)
     assert os.path.isfile(org_file)
+
+
+def test_pair_unpair_notebook(tmpdir):
+    tmp_ipynb = 'notebook.ipynb'
+    tmp_md = 'notebook.md'
+
+    nb = new_notebook(
+        metadata={'kernelspec': {'display_name': 'Python3', 'language': 'python', 'name': 'python3'}},
+        cells=[new_code_cell('1 + 1', outputs=[
+            {
+                "data": {
+                    "text/plain": [
+                        "2"
+                    ]
+                },
+                "execution_count": 1,
+                "metadata": {},
+                "output_type": "execute_result"
+            }
+        ])])
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # save notebook
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    assert not os.path.isfile(str(tmpdir.join(tmp_md)))
+
+    # pair notebook
+    nb['metadata']['jupytext'] = {'formats': 'ipynb,md'}
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
+    assert os.path.isfile(str(tmpdir.join(tmp_md)))
+
+    # reload and get outputs
+    nb2 = cm.get(tmp_md)['content']
+    compare_notebooks(nb2, nb)
+
+    # unpair and save as md
+    del nb['metadata']['jupytext']
+    cm.save(model=dict(type='notebook', content=nb), path=tmp_md)
+    nb2 = cm.get(tmp_md)['content']
+
+    # we get no outputs here
+    compare_notebooks(nb2, nb, compare_outputs=False)
+    assert len(nb2.cells[0]['outputs']) == 0
 
 
 @skip_if_dict_is_not_ordered

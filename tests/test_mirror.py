@@ -8,7 +8,7 @@ import os
 import mock
 import pytest
 from nbformat.v4.nbbase import new_notebook
-from testfixtures import compare
+from jupytext.compare import compare
 
 import jupytext
 from jupytext.compare import compare_notebooks, combine_inputs_with_outputs

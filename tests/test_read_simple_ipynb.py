@@ -1,6 +1,6 @@
 import nbformat
 from nbformat.v4.nbbase import new_notebook
-from testfixtures import compare
+from jupytext.compare import compare
 import jupytext
 
 

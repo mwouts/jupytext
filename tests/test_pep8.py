@@ -1,5 +1,5 @@
 import pytest
-from testfixtures import compare
+from jupytext.compare import compare
 from jupytext import read, reads, writes
 from jupytext.pep8 import next_instruction_is_function_or_class, cell_ends_with_function_or_class
 from jupytext.pep8 import cell_ends_with_code, cell_has_code, pep8_lines_between_cells
