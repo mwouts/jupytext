@@ -1,8 +1,9 @@
 """Compare two Jupyter notebooks"""
 
 import re
+import json
+import difflib
 from copy import copy
-from testfixtures import compare
 from .cell_metadata import _IGNORE_CELL_METADATA
 from .header import _DEFAULT_NOTEBOOK_METADATA
 from .metadata_filter import filter_metadata
@@ -11,6 +12,22 @@ from .combine import combine_inputs_with_outputs
 from .formats import long_form_one_format
 
 _BLANK_LINE = re.compile(r'^\s*$')
+
+
+def _multilines(obj):
+    try:
+        return obj.splitlines()
+    except AttributeError:
+        return json.dumps(obj, indent=True, sort_keys=True).splitlines()
+
+
+def compare(actual, expected):
+    """Compare two strings, lists or dict-like objects"""
+    if actual != expected:
+        raise AssertionError('\n' + '\n'.join(difflib.unified_diff(
+            _multilines(actual),
+            _multilines(expected),
+            'first', 'second', lineterm='')))
 
 
 def filtered_cell(cell, preserve_outputs, cell_metadata_filter):
