@@ -16,7 +16,7 @@ Release History
 (or not) the metadata in the text representation of the notebook.
 - Jupytext's contents manager class is derived dynamically from the default CM class for compatibility with
 ``jupyter_server`` (#270)
-- Removed dependency on ``testfixtures`` (#279)
+- Removed dependency on ``mock`` and ``testfixtures``, thanks to Jean-Sebastien Dieu (#279)
 
 **BugFixes**
 
