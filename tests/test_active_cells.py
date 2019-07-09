@@ -45,7 +45,6 @@ ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
 
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_all(ext, header_insert_and_check_version_number_patch):
-    assert jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER == False
     nb = jupytext.reads(HEADER[ext] + ACTIVE_ALL[ext], ext)
     assert len(nb.cells) == 1
     compare(ACTIVE_ALL[ext], jupytext.writes(nb, ext))

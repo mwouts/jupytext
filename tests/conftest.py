@@ -1,4 +1,3 @@
-import jupytext
 import pytest
 try:
     import mock
