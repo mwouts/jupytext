@@ -1,3 +1,2 @@
 nbformat>=4.0.0
 pyyaml
-mock;python_version<"3"
