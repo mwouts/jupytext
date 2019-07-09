@@ -131,7 +131,7 @@ def test_markdown_image_is_not_magic():
     assert not is_magic('# ![Image name](image.png', 'python')
 
 
-def test_multiline_python_magic(header_insert_and_check_version_number_patch):
+def test_multiline_python_magic(no_jupytext_version_number):
     nb = new_notebook(cells=[new_code_cell("""%load_ext watermark
 %watermark -u -n -t -z \\
     -p jupytext -v

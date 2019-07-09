@@ -26,7 +26,7 @@ def test_rmd_notebooks_are_trusted(nb_file):
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='hash sign'))
-def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir, header_insert_and_check_version_number_patch):
+def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir, no_jupytext_version_number):
     cm = TextFileContentsManager()
     root, file = os.path.split(nb_file)
     tmp_ipynb = str(tmpdir.join(file))
@@ -72,7 +72,7 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir, header_insert_and_check
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='hash sign'))
 def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(nb_file, tmpdir,
-                                                                  header_insert_and_check_version_number_patch):
+                                                                  no_jupytext_version_number):
     cm = TextFileContentsManager()
     root, file = os.path.split(nb_file)
     tmp_ipynb = str(tmpdir.join(file))

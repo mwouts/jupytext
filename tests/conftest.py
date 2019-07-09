@@ -7,8 +7,6 @@ except ImportError:
 
 
 @pytest.fixture
-def header_insert_and_check_version_number_patch():
-    m = mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False)
-    m.start()
-    yield m
-    m.stop()
+def no_jupytext_version_number():
+    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
+        yield

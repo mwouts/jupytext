@@ -1,7 +1,3 @@
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from jupytext.compare import compare
 import jupytext
@@ -302,7 +298,7 @@ nor be split into two pieces."""
     assert len(nb.cells) == 1
 
 
-def test_read_markdown_idl(text='''---
+def test_read_markdown_idl(no_jupytext_version_number, text='''---
 jupyter:
   kernelspec:
     display_name: IDL [conda env:gdl] *
@@ -321,13 +317,11 @@ a = 1
     assert nb.cells[1].cell_type == 'code'
     assert nb.cells[1].source == 'a = 1'
 
-    nb.metadata.pop('jupytext')
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-        text2 = jupytext.writes(nb, 'md')
+    text2 = jupytext.writes(nb, 'md')
     compare(text, text2)
 
 
-def test_read_markdown_IDL(text='''---
+def test_read_markdown_IDL(no_jupytext_version_number, text='''---
 jupyter:
   kernelspec:
     display_name: IDL [conda env:gdl] *
@@ -346,7 +340,5 @@ a = 1
     assert nb.cells[1].cell_type == 'code'
     assert nb.cells[1].source == 'a = 1'
 
-    nb.metadata.pop('jupytext')
-    with mock.patch('jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER', False):
-        text2 = jupytext.writes(nb, 'md')
+    text2 = jupytext.writes(nb, 'md')
     compare(text.replace('```IDL', '```idl'), text2)

@@ -67,7 +67,7 @@ title: Sample header
     assert pos == len(lines)
 
 
-def test_metadata_and_cell_to_header(header_insert_and_check_version_number_patch):
+def test_metadata_and_cell_to_header(no_jupytext_version_number):
     metadata = {'jupytext': {'mainlanguage': 'python'}}
     nb = new_notebook(
         metadata=metadata,
@@ -83,7 +83,7 @@ jupyter:
     assert lines_to_next_cell is None
 
 
-def test_metadata_and_cell_to_header2(header_insert_and_check_version_number_patch):
+def test_metadata_and_cell_to_header2(no_jupytext_version_number):
     nb = new_notebook(cells=[new_markdown_cell(source="Some markdown\ntext")])
     header, lines_to_next_cell = metadata_and_cell_to_header(nb, {}, get_format_implementation('.md'), '.md')
     assert header == []
