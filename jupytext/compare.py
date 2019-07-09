@@ -18,7 +18,9 @@ def _multilines(obj):
     try:
         return obj.splitlines()
     except AttributeError:
-        return json.dumps(obj, indent=True, sort_keys=True).splitlines()
+        # Remove the final blank space on Python 2.7
+        # return json.dumps(obj, indent=True, sort_keys=True).splitlines()
+        return [line.rstrip() for line in json.dumps(obj, indent=True, sort_keys=True).splitlines()]
 
 
 def compare(actual, expected):
