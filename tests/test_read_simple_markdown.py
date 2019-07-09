@@ -1,7 +1,7 @@
 try:
-    import mock
-except ImportError:
     import unittest.mock as mock
+except ImportError:
+    import mock
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from jupytext.compare import compare
 import jupytext

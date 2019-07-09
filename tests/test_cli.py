@@ -2,10 +2,11 @@ import os
 import sys
 import time
 import stat
+
 try:
-    import mock
-except ImportError:
     import unittest.mock as mock
+except ImportError:
+    import mock
 import pytest
 import nbformat
 import itertools

@@ -1,8 +1,9 @@
 import pytest
+
 try:
-    import mock
-except ImportError:
     import unittest.mock as mock
+except ImportError:
+    import mock
 
 
 @pytest.fixture
