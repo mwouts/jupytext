@@ -56,7 +56,7 @@ To disable global pairing for an individual notebook, set formats to a single fo
 
 ## Metadata filtering
 
-You can specify which metadata to include or exclude in the text files created by Jupytext by setting `c.ContentsManager.default_notebook_metadata_filter` (notebook metadata) and `c.ContentsManager.default_cell_metadata_filter` (cell metadata). They accept a string of comma separated keywords. A minus sign `-` in font of a keyword means exclusion.
+You can specify which metadata to include or exclude in the text files created by Jupytext by setting `c.ContentsManager.default_notebook_metadata_filter` (notebook metadata) and `c.ContentsManager.default_cell_metadata_filter` (cell metadata). They accept a string of comma separated keywords. A minus sign `-` in front of a keyword means exclusion.
 
 Suppose you want to keep all the notebook metadata but `widgets` and `varInspector` in the YAML header. For cell metadata, you want to allow `ExecuteTime` and `autoscroll`, but not `hide_output`. You can set
 ```python
