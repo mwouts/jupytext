@@ -53,6 +53,12 @@ jupytext --to ipynb --execute *.md              # convert all .md files to noteb
 jupytext --set-formats ipynb,md --execute *.md  # convert all .md files to paired notebooks and execute them
 ```
 
+## I want a specific cell to be commented out in the paired script
+
+Mark a code cell with an `"active": "ipynb"` metadata or with an `active-ipynb` tag if you want it to be commented out in the paired script.
+
+Mark a raw cell with an `"active": "py"` metadata or with an `active-py` tag if you want it to be inactive in the notebook but active in the script.
+
 ## Which files should I version control?
 
 Unless you want to version the outputs, you should version *only the text representation*. The paired `.ipynb` file can safely be deleted. It will be recreated locally the next time you open the notebook (from the text file) and save it.
@@ -95,7 +101,9 @@ jupytext --sync notebook.ipynb                         # Sync the two representa
 
 ## Can I re-write my git history to use text files instead of notebooks?
 
-Indeed! You can substitute every `.ipynb` file in the project history with its Jupytext Markdown representation using e.g.:
+Indeed, you could substitute every `.ipynb` file in the project history with its Jupytext Markdown representation.
+
+Technically this is available in just one command, which results in a complete rewrite of the history. Please experiment that in a branch, and think twice before pushing the result...
 ```bash
 git filter-branch --tree-filter 'jupytext --to md */*.ipynb && rm -f */*.ipynb' HEAD
 ```
