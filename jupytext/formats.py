@@ -57,6 +57,15 @@ JUPYTEXT_FORMATS = \
             min_readable_version_number='1.0'),
 
         NotebookFormatDescription(
+            format_name='markdown',
+            extension='.markdown',
+            header_prefix='',
+            cell_reader_class=MarkdownCellReader,
+            cell_exporter_class=MarkdownCellExporter,
+            current_version_number='1.1',
+            min_readable_version_number='1.0'),
+
+        NotebookFormatDescription(
             format_name='rmarkdown',
             extension='.Rmd',
             header_prefix='',
