@@ -1473,6 +1473,24 @@ def test_notebook_extensions(tmpdir):
     assert model['type'] == 'file'
 
 
+def test_markdown_and_r_extensions(tmpdir):
+    tmp_r = str(tmpdir.join('script.r'))
+    tmp_markdown = str(tmpdir.join('notebook.markdown'))
+
+    nb = new_notebook()
+    write(nb, tmp_r)
+    write(nb, tmp_markdown)
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    model = cm.get('script.r')
+    assert model['type'] == 'notebook'
+
+    model = cm.get('notebook.markdown')
+    assert model['type'] == 'notebook'
+
+
 def test_server_extension_issubclass():
     class SubClassTextFileContentsManager(jupytext.TextFileContentsManager):
         pass
