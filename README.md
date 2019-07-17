@@ -115,7 +115,7 @@ jupytext --to py notebook.ipynb                 # convert notebook.ipynb to a .p
 jupytext --to notebook notebook.py              # convert notebook.py to an .ipynb file with no outputs
 jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipynb file and run it 
 jupytext --update --to notebook notebook.py     # update the input cells in the .ipynb file and preserve outputs and metadata
-jupytext --set-formats --ipynb,py notebook.ipynb  # Turn notebook.ipynb into a paired ipynb/py notebook
+jupytext --set-formats ipynb,py notebook.ipynb  # Turn notebook.ipynb into a paired ipynb/py notebook
 jupytext --sync notebook.ipynb                  # Update all paired representations of notebook.ipynb
 ```
 

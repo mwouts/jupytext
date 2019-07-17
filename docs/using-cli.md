@@ -22,7 +22,7 @@ jupytext --from ipynb --to py:percent           # read ipynb from stdin and writ
 
 Jupytext has a `--sync` mode that updates all the paired representations of a notebook based on timestamps: 
 ```bash
-jupytext --set-formats --ipynb,py notebook.ipynb  # Turn notebook.ipynb into a paired ipynb/py notebook
+jupytext --set-formats ipynb,py notebook.ipynb  # Turn notebook.ipynb into a paired ipynb/py notebook
 jupytext --sync notebook.ipynb                    # Update whichever of notebook.ipynb/notebook.py is outdated
 ```
 
