@@ -1,4 +1,4 @@
-import { JupyterLab, JupyterLabPlugin } from "@jupyterlab/application";
+import { JupyterFrontEnd, JupyterFrontEndPlugin } from "@jupyterlab/application";
 
 import { ICommandPalette } from "@jupyterlab/apputils";
 
@@ -43,15 +43,41 @@ const JUPYTEXT_FORMATS = [
   }
 ];
 
+function get_selected_format(notebook_tracker: INotebookTracker): string {
+  if (!notebook_tracker.currentWidget) return null;
+
+  if (
+    !notebook_tracker.currentWidget.context.model.metadata.has(
+      "jupytext"
+    )
+  )
+    return "none";
+
+  const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
+    "jupytext"
+  ) as unknown) as JupytextSection;
+  if (!jupytext.formats) return "none";
+
+  const lang = notebook_tracker.currentWidget.context.model.metadata.get(
+    "language_info"
+  ) as nbformat.ILanguageInfoMetadata;
+  return lang
+    ? jupytext.formats.replace(
+      "," + lang.file_extension.substring(1) + ":",
+      ",auto:"
+    )
+    : jupytext.formats;
+};
+
 /**
  * Initialization data for the jupyterlab-jupytext extension.
  */
-const extension: JupyterLabPlugin<void> = {
+const extension: JupyterFrontEndPlugin<void> = {
   id: "jupyterlab-jupytext",
   autoStart: true,
   requires: [ICommandPalette, INotebookTracker],
   activate: (
-    app: JupyterLab,
+    app: JupyterFrontEnd,
     palette: ICommandPalette,
     notebook_tracker: INotebookTracker
   ) => {
@@ -65,33 +91,13 @@ const extension: JupyterLabPlugin<void> = {
         label: args["label"],
         isToggled: () => {
           if (!notebook_tracker.currentWidget) return false;
-
-          if (
-            !notebook_tracker.currentWidget.context.model.metadata.has(
-              "jupytext"
-            )
-          )
-            return formats == "none";
-
-          const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
-            "jupytext"
-          ) as unknown) as JupytextSection;
-          if (!jupytext.formats) return formats == "none";
-
-          const lang = notebook_tracker.currentWidget.context.model.metadata.get(
-            "language_info"
-          ) as nbformat.ILanguageInfoMetadata;
-          const jupytext_formats = lang
-            ? jupytext.formats.replace(
-              "," + lang.file_extension.substring(1) + ":",
-              ",auto:"
-            )
-            : jupytext.formats;
+          const jupytext_formats = get_selected_format(notebook_tracker)
 
           if (formats == "custom")
             return (
               jupytext_formats &&
               [
+                "none",
                 "ipynb,auto:light",
                 "ipynb,auto:percent",
                 "ipynb,auto:hydrogen",
@@ -117,6 +123,11 @@ const extension: JupyterLabPlugin<void> = {
           return formats != "ipynb,md" && formats != "ipynb,Rmd";
         },
         execute: () => {
+          const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
+            "jupytext"
+          ) as unknown) as JupytextSection;
+          const jupytext_formats = get_selected_format(notebook_tracker);
+          const target_format = jupytext_formats === formats ? "none": formats;
           console.log("Jupytext: executing command=" + command);
           if (formats == "custom") {
             alert(
@@ -125,11 +136,7 @@ const extension: JupyterLabPlugin<void> = {
             return;
           }
 
-          const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
-            "jupytext"
-          ) as unknown) as JupytextSection;
-
-          if (formats == "none") {
+          if (target_format == "none") {
             if (
               !notebook_tracker.currentWidget.context.model.metadata.has(
                 "jupytext"
@@ -148,12 +155,12 @@ const extension: JupyterLabPlugin<void> = {
             return;
           }
 
-          // set desired format
-          if (jupytext) jupytext.formats = formats;
+          // set the desired format
+          if (jupytext) jupytext.formats = target_format;
           else
             notebook_tracker.currentWidget.context.model.metadata.set(
               "jupytext",
-              { formats }
+              { target_format }
             );
         }
       });
