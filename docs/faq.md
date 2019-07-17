@@ -95,7 +95,9 @@ jupytext --sync notebook.ipynb                         # Sync the two representa
 
 ## Can I re-write my git history to use text files instead of notebooks?
 
-Indeed! You can substitute every `.ipynb` file in the project history with its Jupytext Markdown representation using e.g.:
+Indeed, you could substitute every `.ipynb` file in the project history with its Jupytext Markdown representation.
+
+Technically this is available in just one command, which results in a complete rewrite of the history. Please experiment that in a branch, and think twice before pushing the result...
 ```bash
 git filter-branch --tree-filter 'jupytext --to md */*.ipynb && rm -f */*.ipynb' HEAD
 ```
