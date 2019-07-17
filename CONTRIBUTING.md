@@ -36,7 +36,7 @@ A pull request for which you do not need to contact us in advance is the additio
 Most of Jupytext's code is written in Python. To develop the Python part of Jupytext, you should clone Jupytext, then create a dedicated Python env:
 ```
 cd jupytext
-conda create -n jupytext-dev python=3.6 notebook mock pyyaml
+conda create -n jupytext-dev jupyterlab pyyaml
 conda activate jupytext-dev
 pip install -r requirements*.txt
 ```
