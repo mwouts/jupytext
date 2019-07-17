@@ -13,26 +13,32 @@ define([
 ) {
     "use strict";
 
-    function checkSelectedJupytextFormat() {
-
+    function getSelectedJupytextFormat() {
         var formats = Jupyter.notebook.metadata.jupytext ? Jupyter.notebook.metadata.jupytext.formats : null;
         if (!formats)
-            formats = 'none';
+            return 'none';
 
         if (Jupyter.notebook.metadata.language_info) {
             var script_ext = Jupyter.notebook.metadata.language_info.file_extension;
 
             if (formats === 'ipynb,' + script_ext.substring(1) + ':light')
-                formats = 'ipynb,auto:light';
+                return 'ipynb,auto:light';
             else if (formats === 'ipynb,' + script_ext.substring(1) + ':percent')
-                formats = 'ipynb,auto:percent';
+                return 'ipynb,auto:percent';
             else if (formats === 'ipynb,' + script_ext.substring(1) + ':hydrogen')
-                formats = 'ipynb,auto:hydrogen';
-            else if (!['ipynb,auto:light', 'ipynb,auto:percent', 'ipynb,auto:hydrogen',
-                'ipynb,md', 'ipynb,Rmd', 'none'].includes(formats))
-                formats = 'custom';
+                return 'ipynb,auto:hydrogen';
         }
 
+        if (!['ipynb,auto:light', 'ipynb,auto:percent', 'ipynb,auto:hydrogen',
+            'ipynb,md', 'ipynb,Rmd', 'none'].includes(formats))
+            return 'custom';
+
+        return formats;
+    }
+
+    function checkSelectedJupytextFormat() {
+
+        var formats = getSelectedJupytextFormat();
         console.log('Jupytext.formats=' + formats);
 
         $('[id^=jupytext_pair_]' + '>.fa').toggleClass('fa-check', false);
@@ -67,16 +73,16 @@ define([
             alert("Please use the notebook metadata editor for this (Menu: Edit/Edit Notebook Metadata).");
             return;
         }
+        if (formats === getSelectedJupytextFormat()) {
+            formats = 'none';
+        }
+
         if (formats === 'none') {
             if (!Jupyter.notebook.metadata.jupytext)
                 return;
-        } else if (Jupyter.notebook.metadata.jupytext && formats === Jupyter.notebook.metadata.jupytext.formats)
-            formats = 'none';
-
-        if (formats === 'none') {
             if (Jupyter.notebook.metadata.jupytext.formats)
                 delete Jupyter.notebook.metadata.jupytext['formats'];
-            if (Jupyter.notebook.metadata.jupytext === {})
+            if (Object.keys(Jupyter.notebook.metadata.jupytext).length === 0)
                 delete Jupyter.notebook.metadata['jupytext'];
         } else {
             if (!Jupyter.notebook.metadata.jupytext)
@@ -103,7 +109,7 @@ define([
                 delete Jupyter.notebook.metadata.jupytext['notebook_metadata_filter'];
                 if (Jupyter.notebook.metadata.jupytext.cell_metadata_filter === "-all")
                     delete Jupyter.notebook.metadata.jupytext['cell_metadata_filter'];
-                if (Jupyter.notebook.metadata.jupytext === {})
+                if (Object.keys(Jupyter.notebook.metadata.jupytext).length === 0)
                     delete Jupyter.notebook.metadata['jupytext'];
             }
         }
