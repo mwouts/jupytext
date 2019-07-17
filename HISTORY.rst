@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-1.2.0 (2019-07-??)
+1.2.0 (2019-07-18)
 ++++++++++++++++++++++
 
 **Improvements**
@@ -17,12 +17,14 @@ Release History
 - Jupytext's contents manager class is derived dynamically from the default CM class for compatibility with
 ``jupyter_server`` (#270)
 - Removed dependency on ``mock`` and ``testfixtures``, thanks to Jean-Sebastien Dieu (#279)
+- Added support for `.markdown` extension (#288)
 
 **BugFixes**
 
-- The ``jupyterlab-jupytext`` extension shipped with the python package is in version 1.0, and is compatible only
+- The ``jupyterlab-jupytext`` extension shipped with the python package is in version 1.0.1, and is compatible only
 with JupyterLab >= 1.0. If you use an earlier version of JupyterLab, please install the version 0.19 of the extension
 with ``jupyter labextension install jupyterlab-jupytext@0.19`` (#276, #278)
+- Text files can be unpaired (#289)
 
 
 1.1.7 (2019-06-23)
