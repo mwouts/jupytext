@@ -283,8 +283,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
         def get(self, path, content=True, type=None, format=None, load_alternative_format=True):
             """ Takes a path for an entity and returns its model"""
-            path = path.strip('/')
-            os_path = self._get_os_path(path)
+            os_path = self._get_os_path(path.strip('/'))
             ext = os.path.splitext(path)[1]
 
             # Not a notebook?
