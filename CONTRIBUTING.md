@@ -38,14 +38,16 @@ Most of Jupytext's code is written in Python. To develop the Python part of Jupy
 cd jupytext
 conda create -n jupytext-dev jupyterlab pyyaml
 conda activate jupytext-dev
-pip install -r requirements*.txt
+pip install -r requirements.txt -r requirements-dev.txt
 ```
 
-Tests are executed with `pytest` (install `pytest-xdist` and then run `pytest -n 3` if you want them to run in parallel). If you develop `jupytext` command line, you can install Jupytext in dev mode with
+Tests are executed with `pytest`. Install `pytest-xdist` to allow running the tests in parallel:
 ```
-pip install -e .
-````
-If you also need the Jupytext extensions for Jupyter, then it is better to build the package in full, and install it with
+pip install pytest-xdist
+pytest -n 5
+``` 
+
+Build the `jupytext` package and install it with
 ```
 python setup.py sdist bdist_wheel
 pip install dist/jupytext-XXX.tar.gz
