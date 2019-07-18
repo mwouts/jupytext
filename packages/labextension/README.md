@@ -32,7 +32,7 @@ In that environment, install JupyterLab's plugin manager, and the extension with
 cd packages/labextension
 
 # Cleanup
-rm lib node_modules yarn.lock
+rm -rf lib node_modules yarn.lock
 
 # Install JupyterLab's plugin manager
 jlpm install
