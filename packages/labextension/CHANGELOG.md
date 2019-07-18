@@ -1,3 +1,7 @@
+# 1.0.2 (2019-07-18)
+
+- Fixed an incorrect `target_format` entry inserted by the version 1.0.1 of the extension.
+
 # 1.0.1 (2019-07-18)
 
 - A click on a selected format toggle the pairing (#289)

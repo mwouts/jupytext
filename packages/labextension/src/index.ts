@@ -160,7 +160,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           else
             notebook_tracker.currentWidget.context.model.metadata.set(
               "jupytext",
-              { target_format }
+              { formats: target_format }
             );
         }
       });
