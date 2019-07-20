@@ -70,6 +70,34 @@ git reset HEAD **/*.ipynb
 ```
 Note that these hooks do not update the `.ipynb` notebook when you pull. Make sure to either run `jupytext` in the other direction, or to use our paired notebook and our contents manager for Jupyter. Also, Jupytext does not offer a merge driver. If a conflict occurs, solve it on the text representation and then update or recreate the `.ipynb` notebook. Or give a try to nbdime and its [merge driver](https://nbdime.readthedocs.io/en/stable/vcs.html#merge-driver).
 
+## Using Jupytext with the pre-commit package manager
+
+Using Jupytext with the [pre-commit package manager](https://pre-commit.com/) is another option. You could add the following to your `.pre-commit-config.yaml` file:
+```
+repos:
+-   repo: local
+    hooks:
+    - id: jupytext
+      name: jupytext
+      entry: jupytext --to md
+      files: .ipynb
+      language: python
+```
+
+Alternatively, you could also create your own pre-commit hook. A sample `jupytext_hook.py` script could be
+
+```python
+import sys
+import pathlib
+import jupytext
+
+nbfile = pathlib.Path(sys.argv[1])
+mdfile = nbfile.with_suffix(".md")
+
+nb = jupytext.read(nbfile)
+jupytext.write(nb, mdfile)
+```
+
 ## Testing the round-trip conversion
 
 Representing Jupyter notebooks as scripts requires a solid round trip conversion. You don't want your notebooks (nor your scripts) to be modified because you are converting them to the other form. Our test suite includes a few hundred tests to ensure that round trip conversion is safe.
