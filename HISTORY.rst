@@ -8,8 +8,9 @@ Release History
 
 **Improvements**
 
-- Documented how to use Jupytext with JupyterLab 0.35 (#299)
-- Improved the usability of `read` and `write` functions (#292)
+- Added documentation on how to use Jupytext with JupyterLab 0.35 (#299)
+- and on using Jupytext with the pre-commit package manager (#292)
+- The `read` and `write` functions are easier to use (#292)
 
 **BugFixes**
 
