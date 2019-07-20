@@ -10,6 +10,11 @@ Release History
 
 - Documented how to use Jupytext with JupyterLab 0.35 (#299)
 
+**BugFixes**
+
+- Jupytext now ships the ``jupyterlab-jupytext`` extension in version 1.0.2. The version 1.0.1 erroneously introduces a `target_formats` metadata in the jupytext section, instead of `formats`, and works only after two clicks.
+
+
 1.2.0 (2019-07-18)
 ++++++++++++++++++++++
 
