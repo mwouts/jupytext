@@ -191,7 +191,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
 def reads(text, fmt, as_version=4, **kwargs):
     """Read a notebook from a string"""
-    fmt = copy(fmt)
+    fmt = copy(fmt) if fmt else divine_format(text)
     fmt = long_form_one_format(fmt)
     ext = fmt['extension']
 
@@ -224,21 +224,21 @@ def read(fp, as_version=4, fmt=None, **kwargs):
     """Read a notebook from a file"""
     if fp == '-':
         text = sys.stdin.read()
-        fmt = fmt or divine_format(text)
         return reads(text, fmt)
 
-    if isinstance(fp, (py3compat.unicode_type, bytes)):
-        _, ext = os.path.splitext(fp)
+    if not hasattr(fp, 'read'):
+        _, ext = os.path.splitext(str(fp))
         fmt = copy(fmt or {})
         fmt.update({'extension': ext})
         with io.open(fp, encoding='utf-8') as stream:
             return read(stream, as_version=as_version, fmt=fmt, **kwargs)
 
-    fmt = long_form_one_format(fmt)
-    if fmt['extension'] == '.ipynb':
-        notebook = nbformat.read(fp, as_version, **kwargs)
-        rearrange_jupytext_metadata(notebook.metadata)
-        return notebook
+    if fmt is not None:
+        fmt = long_form_one_format(fmt)
+        if fmt['extension'] == '.ipynb':
+            notebook = nbformat.read(fp, as_version, **kwargs)
+            rearrange_jupytext_metadata(notebook.metadata)
+            return notebook
 
     return reads(fp.read(), fmt, **kwargs)
 
@@ -283,8 +283,9 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
         write(nb, sys.stdout, version=version, fmt=fmt, **kwargs)
         return
 
-    if isinstance(fp, (py3compat.unicode_type, bytes)):
+    if not hasattr(fp, 'write'):
         fmt = copy(fmt or {})
+        fp = str(fp)
         _, ext = os.path.splitext(fp)
         fmt = long_form_one_format(fmt, update={'extension': ext})
         create_prefix_dir(fp, fmt)

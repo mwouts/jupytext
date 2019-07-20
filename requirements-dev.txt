@@ -5,3 +5,6 @@ codecov
 notebook
 jupyter_client
 nbconvert
+
+# Python 2
+pathlib
