@@ -89,6 +89,11 @@ The Jupytext extension for JupyterLab is bundled with Jupytext. Installing Jupyt
 jupyter lab build
 ```
 
+The version of the extension that is shipped with Jupytext requires JupyterLab 1.0. If you prefer to continue using JupyterLab in version 0.35, you should install the version 0.19 of the extension:
+```
+jupyter labextension install jupyterlab-jupytext@0.19
+``` 
+
 ## Using Jupytext
 
 ### Paired notebooks in the Jupyter Server

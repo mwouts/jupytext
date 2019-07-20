@@ -3,6 +3,13 @@
 Release History
 ---------------
 
+1.2.1 (2019-07-20)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Documented how to use Jupytext with JupyterLab 0.35 (#299)
+
 1.2.0 (2019-07-18)
 ++++++++++++++++++++++
 
