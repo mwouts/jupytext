@@ -242,7 +242,9 @@ def read(fp, as_version=4, fmt=None, **kwargs):
         return reads(text, fmt)
 
     if not hasattr(fp, 'read'):
-        _, ext = os.path.splitext(str(fp))
+        # Treat fp as a file name
+        fp = str(fp)
+        _, ext = os.path.splitext(fp)
         fmt = copy(fmt or {})
         fmt.update({'extension': ext})
         with io.open(fp, encoding='utf-8') as stream:
@@ -315,9 +317,10 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
         return
 
     if not hasattr(fp, 'write'):
-        fmt = copy(fmt or {})
+        # Treat fp as a file name
         fp = str(fp)
         _, ext = os.path.splitext(fp)
+        fmt = copy(fmt or {})
         fmt = long_form_one_format(fmt, update={'extension': ext})
         create_prefix_dir(fp, fmt)
 
