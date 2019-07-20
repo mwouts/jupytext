@@ -6,7 +6,6 @@ import sys
 import logging
 import warnings
 from copy import copy, deepcopy
-from ipython_genutils import py3compat
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell, NotebookNode
 import nbformat
