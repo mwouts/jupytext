@@ -190,7 +190,15 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
 
 def reads(text, fmt, as_version=4, **kwargs):
-    """Read a notebook from a string"""
+    """
+    Read a notebook from a string
+
+    :param text: the text representation of the notebook
+    :param fmt: (optional) the jupytext format like `md`, `py:percent`, ...
+    :param as_version: see nbformat.reads
+    :param kwargs: (not used) additional parameters for nbformat.reads
+    :return: the notebook
+    """
     fmt = copy(fmt) if fmt else divine_format(text)
     fmt = long_form_one_format(fmt)
     ext = fmt['extension']
@@ -221,7 +229,15 @@ def reads(text, fmt, as_version=4, **kwargs):
 
 
 def read(fp, as_version=4, fmt=None, **kwargs):
-    """Read a notebook from a file"""
+    """"
+    Read a notebook from a file name or a file object
+
+    :param fp: a file name or a file object
+    :param as_version: see nbformat.read
+    :param fmt: (optional) the jupytext format like `md`, `py:percent`, ...
+    :param kwargs: (not used) additional parameters for nbformat.read
+    :return: the notebook
+    """
     if fp == '-':
         text = sys.stdin.read()
         return reads(text, fmt)
@@ -244,7 +260,15 @@ def read(fp, as_version=4, fmt=None, **kwargs):
 
 
 def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
-    """Write a notebook to a string"""
+    """"
+    Write a notebook to a file name or a file object
+
+    :param notebook: the notebook
+    :param fmt: the jupytext format like `md`, `py:percent`, ...
+    :param version: see nbformat.writes
+    :param kwargs: (not used) additional parameters for nbformat.writes
+    :return: the text representation of the notebook
+    """
     metadata = deepcopy(notebook.metadata)
     rearrange_jupytext_metadata(metadata)
     fmt = copy(fmt)
@@ -278,7 +302,15 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
 
 
 def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
-    """Write a notebook to a file"""
+    """"
+    Write a notebook to a file name or a file object
+
+    :param nb: the notebook
+    :param fp: a file name or a file object
+    :param version: see nbformat.write
+    :param fmt: (optional if fp is a file name) the jupytext format like `md`, `py:percent`, ...
+    :param kwargs: (not used) additional parameters for nbformat.write
+    """
     if fp == '-':
         write(nb, sys.stdout, version=version, fmt=fmt, **kwargs)
         return
