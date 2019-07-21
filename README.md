@@ -128,4 +128,4 @@ For more examples, see the [jupytext documentation](https://jupytext.readthedocs
 
 ## Want to contribute?
 
-Contributions are welcome. Please let us know how you use `jupytext` and how we could improve it. You think the documentation could be improved? Go ahead! Read our [`CONTRIBUTING.md`](CONTRIBUTING.md) to find out guidelines and instructions on how to setup a development environment. And stay tuned for more demos on [medium](https://medium.com/@marc.wouts) and [twitter](https://twitter.com/marcwouts)!
+Contributions are welcome. Please let us know how you use `jupytext` and how we could improve it. You think the documentation could be improved? Go ahead and edit it on [GitHub](https://github.com/mwouts/jupytext/tree/master/docs)! Read our [`CONTRIBUTING.md`](CONTRIBUTING.md) to find out guidelines and instructions on how to setup a development environment. And stay tuned for more demos on [medium](https://medium.com/@marc.wouts) and [twitter](https://twitter.com/marcwouts)!
