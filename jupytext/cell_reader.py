@@ -5,9 +5,10 @@ import json
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from .languages import _SCRIPT_EXTENSIONS
 
+# Sphinx Gallery is an optional dependency. And we intercept the SyntaxError for #301
 try:
     from sphinx_gallery.notebook import rst2md
-except ImportError:
+except (ImportError, SyntaxError):
     rst2md = None
 
 from .cell_metadata import is_active, json_options_to_metadata, md_options_to_metadata, rmd_options_to_metadata, \
