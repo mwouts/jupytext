@@ -53,6 +53,12 @@ If you want to use Jupytext within Jupyter Notebook or JupyterLab, make sure you
 /path_to_your_jupyter_environment/python -m pip install jupytext --upgrade --user
 ```
 
+Then, enable the Jupytext extension in Jupyter Lab and/or Jupyter Notebook:
+
+```
+jupyter serverextension enable jupytext
+```
+
 ### Jupytext's contents manager
 
 Jupytext includes a contents manager for Jupyter that allows Jupyter to open and save notebooks as text files. When Jupytext's content manager is active in Jupyter, scripts and Markdown documents have a notebook icon.
@@ -87,12 +93,6 @@ In JupyterLab, Jupytext adds a set of commands to the command palette:
 The Jupytext extension for JupyterLab is bundled with Jupytext. Installing Jupytext will trigger a build of JupyterLab the next time you open it. If you prefer, you can trigger the build manually with
 ```
 jupyter lab build
-```
-
-You may also need to manually enable the Jupytext extension in Jupyter Lab:
-
-```
-jupyter serverextension enable jupytext
 ```
 
 The version of the extension that is shipped with Jupytext requires JupyterLab 1.0. If you prefer to continue using JupyterLab in version 0.35, you should install the version 0.19 of the extension:
