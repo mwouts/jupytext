@@ -84,18 +84,25 @@ repos:
       language: python
 ```
 
-Alternatively, you could also create your own pre-commit hook. A sample `jupytext_hook.py` script could be
+Here is another `.pre-commit-config.yaml` example that uses the --pre-commit mode of Jupytext to convert all `.ipynb` notebooks to `py:light` representation and unstage the `.ipynb` files before committing.
+```
+repos:
+  -
+    repo: local
+    hooks:
+      -
+        id: jupytext
+        name: jupytext
+        entry: jupytext --from ipynb --to py:light --pre-commit
+        pass_filenames: false
+        language: python
+      -
+        id: unstage-ipynb
+        name: unstage-ipynb
+        entry: git reset HEAD **/*.ipynb
+        pass_filenames: false
+        language: system
 
-```python
-import sys
-import pathlib
-import jupytext
-
-nbfile = pathlib.Path(sys.argv[1])
-mdfile = nbfile.with_suffix(".md")
-
-nb = jupytext.read(nbfile)
-jupytext.write(nb, mdfile)
 ```
 
 ## Testing the round-trip conversion
