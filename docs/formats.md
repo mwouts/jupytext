@@ -65,10 +65,11 @@ to your `.jupyter/jupyter_notebook_config.py` file.
 
 The `percent` format is a representation of Jupyter notebooks as scripts, in which cells are delimited with a commented double percent sign `# %%`. The format was introduced by Spyder five years ago, and is now supported by many editors, including
 - [Spyder IDE](https://docs.spyder-ide.org/editor.html#defining-code-cells),
-- [Hydrogen](https://atom.io/packages/hydrogen), a package for Atom,
-- [VS Code](https://code.visualstudio.com/),
-- [Python Tools for Visual Studio](https://github.com/Microsoft/PTVS),
-- and [PyCharm Professional](https://www.jetbrains.com/pycharm/).
+- [Hydrogen](https://nteract.gitbooks.io/hydrogen/docs/Usage/NotebookFiles.html#notebook-export), a package for Atom,
+- [VS
+  Code](https://code.visualstudio.com/docs/python/jupyter-support#_jupyter-code-cells),
+- [Python Tools for Visual Studio](https://docs.microsoft.com/en-us/visualstudio/python/python-interactive-repl-in-visual-studio?view=vs-2019#send-to-interactive-command),
+- and [PyCharm Professional](https://www.jetbrains.com/help/pycharm/editing-jupyter-notebook-files.html#edit-content).
 
 Our implementation of the `percent` format is compatible with the original specifications by Spyder. We extended the format to allow markdown cells and cell metadata. Cell headers have the following structure:
 ```python
