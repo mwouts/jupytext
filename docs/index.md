@@ -7,5 +7,6 @@
 * [Installation](install)
 * [Using Jupytext in Jupyter](using-server)
 * [Using at the command line](using-cli)
+* [Using as a Python libary](using-library)
 * [Supported document formats](formats)
 * [Frequently Asked Questions](faq)
