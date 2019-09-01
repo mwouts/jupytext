@@ -15,9 +15,29 @@ matrix:
       sudo: required
 
 install:
-  # install Jupytext requirements
-  - pip install -r requirements-dev.txt
-  - pip install -r requirements.txt
+  # Python 2.7 and 3.4 are mapped to miniconda2 and miniconda3, respectively. This way we can test jupytext with pandoc
+  # Script adapted from https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/use-conda-with-travis-ci.html
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]] OR [[ "$TRAVIS_PYTHON_VERSION" == "3.4" ]]; then
+      sudo apt-get update;
+      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+      else
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      bash miniconda.sh -b -p $HOME/miniconda;
+      export PATH="$HOME/miniconda/bin:$PATH";
+      hash -r;
+      conda config --set always_yes yes --set changeps1 no;
+      conda update -q conda;
+      conda config --append channels conda-forge;
+      conda info -a;
+      conda create -q -n jupytext-env --file requirements-dev.txt --file requirements.txt;
+      source activate jupytext-env;
+      conda install pandoc codecov -c conda-forge;
+      pandoc -v;
+    else
+      pip install -r requirements-dev.txt;
+      pip install -r requirements.txt;
+    fi
   # install is required for testing the pre-commit mode
   - pip install . || true
   # install black if available (Python 3.6 and above), and autopep8 for testing the pipe mode
