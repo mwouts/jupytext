@@ -12,6 +12,9 @@ Release History
 - Mention of the server extension in the documentation (#304)
 - Test a `README.md` is as simple as `jupytext --execute README.md` (#303)
 
+**BugFixes**
+
+- Fix the usability of the `fmt` argument in `jupytext.read` (#312)
 
 1.2.1 (2019-07-20)
 ++++++++++++++++++++++

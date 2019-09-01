@@ -237,6 +237,9 @@ def read(fp, as_version=4, fmt=None, **kwargs):
     :param kwargs: (not used) additional parameters for nbformat.read
     :return: the notebook
     """
+    if as_version != nbformat.NO_CONVERT and type(as_version) != int:
+        raise TypeError("Second argument 'as_version' should be either nbformat.NO_CONVERT, or an integer.")
+
     if fp == '-':
         text = sys.stdin.read()
         return reads(text, fmt)
@@ -246,6 +249,8 @@ def read(fp, as_version=4, fmt=None, **kwargs):
         fp = str(fp)
         _, ext = os.path.splitext(fp)
         fmt = copy(fmt or {})
+        if not isinstance(fmt, dict):
+            fmt = long_form_one_format(fmt)
         fmt.update({'extension': ext})
         with io.open(fp, encoding='utf-8') as stream:
             return read(stream, as_version=as_version, fmt=fmt, **kwargs)
