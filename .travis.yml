@@ -17,12 +17,13 @@ matrix:
 install:
   # Python 2.7 and 3.4 are mapped to miniconda2 and miniconda3, respectively. This way we can test jupytext with pandoc
   # Script adapted from https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/use-conda-with-travis-ci.html
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]] OR [[ "$TRAVIS_PYTHON_VERSION" == "3.4" ]]; then
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]] || [[ "$TRAVIS_PYTHON_VERSION" == "3.4" ]]; then
       sudo apt-get update;
       if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
         wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
       else
         wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      fi;
       bash miniconda.sh -b -p $HOME/miniconda;
       export PATH="$HOME/miniconda/bin:$PATH";
       hash -r;
