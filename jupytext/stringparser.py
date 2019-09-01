@@ -1,5 +1,6 @@
 """A simple file parser that can tell whether the first character of a line
 is quoted or not"""
+from .languages import _COMMENT
 
 
 class StringParser:
@@ -11,6 +12,7 @@ class StringParser:
     def __init__(self, language):
         self.ignore = language is None
         self.python = language != 'R'
+        self.comment = _COMMENT.get(language)
 
     def is_quoted(self):
         """Is the next line quoted?"""
@@ -21,6 +23,10 @@ class StringParser:
     def read_line(self, line):
         """Read a new line"""
         if self.ignore:
+            return
+
+        # Do not search for quotes when the line is commented out (and not quoted)
+        if not self.is_quoted() and self.comment is not None and line.startswith(self.comment):
             return
 
         for i, char in enumerate(line):

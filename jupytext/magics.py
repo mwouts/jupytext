@@ -2,7 +2,7 @@
 
 import re
 from .stringparser import StringParser
-from .languages import _SCRIPT_EXTENSIONS
+from .languages import _SCRIPT_EXTENSIONS, _COMMENT
 
 # A magic expression is a line or cell or metakernel magic (#94, #61) escaped zero, or multiple times
 _MAGIC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
@@ -14,7 +14,6 @@ _MAGIC_NOT_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
     r"^({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*noescape".format(
         _SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS}
 _LINE_CONTINUATION_RE = re.compile(r'.*\\\s*$')
-_COMMENT = {_SCRIPT_EXTENSIONS[ext]['language']: _SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS}
 
 # Commands starting with a question or exclamation mark have to be escaped
 _PYTHON_HELP_OR_BASH_CMD = re.compile(r"^(# |#)*(\?|!)\s*[A-Za-z]")

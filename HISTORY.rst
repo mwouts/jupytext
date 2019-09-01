@@ -17,6 +17,7 @@ Release History
 
 - Fix the usability of the `fmt` argument in `jupytext.read` (#312)
 - Fix the download notebook error when `c.notebook_extensions` has a custom value (#318)
+- Ignore string delimiters in commented text (#307)
 
 1.2.1 (2019-07-20)
 ++++++++++++++++++++++

@@ -667,6 +667,48 @@ def test_notebook_one_blank_line_before_first_markdown_cell(script="""
             assert lines[-1]
 
 
+def test_read_markdown_cell_with_triple_quote_307(
+        script="""# This script test that commented triple quotes '''
+# do not impede the correct identification of Markdown cells
+
+# Here is Markdown cell number 2 '''
+"""):
+    notebook = jupytext.reads(script, 'py')
+    assert len(notebook.cells) == 2
+    assert notebook.cells[0].cell_type == 'markdown'
+    assert notebook.cells[0].source == """This script test that commented triple quotes '''
+do not impede the correct identification of Markdown cells"""
+    assert notebook.cells[1].cell_type == 'markdown'
+    assert notebook.cells[1].source == "Here is Markdown cell number 2 '''"
+
+    script2 = jupytext.writes(notebook, 'py')
+    compare(script2, script)
+
+
+def test_read_explicit_markdown_cell_with_triple_quote_307(
+        script="""# {{{ {"special": "metadata", "cell_type": "markdown"}
+# some text '''
+# }}}
+
+print('hello world')
+
+# {{{ {"special": "metadata", "cell_type": "markdown"}
+# more text '''
+# }}}
+"""):
+    notebook = jupytext.reads(script, 'py')
+    assert len(notebook.cells) == 3
+    assert notebook.cells[0].cell_type == 'markdown'
+    assert notebook.cells[0].source == "some text '''"
+    assert notebook.cells[1].cell_type == 'code'
+    assert notebook.cells[1].source == "print('hello world')"
+    assert notebook.cells[2].cell_type == 'markdown'
+    assert notebook.cells[2].source == "more text '''"
+
+    script2 = jupytext.writes(notebook, 'py')
+    compare(script2, script)
+
+
 def test_round_trip_markdown_cell_with_magic():
     notebook = new_notebook(cells=[new_markdown_cell('IPython has magic commands like\n%quickref')],
                             metadata={'jupytext': {'main_language': 'python'}})
