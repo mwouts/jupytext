@@ -188,7 +188,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         return '\n'.join(header + lines)
 
 
-def reads(text, fmt, as_version=4, **kwargs):
+def reads(text, fmt, as_version=nbformat.NO_CONVERT, **kwargs):
     """
     Read a notebook from a string
 
@@ -227,7 +227,7 @@ def reads(text, fmt, as_version=4, **kwargs):
     return notebook
 
 
-def read(fp, as_version=4, fmt=None, **kwargs):
+def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, **kwargs):
     """"
     Read a notebook from a file name or a file object
 

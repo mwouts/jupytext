@@ -11,6 +11,7 @@ Release History
 - Documented how to use Jupytext as a Python library (#317)
 - Mention of the server extension in the documentation (#304)
 - Test a `README.md` is as simple as `jupytext --execute README.md` (#303)
+- The default value of `as_version` in `jupytext.read` is `nbformat.NO_CONVERT`, as for `nbformat.read`
 
 **BugFixes**
 
