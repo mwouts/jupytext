@@ -213,7 +213,8 @@ def jupytext(args=None):
     if not args.to and not args.output and not args.sync \
             and not args.pipe and not args.check \
             and not args.test and not args.test_strict \
-            and not args.update_metadata and not args.set_kernel:
+            and not args.update_metadata and not args.set_kernel \
+            and not args.execute:
         raise ValueError('Please select an action')
 
     if args.output and len(args.notebooks) != 1:

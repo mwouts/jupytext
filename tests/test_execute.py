@@ -1,4 +1,5 @@
 from .utils import requires_nbconvert, requires_ir_kernel
+import pytest
 from jupytext import read
 from jupytext.cli import jupytext
 
@@ -51,6 +52,40 @@ def test_execute(tmpdir):
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
     assert nb.cells[0].outputs[0]['data'] == {'text/plain': '3'}
+
+
+@requires_nbconvert
+def test_execute_readme_ok(tmpdir):
+    tmp_md = str(tmpdir.join('notebook.md'))
+
+    with open(tmp_md, 'w') as fp:
+        fp.write("""
+A readme with correct instructions
+
+```python
+1 + 2
+```
+""")
+
+    jupytext(args=[tmp_md, '--execute'])
+
+
+@requires_nbconvert
+def test_execute_readme_not_ok(tmpdir):
+    tmp_md = str(tmpdir.join('notebook.md'))
+
+    with open(tmp_md, 'w') as fp:
+        fp.write("""
+A readme with incorrect instructions (a is not defined)
+
+```python
+a + 1
+```
+""")
+
+    import nbconvert
+    with pytest.raises(nbconvert.preprocessors.execute.CellExecutionError, match="NameError: name 'a' is not defined"):
+        jupytext(args=[tmp_md, '--execute'])
 
 
 @requires_nbconvert
