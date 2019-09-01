@@ -357,7 +357,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                         path_inputs = alt_path
                         fmt_inputs = alt_fmt
                         model_outputs = model
-                        model = self.get(alt_path, content=content, type=type, format=format,
+                        model = self.get(alt_path, content=content, type='notebook', format=format,
                                          load_alternative_format=False)
                         break
             # Outputs taken from ipynb if in group, if file exists
@@ -366,7 +366,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     if alt_path.endswith('.ipynb') and self.exists(alt_path):
                         self.log.info(u'Reading OUTPUTS from {}'.format(alt_path))
                         path_outputs = alt_path
-                        model_outputs = self.get(alt_path, content=content, type=type, format=format,
+                        model_outputs = self.get(alt_path, content=content, type='notebook', format=format,
                                                  load_alternative_format=False)
                         break
 

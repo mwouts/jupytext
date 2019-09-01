@@ -1473,6 +1473,23 @@ def test_notebook_extensions(tmpdir):
     assert model['type'] == 'file'
 
 
+def test_download_file_318(tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+
+    nb = new_notebook()
+    nb.metadata['jupytext'] = {'formats': 'ipynb,py'}
+    write(nb, tmp_ipynb)
+    write(nb, tmp_py)
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.notebook_extensions = 'ipynb'
+
+    model = cm.get('notebook.ipynb', content=True, type=None, format=None)
+    assert model['type'] == 'notebook'
+
+
 def test_markdown_and_r_extensions(tmpdir):
     tmp_r = str(tmpdir.join('script.r'))
     tmp_markdown = str(tmpdir.join('notebook.markdown'))
