@@ -9,6 +9,7 @@ Release History
 **Improvements**
 
 - Documented how to use Jupytext as a Python library (#317)
+- Mention of the server extension in the documentation (#304)
 
 
 1.2.1 (2019-07-20)
