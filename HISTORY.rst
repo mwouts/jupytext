@@ -3,21 +3,23 @@
 Release History
 ---------------
 
-1.2.2 (2019-09-??)
+1.2.2 (2019-09-01)
 ++++++++++++++++++++++
 
 **Improvements**
 
-- Documented how to use Jupytext as a Python library (#317)
+- Documentation includes a section on how to use Jupytext as a Python library (#317)
 - Mention of the server extension in the documentation (#304)
-- Test a `README.md` is as simple as `jupytext --execute README.md` (#303)
+- Text notebooks can be tested with `jupytext --execute notebook.md` (#303)
 - The default value of `as_version` in `jupytext.read` is `nbformat.NO_CONVERT`, as for `nbformat.read`
+- Jupytext tests are now included in sdist (#310)
 
 **BugFixes**
 
-- Fix the usability of the `fmt` argument in `jupytext.read` (#312)
-- Fix the download notebook error when `c.notebook_extensions` has a custom value (#318)
-- Ignore string delimiters in commented text (#307)
+- Fixed the usability of the `fmt` argument in `jupytext.read` (#312)
+- Fixed the download notebook error when `c.notebook_extensions` has a custom value (#318)
+- String delimiters in commented text are now ignored (#307)
+
 
 1.2.1 (2019-07-20)
 ++++++++++++++++++++++
