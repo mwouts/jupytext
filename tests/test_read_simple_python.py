@@ -4,6 +4,7 @@ from nbformat.v4.nbbase import new_markdown_cell, new_code_cell, new_notebook
 from jupytext.compare import compare
 import jupytext
 from jupytext.compare import compare_notebooks
+from .utils import skip_if_dict_is_not_ordered
 
 
 def test_read_simple_file(pynb="""# ---
@@ -685,6 +686,7 @@ do not impede the correct identification of Markdown cells"""
     compare(script2, script)
 
 
+@skip_if_dict_is_not_ordered
 def test_read_explicit_markdown_cell_with_triple_quote_307(
         script="""# {{{ {"special": "metadata", "cell_type": "markdown"}
 # some text '''
