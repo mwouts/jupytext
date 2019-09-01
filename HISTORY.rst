@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+1.2.2 (2019-09-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Documented how to use Jupytext as a Python library (#317)
+
+
 1.2.1 (2019-07-20)
 ++++++++++++++++++++++
 
