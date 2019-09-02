@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+1.2.3 (2019-09-02)
+++++++++++++++++++++++
+
+**BugFixes**
+
+- Dependency on ``setuptools`` in ``pandoc.py`` made optional to fix the build of the conda package (#310, #323)
+
+
 1.2.2 (2019-09-01)
 ++++++++++++++++++++++
 
