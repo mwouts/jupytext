@@ -5,7 +5,6 @@ import subprocess
 import tempfile
 # Copy nbformat reads and writes to avoid them being patched in the contents manager!!
 from nbformat import reads as ipynb_reads, writes as ipynb_writes
-from pkg_resources import parse_version
 
 
 class PandocError(OSError):
@@ -44,6 +43,12 @@ def is_pandoc_available():
 def pandoc_version():
     """Pandoc's version number"""
     version = pandoc(u'--version').splitlines()[0].split()[1]
+
+    try:
+        from pkg_resources import parse_version
+    except ImportError:
+        raise PandocError('Please install pkg_resources')
+
     if parse_version(version) < parse_version('2.7.2'):
         raise PandocError('Please install pandoc>=2.7.2 (found version {})'.format(version))
 
