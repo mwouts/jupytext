@@ -34,7 +34,7 @@ In the animation below we propose a quick demo of Jupytext. While the example re
   - We find out that the columns of the data frame were not in the correct order. We update the corresponding cell, and get the correct plot.
 - The Jupyter notebook is refreshed in the browser. Modified inputs are loaded from the Python script. Outputs and variables are preserved. We finally rerun the code and get the correct plot.
 
-![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/b8dd28f44678f8c91f262da2381276fc4d03b00a/JupyterPyCharm.gif)
+![](https://github.com/mwouts/jupytext-screenshots/raw/master/IntroducingJupytext/JupyterPyCharm.gif)
 
 ## Importing Jupyter Notebooks as modules
 

@@ -81,7 +81,8 @@ It is possible (and convenient) to leave the notebook open in Jupyter while you 
 - and refresh the notebook when you switch back from the editor to Jupyter.
 
 In case you forgot to refresh, and saved the Jupyter notebook while the text representation had changed, no worries: Jupyter will ask you which version you want to keep:
-![Notebook changed](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/fcbcd3c3fc1ec4a74669381b53753f9f783e10da/notebook_changed.png)
+
+![](https://github.com/mwouts/jupytext-screenshots/raw/master/JupytextDocumentation/NotebookChanged.png)
 
 When that occurs, please choose the version in which you made the latest changes. And give a second look to our advice to deactivate the autosaving of notebooks in Jupyter.
 
@@ -91,11 +92,12 @@ With Jupytext's contents manager for Jupyter, scripts and Markdown documents gai
 
 By default, Jupyter Notebook open scripts and Markdown documents as notebooks. If you want to open them with the text editor, select the document and click on _edit_:
 
-![Open as text](https://user-images.githubusercontent.com/29915202/53228364-42265400-3681-11e9-812d-46168c6e398c.png)
+![](https://github.com/mwouts/jupytext-screenshots/raw/master/JupytextDocumentation/OpenAsText.png)
+
 
 In JupyterLab this is slightly different. Scripts and Markdown document also have a notebook icon. But they open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu (available in JupyterLab 0.35 and above):
 
-![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/403b53ac5097446a15ea664579ba44cd1badcc57/ContextMenuLab.png)
+![](https://github.com/mwouts/jupytext-screenshots/raw/master/JupytextDocumentation/ContextMenuLab.png)
 
 If do not want to classify scripts or Markdown documents as notebooks, please use the `notebook_extension` option. For instance, if you want to get the notebook icon only for `.ipynb` and `.Rmd` files, set
 

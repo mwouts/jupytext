@@ -17,7 +17,7 @@ The languages that are currently supported by Jupytext are: Julia, Python, R, Ba
 Jupytext can also convert these formats **into Jupyter Notebooks**, allowing
 for two-directional syncing between formats. See below for a quick demo.
 
-![](https://gist.githubusercontent.com/mwouts/13de42d8bb514e4acf6481c580feffd0/raw/b8dd28f44678f8c91f262da2381276fc4d03b00a/JupyterPyCharm.gif)
+![](https://github.com/mwouts/jupytext-screenshots/raw/master/IntroducingJupytext/JupyterPyCharm.gif)
 
 ## How to use Jupytext
 
