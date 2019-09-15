@@ -33,7 +33,7 @@ setup(
                                                          'jupytext/nbextension/jupytext_menu_zoom.png',
                                                          'jupytext/nbextension/jupytext.yml']),
                 ('share/jupyter/lab/extensions', ['packages/labextension/jupyterlab-jupytext-1.0.2.tgz'])],
-    entry_points={'console_scripts': ['jupytext = jupytext.cli:jupytext_cli']},
+    entry_points={'console_scripts': ['jupytext = jupytext.cli:jupytext']},
     tests_require=['pytest'],
     install_requires=['nbformat>=4.0.0', 'pyyaml', 'mock;python_version<"3"'],
     license='MIT',

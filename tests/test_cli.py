@@ -17,7 +17,7 @@ from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from jupytext import __version__
 from jupytext import read, write, writes
-from jupytext.cli import parse_jupytext_args, jupytext, jupytext_cli, system, str2bool
+from jupytext.cli import parse_jupytext_args, jupytext, system, str2bool
 from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths, InconsistentPath
 from jupytext.formats import long_form_one_format, JupytextFormatError
@@ -765,8 +765,8 @@ def test_cli_expect_errors(tmp_ipynb):
         jupytext(['--pre-commit', 'notebook.ipynb'])
     with pytest.raises(ValueError):
         jupytext(['notebook.ipynb', '--from', 'py:percent', '--to', 'md'])
-    with pytest.raises(SystemExit):
-        jupytext_cli([])
+    with pytest.raises(ValueError):
+        jupytext([])
     with pytest.raises((SystemExit, TypeError)):  # SystemExit on Windows, TypeError on Linux
         system('jupytext', ['notebook.ipynb', '--from', 'py:percent', '--to', 'md'])
 

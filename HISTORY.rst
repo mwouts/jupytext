@@ -3,6 +3,18 @@
 Release History
 ---------------
 
+1.2.4 (2019-09-??)
+++++++++++++++++++++++
+
+**Improvements**
+
+- Documentation includes a mention on how to set metadata filters at the command line (#330)
+- Do not catch errors when the flag `--warn-only` is not set (#327)
+
+**BugFixes**
+
+- Flag `--warn-only` catches every possible error (#263)
+
 1.2.3 (2019-09-02)
 ++++++++++++++++++++++
 
