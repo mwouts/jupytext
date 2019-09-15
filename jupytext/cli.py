@@ -159,17 +159,8 @@ def parse_jupytext_args(args=None):
     return parser.parse_args(args)
 
 
-def jupytext_cli(args=None):
-    """Entry point for the jupytext script"""
-    try:
-        jupytext(args)
-    except (ValueError, TypeError, IOError) as err:
-        sys.stderr.write('[jupytext] Error: ' + str(err) + '\n')
-        exit(1)
-
-
 def jupytext(args=None):
-    """Internal implementation of Jupytext command line"""
+    """Entry point for the jupytext script"""
     args = parse_jupytext_args(args)
 
     def log(text):
@@ -187,11 +178,6 @@ def jupytext(args=None):
         log('[jupytext] Notebooks in git index are:')
         for nb_file in args.notebooks:
             log(nb_file)
-
-    def writef_git_add(notebook_, nb_file_, fmt_):
-        write(notebook_, nb_file_, fmt=fmt_)
-        if args.pre_commit:
-            system('git', 'add', nb_file_)
 
     # Read notebook from stdin
     if not args.notebooks:
@@ -227,9 +213,6 @@ def jupytext(args=None):
         args.to = long_form_one_format(args.to)
         set_format_options(args.to, args.format_options)
 
-    # Main loop
-    round_trip_conversion_errors = 0
-
     # Wildcard extension on Windows #202
     notebooks = []
     for pattern in args.notebooks:
@@ -238,183 +221,196 @@ def jupytext(args=None):
         else:
             notebooks.append(pattern)
 
+    # Count how many file have round-trip issues when testing
+    exit_code = 0
     for nb_file in notebooks:
-        try:
-            if nb_file == '-' and args.sync:
-                raise ValueError('Cannot sync a notebook on stdin')
-
-            nb_dest = args.output or (None if not args.to
-                                      else ('-' if nb_file == '-' else
-                                            full_path(base_path(nb_file, args.input_format), args.to)))
-
-            # Just acting on metadata / pipe => save in place
-            if not nb_dest and not args.sync:
-                nb_dest = nb_file
-
-            if nb_dest == '-':
-                args.quiet = True
-
-            # I. ### Read the notebook ###
-            fmt = copy(args.input_format) or {}
-            set_format_options(fmt, args.format_options)
-            log('[jupytext] Reading {}{}'.format(
-                nb_file if nb_file != '-' else 'stdin',
-                ' in format {}'.format(short_form_one_format(fmt)) if 'extension' in fmt else ''))
-
-            notebook = read(nb_file, fmt=fmt)
-            if not fmt:
-                text_representation = notebook.metadata.get('jupytext', {}).get('text_representation', {})
-                ext = os.path.splitext(nb_file)[1]
-                if text_representation.get('extension') == ext:
-                    fmt = {key: text_representation[key] for key in text_representation if
-                           key in ['extension', 'format_name']}
-                elif ext:
-                    fmt = {'extension': ext}
-
-            # Compute actual extension when using script/auto, and update nb_dest if necessary
-            dest_fmt = args.to
-            if dest_fmt and dest_fmt['extension'] == '.auto':
-                auto_ext = auto_ext_from_metadata(notebook.metadata)
-                if not auto_ext:
-                    raise ValueError('The notebook has no language information. '
-                                     'Please provide an explicit script extension.')
-                dest_fmt['extension'] = auto_ext
-                if not args.output and nb_file != '-':
-                    nb_dest = full_path(base_path(nb_file, args.input_format), dest_fmt)
-
-            # Set the kernel
-            set_kernel = args.set_kernel
-            if args.execute and notebook.metadata.get('kernelspec', {}).get('name') is None:
-                log("[jupytext] Setting default kernel with --set-kernel -")
-                set_kernel = '-'
-
-            if set_kernel:
-                if set_kernel == '-':
-                    language = notebook.metadata.get('jupytext', {}).get('main_language') \
-                               or notebook.metadata['kernelspec']['language']
-                    if not language:
-                        raise ValueError('Cannot infer a kernel as notebook language is not defined')
-
-                    kernelspec = kernelspec_from_language(language)
-                    if not kernelspec:
-                        raise ValueError('Found no kernel for {}'.format(language))
-                else:
-                    try:
-                        kernelspec = get_kernel_spec(set_kernel)
-                    except KeyError:
-                        raise KeyError('Please choose a kernel name among {}'
-                                       .format([name for name in find_kernel_specs()]))
-                    kernelspec = {'name': args.set_kernel,
-                                  'language': kernelspec.language,
-                                  'display_name': kernelspec.display_name}
-
-                args.update_metadata['kernelspec'] = kernelspec
-
-            # Update the metadata
-            if args.update_metadata:
-                log("[jupytext] Updating notebook metadata with '{}'".format(json.dumps(args.update_metadata)))
-                # Are we updating a text file that has a metadata filter? #212
-                if fmt['extension'] != '.ipynb' and \
-                        notebook.metadata.get('jupytext', {}).get('notebook_metadata_filter') == '-all':
-                    notebook.metadata.get('jupytext', {}).pop('notebook_metadata_filter')
-                recursive_update(notebook.metadata, args.update_metadata)
-
-                if 'kernelspec' in args.update_metadata and 'main_language' in notebook.metadata.get('jupytext', {}):
-                    notebook.metadata['jupytext'].pop('main_language')
-
-            # Read paired notebooks
-            if args.sync:
-                set_prefix_and_suffix(fmt, notebook, nb_file)
-                try:
-                    notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
-                except NotAPairedNotebook as err:
-                    sys.stderr.write('[jupytext] Warning: ' + str(err) + '\n')
-                    continue
-
-            # II. ### Apply commands onto the notebook ###
-            # Pipe the notebook into the desired commands
-            for cmd in args.pipe or []:
-                notebook = pipe_notebook(notebook, cmd, args.pipe_fmt)
-
-            # and/or test the desired commands onto the notebook
-            for cmd in args.check or []:
-                pipe_notebook(notebook, cmd, args.pipe_fmt, update=False)
-
-            # Execute the notebook
-            if args.execute:
-                log("[jupytext] Executing notebook")
-                kernel_name = notebook.metadata.get('kernelspec', {}).get('name')
-                exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
-                exec_proc.preprocess(notebook, resources={})
-
-            # III. ### Possible actions ###
-            modified = args.update_metadata or args.pipe or args.execute
-            # a. Test round trip conversion
-            if args.test or args.test_strict:
-                try:
-                    test_round_trip_conversion(notebook, dest_fmt,
-                                               update=args.update,
-                                               allow_expected_differences=not args.test_strict,
-                                               stop_on_first_error=args.stop_on_first_error)
-                except NotebookDifference as err:
-                    round_trip_conversion_errors += 1
-                    sys.stdout.write('{}: {}'.format(nb_file, str(err)))
-                continue
-
-            # b. Output to the desired file or format
-            if nb_dest:
-                if nb_dest == nb_file and not dest_fmt:
-                    dest_fmt = fmt
-
-                # Test consistency between dest name and output format
-                if dest_fmt and nb_dest != '-':
-                    base_path(nb_dest, dest_fmt)
-
-                # Describe what jupytext is doing
-                if os.path.isfile(nb_dest) and args.update:
-                    if not nb_dest.endswith('.ipynb'):
-                        raise ValueError('--update is only for ipynb files')
-                    action = ' (destination file updated)'
-                    check_file_version(notebook, nb_file, nb_dest)
-                    combine_inputs_with_outputs(notebook, read(nb_dest), fmt=fmt)
-                elif os.path.isfile(nb_dest):
-                    action = ' (destination file replaced)'
-                else:
-                    action = ''
-
-                log('[jupytext] Writing {nb_dest}{format}{action}'
-                    .format(nb_dest=nb_dest,
-                            format=' in format ' + short_form_one_format(
-                                dest_fmt) if dest_fmt and 'format_name' in dest_fmt else '',
-                            action=action))
-                writef_git_add(notebook, nb_dest, dest_fmt)
-
-            # c. Synchronize paired notebooks
-            if args.sync:
-                # Also update the original notebook if the notebook was modified
-                if modified:
-                    inputs_nb_file = outputs_nb_file = None
-                formats = notebook.metadata['jupytext']['formats']
-
-                for ipynb in [True, False]:
-                    # Write first format last so that it is the most recent file
-                    for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats)[::-1]:
-                        # Write ipynb first for compatibility with our contents manager
-                        if alt_path.endswith('.ipynb') != ipynb:
-                            continue
-                        # Do not write the ipynb file if it was not modified
-                        # But, always write text representations to make sure they are the most recent
-                        if alt_path == inputs_nb_file and alt_path == outputs_nb_file:
-                            continue
-                        log("[jupytext] Updating '{}'".format(alt_path))
-                        writef_git_add(notebook, alt_path, alt_fmt)
-        except (ValueError, TypeError, IOError) as err:
-            if args.warn_only:
+        if not args.warn_only:
+            exit_code += jupytext_single_file(nb_file, args, log)
+        else:
+            try:
+                exit_code += jupytext_single_file(nb_file, args, log)
+            except Exception as err:
                 sys.stderr.write('[jupytext] Error: {}\n'.format(str(err)))
-            else:
-                raise err
 
-    return round_trip_conversion_errors
+    return exit_code
+
+
+def jupytext_single_file(nb_file, args, log):
+    """Apply the jupytext commmand, with given arguments, to a single file"""
+    if nb_file == '-' and args.sync:
+        raise ValueError('Cannot sync a notebook on stdin')
+
+    nb_dest = args.output or (None if not args.to
+                              else ('-' if nb_file == '-' else
+                                    full_path(base_path(nb_file, args.input_format), args.to)))
+
+    # Just acting on metadata / pipe => save in place
+    if not nb_dest and not args.sync:
+        nb_dest = nb_file
+
+    if nb_dest == '-':
+        args.quiet = True
+
+    # I. ### Read the notebook ###
+    fmt = copy(args.input_format) or {}
+    set_format_options(fmt, args.format_options)
+    log('[jupytext] Reading {}{}'.format(
+        nb_file if nb_file != '-' else 'stdin',
+        ' in format {}'.format(short_form_one_format(fmt)) if 'extension' in fmt else ''))
+
+    notebook = read(nb_file, fmt=fmt)
+    if not fmt:
+        text_representation = notebook.metadata.get('jupytext', {}).get('text_representation', {})
+        ext = os.path.splitext(nb_file)[1]
+        if text_representation.get('extension') == ext:
+            fmt = {key: text_representation[key] for key in text_representation if
+                   key in ['extension', 'format_name']}
+        elif ext:
+            fmt = {'extension': ext}
+
+    # Compute actual extension when using script/auto, and update nb_dest if necessary
+    dest_fmt = args.to
+    if dest_fmt and dest_fmt['extension'] == '.auto':
+        auto_ext = auto_ext_from_metadata(notebook.metadata)
+        if not auto_ext:
+            raise ValueError('The notebook has no language information. '
+                             'Please provide an explicit script extension.')
+        dest_fmt['extension'] = auto_ext
+        if not args.output and nb_file != '-':
+            nb_dest = full_path(base_path(nb_file, args.input_format), dest_fmt)
+
+    # Set the kernel
+    set_kernel = args.set_kernel
+    if args.execute and notebook.metadata.get('kernelspec', {}).get('name') is None:
+        log("[jupytext] Setting default kernel with --set-kernel -")
+        set_kernel = '-'
+
+    if set_kernel:
+        if set_kernel == '-':
+            language = notebook.metadata.get('jupytext', {}).get('main_language') \
+                       or notebook.metadata['kernelspec']['language']
+            if not language:
+                raise ValueError('Cannot infer a kernel as notebook language is not defined')
+
+            kernelspec = kernelspec_from_language(language)
+            if not kernelspec:
+                raise ValueError('Found no kernel for {}'.format(language))
+        else:
+            try:
+                kernelspec = get_kernel_spec(set_kernel)
+            except KeyError:
+                raise KeyError('Please choose a kernel name among {}'
+                               .format([name for name in find_kernel_specs()]))
+            kernelspec = {'name': args.set_kernel,
+                          'language': kernelspec.language,
+                          'display_name': kernelspec.display_name}
+
+        args.update_metadata['kernelspec'] = kernelspec
+
+    # Update the metadata
+    if args.update_metadata:
+        log("[jupytext] Updating notebook metadata with '{}'".format(json.dumps(args.update_metadata)))
+        # Are we updating a text file that has a metadata filter? #212
+        if fmt['extension'] != '.ipynb' and \
+                notebook.metadata.get('jupytext', {}).get('notebook_metadata_filter') == '-all':
+            notebook.metadata.get('jupytext', {}).pop('notebook_metadata_filter')
+        recursive_update(notebook.metadata, args.update_metadata)
+
+        if 'kernelspec' in args.update_metadata and 'main_language' in notebook.metadata.get('jupytext', {}):
+            notebook.metadata['jupytext'].pop('main_language')
+
+    # Read paired notebooks
+    if args.sync:
+        set_prefix_and_suffix(fmt, notebook, nb_file)
+        try:
+            notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
+        except NotAPairedNotebook as err:
+            sys.stderr.write('[jupytext] Warning: ' + str(err) + '\n')
+            return 0
+
+    # II. ### Apply commands onto the notebook ###
+    # Pipe the notebook into the desired commands
+    for cmd in args.pipe or []:
+        notebook = pipe_notebook(notebook, cmd, args.pipe_fmt)
+
+    # and/or test the desired commands onto the notebook
+    for cmd in args.check or []:
+        pipe_notebook(notebook, cmd, args.pipe_fmt, update=False)
+
+    # Execute the notebook
+    if args.execute:
+        log("[jupytext] Executing notebook")
+        kernel_name = notebook.metadata.get('kernelspec', {}).get('name')
+        exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
+        exec_proc.preprocess(notebook, resources={})
+
+    # III. ### Possible actions ###
+    modified = args.update_metadata or args.pipe or args.execute
+    # a. Test round trip conversion
+    if args.test or args.test_strict:
+        try:
+            test_round_trip_conversion(notebook, dest_fmt,
+                                       update=args.update,
+                                       allow_expected_differences=not args.test_strict,
+                                       stop_on_first_error=args.stop_on_first_error)
+        except NotebookDifference as err:
+            sys.stdout.write('{}: {}'.format(nb_file, str(err)))
+            return 1
+        return 0
+
+    # b. Output to the desired file or format
+    if nb_dest:
+        if nb_dest == nb_file and not dest_fmt:
+            dest_fmt = fmt
+
+        # Test consistency between dest name and output format
+        if dest_fmt and nb_dest != '-':
+            base_path(nb_dest, dest_fmt)
+
+        # Describe what jupytext is doing
+        if os.path.isfile(nb_dest) and args.update:
+            if not nb_dest.endswith('.ipynb'):
+                raise ValueError('--update is only for ipynb files')
+            action = ' (destination file updated)'
+            check_file_version(notebook, nb_file, nb_dest)
+            combine_inputs_with_outputs(notebook, read(nb_dest), fmt=fmt)
+        elif os.path.isfile(nb_dest):
+            action = ' (destination file replaced)'
+        else:
+            action = ''
+
+        log('[jupytext] Writing {nb_dest}{format}{action}'
+            .format(nb_dest=nb_dest,
+                    format=' in format ' + short_form_one_format(
+                        dest_fmt) if dest_fmt and 'format_name' in dest_fmt else '',
+                    action=action))
+        write(notebook, nb_dest, fmt=dest_fmt)
+        if args.pre_commit:
+            system('git', 'add', nb_dest)
+
+    # c. Synchronize paired notebooks
+    if args.sync:
+        # Also update the original notebook if the notebook was modified
+        if modified:
+            inputs_nb_file = outputs_nb_file = None
+        formats = notebook.metadata['jupytext']['formats']
+
+        for ipynb in [True, False]:
+            # Write first format last so that it is the most recent file
+            for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats)[::-1]:
+                # Write ipynb first for compatibility with our contents manager
+                if alt_path.endswith('.ipynb') != ipynb:
+                    continue
+                # Do not write the ipynb file if it was not modified
+                # But, always write text representations to make sure they are the most recent
+                if alt_path == inputs_nb_file and alt_path == outputs_nb_file:
+                    continue
+                log("[jupytext] Updating '{}'".format(alt_path))
+                write(notebook, alt_path, fmt=alt_fmt)
+                if args.pre_commit:
+                    system('git', 'add', alt_path)
+
+    return 0
 
 
 def notebooks_in_git_index(fmt):
@@ -480,7 +476,6 @@ def set_prefix_and_suffix(fmt, notebook, nb_file):
 
 class NotAPairedNotebook(ValueError):
     """An error raised when a notebook is not a paired notebook"""
-    pass
 
 
 def load_paired_notebook(notebook, fmt, nb_file, log):
