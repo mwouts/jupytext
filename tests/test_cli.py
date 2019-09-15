@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import stat
+from io import StringIO
 
 try:
     import unittest.mock as mock
@@ -16,7 +17,7 @@ from argparse import ArgumentTypeError
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from jupytext import __version__
-from jupytext import read, write, writes
+from jupytext import read, reads, write, writes
 from jupytext.cli import parse_jupytext_args, jupytext, system, str2bool
 from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths, InconsistentPath
@@ -751,6 +752,20 @@ def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir):
         jupytext(['-o', tmp_ipynb])
     nb2 = read(tmp_ipynb)
     compare_notebooks(nb, nb2, 'Rmd')
+
+
+def test_set_kernel_works_with_pipes_326(capsys):
+    md = u"""```python
+1 + 1
+```"""
+
+    with mock.patch('sys.stdin', StringIO(md)):
+        jupytext(['--to', 'ipynb', '--set-kernel', '-', '-'])
+
+    out, err = capsys.readouterr()
+    assert err == ''
+    nb = reads(out, 'ipynb')
+    assert 'kernelspec' in nb.metadata
 
 
 @requires_jupytext_installed
