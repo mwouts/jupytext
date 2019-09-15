@@ -311,8 +311,7 @@ def jupytext_single_file(nb_file, args, log):
     if args.update_metadata:
         log("[jupytext] Updating notebook metadata with '{}'".format(json.dumps(args.update_metadata)))
         # Are we updating a text file that has a metadata filter? #212
-        if fmt['extension'] != '.ipynb' and \
-                notebook.metadata.get('jupytext', {}).get('notebook_metadata_filter') == '-all':
+        if notebook.metadata.get('jupytext', {}).get('notebook_metadata_filter') == '-all':
             notebook.metadata.get('jupytext', {}).pop('notebook_metadata_filter')
         recursive_update(notebook.metadata, args.update_metadata)
 
