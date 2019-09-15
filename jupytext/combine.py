@@ -46,8 +46,8 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
         if key not in nb_outputs_filtered_metadata:
             nb_source.metadata[key] = nb_outputs.metadata[key]
 
-    source_is_md_version_one = ext in ['.md', '.Rmd'] and text_repr.get('format_version') == '1.0'
-    if nb_source.metadata.get('jupytext', {}).get('formats') or ext in ['.md', '.Rmd']:
+    source_is_md_version_one = ext in ['.md', '.markdown', '.Rmd'] and text_repr.get('format_version') == '1.0'
+    if nb_source.metadata.get('jupytext', {}).get('formats') or ext in ['.md', '.markdown', '.Rmd']:
         nb_source.metadata.get('jupytext', {}).pop('text_representation', None)
 
     if not nb_source.metadata.get('jupytext', {}):

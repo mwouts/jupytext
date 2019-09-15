@@ -77,7 +77,8 @@ def uncomment_magic(source, language='python', global_escape_flag=True):
 
 
 _ESCAPED_CODE_START = {'.Rmd': re.compile(r"^(# |#)*```{.*}"),
-                       '.md': re.compile(r"^(# |#)*```")}
+                       '.md': re.compile(r"^(# |#)*```"),
+                       '.markdown': re.compile(r"^(# |#)*```")}
 _ESCAPED_CODE_START.update({ext: re.compile(
     r"^({0} |{0})*({0}|{0} )\+".format(_SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS})
 
