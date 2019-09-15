@@ -54,12 +54,12 @@ def encoding_and_executable(notebook, metadata, ext):
     comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment')
     jupytext_metadata = metadata.get('jupytext', {})
 
-    if ext not in ['.Rmd', '.md'] and 'executable' in jupytext_metadata:
+    if comment is not None and 'executable' in jupytext_metadata:
         lines.append(comment + '!' + jupytext_metadata.pop('executable'))
 
     if 'encoding' in jupytext_metadata:
         lines.append(jupytext_metadata.pop('encoding'))
-    elif ext not in ['.Rmd', '.md']:
+    elif comment is not None:
         for cell in notebook.cells:
             try:
                 cell.source.encode('ascii')
