@@ -170,7 +170,7 @@ def get_format_implementation(ext, format_name=None):
             formats_for_extension.append(fmt.format_name)
 
     if formats_for_extension:
-        if ext == '.md' and format_name == 'pandoc':
+        if ext in ['.md', '.markdown'] and format_name == 'pandoc':
             raise JupytextFormatError('Please install pandoc>=2.7.2')
 
         raise JupytextFormatError("Format '{}' is not associated to extension '{}'. "
@@ -184,7 +184,7 @@ def read_metadata(text, ext):
     ext = '.' + ext.split('.')[-1]
     lines = text.splitlines()
 
-    if ext in ['.md', '.Rmd']:
+    if ext in ['.md', '.markdown', '.Rmd']:
         comment = ''
     else:
         comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#')
@@ -274,7 +274,7 @@ def guess_format(text, ext):
         if rspin_comment_count >= 1:
             return 'spin', {}
 
-    if ext == '.md':
+    if ext in ['.md', '.markdown']:
         for line in lines:
             if line.startswith(':::'):  # Pandoc div
                 return 'pandoc', {}
@@ -355,7 +355,7 @@ def format_name_for_ext(metadata, ext, cm_default_formats=None, explicit_default
             if (not explicit_default) or fmt.get('format_name'):
                 return fmt.get('format_name')
 
-    if (not explicit_default) or ext in ['.Rmd', '.md']:
+    if (not explicit_default) or ext in ['.md', '.markdown', '.Rmd']:
         return None
 
     return get_format_implementation(ext).format_name
@@ -509,7 +509,8 @@ def short_form_one_format(jupytext_format):
         fmt = jupytext_format['prefix'] + '/' + fmt
 
     if jupytext_format.get('format_name'):
-        if jupytext_format['extension'] not in ['.md', '.Rmd'] or jupytext_format['format_name'] == 'pandoc':
+        if jupytext_format['extension'] not in ['.md', '.markdown', '.Rmd'] or \
+                jupytext_format['format_name'] == 'pandoc':
             fmt = fmt + ':' + jupytext_format['format_name']
 
     return fmt

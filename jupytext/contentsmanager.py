@@ -36,7 +36,7 @@ def preferred_format(incomplete_format, preferred_formats):
     for fmt in long_form_multiple_formats(preferred_formats):
         if ((incomplete_format['extension'] == fmt['extension'] or (
                 fmt['extension'] == '.auto' and
-                incomplete_format['extension'] not in ['.md', '.Rmd', '.ipynb'])) and
+                incomplete_format['extension'] not in ['.md', '.markdown', '.Rmd', '.ipynb'])) and
                 incomplete_format.get('suffix') == fmt.get('suffix', incomplete_format.get('suffix')) and
                 incomplete_format.get('prefix') == fmt.get('prefix', incomplete_format.get('prefix'))):
             fmt.update(incomplete_format)
@@ -264,7 +264,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
                     alt_path = full_path(base, fmt)
                     self.create_prefix_dir(alt_path, fmt)
-                    if 'format_name' in fmt and fmt['extension'] not in ['.Rmd', '.md']:
+                    if 'format_name' in fmt and fmt['extension'] not in ['.md', '.markdown', '.Rmd']:
                         self.log.info("Saving %s in format %s:%s",
                                       os.path.basename(alt_path), fmt['extension'][1:], fmt['format_name'])
                     else:

@@ -191,7 +191,7 @@ class BaseCellReader(object):
 
         # Is this a raw cell?
         if ('active' in self.metadata and not is_active('ipynb', self.metadata)) or \
-                (self.ext == '.md' and self.cell_type == 'code' and self.language is None):
+                (self.ext in ['.md', '.markdown'] and self.cell_type == 'code' and self.language is None):
             if self.metadata.get('active') == '':
                 del self.metadata['active']
             self.cell_type = 'raw'
