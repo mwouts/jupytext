@@ -42,8 +42,19 @@ You may also find useful to `--pipe` the text representation of a notebook into 
 jupytext --sync --pipe black notebook.ipynb    # read most recent version of notebook, reformat with black, save
 ```
 
-
 Execute `jupytext --help` to access the full documentation.
+
+
+## Notebook and cell metadata filters
+
+If you want to preserve (or filter out) certain notebook or cell metadata, change the value of either `notebook_metadata_filter` or `cell_metadata_filter` with the `--update-metadata` option. For instance, if you wish to convert an `.ipynb` document to a `.md` file and preserve all the notebook metadata in that document, run
+
+```bash
+jupytext --to md --update-metadata '{"jupytext": {"notebook_metadata_filter":"all"}}' notebook.ipynb
+```
+
+Read more on the default and possible values for the metadata filters in [this section](using-server.md#metadata-filtering).
+
 
 ## Jupytext as a Git pre-commit hook
 
