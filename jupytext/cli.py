@@ -341,8 +341,8 @@ def jupytext_single_file(nb_file, args, log):
 
     # Execute the notebook
     if args.execute:
-        log("[jupytext] Executing notebook")
         kernel_name = notebook.metadata.get('kernelspec', {}).get('name')
+        log("[jupytext] Executing notebook with kernel {}".format(kernel_name))
         exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
         exec_proc.preprocess(notebook, resources={})
 
