@@ -31,6 +31,12 @@ def kernelspec_from_language(language):
                 if kernel_specs.language == 'python' and kernel_specs.argv[0] == sys.executable:
                     return {'name': name, 'language': language, 'display_name': kernel_specs.display_name}
 
+            # If none was found, return the first kernel that has 'python' as argv[0]
+            for name in find_kernel_specs():
+                kernel_specs = get_kernel_spec(name)
+                if kernel_specs.language == 'python' and kernel_specs.argv[0] == 'python':
+                    return {'name': name, 'language': language, 'display_name': kernel_specs.display_name}
+
         for name in find_kernel_specs():
             kernel_specs = get_kernel_spec(name)
             if kernel_specs.language == language or (language == 'c++' and kernel_specs.language.startswith('C++')):
