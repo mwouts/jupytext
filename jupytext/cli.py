@@ -281,18 +281,19 @@ def jupytext_single_file(nb_file, args, log):
 
     # Set the kernel
     set_kernel = args.set_kernel
-    if args.execute and notebook.metadata.get('kernelspec', {}).get('name') is None:
-        log("[jupytext] Setting default kernel with --set-kernel -")
+    if (not set_kernel) and args.execute and notebook.metadata.get('kernelspec', {}).get('name') is None:
         set_kernel = '-'
 
     if set_kernel:
         if set_kernel == '-':
             language = notebook.metadata.get('jupytext', {}).get('main_language') \
                        or notebook.metadata['kernelspec']['language']
+
             if not language:
                 raise ValueError('Cannot infer a kernel as notebook language is not defined')
 
             kernelspec = kernelspec_from_language(language)
+
             if not kernelspec:
                 raise ValueError('Found no kernel for {}'.format(language))
         else:
@@ -301,10 +302,12 @@ def jupytext_single_file(nb_file, args, log):
             except KeyError:
                 raise KeyError('Please choose a kernel name among {}'
                                .format([name for name in find_kernel_specs()]))
+
             kernelspec = {'name': args.set_kernel,
                           'language': kernelspec.language,
                           'display_name': kernelspec.display_name}
 
+        log("[jupytext] Setting kernel {}".format(kernelspec.get('name')))
         args.update_metadata['kernelspec'] = kernelspec
 
     # Update the metadata
