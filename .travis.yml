@@ -55,6 +55,8 @@ before_script:
   - flake8 . --count --exit-zero --max-complexity=10 --statistics
 script:
   - coverage run --source=. -m py.test
+  # Test HTML display of Utf-8 chars with pipes
+  - echo "from IPython.core.display import HTML; HTML(u'\xd7')" | jupytext --from py --to ipynb --set-kernel - --execute > out.ipynb
 after_success:
   - coverage report -m
   - codecov

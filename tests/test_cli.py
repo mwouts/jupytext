@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import sys
 import time
@@ -766,6 +768,20 @@ def test_set_kernel_works_with_pipes_326(capsys):
     assert err == ''
     nb = reads(out, 'ipynb')
     assert 'kernelspec' in nb.metadata
+
+
+def test_utf8_out_331(capsys):
+    py = u"from IPython.core.display import HTML; HTML(u'\xd7')"
+
+    with mock.patch('sys.stdin', StringIO(py)):
+        jupytext(['--to', 'ipynb', '--execute', '-'])
+
+    out, err = capsys.readouterr()
+    assert err == ''
+    nb = reads(out, 'ipynb')
+    assert len(nb.cells) == 1
+    print(nb.cells[0].outputs)
+    assert nb.cells[0].outputs[0]['data']['text/html'] == u'\xd7'
 
 
 @requires_jupytext_installed
