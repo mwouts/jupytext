@@ -16,6 +16,7 @@ Release History
 - Flag `--warn-only` catches every possible error (#263)
 - Treat `.md` and `.markdown` files identically (#325)
 - Make sure `--set-kernel` can be used with pipes (#326)
+- Fixed utf-8 encoding on stdout on Python 2 (#331)
 
 1.2.3 (2019-09-02)
 ++++++++++++++++++++++

@@ -318,7 +318,13 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
     :param kwargs: (not used) additional parameters for nbformat.write
     """
     if fp == '-':
-        write(nb, sys.stdout, version=version, fmt=fmt, **kwargs)
+        # Use sys.stdout.buffer when possible, and explicit utf-8 encoding, cf. #331
+        content = writes(nb, version=version, fmt=fmt, **kwargs)
+        try:
+            # Python 3
+            sys.stdout.buffer.write(content.encode('utf-8'))
+        except AttributeError:
+            sys.stdout.write(content.encode('utf-8'))
         return
 
     if not hasattr(fp, 'write'):
