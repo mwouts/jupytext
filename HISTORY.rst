@@ -8,14 +8,14 @@ Release History
 
 **Improvements**
 
-- Documentation includes a mention on how to set metadata filters at the command line (#330)
-- Do not catch errors when the flag `--warn-only` is not set (#327)
+- The documentation includes a mention on how to set metadata filters at the command line (#330)
+- Jupytext will not catch any error when the flag ``--warn-only`` is not set (#327)
 
 **BugFixes**
 
-- Flag `--warn-only` catches every possible error (#263)
-- Treat `.md` and `.markdown` files identically (#325)
-- Make sure `--set-kernel` can be used with pipes (#326)
+- Now the flag ``--warn-only`` catches every possible error (#263)
+- ``.md`` and ``.markdown`` files are treated identically (#325)
+- Fixed ``--set-kernel`` when using pipes (#326)
 - Fixed utf-8 encoding on stdout on Python 2 (#331)
 
 1.2.3 (2019-09-02)
