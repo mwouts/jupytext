@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-1.2.4 (2019-09-??)
+1.2.4 (2019-09-19)
 ++++++++++++++++++++++
 
 **Improvements**
@@ -17,6 +17,7 @@ Release History
 - ``.md`` and ``.markdown`` files are treated identically (#325)
 - Fixed ``--set-kernel`` when using pipes (#326)
 - Fixed utf-8 encoding on stdout on Python 2 (#331)
+
 
 1.2.3 (2019-09-02)
 ++++++++++++++++++++++
