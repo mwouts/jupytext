@@ -113,22 +113,25 @@ class MarkdownCellExporter(BaseCellExporter):
         BaseCellExporter.__init__(self, *args, **kwargs)
         self.comment = ''
 
+    def html_comment(self, metadata, code='region'):
+        if metadata:
+            region_start = ['<!-- #' + code]
+            if 'title' in metadata and '{' not in metadata['title']:
+                region_start.append(metadata.pop('title'))
+            region_start.append(json.dumps(metadata))
+            region_start.append('-->')
+            region_start = ' '.join(region_start)
+        else:
+            region_start = '<!-- #{} -->'.format(code)
+
+        return [region_start] + self.source + ['<!-- #end{} -->'.format(code)]
+
     def cell_to_text(self):
         """Return the text representation of a cell"""
         if self.cell_type == 'markdown':
             # Is an explicit region required?
             if self.metadata or self.cell_reader(self.fmt).read(self.source)[1] < len(self.source):
-                if self.metadata:
-                    region_start = ['<!-- #region']
-                    if 'title' in self.metadata and '{' not in self.metadata['title']:
-                        region_start.append(self.metadata.pop('title'))
-                    region_start.append(json.dumps(self.metadata))
-                    region_start.append('-->')
-                    region_start = ' '.join(region_start)
-                else:
-                    region_start = '<!-- #region -->'
-
-                return [region_start] + self.source + ['<!-- #endregion -->']
+                return self.html_comment(self.metadata)
             return self.source
 
         return self.code_to_text()
@@ -147,6 +150,9 @@ class MarkdownCellExporter(BaseCellExporter):
 
         if filtered_metadata:
             options.append(metadata_to_md_options(filtered_metadata))
+
+        if self.cell_type == 'raw':
+            return self.html_comment(filtered_metadata, 'raw')
 
         return ['```{}'.format(' '.join(options))] + source + ['```']
 

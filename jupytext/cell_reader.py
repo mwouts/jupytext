@@ -95,7 +95,8 @@ class BaseCellReader(object):
             fmt = {}
         self.ext = fmt.get('extension')
         self.default_language = default_language or _SCRIPT_EXTENSIONS.get(self.ext, {}).get('language', 'python')
-        self.comment_magics = fmt['comment_magics'] if 'comment_magics' in fmt else self.default_comment_magics
+        self.comment_magics = fmt.get('comment_magics', self.default_comment_magics)
+        self.format_version = fmt.get('format_version')
         self.metadata = None
         self.org_content = []
         self.content = []
@@ -194,7 +195,14 @@ class BaseCellReader(object):
                 (self.ext in ['.md', '.markdown'] and self.cell_type == 'code' and self.language is None):
             if self.metadata.get('active') == '':
                 del self.metadata['active']
-            self.cell_type = 'raw'
+            # Is this a Jupytext document in the Markdown format >= 1.2 ?
+            if self.ext in ['.md', '.markdown'] and self.format_version not in ['1.0', '1.1']:
+                self.cell_type = 'markdown'
+                self.explicit_eoc = False
+                cell_end_marker += 1
+                self.content = lines[:cell_end_marker]
+            else:
+                self.cell_type = 'raw'
 
         # Explicit end of cell marker?
         if (next_cell_start + 1 < len(lines) and
@@ -228,17 +236,25 @@ class MarkdownCellReader(BaseCellReader):
     end_code_re = re.compile(r"^```\s*$")
     start_region_re = re.compile(r"^<!--\s*#region(.*)-->\s*$")
     end_region_re = re.compile(r"^<!--\s*#endregion\s*-->\s*$")
+    start_raw_re = re.compile(r"^<!--\s*#raw(.*)-->\s*$")
+    end_raw_re = re.compile(r"^<!--\s*#endraw\s*-->\s*$")
     default_comment_magics = False
 
     def __init__(self, fmt=None, default_language=None):
         super(MarkdownCellReader, self).__init__(fmt, default_language)
         self.split_at_heading = (fmt or {}).get('split_at_heading', False)
         self.in_region = False
+        self.in_raw = False
 
     def metadata_and_language_from_option_line(self, line):
         region = self.start_region_re.match(line)
-        if region:
-            self.in_region = True
+        raw = self.start_raw_re.match(line)
+        if region or raw:
+            if region:
+                self.in_region = True
+            else:
+                self.in_raw = True
+                region = raw
             options = region.groups()[0].strip()
             if options:
                 start = options.find('{')
@@ -266,6 +282,11 @@ class MarkdownCellReader(BaseCellReader):
             self.cell_type = 'markdown'
             for i, line in enumerate(lines):
                 if self.end_region_re.match(line):
+                    return i, i + 1, True
+        if self.in_raw:
+            self.cell_type = 'raw'
+            for i, line in enumerate(lines):
+                if self.end_raw_re.match(line):
                     return i, i + 1, True
         elif self.metadata is None:
             # default markdown: (last) two consecutive blank lines, except when in code blocks
@@ -295,7 +316,7 @@ class MarkdownCellReader(BaseCellReader):
                 if in_indented_code_block or in_explicit_code_block:
                     continue
 
-                if self.start_code_re.match(line) or self.start_region_re.match(line):
+                if self.start_code_re.match(line) or self.start_region_re.match(line) or self.start_raw_re.match(line):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False

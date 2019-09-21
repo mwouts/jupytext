@@ -39,6 +39,12 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             if opt in self.fmt:
                 metadata.setdefault('jupytext', {}).setdefault(opt, self.fmt[opt])
 
+        # Is this format the same as that documented in the YAML header? If so, we want to know the format version
+        file_fmt = metadata.get('jupytext', {}).get('text_representation', {})
+        if self.fmt.get('extension') == file_fmt.get('extension') and \
+                self.fmt.get('format_name') == file_fmt.get('format_name'):
+            self.fmt.update(file_fmt)
+
         # rST to md conversion should happen only once
         if metadata.get('jupytext', {}).get('rst2md') is True:
             metadata['jupytext']['rst2md'] = False
@@ -165,6 +171,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 if (i + 1 < len(cell_exporters) and not cell_exporters[i + 1].is_code() and
                         not texts[i][0].startswith('<!-- #region') and
                         not texts[i + 1][0].startswith('<!-- #region') and
+                        not texts[i][0].startswith('```') and
+                        not texts[i + 1][0].startswith('```') and
                         (not split_at_heading or not (texts[i + 1] and texts[i + 1][0].startswith('#')))):
                     text.append('')
 
