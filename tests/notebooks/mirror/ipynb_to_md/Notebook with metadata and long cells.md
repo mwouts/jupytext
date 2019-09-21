@@ -35,11 +35,11 @@ After that cell we'll have a code cell
 
 Followed by a raw cell
 
-```
+<!-- #raw -->
 This is 
 the content
 of the raw cell
-```
+<!-- #endraw -->
 
 # Part two - cell metadata
 
@@ -51,6 +51,6 @@ This is a markdown cell with cell metadata `{"key": "value"}`
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
 ```
 
-```key="value"
+<!-- #raw {"key": "value"} -->
 This is a raw cell with cell metadata `{"key": "value"}`
-```
+<!-- #endraw -->

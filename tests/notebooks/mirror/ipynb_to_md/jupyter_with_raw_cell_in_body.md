@@ -10,8 +10,8 @@ jupyter:
 1+2+3
 ```
 
-```
+<!-- #raw -->
 This is a raw cell
-```
+<!-- #endraw -->
 
 This is a markdown cell
