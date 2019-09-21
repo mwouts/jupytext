@@ -8,6 +8,7 @@ Release History
 
 **Improvements**
 
+- ``jupytext notebook.py --to ipynb`` updates the timestamp of ``notebook.py`` so that the paired notebook still works in Jupyter (#335, #254)
 **BugFixes**
 
 
