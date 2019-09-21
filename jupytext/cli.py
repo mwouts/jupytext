@@ -415,7 +415,7 @@ def jupytext_single_file(nb_file, args, log):
         # Update the original text file timestamp, as required by our Content Manager
         # Otherwise Jupyter will refuse to open the paired notebook #335
         log("[jupytext] Sync timestamp of '{}'".format(nb_file))
-        os.utime(nb_file)
+        os.utime(nb_file, None)
 
     return 0
 
