@@ -53,7 +53,8 @@ JUPYTEXT_FORMATS = \
             cell_exporter_class=MarkdownCellExporter,
             # Version 1.0 on 2018-08-31 - jupytext v0.6.0 : Initial version
             # Version 1.1 on 2019-03-24 - jupytext v1.1.0 : Markdown regions and cell metadata
-            current_version_number='1.1',
+            # Version 1.2 on 2019-09-21 - jupytext v1.3.0 : Raw regions are now marked with HTML comments
+            current_version_number='1.2',
             min_readable_version_number='1.0'),
 
         NotebookFormatDescription(
@@ -62,7 +63,7 @@ JUPYTEXT_FORMATS = \
             header_prefix='',
             cell_reader_class=MarkdownCellReader,
             cell_exporter_class=MarkdownCellExporter,
-            current_version_number='1.1',
+            current_version_number='1.2',
             min_readable_version_number='1.0'),
 
         NotebookFormatDescription(
@@ -73,7 +74,8 @@ JUPYTEXT_FORMATS = \
             cell_exporter_class=RMarkdownCellExporter,
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
             # Version 1.1 on 2019-03-24 - jupytext v1.1.0 : Markdown regions and cell metadata
-            current_version_number='1.1',
+            # Version 1.2 on 2019-09-21 - jupytext v1.3.0 : Raw regions are now marked with HTML comments
+            current_version_number='1.2',
             min_readable_version_number='1.0')] + \
     [
         NotebookFormatDescription(
