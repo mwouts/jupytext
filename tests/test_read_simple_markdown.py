@@ -19,8 +19,12 @@ y = np.abs(x)-.5
 ```
 
 ```
-# this is a raw cell
+# this is a code cell with no language info
 ```
+
+<!-- #raw -->
+this is a raw cell
+<!-- #endraw -->
 
 ```R
 ls()
@@ -46,9 +50,12 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
                         'execution_count': None,
                         'source': 'x = np.arange(0,1,eps)\ny = np.abs(x)-.5',
                         'outputs': []},
+                       {'cell_type': 'markdown',
+                        'metadata': {},
+                        'source': '```\n# this is a code cell with no language info\n```'},
                        {'cell_type': 'raw',
                         'metadata': {},
-                        'source': '# this is a raw cell'},
+                        'source': 'this is a raw cell'},
                        {'cell_type': 'code',
                         'metadata': {},
                         'execution_count': None,
@@ -155,14 +162,34 @@ b = 2
     compare(markdown, markdown2)
 
 
-def test_raw_cell_with_metadata(markdown="""```key="value"
+def test_raw_cell_with_metadata(markdown="""<!-- #raw {"key": "value"} -->
 raw content
-```
+<!-- #endraw -->
 """):
     nb = jupytext.reads(markdown, 'md')
     compare(nb.cells[0], new_raw_cell(source='raw content', metadata={'key': 'value'}))
     markdown2 = jupytext.writes(nb, 'md')
     compare(markdown, markdown2)
+
+
+def test_read_raw_cell_markdown_version_1_1(markdown="""---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.1'
+      jupytext_version: 1.1.0
+---
+
+```key="value"
+raw content
+```
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    compare(nb.cells[0], new_raw_cell(source='raw content', metadata={'key': 'value'}))
+    md2 = jupytext.writes(nb, 'md')
+    assert "format_version: '1.1'" not in md2
 
 
 def test_markdown_cell_with_metadata(markdown="""<!-- #region {"key": "value"} -->
