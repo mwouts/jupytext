@@ -10,6 +10,7 @@ from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from tornado.web import HTTPError
 from jupytext.compare import compare
 import jupytext
+from jupytext.cli import jupytext as jupytext_cli
 from jupytext.jupytext import writes, write, read
 from jupytext.compare import compare_notebooks
 from jupytext.header import header_to_metadata_and_cell
@@ -428,6 +429,34 @@ def test_outdated_text_notebook(nb_file, tmpdir):
     # 7. test OK with
     cm.outdated_text_notebook_margin = float("inf")
     cm.get(tmp_nbpy)
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
+def test_reload_notebook_after_jupytext_cli(nb_file, tmpdir):
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_nbpy = str(tmpdir.join('notebook.py'))
+
+    cm = jupytext.TextFileContentsManager()
+    cm.default_jupytext_formats = 'py,ipynb'
+    cm.outdated_text_notebook_margin = 0
+    cm.root_dir = str(tmpdir)
+
+    # write the paired notebook
+    nb = jupytext.read(nb_file)
+    cm.save(model=dict(type='notebook', content=nb), path='notebook.py')
+
+    assert os.path.isfile(tmp_ipynb)
+    assert os.path.isfile(tmp_nbpy)
+
+    # run jupytext CLI
+    jupytext_cli([tmp_nbpy, '--to', 'ipynb', '--update'])
+
+    # test reload
+    nb1 = cm.get('notebook.py')['content']
+    nb2 = cm.get('notebook.ipynb')['content']
+
+    compare_notebooks(nb1, nb)
+    compare_notebooks(nb2, nb)
 
 
 @skip_if_dict_is_not_ordered
