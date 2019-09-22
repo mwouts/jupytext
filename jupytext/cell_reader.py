@@ -619,7 +619,22 @@ class DoublePercentScriptCellReader(ScriptCellReader):
 
         if self.cell_type != 'code' or (self.metadata and not is_active('py', self.metadata)) \
                 or (self.language is not None and self.language != self.default_language):
-            source = uncomment(source, self.comment)
+            if self.ext == '.py' and self.cell_type != 'code' and self.org_content \
+                    and self.org_content[0].lstrip().startswith(('"""', "'''")):
+                content = '\n'.join(self.org_content).strip()
+                for triple_quote in ['"""', "'''"]:
+                    if content.startswith(triple_quote) and content.endswith(triple_quote):
+                        content = content[3:-3]
+                        self.metadata['cell_marker'] = triple_quote
+                        # Trim first/last line return
+                        if content.startswith('\n'):
+                            content = content[1:]
+                        if content.endswith('\n'):
+                            content = content[:-1]
+                        source = content.splitlines()
+                        break
+            else:
+                source = uncomment(source, self.comment)
         elif self.metadata is not None and self.comment_magics:
             source = self.uncomment_code_and_magics(source)
 
@@ -643,7 +658,13 @@ class DoublePercentScriptCellReader(ScriptCellReader):
             self.cell_type = 'code'
 
         next_cell = len(lines)
+        parser = StringParser(self.language or self.default_language)
         for i, line in enumerate(lines):
+            if parser.is_quoted():
+                parser.read_line(line)
+                continue
+
+            parser.read_line(line)
             if i > 0 and (self.start_code_re.match(line) or self.alternative_start_code_re.match(line)):
                 next_cell = i
                 break

@@ -75,7 +75,16 @@ Our implementation of the `percent` format is compatible with the original speci
 ```python
 # %% Optional text [cell type] {optional JSON metadata}
 ```
-where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The content of markdown and raw cells is commented out in the resulting script.
+where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. The content of markdown and raw cells is commented out in the resulting script, using line comments by default. Multiline comments can also be used for Python scripts. If you want to use multiline comments for all text cells, add a `{"jupytext": '{"cell_markers": "\\"\\"\\""}'}` metadata to your notebook, either with the notebook metadata editor in Jupyter, or at the command line:
+```bash
+jupytext --update-metadata '{"jupytext": {"cell_markers": "\\"\\"\\""}}' notebook.ipynb --to py:percent
+```
+
+If you want to use multiline comments for all your paired notebooks, you could also add
+```python
+c.ContentsManager.default_cell_markers = '"""'
+```
+to your `.jupyter/jupyter_notebook_config.py` file.
 
 Percent scripts created by Jupytext have a header with an explicit format information. The format of scripts with no header is inferred automatically: scripts with at least one `# %%` cell are identified as `percent` scripts. Scripts with at least one double percent cell, and an uncommented Jupyter magic command, are identified as `hydrogen` scripts.
 

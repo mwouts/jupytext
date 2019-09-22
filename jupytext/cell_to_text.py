@@ -2,6 +2,7 @@
 
 import re
 import json
+import warnings
 from copy import copy
 from .languages import cell_language, comment_lines
 from .cell_metadata import is_active, _IGNORE_CELL_METADATA
@@ -207,7 +208,10 @@ class LightScriptCellExporter(BaseCellExporter):
     def __init__(self, *args, **kwargs):
         BaseCellExporter.__init__(self, *args, **kwargs)
         if 'cell_markers' in self.fmt:
-            if self.fmt['cell_markers'] != '+,-':
+            if ',' not in self.fmt['cell_markers']:
+                warnings.warn("Ignored cell markers '{}' as it does not match the expected 'start,end' pattern"
+                              .format(self.fmt.pop('cell_markers')))
+            elif self.fmt['cell_markers'] != '+,-':
                 self.cell_marker_start, self.cell_marker_end = self.fmt['cell_markers'].split(',', 1)
         for key in ['endofcell']:
             if key in self.unfiltered_metadata:
@@ -357,6 +361,10 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
     default_comment_magics = True
     parse_cell_language = True
 
+    def __init__(self, *args, **kwargs):
+        BaseCellExporter.__init__(self, *args, **kwargs)
+        self.cell_markers = self.fmt.get('cell_markers')
+
     def cell_to_text(self):
         """Return the text representation for the cell"""
         if self.cell_type != 'code':
@@ -380,6 +388,10 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
             if source == ['']:
                 return lines
             return lines + source
+
+        cell_marker = self.unfiltered_metadata.get('cell_marker', self.cell_markers)
+        if self.cell_type != 'code' and cell_marker:
+            return lines + [cell_marker] + self.source + [cell_marker]
 
         return lines + comment_lines(self.source, self.comment)
 
