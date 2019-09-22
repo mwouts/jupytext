@@ -110,11 +110,12 @@ JUPYTEXT_FORMATS = \
             header_prefix=_SCRIPT_EXTENSIONS[ext]['comment'],
             cell_reader_class=DoublePercentScriptCellReader,
             cell_exporter_class=DoublePercentCellExporter,
+            # Version 1.3 on 2019-09-21 - jupytext v1.3.0: Markdown cells can be quoted using triple quotes #305
             # Version 1.2 on 2018-11-18 - jupytext v0.8.6: Jupyter magics are commented by default #126, #132
             # Version 1.1 on 2018-09-23 - jupytext v0.7.0rc1 : [markdown] and
             # [raw] for markdown and raw cells.
             # Version 1.0 on 2018-09-22 - jupytext v0.7.0rc0 : Initial version
-            current_version_number='1.2',
+            current_version_number='1.3',
             min_readable_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
     [
         NotebookFormatDescription(
