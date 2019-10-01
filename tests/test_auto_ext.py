@@ -22,7 +22,7 @@ def test_auto_in_fmt(nb_file):
         writes(nb, 'auto:percent')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R') + list_notebooks('ipynb_py'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_R') + list_notebooks('ipynb_py', skip='plotly'))
 def test_auto_in_formats(nb_file):
     nb = read(nb_file)
     nb.metadata['jupytext'] = {'formats': 'ipynb,auto:percent'}
