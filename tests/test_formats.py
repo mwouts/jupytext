@@ -26,6 +26,13 @@ def test_guess_format_sphinx(nb_file):
         assert guess_format(stream.read(), ext='.py')[0] == 'sphinx'
 
 
+def test_guess_format_hydrogen():
+    text = """# %%
+cat hello.txt
+"""
+    assert guess_format(text, ext='.py')[0] == 'hydrogen'
+
+
 def test_divine_format():
     assert divine_format('{"cells":[]}') == 'ipynb'
     assert divine_format('''def f(x):
