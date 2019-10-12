@@ -17,6 +17,7 @@ from .metadata_filter import metadata_filter_as_string
 from .stringparser import StringParser
 from .languages import _SCRIPT_EXTENSIONS, _COMMENT_CHARS
 from .pandoc import pandoc_version, is_pandoc_available
+from .magics import is_magic
 
 
 class JupytextFormatError(ValueError):
@@ -219,8 +220,8 @@ def guess_format(text, ext):
     # Or a Sphinx-gallery script?
     if ext in _SCRIPT_EXTENSIONS:
         comment = _SCRIPT_EXTENSIONS[ext]['comment']
+        language = _SCRIPT_EXTENSIONS[ext]['language']
         twenty_hash = ''.join(['#'] * 20)
-        magic_re = re.compile(r'^(%|%%|%%%)[a-zA-Z]')
         double_percent_re = re.compile(r'^{}( %%|%%)$'.format(comment))
         double_percent_and_space_re = re.compile(r'^{}( %%|%%)\s'.format(comment))
         nbconvert_script_re = re.compile(r'^{}( <codecell>| In\[[0-9 ]*\]:?)'.format(comment))
@@ -245,7 +246,7 @@ def guess_format(text, ext):
                     nbconvert_script_re.match(line):
                 double_percent_count += 1
 
-            if magic_re.match(line):
+            if not line.startswith(comment) and is_magic(line, language):
                 magic_command_count += 1
 
             if line.startswith(twenty_hash) and ext == '.py':
