@@ -18,7 +18,8 @@ _LINE_CONTINUATION_RE = re.compile(r'.*\\\s*$')
 # Commands starting with a question or exclamation mark have to be escaped
 _PYTHON_HELP_OR_BASH_CMD = re.compile(r"^(# |#)*(\?|!)\s*[A-Za-z]")
 
-_PYTHON_MAGIC_CMD = re.compile(r"^(# |#)*({})(\s|$)".format('|'.join(
+# A bash command not followed by an equal sign or a parenthesis is a magic command
+_PYTHON_MAGIC_CMD = re.compile(r"^(# |#)*({})($|\s$|\s[^=,])".format('|'.join(
     # posix
     ['cat', 'cp', 'mv', 'rm', 'rmdir', 'mkdir'] +
     # windows
