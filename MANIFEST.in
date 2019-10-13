@@ -6,3 +6,4 @@ include *.rst
 graft tests
 prune tests\__pycache__
 global-exclude *population.ipynb
+global-exclude plotly_graphs.ipynb
