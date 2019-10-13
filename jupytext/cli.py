@@ -301,7 +301,7 @@ def jupytext_single_file(nb_file, args, log):
                 kernelspec = get_kernel_spec(set_kernel)
             except KeyError:
                 raise KeyError('Please choose a kernel name among {}'
-                               .format([name for name in find_kernel_specs()]))
+                               .format(find_kernel_specs().keys()))
 
             kernelspec = {'name': args.set_kernel,
                           'language': kernelspec.language,
