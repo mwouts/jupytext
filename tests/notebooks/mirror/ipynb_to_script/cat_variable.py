@@ -6,4 +6,4 @@
 #     name: python3
 # ---
 
-# cat = 42
+cat = 42
