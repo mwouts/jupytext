@@ -14,7 +14,7 @@ from .formats import long_form_one_format, long_form_multiple_formats, short_for
 from .header import recursive_update
 from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
-from .compare import test_round_trip_conversion, NotebookDifference
+from .compare import test_round_trip_conversion, NotebookDifference, compare
 from .kernels import kernelspec_from_language, find_kernel_specs, get_kernel_spec
 from .reraise import reraise
 from .version import __version__
@@ -351,11 +351,27 @@ def jupytext_single_file(nb_file, args, log):
     # a. Test round trip conversion
     if args.test or args.test_strict:
         try:
-            test_round_trip_conversion(notebook, dest_fmt,
-                                       update=args.update,
-                                       allow_expected_differences=not args.test_strict,
-                                       stop_on_first_error=args.stop_on_first_error)
-        except NotebookDifference as err:
+            # Round trip from an ipynb document
+            if fmt['extension'] == '.ipynb':
+                test_round_trip_conversion(notebook, dest_fmt,
+                                           update=args.update,
+                                           allow_expected_differences=not args.test_strict,
+                                           stop_on_first_error=args.stop_on_first_error)
+
+            # Round trip from a text file
+            else:
+                with open(nb_file) as fp:
+                    org_text = fp.read()
+
+                # If the destination is not ipynb, we convert to/back that format
+                if dest_fmt['extension'] != '.ipynb':
+                    dest_text = writes(notebook, fmt=dest_fmt)
+                    notebook = reads(dest_text, fmt=dest_fmt)
+
+                text = writes(notebook, fmt=fmt)
+                compare(org_text, text)
+
+        except (NotebookDifference, AssertionError) as err:
             sys.stdout.write('{}: {}'.format(nb_file, str(err)))
             return 1
         return 0
