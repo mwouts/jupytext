@@ -967,3 +967,18 @@ def test_339_ipynb(tmpdir, fmt):
     nbformat.write(nb, tmp_ipynb)
 
     assert jupytext([tmp_ipynb, '--to', fmt, '--test-strict']) == 0
+
+
+def test_339_py(tmpdir):
+    """Test that an incorrect round trip conversion on the text file is detected"""
+    tmp_py = str(tmpdir.join('test.py'))
+    with open(tmp_py, 'w') as fp:
+        fp.write("""# %%
+cat = 42
+""")
+
+    def erroneous_is_magic(line, language, comment_magics):
+        return 'cat' in line
+
+    with mock.patch('jupytext.magics.is_magic', erroneous_is_magic):
+        assert jupytext([tmp_py, '--to', 'ipynb', '--test-strict']) != 0

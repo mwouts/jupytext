@@ -16,6 +16,7 @@ Release History
 
 - Fixed an inconsistent round trip (code cell with ``"cat"`` being converted to a markdown cell) in the ``py:light`` format (#339)
 - Commands like ``cat = x`` are not magic commands {#339)
+- ``jupytext --test`` now really compares the text (rather than the corresponding notebook) when run on text files (#339)
 
 
 1.2.4 (2019-09-19)
