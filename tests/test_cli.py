@@ -958,3 +958,12 @@ def test_warn_only_skips_incorrect_notebook(tmpdir, capsys):
 
     assert not os.path.exists(incorrect_md)
     assert os.path.exists(correct_md)
+
+
+@pytest.mark.parametrize('fmt', ['md', 'Rmd', 'py', 'py:percent', 'py:hydrogen'])
+def test_339_ipynb(tmpdir, fmt):
+    tmp_ipynb = str(tmpdir.join('test.ipynb'))
+    nb = new_notebook(cells=[new_code_cell('cat = 42')])
+    nbformat.write(nb, tmp_ipynb)
+
+    assert jupytext([tmp_ipynb, '--to', fmt, '--test-strict']) == 0
