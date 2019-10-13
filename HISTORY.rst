@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-1.3.0 (2019-09-??)
+1.3.0 (2019-10-??)
 ++++++++++++++++++++++
 
 **Improvements**
@@ -13,6 +13,8 @@ Release History
 - ``jupytext notebook.py --to ipynb`` updates the timestamp of ``notebook.py`` so that the paired notebook still works in Jupyter (#335, #254)
 
 **BugFixes**
+
+- Fixed an inconsistent round trip (code cell with ``"cat"`` being converted to a markdown cell) in the ``py:light`` format (#339)
 
 
 1.2.4 (2019-09-19)
