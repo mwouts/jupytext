@@ -115,6 +115,7 @@ class MarkdownCellExporter(BaseCellExporter):
         self.comment = ''
 
     def html_comment(self, metadata, code='region'):
+        """Encore the source text in an HTML region"""
         if metadata:
             region_start = ['<!-- #' + code]
             if 'title' in metadata and '{' not in metadata['title']:
