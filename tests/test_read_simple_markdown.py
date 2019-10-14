@@ -18,9 +18,21 @@ x = np.arange(0,1,eps)
 y = np.abs(x)-.5
 ```
 
+This is
+a Markdown cell
+
 ```
-# this is a code cell with no language info
+# followed by a code cell with no language info
 ```
+
+```
+# another code cell
+
+
+# with two blank lines
+```
+
+And the same markdown cell continues
 
 <!-- #raw -->
 this is a raw cell
@@ -52,7 +64,21 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
                         'outputs': []},
                        {'cell_type': 'markdown',
                         'metadata': {},
-                        'source': '```\n# this is a code cell with no language info\n```'},
+                        'source': '''This is
+a Markdown cell
+
+```
+# followed by a code cell with no language info
+```
+
+```
+# another code cell
+
+
+# with two blank lines
+```
+
+And the same markdown cell continues'''},
                        {'cell_type': 'raw',
                         'metadata': {},
                         'source': 'this is a raw cell'},

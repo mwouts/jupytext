@@ -33,10 +33,10 @@ Indented code is accepted, and consecutive blank lines there do not break Markdo
 
 ## Raw cells
 
-Raw cells starts with ` ``` `, like here:
-```
-THIS IS A RAW CELL
-```
+Raw cells are delimited with `<!-- #raw -->` and <!-- #endraw -->, like here:
+<!-- #raw -->
+this is a raw cell
+<!-- #endraw -->
 
 # Protected Markdown cells
 
@@ -62,7 +62,7 @@ Metadata are supported for all cell types.
 A cell with a title and additional metadata.
 <!-- #endregion -->
 
-## Code and raw cells
+## Code cells
 
 ```python tags=["parameters"]
 a = 2
