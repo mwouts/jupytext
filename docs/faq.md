@@ -71,7 +71,12 @@ By default, Jupyter saves your notebook every 2 minutes. Fortunately, it is also
 
 You should simply click on _Reload_.
 
-Note you can deactivate Jupyter's autosave function with the Jupytext Menu in Jupyter Notebook, and with the _Autosave Document_ setting in JupyterLab. See [here](https://stackoverflow.com/a/45980165) if you want to permanently deactivate the autosave in Jupyter Notebook.
+Note you can deactivate Jupyter's autosave function with the Jupytext Menu in Jupyter Notebook, and with the _Autosave Document_ setting in JupyterLab. If you want to permanently deactivate autosave in Jupyter Notebook, it is [recommended by Jupyter](https://github.com/jupyter/notebook/blob/master/docs/source/examples/Notebook/JavaScript%20Notebook%20Extensions.ipynb) to do so via a *custom.js* file:
+
+```sh
+mkdir -p ~/.jupyter/custom
+echo "Jupyter.notebook.set_autosave_interval(0);" >> ~/.jupyter/custom/custom.js
+```
 
 ## When I reload, Jupyter warns me that my notebook has unsaved changes
 
