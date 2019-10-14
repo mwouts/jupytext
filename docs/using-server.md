@@ -77,7 +77,7 @@ NB: All these global options (and more) are documented [here](https://github.com
 When saving a paired notebook using Jupytext's contents manager, Jupyter updates both the `.ipynb` and its text representation. The text representation can be edited outside of Jupyter. When the notebook is refreshed in Jupyter, the input cells are read from the text file, and the output cells from the `.ipynb` file.
 
 It is possible (and convenient) to leave the notebook open in Jupyter while you edit its text representation. However, you don't want that the two editors save the notebook simultaneously. To avoid this:
-- deactivate Jupyter's autosave, by toggling the `"Autosave notebook"` menu entry (or run `%autosave 0` in a cell of the notebook)
+- deactivate Jupyter's autosave, by either toggling the `"Autosave notebook"` menu entry or run `%autosave 0` in a cell of the notebook (see in the [faq](https://github.com/mwouts/jupytext/blob/master/docs/faq.md#jupyter-warns-me-that-the-file-has-changed-on-disk) how to deactivate autosave permanently)
 - and refresh the notebook when you switch back from the editor to Jupyter.
 
 In case you forgot to refresh, and saved the Jupyter notebook while the text representation had changed, no worries: Jupyter will ask you which version you want to keep:
