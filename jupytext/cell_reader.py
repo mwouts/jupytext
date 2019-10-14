@@ -13,6 +13,7 @@ except (ImportError, SyntaxError):
 
 from .cell_metadata import is_active, json_options_to_metadata, md_options_to_metadata, rmd_options_to_metadata, \
     double_percent_options_to_metadata
+from .languages import _JUPYTER_LANGUAGES
 from .stringparser import StringParser
 from .magics import uncomment_magic, is_magic, unescape_code_start
 from .pep8 import pep8_lines_between_cells
@@ -233,8 +234,9 @@ class BaseCellReader(object):
 class MarkdownCellReader(BaseCellReader):
     """Read notebook cells from Markdown documents"""
     comment = ''
-    start_code_re = re.compile(r"^```(.*)")
-    non_jupyter_code_re = re.compile(r"^```\{")
+    start_code_re = re.compile(r"^```({})(.*)".format('|'.join(
+        _JUPYTER_LANGUAGES + [str.upper(lang) for lang in _JUPYTER_LANGUAGES]).replace('+', '\\+')))
+    non_jupyter_code_re = re.compile(r"^```")
     end_code_re = re.compile(r"^```\s*$")
     start_region_re = re.compile(r"^<!--\s*#region(.*)-->\s*$")
     end_region_re = re.compile(r"^<!--\s*#endregion\s*-->\s*$")
@@ -247,6 +249,8 @@ class MarkdownCellReader(BaseCellReader):
         self.split_at_heading = (fmt or {}).get('split_at_heading', False)
         self.in_region = False
         self.in_raw = False
+        if self.format_version in ['1.0', '1.1']:
+            self.start_code_re = re.compile(r"^```(.*)")
 
     def metadata_and_language_from_option_line(self, line):
         region = self.start_region_re.match(line)
@@ -275,6 +279,8 @@ class MarkdownCellReader(BaseCellReader):
             self.language, self.metadata = self.options_to_metadata(self.start_code_re.findall(line)[0])
 
     def options_to_metadata(self, options):
+        if isinstance(options, tuple):
+            options = ' '.join(options)
         return md_options_to_metadata(options)
 
     def find_cell_end(self, lines):
@@ -302,11 +308,6 @@ class MarkdownCellReader(BaseCellReader):
                     in_explicit_code_block = False
                     continue
 
-                if self.non_jupyter_code_re and self.non_jupyter_code_re.match(line):
-                    in_explicit_code_block = True
-                    prev_blank = 0
-                    continue
-
                 if prev_blank and line.startswith('    ') and not _BLANK_LINE.match(line):
                     in_indented_code_block = True
                     prev_blank = 0
@@ -322,6 +323,11 @@ class MarkdownCellReader(BaseCellReader):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False
+
+                if self.non_jupyter_code_re and self.non_jupyter_code_re.match(line):
+                    in_explicit_code_block = True
+                    prev_blank = 0
+                    continue
 
                 if self.split_at_heading and line.startswith('#') and prev_blank >= 1:
                     return i - 1, i, False
