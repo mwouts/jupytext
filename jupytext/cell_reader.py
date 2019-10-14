@@ -238,10 +238,8 @@ class MarkdownCellReader(BaseCellReader):
         _JUPYTER_LANGUAGES + [str.upper(lang) for lang in _JUPYTER_LANGUAGES]).replace('+', '\\+')))
     non_jupyter_code_re = re.compile(r"^```")
     end_code_re = re.compile(r"^```\s*$")
-    start_region_re = re.compile(r"^<!--\s*#region(.*)-->\s*$")
-    end_region_re = re.compile(r"^<!--\s*#endregion\s*-->\s*$")
-    start_raw_re = re.compile(r"^<!--\s*#raw(.*)-->\s*$")
-    end_raw_re = re.compile(r"^<!--\s*#endraw\s*-->\s*$")
+    start_region_re = re.compile(r"^<!--\s*#(region|markdown|md|raw)(.*)-->\s*$")
+    end_region_re = None
     default_comment_magics = False
 
     def __init__(self, fmt=None, default_language=None):
@@ -253,15 +251,17 @@ class MarkdownCellReader(BaseCellReader):
             self.start_code_re = re.compile(r"^```(.*)")
 
     def metadata_and_language_from_option_line(self, line):
-        region = self.start_region_re.match(line)
-        raw = self.start_raw_re.match(line)
-        if region or raw:
-            if region:
-                self.in_region = True
+        match_region = self.start_region_re.match(line)
+        if match_region:
+            self.in_region = True
+            groups = match_region.groups()
+            region_name = groups[0]
+            self.end_region_re = re.compile(r"^<!--\s*#end{}\s*-->\s*$".format(region_name))
+            options = groups[1].strip()
+            if region_name == 'raw':
+                self.cell_type = 'raw'
             else:
-                self.in_raw = True
-                region = raw
-            options = region.groups()[0].strip()
+                self.cell_type = 'markdown'
             if options:
                 start = options.find('{')
                 if start >= 0:
@@ -275,6 +275,8 @@ class MarkdownCellReader(BaseCellReader):
                     self.metadata['title'] = title
             else:
                 self.metadata = {}
+            if region_name in ['markdown', 'md']:
+                self.metadata['region_name'] = region_name
         elif self.start_code_re.match(line):
             self.language, self.metadata = self.options_to_metadata(self.start_code_re.findall(line)[0])
 
@@ -287,14 +289,8 @@ class MarkdownCellReader(BaseCellReader):
         """Return position of end of cell marker, and position
         of first line after cell"""
         if self.in_region:
-            self.cell_type = 'markdown'
             for i, line in enumerate(lines):
                 if self.end_region_re.match(line):
-                    return i, i + 1, True
-        if self.in_raw:
-            self.cell_type = 'raw'
-            for i, line in enumerate(lines):
-                if self.end_raw_re.match(line):
                     return i, i + 1, True
         elif self.metadata is None:
             # default markdown: (last) two consecutive blank lines, except when in code blocks
@@ -319,7 +315,7 @@ class MarkdownCellReader(BaseCellReader):
                 if in_indented_code_block or in_explicit_code_block:
                     continue
 
-                if self.start_code_re.match(line) or self.start_region_re.match(line) or self.start_raw_re.match(line):
+                if self.start_code_re.match(line) or self.start_region_re.match(line):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False

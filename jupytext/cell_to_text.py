@@ -132,7 +132,7 @@ class MarkdownCellExporter(BaseCellExporter):
         if self.cell_type == 'markdown':
             # Is an explicit region required?
             if self.metadata or self.cell_reader(self.fmt).read(self.source)[1] < len(self.source):
-                return self.html_comment(self.metadata)
+                return self.html_comment(self.metadata, self.metadata.pop('region_name', 'region'))
             return self.source
 
         return self.code_to_text()

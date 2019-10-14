@@ -98,6 +98,42 @@ And the same markdown cell continues'''},
     compare(markdown, markdown2)
 
 
+def test_read_md_and_markdown_regions(markdown="""Some text
+
+<!-- #md -->
+A
+
+
+long
+cell
+<!-- #endmd -->
+
+<!-- #markdown -->
+Another
+
+
+long
+cell
+<!-- #endmarkdown -->
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    assert nb.metadata['jupytext']['main_language'] == 'python'
+    compare(nb.cells, [new_markdown_cell('Some text'),
+                       new_markdown_cell("""A
+
+
+long
+cell""", metadata={'region_name': 'md'}),
+                       new_markdown_cell("""Another
+
+
+long
+cell""", metadata={'region_name': 'markdown'})])
+
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
 def test_read_mostly_R_markdown_file(markdown="""```R
 ls()
 ```
