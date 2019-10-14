@@ -37,7 +37,7 @@ _IGNORE_CELL_METADATA = ','.join('-{}'.format(name) for name in [
     'autoscroll', 'collapsed', 'scrolled', 'trusted', 'ExecuteTime'] +
                                  _JUPYTEXT_CELL_METADATA)
 _PERCENT_CELL = re.compile(
-    r'(# |#)%%([^\{\[]*)(|\[raw\]|\[markdown\])([^\{\[]*)(|\{.*\})\s*$')
+    r'(# |#)%%([^\{\[]*)(|\[raw\]|\[markdown\]||\[md\])([^\{\[]*)(|\{.*\})\s*$')
 
 
 def _r_logical_values(pybool):
@@ -379,7 +379,10 @@ def double_percent_options_to_metadata(options):
     # Third match is cell type
     cell_type = matches[2]
     if cell_type:
-        metadata['cell_type'] = cell_type[1:-1]
+        cell_type = cell_type[1:-1]
+        if cell_type == 'md':
+            cell_type = 'markdown'
+        metadata['cell_type'] = cell_type
 
     # Second and fourth match are description
     title = [matches[i].strip() for i in [1, 3]]

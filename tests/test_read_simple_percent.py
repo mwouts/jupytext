@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from nbformat.v4.nbbase import new_notebook, new_code_cell, new_markdown_cell
+from nbformat.v4.nbbase import new_notebook, new_code_cell, new_markdown_cell, new_raw_cell
 from jupytext.compare import compare, compare_notebooks
 import jupytext
 
@@ -12,6 +12,9 @@ def test_read_simple_file(script="""# ---
 
 # %% [markdown]
 # This is a markdown cell
+
+# %% [md]
+# This is also a markdown cell
 
 # %% [raw]
 # This is a raw cell
@@ -31,30 +34,22 @@ def test_read_simple_file(script="""# ---
 7
 """):
     nb = jupytext.reads(script, 'py:percent')
-    assert len(nb.cells) == 6
-    assert nb.cells[0].cell_type == 'raw'
-    assert nb.cells[0].source == '---\ntitle: Simple file\n---'
-    assert nb.cells[1].cell_type == 'markdown'
-    assert nb.cells[1].source == 'This is a markdown cell'
-    assert nb.cells[2].cell_type == 'raw'
-    assert nb.cells[2].source == 'This is a raw cell'
-    assert nb.cells[3].cell_type == 'code'
-    assert nb.cells[3].source == '# This is a sub-cell'
-    assert nb.cells[3].metadata['title'] == 'sub-cell title'
-    assert nb.cells[4].cell_type == 'code'
-    assert nb.cells[4].source == '# This is a sub-sub-cell'
-    assert nb.cells[4].metadata['title'] == 'sub-sub-cell title'
-    assert nb.cells[5].cell_type == 'code'
-    compare(nb.cells[5].source, '''1 + 2 + 3 + 4
+    compare_notebooks(nb, new_notebook(cells=[
+        new_raw_cell('---\ntitle: Simple file\n---'),
+        new_markdown_cell('This is a markdown cell'),
+        new_markdown_cell('This is also a markdown cell'),
+        new_raw_cell('This is a raw cell'),
+        new_code_cell('# This is a sub-cell', metadata={'title': 'sub-cell title', 'cell_depth': 1}),
+        new_code_cell('# This is a sub-sub-cell', metadata={'title': 'sub-sub-cell title', 'cell_depth': 2}),
+        new_code_cell('''1 + 2 + 3 + 4
 5
 6
 %%magic # this is a commented magic, not a cell
 
-7''')
-    assert nb.cells[5].metadata == {'title': 'And now a code cell'}
+7''', metadata={'title': 'And now a code cell'})]))
 
     script2 = jupytext.writes(nb, 'py:percent')
-    compare(script, script2)
+    compare(script.replace('[md]', '[markdown]'), script2)
 
 
 def test_read_cell_with_metadata(
