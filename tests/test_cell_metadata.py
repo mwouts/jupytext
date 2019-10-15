@@ -111,6 +111,9 @@ def test_write_parse_json():
     assert metadata == metadata2
 
 
+pytestmark = skip_if_dict_is_not_ordered
+
+
 def test_simple_metadata(text='python string="value" number=1.0 array=["a", "b"]',
                          value=('python', {'string': 'value', 'number': 1.0, 'array': ['a', 'b']})):
     compare(text_to_metadata(text), value)
