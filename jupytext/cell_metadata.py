@@ -38,6 +38,7 @@ _IGNORE_CELL_METADATA = ','.join('-{}'.format(name) for name in [
                                  _JUPYTEXT_CELL_METADATA)
 _PERCENT_CELL = re.compile(
     r'(# |#)%%([^\{\[]*)(|\[raw\]|\[markdown\]||\[md\])([^\{\[]*)(|\{.*\})\s*$')
+_IDENTIFIER_RE = re.compile(r'^[a-zA-Z_\\.]+[a-zA-Z0-9_\\.]*$')
 
 
 def _r_logical_values(pybool):
@@ -422,6 +423,10 @@ def incorrectly_encoded_metadata(text):
     return {'incorrectly_encoded_metadata': text}
 
 
+def isidentifier(text):
+    return _IDENTIFIER_RE.match(text)
+
+
 def parse_key_equal_value(text):
     """Parse a string of the form 'key1=value1 key2=value2'"""
     # Empty metadata?
@@ -432,7 +437,7 @@ def parse_key_equal_value(text):
     last_space_pos = text.rfind(' ')
 
     # Just an identifier?
-    if text[last_space_pos + 1:].replace('.', '').isidentifier():
+    if isidentifier(text[last_space_pos + 1:]):
         key = text[last_space_pos + 1:]
         value = None
         result = {key: value}
@@ -450,7 +455,7 @@ def parse_key_equal_value(text):
         # Do we have an identifier on the left of the equal sign?
         prev_whitespace = text[:equal_sign_pos].rstrip().rfind(' ')
         key = text[prev_whitespace + 1:equal_sign_pos].strip()
-        if not key.replace('.', '').isidentifier():
+        if not isidentifier(key.replace('.', '')):
             continue
 
         try:
