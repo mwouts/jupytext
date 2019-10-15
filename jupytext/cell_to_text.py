@@ -115,6 +115,7 @@ class MarkdownCellExporter(BaseCellExporter):
         self.comment = ''
 
     def html_comment(self, metadata, code='region'):
+        """Protect a Markdown or Raw cell with HTML comments"""
         if metadata:
             region_start = ['<!-- #' + code]
             if 'title' in metadata and '{' not in metadata['title']:
@@ -143,17 +144,17 @@ class MarkdownCellExporter(BaseCellExporter):
         comment_magic(source, self.language, self.comment_magics)
 
         options = []
+        self.language = self.metadata.pop('language', self.language)
         if self.cell_type == 'code' and self.language:
             options.append(self.language)
 
-        filtered_metadata = {key: self.metadata[key] for key in self.metadata
-                             if key not in ['active', 'language']}
-
-        if filtered_metadata:
-            options.append(metadata_to_md_options(filtered_metadata))
+        if self.metadata:
+            options.append(metadata_to_md_options(self.metadata))
 
         if self.cell_type == 'raw':
-            return self.html_comment(filtered_metadata, 'raw')
+            if self.metadata.get('active') == '':
+                self.metadata.pop('active')
+            return self.html_comment(self.metadata, 'raw')
 
         return ['```{}'.format(' '.join(options))] + source + ['```']
 
