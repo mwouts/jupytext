@@ -381,6 +381,7 @@ def double_percent_options_to_metadata(options):
     if cell_type:
         cell_type = cell_type[1:-1]
         if cell_type == 'md':
+            metadata['region_name'] = cell_type
             cell_type = 'markdown'
         metadata['cell_type'] = cell_type
 
@@ -409,7 +410,7 @@ def metadata_to_double_percent_options(metadata):
     if 'title' in metadata:
         options.append(metadata.pop('title'))
     if 'cell_type' in metadata:
-        options.append('[{}]'.format(metadata.pop('cell_type')))
+        options.append('[{}]'.format(metadata.pop('region_name', metadata.pop('cell_type'))))
     metadata = metadata_to_json_options(metadata)
     if metadata != '{}':
         options.append(metadata)

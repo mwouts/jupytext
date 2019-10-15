@@ -37,7 +37,7 @@ def test_read_simple_file(script="""# ---
     compare_notebooks(nb, new_notebook(cells=[
         new_raw_cell('---\ntitle: Simple file\n---'),
         new_markdown_cell('This is a markdown cell'),
-        new_markdown_cell('This is also a markdown cell'),
+        new_markdown_cell('This is also a markdown cell', metadata={'region_name': 'md'}),
         new_raw_cell('This is a raw cell'),
         new_code_cell('# This is a sub-cell', metadata={'title': 'sub-cell title', 'cell_depth': 1}),
         new_code_cell('# This is a sub-sub-cell', metadata={'title': 'sub-sub-cell title', 'cell_depth': 2}),
@@ -49,7 +49,7 @@ def test_read_simple_file(script="""# ---
 7''', metadata={'title': 'And now a code cell'})]))
 
     script2 = jupytext.writes(nb, 'py:percent')
-    compare(script.replace('[md]', '[markdown]'), script2)
+    compare(script, script2)
 
 
 def test_read_cell_with_metadata(
