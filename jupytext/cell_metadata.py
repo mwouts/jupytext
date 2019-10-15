@@ -415,3 +415,114 @@ def metadata_to_double_percent_options(metadata):
     if metadata != '{}':
         options.append(metadata)
     return ' '.join(options)
+
+
+def incorrectly_encoded_metadata(text):
+    """Encode a text that Jupytext cannot parse as a cell metadata"""
+    return {'incorrectly_encoded_metadata': text}
+
+
+def parse_key_equal_value(text):
+    """Parse a string of the form 'key1=value1 key2=value2'"""
+    # Empty metadata?
+    text = text.strip()
+    if not text:
+        return {}
+
+    last_space_pos = text.rfind(' ')
+
+    # Just an identifier?
+    if text[last_space_pos + 1:].replace('.', '').isidentifier():
+        key = text[last_space_pos + 1:]
+        value = None
+        result = {key: value}
+        if last_space_pos > 0:
+            result.update(parse_key_equal_value(text[:last_space_pos]))
+        return result
+
+    # Iterate on the '=' signs, starting from the right
+    equal_sign_pos = None
+    while True:
+        equal_sign_pos = text.rfind('=', None, equal_sign_pos)
+        if equal_sign_pos < 0:
+            return incorrectly_encoded_metadata(text)
+
+        # Do we have an identifier on the left of the equal sign?
+        prev_whitespace = text[:equal_sign_pos].rstrip().rfind(' ')
+        key = text[prev_whitespace + 1:equal_sign_pos].strip()
+        if not key.replace('.', '').isidentifier():
+            continue
+
+        try:
+            value = relax_json_loads(text[equal_sign_pos + 1:])
+        except (ValueError, SyntaxError):
+            # try with a longer expression
+            continue
+
+        # Combine with remaining metadata
+        metadata = parse_key_equal_value(text[:prev_whitespace]) if prev_whitespace > 0 else {}
+
+        # Append our value
+        metadata[key] = value
+
+        # And return
+        return metadata
+
+
+def relax_json_loads(text, catch=False):
+    """Parse a JSON string or similar"""
+    text = text.strip()
+    try:
+        return loads(text)
+    except JSONDecodeError:
+        pass
+
+    if not catch:
+        return ast.literal_eval(text)
+
+    try:
+        return ast.literal_eval(text)
+    except (ValueError, SyntaxError):
+        pass
+
+    return incorrectly_encoded_metadata(text)
+
+
+def text_to_metadata(text, allow_title=False):
+    """Parse the language/cell title and associated metadata"""
+    # Parse the language or cell title = everything before the last blank space before { or =
+    text = text.strip()
+    first_curly_bracket = text.find('{')
+    first_equal_sign = text.find('=')
+
+    if first_equal_sign < 0 and not allow_title:
+        first_equal_sign = len(text)
+
+    if first_curly_bracket < 0 and first_equal_sign < 0:
+        # no metadata
+        return text, {}
+
+    if first_curly_bracket < 0 or (0 <= first_equal_sign < first_curly_bracket):
+        # this is a key=value metadata line
+        if allow_title:
+            prev_whitespace = text[:first_equal_sign].rstrip().rfind(' ')
+        else:
+            prev_whitespace = text.find(' ')
+
+        return text[:prev_whitespace].rstrip(), parse_key_equal_value(text[prev_whitespace:])
+
+    # json metadata line
+    return text[:first_curly_bracket].strip(), relax_json_loads(text[first_curly_bracket:], catch=True)
+
+
+def metadata_to_text(language_or_title, metadata):
+    """Write the cell metadata in the format key=value"""
+    text = [language_or_title] if language_or_title else []
+    for key in metadata:
+        if key == 'incorrectly_encoded_metadata':
+            text.append(metadata[key])
+        elif metadata[key] is None:
+            text.append(key)
+        else:
+            text.append('{}={}'.format(key, dumps(metadata[key])))
+    return ' '.join(text)
