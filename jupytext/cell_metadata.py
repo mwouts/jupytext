@@ -36,8 +36,7 @@ _IGNORE_CELL_METADATA = ','.join('-{}'.format(name) for name in [
     # (these metadata are preserved in the paired Jupyter notebook).
     'autoscroll', 'collapsed', 'scrolled', 'trusted', 'ExecuteTime'] +
                                  _JUPYTEXT_CELL_METADATA)
-_PERCENT_CELL = re.compile(
-    r'(# |#)%%([^\{\[]*)(|\[raw\]|\[markdown\]||\[md\])([^\{\[]*)(|\{.*\})\s*$')
+
 _IDENTIFIER_RE = re.compile(r'^[a-zA-Z_\\.]+[a-zA-Z0-9_\\.]*$')
 
 
@@ -358,49 +357,6 @@ def is_active(ext, metadata):
     if 'active' not in metadata:
         return True
     return ext.replace('.', '') in re.split('\\.|,', metadata['active'])
-
-
-def double_percent_options_to_metadata(options):
-    """Parse double percent options"""
-    matches = _PERCENT_CELL.findall('# %%' + options)
-
-    # Fail safe when regexp matching fails #116
-    # (occurs e.g. if square brackets are found in the title)
-    if not matches:
-        return {'title': options.strip()}
-
-    matches = matches[0]
-
-    # Fifth match are JSON metadata
-    if matches[4]:
-        metadata = json_options_to_metadata(matches[4], add_brackets=False)
-    else:
-        metadata = {}
-
-    # Third match is cell type
-    cell_type = matches[2]
-    if cell_type:
-        cell_type = cell_type[1:-1]
-        if cell_type == 'md':
-            metadata['region_name'] = cell_type
-            cell_type = 'markdown'
-        metadata['cell_type'] = cell_type
-
-    # Second and fourth match are description
-    title = [matches[i].strip() for i in [1, 3]]
-    title = [part for part in title if part]
-    if title:
-        title = ' '.join(title)
-        cell_depth = 0
-        while title.startswith('%'):
-            cell_depth += 1
-            title = title[1:]
-
-        if cell_depth:
-            metadata['cell_depth'] = cell_depth
-        metadata['title'] = title.strip()
-
-    return metadata
 
 
 def metadata_to_double_percent_options(metadata):

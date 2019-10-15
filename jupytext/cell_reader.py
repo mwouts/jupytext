@@ -11,8 +11,8 @@ try:
 except (ImportError, SyntaxError):
     rst2md = None
 
-from .cell_metadata import is_active, json_options_to_metadata, md_options_to_metadata, rmd_options_to_metadata, \
-    double_percent_options_to_metadata
+from .cell_metadata import is_active, json_options_to_metadata, md_options_to_metadata, rmd_options_to_metadata
+from .cell_metadata import text_to_metadata
 from .languages import _JUPYTER_LANGUAGES
 from .stringparser import StringParser
 from .magics import uncomment_magic, is_magic, unescape_code_start
@@ -604,7 +604,33 @@ class DoublePercentScriptCellReader(ScriptCellReader):
             self.metadata = {}
 
     def options_to_metadata(self, options):
-        return None, double_percent_options_to_metadata(options)
+        title, metadata = text_to_metadata(options, allow_title=True)
+
+        # Cell type
+        for cell_type in ['markdown', 'raw', 'md']:
+            code = '[{}]'.format(cell_type)
+            if code in title:
+                title = title.replace(code, '').strip()
+                metadata['cell_type'] = cell_type
+                if cell_type == 'md':
+                    metadata['region_name'] = cell_type
+                    metadata['cell_type'] = 'markdown'
+                break
+
+        # Spyder has sub cells
+        cell_depth = 0
+        while title.startswith('%'):
+            cell_depth += 1
+            title = title[1:]
+
+        if cell_depth:
+            metadata['cell_depth'] = cell_depth
+            title = title.strip()
+
+        if title:
+            metadata['title'] = title
+
+        return None, metadata
 
     def find_cell_content(self, lines):
         """Parse cell till its end and set content, lines_to_next_cell.
