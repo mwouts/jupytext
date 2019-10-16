@@ -15,6 +15,11 @@ _MAGIC_NOT_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
         _SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS}
 _LINE_CONTINUATION_RE = re.compile(r'.*\\\s*$')
 
+# Rust magics start with single ':' #351
+_MAGIC_RE['rust'] = re.compile(r"^(// |//)*:[a-zA-Z]")
+_MAGIC_FORCE_ESC_RE['rust'] = re.compile(r"^(// |//)*:[a-zA-Z](.*)//\s*escape")
+_MAGIC_FORCE_ESC_RE['rust'] = re.compile(r"^(// |//)*:[a-zA-Z](.*)//\s*noescape")
+
 # Commands starting with a question or exclamation mark have to be escaped
 _PYTHON_HELP_OR_BASH_CMD = re.compile(r"^(# |#)*(\?|!)\s*[A-Za-z]")
 

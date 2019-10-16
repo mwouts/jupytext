@@ -64,7 +64,7 @@ std::thread::spawn({
 // ## Loading external crates
 // We can load external crates. This one takes a while to compile, but once it's compiled, subsequent cells shouldn't need to recompile it, so it should be much quicker.
 
-:dep base64 = "0.10.1"
+// :dep base64 = "0.10.1"
 base64::encode(&vec![1, 2, 3, 4])
 
 // ## Customizing how types are displayed
@@ -134,10 +134,10 @@ s.push_str(format!("foo {}", 42));
 // ## Seeing what variables have been defined
 // We can print a table of defined variables and their types with the :vars command.
 
-:vars
+// :vars
 
 // Other built-in commands can be found via :help
 
-:help
+// :help
 
 
