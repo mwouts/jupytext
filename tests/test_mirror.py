@@ -82,7 +82,8 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
         compare_notebooks(notebook, nb_mirror, fmt, compare_outputs=True)
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('julia') + list_notebooks('python') + list_notebooks('R'))
+@pytest.mark.parametrize('nb_file', list_notebooks('julia') + list_notebooks('python') +
+                         list_notebooks('R') + list_notebooks('ps1'))
 def test_script_to_ipynb(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, 'ipynb', 'script_to_ipynb')
 
@@ -140,6 +141,11 @@ def test_ipynb_to_clojure(nb_file, no_jupytext_version_number):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_bash'))
 def test_ipynb_to_bash(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, 'sh', 'ipynb_to_script')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_ps1'))
+def test_ipynb_to_powershell(nb_file, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(nb_file, 'ps1', 'ipynb_to_script')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_cpp'))
@@ -215,6 +221,11 @@ def test_ipynb_to_clojure_percent(nb_file, no_jupytext_version_number):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_bash'))
 def test_ipynb_to_bash_percent(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, 'sh:percent', 'ipynb_to_percent')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_ps1'))
+def test_ipynb_to_powershell_percent(nb_file, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(nb_file, 'ps1:percent', 'ipynb_to_percent')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_q'))
