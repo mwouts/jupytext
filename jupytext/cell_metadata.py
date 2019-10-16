@@ -298,19 +298,6 @@ def parse_md_code_options(options):
     return metadata
 
 
-def md_options_to_metadata(options):
-    """Parse markdown options and return language and metadata"""
-    metadata = parse_md_code_options(options)
-
-    if metadata:
-        language = metadata[0][0]
-        for lang in _JUPYTER_LANGUAGES:
-            if language.lower() == lang.lower():
-                return lang, dict(metadata[1:])
-
-    return None, dict(metadata)
-
-
 def try_eval_metadata(metadata, name):
     """Evaluate given metadata to a python object, if possible"""
     value = metadata[name]

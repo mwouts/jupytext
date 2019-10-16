@@ -1,7 +1,6 @@
 """Read notebook cells from their text representation"""
 
 import re
-import json
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from .languages import _SCRIPT_EXTENSIONS
 
@@ -11,7 +10,7 @@ try:
 except (ImportError, SyntaxError):
     rst2md = None
 
-from .cell_metadata import is_active, json_options_to_metadata, md_options_to_metadata, rmd_options_to_metadata
+from .cell_metadata import is_active, json_options_to_metadata, rmd_options_to_metadata
 from .cell_metadata import text_to_metadata
 from .languages import _JUPYTER_LANGUAGES
 from .stringparser import StringParser
@@ -195,7 +194,7 @@ class BaseCellReader(object):
 
         # Is this a raw cell?
         if ('active' in self.metadata and not is_active('ipynb', self.metadata)) or \
-                (self.ext in ['.md', '.markdown'] and self.cell_type == 'code' and self.language is None):
+                (self.ext in ['.md', '.markdown'] and self.cell_type == 'code' and not self.language):
             if self.metadata.get('active') == '':
                 del self.metadata['active']
             # Is this a Jupytext document in the Markdown format >= 1.2 ?
@@ -257,24 +256,13 @@ class MarkdownCellReader(BaseCellReader):
             groups = match_region.groups()
             region_name = groups[0]
             self.end_region_re = re.compile(r"^<!--\s*#end{}\s*-->\s*$".format(region_name))
-            options = groups[1].strip()
+            title, self.metadata = text_to_metadata(groups[1], allow_title=True)
             if region_name == 'raw':
                 self.cell_type = 'raw'
             else:
                 self.cell_type = 'markdown'
-            if options:
-                start = options.find('{')
-                if start >= 0:
-                    title = options[:start].strip()
-                    options = options[start:]
-                else:
-                    title = options.strip()
-                    options = "{}"
-                self.metadata = json.loads(options)
-                if title:
-                    self.metadata['title'] = title
-            else:
-                self.metadata = {}
+            if title:
+                self.metadata['title'] = title
             if region_name in ['markdown', 'md']:
                 self.metadata['region_name'] = region_name
         elif self.start_code_re.match(line):
@@ -283,7 +271,7 @@ class MarkdownCellReader(BaseCellReader):
     def options_to_metadata(self, options):
         if isinstance(options, tuple):
             options = ' '.join(options)
-        return md_options_to_metadata(options)
+        return text_to_metadata(options)
 
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position
