@@ -417,7 +417,7 @@ def text_to_metadata(text, allow_title=False):
         # single expression
         if prev_whitespace < 0:
             # is is a title or a jupyter language?
-            if allow_title or is_jupyter_language(text):
+            if (allow_title and first_equal_sign < 0) or is_jupyter_language(text):
                 return text, {}
 
             # else, parse this expression as a key

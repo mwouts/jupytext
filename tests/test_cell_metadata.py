@@ -90,7 +90,12 @@ def test_language_no_metadata(text='python', value=('python', {})):
 
 def test_only_metadata(text='key="value"', value=('', {'key': 'value'})):
     compare(text_to_metadata(text), value)
-    assert metadata_to_text(*value) == text.strip()
+    assert metadata_to_text(*value) == text
+
+
+def test_only_metadata_2(text='key="value"', value=('', {'key': 'value'})):
+    compare(text_to_metadata(text, allow_title=True), value)
+    assert metadata_to_text(*value) == text
 
 
 def test_no_language(text='.class', value=('', {'.class': None})):
