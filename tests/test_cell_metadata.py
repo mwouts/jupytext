@@ -2,7 +2,6 @@ import pytest
 from jupytext.compare import compare
 from jupytext.cell_metadata import rmd_options_to_metadata, metadata_to_rmd_options, parse_rmd_options
 from jupytext.cell_metadata import _IGNORE_CELL_METADATA, RMarkdownOptionParsingError, try_eval_metadata
-from jupytext.cell_metadata import json_options_to_metadata, metadata_to_json_options
 from jupytext.cell_metadata import text_to_metadata, metadata_to_text
 from jupytext.metadata_filter import filter_metadata
 from .utils import skip_if_dict_is_not_ordered
@@ -79,17 +78,6 @@ def test_try_eval_metadata():
     try_eval_metadata(metadata, 'list')
     try_eval_metadata(metadata, 'c')
     assert metadata == {'list': ['a', 5], 'c': [1, 2, 3]}
-
-
-def test_parse_wrong_json():
-    assert json_options_to_metadata("""{"key":'incorrect value'}""") == {}
-
-
-def test_write_parse_json():
-    metadata = {"tags": ["parameters"]}
-    options = metadata_to_json_options(metadata)
-    metadata2 = json_options_to_metadata(options, add_brackets=False)
-    assert metadata == metadata2
 
 
 pytestmark = skip_if_dict_is_not_ordered

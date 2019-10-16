@@ -317,15 +317,6 @@ def try_eval_metadata(metadata, name):
         return
 
 
-def json_options_to_metadata(options, add_brackets=True):
-    """Read metadata from its json representation"""
-    try:
-        options = loads('{' + options + '}' if add_brackets else options)
-        return options
-    except ValueError:
-        return {}
-
-
 def metadata_to_json_options(metadata):
     """Represent metadata as json text"""
     for key in _JUPYTEXT_CELL_METADATA:

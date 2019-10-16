@@ -10,7 +10,7 @@ try:
 except (ImportError, SyntaxError):
     rst2md = None
 
-from .cell_metadata import is_active, json_options_to_metadata, rmd_options_to_metadata
+from .cell_metadata import is_active, rmd_options_to_metadata
 from .cell_metadata import text_to_metadata
 from .languages import _JUPYTER_LANGUAGES
 from .stringparser import StringParser
@@ -458,25 +458,14 @@ class LightScriptCellReader(ScriptCellReader):
         self.explicit_end_marker_required = False
         if fmt and 'cell_markers' in fmt and fmt['cell_markers'] != '+,-':
             self.cell_marker_start, self.cell_marker_end = fmt['cell_markers'].split(',', 1)
-            self.start_code_re = re.compile('^' + self.comment + r'\s*' + self.cell_marker_start + r'\s*(.*)$')
+            self.start_code_re = re.compile('^' + self.comment + r'\s*' + self.cell_marker_start + r'(.*)$')
             self.end_code_re = re.compile('^' + self.comment + r'\s*' + self.cell_marker_end + r'\s*$')
         else:
-            self.start_code_re = re.compile('^' + self.comment + r'\s*\+\s*{(.*)}$')
-            self.simple_start_code_re = re.compile('^' + self.comment + r'\s*\+\s*$')
+            self.start_code_re = re.compile('^' + self.comment + r'\s*\+(.*)$')
 
     def options_to_metadata(self, options):
-        if not self.cell_marker_start:
-            return json_options_to_metadata(options)
+        title, metadata = text_to_metadata(options, allow_title=True)
 
-        bracket = options.find('{')
-        if bracket < 0:
-            title = options
-            metadata = {}
-        else:
-            title = options[:bracket]
-            metadata = json_options_to_metadata(options[bracket:], False)
-
-        title = title.strip()
         if title:
             metadata['title'] = title
 
