@@ -380,7 +380,16 @@ def incorrectly_encoded_metadata(text):
 
 
 def isidentifier(text):
+    """Can this text be a proper key?"""
     return _IDENTIFIER_RE.match(text)
+
+
+def is_jupyter_language(language):
+    """Is this a jupyter language?"""
+    for lang in _JUPYTER_LANGUAGES:
+        if language.lower() == lang.lower():
+            return True
+    return False
 
 
 def parse_key_equal_value(text):
@@ -456,10 +465,7 @@ def text_to_metadata(text, allow_title=False):
     first_curly_bracket = text.find('{')
     first_equal_sign = text.find('=')
 
-    if first_equal_sign < 0 and not allow_title:
-        first_equal_sign = len(text)
-
-    if first_curly_bracket < 0 and first_equal_sign < 0:
+    if first_curly_bracket < 0 and first_equal_sign < 0 and allow_title:
         # no metadata
         return text, {}
 
@@ -469,6 +475,15 @@ def text_to_metadata(text, allow_title=False):
             prev_whitespace = text[:first_equal_sign].rstrip().rfind(' ')
         else:
             prev_whitespace = text.find(' ')
+
+        # single expression
+        if prev_whitespace < 0:
+            # is is a title or a jupyter language?
+            if allow_title or is_jupyter_language(text):
+                return text, {}
+
+            # else, parse this expression as a key
+            prev_whitespace = 0
 
         return text[:prev_whitespace].rstrip(), parse_key_equal_value(text[prev_whitespace:])
 
