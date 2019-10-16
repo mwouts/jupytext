@@ -11,6 +11,7 @@ Release History
 - Raw cells are now encoded using HTML comments (``<!-- #raw -->`` and ``<!-- #endraw -->``) in Markdown files. And code blocks from Markdown files, when they don't have an explicit language, are displayed as Markdown cells in Jupyter (#321)
 - Markdown and raw cells can use multiline comments in the ``py:percent`` format (#305)
 - ``jupytext notebook.py --to ipynb`` updates the timestamp of ``notebook.py`` so that the paired notebook still works in Jupyter (#335, #254)
+- Added support for PowerShell scripts (#349)
 
 **BugFixes**
 
