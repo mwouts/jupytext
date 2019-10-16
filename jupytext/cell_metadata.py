@@ -258,46 +258,6 @@ def metadata_to_md_options(metadata):
                      if metadata[key] is not None else key for key in metadata])
 
 
-def parse_md_code_options(options):
-    """Parse 'python class key="value"' into [('python', None), ('class', None), ('key', 'value')]"""
-
-    metadata = []
-    while options:
-        name_and_value = re.split(r'[\s=]+', options, maxsplit=1)
-        name = name_and_value[0]
-
-        # Equal sign in between name and what's next?
-        if len(name_and_value) == 2:
-            sep = options[len(name):-len(name_and_value[1])]
-            has_value = sep.find('=') >= 0
-            options = name_and_value[1]
-        else:
-            has_value = False
-            options = ''
-
-        if not has_value:
-            metadata.append((name, None))
-            continue
-
-        try:
-            value = loads(options)
-            options = ''
-        except JSONDecodeError as err:
-            try:
-                split = err.colno - 1
-            except AttributeError:
-                # str(err) is like: "ValueError: Extra data: line 1 column 7 - line 1 column 50 (char 6 - 49)"
-                match = re.match(r'.*char ([0-9]*)', str(err))
-                split = int(match.groups()[0])
-
-            value = loads(options[:split])
-            options = options[split:]
-
-        metadata.append((name, value))
-
-    return metadata
-
-
 def try_eval_metadata(metadata, name):
     """Evaluate given metadata to a python object, if possible"""
     value = metadata[name]
