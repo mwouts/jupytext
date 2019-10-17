@@ -277,14 +277,6 @@ def try_eval_metadata(metadata, name):
         return
 
 
-def metadata_to_json_options(metadata):
-    """Represent metadata as json text"""
-    for key in _JUPYTEXT_CELL_METADATA:
-        metadata.pop(key, None)
-
-    return dumps(metadata)
-
-
 def is_active(ext, metadata):
     """Is the cell active for the given file extension?"""
     if metadata.get('run_control', {}).get('frozen') is True:
@@ -299,17 +291,14 @@ def is_active(ext, metadata):
 
 def metadata_to_double_percent_options(metadata):
     """Metadata to double percent lines"""
-    options = []
-    if 'cell_depth' in metadata:
-        options.append('%' * metadata.pop('cell_depth'))
+    text = []
     if 'title' in metadata:
-        options.append(metadata.pop('title'))
+        text.append(metadata.pop('title'))
+    if 'cell_depth' in metadata:
+        text.insert(0, '%' * metadata.pop('cell_depth'))
     if 'cell_type' in metadata:
-        options.append('[{}]'.format(metadata.pop('region_name', metadata.pop('cell_type'))))
-    metadata = metadata_to_json_options(metadata)
-    if metadata != '{}':
-        options.append(metadata)
-    return ' '.join(options)
+        text.append('[{}]'.format(metadata.pop('region_name', metadata.pop('cell_type'))))
+    return metadata_to_text(' '.join(text), metadata, plain_json=True)
 
 
 def incorrectly_encoded_metadata(text):
@@ -429,14 +418,27 @@ def text_to_metadata(text, allow_title=False):
     return text[:first_curly_bracket].strip(), relax_json_loads(text[first_curly_bracket:], catch=True)
 
 
-def metadata_to_text(language_or_title, metadata):
+def metadata_to_text(language_or_title, metadata=None, plain_json=False):
     """Write the cell metadata in the format key=value"""
+    # Was metadata the first argument?
+    if metadata is None:
+        metadata, language_or_title = language_or_title, metadata
+
+    metadata = {key: metadata[key] for key in metadata if key not in _JUPYTEXT_CELL_METADATA}
     text = [language_or_title] if language_or_title else []
-    for key in metadata:
-        if key == 'incorrectly_encoded_metadata':
-            text.append(metadata[key])
-        elif metadata[key] is None:
-            text.append(key)
-        else:
-            text.append('{}={}'.format(key, dumps(metadata[key])))
+    if language_or_title is None:
+        if 'title' in metadata and '{' not in metadata['title']:
+            text.append(metadata.pop('title'))
+
+    if plain_json:
+        if metadata:
+            text.append(dumps(metadata))
+    else:
+        for key in metadata:
+            if key == 'incorrectly_encoded_metadata':
+                text.append(metadata[key])
+            elif metadata[key] is None:
+                text.append(key)
+            else:
+                text.append('{}={}'.format(key, dumps(metadata[key])))
     return ' '.join(text)
