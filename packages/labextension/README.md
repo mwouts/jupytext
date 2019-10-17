@@ -6,7 +6,7 @@ This extension adds a few [Jupytext](https://github.com/mwouts/jupytext) command
 
 ## Installation
 
-Please [install Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. The jupytext installation should automatically install the JupyterLab extension. In order to activate it, rebuild JupyterLab with
+Please [install Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. The Jupytext extension for JupyterLab is bundled with Jupytext. Installing Jupytext will trigger a build of JupyterLab the next time you open it. If you prefer, you can trigger the build manually with
 
 ```bash
 jupyter lab build
