@@ -1,5 +1,5 @@
-from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
-from jupytext.compare import compare
+from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell, new_notebook
+from jupytext.compare import compare, compare_notebooks
 import jupytext
 from jupytext.combine import combine_inputs_with_outputs
 
@@ -431,3 +431,27 @@ a = 1
 
     text2 = jupytext.writes(nb, 'md')
     compare(text.replace('```IDL', '```idl'), text2)
+
+
+def test_inactive_cell(text='''```python active="md"
+# This becomes a raw cell in Jupyter
+```
+''', expected=new_notebook(
+    cells=[new_raw_cell('# This becomes a raw cell in Jupyter',
+                        metadata={'active': 'md'})])):
+    nb = jupytext.reads(text, 'md')
+    compare_notebooks(nb, expected)
+    text2 = jupytext.writes(nb, 'md')
+    # compare(text2, text)
+
+
+def test_inactive_cell_using_tag(text='''```python tags=["active-md"]
+# This becomes a raw cell in Jupyter
+```
+''', expected=new_notebook(
+    cells=[new_raw_cell('# This becomes a raw cell in Jupyter',
+                        metadata={'tags': ['active-md']})])):
+    nb = jupytext.reads(text, 'md')
+    compare_notebooks(nb, expected)
+    text2 = jupytext.writes(nb, 'md')
+    # compare(text2, text)
