@@ -29,10 +29,7 @@ _COMMENT_CHARS = [_SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIO
                   _SCRIPT_EXTENSIONS[ext]['comment'] != '#']
 
 _COMMENT = {_SCRIPT_EXTENSIONS[ext]['language']: _SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS}
-
-_JUPYTER_LANGUAGES = _JUPYTER_LANGUAGES + [
-    _SCRIPT_EXTENSIONS[ext]['language'] for ext in _SCRIPT_EXTENSIONS if
-    _SCRIPT_EXTENSIONS[ext]['language'] not in _JUPYTER_LANGUAGES]
+_JUPYTER_LANGUAGES = set(_JUPYTER_LANGUAGES).union(_COMMENT.keys())
 
 
 def default_language_from_metadata_and_ext(metadata, ext):
