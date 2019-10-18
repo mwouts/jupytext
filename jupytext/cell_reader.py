@@ -1,6 +1,7 @@
 """Read notebook cells from their text representation"""
 
 import re
+from copy import copy
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from .languages import _SCRIPT_EXTENSIONS
 
@@ -171,7 +172,7 @@ class BaseCellReader(object):
 
         # Cell content
         source = lines[cell_start:cell_end_marker]
-        self.org_content = [line for line in source]
+        self.org_content = copy(source)
 
         # Exactly two empty lines at the end of cell (caused by PEP8)?
         if self.ext == '.py' and self.explicit_eoc:
@@ -624,7 +625,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
 
         # Cell content
         source = lines[cell_start:cell_end_marker]
-        self.org_content = [line for line in source]
+        self.org_content = copy(source)
 
         if self.cell_type != 'code' or (self.metadata and not is_active(self.ext, self.metadata)) \
                 or (self.language is not None and self.language != self.default_language):
@@ -802,7 +803,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):  # pylint: disable=W0223
 
         # Cell content
         source = lines[cell_start:cell_end_marker]
-        self.org_content = [line for line in source]
+        self.org_content = copy(source)
 
         if self.cell_type == 'code' and self.comment_magics:
             uncomment_magic(source, self.language or self.default_language)

@@ -13,6 +13,8 @@ Release History
 - Code blocks from Markdown files, when they don't have an explicit language, below to the text of the Markdown cell in Jupyter (#321)
 - Markdown and raw cells can use multiline comments in the ``py:percent`` format. And Markdown cells can start with just ``# %% [md]`` (#305)
 - ``jupytext notebook.py --to ipynb`` updates the timestamp of ``notebook.py`` so that the paired notebook still works in Jupyter (#335, #254)
+- The Jupyter Notebook extension for Jupytext is compatible with Jupyter Notebook 6.0 (#346)
+- Added support for Rust/Evxcr, by Jonas Bushart (#351)
 
 **BugFixes**
 

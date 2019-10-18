@@ -233,14 +233,13 @@ def rmd_options_to_metadata(options):
         if i == 0 and name == '':
             metadata['name'] = value
             continue
-        else:
-            if update_metadata_from_rmd_options(name, value, metadata):
-                continue
-            try:
-                metadata[name] = _py_logical_values(value)
-                continue
-            except RLogicalValueError:
-                metadata[name] = value
+        if update_metadata_from_rmd_options(name, value, metadata):
+            continue
+        try:
+            metadata[name] = _py_logical_values(value)
+            continue
+        except RLogicalValueError:
+            metadata[name] = value
 
     for name in metadata:
         try_eval_metadata(metadata, name)

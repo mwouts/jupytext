@@ -173,8 +173,7 @@ def header_to_metadata_and_cell(lines, header_prefix, ext=None):
         if i == start:
             if _HEADER_RE.match(line):
                 continue
-            else:
-                break
+            break
 
         if i > start and _HEADER_RE.match(line):
             ended = True

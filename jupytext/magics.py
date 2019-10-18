@@ -15,6 +15,11 @@ _MAGIC_NOT_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
         _SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS}
 _LINE_CONTINUATION_RE = re.compile(r'.*\\\s*$')
 
+# Rust magics start with single ':' #351
+_MAGIC_RE['rust'] = re.compile(r"^(// |//)*:[a-zA-Z]")
+_MAGIC_FORCE_ESC_RE['rust'] = re.compile(r"^(// |//)*:[a-zA-Z](.*)//\s*escape")
+_MAGIC_FORCE_ESC_RE['rust'] = re.compile(r"^(// |//)*:[a-zA-Z](.*)//\s*noescape")
+
 # Commands starting with a question or exclamation mark have to be escaped
 _PYTHON_HELP_OR_BASH_CMD = re.compile(r"^(# |#)*(\?|!)\s*[A-Za-z]")
 
@@ -25,16 +30,18 @@ _PYTHON_MAGIC_CMD = re.compile(r"^(# |#)*({})($|\s$|\s[^=,])".format('|'.join(
     # windows
     ['copy', 'ddir', 'echo', 'ls', 'ldir', 'mkdir', 'ren', 'rmdir'])))
 
+_SCRIPT_LANGUAGES = [_SCRIPT_EXTENSIONS[ext]['language'] for ext in _SCRIPT_EXTENSIONS]
+
 
 def is_magic(line, language, global_escape_flag=True):
     """Is the current line a (possibly escaped) Jupyter magic, and should it be commented?"""
-    if language in ['octave', 'matlab']:
+    if language in ['octave', 'matlab'] or language not in _SCRIPT_LANGUAGES:
         return False
-    if _MAGIC_FORCE_ESC_RE.get(language, _MAGIC_FORCE_ESC_RE['python']).match(line):
+    if _MAGIC_FORCE_ESC_RE[language].match(line):
         return True
-    if not global_escape_flag or _MAGIC_NOT_ESC_RE.get(language, _MAGIC_NOT_ESC_RE['python']).match(line):
+    if not global_escape_flag or _MAGIC_NOT_ESC_RE[language].match(line):
         return False
-    if _MAGIC_RE.get(language, _MAGIC_RE['python']).match(line):
+    if _MAGIC_RE[language].match(line):
         return True
     if language != 'python':
         return False

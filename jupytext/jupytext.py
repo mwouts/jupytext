@@ -245,7 +245,7 @@ def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, **kwargs):
     :param kwargs: (not used) additional parameters for nbformat.read
     :return: the notebook
     """
-    if as_version != nbformat.NO_CONVERT and type(as_version) != int:
+    if as_version != nbformat.NO_CONVERT and not isinstance(as_version, int):
         raise TypeError("Second argument 'as_version' should be either nbformat.NO_CONVERT, or an integer.")
 
     if fp == '-':

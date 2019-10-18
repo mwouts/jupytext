@@ -321,3 +321,13 @@ def test_ipynb_to_scala(nb_file, no_jupytext_version_number):
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_scala'))
 def test_ipynb_to_scala_percent(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, 'scala:percent', 'ipynb_to_percent')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_rust'))
+def test_ipynb_to_rust(nb_file, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(nb_file, 'rs', 'ipynb_to_script')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_rust'))
+def test_ipynb_to_rust_percent(nb_file, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(nb_file, 'rs:percent', 'ipynb_to_percent')
