@@ -191,19 +191,22 @@ class BaseCellReader(object):
         else:
             self.content = self.uncomment_code_and_magics(source)
 
-        # Is this a raw cell?
-        if ('active' in self.metadata and not is_active('.ipynb', self.metadata)) or \
-                (self.ext in ['.md', '.markdown'] and self.cell_type == 'code' and not self.language):
-            if self.metadata.get('active') == '':
-                del self.metadata['active']
-            # Is this a Jupytext document in the Markdown format >= 1.2 ?
-            if self.ext in ['.md', '.markdown'] and self.format_version not in ['1.0', '1.1']:
-                self.cell_type = 'markdown'
-                self.explicit_eoc = False
-                cell_end_marker += 1
-                self.content = lines[:cell_end_marker]
-            else:
+        # Is this an inactive cell?
+        if self.cell_type == 'code':
+            if not is_active('.ipynb', self.metadata):
+                if self.metadata.get('active') == '':
+                    del self.metadata['active']
                 self.cell_type = 'raw'
+            elif self.ext in ['.md', '.markdown'] and not self.language:
+                # Markdown files in version >= 1.3 represent code chunks with no language as Markdown cells
+                if self.format_version not in ['1.0', '1.1']:
+                    self.cell_type = 'markdown'
+                    self.explicit_eoc = False
+                    cell_end_marker += 1
+                    self.content = lines[:cell_end_marker]
+                # Previous versions mapped those to raw cells
+                else:
+                    self.cell_type = 'raw'
 
         # Explicit end of cell marker?
         if (next_cell_start + 1 < len(lines) and
