@@ -27,4 +27,4 @@ def test_notebook_with_empty_cells(blank_cells):
     script = jupytext.writes(notebook, 'py')
     notebook2 = jupytext.reads(script, 'py')
 
-    compare_notebooks(notebook, notebook2)
+    compare_notebooks(notebook2, notebook)

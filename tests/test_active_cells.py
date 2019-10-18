@@ -17,7 +17,13 @@ HEADER = {'.py': '''# ---
 # ---
 
 ''',
+          '.md': '''---
+jupyter:
+  jupytext:
+    main_language: python
+---
 
+''',
           '.Rmd': '''---
 jupyter:
   jupytext:
@@ -33,6 +39,10 @@ ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
 # This cell is active in all extensions
 ```
 """,
+              '.md': """```python active="ipynb,py,R,Rmd"
+# This cell is active in all extensions
+```
+""",
               '.R': """# + {"active": "ipynb,py,R,Rmd"}
 # This cell is active in all extensions
 """,
@@ -43,7 +53,7 @@ ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
                          'outputs': []}}
 
 
-@pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
+@pytest.mark.parametrize('ext', ['.Rmd', '.md', '.py', '.R'])
 def test_active_all(ext, no_jupytext_version_number):
     nb = jupytext.reads(HEADER[ext] + ACTIVE_ALL[ext], ext)
     assert len(nb.cells) == 1
@@ -56,6 +66,11 @@ ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
 # %matplotlib inline
 """,
                 '.Rmd': """```{python active="ipynb", eval=FALSE}
+# This cell is active only in ipynb
+%matplotlib inline
+```
+""",
+                '.md': """```python active="ipynb"
 # This cell is active only in ipynb
 %matplotlib inline
 ```
@@ -73,7 +88,7 @@ ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
 
 
 @skip_if_dict_is_not_ordered
-@pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
+@pytest.mark.parametrize('ext', ['.Rmd', '.md', '.py', '.R'])
 def test_active_ipynb(ext, no_jupytext_version_number):
     nb = jupytext.reads(HEADER[ext] + ACTIVE_IPYNB[ext], ext)
     assert len(nb.cells) == 1
@@ -90,6 +105,11 @@ ACTIVE_IPYNB_RMD_USING_TAG = {'.py': """# + {"tags": ["active-ipynb-Rmd"]}
 # %matplotlib inline
 ```
 """,
+                              '.md': """```python tags=["active-ipynb-Rmd"]
+# This cell is active only in ipynb and Rmd
+%matplotlib inline
+```
+""",
                               '.R': """# + {"tags": ["active-ipynb-Rmd"]}
 # # This cell is active only in ipynb and Rmd
 # %matplotlib inline
@@ -103,7 +123,7 @@ ACTIVE_IPYNB_RMD_USING_TAG = {'.py': """# + {"tags": ["active-ipynb-Rmd"]}
 
 
 @skip_if_dict_is_not_ordered
-@pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
+@pytest.mark.parametrize('ext', ['.Rmd', '.md', '.py', '.R'])
 def test_active_ipynb_rmd_using_tags(ext, no_jupytext_version_number):
     nb = jupytext.reads(HEADER[ext] + ACTIVE_IPYNB_RMD_USING_TAG[ext], ext)
     assert len(nb.cells) == 1
@@ -138,6 +158,10 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 # This cell is active in py and ipynb extensions
 ```
 """,
+                   '.md': """```python active="ipynb,py"
+# This cell is active in py and ipynb extensions
+```
+""",
                    '.R': """# + {"active": "ipynb,py"}
 # # This cell is active in py and ipynb extensions
 """,
@@ -150,7 +174,7 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 
 
 @skip_if_dict_is_not_ordered
-@pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
+@pytest.mark.parametrize('ext', ['.Rmd', '.md', '.py', '.R'])
 def test_active_py_ipynb(ext, no_jupytext_version_number):
     nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_IPYNB[ext], ext)
     assert len(nb.cells) == 1

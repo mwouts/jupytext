@@ -716,7 +716,7 @@ def test_round_trip_markdown_cell_with_magic():
                             metadata={'jupytext': {'main_language': 'python'}})
     text = jupytext.writes(notebook, 'py')
     notebook2 = jupytext.reads(text, 'py')
-    compare_notebooks(notebook, notebook2)
+    compare_notebooks(notebook2, notebook)
 
 
 def test_round_trip_python_with_js_cell():
@@ -726,7 +726,7 @@ notebook.nbextensions.install_nbextension('jupytext.js', user=True)'''),
 Jupyter.utils.load_extensions('jupytext')''')])
     text = jupytext.writes(notebook, 'py')
     notebook2 = jupytext.reads(text, 'py')
-    compare_notebooks(notebook, notebook2)
+    compare_notebooks(notebook2, notebook)
 
 
 def test_round_trip_python_with_js_cell_no_cell_metadata():
@@ -738,4 +738,4 @@ Jupyter.utils.load_extensions('jupytext')''')],
                                                    'cell_metadata_filter': '-all'}})
     text = jupytext.writes(notebook, 'py')
     notebook2 = jupytext.reads(text, 'py')
-    compare_notebooks(notebook, notebook2)
+    compare_notebooks(notebook2, notebook)

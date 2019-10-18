@@ -85,12 +85,8 @@ def same_content(ref_source, test_source, allow_removed_final_blank_line):
     return _BLANK_LINE.match(ref_source[-1])
 
 
-def compare_notebooks(notebook_expected,
-                      notebook_actual,
-                      fmt=None,
-                      allow_expected_differences=True,
-                      raise_on_first_difference=True,
-                      compare_outputs=False):
+def compare_notebooks(notebook_actual, notebook_expected, fmt=None, allow_expected_differences=True,
+                      raise_on_first_difference=True, compare_outputs=False):
     """Compare the two notebooks, and raise with a meaningful message
     that explains the differences, if any"""
     fmt = long_form_one_format(fmt)
@@ -245,5 +241,5 @@ def test_round_trip_conversion(notebook, fmt, update, allow_expected_differences
     if update:
         combine_inputs_with_outputs(round_trip, notebook, fmt)
 
-    compare_notebooks(notebook, round_trip, fmt, allow_expected_differences,
+    compare_notebooks(round_trip, notebook, fmt, allow_expected_differences,
                       raise_on_first_difference=stop_on_first_error)

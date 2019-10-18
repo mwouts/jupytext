@@ -24,7 +24,7 @@ def test_rmd_is_ok(nb_file, tmpdir):
 
     nb2 = jupytext.read(str(tmpdir.join(tmp_rmd)))
 
-    compare_notebooks(nb, nb2, 'Rmd')
+    compare_notebooks(nb2, nb, 'Rmd')
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('Rmd'))
@@ -40,7 +40,7 @@ def test_ipynb_is_ok(nb_file, tmpdir):
     cm.save(model=dict(type='notebook', content=nb), path=tmp_rmd)
 
     nb2 = jupytext.read(str(tmpdir.join(tmp_ipynb)))
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='66'))
@@ -57,10 +57,10 @@ def test_all_files_created(nb_file, tmpdir):
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
 
     nb2 = jupytext.read(str(tmpdir.join(tmp_py)))
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
     nb3 = jupytext.read(str(tmpdir.join(tmp_rmd)))
-    compare_notebooks(nb, nb3, 'Rmd')
+    compare_notebooks(nb3, nb, 'Rmd')
 
 
 def test_no_files_created_on_no_format(tmpdir):
