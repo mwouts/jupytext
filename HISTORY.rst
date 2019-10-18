@@ -10,17 +10,17 @@ Release History
 
 - Raw cells are now encoded using HTML comments (``<!-- #raw -->`` and ``<!-- #endraw -->``) in Markdown files (#321)
 - Markdown cells can be delimited with any of ``<!-- #region -->``,  ``<!-- #markdown -->`` or ``<!-- #md -->`` (#344)
-- Code blocks from Markdown files, when they don't have an explicit language, below to the text of the Markdown cell in Jupyter (#321)
-- Markdown and raw cells can use multiline comments in the ``py:percent`` format. And Markdown cells can start with just ``# %% [md]`` (#305)
+- Code blocks from Markdown files, when they don't have an explicit language, appear in Markdown cells in Jupyter (#321)
+- Markdown and raw cells can be quoted with triple quotes in the ``py:percent`` format. And Markdown cells can start with just ``# %% [md]`` (#305)
 - ``jupytext notebook.py --to ipynb`` updates the timestamp of ``notebook.py`` so that the paired notebook still works in Jupyter (#335, #254)
 - The Jupyter Notebook extension for Jupytext is compatible with Jupyter Notebook 6.0 (#346)
 - Added support for Rust/Evxcr, by Jonas Bushart (#351)
 
 **BugFixes**
 
+- Commands like ``cat = x`` are not magic commands, so they are not commented any more (#339)
 - Fixed an inconsistent round trip (code cell with ``"cat"`` being converted to a markdown cell) in the ``py:light`` format (#339)
-- Commands like ``cat = x`` are not magic commands {#339)
-- ``jupytext --test`` now really compares the text (rather than the corresponding notebook) when run on text files (#339)
+- ``jupytext --test textfile.ext`` now really compares the text file to its round trip (rather than the corresponding notebook) (#339)
 
 
 1.2.4 (2019-09-19)
