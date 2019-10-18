@@ -10,8 +10,7 @@ try:
 except (ImportError, SyntaxError):
     rst2md = None
 
-from .cell_metadata import is_active, rmd_options_to_metadata
-from .cell_metadata import text_to_metadata
+from .cell_metadata import is_active, text_to_metadata, rmd_options_to_metadata
 from .languages import _JUPYTER_LANGUAGES
 from .stringparser import StringParser
 from .magics import uncomment_magic, is_magic, unescape_code_start
@@ -352,7 +351,7 @@ class RMarkdownCellReader(MarkdownCellReader):
         return rmd_options_to_metadata(options)
 
     def uncomment_code_and_magics(self, lines):
-        if self.cell_type == 'code' and self.comment_magics and is_active('.Rmd', self.metadata):
+        if self.cell_type == 'code' and self.comment_magics and is_active(self.ext, self.metadata):
             uncomment_magic(lines, self.language or self.default_language)
 
         return lines
@@ -624,7 +623,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
         source = lines[cell_start:cell_end_marker]
         self.org_content = [line for line in source]
 
-        if self.cell_type != 'code' or (self.metadata and not is_active('py', self.metadata)) \
+        if self.cell_type != 'code' or (self.metadata and not is_active(self.ext, self.metadata)) \
                 or (self.language is not None and self.language != self.default_language):
             if self.ext == '.py' and self.cell_type != 'code' and self.org_content \
                     and self.org_content[0].lstrip().startswith(('"""', "'''")):

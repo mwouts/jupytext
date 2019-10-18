@@ -168,7 +168,7 @@ class RMarkdownCellExporter(MarkdownCellExporter):
             comment_magic(source, self.language, self.comment_magics)
 
         lines = []
-        if not is_active('Rmd', self.metadata):
+        if not is_active(self.ext, self.metadata):
             self.metadata['eval'] = False
         options = metadata_to_rmd_options(self.language, self.metadata)
         lines.append('```{{{}}}'.format(options))
@@ -335,7 +335,7 @@ class RScriptCellExporter(BaseCellExporter):
             source = ['# ' + line if line else '#' for line in source]
 
         lines = []
-        if not is_active('R', self.metadata):
+        if not is_active(self.ext, self.metadata):
             self.metadata['eval'] = False
         options = metadata_to_rmd_options(None, self.metadata)
         if options:
@@ -358,7 +358,7 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
         if self.cell_type != 'code':
             self.metadata['cell_type'] = self.cell_type
 
-        active = is_active('py', self.metadata)
+        active = is_active(self.ext, self.metadata)
         if self.language != self.default_language and 'active' not in self.metadata:
             active = False
         if self.cell_type == 'raw' and 'active' in self.metadata and self.metadata['active'] == '':
