@@ -270,6 +270,11 @@ class MarkdownCellReader(BaseCellReader):
                 self.metadata['region_name'] = region_name
         elif self.start_code_re.match(line):
             self.language, self.metadata = self.options_to_metadata(self.start_code_re.findall(line)[0])
+            # Cells with a .noeval attribute are markdown cells #347
+            if self.metadata.get('.noeval', '') is None:
+                self.cell_type = 'markdown'
+                self.metadata = {}
+                self.language = None
 
     def options_to_metadata(self, options):
         if isinstance(options, tuple):
@@ -306,12 +311,24 @@ class MarkdownCellReader(BaseCellReader):
                 if in_indented_code_block or in_explicit_code_block:
                     continue
 
-                if self.start_code_re.match(line) or self.start_region_re.match(line):
+                if self.start_region_re.match(line):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False
 
-                if self.non_jupyter_code_re and self.non_jupyter_code_re.match(line):
+                if self.start_code_re.match(line):
+                    # Cells with a .noeval attribute are markdown cells #347
+                    _, metadata = self.options_to_metadata(self.start_code_re.findall(line)[0])
+                    if metadata.get('.noeval', '') is None:
+                        in_explicit_code_block = True
+                        prev_blank = 0
+                        continue
+
+                    if i > 1 and prev_blank:
+                        return i - 1, i, False
+                    return i, i, False
+
+                if self.non_jupyter_code_re.match(line):
                     in_explicit_code_block = True
                     prev_blank = 0
                     continue
