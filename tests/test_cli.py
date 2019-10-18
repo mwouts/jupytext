@@ -60,7 +60,7 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     nb1 = read(nb_org)
     nb2 = read(nb_other)
 
-    compare_notebooks(nb1, nb2)
+    compare_notebooks(nb2, nb1)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb') + list_notebooks('Rmd'))
@@ -137,7 +137,7 @@ def test_convert_multiple_file(nb_files, tmpdir):
     for nb_org, nb_other in zip(nb_orgs, nb_others):
         nb1 = read(nb_org)
         nb2 = read(nb_other)
-        compare_notebooks(nb1, nb2)
+        compare_notebooks(nb2, nb1)
 
 
 def test_error_not_notebook_ext_input(tmpdir, capsys):
@@ -291,7 +291,7 @@ def test_convert_to_percent_format(nb_file, tmpdir):
     nb1 = read(tmp_ipynb)
     nb2 = read(tmp_nbpy)
 
-    compare_notebooks(nb1, nb2)
+    compare_notebooks(nb2, nb1)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
@@ -312,7 +312,7 @@ def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
     nb1 = read(tmp_ipynb)
     nb2 = read(tmp_nbpy)
 
-    compare_notebooks(nb1, nb2)
+    compare_notebooks(nb2, nb1)
 
 
 def git_in_tmpdir(tmpdir):
@@ -617,22 +617,22 @@ def test_sync(nb_file, tmpdir, capsys):
     jupytext(['--sync', tmp_ipynb])
 
     assert os.path.isfile(tmp_py)
-    compare_notebooks(nb, read(tmp_py))
+    compare_notebooks(read(tmp_py), nb)
 
     assert os.path.isfile(tmp_rmd)
-    compare_notebooks(nb, read(tmp_rmd), 'Rmd')
+    compare_notebooks(read(tmp_rmd), nb, 'Rmd')
 
     write(nb, tmp_rmd, 'Rmd')
     jupytext(['--sync', tmp_ipynb])
 
     nb2 = read(tmp_ipynb)
-    compare_notebooks(nb, nb2, 'Rmd', compare_outputs=True)
+    compare_notebooks(nb2, nb, 'Rmd', compare_outputs=True)
 
     write(nb, tmp_py, 'py')
     jupytext(['--sync', tmp_ipynb])
 
     nb2 = read(tmp_ipynb)
-    compare_notebooks(nb, nb2, compare_outputs=True)
+    compare_notebooks(nb2, nb, compare_outputs=True)
 
     # Finally we recreate the ipynb
     os.remove(tmp_ipynb)
@@ -641,7 +641,7 @@ def test_sync(nb_file, tmpdir, capsys):
     jupytext(['--sync', tmp_py])
 
     nb2 = read(tmp_ipynb)
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
     # ipynb must be older than py file, otherwise our Contents Manager will complain
     assert os.path.getmtime(tmp_ipynb) <= os.path.getmtime(tmp_py)
@@ -668,7 +668,7 @@ def test_sync_pandoc(nb_file, tmpdir, capsys):
     jupytext(['--sync', tmp_ipynb])
 
     assert os.path.isfile(tmp_md)
-    compare_notebooks(nb, read(tmp_md), 'md:pandoc')
+    compare_notebooks(read(tmp_md), nb, 'md:pandoc')
 
     with open(tmp_md) as fp:
         assert 'pandoc' in fp.read()
@@ -687,13 +687,13 @@ def test_cli_can_infer_jupytext_format(nb_file, ext, tmpdir):
     write(nb, tmp_text)
     jupytext(['--to', 'notebook', tmp_text])
     nb2 = read(tmp_ipynb)
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
     # Percent format to Jupyter notebook
     write(nb, tmp_text, ext + ':percent')
     jupytext(['--to', 'notebook', tmp_text])
     nb2 = read(tmp_ipynb)
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
 
 @pytest.mark.parametrize('nb_file,ext',
@@ -707,7 +707,7 @@ def test_cli_to_script(nb_file, ext, tmpdir):
     write(nb, tmp_ipynb)
     jupytext(['--to', 'script', tmp_ipynb])
     nb2 = read(tmp_text)
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
 
 @pytest.mark.parametrize('nb_file,ext',
@@ -721,7 +721,7 @@ def test_cli_to_auto(nb_file, ext, tmpdir):
     write(nb, tmp_ipynb)
     jupytext(['--to', 'auto', tmp_ipynb])
     nb2 = read(tmp_text)
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
@@ -735,25 +735,25 @@ def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir):
     with open(nb_file) as fp, mock.patch('sys.stdin', fp):
         jupytext(['--to', 'py:percent', '-o', tmp_py])
     nb2 = read(tmp_py)
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
     # read python notebook on stdin, write to ipynb
     with open(tmp_py) as fp, mock.patch('sys.stdin', fp):
         jupytext(['-o', tmp_ipynb])
     nb2 = read(tmp_ipynb)
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
     # read ipynb notebook on stdin, write to R markdown
     with open(nb_file) as fp, mock.patch('sys.stdin', fp):
         jupytext(['-o', tmp_rmd])
     nb2 = read(tmp_rmd)
-    compare_notebooks(nb, nb2, 'Rmd')
+    compare_notebooks(nb2, nb, 'Rmd')
 
     # read markdown notebook on stdin, write to ipynb
     with open(tmp_rmd) as fp, mock.patch('sys.stdin', fp):
         jupytext(['-o', tmp_ipynb])
     nb2 = read(tmp_ipynb)
-    compare_notebooks(nb, nb2, 'Rmd')
+    compare_notebooks(nb2, nb, 'Rmd')
 
 
 def test_set_kernel_works_with_pipes_326(capsys):

@@ -52,7 +52,7 @@ def test_magics_commented_default(fmt, commented):
     if 'sphinx' in fmt:
         nb2.cells = nb2.cells[1:]
 
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
 
 @pytest.mark.parametrize('fmt', ['md', 'Rmd', 'py:light', 'py:percent', 'py:sphinx', 'R', 'ss:light', 'ss:percent'])
@@ -69,7 +69,7 @@ def test_magics_are_commented(fmt):
     if 'sphinx' in fmt:
         nb2.cells = nb2.cells[1:]
 
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
 
 @pytest.mark.parametrize('fmt', ['md', 'Rmd', 'py:light', 'py:percent', 'py:sphinx', 'R', 'ss:light', 'ss:percent'])
@@ -86,7 +86,7 @@ def test_magics_are_not_commented(fmt):
     if 'sphinx' in fmt:
         nb2.cells = nb2.cells[1:]
 
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
 
 def test_force_comment_using_contents_manager(tmpdir):
@@ -150,4 +150,4 @@ def g(x):
 def g(x):
     return x+1
 """, text)
-    compare_notebooks(nb, jupytext.reads(text, 'py'))
+    compare_notebooks(jupytext.reads(text, 'py'), nb)

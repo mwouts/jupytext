@@ -19,4 +19,4 @@ def test_read_file_with_explicit_fmt(tmpdir):
     nb1 = jupytext.read(tmp_py)
     nb2 = jupytext.read(tmp_py, fmt='py:percent')
 
-    compare_notebooks(nb1, nb2)
+    compare_notebooks(nb2, nb1)
