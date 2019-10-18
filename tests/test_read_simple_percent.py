@@ -34,7 +34,7 @@ def test_read_simple_file(script="""# ---
 7
 """):
     nb = jupytext.reads(script, 'py:percent')
-    compare_notebooks(nb, new_notebook(cells=[
+    compare_notebooks(new_notebook(cells=[
         new_raw_cell('---\ntitle: Simple file\n---'),
         new_markdown_cell('This is a markdown cell'),
         new_markdown_cell('This is also a markdown cell', metadata={'region_name': 'md'}),
@@ -46,7 +46,7 @@ def test_read_simple_file(script="""# ---
 6
 %%magic # this is a commented magic, not a cell
 
-7''', metadata={'title': 'And now a code cell'})]))
+7''', metadata={'title': 'And now a code cell'})]), nb)
 
     script2 = jupytext.writes(nb, 'py:percent')
     compare(script, script2)
@@ -324,7 +324,7 @@ cell
 """)
 
     nb2 = jupytext.read(tmp_py)
-    compare_notebooks(nb2, nb)
+    compare_notebooks(nb, nb2)
 
 
 def test_default_cell_markers_in_contents_manager(tmpdir):
@@ -358,7 +358,7 @@ cell
 """)
 
     nb2 = jupytext.read(tmp_py)
-    compare_notebooks(nb2, nb)
+    compare_notebooks(nb, nb2)
 
 
 def test_default_cell_markers_in_contents_manager_does_not_impact_light_format(tmpdir):
@@ -388,4 +388,4 @@ def test_default_cell_markers_in_contents_manager_does_not_impact_light_format(t
 """)
 
     nb2 = jupytext.read(tmp_py)
-    compare_notebooks(nb2, nb)
+    compare_notebooks(nb, nb2)

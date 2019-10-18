@@ -16,4 +16,4 @@ def test_identity_source_write_read(nb_file):
     py = jupytext.writes(nb1, 'py')
     nb2 = jupytext.reads(py, 'py')
 
-    compare_notebooks(nb1, nb2)
+    compare_notebooks(nb2, nb1)

@@ -85,7 +85,7 @@ def test_pair_unpair_notebook(tmpdir):
 
     # reload and get outputs
     nb2 = cm.get(tmp_md)['content']
-    compare_notebooks(nb2, nb)
+    compare_notebooks(nb, nb2)
 
     # unpair and save as md
     del nb['metadata']['jupytext']
@@ -93,7 +93,7 @@ def test_pair_unpair_notebook(tmpdir):
     nb2 = cm.get(tmp_md)['content']
 
     # we get no outputs here
-    compare_notebooks(nb2, nb, compare_outputs=False)
+    compare_notebooks(nb, nb2, compare_outputs=False)
     assert len(nb2.cells[0]['outputs']) == 0
 
 
@@ -111,7 +111,7 @@ def test_load_save_rename(nb_file, tmpdir):
     nb = jupytext.read(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_rmd)
     nb_rmd = cm.get(tmp_rmd)
-    compare_notebooks(nb, nb_rmd['content'], 'Rmd')
+    compare_notebooks(nb_rmd['content'], nb, 'Rmd')
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
@@ -157,7 +157,7 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
     nb_md = cm.get(tmp_md)
 
-    compare_notebooks(nb, nb_md['content'], 'md')
+    compare_notebooks(nb_md['content'], nb, 'md')
     assert nb_md['content'].metadata['jupytext']['formats'] == 'ipynb,md'
 
 
@@ -178,7 +178,7 @@ def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
     nb_md = cm.get(tmp_md)
 
-    compare_notebooks(nb, nb_md['content'], 'md:pandoc')
+    compare_notebooks(nb_md['content'], nb, 'md:pandoc')
     assert nb_md['content'].metadata['jupytext']['formats'] == 'ipynb,md:pandoc'
 
 
@@ -210,7 +210,7 @@ def test_pair_plain_script(py_file, tmpdir):
 
     # reopen py file with the cm
     nb2 = cm.get(tmp_py)['content']
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
     assert nb2.metadata['jupytext']['formats'] == 'ipynb,py:hydrogen'
 
     # remove the pairing and save
@@ -219,7 +219,7 @@ def test_pair_plain_script(py_file, tmpdir):
 
     # reopen py file with the cm
     nb2 = cm.get(tmp_py)['content']
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
     assert 'formats' not in nb2.metadata['jupytext']
 
 
@@ -237,7 +237,7 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
     nb = jupytext.read(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
-    compare_notebooks(nb, nbpy['content'])
+    compare_notebooks(nbpy['content'], nb)
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
@@ -295,7 +295,7 @@ def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
     nb = jupytext.read(nb_file)
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
-    compare_notebooks(nb, nbpy['content'])
+    compare_notebooks(nbpy['content'], nb)
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
@@ -324,11 +324,11 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
 
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
-    compare_notebooks(nb, nbpy['content'])
+    compare_notebooks(nbpy['content'], nb)
 
     # open ipynb
     nbipynb = cm.get(tmp_ipynb)
-    compare_notebooks(nb, nbipynb['content'])
+    compare_notebooks(nbipynb['content'], nb)
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
@@ -365,11 +365,11 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
 
     cm.save(model=dict(type='notebook', content=nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
-    compare_notebooks(nb, nbpy['content'])
+    compare_notebooks(nbpy['content'], nb)
 
     # open ipynb
     nbipynb = cm.get(tmp_ipynb)
-    compare_notebooks(nb, nbipynb['content'])
+    compare_notebooks(nbipynb['content'], nb)
 
     # save ipynb
     cm.save(model=dict(type='notebook', content=nb), path=tmp_ipynb)
@@ -455,8 +455,8 @@ def test_reload_notebook_after_jupytext_cli(nb_file, tmpdir):
     nb1 = cm.get('notebook.py')['content']
     nb2 = cm.get('notebook.ipynb')['content']
 
-    compare_notebooks(nb1, nb)
-    compare_notebooks(nb2, nb)
+    compare_notebooks(nb, nb1)
+    compare_notebooks(nb, nb2)
 
 
 @skip_if_dict_is_not_ordered
@@ -591,12 +591,12 @@ def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
 
     # read py file
     model2 = cm.get('python/notebook.py')
-    compare_notebooks(model['content'], model2['content'])
+    compare_notebooks(model2['content'], model['content'])
 
     # move py file to the another folder
     shutil.move(tmp_py, tmp_py2)
     model2 = cm.get('other/notebook.py')
-    compare_notebooks(model['content'], model2['content'])
+    compare_notebooks(model2['content'], model['content'])
     cm.save(model=model, path='other/notebook.py')
     assert not os.path.isfile(tmp_ipynb)
     assert not os.path.isfile(str(tmpdir.join('other/notebook.ipynb')))
@@ -626,7 +626,7 @@ def test_kernelspec_are_preserved(nb_file, tmpdir):
 
     # read ipynb
     model2 = cm.get('notebook.ipynb')
-    compare_notebooks(model['content'], model2['content'])
+    compare_notebooks(model2['content'], model['content'])
 
 
 @skip_if_dict_is_not_ordered
@@ -657,16 +657,16 @@ def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
         assert read_format_from_metadata(stream.read(), '.py') == 'sphinx'
 
     model = cm.get(path=tmp_pct_py)
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
     model = cm.get(path=tmp_lgt_py)
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
     model = cm.get(path=tmp_spx_py)
     # (notebooks not equal as we insert %matplotlib inline in sphinx)
 
     model = cm.get(path=tmp_ipynb)
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
 
 @skip_if_dict_is_not_ordered
@@ -693,11 +693,11 @@ def test_pair_notebook_with_dot(nb_file, tmpdir):
 
     model = cm.get(path=tmp_py)
     assert model['name'] == 'file.5.1.py'
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
     model = cm.get(path=tmp_ipynb)
     assert model['name'] == 'file.5.1.ipynb'
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
@@ -728,7 +728,7 @@ def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
     assert model['content']['metadata']['jupytext']['formats'] == 'ipynb,py:light'
 
     # Check contents
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
     # Change save format and save
     model['content']['metadata']['jupytext']['formats'] == 'ipynb,py'
@@ -737,7 +737,7 @@ def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
 
     # Read notebook
     model = cm.get(tmp_nbpy)
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
     # Check that format is explicit
     assert model['content']['metadata']['jupytext']['formats'] == 'ipynb,py:percent'
@@ -790,7 +790,7 @@ def test_save_in_auto_extension_global(nb_file, tmpdir):
     # saving should not create a format entry #95
     assert 'formats' not in model['content'].metadata.get('jupytext', {})
 
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
 
 def test_global_auto_pairing_works_with_empty_notebook(tmpdir):
@@ -815,7 +815,7 @@ def test_global_auto_pairing_works_with_empty_notebook(tmpdir):
     assert 'notebook.ipynb' not in cm.paired_notebooks
 
     model = cm.get(path='notebook.ipynb')
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
     # add language information to the notebook
     nb.metadata['language_info'] = {
@@ -876,7 +876,7 @@ def test_save_in_auto_extension_global_with_format(nb_file, tmpdir):
     # saving should not create a format entry #95
     assert 'formats' not in model['content'].metadata.get('jupytext', {})
 
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
@@ -903,7 +903,7 @@ def test_save_in_auto_extension_local(nb_file, tmpdir):
     # reload and compare with original notebook
     model = cm.get(path=tmp_script)
 
-    compare_notebooks(nb, model['content'])
+    compare_notebooks(model['content'], nb)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb'))
@@ -972,7 +972,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     # read paired notebook
     nb3 = cm.get(tmp_script)['content']
 
-    compare_notebooks(nb, nb3)
+    compare_notebooks(nb3, nb)
 
 
 def test_no_metadata_added_to_scripts_139(tmpdir):
@@ -1032,7 +1032,7 @@ def test_local_format_can_deactivate_pairing(nb_file, ext, tmpdir):
     assert os.path.isfile(str(tmpdir.join('notebook.py'))) == (ext == '.py')
     assert os.path.isfile(str(tmpdir.join('notebook.ipynb'))) == (ext == '.ipynb')
     nb2 = cm.get('notebook' + ext)['content']
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
     # resave, check again
     cm.save(model=dict(type='notebook', content=nb2), path='notebook' + ext)
@@ -1040,7 +1040,7 @@ def test_local_format_can_deactivate_pairing(nb_file, ext, tmpdir):
     assert os.path.isfile(str(tmpdir.join('notebook.py'))) == (ext == '.py')
     assert os.path.isfile(str(tmpdir.join('notebook.ipynb'))) == (ext == '.ipynb')
     nb3 = cm.get('notebook' + ext)['content']
-    compare_notebooks(nb, nb3)
+    compare_notebooks(nb3, nb)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('Rmd'))
@@ -1062,7 +1062,7 @@ def test_global_pairing_allows_to_save_other_file_types(nb_file, tmpdir):
     assert not os.path.isfile(str(tmpdir.join('notebook.ipynb')))
 
     nb2 = cm.get('notebook.Rmd')['content']
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
 
 @skip_if_dict_is_not_ordered
@@ -1332,7 +1332,7 @@ def test_vim_folding_markers(tmpdir):
     assert os.path.isfile(tmp_py)
 
     nb2 = cm.get('nb.ipynb')['content']
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
     nb3 = read(tmp_py)
     assert nb3.metadata['jupytext']['cell_markers'] == '{{{,}}}'
@@ -1379,7 +1379,7 @@ def test_vscode_pycharm_folding_markers(tmpdir):
     assert os.path.isfile(tmp_py)
 
     nb2 = cm.get('nb.ipynb')['content']
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
     nb3 = read(tmp_py)
     assert nb3.metadata['jupytext']['cell_markers'] == 'region,endregion'
@@ -1474,7 +1474,7 @@ def test_save_file_with_default_cell_markers(tmpdir):
     compare('\n'.join(text.splitlines()), '\n'.join(text2.splitlines()[-len(text.splitlines()):]))
 
     nb2 = cm.get('nb.py')['content']
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
     assert nb2.metadata['jupytext']['cell_markers'] == '+,-'
 
 

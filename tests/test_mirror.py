@@ -62,7 +62,7 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
 
     if not actual.endswith('\n'):
         actual = actual + '\n'
-    compare(expected, actual)
+    compare(actual, expected)
 
     # Compare the two notebooks
     if ext != '.ipynb':
@@ -76,10 +76,10 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
             for cell in nb_mirror.cells:
                 cell.metadata = {}
 
-        compare_notebooks(notebook, nb_mirror, fmt)
+        compare_notebooks(nb_mirror, notebook, fmt)
 
         combine_inputs_with_outputs(nb_mirror, notebook)
-        compare_notebooks(notebook, nb_mirror, fmt, compare_outputs=True)
+        compare_notebooks(nb_mirror, notebook, fmt, compare_outputs=True)
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('julia') + list_notebooks('python') + list_notebooks('R'))
