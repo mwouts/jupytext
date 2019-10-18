@@ -218,10 +218,7 @@ class LightScriptCellExporter(BaseCellExporter):
 
     def code_to_text(self):
         """Return the text representation of a code cell"""
-        active = is_active(self.ext, self.metadata)
-        if self.language != self.default_language and 'active' not in self.metadata:
-            active = False
-
+        active = is_active(self.ext, self.metadata, self.language == self.default_language)
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
 
@@ -358,9 +355,7 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
         if self.cell_type != 'code':
             self.metadata['cell_type'] = self.cell_type
 
-        active = is_active(self.ext, self.metadata)
-        if self.language != self.default_language and 'active' not in self.metadata:
-            active = False
+        active = is_active(self.ext, self.metadata, self.language == self.default_language)
         if self.cell_type == 'raw' and 'active' in self.metadata and self.metadata['active'] == '':
             del self.metadata['active']
 

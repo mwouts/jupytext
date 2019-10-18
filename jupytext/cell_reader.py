@@ -192,7 +192,7 @@ class BaseCellReader(object):
             self.content = self.uncomment_code_and_magics(source)
 
         # Is this a raw cell?
-        if ('active' in self.metadata and not is_active('ipynb', self.metadata)) or \
+        if ('active' in self.metadata and not is_active('.ipynb', self.metadata)) or \
                 (self.ext in ['.md', '.markdown'] and self.cell_type == 'code' and not self.language):
             if self.metadata.get('active') == '':
                 del self.metadata['active']
