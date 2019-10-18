@@ -285,7 +285,7 @@ def is_active(ext, metadata, default=True):
             return ext.replace('.', '') in tag.split('-')
     if 'active' not in metadata:
         return default
-    return ext.replace('.', '') in re.split('\\.|,', metadata['active'])
+    return ext.replace('.', '') in re.split(r'\.|,', metadata['active'])
 
 
 def metadata_to_double_percent_options(metadata):
