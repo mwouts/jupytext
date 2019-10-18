@@ -426,7 +426,7 @@ def metadata_to_text(language_or_title, metadata=None, plain_json=False):
     metadata = {key: metadata[key] for key in metadata if key not in _JUPYTEXT_CELL_METADATA}
     text = [language_or_title] if language_or_title else []
     if language_or_title is None:
-        if 'title' in metadata and '{' not in metadata['title']:
+        if 'title' in metadata and '{' not in metadata['title'] and '=' not in metadata['title']:
             text.append(metadata.pop('title'))
 
     if plain_json:
