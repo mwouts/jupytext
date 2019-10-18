@@ -455,3 +455,34 @@ def test_inactive_cell_using_tag(text='''```python tags=["active-md"]
     compare_notebooks(nb, expected)
     text2 = jupytext.writes(nb, 'md')
     compare(text2, text)
+
+
+def test_inactive_cell_using_noeval(text='''This is text
+
+```python .noeval
+# This is python code.
+# It should not become a code cell
+```
+'''):
+    expected = new_notebook(cells=[new_markdown_cell(text[:-1])])
+    nb = jupytext.reads(text, 'md')
+    compare_notebooks(nb, expected)
+    text2 = jupytext.writes(nb, 'md')
+    compare(text2, text)
+
+
+def test_noeval_followed_by_code_works(text='''```python .noeval
+# Not a code cell in Jupyter
+```
+
+```python
+1 + 1
+```
+''', expected=new_notebook(cells=[new_markdown_cell('''```python .noeval
+# Not a code cell in Jupyter
+```'''),
+                                  new_code_cell('1 + 1')])):
+    nb = jupytext.reads(text, 'md')
+    compare_notebooks(nb, expected)
+    text2 = jupytext.writes(nb, 'md')
+    compare(text2, text)
