@@ -1,13 +1,11 @@
 """Export notebook cells as text"""
 
 import re
-import json
 import warnings
 from copy import copy
 from .languages import cell_language, comment_lines
 from .cell_metadata import is_active, _IGNORE_CELL_METADATA
-from .cell_metadata import metadata_to_md_options, metadata_to_rmd_options
-from .cell_metadata import metadata_to_json_options, metadata_to_double_percent_options
+from .cell_metadata import metadata_to_text, metadata_to_rmd_options, metadata_to_double_percent_options
 from .metadata_filter import filter_metadata
 from .magics import comment_magic, escape_code_start
 from .cell_reader import LightScriptCellReader, MarkdownCellReader, RMarkdownCellReader
@@ -115,13 +113,9 @@ class MarkdownCellExporter(BaseCellExporter):
         self.comment = ''
 
     def html_comment(self, metadata, code='region'):
-        """Encore the source text in an HTML region"""
+        """Protect a Markdown or Raw cell with HTML comments"""
         if metadata:
-            region_start = ['<!-- #' + code]
-            if 'title' in metadata and '{' not in metadata['title']:
-                region_start.append(metadata.pop('title'))
-            region_start.append(json.dumps(metadata))
-            region_start.append('-->')
+            region_start = ['<!-- #' + code, metadata_to_text(metadata, plain_json=True), '-->']
             region_start = ' '.join(region_start)
         else:
             region_start = '<!-- #{} -->'.format(code)
@@ -133,7 +127,7 @@ class MarkdownCellExporter(BaseCellExporter):
         if self.cell_type == 'markdown':
             # Is an explicit region required?
             if self.metadata or self.cell_reader(self.fmt).read(self.source)[1] < len(self.source):
-                return self.html_comment(self.metadata)
+                return self.html_comment(self.metadata, self.metadata.pop('region_name', 'region'))
             return self.source
 
         return self.code_to_text()
@@ -143,20 +137,15 @@ class MarkdownCellExporter(BaseCellExporter):
         source = copy(self.source)
         comment_magic(source, self.language, self.comment_magics)
 
-        options = []
-        if self.cell_type == 'code' and self.language:
-            options.append(self.language)
+        if self.metadata.get('active') == '':
+            self.metadata.pop('active')
 
-        filtered_metadata = {key: self.metadata[key] for key in self.metadata
-                             if key not in ['active', 'language']}
+        self.language = self.metadata.pop('language', self.language)
+        if self.cell_type == 'raw' and not is_active(self.ext, self.metadata, False):
+            return self.html_comment(self.metadata, 'raw')
 
-        if filtered_metadata:
-            options.append(metadata_to_md_options(filtered_metadata))
-
-        if self.cell_type == 'raw':
-            return self.html_comment(filtered_metadata, 'raw')
-
-        return ['```{}'.format(' '.join(options))] + source + ['```']
+        options = metadata_to_text(self.language, self.metadata)
+        return ['```' + options] + source + ['```']
 
 
 class RMarkdownCellExporter(MarkdownCellExporter):
@@ -178,7 +167,7 @@ class RMarkdownCellExporter(MarkdownCellExporter):
             comment_magic(source, self.language, self.comment_magics)
 
         lines = []
-        if not is_active('Rmd', self.metadata):
+        if not is_active(self.ext, self.metadata):
             self.metadata['eval'] = False
         options = metadata_to_rmd_options(self.language, self.metadata)
         lines.append('```{{{}}}'.format(options))
@@ -228,10 +217,7 @@ class LightScriptCellExporter(BaseCellExporter):
 
     def code_to_text(self):
         """Return the text representation of a code cell"""
-        active = is_active(self.ext, self.metadata)
-        if self.language != self.default_language and 'active' not in self.metadata:
-            active = False
-
+        active = is_active(self.ext, self.metadata, self.language == self.default_language)
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
 
@@ -252,14 +238,11 @@ class LightScriptCellExporter(BaseCellExporter):
             del self.metadata['endofcell']
 
         cell_start = [self.comment, self.cell_marker_start or '+']
-        if not self.cell_marker_start:
-            cell_start.append(metadata_to_json_options(self.metadata))
-        elif self.metadata:
-            if 'title' in self.metadata:
-                cell_start.append(self.metadata.pop('title'))
-            if self.metadata:
-                cell_start.append(metadata_to_json_options(self.metadata))
-
+        cell_metadata = metadata_to_text(self.metadata, plain_json=True)
+        if cell_metadata:
+            cell_start.append(cell_metadata)
+        elif not self.cell_marker_start:
+            cell_start.append('{}')
         lines.append(' '.join(cell_start))
         lines.extend(source)
         lines.append(self.comment + ' {}'.format(endofcell))
@@ -348,7 +331,7 @@ class RScriptCellExporter(BaseCellExporter):
             source = ['# ' + line if line else '#' for line in source]
 
         lines = []
-        if not is_active('R', self.metadata):
+        if not is_active(self.ext, self.metadata):
             self.metadata['eval'] = False
         options = metadata_to_rmd_options(None, self.metadata)
         if options:
@@ -371,9 +354,7 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
         if self.cell_type != 'code':
             self.metadata['cell_type'] = self.cell_type
 
-        active = is_active('py', self.metadata)
-        if self.language != self.default_language and 'active' not in self.metadata:
-            active = False
+        active = is_active(self.ext, self.metadata, self.language == self.default_language)
         if self.cell_type == 'raw' and 'active' in self.metadata and self.metadata['active'] == '':
             del self.metadata['active']
 

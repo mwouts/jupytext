@@ -20,7 +20,7 @@ print("hello")
     markdown2 = jupytext.writes(nb, 'md')
 
     nb2 = jupytext.reads(markdown2, 'md')
-    compare_notebooks(nb, nb2)
+    compare_notebooks(nb2, nb)
 
     markdown3 = jupytext.writes(nb2, 'md')
     compare(markdown2, markdown3)
@@ -58,4 +58,4 @@ This is the greek letter $\\pi$: π''')])):
     markdown = jupytext.writes(nb, 'md:pandoc')
     nb2 = jupytext.reads(markdown, 'md:pandoc')
     nb2.metadata.pop('jupytext')
-    compare_notebooks(nb2, nb, 'md:pandoc')
+    compare_notebooks(nb, nb2, 'md:pandoc')

@@ -2,8 +2,7 @@ import pytest
 from jupytext.compare import compare
 from jupytext.cell_metadata import rmd_options_to_metadata, metadata_to_rmd_options, parse_rmd_options
 from jupytext.cell_metadata import _IGNORE_CELL_METADATA, RMarkdownOptionParsingError, try_eval_metadata
-from jupytext.cell_metadata import json_options_to_metadata, metadata_to_json_options
-from jupytext.cell_metadata import md_options_to_metadata, metadata_to_md_options
+from jupytext.cell_metadata import text_to_metadata, metadata_to_text
 from jupytext.metadata_filter import filter_metadata
 from .utils import skip_if_dict_is_not_ordered
 
@@ -81,30 +80,75 @@ def test_try_eval_metadata():
     assert metadata == {'list': ['a', 5], 'c': [1, 2, 3]}
 
 
-def test_parse_wrong_json():
-    assert json_options_to_metadata("""{"key":'incorrect value'}""") == {}
+pytestmark = skip_if_dict_is_not_ordered
 
 
-def test_parse_md_options():
-    assert md_options_to_metadata('python') == ('python', {})
-    assert md_options_to_metadata('not_a_language') == (None, {'not_a_language': None})
+def test_language_no_metadata(text='python', value=('python', {})):
+    compare(text_to_metadata(text), value)
+    assert metadata_to_text(*value) == text.strip()
 
 
-def test_round_trip_md_options(metadata={'.class': None,
-                                         'long-and-str$ange.name': None,
-                                         'string': "Hello",
-                                         'number': .21,
-                                         'array': ['First', 'Second', 3, "string with single ' in it'"],
-                                         'dict': {"a": 5, "b": [1.2, "four"]},
-                                         '.another_class': None}):
-    options = metadata_to_md_options(metadata)
-    language, metadata2 = md_options_to_metadata('python ' + options)
-    assert language == 'python'
-    compare(metadata, metadata2)
+def test_only_metadata(text='key="value"', value=('', {'key': 'value'})):
+    compare(text_to_metadata(text), value)
+    assert metadata_to_text(*value) == text
 
 
-def test_write_parse_json():
-    metadata = {"tags": ["parameters"]}
-    options = metadata_to_json_options(metadata)
-    metadata2 = json_options_to_metadata(options, add_brackets=False)
-    assert metadata == metadata2
+def test_only_metadata_2(text='key="value"', value=('', {'key': 'value'})):
+    compare(text_to_metadata(text, allow_title=True), value)
+    assert metadata_to_text(*value) == text
+
+
+def test_no_language(text='.class', value=('', {'.class': None})):
+    compare(text_to_metadata(text), value)
+    assert metadata_to_text(*value) == text
+
+
+def test_language_metadata_no_space(text='python{"a":1}', value=('python', {'a': 1})):
+    compare(text_to_metadata(text), value)
+    assert metadata_to_text(*value) == 'python a=1'
+
+
+def test_title_no_metadata(text='title', value=('title', {})):
+    compare(text_to_metadata(text, allow_title=True), value)
+    assert metadata_to_text(*value) == text.strip()
+
+
+def test_simple_metadata(text='python string="value" number=1.0 array=["a", "b"]',
+                         value=('python', {'string': 'value', 'number': 1.0, 'array': ['a', 'b']})):
+    compare(text_to_metadata(text), value)
+    assert metadata_to_text(*value) == text
+
+
+def test_simple_metadata_with_spaces(text='python string = "value" number = 1.0 array = ["a",  "b"]',
+                                     value=('python', {'string': 'value', 'number': 1.0, 'array': ['a', 'b']})):
+    compare(text_to_metadata(text), value)
+    assert metadata_to_text(*value) == 'python string="value" number=1.0 array=["a", "b"]'
+
+
+def test_title_and_relax_json(text="cell title string='value' number=1.0 array=['a', \"b\"]",
+                              value=('cell title', {'string': 'value', 'number': 1.0, 'array': ['a', 'b']})):
+    compare(text_to_metadata(text, allow_title=True), value)
+    assert metadata_to_text(*value) == 'cell title string="value" number=1.0 array=["a", "b"]'
+
+
+def test_title_and_json_dict(text='cell title {"string": "value", "number": 1.0, "array": ["a", "b"]}',
+                             value=('cell title', {'string': 'value', 'number': 1.0, 'array': ['a', 'b']})):
+    compare(text_to_metadata(text, allow_title=True), value)
+    assert metadata_to_text(*value) == 'cell title string="value" number=1.0 array=["a", "b"]'
+
+
+def test_tags(text="python .class",
+              value=('python', {'.class': None})):
+    compare(text_to_metadata(text), value)
+    assert metadata_to_text(*value) == text
+
+
+def test_values_with_equal_signs_inside(text='python string="value=5"',
+                                        value=('python', {'string': 'value=5'})):
+    compare(text_to_metadata(text), value)
+    assert metadata_to_text(*value) == text
+
+
+def test_incorrectly_encoded(text="this is an incorrect expression d={{4 b=3"):
+    value = text_to_metadata(text, allow_title=True)
+    assert metadata_to_text(*value) == text
