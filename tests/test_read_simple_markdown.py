@@ -442,7 +442,7 @@ def test_inactive_cell(text='''```python active="md"
     nb = jupytext.reads(text, 'md')
     compare_notebooks(nb, expected)
     text2 = jupytext.writes(nb, 'md')
-    # compare(text2, text)
+    compare(text2, text)
 
 
 def test_inactive_cell_using_tag(text='''```python tags=["active-md"]
@@ -454,4 +454,4 @@ def test_inactive_cell_using_tag(text='''```python tags=["active-md"]
     nb = jupytext.reads(text, 'md')
     compare_notebooks(nb, expected)
     text2 = jupytext.writes(nb, 'md')
-    # compare(text2, text)
+    compare(text2, text)

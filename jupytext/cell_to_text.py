@@ -137,15 +137,14 @@ class MarkdownCellExporter(BaseCellExporter):
         source = copy(self.source)
         comment_magic(source, self.language, self.comment_magics)
 
-        self.language = self.metadata.pop('language', self.language)
-        if self.cell_type == 'code':
-            options = metadata_to_text(self.language, self.metadata)
+        if self.metadata.get('active') == '':
+            self.metadata.pop('active')
 
-        if self.cell_type == 'raw':
-            if self.metadata.get('active') == '':
-                self.metadata.pop('active')
+        self.language = self.metadata.pop('language', self.language)
+        if self.cell_type == 'raw' and not is_active(self.ext, self.metadata, False):
             return self.html_comment(self.metadata, 'raw')
 
+        options = metadata_to_text(self.language, self.metadata)
         return ['```' + options] + source + ['```']
 
 
