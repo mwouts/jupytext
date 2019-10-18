@@ -16,20 +16,25 @@ _BLANK_LINE = re.compile(r'^\s*$')
 
 def _multilines(obj):
     try:
-        return obj.splitlines()
+        lines = obj.splitlines()
+        return lines + [''] if obj.endswith('\n') else lines
     except AttributeError:
         # Remove the final blank space on Python 2.7
         # return json.dumps(obj, indent=True, sort_keys=True).splitlines()
         return [line.rstrip() for line in json.dumps(obj, indent=True, sort_keys=True).splitlines()]
 
 
-def compare(actual, expected):
+def compare(actual, expected, return_diff=False):
     """Compare two strings, lists or dict-like objects"""
     if actual != expected:
-        raise AssertionError('\n' + '\n'.join(difflib.unified_diff(
+        diff = '\n'.join(difflib.unified_diff(
             _multilines(actual),
             _multilines(expected),
-            'first', 'second', lineterm='')))
+            'first', 'second', lineterm=''))
+        if return_diff:
+            return diff
+        raise AssertionError('\n' + diff)
+    return ''
 
 
 def filtered_cell(cell, preserve_outputs, cell_metadata_filter):
@@ -166,12 +171,11 @@ def compare_notebooks(notebook_actual, notebook_expected, fmt=None, allow_expect
 
         # 3. bis test entire cell content
         if not same_content(ref_cell.source, test_cell.source, allow_removed_final_blank_line):
-            try:
-                compare(ref_cell.source, test_cell.source)
-            except AssertionError as error:
+            if ref_cell.source != test_cell.source:
                 if raise_on_first_difference:
+                    diff = compare(ref_cell.source, test_cell.source, return_diff=True)
                     raise NotebookDifference("Cell content differ on {} cell #{}: {}"
-                                             .format(test_cell.cell_type, i, str(error)))
+                                             .format(test_cell.cell_type, i, diff))
                 modified_cells.add(i)
 
         if not compare_outputs:
