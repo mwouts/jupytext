@@ -288,7 +288,7 @@ def is_active(ext, metadata, default=True):
     return ext.replace('.', '') in re.split(r'\.|,', metadata['active'])
 
 
-def metadata_to_double_percent_options(metadata):
+def metadata_to_double_percent_options(metadata, plain_json):
     """Metadata to double percent lines"""
     text = []
     if 'title' in metadata:
@@ -297,7 +297,7 @@ def metadata_to_double_percent_options(metadata):
         text.insert(0, '%' * metadata.pop('cell_depth'))
     if 'cell_type' in metadata:
         text.append('[{}]'.format(metadata.pop('region_name', metadata.pop('cell_type'))))
-    return metadata_to_text(' '.join(text), metadata, plain_json=True)
+    return metadata_to_text(' '.join(text), metadata, plain_json=plain_json)
 
 
 def incorrectly_encoded_metadata(text):
@@ -382,6 +382,19 @@ def relax_json_loads(text, catch=False):
         pass
 
     return incorrectly_encoded_metadata(text)
+
+
+def is_json_metadata(text):
+    """Is this a JSON metadata?"""
+    first_curly_bracket = text.find('{')
+    if first_curly_bracket < 0:
+        return False
+
+    first_equal_sign = text.find('=')
+    if first_equal_sign < 0:
+        return True
+
+    return first_curly_bracket < first_equal_sign
 
 
 def text_to_metadata(text, allow_title=False):

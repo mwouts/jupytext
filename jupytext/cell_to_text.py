@@ -54,6 +54,7 @@ class BaseCellExporter(object):
         self.comment = _SCRIPT_EXTENSIONS.get(self.ext, {}).get('comment', '#')
         self.comment_magics = self.fmt['comment_magics'] if 'comment_magics' in self.fmt \
             else self.default_comment_magics
+        self.cell_metadata_json = self.fmt.get('cell_metadata_json', False)
 
         # how many blank lines before next cell
         self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell')
@@ -115,7 +116,7 @@ class MarkdownCellExporter(BaseCellExporter):
     def html_comment(self, metadata, code='region'):
         """Protect a Markdown or Raw cell with HTML comments"""
         if metadata:
-            region_start = ['<!-- #' + code, metadata_to_text(metadata, plain_json=True), '-->']
+            region_start = ['<!-- #' + code, metadata_to_text(metadata, plain_json=self.cell_metadata_json), '-->']
             region_start = ' '.join(region_start)
         else:
             region_start = '<!-- #{} -->'.format(code)
@@ -238,7 +239,7 @@ class LightScriptCellExporter(BaseCellExporter):
             del self.metadata['endofcell']
 
         cell_start = [self.comment, self.cell_marker_start or '+']
-        cell_metadata = metadata_to_text(self.metadata, plain_json=True)
+        cell_metadata = metadata_to_text(self.metadata, plain_json=self.cell_metadata_json)
         if cell_metadata:
             cell_start.append(cell_metadata)
         elif not self.cell_marker_start:
@@ -358,7 +359,7 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
         if self.cell_type == 'raw' and 'active' in self.metadata and self.metadata['active'] == '':
             del self.metadata['active']
 
-        options = metadata_to_double_percent_options(self.metadata)
+        options = metadata_to_double_percent_options(self.metadata, self.cell_metadata_json)
         if options.startswith('%') or not options:
             lines = [self.comment + ' %%' + options]
         else:

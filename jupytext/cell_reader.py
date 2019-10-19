@@ -11,7 +11,7 @@ try:
 except (ImportError, SyntaxError):
     rst2md = None
 
-from .cell_metadata import is_active, text_to_metadata, rmd_options_to_metadata
+from .cell_metadata import is_active, text_to_metadata, is_json_metadata, rmd_options_to_metadata
 from .languages import _JUPYTER_LANGUAGES
 from .stringparser import StringParser
 from .magics import uncomment_magic, is_magic, unescape_code_start
@@ -105,6 +105,7 @@ class BaseCellReader(object):
         self.explicit_eoc = None
         self.cell_type = None
         self.language = None
+        self.cell_metadata_json = fmt.get('cell_metadata_json', False)
 
     def read(self, lines):
         """Read one cell from the given lines, and return the cell,
@@ -259,6 +260,7 @@ class MarkdownCellReader(BaseCellReader):
             groups = match_region.groups()
             region_name = groups[0]
             self.end_region_re = re.compile(r"^<!--\s*#end{}\s*-->\s*$".format(region_name))
+            self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(groups[1])
             title, self.metadata = text_to_metadata(groups[1], allow_title=True)
             if region_name == 'raw':
                 self.cell_type = 'raw'
@@ -279,6 +281,7 @@ class MarkdownCellReader(BaseCellReader):
     def options_to_metadata(self, options):
         if isinstance(options, tuple):
             options = ' '.join(options)
+        self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(options)
         return text_to_metadata(options)
 
     def find_cell_end(self, lines):
@@ -484,6 +487,7 @@ class LightScriptCellReader(ScriptCellReader):
             self.start_code_re = re.compile('^' + self.comment + r'\s*\+(.*)$')
 
     def options_to_metadata(self, options):
+        self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(options)
         title, metadata = text_to_metadata(options, allow_title=True)
 
         if title:
@@ -601,6 +605,7 @@ class DoublePercentScriptCellReader(ScriptCellReader):
             self.metadata = {}
 
     def options_to_metadata(self, options):
+        self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(options)
         title, metadata = text_to_metadata(options, allow_title=True)
 
         # Cell type
