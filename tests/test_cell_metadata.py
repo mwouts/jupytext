@@ -137,9 +137,21 @@ def test_title_and_json_dict(text='cell title {"string": "value", "number": 1.0,
     assert metadata_to_text(*value) == 'cell title string="value" number=1.0 array=["a", "b"]'
 
 
-def test_tags(text="python .class",
-              value=('python', {'.class': None})):
+@pytest.mark.parametrize('allow_title', [True, False])
+def test_attribute(allow_title):
+    text = ".class"
+    value = ('', {'.class': None})
+    compare(text_to_metadata(text, allow_title), value)
+    assert metadata_to_text(*value) == text
+
+
+def test_language_and_attribute(text="python .class", value=('python', {'.class': None})):
     compare(text_to_metadata(text), value)
+    assert metadata_to_text(*value) == text
+
+
+def test_title_and_attribute(text="This is my title. .class", value=('This is my title.', {'.class': None})):
+    compare(text_to_metadata(text, allow_title=True), value)
     assert metadata_to_text(*value) == text
 
 

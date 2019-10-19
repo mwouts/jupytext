@@ -404,27 +404,37 @@ def text_to_metadata(text, allow_title=False):
     first_curly_bracket = text.find('{')
     first_equal_sign = text.find('=')
 
-    if first_curly_bracket < 0 and first_equal_sign < 0 and allow_title:
-        # no metadata
-        return text, {}
-
     if first_curly_bracket < 0 or (0 <= first_equal_sign < first_curly_bracket):
         # this is a key=value metadata line
-        if allow_title:
-            prev_whitespace = text[:first_equal_sign].rstrip().rfind(' ')
-        else:
-            prev_whitespace = text.find(' ')
-
-        # single expression
-        if prev_whitespace < 0:
-            # is is a title or a jupyter language?
-            if (allow_title and first_equal_sign < 0) or is_jupyter_language(text):
+        # case one = the options may be preceeded with a language
+        if not allow_title:
+            if is_jupyter_language(text):
                 return text, {}
+            if ' ' not in text:
+                return '', parse_key_equal_value(text)
+            language, options = text.split(' ', 1)
+            if is_jupyter_language(language):
+                return language, parse_key_equal_value(options)
+            return '', parse_key_equal_value(text)
 
-            # else, parse this expression as a key
-            prev_whitespace = 0
+        # case two = a title may be before the options
+        # we split the title into words
+        if first_equal_sign >= 0:
+            words = text[:first_equal_sign].split(' ')
+            # last word is the key before the equal sign!
+            while words and not words[-1]:
+                words.pop()
+            if words:
+                words.pop()
+        else:
+            words = text.split(' ')
 
-        return text[:prev_whitespace].rstrip(), parse_key_equal_value(text[prev_whitespace:])
+        # and we remove words on the right that are attributes (they start with '.')
+        while words and (not words[-1].strip() or words[-1].startswith('.')):
+            words.pop()
+
+        title = ' '.join(words)
+        return title, parse_key_equal_value(text[len(title):])
 
     # json metadata line
     return text[:first_curly_bracket].strip(), relax_json_loads(text[first_curly_bracket:], catch=True)
