@@ -33,7 +33,7 @@
 
 # Followed by a raw cell
 
-# region {"active": ""}
+# region active=""
 # This is 
 # the content
 # of the raw cell
@@ -41,14 +41,14 @@
 
 # # Part two - cell metadata
 
-# region {"key": "value", "cell_type": "markdown"}
+# region key="value" cell_type="markdown"
 # This is a markdown cell with cell metadata `{"key": "value"}`
 # endregion
 
-# region {".class": null, "tags": ["parameters"]}
+# region .class tags=["parameters"]
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
 # endregion
 
-# region {"key": "value", "active": ""}
+# region key="value" active=""
 # This is a raw cell with cell metadata `{"key": "value"}`
 # endregion

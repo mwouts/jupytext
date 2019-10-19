@@ -24,8 +24,9 @@ plot (x, sin (x));
 
 % And to finish with, a Python cell
 
-% + {"language": "python"}
+% + language="python"
 % a = 1
+% -
 
-% + {"language": "python"}
+% + language="python"
 % a + 1

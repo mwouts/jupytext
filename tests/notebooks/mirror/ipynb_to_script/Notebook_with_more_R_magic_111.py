@@ -18,7 +18,8 @@ df = pd.DataFrame(
         "Z": [1, 2, 3, 1, 2, 3, 1, 2, 3],
     }
 )
+# -
 
-# + {"magic_args": "-i df", "language": "R"}
+# + magic_args="-i df" language="R"
 # library("ggplot2")
 # ggplot(data = df) + geom_point(aes(x = X, y = Y, color = Letter, size = Z))
