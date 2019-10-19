@@ -8,17 +8,17 @@
 #     name: python3
 # ---
 
-# {{{ {"language": "html"}
+# {{{ language="html"
 # <p><a href="https://github.com/mwouts/jupytext", style="color: rgb(0,0,255)">Jupytext</a> on GitHub</p>
 # }}}
 
-# {{{ {"language": "latex"}
+# {{{ language="latex"
 # $\frac{\pi}{2}$
 # }}}
 
 # %load_ext rpy2.ipython
 
-# {{{ {"language": "R"}
+# {{{ language="R"
 # library(ggplot2)
 # ggplot(data=data.frame(x=c('A', 'B'), y=c(5, 2)), aes(x,weight=y)) + geom_bar()
 # }}}

@@ -6,7 +6,7 @@ jupyter:
     name: python3
 ---
 
-<!-- #region {"slideshow": {"slide_type": "slide"}} -->
+<!-- #region slideshow={"slide_type": "slide"} -->
 A markdown cell
 <!-- #endregion -->
 
@@ -14,6 +14,6 @@ A markdown cell
 1+1
 ```
 
-<!-- #region {"cell_style": "center", "slideshow": {"slide_type": "fragment"}} -->
+<!-- #region cell_style="center" slideshow={"slide_type": "fragment"} -->
 Markdown cell two
 <!-- #endregion -->

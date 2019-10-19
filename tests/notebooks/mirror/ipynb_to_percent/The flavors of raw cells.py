@@ -6,19 +6,19 @@
 #     name: python3
 # ---
 
-# %% [raw] {"raw_mimetype": "text/latex"}
+# %% [raw] raw_mimetype="text/latex"
 # $1+1$
 
-# %% [raw] {"raw_mimetype": "text/restructuredtext"}
+# %% [raw] raw_mimetype="text/restructuredtext"
 # :math:`1+1`
 
-# %% [raw] {"raw_mimetype": "text/html"}
+# %% [raw] raw_mimetype="text/html"
 # <b>Bold text<b>
 
-# %% [raw] {"raw_mimetype": "text/markdown"}
+# %% [raw] raw_mimetype="text/markdown"
 # **Bold text**
 
-# %% [raw] {"raw_mimetype": "text/x-python"}
+# %% [raw] raw_mimetype="text/x-python"
 # 1 + 1
 
 # %% [raw]

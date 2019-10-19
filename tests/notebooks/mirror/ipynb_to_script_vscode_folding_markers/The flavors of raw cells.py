@@ -8,26 +8,26 @@
 #     name: python3
 # ---
 
-# region {"raw_mimetype": "text/latex", "active": ""}
+# region raw_mimetype="text/latex" active=""
 # $1+1$
 # endregion
 
-# region {"raw_mimetype": "text/restructuredtext", "active": ""}
+# region raw_mimetype="text/restructuredtext" active=""
 # :math:`1+1`
 # endregion
 
-# region {"raw_mimetype": "text/html", "active": ""}
+# region raw_mimetype="text/html" active=""
 # <b>Bold text<b>
 # endregion
 
-# region {"raw_mimetype": "text/markdown", "active": ""}
+# region raw_mimetype="text/markdown" active=""
 # **Bold text**
 # endregion
 
-# region {"raw_mimetype": "text/x-python", "active": ""}
+# region raw_mimetype="text/x-python" active=""
 # 1 + 1
 # endregion
 
-# region {"active": ""}
+# region active=""
 # Not formatted
 # endregion

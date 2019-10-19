@@ -14,14 +14,14 @@
 # %%
 # %load_ext rpy2.ipython
 
-# %% {"language": "R"}
+# %% language="R"
 # suppressMessages(require(tidyverse))
 
-# %% {"language": "R"}
+# %% language="R"
 # ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color=Species)) + geom_point()
 
 # %% [markdown]
 # The default plot dimensions are not good for us, so we use the -w and -h parameters in %%R magic to set the plot size
 
-# %% {"magic_args": "-w 400 -h 240", "language": "R"}
+# %% magic_args="-w 400 -h 240" language="R"
 # ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color=Species)) + geom_point()

@@ -31,7 +31,7 @@
 
 # Followed by a raw cell
 
-# + {"active": ""}
+# + active=""
 # This is 
 # the content
 # of the raw cell
@@ -39,11 +39,13 @@
 
 # # Part two - cell metadata
 
-# + {"key": "value", "cell_type": "markdown"}
+# + key="value" cell_type="markdown"
 # This is a markdown cell with cell metadata `{"key": "value"}`
+# -
 
-# + {".class": null, "tags": ["parameters"]}
+# + .class tags=["parameters"]
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
+# -
 
-# + {"key": "value", "active": ""}
+# + key="value" active=""
 # This is a raw cell with cell metadata `{"key": "value"}`

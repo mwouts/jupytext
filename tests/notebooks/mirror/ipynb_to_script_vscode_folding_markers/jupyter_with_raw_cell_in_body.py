@@ -10,7 +10,7 @@
 
 1+2+3
 
-# region {"active": ""}
+# region active=""
 # This is a raw cell
 # endregion
 
