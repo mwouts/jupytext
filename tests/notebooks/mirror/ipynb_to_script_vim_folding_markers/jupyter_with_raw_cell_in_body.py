@@ -10,7 +10,7 @@
 
 1+2+3
 
-# {{{ {"active": ""}
+# {{{ active=""
 # This is a raw cell
 # }}}
 

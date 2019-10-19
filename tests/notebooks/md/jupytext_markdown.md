@@ -58,7 +58,7 @@ Metadata are supported for all cell types.
 
 ## Markdown cells
 
-<!-- #region Region title {"key": "value"} -->
+<!-- #region Region title key="value" -->
 A cell with a title and additional metadata.
 <!-- #endregion -->
 

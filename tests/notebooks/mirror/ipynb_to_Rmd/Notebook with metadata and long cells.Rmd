@@ -41,7 +41,7 @@ of the raw cell
 
 # Part two - cell metadata
 
-<!-- #region {"key": "value"} -->
+<!-- #region key="value" -->
 This is a markdown cell with cell metadata `{"key": "value"}`
 <!-- #endregion -->
 
