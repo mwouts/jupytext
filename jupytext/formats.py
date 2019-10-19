@@ -54,7 +54,8 @@ JUPYTEXT_FORMATS = \
             cell_exporter_class=MarkdownCellExporter,
             # Version 1.0 on 2018-08-31 - jupytext v0.6.0 : Initial version
             # Version 1.1 on 2019-03-24 - jupytext v1.1.0 : Markdown regions and cell metadata
-            # Version 1.2 on 2019-09-21 - jupytext v1.3.0 : Raw regions are now marked with HTML comments
+            # Version 1.2 on 2019-09-21 - jupytext v1.3.0 : Raw regions are now encoded with HTML comments (#321)
+            # and by default, cell metadata use the key=value representation (#347)
             current_version_number='1.2',
             min_readable_version_number='1.0'),
 
@@ -75,7 +76,8 @@ JUPYTEXT_FORMATS = \
             cell_exporter_class=RMarkdownCellExporter,
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
             # Version 1.1 on 2019-03-24 - jupytext v1.1.0 : Markdown regions and cell metadata
-            # Version 1.2 on 2019-09-21 - jupytext v1.3.0 : Raw regions are now marked with HTML comments
+            # Version 1.2 on 2019-09-21 - jupytext v1.3.0 : Raw regions are now encoded with HTML comments (#321)
+            # and by default, cell metadata use the key=value representation in raw and markdown cells (#347)
             current_version_number='1.2',
             min_readable_version_number='1.0')] + \
     [
@@ -85,6 +87,7 @@ JUPYTEXT_FORMATS = \
             header_prefix=_SCRIPT_EXTENSIONS[ext]['comment'],
             cell_reader_class=LightScriptCellReader,
             cell_exporter_class=LightScriptCellExporter,
+            # Version 1.5 on 2019-10-19 - jupytext v1.3.0 - Cell metadata represented as key=value by default
             # Version 1.4 on 2019-03-30 - jupytext v1.1.0 - custom cell markers allowed
             # Version 1.3 on 2018-09-22 - jupytext v0.7.0rc0 : Metadata are
             # allowed for all cell types (and then include 'cell_type')
@@ -93,7 +96,7 @@ JUPYTEXT_FORMATS = \
             # Version 1.1 on 2018-08-25 - jupytext v0.6.0 : Cells separated
             # with one blank line #38
             # Version 1.0 on 2018-08-22 - jupytext v0.5.2 : Initial version
-            current_version_number='1.4',
+            current_version_number='1.5',
             min_readable_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
     [
         NotebookFormatDescription(
@@ -112,6 +115,7 @@ JUPYTEXT_FORMATS = \
             cell_reader_class=DoublePercentScriptCellReader,
             cell_exporter_class=DoublePercentCellExporter,
             # Version 1.3 on 2019-09-21 - jupytext v1.3.0: Markdown cells can be quoted using triple quotes #305
+            # and cell metadata are represented as key=value by default
             # Version 1.2 on 2018-11-18 - jupytext v0.8.6: Jupyter magics are commented by default #126, #132
             # Version 1.1 on 2018-09-23 - jupytext v0.7.0rc1 : [markdown] and
             # [raw] for markdown and raw cells.
@@ -126,7 +130,7 @@ JUPYTEXT_FORMATS = \
             cell_reader_class=HydrogenCellReader,
             cell_exporter_class=HydrogenCellExporter,
             # Version 1.2 on 2018-12-14 - jupytext v0.9.0: same as percent - only magics are not commented by default
-            current_version_number='1.2',
+            current_version_number='1.3',
             min_readable_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
     [
         NotebookFormatDescription(
