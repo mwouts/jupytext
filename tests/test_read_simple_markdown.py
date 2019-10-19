@@ -224,7 +224,17 @@ b = 2
     compare(markdown, markdown2)
 
 
-def test_raw_cell_with_metadata(markdown="""<!-- #raw {"key": "value"} -->
+def test_raw_cell_with_metadata_json(markdown="""<!-- #raw {"key": "value"} -->
+raw content
+<!-- #endraw -->
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    compare(nb.cells[0], new_raw_cell(source='raw content', metadata={'key': 'value'}))
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
+def test_raw_cell_with_metadata(markdown="""<!-- #raw key="value" -->
 raw content
 <!-- #endraw -->
 """):
@@ -254,7 +264,21 @@ raw content
     assert "format_version: '1.1'" not in md2
 
 
-def test_markdown_cell_with_metadata(markdown="""<!-- #region {"key": "value"} -->
+def test_markdown_cell_with_metadata_json(markdown="""<!-- #region {"key": "value"} -->
+A long
+
+
+markdown cell
+<!-- #endregion -->
+"""):
+    nb = jupytext.reads(markdown, 'md')
+    compare(nb.cells[0], new_markdown_cell(source='A long\n\n\nmarkdown cell',
+                                           metadata={'key': 'value'}))
+    markdown2 = jupytext.writes(nb, 'md')
+    compare(markdown, markdown2)
+
+
+def test_markdown_cell_with_metadata(markdown="""<!-- #region key="value" -->
 A long
 
 
