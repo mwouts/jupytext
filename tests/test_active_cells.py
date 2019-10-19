@@ -32,7 +32,7 @@ jupyter:
 
 '''}
 
-ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
+ACTIVE_ALL = {'.py': """# + active="ipynb,py,R,Rmd"
 # This cell is active in all extensions
 """,
               '.Rmd': """```{python active="ipynb,py,R,Rmd"}
@@ -43,7 +43,7 @@ ACTIVE_ALL = {'.py': """# + {"active": "ipynb,py,R,Rmd"}
 # This cell is active in all extensions
 ```
 """,
-              '.R': """# + {"active": "ipynb,py,R,Rmd"}
+              '.R': """# + active="ipynb,py,R,Rmd"
 # This cell is active in all extensions
 """,
               '.ipynb': {'cell_type': 'code',
@@ -61,7 +61,7 @@ def test_active_all(ext, no_jupytext_version_number):
     compare(nb.cells[0], ACTIVE_ALL['.ipynb'])
 
 
-ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
+ACTIVE_IPYNB = {'.py': """# + active="ipynb"
 # # This cell is active only in ipynb
 # %matplotlib inline
 """,
@@ -75,7 +75,7 @@ ACTIVE_IPYNB = {'.py': """# + {"active": "ipynb"}
 %matplotlib inline
 ```
 """,
-                '.R': """# + {"active": "ipynb"}
+                '.R': """# + active="ipynb"
 # # This cell is active only in ipynb
 # %matplotlib inline
 """,
@@ -96,7 +96,7 @@ def test_active_ipynb(ext, no_jupytext_version_number):
     compare(nb.cells[0], ACTIVE_IPYNB['.ipynb'])
 
 
-ACTIVE_IPYNB_RMD_USING_TAG = {'.py': """# + {"tags": ["active-ipynb-Rmd"]}
+ACTIVE_IPYNB_RMD_USING_TAG = {'.py': """# + tags=["active-ipynb-Rmd"]
 # # This cell is active only in ipynb and Rmd
 # %matplotlib inline
 """,
@@ -110,7 +110,7 @@ ACTIVE_IPYNB_RMD_USING_TAG = {'.py': """# + {"tags": ["active-ipynb-Rmd"]}
 %matplotlib inline
 ```
 """,
-                              '.R': """# + {"tags": ["active-ipynb-Rmd"]}
+                              '.R': """# + tags=["active-ipynb-Rmd"]
 # # This cell is active only in ipynb and Rmd
 # %matplotlib inline
 """,
@@ -151,7 +151,7 @@ def test_active_ipynb_rspin(no_jupytext_version_number):
     compare(nb.cells[0], ACTIVE_IPYNB_RSPIN['.ipynb'])
 
 
-ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
+ACTIVE_PY_IPYNB = {'.py': """# + active="ipynb,py"
 # This cell is active in py and ipynb extensions
 """,
                    '.Rmd': """```{python active="ipynb,py", eval=FALSE}
@@ -162,7 +162,7 @@ ACTIVE_PY_IPYNB = {'.py': """# + {"active": "ipynb,py"}
 # This cell is active in py and ipynb extensions
 ```
 """,
-                   '.R': """# + {"active": "ipynb,py"}
+                   '.R': """# + active="ipynb,py"
 # # This cell is active in py and ipynb extensions
 """,
                    '.ipynb': {'cell_type': 'code',
@@ -182,14 +182,14 @@ def test_active_py_ipynb(ext, no_jupytext_version_number):
     compare(nb.cells[0], ACTIVE_PY_IPYNB['.ipynb'])
 
 
-ACTIVE_PY_R_IPYNB = {'.py': """# + {"active": "ipynb,py,R"}
+ACTIVE_PY_R_IPYNB = {'.py': """# + active="ipynb,py,R"
 # This cell is active in py, R and ipynb extensions
 """,
                      '.Rmd': """```{python active="ipynb,py,R", eval=FALSE}
 # This cell is active in py, R and ipynb extensions
 ```
 """,
-                     '.R': """# + {"active": "ipynb,py,R"}
+                     '.R': """# + active="ipynb,py,R"
 # This cell is active in py, R and ipynb extensions
 """,
                      '.ipynb': {'cell_type': 'code',
@@ -209,14 +209,14 @@ def test_active_py_r_ipynb(ext, no_jupytext_version_number):
     compare(nb.cells[0], ACTIVE_PY_R_IPYNB['.ipynb'])
 
 
-ACTIVE_RMD = {'.py': """# + {"active": "Rmd"}
+ACTIVE_RMD = {'.py': """# + active="Rmd"
 # # This cell is active in Rmd only
 """,
               '.Rmd': """```{python active="Rmd"}
 # This cell is active in Rmd only
 ```
 """,
-              '.R': """# + {"active": "Rmd"}
+              '.R': """# + active="Rmd"
 # # This cell is active in Rmd only
 """,
               '.ipynb': {'cell_type': 'raw',
@@ -233,14 +233,14 @@ def test_active_rmd(ext, no_jupytext_version_number):
     compare(nb.cells[0], ACTIVE_RMD['.ipynb'])
 
 
-ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + {"hide_output": true, "active": "Rmd"}
+ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + hide_output=true active="Rmd"
 # # This cell is active in Rmd only
 """,
                           '.Rmd': """```{python include=FALSE, active="Rmd"}
 # This cell is active in Rmd only
 ```
 """,
-                          '.R': """# + {"hide_output": true, "active": "Rmd"}
+                          '.R': """# + hide_output=true active="Rmd"
 # # This cell is active in Rmd only
 """,
                           '.ipynb':
