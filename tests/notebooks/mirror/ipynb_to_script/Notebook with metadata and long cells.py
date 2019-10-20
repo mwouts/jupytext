@@ -39,7 +39,7 @@
 
 # # Part two - cell metadata
 
-# + key="value" cell_type="markdown"
+# + [markdown] key="value"
 # This is a markdown cell with cell metadata `{"key": "value"}`
 # -
 

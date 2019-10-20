@@ -688,13 +688,13 @@ do not impede the correct identification of Markdown cells"""
 
 @skip_if_dict_is_not_ordered
 def test_read_explicit_markdown_cell_with_triple_quote_307(
-        script="""# {{{ {"special": "metadata", "cell_type": "markdown"}
+        script="""# {{{ [md] {"special": "metadata"}
 # some text '''
 # }}}
 
 print('hello world')
 
-# {{{ {"special": "metadata", "cell_type": "markdown"}
+# {{{ [md] {"special": "metadata"}
 # more text '''
 # }}}
 """):
@@ -739,3 +739,12 @@ Jupyter.utils.load_extensions('jupytext')''')],
     text = jupytext.writes(notebook, 'py')
     notebook2 = jupytext.reads(text, 'py')
     compare_notebooks(notebook2, notebook)
+
+
+def test_markdown_with_metadata(no_jupytext_version_number, text="""# + [markdown] key="value"
+# Markdown cell
+""", notebook=new_notebook(cells=[new_markdown_cell('Markdown cell', metadata={'key': 'value'})])):
+    nb2 = jupytext.reads(text, 'py')
+    compare_notebooks(nb2, notebook)
+    text2 = jupytext.writes(notebook, 'py')
+    compare(text2, text)

@@ -8,7 +8,7 @@
 #     name: python3
 # ---
 
-# {{{ slideshow={"slide_type": "slide"} cell_type="markdown"
+# {{{ [markdown] slideshow={"slide_type": "slide"}
 # A markdown cell
 # }}}
 
@@ -16,6 +16,6 @@
 1+1
 # }}}
 
-# {{{ cell_style="center" slideshow={"slide_type": "fragment"} cell_type="markdown"
+# {{{ [markdown] cell_style="center" slideshow={"slide_type": "fragment"}
 # Markdown cell two
 # }}}
