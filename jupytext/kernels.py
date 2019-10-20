@@ -2,6 +2,7 @@
 
 import sys
 from .reraise import reraise
+from .languages import same_language
 
 try:
     # I prefer not to take a dependency on jupyter_client
@@ -39,7 +40,7 @@ def kernelspec_from_language(language):
 
         for name in find_kernel_specs():
             kernel_specs = get_kernel_spec(name)
-            if kernel_specs.language == language or (language == 'c++' and kernel_specs.language.startswith('C++')):
+            if same_language(kernel_specs.language, language):
                 return {'name': name, 'language': language, 'display_name': kernel_specs.display_name}
     except (KeyError, ValueError):
         pass
