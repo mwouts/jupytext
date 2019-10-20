@@ -10,7 +10,7 @@ import json
 from copy import copy
 from .jupytext import read, reads, write, writes
 from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, check_file_version
-from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format, auto_ext_from_metadata
+from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format, check_auto_ext
 from .header import recursive_update
 from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
@@ -567,21 +567,6 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
     if latest_inputs != nb_file:
         notebook = read(latest_inputs, fmt=input_fmt)
     return notebook, latest_inputs, latest_outputs
-
-
-def check_auto_ext(fmt, metadata, option):
-    """Raise a ValueError when the .auto extension cannot be determined"""
-    if fmt['extension'] != '.auto':
-        return
-
-    auto_ext = auto_ext_from_metadata(metadata)
-    if auto_ext:
-        fmt['extension'] = auto_ext
-        return
-
-    raise ValueError("The notebook does not have a 'language_info' metadata. "
-                     "Please replace 'auto' with the actual language extension in the {} option (currently {})."
-                     .format(option, short_form_one_format(fmt)))
 
 
 def pipe_notebook(notebook, command, fmt='py:percent', update=True):

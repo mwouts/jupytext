@@ -578,3 +578,18 @@ def auto_ext_from_metadata(metadata):
         return '.R'
 
     return auto_ext
+
+
+def check_auto_ext(fmt, metadata, option):
+    """Raise a ValueError when the .auto extension cannot be determined"""
+    if fmt['extension'] != '.auto':
+        return
+
+    auto_ext = auto_ext_from_metadata(metadata)
+    if auto_ext:
+        fmt['extension'] = auto_ext
+        return
+
+    raise ValueError("The notebook does not have a 'language_info' metadata. "
+                     "Please replace 'auto' with the actual language extension in the {} option (currently {})."
+                     .format(option, short_form_one_format(fmt)))
