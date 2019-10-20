@@ -225,12 +225,15 @@ def jupytext(args=None):
         print_paired_paths(args.notebooks[0], args.input_format)
         return 1
 
+    if (args.test or args.test_strict) and not args.to and not args.output and not args.sync:
+        raise ValueError('Please provide one of --to, --output or --sync')
+
     if not args.to and not args.output and not args.sync \
             and not args.pipe and not args.check \
-            and not args.test and not args.test_strict \
             and not args.update_metadata and not args.set_kernel \
             and not args.execute:
-        raise ValueError('Please select an action')
+        raise ValueError('Please provide one of --to, --output, --sync, --pipe, '
+                         '--check, --update_metadata, --set-kernel or --execute')
 
     if args.output and len(args.notebooks) != 1:
         raise ValueError('Please input a single notebook when using --output')
