@@ -488,22 +488,13 @@ class LightScriptCellReader(ScriptCellReader):
         else:
             self.start_code_re = re.compile('^' + self.comment + r'\s*\+(.*)$')
 
-    def options_to_metadata(self, options):
-        self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(options)
-        title, metadata = text_to_metadata(options, allow_title=True)
-
-        if title:
-            metadata['title'] = title
-
-        return metadata
-
     def metadata_and_language_from_option_line(self, line):
         if self.start_code_re.match(line):
             # We want to parse inner most regions as cells.
             # Thus, if we find another region start before the end for this region,
             # we will have ignore the metadata that we found here, and move on to the next cell.
             groups = self.start_code_re.match(line).groups()
-            self.metadata = self.options_to_metadata(groups[0])
+            self.language, self.metadata = self.options_to_metadata(groups[0])
             self.ignore_end_marker = False
             if self.cell_marker_start:
                 self.explicit_end_marker_required = True
@@ -516,6 +507,36 @@ class LightScriptCellReader(ScriptCellReader):
 
         if self.metadata is not None:
             self.language = self.metadata.get('language', self.default_language)
+
+    def options_to_metadata(self, options):
+        self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(options)
+        title, metadata = text_to_metadata(options, allow_title=True)
+
+        # Cell type
+        for cell_type in ['markdown', 'raw', 'md']:
+            code = '[{}]'.format(cell_type)
+            if code in title:
+                title = title.replace(code, '').strip()
+                metadata['cell_type'] = cell_type
+                if cell_type == 'md':
+                    metadata['region_name'] = cell_type
+                    metadata['cell_type'] = 'markdown'
+                break
+
+        # Spyder has sub cells
+        cell_depth = 0
+        while title.startswith('%'):
+            cell_depth += 1
+            title = title[1:]
+
+        if cell_depth:
+            metadata['cell_depth'] = cell_depth
+            title = title.strip()
+
+        if title:
+            metadata['title'] = title
+
+        return None, metadata
 
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position of first line after cell"""
@@ -586,7 +607,7 @@ class LightScriptCellReader(ScriptCellReader):
         return len(lines), len(lines), False
 
 
-class DoublePercentScriptCellReader(ScriptCellReader):
+class DoublePercentScriptCellReader(LightScriptCellReader):
     """Read notebook cells from Spyder/VScode scripts (#59)"""
     default_comment_magics = True
 
@@ -605,36 +626,6 @@ class DoublePercentScriptCellReader(ScriptCellReader):
             self.language, self.metadata = self.options_to_metadata(line[line.find('%%') + 2:])
         elif self.alternative_start_code_re.match(line):
             self.metadata = {}
-
-    def options_to_metadata(self, options):
-        self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(options)
-        title, metadata = text_to_metadata(options, allow_title=True)
-
-        # Cell type
-        for cell_type in ['markdown', 'raw', 'md']:
-            code = '[{}]'.format(cell_type)
-            if code in title:
-                title = title.replace(code, '').strip()
-                metadata['cell_type'] = cell_type
-                if cell_type == 'md':
-                    metadata['region_name'] = cell_type
-                    metadata['cell_type'] = 'markdown'
-                break
-
-        # Spyder has sub cells
-        cell_depth = 0
-        while title.startswith('%'):
-            cell_depth += 1
-            title = title[1:]
-
-        if cell_depth:
-            metadata['cell_depth'] = cell_depth
-            title = title.strip()
-
-        if title:
-            metadata['title'] = title
-
-        return None, metadata
 
     def find_cell_content(self, lines):
         """Parse cell till its end and set content, lines_to_next_cell.
