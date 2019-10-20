@@ -151,3 +151,39 @@ def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
     nb_black.metadata = {key: nb_black.metadata[key] for key in nb_black.metadata
                          if key in _DEFAULT_NOTEBOOK_METADATA}
     compare(nb_black, nb_now)
+
+
+@requires_black
+def test_apply_black_on_markdown_notebook(tmpdir):
+    text = """---
+jupyter:
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  language_info:
+    codemirror_mode:
+      name: ipython
+      version: 3
+    file_extension: .py
+    mimetype: text/x-python
+    name: python
+    nbconvert_exporter: python
+    pygments_lexer: ipython3
+    version: 3.7.4
+---
+
+```python
+1    +     \
+2+3\
++4
+```
+"""
+    tmp_md = str(tmpdir.join('test.md'))
+    with open(tmp_md, 'w') as fp:
+        fp.write(text)
+
+    jupytext([tmp_md, '--pipe', 'black'])
+
+    nb = read(tmp_md)
+    compare(nb.cells, [new_code_cell('1 + 2 + 3 + 4')])
