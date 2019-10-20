@@ -24,6 +24,7 @@ Release History
 - Commands like ``cat = x`` are not magic commands, so they are not commented any more (#339)
 - Fixed an inconsistent round trip (code cell with ``"cat"`` being converted to a markdown cell) in the ``py:light`` format (#339)
 - ``jupytext --test textfile.ext`` now really compares the text file to its round trip (rather than the corresponding notebook) (#339)
+- Markdown cells that contain code are now preserved in a round trip through the Markdown and R Markdown formats (#361)
 
 
 1.2.4 (2019-09-19)
