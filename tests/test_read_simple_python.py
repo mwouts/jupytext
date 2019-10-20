@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from nbformat.v4.nbbase import new_markdown_cell, new_code_cell, new_notebook
+from nbformat.v4.nbbase import new_markdown_cell, new_code_cell, new_raw_cell, new_notebook
 from jupytext.compare import compare
 import jupytext
 from jupytext.compare import compare_notebooks
@@ -739,6 +739,24 @@ Jupyter.utils.load_extensions('jupytext')''')],
     text = jupytext.writes(notebook, 'py')
     notebook2 = jupytext.reads(text, 'py')
     compare_notebooks(notebook2, notebook)
+
+
+def test_raw_with_metadata(no_jupytext_version_number, text="""# + key="value" active=""
+# Raw cell
+# # Commented line
+""", notebook=new_notebook(cells=[new_raw_cell('Raw cell\n# Commented line', metadata={'key': 'value'})])):
+    nb2 = jupytext.reads(text, 'py')
+    compare_notebooks(nb2, notebook)
+    text2 = jupytext.writes(notebook, 'py')
+    compare(text2, text)
+
+
+def test_raw_with_metadata_2(no_jupytext_version_number, text="""# + [raw] key="value"
+# Raw cell
+# # Commented line
+""", notebook=new_notebook(cells=[new_raw_cell('Raw cell\n# Commented line', metadata={'key': 'value'})])):
+    nb2 = jupytext.reads(text, 'py')
+    compare_notebooks(nb2, notebook)
 
 
 def test_markdown_with_metadata(no_jupytext_version_number, text="""# + [markdown] key="value"
