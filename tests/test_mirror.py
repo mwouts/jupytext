@@ -173,7 +173,7 @@ def test_ipynb_to_python_percent(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, 'py:percent', 'ipynb_to_percent')
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip=''))
 def test_ipynb_to_python_hydrogen(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, 'py:hydrogen', 'ipynb_to_hydrogen')
 
