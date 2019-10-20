@@ -180,7 +180,7 @@ def test_error_not_same_ext(tmp_ipynb, tmpdir):
 
 
 def test_error_no_action(tmp_ipynb):
-    with pytest.raises(ValueError, match="Please select an action"):
+    with pytest.raises(ValueError, match="Please provide one of"):
         jupytext([tmp_ipynb])
 
 
@@ -982,3 +982,11 @@ cat = 42
 
     with mock.patch('jupytext.magics.is_magic', erroneous_is_magic):
         assert jupytext([tmp_py, '--to', 'ipynb', '--test-strict']) != 0
+
+
+def test_339_require_to(tmpdir):
+    """Test that the to argument is asked for when a `--test` command is provided"""
+    tmp_py = str(tmpdir.join('test.py'))
+
+    with pytest.raises(ValueError, match='--to'):
+        jupytext([tmp_py, '--test-strict'])
