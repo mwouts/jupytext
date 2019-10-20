@@ -2,6 +2,7 @@ import os
 import shutil
 import pytest
 from jupytext.contentsmanager import TextFileContentsManager
+from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 
 
@@ -64,7 +65,7 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir, no_jupytext_version_num
     for cell in nb2['content'].cells:
         assert cell.metadata.get('trusted', True)
 
-    assert model['content'] == nb2['content']
+    compare_notebooks(nb2['content'], model['content'])
 
     # Just for coverage
     cm.trust_notebook(file)
@@ -108,4 +109,4 @@ def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(nb_file, tmpdi
     for cell in nb2['content'].cells:
         assert cell.metadata.get('trusted', True)
 
-    assert model['content'] == nb2['content']
+    compare_notebooks(nb2['content'], model['content'])
