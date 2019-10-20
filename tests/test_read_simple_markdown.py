@@ -510,3 +510,47 @@ def test_noeval_followed_by_code_works(text='''```python .noeval
     compare_notebooks(nb, expected)
     text2 = jupytext.writes(nb, 'md')
     compare(text2, text)
+
+
+def test_markdown_cell_with_code_works(nb=new_notebook(cells=[
+    new_markdown_cell("""```python
+1 + 1
+```""")])):
+    text = jupytext.writes(nb, 'md')
+    nb2 = jupytext.reads(text, 'md')
+    compare_notebooks(nb2, nb)
+
+
+def test_markdown_cell_with_noeval_code_works(nb=new_notebook(cells=[
+    new_markdown_cell("""```python .noeval
+1 + 1
+```""")])):
+    text = jupytext.writes(nb, 'md')
+    nb2 = jupytext.reads(text, 'md')
+    compare_notebooks(nb2, nb)
+
+
+def test_two_markdown_cell_with_code_works(nb=new_notebook(cells=[
+    new_markdown_cell("""```python
+1 + 1
+```"""),
+    new_markdown_cell("""```python
+2 + 2
+```""")
+])):
+    text = jupytext.writes(nb, 'md')
+    nb2 = jupytext.reads(text, 'md')
+    compare_notebooks(nb2, nb)
+
+
+def test_two_markdown_cell_with_no_language_code_works(nb=new_notebook(cells=[
+    new_markdown_cell("""```
+1 + 1
+```"""),
+    new_markdown_cell("""```
+2 + 2
+```""")
+])):
+    text = jupytext.writes(nb, 'md')
+    nb2 = jupytext.reads(text, 'md')
+    compare_notebooks(nb2, nb)

@@ -1,5 +1,6 @@
 import re
-from jupytext.compare import compare
+from nbformat.v4.nbbase import new_markdown_cell, new_notebook
+from jupytext.compare import compare, compare_notebooks
 import jupytext
 from .utils import skip_if_dict_is_not_ordered
 
@@ -58,3 +59,25 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
     rmd2 = re.sub(r'```{r ', '```{r, ', rmd2)
     rmd2 = re.sub(r'```{python ', '```{python, ', rmd2)
     compare(rmd, rmd2)
+
+
+def test_markdown_cell_with_code_works(nb=new_notebook(cells=[
+    new_markdown_cell("""```python
+1 + 1
+```""")])):
+    text = jupytext.writes(nb, 'Rmd')
+    nb2 = jupytext.reads(text, 'Rmd')
+    compare_notebooks(nb2, nb)
+
+
+def test_two_markdown_cell_with_code_works(nb=new_notebook(cells=[
+    new_markdown_cell("""```python
+1 + 1
+```"""),
+    new_markdown_cell("""```python
+2 + 2
+```""")
+])):
+    text = jupytext.writes(nb, 'Rmd')
+    nb2 = jupytext.reads(text, 'Rmd')
+    compare_notebooks(nb2, nb)
