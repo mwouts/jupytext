@@ -13,6 +13,7 @@ Release History
 - Code blocks from Markdown files, when they don't have an explicit language, appear in Markdown cells in Jupyter (#321)
 - Code blocks with an explicit language and a ``.noeval`` attribute are inactive in Jupyter (#347)
 - Markdown and raw cells can be quoted with triple quotes in the ``py:percent`` format. And Markdown cells can start with just ``# %% [md]`` (#305)
+- The light format uses `[markdown]` rather than `cell_type` to identify markdown cells with metadata (#356)
 - Cell metadata can be encoded as either key=value (the new default) or in JSON. An automatic option ``cell_metadata_json`` should help minimize the impact on existing files (#344)
 - The Jupyter Notebook extension for Jupytext is compatible with Jupyter Notebook 6.0 (#346)
 - ``jupytext notebook.py --to ipynb`` updates the timestamp of ``notebook.py`` so that the paired notebook still works in Jupyter (#335, #254)
