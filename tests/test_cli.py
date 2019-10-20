@@ -994,21 +994,13 @@ def test_339_require_to(tmpdir):
 
 @requires_black
 def test_detailed_message_missing_language_info(tmpdir):
-    text = """---
-jupyter:
-  kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
----
-
-```python
+    text = """```python
 1 + 1
 ```
 """
     tmp_md = str(tmpdir.join('test.md'))
     with open(tmp_md, 'w') as fp:
-        fp.write(tmp_md)
+        fp.write(text)
 
     with pytest.raises(ValueError, match='--pipe-fmt'):
         jupytext([tmp_md, '--pipe', 'black'])
