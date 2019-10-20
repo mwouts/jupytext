@@ -49,6 +49,19 @@ def default_language_from_metadata_and_ext(metadata, ext):
     return language.lower()
 
 
+def same_language(kernel_language, language):
+    """Are those the same language?"""
+    if kernel_language == language:
+        return True
+    if kernel_language.lower() == language:
+        return True
+    if kernel_language.startswith('C++') and language == 'c++':
+        return True
+    if kernel_language == 'octave' and language == 'matlab':
+        return True
+    return False
+
+
 def set_main_and_cell_language(metadata, cells, ext):
     """Set main language for the given collection of cells, and
     use magics for cells that use other languages"""
