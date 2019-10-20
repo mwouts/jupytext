@@ -52,6 +52,7 @@ def parse_jupytext_args(args=None):
 
     class RawTextArgumentDefaultsHelpFormatter(argparse.RawTextHelpFormatter,
                                                argparse.ArgumentDefaultsHelpFormatter):
+        """Keep the raw formatting in command line help, plus show the default values"""
         pass
 
     parser = argparse.ArgumentParser(
@@ -303,11 +304,7 @@ def jupytext_single_file(nb_file, args, log):
     # Compute actual extension when using script/auto, and update nb_dest if necessary
     dest_fmt = args.to
     if dest_fmt and dest_fmt['extension'] == '.auto':
-        auto_ext = auto_ext_from_metadata(notebook.metadata)
-        if not auto_ext:
-            raise ValueError('The notebook has no language information. '
-                             'Please provide an explicit script extension.')
-        dest_fmt['extension'] = auto_ext
+        check_auto_ext(dest_fmt, notebook.metadata, '--to')
         if not args.output and nb_file != '-':
             nb_dest = full_path(base_path(nb_file, args.input_format), dest_fmt)
 
@@ -572,13 +569,29 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
     return notebook, latest_inputs, latest_outputs
 
 
+def check_auto_ext(fmt, metadata, option):
+    """Raise a ValueError when the .auto extension cannot be determined"""
+    if fmt['extension'] != '.auto':
+        return
+
+    auto_ext = auto_ext_from_metadata(metadata)
+    if auto_ext:
+        fmt['extension'] = auto_ext
+        return
+
+    raise ValueError("The notebook does not have a 'language_info' metadata. "
+                     "Please replace 'auto' with the actual language extension in the {} option (currently {})."
+                     .format(option, short_form_one_format(fmt)))
+
+
 def pipe_notebook(notebook, command, fmt='py:percent', update=True):
     """Pipe the notebook, in the desired representation, to the given command. Update the notebook
     with the returned content if desired."""
     if command in ['black', 'flake8', 'autopep8']:
         command = command + ' -'
 
-    fmt = long_form_one_format(fmt, notebook.metadata)
+    fmt = long_form_one_format(fmt, notebook.metadata, auto_ext_requires_language_info=False)
+    check_auto_ext(fmt, notebook.metadata, '--pipe-fmt')
     text = writes(notebook, fmt)
     process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
     cmd_output, err = process.communicate(input=text.encode('utf-8'))
