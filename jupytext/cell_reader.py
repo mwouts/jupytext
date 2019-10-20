@@ -396,12 +396,9 @@ class ScriptCellReader(BaseCellReader):  # pylint: disable=W0223
                     lines = uncomment(lines)
 
         if self.cell_type == 'code':
-            unescape_code_start(lines, self.ext, self.language or self.default_language)
+            return unescape_code_start(lines, self.ext, self.language or self.default_language)
 
-        if self.cell_type == 'markdown':
-            lines = uncomment(lines, self.markdown_prefix or self.comment)
-
-        return lines
+        return uncomment(lines, self.markdown_prefix or self.comment)
 
 
 class RScriptCellReader(ScriptCellReader):
@@ -504,9 +501,6 @@ class LightScriptCellReader(ScriptCellReader):
         elif self.cell_marker_end and self.end_code_re.match(line):
             self.metadata = None
             self.cell_type = 'code'
-
-        if self.metadata is not None:
-            self.language = self.metadata.get('language', self.default_language)
 
     def options_to_metadata(self, options):
         self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(options)
