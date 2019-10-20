@@ -332,6 +332,8 @@ class MarkdownCellReader(BaseCellReader):
                     return i, i, False
 
                 if self.non_jupyter_code_re.match(line):
+                    if prev_blank >= 2:
+                        return i - 2, i, True
                     in_explicit_code_block = True
                     prev_blank = 0
                     continue
@@ -341,7 +343,7 @@ class MarkdownCellReader(BaseCellReader):
 
                 if _BLANK_LINE.match(lines[i]):
                     prev_blank += 1
-                elif i > 2 and prev_blank >= 2:
+                elif prev_blank >= 2:
                     return i - 2, i, True
                 else:
                     prev_blank = 0

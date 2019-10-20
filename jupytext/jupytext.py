@@ -176,8 +176,6 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 if (i + 1 < len(cell_exporters) and not cell_exporters[i + 1].is_code() and
                         not texts[i][0].startswith('<!-- #') and
                         not texts[i + 1][0].startswith('<!-- #') and
-                        not texts[i][0].startswith('```') and
-                        not texts[i + 1][0].startswith('```') and
                         (not split_at_heading or not (texts[i + 1] and texts[i + 1][0].startswith('#')))):
                     text.append('')
 

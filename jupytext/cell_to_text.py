@@ -127,7 +127,13 @@ class MarkdownCellExporter(BaseCellExporter):
         """Return the text representation of a cell"""
         if self.cell_type == 'markdown':
             # Is an explicit region required?
-            if self.metadata or self.cell_reader(self.fmt).read(self.source)[1] < len(self.source):
+            if self.metadata:
+                protect = True
+            else:
+                # Would the text be parsed to a shorter cell/a cell with a different type?
+                cell, pos = self.cell_reader(self.fmt).read(self.source)
+                protect = pos < len(self.source) or cell.cell_type != self.cell_type
+            if protect:
                 return self.html_comment(self.metadata, self.metadata.pop('region_name', 'region'))
             return self.source
 
