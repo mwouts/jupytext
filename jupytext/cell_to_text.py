@@ -245,9 +245,9 @@ class LightScriptCellExporter(BaseCellExporter):
             del self.metadata['endofcell']
 
         cell_start = [self.comment, self.cell_marker_start or '+']
-        cell_metadata = metadata_to_text(self.metadata, plain_json=self.cell_metadata_json)
-        if cell_metadata:
-            cell_start.append(cell_metadata)
+        options = metadata_to_double_percent_options(self.metadata, self.cell_metadata_json)
+        if options:
+            cell_start.append(options)
         elif not self.cell_marker_start:
             cell_start.append('{}')
         lines.append(' '.join(cell_start))
