@@ -8,7 +8,7 @@
 #     name: python3
 # ---
 
-# region slideshow={"slide_type": "slide"} cell_type="markdown"
+# region [markdown] slideshow={"slide_type": "slide"}
 # A markdown cell
 # endregion
 
@@ -16,6 +16,6 @@
 1+1
 # endregion
 
-# region cell_style="center" slideshow={"slide_type": "fragment"} cell_type="markdown"
+# region [markdown] cell_style="center" slideshow={"slide_type": "fragment"}
 # Markdown cell two
 # endregion

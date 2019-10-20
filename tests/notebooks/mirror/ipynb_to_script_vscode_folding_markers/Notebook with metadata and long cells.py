@@ -41,7 +41,7 @@
 
 # # Part two - cell metadata
 
-# region key="value" cell_type="markdown"
+# region [markdown] key="value"
 # This is a markdown cell with cell metadata `{"key": "value"}`
 # endregion
 
