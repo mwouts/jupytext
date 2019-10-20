@@ -15,7 +15,7 @@ from .cell_to_text import MarkdownCellExporter, RMarkdownCellExporter, \
     HydrogenCellExporter, SphinxGalleryCellExporter
 from .metadata_filter import metadata_filter_as_string
 from .stringparser import StringParser
-from .languages import _SCRIPT_EXTENSIONS, _COMMENT_CHARS
+from .languages import _SCRIPT_EXTENSIONS, _COMMENT_CHARS, same_language
 from .pandoc import pandoc_version, is_pandoc_available
 from .magics import is_magic
 
@@ -563,8 +563,18 @@ def validate_one_format(jupytext_format):
 
 
 def auto_ext_from_metadata(metadata):
-    """Script extension from kernel information"""
+    """Script extension from notebook metadata"""
     auto_ext = metadata.get('language_info', {}).get('file_extension')
+
+    if auto_ext is None:
+        kernel_language = metadata.get('kernelspec', {}).get('language')
+        if kernel_language:
+            for ext in _SCRIPT_EXTENSIONS:
+                if same_language(kernel_language, _SCRIPT_EXTENSIONS[ext]['language']):
+                    auto_ext = ext
+                    break
+
     if auto_ext == '.r':
         return '.R'
+
     return auto_ext
