@@ -71,8 +71,24 @@ class BaseCellExporter(object):
             return True
         return False
 
+    def use_triple_quotes(self):
+        """Should this markdown cell use triple quote?"""
+        if 'cell_marker' not in self.unfiltered_metadata:
+            return False
+        cell_marker = self.unfiltered_metadata['cell_marker']
+        if cell_marker in ['"""', "'''"]:
+            return True
+        if ',' not in cell_marker:
+            return False
+        left, right = cell_marker.split(',')
+        return left[:3] == right[-3:] and left[:3] in ['"""', "'''"]
+
     def cell_to_text(self):
         """Return the text representation for the cell"""
+        # Trigger cell marker in case we are using multiline quotes
+        if self.cell_type != 'code' and not self.metadata and self.use_triple_quotes():
+            self.metadata['cell_type'] = self.cell_type
+
         if self.is_code():
             return self.code_to_text()
 
@@ -83,7 +99,21 @@ class BaseCellExporter(object):
 
     def markdown_to_text(self, source):
         """Escape the given source, for a markdown cell"""
-        if self.comment and self.comment != "#'":
+        cell_markers = self.unfiltered_metadata.get('cell_marker', self.fmt.get('cell_markers'))
+        if cell_markers:
+            if ',' in cell_markers:
+                left, right = cell_markers.split(',', 1)
+            else:
+                left = cell_markers + '\n'
+                right = '\n' + cell_markers
+            if left[:3] == right[-3:] and left[:3] in ['"""', "'''"]:
+                source = copy(source)
+                source[0] = left + source[0]
+                source[-1] = source[-1] + right
+                return source
+
+        if self.comment and self.comment != "#'" and is_active(self.ext, self.metadata) and \
+                self.fmt.get('format_name') not in ['percent', 'hydrogen']:
             source = copy(source)
             comment_magic(source, self.language, self.comment_magics)
 
@@ -216,9 +246,12 @@ class LightScriptCellExporter(BaseCellExporter):
 
     def is_code(self):
         # Treat markdown cells with metadata as code cells (#66)
-        if self.cell_type == 'markdown' and self.metadata:
-            self.metadata['cell_type'] = self.cell_type
-            self.source = comment_lines(self.source, self.comment)
+        if (self.cell_type == 'markdown' and self.metadata) or self.use_triple_quotes():
+            if is_active(self.ext, self.metadata):
+                self.metadata['cell_type'] = self.cell_type
+                self.source = self.markdown_to_text(self.source)
+                self.cell_type = 'code'
+                self.unfiltered_metadata.pop('cell_marker', '')
             return True
         return super(LightScriptCellExporter, self).is_code()
 
@@ -231,7 +264,7 @@ class LightScriptCellExporter(BaseCellExporter):
         if active:
             comment_magic(source, self.language, self.comment_magics)
         else:
-            source = [self.comment + ' ' + line if line else self.comment for line in source]
+            source = self.markdown_to_text(source)
 
         if self.explicit_start_marker(source):
             self.metadata['endofcell'] = self.cell_marker_end or endofcell_marker(source, self.comment)
@@ -378,11 +411,7 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
                 return lines
             return lines + source
 
-        cell_marker = self.unfiltered_metadata.get('cell_marker', self.cell_markers)
-        if self.cell_type != 'code' and cell_marker:
-            return lines + [cell_marker] + self.source + [cell_marker]
-
-        return lines + comment_lines(self.source, self.comment)
+        return lines + self.markdown_to_text(self.source)
 
 
 class HydrogenCellExporter(DoublePercentCellExporter):  # pylint: disable=W0223
