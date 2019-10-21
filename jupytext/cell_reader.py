@@ -187,11 +187,8 @@ class BaseCellReader(object):
             if lines_to_end_of_cell_marker != (0 if pep8_lines == 1 else 2):
                 self.metadata['lines_to_end_of_cell_marker'] = lines_to_end_of_cell_marker
 
-        if not is_active(self.ext, self.metadata) or \
-                ('active' not in self.metadata and self.language and self.language != self.default_language):
-            self.content = uncomment(source, self.comment if self.ext not in ['.r', '.R'] else '#')
-        else:
-            self.content = self.uncomment_code_and_magics(source)
+        # Uncomment content
+        self.content = self.extract_content(source)
 
         # Is this an inactive cell?
         if self.cell_type == 'code':
@@ -232,6 +229,33 @@ class BaseCellReader(object):
     def uncomment_code_and_magics(self, lines):
         """Uncomment code and possibly commented magic commands"""
         raise NotImplementedError('This method must be implemented in a sub class')
+
+    def extract_content(self, lines):
+        # Code cells with just a multiline string become Markdown cells
+        if self.ext == '.py' and not is_active(self.ext, self.metadata, self.cell_type == 'code'):
+            content = '\n'.join(lines).strip()
+            for triple_quote in ['"""', "'''"]:
+                if content.startswith(triple_quote) and content.endswith(triple_quote) and len(content) >= 6:
+                    left = right = triple_quote
+                    content = content[3:-3]
+                    # Trim first/last line return
+                    if content.startswith('\n'):
+                        content = content[1:]
+                        left = triple_quote + '\n'
+                    if content.endswith('\n'):
+                        content = content[:-1]
+                        right = '\n' + triple_quote
+                    if len(left) == len(right) == 4:
+                        self.metadata['cell_marker'] = left[:3]
+                    else:
+                        self.metadata['cell_marker'] = left + ',' + right
+                    return content.splitlines()
+
+        if not is_active(self.ext, self.metadata) or \
+                ('active' not in self.metadata and self.language and self.language != self.default_language):
+            return uncomment(lines, self.comment if self.ext not in ['.r', '.R'] else '#')
+
+        return self.uncomment_code_and_magics(lines)
 
 
 class MarkdownCellReader(BaseCellReader):
@@ -568,7 +592,6 @@ class LightScriptCellReader(ScriptCellReader):
                 continue
 
             parser.read_line(line)
-
             # New code region
             # Simple code pattern in LightScripts must be preceded with a blank line
             if self.start_code_re.match(line) or (
@@ -606,7 +629,7 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
     default_comment_magics = True
 
     def __init__(self, fmt, default_language=None):
-        ScriptCellReader.__init__(self, fmt, default_language)
+        LightScriptCellReader.__init__(self, fmt, default_language)
         script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = default_language or script['language']
         self.comment = script['comment']
@@ -618,7 +641,7 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
         is found, self.metadata is set to a dictionary."""
         if self.start_code_re.match(line):
             self.language, self.metadata = self.options_to_metadata(line[line.find('%%') + 2:])
-        elif self.alternative_start_code_re.match(line):
+        else:
             self.metadata = {}
 
     def find_cell_content(self, lines):
@@ -635,29 +658,7 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
         # Cell content
         source = lines[cell_start:cell_end_marker]
         self.org_content = copy(source)
-
-        if self.cell_type != 'code' or (self.metadata and not is_active(self.ext, self.metadata)) \
-                or (self.language is not None and self.language != self.default_language):
-            if self.ext == '.py' and self.cell_type != 'code' and self.org_content \
-                    and self.org_content[0].lstrip().startswith(('"""', "'''")):
-                content = '\n'.join(self.org_content).strip()
-                for triple_quote in ['"""', "'''"]:
-                    if content.startswith(triple_quote) and content.endswith(triple_quote):
-                        content = content[3:-3]
-                        self.metadata['cell_marker'] = triple_quote
-                        # Trim first/last line return
-                        if content.startswith('\n'):
-                            content = content[1:]
-                        if content.endswith('\n'):
-                            content = content[:-1]
-                        source = content.splitlines()
-                        break
-            else:
-                source = uncomment(source, self.comment)
-        elif self.metadata is not None and self.comment_magics:
-            source = self.uncomment_code_and_magics(source)
-
-        self.content = source
+        self.content = self.extract_content(source)
 
         self.lines_to_next_cell = count_lines_to_next_cell(
             cell_end_marker,

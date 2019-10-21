@@ -766,3 +766,77 @@ def test_markdown_with_metadata(no_jupytext_version_number, text="""# + [markdow
     compare_notebooks(nb2, notebook)
     text2 = jupytext.writes(notebook, 'py')
     compare(text2, text)
+
+
+def test_multiline_comments_in_markdown_1():
+    text = """# + [markdown]
+'''
+a
+long
+cell
+'''
+"""
+    nb = jupytext.reads(text, 'py')
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[0].source == "a\nlong\ncell"
+    py = jupytext.writes(nb, 'py')
+    compare(py, text)
+
+
+def test_multiline_comments_in_markdown_2():
+    text = '''# + [markdown]
+"""
+a
+long
+cell
+"""
+'''
+    nb = jupytext.reads(text, 'py')
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[0].source == "a\nlong\ncell"
+    py = jupytext.writes(nb, 'py')
+    compare(py, text)
+
+
+def test_multiline_comments_in_raw_cell():
+    text = '''# + active=""
+"""
+some
+text
+"""
+'''
+    nb = jupytext.reads(text, 'py')
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == 'raw'
+    assert nb.cells[0].source == "some\ntext"
+    py = jupytext.writes(nb, 'py')
+    compare(py, text)
+
+
+def test_multiline_comments_in_markdown_cell_no_line_return():
+    text = '''# + [md]
+"""a
+long
+cell"""
+'''
+    nb = jupytext.reads(text, 'py')
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[0].source == "a\nlong\ncell"
+
+
+def test_multiline_comments_in_markdown_cell_is_robust_to_additional_cell_marker():
+    text = '''# + [md]
+"""
+some text, and a fake cell marker
+# + [raw]
+"""
+'''
+    nb = jupytext.reads(text, 'py')
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == 'markdown'
+    assert nb.cells[0].source == "some text, and a fake cell marker\n# + [raw]"
+    py = jupytext.writes(nb, 'py')
+    compare(py, text)
