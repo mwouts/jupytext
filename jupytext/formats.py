@@ -225,7 +225,7 @@ def guess_format(text, ext):
     if ext in _SCRIPT_EXTENSIONS:
         comment = _SCRIPT_EXTENSIONS[ext]['comment']
         language = _SCRIPT_EXTENSIONS[ext]['language']
-        twenty_hash = ''.join(['#'] * 20)
+        twenty_hash_re = re.compile(r'^#( |)#{19,}\s*$')
         double_percent_re = re.compile(r'^{}( %%|%%)$'.format(comment))
         double_percent_and_space_re = re.compile(r'^{}( %%|%%)\s'.format(comment))
         nbconvert_script_re = re.compile(r'^{}( <codecell>| In\[[0-9 ]*\]:?)'.format(comment))
@@ -253,7 +253,7 @@ def guess_format(text, ext):
             if not line.startswith(comment) and is_magic(line, language):
                 magic_command_count += 1
 
-            if line.startswith(twenty_hash) and ext == '.py':
+            if twenty_hash_re.match(line) and ext == '.py':
                 twenty_hash_count += 1
 
             if line.startswith("#'") and ext in ['.R', '.r']:
