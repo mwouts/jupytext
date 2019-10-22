@@ -40,7 +40,7 @@ def notebook_metadata():
 
 
 @pytest.fixture()
-def notebook_1():
+def notebook_expected():
     return new_notebook(
         metadata=notebook_metadata(),
         cells=[new_markdown_cell('First markdown cell'),
@@ -49,7 +49,7 @@ def notebook_1():
 
 
 @pytest.fixture()
-def notebook_2():
+def notebook_actual():
     metadata = notebook_metadata()
     metadata['language_info']['version'] = '3.6.8'
     return new_notebook(
@@ -59,9 +59,9 @@ def notebook_2():
                new_markdown_cell('Modified markdown cell')])
 
 
-def test_compare_on_notebooks(notebook_1, notebook_2):
+def test_compare_on_notebooks(notebook_actual, notebook_expected):
     with pytest.raises(AssertionError) as err:
-        compare(notebook_1, notebook_2)
+        compare(notebook_actual, notebook_expected)
 
     assert str(err.value) == """
 --- first

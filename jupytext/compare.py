@@ -28,8 +28,8 @@ def compare(actual, expected, return_diff=False):
     """Compare two strings, lists or dict-like objects"""
     if actual != expected:
         diff = '\n'.join(difflib.unified_diff(
-            _multilines(actual),
             _multilines(expected),
+            _multilines(actual),
             'first', 'second', lineterm=''))
         if return_diff:
             return diff
