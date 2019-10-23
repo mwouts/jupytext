@@ -648,7 +648,7 @@ def test_sync(nb_file, tmpdir, capsys):
 
 
 @requires_pandoc
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='(Notebook with|flavors)'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py', skip='(Notebook with|flavors|305)'))
 def test_sync_pandoc(nb_file, tmpdir, capsys):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
     tmp_md = str(tmpdir.join('notebook.md'))
