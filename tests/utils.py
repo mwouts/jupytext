@@ -61,4 +61,5 @@ def list_notebooks(path='ipynb', skip='World'):
     else:
         notebooks = [os.path.join(nb_path, nb_file) for nb_file in os.listdir(nb_path)]
 
-    return notebooks
+    # ignore ".ipynb_checkpoints" sub-folder
+    return [nb_file for nb_file in notebooks if os.path.isfile(nb_file)]
