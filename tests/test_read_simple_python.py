@@ -741,6 +741,7 @@ Jupyter.utils.load_extensions('jupytext')''')],
     compare_notebooks(notebook2, notebook)
 
 
+@skip_if_dict_is_not_ordered
 def test_raw_with_metadata(no_jupytext_version_number, text="""# + key="value" active=""
 # Raw cell
 # # Commented line
