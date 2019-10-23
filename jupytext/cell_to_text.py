@@ -33,7 +33,7 @@ class BaseCellExporter(object):
         self.ext = self.fmt.get('extension')
         self.cell_type = cell.cell_type
         self.source = cell_source(cell)
-        self.unfiltered_metadata = cell.metadata
+        self.unfiltered_metadata = copy(cell.metadata)
         self.metadata = filter_metadata(copy(cell.metadata),
                                         self.fmt.get('cell_metadata_filter'),
                                         _IGNORE_CELL_METADATA)
