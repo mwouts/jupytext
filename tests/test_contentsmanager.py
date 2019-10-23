@@ -163,7 +163,7 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
 
 @requires_pandoc
 @skip_if_dict_is_not_ordered
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='(functional|Notebook with|flavors|invalid)'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='(functional|Notebook with|flavors|invalid|305)'))
 def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
     tmp_ipynb = 'notebook.ipynb'
     tmp_md = 'notebook.md'
@@ -934,7 +934,7 @@ def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
         assert read_format_from_metadata(stream.read(), auto_ext) == 'light'
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='magic'))
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb', skip='(magic|305)'))
 def test_metadata_filter_is_effective(nb_file, tmpdir):
     nb = jupytext.read(nb_file)
     tmp_ipynb = 'notebook.ipynb'
