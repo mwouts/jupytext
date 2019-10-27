@@ -264,6 +264,42 @@ raw content
     assert "format_version: '1.1'" not in md2
 
 
+def test_read_raw_cell_markdown_version_1_1_with_mimetype(header="""---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.1'
+      jupytext_version: 1.1.0-rc0
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+""", markdown_11="""```raw_mimetype="text/restructuredtext"
+.. meta::
+   :description: Topic: Integrated Development Environments, Difficulty: Easy, Category: Tools
+   :keywords: python, introduction, IDE, PyCharm, VSCode, Jupyter, recommendation, tools
+```
+""", markdown_12="""<!-- #raw raw_mimetype="text/restructuredtext" -->
+.. meta::
+   :description: Topic: Integrated Development Environments, Difficulty: Easy, Category: Tools
+   :keywords: python, introduction, IDE, PyCharm, VSCode, Jupyter, recommendation, tools
+<!-- #endraw -->
+"""):
+    nb = jupytext.reads(header + '\n' + markdown_11, 'md')
+    compare(nb.cells[0], new_raw_cell(source=""".. meta::
+   :description: Topic: Integrated Development Environments, Difficulty: Easy, Category: Tools
+   :keywords: python, introduction, IDE, PyCharm, VSCode, Jupyter, recommendation, tools""",
+                                      metadata={'raw_mimetype': 'text/restructuredtext'}))
+    md2 = jupytext.writes(nb, 'md')
+    assert "format_version: '1.1'" not in md2
+    nb.metadata['jupytext']['notebook_metadata_filter'] = '-all'
+    md2 = jupytext.writes(nb, 'md')
+    compare(md2, markdown_12)
+
+
 def test_markdown_cell_with_metadata_json(markdown="""<!-- #region {"key": "value"} -->
 A long
 
