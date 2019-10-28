@@ -49,7 +49,7 @@ def test_read_simple_file(script="""# ---
 7''', metadata={'title': 'And now a code cell'})]), nb)
 
     script2 = jupytext.writes(nb, 'py:percent')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_read_cell_with_metadata(
@@ -65,7 +65,7 @@ a = 3
         'tags': ['parameters']}
 
     script2 = jupytext.writes(nb, 'py:percent')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_read_nbconvert_script(script="""
@@ -138,7 +138,7 @@ def f(x):
         assert not nb.cells[i].source.endswith('\n')
 
     script2 = jupytext.writes(nb, 'py:percent')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_no_crash_on_square_bracket(script="""# %% In [2]
@@ -146,7 +146,7 @@ print('Hello')
 """):
     nb = jupytext.reads(script, 'py')
     script2 = jupytext.writes(nb, 'py:percent')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_nbconvert_cell(script="""# In[2]:
@@ -157,7 +157,7 @@ print('Hello')
     expected = """# %%
 print('Hello')
 """
-    compare(expected, script2)
+    compare(script2, expected)
 
 
 def test_nbformat_v3_nbpy_cell(script="""# <codecell>
@@ -168,7 +168,7 @@ print('Hello')
     expected = """# %%
 print('Hello')
 """
-    compare(expected, script2)
+    compare(script2, expected)
 
 
 def test_multiple_empty_cells():
@@ -181,10 +181,10 @@ def test_multiple_empty_cells():
 
 # %%
 """
-    compare(expected, text)
+    compare(text, expected)
     nb2 = jupytext.reads(text, 'py:percent')
     nb2.metadata = nb.metadata
-    compare(nb, nb2)
+    compare(nb2, nb)
 
 
 def test_first_cell_markdown_191():

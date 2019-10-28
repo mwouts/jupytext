@@ -64,7 +64,7 @@ def test_read_ipynb_from_stream():
 
     nb = jupytext.read(stream())
     nb2 = jupytext.read(stream(), fmt='ipynb')
-    compare(nb, nb2)
+    compare(nb2, nb)
 
 
 def test_read_py_percent_from_stream():
@@ -75,4 +75,4 @@ def test_read_py_percent_from_stream():
 
     nb = jupytext.read(stream())
     nb2 = jupytext.read(stream(), fmt='py:percent')
-    compare(nb, nb2)
+    compare(nb2, nb)

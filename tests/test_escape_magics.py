@@ -142,12 +142,12 @@ def g(x):
     return x+1""")])
 
     text = jupytext.writes(nb, 'py')
-    compare("""# +
+    compare(text, """# +
 # %load_ext watermark
 # %watermark -u -n -t -z \\
 #     -p jupytext -v
 
 def g(x):
     return x+1
-""", text)
+""")
     compare_notebooks(jupytext.reads(text, 'py'), nb)

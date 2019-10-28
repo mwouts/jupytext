@@ -206,7 +206,7 @@ def test_pair_plain_script(py_file, tmpdir):
     with open(str(tmpdir.join(tmp_py))) as fp:
         script2 = fp.read()
 
-    compare(script, script2)
+    compare(script2, script)
 
     # reopen py file with the cm
     nb2 = cm.get(tmp_py)['content']
@@ -278,7 +278,7 @@ def test_load_save_py_freeze_metadata(script, tmpdir):
     with open(str(tmpdir.join(tmp_nbpy))) as fp:
         text_py2 = fp.read()
 
-    compare(text_py, text_py2)
+    compare(text_py2, text_py)
 
 
 @skip_if_dict_is_not_ordered
@@ -487,7 +487,7 @@ def test_load_save_percent_format(nb_file, tmpdir):
     # Remove the YAML header
     text_py2 = text_py2[-len(text_py):]
 
-    compare(text_py, text_py2)
+    compare(text_py2, text_py)
 
 
 @skip_if_dict_is_not_ordered
@@ -1011,7 +1011,7 @@ print('hello2')
     cm.save(model=model, path='script.py')
 
     with open(tmp_script) as fp:
-        compare(text, fp.read())
+        compare(fp.read(), text)
 
 
 @pytest.mark.parametrize('nb_file,ext', itertools.product(list_notebooks('ipynb_py'), ['.py', '.ipynb']))
@@ -1087,7 +1087,7 @@ def test_python_kernel_preserves_R_files(nb_file, tmpdir):
     with open(tmp_r_file) as fp:
         script2 = fp.read()
 
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_pair_notebook_in_another_folder(tmpdir):
@@ -1174,7 +1174,7 @@ def test_split_at_heading_option(tmpdir):
 
     nb.metadata['jupytext']['notebook_metadata_filter'] = '-all'
     text2 = writes(nb, 'md')
-    compare(text, text2)
+    compare(text2, text)
 
 
 def test_load_then_change_formats(tmpdir):
@@ -1343,7 +1343,7 @@ def test_vim_folding_markers(tmpdir):
     # Remove YAML header
     text = re.sub(re.compile(r'# ---.*# ---\n\n', re.DOTALL), '', text)
 
-    compare("""# region
+    compare(text, """# region
 '''Sample cell with region markers'''
 '''End of the cell'''
 # end region
@@ -1354,7 +1354,7 @@ a = 1
 
 b = 1
 # }}}
-""", text)
+""")
 
 
 def test_vscode_pycharm_folding_markers(tmpdir):
@@ -1390,7 +1390,7 @@ def test_vscode_pycharm_folding_markers(tmpdir):
     # Remove YAML header
     text = re.sub(re.compile(r'# ---.*# ---\n\n', re.DOTALL), '', text)
 
-    compare("""# {{{
+    compare(text, """# {{{
 '''Sample cell with region markers'''
 '''End of the cell'''
 # }}}
@@ -1401,7 +1401,7 @@ a = 1
 
 b = 1
 # endregion
-""", text)
+""")
 
 
 def test_open_file_with_default_cell_markers(tmpdir):
@@ -1439,7 +1439,7 @@ def test_open_file_with_default_cell_markers(tmpdir):
 # endregion
 """
 
-    compare(expected, text2)
+    compare(text2, expected)
 
 
 def test_save_file_with_default_cell_markers(tmpdir):
@@ -1471,7 +1471,7 @@ def test_save_file_with_default_cell_markers(tmpdir):
     with open(tmp_py) as fp:
         text2 = fp.read()
 
-    compare('\n'.join(text.splitlines()), '\n'.join(text2.splitlines()[-len(text.splitlines()):]))
+    compare('\n'.join(text2.splitlines()[-len(text.splitlines()):]), '\n'.join(text.splitlines()))
 
     nb2 = cm.get('nb.py')['content']
     compare_notebooks(nb2, nb)

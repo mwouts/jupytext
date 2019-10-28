@@ -45,4 +45,4 @@ end'''
     compare(nb.cells[2].source, 'And a markdown comment')
 
     julia2 = jupytext.writes(nb, 'jl')
-    compare(julia, julia2)
+    compare(julia2, julia)

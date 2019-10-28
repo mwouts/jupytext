@@ -30,11 +30,12 @@ def compare(actual, expected, return_diff=False):
         diff = '\n'.join(difflib.unified_diff(
             _multilines(expected),
             _multilines(actual),
-            'first', 'second', lineterm=''))
+            'actual', 'expected', lineterm=''))
         if return_diff:
             return diff
         raise AssertionError('\n' + diff)
-    return ''
+    if return_diff:
+        return ''
 
 
 def filtered_cell(cell, preserve_outputs, cell_metadata_filter):
@@ -145,7 +146,7 @@ def compare_notebooks(notebook_actual, notebook_expected, fmt=None, allow_expect
             if ref_cell.metadata != test_cell.metadata:
                 if raise_on_first_difference:
                     try:
-                        compare(ref_cell.metadata, test_cell.metadata)
+                        compare(test_cell.metadata, ref_cell.metadata)
                     except AssertionError as error:
                         raise NotebookDifference("Metadata differ on {} cell #{}: {}\nCell content:\n{}"
                                                  .format(test_cell.cell_type, i, str(error), ref_cell.source))
@@ -162,7 +163,7 @@ def compare_notebooks(notebook_actual, notebook_expected, fmt=None, allow_expect
         if ref_lines != test_lines:
             if raise_on_first_difference:
                 try:
-                    compare('\n'.join(ref_lines), '\n'.join(test_lines))
+                    compare('\n'.join(test_lines), '\n'.join(ref_lines))
                 except AssertionError as error:
                     raise NotebookDifference("Cell content differ on {} cell #{}: {}"
                                              .format(test_cell.cell_type, i, str(error)))
@@ -173,7 +174,7 @@ def compare_notebooks(notebook_actual, notebook_expected, fmt=None, allow_expect
         if not same_content(ref_cell.source, test_cell.source, allow_removed_final_blank_line):
             if ref_cell.source != test_cell.source:
                 if raise_on_first_difference:
-                    diff = compare(ref_cell.source, test_cell.source, return_diff=True)
+                    diff = compare(test_cell.source, ref_cell.source, return_diff=True)
                     raise NotebookDifference("Cell content differ on {} cell #{}: {}"
                                              .format(test_cell.cell_type, i, diff))
                 modified_cells.add(i)
@@ -192,7 +193,7 @@ def compare_notebooks(notebook_actual, notebook_expected, fmt=None, allow_expect
                                   cell_metadata_filter=cell_metadata_filter)
 
         try:
-            compare(ref_cell, test_cell)
+            compare(test_cell, ref_cell)
         except AssertionError as error:
             if raise_on_first_difference:
                 raise NotebookDifference("Cell outputs differ on {} cell #{}: {}"
@@ -217,8 +218,8 @@ def compare_notebooks(notebook_actual, notebook_expected, fmt=None, allow_expect
     # Compare notebook metadata
     modified_metadata = False
     try:
-        compare(filtered_notebook_metadata(notebook_expected),
-                filtered_notebook_metadata(notebook_actual))
+        compare(filtered_notebook_metadata(notebook_actual),
+                filtered_notebook_metadata(notebook_expected))
     except AssertionError as error:
         if raise_on_first_difference:
             raise NotebookDifference("Notebook metadata differ: {}".format(str(error)))

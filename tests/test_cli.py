@@ -919,7 +919,7 @@ def test_convert_and_update_preserves_notebook(nb_file, fmt, tmpdir):
 
     nb_org = read(nb_file)
     nb_now = read(tmp_ipynb)
-    compare(nb_org, nb_now)
+    compare(nb_now, nb_org)
 
 
 def test_incorrect_notebook_causes_early_exit(tmpdir):

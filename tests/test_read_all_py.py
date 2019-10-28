@@ -16,4 +16,4 @@ def test_identity_source_write_read(py_file):
     nb = jupytext.reads(py, 'py')
     py2 = jupytext.writes(nb, 'py')
 
-    compare(py, py2)
+    compare(py2, py)

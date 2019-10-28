@@ -37,7 +37,7 @@ h <- function(y)
     y + 1''')
 
     rnb2 = jupytext.writes(nb, ext)
-    compare(rnb, rnb2)
+    compare(rnb2, rnb)
 
 
 @pytest.mark.parametrize('ext', ['.r', '.R'])
@@ -81,7 +81,7 @@ h <- function(y) {
 }''')
 
     rnb2 = jupytext.writes(nb, ext)
-    compare(rnb, rnb2)
+    compare(rnb2, rnb)
 
 
 @pytest.mark.parametrize('ext', ['.r', '.R'])
@@ -109,7 +109,7 @@ f <- function(x)
     assert nb.cells[2].source == u'And a new cell, and non ascii contênt'
 
     rnb2 = jupytext.writes(nb, ext)
-    compare(rnb, rnb2)
+    compare(rnb2, rnb)
 
 
 @pytest.mark.parametrize('ext', ['.r', '.R'])
@@ -119,7 +119,7 @@ print('Hello world')
 """):
     nb = jupytext.reads(rnb, ext)
     rnb2 = jupytext.writes(nb, ext)
-    compare(rnb, rnb2)
+    compare(rnb2, rnb)
 
 
 @pytest.mark.parametrize('ext', ['.r', '.R'])
@@ -145,7 +145,7 @@ def test_escape_start_pattern(ext, rnb="""#' The code start pattern '#+' can
 #+ cell_name language="python"
 1 + 1''')
     rnb2 = jupytext.writes(nb, ext)
-    compare(rnb, rnb2)
+    compare(rnb2, rnb)
 
 
 @pytest.mark.parametrize('ext', ['.r', '.R'])
@@ -167,4 +167,4 @@ plot(cars)
     assert nb.cells[1].source == 'cars'
     assert nb.cells[2].source == 'plot(cars)'
     text2 = jupytext.writes(nb, ext)
-    compare(text, text2)
+    compare(text2, text)

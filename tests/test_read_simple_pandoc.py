@@ -23,7 +23,7 @@ print("hello")
     compare_notebooks(nb2, nb)
 
     markdown3 = jupytext.writes(nb2, 'md')
-    compare(markdown2, markdown3)
+    compare(markdown3, markdown2)
 
 
 @requires_pandoc
@@ -36,7 +36,7 @@ bibendum felis dictum sodales.
     nb = jupytext.reads(markdown, 'md')
 
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, '\n'.join(markdown2.splitlines()[12:]))
+    compare('\n'.join(markdown2.splitlines()[12:]), markdown)
 
 
 @requires_pandoc
@@ -48,7 +48,7 @@ This is the greek letter $\\pi$: π
     nb = jupytext.reads(markdown, 'md')
 
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, '\n'.join(markdown2.splitlines()[12:]))
+    compare('\n'.join(markdown2.splitlines()[12:]), markdown)
 
 
 @requires_pandoc

@@ -58,7 +58,7 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
     rmd2 = jupytext.writes(nb, 'Rmd')
     rmd2 = re.sub(r'```{r ', '```{r, ', rmd2)
     rmd2 = re.sub(r'```{python ', '```{python, ', rmd2)
-    compare(rmd, rmd2)
+    compare(rmd2, rmd)
 
 
 def test_markdown_cell_with_code_works(nb=new_notebook(cells=[

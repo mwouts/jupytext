@@ -36,7 +36,7 @@ def h(y):
     return y-1''')
 
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_less_simple_file(pynb="""# ---
@@ -73,7 +73,7 @@ def h(y):
             '''# And a comment on h\ndef h(y):\n    return y-1''')
 
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_non_pep8_file(pynb="""# ---
@@ -104,7 +104,7 @@ def f(x):
             '    return x+1')
 
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_cell_two_blank_lines(pynb="""# ---
@@ -127,7 +127,7 @@ a + 2
     assert nb.cells[1].source == 'a = 1\n\n\na + 2'
 
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_cell_explicit_start(pynb='''
@@ -141,7 +141,7 @@ data()
 '''):
     nb = jupytext.reads(pynb, 'py')
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_complex_cells(pynb='''import pandas as pd
@@ -192,7 +192,7 @@ data2()
 # -''')
 
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_prev_function(
@@ -207,11 +207,11 @@ data()
 '''):
     nb = jupytext.reads(pynb, 'py')
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 """):
     nb = jupytext.reads(pynb, 'py')
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_cell_with_one_blank_line_end(pynb="""import pandas
@@ -220,7 +220,7 @@ def test_read_cell_with_one_blank_line_end(pynb="""import pandas
     nb = jupytext.reads(pynb, 'py')
     assert len(nb.cells) == 1
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_code_cell_fully_commented(pynb="""# +
@@ -233,7 +233,7 @@ def test_read_code_cell_fully_commented(pynb="""# +
     assert nb.cells[0].source == """# This is a code cell that
 # only contains comments"""
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_file_with_two_blank_line_end(pynb="""import pandas
@@ -242,7 +242,7 @@ def test_file_with_two_blank_line_end(pynb="""import pandas
 """):
     nb = jupytext.reads(pynb, 'py')
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_one_blank_lines_after_endofcell(pynb="""# +
@@ -267,7 +267,7 @@ def test_one_blank_lines_after_endofcell(pynb="""# +
     assert nb.cells[1].source == '''# This cell is a cell with implicit start
 1 + 1'''
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_two_cells_with_explicit_start(pynb="""# +
@@ -295,7 +295,7 @@ def test_two_cells_with_explicit_start(pynb="""# +
 
 2 + 2'''
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_escape_start_pattern(pynb="""# The code start pattern '# +' can
@@ -320,7 +320,7 @@ def test_escape_start_pattern(pynb="""# The code start pattern '# +' can
 # + {"sample_metadata": "value"}
 1 + 1''')
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_dictionary_with_blank_lines_not_broken(
@@ -349,7 +349,7 @@ inside it'''
     # and the end
     'z': 'Z'}'''
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_isolated_cell_with_magic(pynb="""# ---
@@ -386,7 +386,7 @@ def test_isolated_cell_with_magic(pynb="""# ---
     assert nb.cells[5].source == '%matplotlib inline\n1 + 1'
 
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_multiline_comment(pynb="""'''This is a multiline
@@ -415,7 +415,7 @@ and it ends here'''"""
     assert nb.cells[1].source == '1 + 1'
 
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_no_space_after_code(pynb=u"""# -*- coding: utf-8 -*-
@@ -437,7 +437,7 @@ def f(x):
     assert nb.cells[2].source == u'And a new cell, and non ascii contênt'
 
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_write_script(pynb="""#!/usr/bin/env python
@@ -446,7 +446,7 @@ print('Hello world')
 """):
     nb = jupytext.reads(pynb, 'py')
     pynb2 = jupytext.writes(nb, 'py')
-    compare(pynb, pynb2)
+    compare(pynb2, pynb)
 
 
 def test_read_write_script_with_metadata_241(pynb="""#!/usr/bin/env python3
@@ -478,7 +478,7 @@ a + 1
     def remove_version_info(text):
         return '\n'.join([line for line in text.splitlines() if 'version' not in line])
 
-    compare(remove_version_info(pynb), remove_version_info(pynb2))
+    compare(remove_version_info(pynb2), remove_version_info(pynb))
 
 
 def test_notebook_blank_lines(script="""# +
@@ -527,7 +527,7 @@ d = 6
 
     script2 = jupytext.writes(notebook, 'py')
 
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_notebook_two_blank_lines_before_next_cell(script="""# +
@@ -561,7 +561,7 @@ def g(x):
 
     script2 = jupytext.writes(notebook, 'py')
 
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_notebook_one_blank_line_between_cells(script="""# +
@@ -614,7 +614,7 @@ def j(x):
 
     script2 = jupytext.writes(notebook, 'py')
 
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_notebook_with_magic_and_bash_cells(script="""# This is a test for issue #181
@@ -632,7 +632,7 @@ def test_notebook_with_magic_and_bash_cells(script="""# This is a test for issue
 
     script2 = jupytext.writes(notebook, 'py')
 
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_notebook_no_line_to_next_cell(nb=new_notebook(
@@ -648,7 +648,7 @@ def test_notebook_no_line_to_next_cell(nb=new_notebook(
     nb2 = jupytext.reads(script, 'py')
     nb2.metadata.pop('jupytext')
 
-    compare(nb, nb2)
+    compare(nb2, nb)
 
 
 def test_notebook_one_blank_line_before_first_markdown_cell(script="""
@@ -658,7 +658,7 @@ def test_notebook_one_blank_line_before_first_markdown_cell(script="""
 """):
     notebook = jupytext.reads(script, 'py')
     script2 = jupytext.writes(notebook, 'py')
-    compare(script, script2)
+    compare(script2, script)
 
     assert len(notebook.cells) == 3
     for cell in notebook.cells:

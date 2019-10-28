@@ -59,7 +59,7 @@ def test_pipe_into_black():
     nb_dest = new_notebook(cells=[new_code_cell('1 + 1')])
 
     nb_pipe = pipe_notebook(nb_org, 'black')
-    compare(nb_dest, nb_pipe)
+    compare(nb_pipe, nb_dest)
 
 
 @requires_autopep8
@@ -68,7 +68,7 @@ def test_pipe_into_autopep8():
     nb_dest = new_notebook(cells=[new_code_cell('1 + 1')])
 
     nb_pipe = pipe_notebook(nb_org, 'autopep8 -')
-    compare(nb_dest, nb_pipe)
+    compare(nb_pipe, nb_dest)
 
 
 @requires_flake8
@@ -102,7 +102,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     write(nb_org, tmp_ipynb)
     jupytext([tmp_ipynb, '--pipe', 'black'])
     nb_now = read(tmp_ipynb)
-    compare(nb_black, nb_now)
+    compare(nb_now, nb_black)
 
     # Write to another folder using dots
     script_fmt = os.path.join('..', 'script_folder//py:percent')
@@ -111,7 +111,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     assert os.path.isfile(tmp_py)
     nb_now = read(tmp_py)
     nb_now.metadata = metadata
-    compare(nb_black, nb_now)
+    compare(nb_now, nb_black)
     os.remove(tmp_py)
 
     # Map to another folder based on file name
@@ -121,7 +121,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     assert os.path.isfile(tmp_py)
     nb_now = read(tmp_py)
     nb_now.metadata = metadata
-    compare(nb_black, nb_now)
+    compare(nb_now, nb_black)
 
 
 @requires_black
@@ -143,14 +143,14 @@ def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
     jupytext([tmp_ipynb, '--pipe', 'black', '--sync'])
 
     nb_now = read(tmp_ipynb)
-    compare(nb_black, nb_now)
+    compare(nb_now, nb_black)
     assert 'language_info' in nb_now.metadata
 
     nb_now = read(tmp_py)
     nb_now.metadata['jupytext'].pop('text_representation')
     nb_black.metadata = {key: nb_black.metadata[key] for key in nb_black.metadata
                          if key in _DEFAULT_NOTEBOOK_METADATA}
-    compare(nb_black, nb_now)
+    compare(nb_now, nb_black)
 
 
 @requires_black

@@ -48,7 +48,7 @@ def f(x):
     assert len(nb.cells) == 6
 
     script2 = jupytext.writes(nb, 'py:sphinx')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_read_more_complex_file(script="""'''This is a markdown cell'''

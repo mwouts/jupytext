@@ -16,7 +16,7 @@ def test_identity_write_read(nb_file, no_jupytext_version_number):
     nb = jupytext.reads(rmd, 'Rmd')
     rmd2 = jupytext.writes(nb, 'Rmd')
 
-    compare(rmd, rmd2)
+    compare(rmd2, rmd)
 
 
 def test_two_blank_lines_as_cell_separator():

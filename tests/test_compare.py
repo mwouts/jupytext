@@ -64,8 +64,8 @@ def test_compare_on_notebooks(notebook_actual, notebook_expected):
         compare(notebook_actual, notebook_expected)
 
     assert str(err.value) == """
---- first
-+++ second
+--- actual
++++ expected
 @@ -15,7 +15,7 @@
    {
     "cell_type": "markdown",

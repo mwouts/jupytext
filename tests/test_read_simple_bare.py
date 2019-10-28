@@ -28,4 +28,4 @@ def h(x):
     assert len(nb2.cells) == 7
     nb1.cells = nb1.cells[:5]
     nb2.cells = nb2.cells[:5]
-    compare(nb1, nb2)
+    compare(nb2, nb1)

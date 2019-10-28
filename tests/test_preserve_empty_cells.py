@@ -13,7 +13,7 @@ def test_file_with_blank_lines(blank_lines):
 
     notebook = jupytext.reads(py_script, 'py')
     py_script2 = jupytext.writes(notebook, 'py')
-    compare(py_script, py_script2)
+    compare(py_script2, py_script)
 
 
 @pytest.mark.parametrize('blank_cells', range(1, 3))
