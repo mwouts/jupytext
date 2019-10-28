@@ -8,8 +8,8 @@ from jupytext.formats import long_form_one_format, long_form_multiple_formats, s
 def test_simple_pair():
     formats = long_form_multiple_formats('ipynb,py')
     expected_paths = ['notebook.ipynb', 'notebook.py']
-    compare(list(zip(expected_paths, formats)), paired_paths('notebook.ipynb', 'ipynb', formats))
-    compare(list(zip(expected_paths, formats)), paired_paths('notebook.py', 'py', formats))
+    compare(paired_paths('notebook.ipynb', 'ipynb', formats), list(zip(expected_paths, formats)))
+    compare(paired_paths('notebook.py', 'py', formats), list(zip(expected_paths, formats)))
 
 
 def test_base_path():
@@ -23,7 +23,7 @@ def test_many_and_suffix():
     formats = long_form_multiple_formats('ipynb,.pct.py,_lgt.py')
     expected_paths = ['notebook.ipynb', 'notebook.pct.py', 'notebook_lgt.py']
     for fmt, path in zip(formats, expected_paths):
-        compare(list(zip(expected_paths, formats)), paired_paths(path, fmt, formats))
+        compare(paired_paths(path, fmt, formats), list(zip(expected_paths, formats)))
 
     with pytest.raises(InconsistentPath):
         paired_paths('wrong_suffix.py', 'py', formats)
@@ -41,12 +41,12 @@ def test_prefix_and_suffix():
                       'parent/script_folder/NOTEBOOK_NAME_in_percent_format.py',
                       'parent/script_folder/NOTEBOOK_NAME_in_light_format.py']
     for fmt, path in zip(formats, expected_paths):
-        compare(list(zip(expected_paths, formats)), paired_paths(path, fmt, formats))
+        compare(paired_paths(path, fmt, formats), list(zip(expected_paths, formats)))
 
     # without the parent folder
     expected_paths = [path[7:] for path in expected_paths]
     for fmt, path in zip(formats, expected_paths):
-        compare(list(zip(expected_paths, formats)), paired_paths(path, fmt, formats))
+        compare(paired_paths(path, fmt, formats), list(zip(expected_paths, formats)))
 
     # Not the expected parent folder
     with pytest.raises(InconsistentPath):
@@ -69,7 +69,7 @@ def test_prefix_on_root_174():
 
     expected_paths = ['/Untitled.ipynb', '/python/Untitled.py']
     for fmt, path in zip(formats, expected_paths):
-        compare(list(zip(expected_paths, formats)), paired_paths(path, fmt, formats))
+        compare(paired_paths(path, fmt, formats), list(zip(expected_paths, formats)))
 
 
 def test_duplicated_paths():

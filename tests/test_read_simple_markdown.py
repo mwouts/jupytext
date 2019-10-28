@@ -95,7 +95,7 @@ And the same markdown cell continues'''},
                         'outputs': []}])
 
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_read_md_and_markdown_regions(markdown="""Some text
@@ -131,7 +131,7 @@ long
 cell""", metadata={'region_name': 'markdown'})])
 
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_read_mostly_R_markdown_file(markdown="""```R
@@ -156,7 +156,7 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
                         'outputs': []}])
 
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_read_markdown_file_no_language(markdown="""```
@@ -169,7 +169,7 @@ echo 'Hello World'
 """):
     nb = jupytext.reads(markdown, 'md')
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_read_julia_notebook(markdown="""```julia
@@ -181,7 +181,7 @@ def test_read_julia_notebook(markdown="""```julia
     assert len(nb.cells) == 1
     assert nb.cells[0].cell_type == 'code'
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_split_on_header(markdown="""A paragraph
@@ -199,7 +199,7 @@ Another paragraph
     assert nb.cells[2].source == '## H2 Header\n\nAnother paragraph'
     assert len(nb.cells) == 3
     markdown2 = jupytext.writes(nb, fmt)
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_split_on_header_after_two_blank_lines(markdown="""A paragraph
@@ -210,7 +210,7 @@ def test_split_on_header_after_two_blank_lines(markdown="""A paragraph
     fmt = {'extension': '.Rmd', 'split_at_heading': True}
     nb = jupytext.reads(markdown, fmt)
     markdown2 = jupytext.writes(nb, fmt)
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_code_cell_with_metadata(markdown="""```python tags=["parameters"]
@@ -221,7 +221,7 @@ b = 2
     nb = jupytext.reads(markdown, 'md')
     compare(nb.cells[0], new_code_cell(source='a = 1\nb = 2', metadata={'tags': ['parameters']}))
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_raw_cell_with_metadata_json(markdown="""<!-- #raw {"key": "value"} -->
@@ -231,7 +231,7 @@ raw content
     nb = jupytext.reads(markdown, 'md')
     compare(nb.cells[0], new_raw_cell(source='raw content', metadata={'key': 'value'}))
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_raw_cell_with_metadata(markdown="""<!-- #raw key="value" -->
@@ -241,7 +241,7 @@ raw content
     nb = jupytext.reads(markdown, 'md')
     compare(nb.cells[0], new_raw_cell(source='raw content', metadata={'key': 'value'}))
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_read_raw_cell_markdown_version_1_1(markdown="""---
@@ -311,7 +311,7 @@ markdown cell
     compare(nb.cells[0], new_markdown_cell(source='A long\n\n\nmarkdown cell',
                                            metadata={'key': 'value'}))
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_markdown_cell_with_metadata(markdown="""<!-- #region key="value" -->
@@ -325,7 +325,7 @@ markdown cell
     compare(nb.cells[0], new_markdown_cell(source='A long\n\n\nmarkdown cell',
                                            metadata={'key': 'value'}))
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_two_markdown_cells(markdown="""# A header
@@ -341,7 +341,7 @@ markdown cell
     compare(nb.cells[0], new_markdown_cell(source='# A header'))
     compare(nb.cells[1], new_markdown_cell(source='A long\n\n\nmarkdown cell'))
     markdown2 = jupytext.writes(nb, 'md')
-    compare(markdown, markdown2)
+    compare(markdown2, markdown)
 
 
 def test_combine_md_version_one():
@@ -397,17 +397,17 @@ the code cell should become a Jupyter cell.
 """
     nb = jupytext.reads(text, 'md')
     assert nb.cells[0].cell_type == 'markdown'
-    compare("""Here we have a markdown
-file with a jupyter code cell""", nb.cells[0].source)
+    compare(nb.cells[0].source, """Here we have a markdown
+file with a jupyter code cell""")
 
     assert nb.cells[1].cell_type == 'code'
-    compare("""1 + 1
+    compare(nb.cells[1].source, """1 + 1
 
 
-2 + 2""", nb.cells[1].source)
+2 + 2""")
 
     assert nb.cells[2].cell_type == 'markdown'
-    compare("the code cell should become a Jupyter cell.", nb.cells[2].source)
+    compare(nb.cells[2].source, "the code cell should become a Jupyter cell.")
     assert len(nb.cells) == 3
 
 
@@ -423,7 +423,7 @@ file with an indented code cell
 the code cell should not become a Jupyter cell,
 nor be split into two pieces."""
     nb = jupytext.reads(text, 'md')
-    compare(text, nb.cells[0].source)
+    compare(nb.cells[0].source, text)
     assert nb.cells[0].cell_type == 'markdown'
     assert len(nb.cells) == 1
 
@@ -442,7 +442,7 @@ file with a non-jupyter code cell
 the code cell should not become a Jupyter cell,
 nor be split into two pieces."""
     nb = jupytext.reads(text, 'md')
-    compare(text, nb.cells[0].source)
+    compare(nb.cells[0].source, text)
     assert nb.cells[0].cell_type == 'markdown'
     assert len(nb.cells) == 1
 
@@ -467,7 +467,7 @@ a = 1
     assert nb.cells[1].source == 'a = 1'
 
     text2 = jupytext.writes(nb, 'md')
-    compare(text, text2)
+    compare(text2, text)
 
 
 def test_read_markdown_IDL(no_jupytext_version_number, text='''---
@@ -490,7 +490,7 @@ a = 1
     assert nb.cells[1].source == 'a = 1'
 
     text2 = jupytext.writes(nb, 'md')
-    compare(text.replace('```IDL', '```idl'), text2)
+    compare(text2, text.replace('```IDL', '```idl'))
 
 
 def test_inactive_cell(text='''```python active="md"

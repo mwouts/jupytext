@@ -131,7 +131,7 @@ x = 4
         assert not cell.metadata
 
     text2 = writes(nb, 'py')
-    compare(text, text2)
+    compare(text2, text)
 
 
 def test_pep8_bis():
@@ -150,7 +150,7 @@ def f(x):
         assert not cell.metadata
 
     text2 = writes(nb, 'py')
-    compare(text, text2)
+    compare(text2, text)
 
 
 @pytest.mark.parametrize('py_file', [py_file for py_file in list_notebooks('../jupytext') + list_notebooks('.') if

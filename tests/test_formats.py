@@ -152,31 +152,31 @@ def test_compress_formats():
 def test_rearrange_jupytext_metadata():
     metadata = {'nbrmd_formats': 'ipynb,py'}
     rearrange_jupytext_metadata(metadata)
-    compare({'jupytext': {'formats': 'ipynb,py'}}, metadata)
+    compare(metadata, {'jupytext': {'formats': 'ipynb,py'}})
 
     metadata = {'jupytext_formats': 'ipynb,py'}
     rearrange_jupytext_metadata(metadata)
-    compare({'jupytext': {'formats': 'ipynb,py'}}, metadata)
+    compare(metadata, {'jupytext': {'formats': 'ipynb,py'}})
 
     metadata = {'executable': '#!/bin/bash'}
     rearrange_jupytext_metadata(metadata)
-    compare({'jupytext': {'executable': '#!/bin/bash'}}, metadata)
+    compare(metadata, {'jupytext': {'executable': '#!/bin/bash'}})
 
 
 def test_rearrange_jupytext_metadata_metadata_filter():
     metadata = {'jupytext': {'metadata_filter': {'notebook': {'additional': ['one', 'two'], 'excluded': 'all'},
                                                  'cells': {'additional': 'all', 'excluded': ['three', 'four']}}}}
     rearrange_jupytext_metadata(metadata)
-    compare({'jupytext': {'notebook_metadata_filter': 'one,two,-all',
-                          'cell_metadata_filter': 'all,-three,-four'}}, metadata)
+    compare(metadata, {'jupytext': {'notebook_metadata_filter': 'one,two,-all',
+                                    'cell_metadata_filter': 'all,-three,-four'}})
 
 
 def test_rearrange_jupytext_metadata_add_dot_in_suffix():
     metadata = {'jupytext': {'text_representation': {'jupytext_version': '0.8.6'},
                              'formats': 'ipynb,pct.py,lgt.py'}}
     rearrange_jupytext_metadata(metadata)
-    compare({'jupytext': {'text_representation': {'jupytext_version': '0.8.6'},
-                          'formats': 'ipynb,.pct.py,.lgt.py'}}, metadata)
+    compare(metadata, {'jupytext': {'text_representation': {'jupytext_version': '0.8.6'},
+                                    'formats': 'ipynb,.pct.py,.lgt.py'}})
 
 
 def test_fix_139():
@@ -229,4 +229,4 @@ def test_pandoc_format_is_preserved():
     long = long_form_multiple_formats(formats_org)
     formats_new = short_form_multiple_formats(long)
 
-    compare(formats_org, formats_new)
+    compare(formats_new, formats_org)

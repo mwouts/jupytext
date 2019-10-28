@@ -25,7 +25,7 @@ c = 3
     assert nb.cells[1].metadata == {'title': 'And this is a foldable code region with metadata', 'key': 'value'}
 
     script2 = jupytext.writes(nb, 'py')
-    compare(script, script2)
+    compare(script2, script)
 
 
 # endregion
@@ -51,7 +51,7 @@ c = 3
     assert nb.cells[1].metadata == {'title': 'And this is a foldable code region with metadata', 'key': 'value'}
 
     script2 = jupytext.writes(nb, 'py')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_mark_cell_with_no_title_and_inner_region(
@@ -90,7 +90,7 @@ d = 4
     assert len(nb.cells) == 6
 
     script2 = jupytext.writes(nb, 'py')
-    compare(script, script2)
+    compare(script2, script)
 
 
 # endregion
@@ -115,7 +115,7 @@ b = 2
     assert nb.cells[2].source == '# endregion'
 
     script2 = jupytext.writes(nb, 'py')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_indented_markers_are_ignored(
@@ -132,4 +132,4 @@ b = 2
     assert nb.cells[0].cell_type == 'code'
 
     script2 = jupytext.writes(nb, 'py')
-    compare(script, script2)
+    compare(script2, script)

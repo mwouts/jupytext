@@ -28,4 +28,4 @@ def test_read_simple_file(script=""";; ---
   (println "Hello World")))""")
 
     script2 = jupytext.writes(nb, 'clj')
-    compare(script, script2)
+    compare(script2, script)

@@ -19,4 +19,4 @@ def test_save_ipynb_with_jupytext_has_final_newline(tmpdir):
     with open(file_nbformat) as fp:
         text_nbformat = fp.read()
 
-    compare(text_nbformat, text_jupytext)
+    compare(text_jupytext, text_nbformat)

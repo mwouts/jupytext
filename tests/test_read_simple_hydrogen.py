@@ -52,7 +52,7 @@ def test_read_simple_file(script="""# ---
     assert nb.cells[5].metadata == {'title': 'And now a code cell'}
 
     script2 = jupytext.writes(nb, 'py:hydrogen')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_read_cell_with_metadata(
@@ -68,7 +68,7 @@ a = 3
         'tags': ['parameters']}
 
     script2 = jupytext.writes(nb, 'py:hydrogen')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_read_nbconvert_script(script="""
@@ -142,7 +142,7 @@ def f(x):
         assert not nb.cells[i].source.endswith('\n')
 
     script2 = jupytext.writes(nb, 'py:hydrogen')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_no_crash_on_square_bracket(script="""# %% In [2]
@@ -150,7 +150,7 @@ print('Hello')
 """):
     nb = jupytext.reads(script, 'py')
     script2 = jupytext.writes(nb, 'py:hydrogen')
-    compare(script, script2)
+    compare(script2, script)
 
 
 def test_nbconvert_cell(script="""# In[2]:
@@ -161,7 +161,7 @@ print('Hello')
     expected = """# %%
 print('Hello')
 """
-    compare(expected, script2)
+    compare(script2, expected)
 
 
 def test_nbformat_v3_nbpy_cell(script="""# <codecell>
@@ -172,4 +172,4 @@ print('Hello')
     expected = """# %%
 print('Hello')
 """
-    compare(expected, script2)
+    compare(script2, expected)

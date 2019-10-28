@@ -96,6 +96,6 @@ def test_notebook_from_plain_script_has_metadata_filter(script="""print('Hello w
     nb = jupytext.reads(script, '.py')
     assert nb.metadata.get('jupytext', {}).get('notebook_metadata_filter') == '-all'
     assert nb.metadata.get('jupytext', {}).get('cell_metadata_filter') == '-all'
-    scripts2 = jupytext.writes(nb, '.py')
+    script2 = jupytext.writes(nb, '.py')
 
-    compare(script, scripts2)
+    compare(script2, script)

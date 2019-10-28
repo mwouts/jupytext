@@ -25,4 +25,4 @@ def test_read_simple_file(script=""";; ---
         compare(nb.cells[2].source, '(define a 35)')
 
         script2 = jupytext.writes(nb, file_extension)
-        compare(script, script2)
+        compare(script2, script)

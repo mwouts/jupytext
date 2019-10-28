@@ -53,7 +53,6 @@ def parse_jupytext_args(args=None):
     class RawTextArgumentDefaultsHelpFormatter(argparse.RawTextHelpFormatter,
                                                argparse.ArgumentDefaultsHelpFormatter):
         """Keep the raw formatting in command line help, plus show the default values"""
-        pass
 
     parser = argparse.ArgumentParser(
         description='Jupyter notebooks as markdown documents, Julia, Python or R scripts',
@@ -398,7 +397,7 @@ def jupytext_single_file(nb_file, args, log):
                     notebook = reads(dest_text, fmt=dest_fmt)
 
                 text = writes(notebook, fmt=fmt)
-                compare(org_text, text)
+                compare(text, org_text)
 
         except (NotebookDifference, AssertionError) as err:
             sys.stdout.write('{}: {}'.format(nb_file, str(err)))
