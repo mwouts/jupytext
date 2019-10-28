@@ -29,31 +29,31 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 ```
 """):
     nb = jupytext.reads(rmd, 'Rmd')
-    assert nb.cells == [{'cell_type': 'raw',
-                         'source': '---\ntitle: Simple file\n---',
-                         'metadata': {}},
-                        {'cell_type': 'code',
-                         'metadata': {'hide_input': False},
-                         'execution_count': None,
-                         'source': 'import numpy as np\n'
-                                   'x = np.arange(0, 2*math.pi, eps)',
-                         'outputs': []},
-                        {'cell_type': 'code',
-                         'metadata': {'hide_input': False},
-                         'execution_count': None,
-                         'source': 'x = np.arange(0,1,eps)\ny = np.abs(x)-.5',
-                         'outputs': []},
-                        {'cell_type': 'code',
-                         'metadata': {},
-                         'execution_count': None,
-                         'source': '%%R\nls()',
-                         'outputs': []},
-                        {'cell_type': 'code',
-                         'metadata': {'results': "'asis'"},
-                         'execution_count': None,
-                         'source': "%%R -i x\ncat(stringi::"
-                                   "stri_rand_lipsum(3), sep='\n\n')",
-                         'outputs': []}]
+    compare(nb.cells, [{'cell_type': 'raw',
+                        'source': '---\ntitle: Simple file\n---',
+                        'metadata': {}},
+                       {'cell_type': 'code',
+                        'metadata': {'echo': True},
+                        'execution_count': None,
+                        'source': 'import numpy as np\n'
+                                  'x = np.arange(0, 2*math.pi, eps)',
+                        'outputs': []},
+                       {'cell_type': 'code',
+                        'metadata': {'echo': True},
+                        'execution_count': None,
+                        'source': 'x = np.arange(0,1,eps)\ny = np.abs(x)-.5',
+                        'outputs': []},
+                       {'cell_type': 'code',
+                        'metadata': {},
+                        'execution_count': None,
+                        'source': '%%R\nls()',
+                        'outputs': []},
+                       {'cell_type': 'code',
+                        'metadata': {'results': "'asis'"},
+                        'execution_count': None,
+                        'source': "%%R -i x\ncat(stringi::"
+                                  "stri_rand_lipsum(3), sep='\n\n')",
+                        'outputs': []}])
 
     rmd2 = jupytext.writes(nb, 'Rmd')
     rmd2 = re.sub(r'```{r ', '```{r, ', rmd2)
