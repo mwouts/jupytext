@@ -15,7 +15,7 @@ SAMPLES = [('r', ('R', {})),
            ('r echo=FALSE',
             ('R', {'hide_input': True})),
            ('r plot_1, echo=TRUE',
-            ('R', {'name': 'plot_1', 'hide_input': False})),
+            ('R', {'name': 'plot_1', 'echo': True})),
            ('python echo=if a==5 then TRUE else FALSE',
             ('python', {'echo': 'if a==5 then TRUE else FALSE'})),
            ('python noname, tags=c("a", "b", "c"), echo={sum(a+c(1,2))>1}',
@@ -24,23 +24,23 @@ SAMPLES = [('r', ('R', {})),
            ('python active="ipynb,py"',
             ('python', {'active': 'ipynb,py'})),
            ('python include=FALSE, active="Rmd"',
-            ('python', {'active': 'Rmd', 'hide_output': True})),
+            ('python', {'active': 'Rmd', 'hide_output': True, 'hide_input': True})),
            ('r chunk_name, include=FALSE, active="Rmd"',
             ('R',
-             {'name': 'chunk_name', 'active': 'Rmd', 'hide_output': True})),
+             {'name': 'chunk_name', 'active': 'Rmd', 'hide_output': True, 'hide_input': True})),
            ('python tags=c("parameters")',
             ('python', {'tags': ['parameters']}))]
 
 
 @pytest.mark.parametrize('options,language_and_metadata', SAMPLES)
 def test_parse_rmd_options(options, language_and_metadata):
-    assert rmd_options_to_metadata(options) == language_and_metadata
+    compare(rmd_options_to_metadata(options), language_and_metadata)
 
 
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('options,language_and_metadata', SAMPLES)
 def test_build_options(options, language_and_metadata):
-    assert metadata_to_rmd_options(*language_and_metadata) == options
+    compare(metadata_to_rmd_options(*language_and_metadata), options)
 
 
 @pytest.mark.parametrize('options,language_and_metadata', SAMPLES)
