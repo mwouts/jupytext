@@ -21,11 +21,16 @@ try:
 except NameError:
     unicode = str  # Python 3
 
-# Map R Markdown's "echo" and "include" to "hide_input" and "hide_output", that are understood by the `runtools`
-# extension for Jupyter notebook, and by nbconvert (use the `hide_input_output.tpl` template).
+# Map R Markdown's "echo", "results" and "include" to "hide_input" and "hide_output", that are understood by the
+# `runtools` extension for Jupyter notebook, and by nbconvert (use the `hide_input_output.tpl` template).
 # See http://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html
-_BOOLEAN_OPTIONS_DICTIONARY = [('hide_input', 'echo', True),
-                               ('hide_output', 'include', True)]
+_RMARKDOWN_TO_RUNTOOLS_OPTION_MAP = [
+    (('include', 'FALSE'), [('hide_input', True), ('hide_output', True)]),
+    (('echo', 'FALSE'), [('hide_input', True)]),
+    (('results', "'hide'"), [('hide_output', True)]),
+    (('results', '"hide"'), [('hide_output', True)])
+]
+
 _JUPYTEXT_CELL_METADATA = [
     # Pre-jupytext metadata
     'skipline', 'noskipline',
@@ -71,11 +76,11 @@ def metadata_to_rmd_options(language, metadata):
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
         del metadata['name']
-    for jupyter_option, rmd_option, rev in _BOOLEAN_OPTIONS_DICTIONARY:
-        if jupyter_option in metadata:
-            options += ' {}={},'.format(
-                rmd_option, _r_logical_values(metadata[jupyter_option] != rev))
-            del metadata[jupyter_option]
+    for rmd_option, jupyter_options in _RMARKDOWN_TO_RUNTOOLS_OPTION_MAP:
+        if all([metadata.get(opt_name) == opt_value for opt_name, opt_value in jupyter_options]):
+            options += ' {}={},'.format(rmd_option[0], 'FALSE' if rmd_option[1] is False else rmd_option[1])
+            for opt_name, _ in jupyter_options:
+                metadata.pop(opt_name)
     for opt_name in metadata:
         opt_value = metadata[opt_name]
         opt_name = opt_name.strip()
@@ -103,13 +108,11 @@ def update_metadata_from_rmd_options(name, value, metadata):
     :param metadata:
     :return:
     """
-    for jupyter_option, rmd_option, rev in _BOOLEAN_OPTIONS_DICTIONARY:
-        if name == rmd_option:
-            try:
-                metadata[jupyter_option] = _py_logical_values(value) != rev
-                return True
-            except RLogicalValueError:
-                pass
+    for rmd_option, jupyter_options in _RMARKDOWN_TO_RUNTOOLS_OPTION_MAP:
+        if name == rmd_option[0] and value == rmd_option[1]:
+            for opt_name, opt_value in jupyter_options:
+                metadata[opt_name] = opt_value
+            return True
     return False
 
 
