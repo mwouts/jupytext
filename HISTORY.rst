@@ -28,6 +28,7 @@ Release History
 - Fixed an inconsistent round trip (code cell with ``"cat"`` being converted to a markdown cell) in the ``py:light`` format (#339)
 - ``jupytext --test textfile.ext`` now really compares the text file to its round trip (rather than the corresponding notebook) (#339)
 - Markdown cells that contain code are now preserved in a round trip through the Markdown and R Markdown formats (#361)
+- Code cells with a ``%%python3`` cell magic are now preserved in a round trip through the Markdown format (#365)
 
 
 1.2.4 (2019-09-19)
