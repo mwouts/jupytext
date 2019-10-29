@@ -13,7 +13,7 @@ SAMPLES = [('r', ('R', {})),
             ('R', {'name': 'plot_1', 'bool': True,
                    'fig.path': "'fig_path/'"})),
            ('r echo=FALSE',
-            ('R', {'hide_input': True})),
+            ('R', {'tags': ['remove_input']})),
            ('r plot_1, echo=TRUE',
             ('R', {'name': 'plot_1', 'echo': True})),
            ('python echo=if a==5 then TRUE else FALSE',
@@ -24,10 +24,10 @@ SAMPLES = [('r', ('R', {})),
            ('python active="ipynb,py"',
             ('python', {'active': 'ipynb,py'})),
            ('python include=FALSE, active="Rmd"',
-            ('python', {'active': 'Rmd', 'hide_output': True, 'hide_input': True})),
+            ('python', {'active': 'Rmd', 'tags': ['remove_cell']})),
            ('r chunk_name, include=FALSE, active="Rmd"',
             ('R',
-             {'name': 'chunk_name', 'active': 'Rmd', 'hide_output': True, 'hide_input': True})),
+             {'name': 'chunk_name', 'active': 'Rmd', 'tags': ['remove_cell']})),
            ('python tags=c("parameters")',
             ('python', {'tags': ['parameters']}))]
 
@@ -63,7 +63,7 @@ def test_parsing_error(options):
 
 
 def test_ignore_metadata():
-    metadata = {'trusted': True, 'hide_input': True}
+    metadata = {'trusted': True, 'tags': ['remove_input']}
     metadata = filter_metadata(metadata, None, _IGNORE_CELL_METADATA)
     assert metadata_to_rmd_options('R', metadata) == 'r echo=FALSE'
 

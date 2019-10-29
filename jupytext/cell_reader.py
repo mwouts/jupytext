@@ -98,6 +98,7 @@ class BaseCellReader(object):
         self.ext = fmt.get('extension')
         self.default_language = default_language or _SCRIPT_EXTENSIONS.get(self.ext, {}).get('language', 'python')
         self.comment_magics = fmt.get('comment_magics', self.default_comment_magics)
+        self.use_runtools = fmt.get('use_runtools', False)
         self.format_version = fmt.get('format_version')
         self.metadata = None
         self.org_content = []
@@ -398,7 +399,7 @@ class RMarkdownCellReader(MarkdownCellReader):
     default_comment_magics = True
 
     def options_to_metadata(self, options):
-        return rmd_options_to_metadata(options)
+        return rmd_options_to_metadata(options, self.use_runtools)
 
     def uncomment_code_and_magics(self, lines):
         if self.cell_type == 'code' and self.comment_magics and is_active(self.ext, self.metadata):
@@ -436,7 +437,7 @@ class RScriptCellReader(ScriptCellReader):
     default_comment_magics = True
 
     def options_to_metadata(self, options):
-        return rmd_options_to_metadata('r ' + options)
+        return rmd_options_to_metadata('r ' + options, self.use_runtools)
 
     def find_cell_end(self, lines):
         """Return position of end of cell marker, and position

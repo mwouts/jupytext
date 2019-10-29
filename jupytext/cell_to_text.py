@@ -52,9 +52,9 @@ class BaseCellExporter(object):
         self.language = self.language or default_language
         self.default_language = default_language
         self.comment = _SCRIPT_EXTENSIONS.get(self.ext, {}).get('comment', '#')
-        self.comment_magics = self.fmt['comment_magics'] if 'comment_magics' in self.fmt \
-            else self.default_comment_magics
+        self.comment_magics = self.fmt.get('comment_magics', self.default_comment_magics)
         self.cell_metadata_json = self.fmt.get('cell_metadata_json', False)
+        self.use_runtools = self.fmt.get('use_runtools', False)
 
         # how many blank lines before next cell
         self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell')
@@ -206,7 +206,7 @@ class RMarkdownCellExporter(MarkdownCellExporter):
         lines = []
         if not is_active(self.ext, self.metadata):
             self.metadata['eval'] = False
-        options = metadata_to_rmd_options(self.language, self.metadata)
+        options = metadata_to_rmd_options(self.language, self.metadata, self.use_runtools)
         lines.append('```{{{}}}'.format(options))
         lines.extend(source)
         lines.append('```')
@@ -373,7 +373,7 @@ class RScriptCellExporter(BaseCellExporter):
         lines = []
         if not is_active(self.ext, self.metadata):
             self.metadata['eval'] = False
-        options = metadata_to_rmd_options(None, self.metadata)
+        options = metadata_to_rmd_options(None, self.metadata, self.use_runtools)
         if options:
             lines.append('#+ {}'.format(options))
         lines.extend(source)
