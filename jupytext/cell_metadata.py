@@ -30,6 +30,13 @@ _RMARKDOWN_TO_RUNTOOLS_OPTION_MAP = [
     (('results', "'hide'"), [('hide_output', True)]),
     (('results', '"hide"'), [('hide_output', True)])
 ]
+# Alternatively, Jupytext can also map the Jupyter Book options to R Markdown
+_RMARKDOWN_TO_JUPYTER_BOOK_MAP = [
+    (('include', 'FALSE'), 'remove_cell'),
+    (('echo', 'FALSE'), 'remove_input'),
+    (('results', "'hide'"), 'remove_output'),
+    (('results', '"hide"'), 'remove_output')
+]
 
 _JUPYTEXT_CELL_METADATA = [
     # Pre-jupytext metadata
@@ -65,22 +72,25 @@ def _py_logical_values(rbool):
     raise RLogicalValueError
 
 
-def metadata_to_rmd_options(language, metadata):
-    """
-    Convert language and metadata information to their rmd representation
-    :param language:
-    :param metadata:
-    :return:
-    """
+def metadata_to_rmd_options(language, metadata, use_runtools=False):
+    """Convert language and metadata information to their rmd representation"""
     options = (language or 'R').lower()
     if 'name' in metadata:
         options += ' ' + metadata['name'] + ','
         del metadata['name']
-    for rmd_option, jupyter_options in _RMARKDOWN_TO_RUNTOOLS_OPTION_MAP:
-        if all([metadata.get(opt_name) == opt_value for opt_name, opt_value in jupyter_options]):
-            options += ' {}={},'.format(rmd_option[0], 'FALSE' if rmd_option[1] is False else rmd_option[1])
-            for opt_name, _ in jupyter_options:
-                metadata.pop(opt_name)
+    if use_runtools:
+        for rmd_option, jupyter_options in _RMARKDOWN_TO_RUNTOOLS_OPTION_MAP:
+            if all([metadata.get(opt_name) == opt_value for opt_name, opt_value in jupyter_options]):
+                options += ' {}={},'.format(rmd_option[0], 'FALSE' if rmd_option[1] is False else rmd_option[1])
+                for opt_name, _ in jupyter_options:
+                    metadata.pop(opt_name)
+    else:
+        for rmd_option, tag in _RMARKDOWN_TO_JUPYTER_BOOK_MAP:
+            if tag in metadata.get('tags', []):
+                options += ' {}={},'.format(rmd_option[0], 'FALSE' if rmd_option[1] is False else rmd_option[1])
+                metadata['tags'] = [i for i in metadata['tags'] if i != tag]
+                if not metadata['tags']:
+                    metadata.pop('tags')
     for opt_name in metadata:
         opt_value = metadata[opt_name]
         opt_name = opt_name.strip()
@@ -100,19 +110,19 @@ def metadata_to_rmd_options(language, metadata):
     return options.strip(',').strip()
 
 
-def update_metadata_from_rmd_options(name, value, metadata):
-    """
-    Update metadata using the _BOOLEAN_OPTIONS_DICTIONARY mapping
-    :param name: option name
-    :param value: option value
-    :param metadata:
-    :return:
-    """
-    for rmd_option, jupyter_options in _RMARKDOWN_TO_RUNTOOLS_OPTION_MAP:
-        if name == rmd_option[0] and value == rmd_option[1]:
-            for opt_name, opt_value in jupyter_options:
-                metadata[opt_name] = opt_value
-            return True
+def update_metadata_from_rmd_options(name, value, metadata, use_runtools=False):
+    """Map the R Markdown cell visibility options to the Jupyter ones"""
+    if use_runtools:
+        for rmd_option, jupyter_options in _RMARKDOWN_TO_RUNTOOLS_OPTION_MAP:
+            if name == rmd_option[0] and value == rmd_option[1]:
+                for opt_name, opt_value in jupyter_options:
+                    metadata[opt_name] = opt_value
+                return True
+    else:
+        for rmd_option, tag in _RMARKDOWN_TO_JUPYTER_BOOK_MAP:
+            if name == rmd_option[0] and value == rmd_option[1]:
+                metadata.setdefault('tags', []).append(tag)
+                return True
     return False
 
 
@@ -213,12 +223,8 @@ def parse_rmd_options(line):
     return result
 
 
-def rmd_options_to_metadata(options):
-    """
-    Parse rmd options and return a metadata dictionary
-    :param options:
-    :return:
-    """
+def rmd_options_to_metadata(options, use_runtools=False):
+    """Parse rmd options and return a metadata dictionary"""
     options = re.split(r'\s|,', options, 1)
     if len(options) == 1:
         language = options[0]
@@ -236,7 +242,7 @@ def rmd_options_to_metadata(options):
         if i == 0 and name == '':
             metadata['name'] = value
             continue
-        if update_metadata_from_rmd_options(name, value, metadata):
+        if update_metadata_from_rmd_options(name, value, metadata, use_runtools=use_runtools):
             continue
         try:
             metadata[name] = _py_logical_values(value)

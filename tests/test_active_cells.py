@@ -233,22 +233,20 @@ def test_active_rmd(ext, no_jupytext_version_number):
     compare(nb.cells[0], ACTIVE_RMD['.ipynb'])
 
 
-ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + hide_input=true hide_output=true active="Rmd"
+ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + tags=["remove_cell"] active="Rmd"
 # # This cell is active in Rmd only
 """,
                           '.Rmd': """```{python include=FALSE, active="Rmd"}
 # This cell is active in Rmd only
 ```
 """,
-                          '.R': """# + hide_input=true hide_output=true active="Rmd"
+                          '.R': """# + tags=["remove_cell"] active="Rmd"
 # # This cell is active in Rmd only
 """,
                           '.ipynb':
                               {'cell_type': 'raw',
                                'source': '# This cell is active in Rmd only',
-                               'metadata': {'active': 'Rmd',
-                                            'hide_input': True,
-                                            'hide_output': True}}}
+                               'metadata': {'active': 'Rmd', 'tags': ['remove_cell']}}}
 
 
 @skip_if_dict_is_not_ordered
