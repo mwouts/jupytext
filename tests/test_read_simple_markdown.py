@@ -590,3 +590,34 @@ def test_two_markdown_cell_with_no_language_code_works(nb=new_notebook(cells=[
     text = jupytext.writes(nb, 'md')
     nb2 = jupytext.reads(text, 'md')
     compare_notebooks(nb2, nb)
+
+
+def test_notebook_with_python3_magic(no_jupytext_version_number,
+                                     nb=new_notebook(metadata={
+                                         'kernelspec': {'display_name': 'Python 3', 'language': 'python',
+                                                        'name': 'python3'}},
+                                                     cells=[new_code_cell('%%python2\na = 1\nprint a'),
+                                                            new_code_cell('%%python3\nb = 2\nprint(b)')]),
+                                     text="""---
+jupyter:
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```python2
+a = 1
+print a
+```
+
+```python3
+b = 2
+print(b)
+```
+"""):
+    md = jupytext.writes(nb, 'md')
+    compare(md, text)
+
+    nb2 = jupytext.reads(md, 'md')
+    compare_notebooks(nb2, nb)
