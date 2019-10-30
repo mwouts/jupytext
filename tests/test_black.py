@@ -187,3 +187,23 @@ jupyter:
 
     nb = read(tmp_md)
     compare(nb.cells, [new_code_cell('1 + 2 + 3 + 4')])
+
+
+@requires_black
+def test_black_through_tempfile(
+        tmpdir,
+        text="""```python
+1 +    2 \
++ 3
+```
+""",
+        black="""```python
+1 + 2 + 3
+```
+"""):
+    tmp_md = str(tmpdir.join('notebook.md'))
+    with open(tmp_md, 'w') as fp:
+        fp.write(text)
+    jupytext([tmp_md, '--pipe', 'black {}'])
+    with open(tmp_md) as fp:
+        compare(fp.read(), black)
