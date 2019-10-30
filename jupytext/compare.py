@@ -34,8 +34,7 @@ def compare(actual, expected, return_diff=False):
         if return_diff:
             return diff
         raise AssertionError('\n' + diff)
-    if return_diff:
-        return ''
+    return '' if return_diff else None
 
 
 def filtered_cell(cell, preserve_outputs, cell_metadata_filter):
