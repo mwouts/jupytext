@@ -990,17 +990,3 @@ def test_339_require_to(tmpdir):
 
     with pytest.raises(ValueError, match='--to'):
         jupytext([tmp_py, '--test-strict'])
-
-
-@requires_black
-def test_detailed_message_missing_language_info(tmpdir):
-    text = """```python
-1 + 1
-```
-"""
-    tmp_md = str(tmpdir.join('test.md'))
-    with open(tmp_md, 'w') as fp:
-        fp.write(text)
-
-    with pytest.raises(ValueError, match='--pipe-fmt'):
-        jupytext([tmp_md, '--pipe', 'black'])
