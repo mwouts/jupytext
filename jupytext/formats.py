@@ -567,10 +567,10 @@ def auto_ext_from_metadata(metadata):
     auto_ext = metadata.get('language_info', {}).get('file_extension')
 
     if auto_ext is None:
-        kernel_language = metadata.get('kernelspec', {}).get('language')
-        if kernel_language:
+        language = metadata.get('kernelspec', {}).get('language') or metadata.get('jupytext', {}).get('main_language')
+        if language:
             for ext in _SCRIPT_EXTENSIONS:
-                if same_language(kernel_language, _SCRIPT_EXTENSIONS[ext]['language']):
+                if same_language(language, _SCRIPT_EXTENSIONS[ext]['language']):
                     auto_ext = ext
                     break
 
