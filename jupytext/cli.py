@@ -8,6 +8,7 @@ import subprocess
 import argparse
 import json
 from copy import copy
+from tempfile import NamedTemporaryFile
 from .jupytext import read, reads, write, writes
 from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, check_file_version
 from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format, check_auto_ext
@@ -157,18 +158,28 @@ def parse_jupytext_args(args=None):
     # Pipe notebook inputs into other commands
     parser.add_argument('--pipe',
                         action='append',
-                        help='Pipe the text representation of the notebook into another\n'
-                             'program, and read the notebook back. For instance, reformat\n'
+                        help='Pipe the text representation (in format --pipe-fmt) of the notebook into\n'
+                             'another program, and read the notebook back. For instance, reformat\n'
                              'your notebook with:\n'
-                             "    jupytext notebook.ipynb --pipe black\n"
+                             '    jupytext notebook.ipynb --pipe black\n'
                              'If you want to reformat it and sync the paired representation, execute:\n'
-                             "    jupytext notebook.ipynb --sync --pipe black\n")
+                             '    jupytext notebook.ipynb --sync --pipe black\n'
+                             'In case the program that you want to execute does not accept pipes, use {}\n'
+                             'as a placeholder for a temporary file name into which jupytext will\n'
+                             'write the text representation of the notebook, e.g.:\n'
+                             "    jupytext notebook.ipynb --pipe 'black {}'\n")
     parser.add_argument('--check',
                         action='append',
-                        help='Pipe the text representation of the notebook into another program,\n'
-                             'and test that the returned value is non zero. For instance,\n'
-                             'test that your notebook is pep8 compliant with:\n'
-                             "    jupytext notebook.ipynb --check flake8\n")
+                        help='Pipe the text representation (in format --pipe-fmt) of the notebook into\n'
+                             'another program, and test that the returned value is non zero. For\n'
+                             'instance, test that your notebook is pep8 compliant with:\n'
+                             '    jupytext notebook.ipynb --check flake8\n'
+                             'or run pytest on your notebook with:\n'
+                             '    jupytext notebook.ipynb --check pytest\n'
+                             'In case the program that you want to execute does not accept pipes, use {}\n'
+                             'as a placeholder for a temporary file name into which jupytext will\n'
+                             'write the text representation of the notebook, e.g.:\n'
+                             "    jupytext notebook.ipynb --check 'pytest {}'\n")
     parser.add_argument('--pipe-fmt',
                         default='auto:percent',
                         help='The format in which the notebook should be piped to other programs,\n'
@@ -568,31 +579,58 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
     return notebook, latest_inputs, latest_outputs
 
 
+def exec_command(command, input=None):
+    """Execute the desired command, and pipe the given input into it"""
+    process = subprocess.Popen(command.split(' '),
+                               **(dict(stdout=subprocess.PIPE, stdin=subprocess.PIPE) if input is not None else {}))
+    out, err = process.communicate(input=input)
+
+    if process.returncode:
+        sys.stderr.write("Command '{}' exited with code {}: {}"
+                         .format(command, process.returncode, err or out))
+        raise SystemExit(process.returncode)
+
+    return out
+
+
 def pipe_notebook(notebook, command, fmt='py:percent', update=True):
     """Pipe the notebook, in the desired representation, to the given command. Update the notebook
     with the returned content if desired."""
     if command in ['black', 'flake8', 'autopep8']:
         command = command + ' -'
+    elif command in ['pytest', 'unittest']:
+        command = command + ' {}'
 
     fmt = long_form_one_format(fmt, notebook.metadata, auto_ext_requires_language_info=False)
     check_auto_ext(fmt, notebook.metadata, '--pipe-fmt')
     text = writes(notebook, fmt)
-    process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-    cmd_output, err = process.communicate(input=text.encode('utf-8'))
 
-    if process.returncode:
-        sys.stderr.write("Command '{}' exited with code {}: {}"
-                         .format(command, process.returncode, err or cmd_output))
-        raise SystemExit(process.returncode)
+    if '{}' in command:
+        tmp = NamedTemporaryFile(mode='w+', encoding='utf8', suffix=fmt['extension'], delete=False)
+        try:
+            tmp.write(text)
+            tmp.close()
 
-    if not update:
-        return notebook
+            exec_command(command.replace('{}', tmp.name))
 
-    if not cmd_output:
-        sys.stderr.write("[jupytext] The command '{}' had no output. As a result, the notebook is empty. "
-                         "Is this expected? If not, use --check rather than --pipe for this command.".format(command))
+            if not update:
+                return notebook
 
-    piped_notebook = reads(cmd_output.decode('utf-8'), fmt)
+            piped_notebook = read(tmp.name, fmt=fmt)
+        finally:
+            os.remove(tmp.name)
+    else:
+        cmd_output = exec_command(command, text.encode('utf-8'))
+
+        if not update:
+            return notebook
+
+        if not cmd_output:
+            sys.stderr.write("[jupytext] The command '{}' had no output. As a result, the notebook is empty. "
+                             "Is this expected? If not, use --check rather than --pipe for this command."
+                             .format(command))
+
+        piped_notebook = reads(cmd_output.decode('utf-8'), fmt)
 
     if fmt['extension'] != '.ipynb':
         combine_inputs_with_outputs(piped_notebook, notebook, fmt)
