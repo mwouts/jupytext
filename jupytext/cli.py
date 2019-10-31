@@ -606,7 +606,11 @@ def pipe_notebook(notebook, command, fmt='py:percent', update=True):
     text = writes(notebook, fmt)
 
     if '{}' in command:
-        tmp = NamedTemporaryFile(mode='w+', encoding='utf8', suffix=fmt['extension'], delete=False)
+        try:
+            tmp = NamedTemporaryFile(mode='w+', encoding='utf8', suffix=fmt['extension'], delete=False)
+        except TypeError:
+            # NamedTemporaryFile does not have an 'encoding' argument on pypy
+            tmp = NamedTemporaryFile(mode='w+', suffix=fmt['extension'], delete=False)
         try:
             tmp.write(text)
             tmp.close()
