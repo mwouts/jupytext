@@ -371,12 +371,13 @@ def jupytext_single_file(nb_file, args, log):
 
     # II. ### Apply commands onto the notebook ###
     # Pipe the notebook into the desired commands
+    prefix = None if nb_file == '-' else os.path.splitext(os.path.basename(nb_file))[0]
     for cmd in args.pipe or []:
-        notebook = pipe_notebook(notebook, cmd, args.pipe_fmt)
+        notebook = pipe_notebook(notebook, cmd, args.pipe_fmt, prefix=prefix)
 
     # and/or test the desired commands onto the notebook
     for cmd in args.check or []:
-        pipe_notebook(notebook, cmd, args.pipe_fmt, update=False)
+        pipe_notebook(notebook, cmd, args.pipe_fmt, update=False, prefix=prefix)
 
     # Execute the notebook
     if args.execute:
@@ -581,19 +582,21 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
 
 def exec_command(command, input=None):
     """Execute the desired command, and pipe the given input into it"""
-    process = subprocess.Popen(command.split(' '),
+    if not isinstance(command, list):
+        command = command.split(' ')
+    process = subprocess.Popen(command,
                                **(dict(stdout=subprocess.PIPE, stdin=subprocess.PIPE) if input is not None else {}))
     out, err = process.communicate(input=input)
 
     if process.returncode:
-        sys.stderr.write("Command '{}' exited with code {}: {}"
-                         .format(command, process.returncode, err or out))
+        sys.stderr.write("The command {} exited with code {}{}"
+                         .format(command, process.returncode, ': {}'.format(err or out) if err or out else ''))
         raise SystemExit(process.returncode)
 
     return out
 
 
-def pipe_notebook(notebook, command, fmt='py:percent', update=True):
+def pipe_notebook(notebook, command, fmt='py:percent', update=True, prefix=None):
     """Pipe the notebook, in the desired representation, to the given command. Update the notebook
     with the returned content if desired."""
     if command in ['black', 'flake8', 'autopep8']:
@@ -605,17 +608,26 @@ def pipe_notebook(notebook, command, fmt='py:percent', update=True):
     check_auto_ext(fmt, notebook.metadata, '--pipe-fmt')
     text = writes(notebook, fmt)
 
+    command = command.split(' ')
     if '{}' in command:
+        if prefix is not None:
+            prefix = prefix + (' ' if ' ' in prefix else '_')
+        tmp_file_args = dict(mode='w+',
+                             encoding='utf8',
+                             prefix=prefix,
+                             suffix=fmt['extension'],
+                             delete=False)
         try:
-            tmp = NamedTemporaryFile(mode='w+', encoding='utf8', suffix=fmt['extension'], delete=False)
+            tmp = NamedTemporaryFile(**tmp_file_args)
         except TypeError:
             # NamedTemporaryFile does not have an 'encoding' argument on pypy
-            tmp = NamedTemporaryFile(mode='w+', suffix=fmt['extension'], delete=False)
+            tmp_file_args.pop('encoding')
+            tmp = NamedTemporaryFile(**tmp_file_args)
         try:
             tmp.write(text)
             tmp.close()
 
-            exec_command(command.replace('{}', tmp.name))
+            exec_command([cmd if cmd != '{}' else tmp.name for cmd in command])
 
             if not update:
                 return notebook
