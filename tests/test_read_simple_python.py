@@ -389,6 +389,33 @@ def test_isolated_cell_with_magic(pynb="""# ---
     compare(pynb2, pynb)
 
 
+def test_ipython_help_are_commented_297(text="""# This is a markdown cell
+# that ends with a question: float?
+
+# The next cell is also a markdown cell,
+# because it has no code marker:
+
+# float?
+
+# +
+# float?
+
+# +
+# float??
+""", nb=new_notebook(
+    cells=[
+        new_markdown_cell('This is a markdown cell\nthat ends with a question: float?'),
+        new_markdown_cell('The next cell is also a markdown cell,\nbecause it has no code marker:'),
+        new_markdown_cell('float?'),
+        new_code_cell('float?'),
+        new_code_cell('float??')])):
+    nb2 = jupytext.reads(text, 'py')
+    compare_notebooks(nb2, nb)
+
+    text2 = jupytext.writes(nb2, 'py')
+    compare(text2, text)
+
+
 def test_read_multiline_comment(pynb="""'''This is a multiline
 comment with "quotes", 'single quotes'
 # and comments
