@@ -1543,3 +1543,41 @@ def test_server_extension_issubclass():
 
     assert not isinstance(SubClassTextFileContentsManager, jupytext.TextFileContentsManager)
     assert issubclass(SubClassTextFileContentsManager, jupytext.TextFileContentsManager)
+
+
+def test_multiple_pairing(tmpdir):
+    """Test that multiple pairing works. Input cells are loaded from the most recent text representation among
+    the paired ones"""
+    tmp_ipynb = str(tmpdir.join('notebook.ipynb'))
+    tmp_md = str(tmpdir.join('notebook.md'))
+    tmp_py = str(tmpdir.join('notebook.py'))
+
+    def nb(text):
+        return new_notebook(cells=[new_markdown_cell(text)],
+                            metadata={'jupytext': {'formats': 'ipynb,md,py'}})
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    cm.save(model=dict(type='notebook', content=nb('saved from cm')), path='notebook.ipynb')
+    compare_notebooks(jupytext.read(tmp_ipynb), nb('saved from cm'))
+    compare_notebooks(jupytext.read(tmp_md), nb('saved from cm'))
+    compare_notebooks(jupytext.read(tmp_py), nb('saved from cm'))
+
+    jupytext.write(nb('md edited'), tmp_md)
+    model = cm.get('notebook.ipynb')
+    compare_notebooks(model['content'], nb('md edited'))
+
+    cm.save(model=model, path='notebook.ipynb')
+    compare_notebooks(jupytext.read(tmp_ipynb), nb('md edited'))
+    compare_notebooks(jupytext.read(tmp_md), nb('md edited'))
+    compare_notebooks(jupytext.read(tmp_py), nb('md edited'))
+
+    jupytext.write(nb('py edited'), tmp_py)
+    model = cm.get('notebook.ipynb')
+    compare_notebooks(model['content'], nb('py edited'))
+
+    cm.save(model=model, path='notebook.ipynb')
+    compare_notebooks(jupytext.read(tmp_ipynb), nb('py edited'))
+    compare_notebooks(jupytext.read(tmp_md), nb('py edited'))
+    compare_notebooks(jupytext.read(tmp_py), nb('py edited'))
