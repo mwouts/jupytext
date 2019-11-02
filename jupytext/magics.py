@@ -29,11 +29,13 @@ _PYTHON_MAGIC_CMD = re.compile(r"^(# |#)*({})($|\s$|\s[^=,])".format('|'.join(
     ['cat', 'cp', 'mv', 'rm', 'rmdir', 'mkdir'] +
     # windows
     ['copy', 'ddir', 'echo', 'ls', 'ldir', 'mkdir', 'ren', 'rmdir'])))
+# Python help commands end with ?
+_IPYTHON_MAGIC_HELP = re.compile(r"^(# )*[^\s]*\?\s*$")
 
 _SCRIPT_LANGUAGES = [_SCRIPT_EXTENSIONS[ext]['language'] for ext in _SCRIPT_EXTENSIONS]
 
 
-def is_magic(line, language, global_escape_flag=True):
+def is_magic(line, language, global_escape_flag=True, explicitly_code=False):
     """Is the current line a (possibly escaped) Jupyter magic, and should it be commented?"""
     if language in ['octave', 'matlab'] or language not in _SCRIPT_LANGUAGES:
         return False
@@ -47,15 +49,31 @@ def is_magic(line, language, global_escape_flag=True):
         return False
     if _PYTHON_HELP_OR_BASH_CMD.match(line):
         return True
+    if explicitly_code and _IPYTHON_MAGIC_HELP.match(line):
+        return True
     return _PYTHON_MAGIC_CMD.match(line)
 
 
-def comment_magic(source, language='python', global_escape_flag=True):
+def need_explicit_marker(source, language='python', global_escape_flag=True, explicitly_code=True):
+    """Does this code needs an explicit cell marker?"""
+    if language != 'python' or not global_escape_flag or not explicitly_code:
+        return False
+
+    parser = StringParser(language)
+    for pos, line in enumerate(source):
+        if not parser.is_quoted() and is_magic(line, language, global_escape_flag, explicitly_code):
+            if not is_magic(line, language, global_escape_flag, False):
+                return True
+        parser.read_line(line)
+    return False
+
+
+def comment_magic(source, language='python', global_escape_flag=True, explicitly_code=True):
     """Escape Jupyter magics with '# '"""
     parser = StringParser(language)
     next_is_magic = False
     for pos, line in enumerate(source):
-        if not parser.is_quoted() and (next_is_magic or is_magic(line, language, global_escape_flag)):
+        if not parser.is_quoted() and (next_is_magic or is_magic(line, language, global_escape_flag, explicitly_code)):
             source[pos] = _COMMENT[language] + ' ' + line
             next_is_magic = language == 'python' and _LINE_CONTINUATION_RE.match(line)
         parser.read_line(line)
@@ -72,12 +90,12 @@ def unesc(line, language):
     return line
 
 
-def uncomment_magic(source, language='python', global_escape_flag=True):
+def uncomment_magic(source, language='python', global_escape_flag=True, explicitly_code=True):
     """Unescape Jupyter magics"""
     parser = StringParser(language)
     next_is_magic = False
     for pos, line in enumerate(source):
-        if not parser.is_quoted() and (next_is_magic or is_magic(line, language, global_escape_flag)):
+        if not parser.is_quoted() and (next_is_magic or is_magic(line, language, global_escape_flag, explicitly_code)):
             source[pos] = unesc(line, language)
             next_is_magic = language == 'python' and _LINE_CONTINUATION_RE.match(line)
         parser.read_line(line)
