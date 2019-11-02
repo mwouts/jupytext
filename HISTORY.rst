@@ -15,6 +15,7 @@ Release History
 - Markdown and raw cells can be quoted with triple quotes in the ``py:percent`` format. And Markdown cells can start with just ``# %% [md]`` (#305)
 - The light format uses ``# + [markdown]`` rather than the previous ``cell_type`` metadata to identify markdown cells with metadata (#356)
 - Explicit Markdown cells in the light format ``# + [markdown]`` can use triple quotes (#356)
+- IPython magic help commands like ``float?`` are classified as magics, and thus commented in Python scripts (#297)
 - Cell metadata can be encoded as either key=value (the new default) or in JSON. An automatic option ``cell_metadata_json`` should help minimize the impact on existing files (#344)
 - R Markdown hidden inputs, outputs, or cells are now mapped to the corresponding Jupyter Book tags by default (#337)
 - The Jupyter Notebook extension for Jupytext is compatible with Jupyter Notebook 6.0 (#346)
