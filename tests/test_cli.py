@@ -977,7 +977,7 @@ def test_339_py(tmpdir):
 cat = 42
 """)
 
-    def erroneous_is_magic(line, language, comment_magics):
+    def erroneous_is_magic(line, language, comment_magics, explicitly_code):
         return 'cat' in line
 
     with mock.patch('jupytext.magics.is_magic', erroneous_is_magic):
