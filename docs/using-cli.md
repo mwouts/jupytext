@@ -42,8 +42,13 @@ You may also find useful to `--pipe` the text representation of a notebook into 
 jupytext --sync --pipe black notebook.ipynb    # read most recent version of notebook, reformat with black, save
 ```
 
-Execute `jupytext --help` to access the full documentation.
+For programs that don't accept pipes, use `{}` as a placeholder for the name of a temporary file that will contain the text representation of the notebook. For instance, run `pytest` on your notebook with:
+```bash
+jupytext --check 'pytest {}' notebook.ipynb    # export the notebook in format py:percent in a temp file, run pytest
+```
+(read more about running `pytest` on notebooks in our example [`Tests in a notebook.md`](https://github.com/mwouts/jupytext/blob/master/demo/Tests%20in%20a%20notebook.md)).
 
+Execute `jupytext --help` to access the full documentation.
 
 ## Notebook and cell metadata filters
 
