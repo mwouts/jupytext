@@ -7,7 +7,7 @@ from .languages import cell_language, comment_lines
 from .cell_metadata import is_active, _IGNORE_CELL_METADATA
 from .cell_metadata import metadata_to_text, metadata_to_rmd_options, metadata_to_double_percent_options
 from .metadata_filter import filter_metadata
-from .magics import comment_magic, escape_code_start
+from .magics import comment_magic, escape_code_start, need_explicit_marker
 from .cell_reader import LightScriptCellReader, MarkdownCellReader, RMarkdownCellReader
 from .languages import _SCRIPT_EXTENSIONS
 from .pep8 import pep8_lines_between_cells
@@ -115,7 +115,7 @@ class BaseCellExporter(object):
         if self.comment and self.comment != "#'" and is_active(self.ext, self.metadata) and \
                 self.fmt.get('format_name') not in ['percent', 'hydrogen']:
             source = copy(source)
-            comment_magic(source, self.language, self.comment_magics)
+            comment_magic(source, self.language, self.comment_magics, explicitly_code=self.cell_type == 'code')
 
         return comment_lines(source, self.comment)
 
@@ -266,7 +266,8 @@ class LightScriptCellExporter(BaseCellExporter):
         else:
             source = self.markdown_to_text(source)
 
-        if self.explicit_start_marker(source):
+        if (active and need_explicit_marker(self.source, self.language, self.comment_magics)) \
+                or self.explicit_start_marker(source):
             self.metadata['endofcell'] = self.cell_marker_end or endofcell_marker(source, self.comment)
 
         if not self.metadata or not self.use_cell_markers:
