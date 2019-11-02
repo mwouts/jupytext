@@ -8,6 +8,7 @@ Release History
 
 **Improvements**
 
+- Pairing a notebook to both `.md` and `.py` is now supported in Jupyter. Input cells are loaded from the most recent text representation. (#290).
 - Raw cells are now encoded using HTML comments (``<!-- #raw -->`` and ``<!-- #endraw -->``) in Markdown files (#321)
 - Markdown cells can be delimited with any of ``<!-- #region -->``,  ``<!-- #markdown -->`` or ``<!-- #md -->`` (#344)
 - Code blocks from Markdown files, when they don't have an explicit language, appear in Markdown cells in Jupyter (#321)
