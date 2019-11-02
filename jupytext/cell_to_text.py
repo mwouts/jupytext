@@ -260,13 +260,14 @@ class LightScriptCellExporter(BaseCellExporter):
         active = is_active(self.ext, self.metadata, self.language == self.default_language)
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
+        comment_questions = self.metadata.pop('comment_questions', True)
 
         if active:
-            comment_magic(source, self.language, self.comment_magics)
+            comment_magic(source, self.language, self.comment_magics, comment_questions)
         else:
             source = self.markdown_to_text(source)
 
-        if (active and need_explicit_marker(self.source, self.language, self.comment_magics)) \
+        if (active and comment_questions and need_explicit_marker(self.source, self.language, self.comment_magics)) \
                 or self.explicit_start_marker(source):
             self.metadata['endofcell'] = self.cell_marker_end or endofcell_marker(source, self.comment)
 
