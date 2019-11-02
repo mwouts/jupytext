@@ -46,7 +46,7 @@ For programs that don't accept pipes, use `{}` as a placeholder for the name of 
 ```bash
 jupytext --check 'pytest {}' notebook.ipynb    # export the notebook in format py:percent in a temp file, run pytest
 ```
-(read more about running `pytest` on notebooks in our example [`Tests in a notebook.md`](https://github.com/mwouts/jupytext/blob/master/demo/Tests%20in%20a%20notebook.md)).
+(read more about running `pytest` on notebooks in our example [`Tests in a notebook.md`](https://github.com/mwouts/jupytext/blob/master/demo/Tests%20in%20a%20notebook.md#)).
 
 Execute `jupytext --help` to access the full documentation.
 
