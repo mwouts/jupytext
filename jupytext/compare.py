@@ -30,7 +30,7 @@ def compare(actual, expected, return_diff=False):
         diff = '\n'.join(difflib.unified_diff(
             _multilines(expected),
             _multilines(actual),
-            'actual', 'expected', lineterm=''))
+            'expected', 'actual', lineterm=''))
         if return_diff:
             return diff
         raise AssertionError('\n' + diff)
