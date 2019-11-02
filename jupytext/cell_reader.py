@@ -14,7 +14,7 @@ except (ImportError, SyntaxError):
 from .cell_metadata import is_active, text_to_metadata, is_json_metadata, rmd_options_to_metadata
 from .languages import _JUPYTER_LANGUAGES
 from .stringparser import StringParser
-from .magics import uncomment_magic, is_magic, unescape_code_start
+from .magics import uncomment_magic, is_magic, unescape_code_start, need_explicit_marker
 from .pep8 import pep8_lines_between_cells
 
 _BLANK_LINE = re.compile(r"^\s*$")
@@ -103,6 +103,7 @@ class BaseCellReader(object):
         self.metadata = None
         self.org_content = []
         self.content = []
+        self.explicit_soc = None
         self.explicit_eoc = None
         self.cell_type = None
         self.language = None
@@ -189,6 +190,7 @@ class BaseCellReader(object):
                 self.metadata['lines_to_end_of_cell_marker'] = lines_to_end_of_cell_marker
 
         # Uncomment content
+        self.explicit_soc = cell_start > 0
         self.content = self.extract_content(source)
 
         # Is this an inactive cell?
@@ -416,7 +418,10 @@ class ScriptCellReader(BaseCellReader):  # pylint: disable=W0223
         if self.cell_type == 'code' or self.comment != "#'":
             if self.comment_magics:
                 if is_active(self.ext, self.metadata):
-                    uncomment_magic(lines, self.language or self.default_language)
+                    uncomment_magic(lines, self.language or self.default_language, explicitly_code=self.explicit_soc)
+                    if self.cell_type == 'code' and not self.explicit_soc and \
+                            need_explicit_marker(lines, self.language or self.default_language):
+                        self.metadata['comment_questions'] = False
                 else:
                     lines = uncomment(lines)
 
@@ -636,6 +641,7 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
         self.comment = script['comment']
         self.start_code_re = re.compile(r"^{}\s*%%(%*)\s(.*)$".format(self.comment))
         self.alternative_start_code_re = re.compile(r"^{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(self.comment))
+        self.explicit_soc = True
 
     def metadata_and_language_from_option_line(self, line):
         """Parse code options on the given line. When a start of a code cell

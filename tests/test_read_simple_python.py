@@ -402,13 +402,30 @@ def test_ipython_help_are_commented_297(text="""# This is a markdown cell
 
 # +
 # float??
+
+# +
+# Finally a question in a code
+# # cell?
 """, nb=new_notebook(
     cells=[
         new_markdown_cell('This is a markdown cell\nthat ends with a question: float?'),
         new_markdown_cell('The next cell is also a markdown cell,\nbecause it has no code marker:'),
         new_markdown_cell('float?'),
         new_code_cell('float?'),
-        new_code_cell('float??')])):
+        new_code_cell('float??'),
+        new_code_cell('# Finally a question in a code\n# cell?')])):
+    nb2 = jupytext.reads(text, 'py')
+    compare_notebooks(nb2, nb)
+
+    text2 = jupytext.writes(nb2, 'py')
+    compare(text2, text)
+
+
+def test_questions_in_unmarked_cells_are_not_uncommented_297(text="""# This cell has no explicit marker
+# question?
+1 + 2
+""", nb=new_notebook(cells=[new_code_cell('# This cell has no explicit marker\n# question?\n1 + 2',
+                                          metadata={'comment_questions': False})])):
     nb2 = jupytext.reads(text, 'py')
     compare_notebooks(nb2, nb)
 
