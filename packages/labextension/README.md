@@ -2,11 +2,18 @@
 
 This extension adds a few [Jupytext](https://github.com/mwouts/jupytext) commands to the command palette. Use these to select the desired ipynb/text pairing for your notebook.
 
-![Jupytext commands](jupytext_commands.png)
+The latest version for this extension is [![npm version](https://badge.fury.io/js/jupyterlab-jupytext.svg)](https://badge.fury.io/js/jupyterlab-jupytext).
+ 
+Most users do not need to install this extension, since it is already included in the latest [jupytext](https://github.com/mwouts/jupytext/), both on [![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext) and 
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/jupytext.svg)](https://anaconda.org/conda-forge/jupytext).
+
+![](https://github.com/mwouts/jupytext/raw/master/packages/labextension/jupytext_commands.png)
 
 ## Installation
 
-Please [install Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. The Jupytext extension for JupyterLab is bundled with Jupytext. Installing Jupytext will trigger a build of JupyterLab the next time you open it. If you prefer, you can trigger the build manually with
+Please install [Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. As mentioned above, both the `pip` and `conda` packages do include the latest version of the JupyterLab extension, so in most cases you don't need to specifically install this `npm` package. 
+
+Installing Jupytext will trigger a build of JupyterLab the next time you open it. If you prefer, you can trigger the build manually with
 
 ```bash
 jupyter lab build
