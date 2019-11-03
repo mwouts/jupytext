@@ -1,5 +1,6 @@
 # 1.1.0 (2019-11-03)
 
+- Multiple pairings are supported (#290)
 - The documentation includes the last version numbers for both Jupytext Python and for this extension (#311)
 - Documentation says clearly that the extension is bundled with the Python package (#350)
 

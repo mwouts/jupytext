@@ -6,67 +6,112 @@ import { INotebookTracker } from "@jupyterlab/notebook";
 
 import { nbformat } from "@jupyterlab/coreutils";
 
+interface JupytextRepresentation {
+  format_name: string;
+  extension: string;
+};
+
 interface JupytextSection {
   formats?: string;
   notebook_metadata_filter?: string;
   cell_metadata_filter?: string;
-}
+  text_representation?: JupytextRepresentation
+};
 
 const JUPYTEXT_FORMATS = [
   {
-    formats: "ipynb,auto:light",
+    format: "ipynb",
+    label: "Pair Notebook with ipynb document"
+  },
+    {
+    format: "auto:light",
     label: "Pair Notebook with light Script"
   },
   {
-    formats: "ipynb,auto:percent",
+    format: "auto:percent",
     label: "Pair Notebook with percent Script"
   },
   {
-    formats: "ipynb,auto:hydrogen",
+    format: "auto:hydrogen",
     label: "Pair Notebook with Hydrogen Script"
   },
   {
-    formats: "ipynb,md",
+    format: "md",
     label: "Pair Notebook with Markdown"
   },
   {
-    formats: "ipynb,Rmd",
+    format: "Rmd",
     label: "Pair Notebook with R Markdown"
   },
   {
-    formats: "custom",
+    format: "custom",
     label: "Custom pairing"
   },
   {
-    formats: "none",
+    format: "none",
     label: "Unpair Notebook"
   }
 ];
 
-function get_selected_format(notebook_tracker: INotebookTracker): string {
-  if (!notebook_tracker.currentWidget) return null;
+function get_jupytext_formats(notebook_tracker: INotebookTracker): Array<string> {
+  if (!notebook_tracker.currentWidget) return [];
 
-  if (
-    !notebook_tracker.currentWidget.context.model.metadata.has(
-      "jupytext"
-    )
-  )
-    return "none";
+  if (!notebook_tracker.currentWidget.context.model.metadata.has("jupytext"))
+    return [];
 
   const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
-    "jupytext"
+      "jupytext"
   ) as unknown) as JupytextSection;
-  if (!jupytext.formats) return "none";
+  let formats: Array<string> = jupytext && jupytext.formats ? jupytext.formats.split(',') : [];
+  return formats.filter(function (fmt) {
+    return fmt !== '';
+  });
+}
+
+function get_selected_formats(notebook_tracker: INotebookTracker): Array<string> {
+  if (!notebook_tracker.currentWidget) return [];
+
+  let formats = get_jupytext_formats(notebook_tracker);
 
   const lang = notebook_tracker.currentWidget.context.model.metadata.get(
-    "language_info"
+      "language_info"
   ) as nbformat.ILanguageInfoMetadata;
-  return lang
-    ? jupytext.formats.replace(
-      "," + lang.file_extension.substring(1) + ":",
-      ",auto:"
-    )
-    : jupytext.formats;
+  if (lang && lang.file_extension) {
+    const script_ext = lang.file_extension.substring(1);
+    formats = formats.map(function (fmt) {
+      if (fmt === script_ext)
+        return 'auto:light';
+      return fmt.replace(script_ext + ':', 'auto:');
+    });
+  }
+
+  let notebook_extension: string | undefined = notebook_tracker.currentWidget.context.path.split('.').pop();
+  if (!notebook_extension)
+    return formats;
+
+  notebook_extension = ['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
+  for (const i in formats) {
+    const ext = formats[i].split(':')[0];
+    if (ext == notebook_extension)
+      return formats;
+  }
+
+  // the notebook extension was not found among the formats
+  if (['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) != -1)
+    formats.push(notebook_extension);
+  else {
+    let format_name = 'light';
+    if (notebook_tracker.currentWidget.context.model.metadata.has("jupytext")) {
+      const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
+          "jupytext"
+      ) as unknown) as JupytextSection;
+
+      if (jupytext && jupytext.text_representation && jupytext.text_representation.format_name)
+        format_name = jupytext.text_representation.format_name;
+    }
+    formats.push('auto:' + format_name);
+  }
+  return formats;
 };
 
 /**
@@ -81,62 +126,97 @@ const extension: JupyterFrontEndPlugin<void> = {
     palette: ICommandPalette,
     notebook_tracker: INotebookTracker
   ) => {
-    console.log("JupyterLab extension jupyterlab-jupytext is activated");    
-    
+    console.log("JupyterLab extension jupyterlab-jupytext is activated");
+
     // Jupytext formats
     JUPYTEXT_FORMATS.forEach((args, rank) => {
-      const formats: string = args["formats"];
-      const command: string = "jupytext:" + formats;
+      const format: string = args["format"];
+      const command: string = "jupytext:" + format;
       app.commands.addCommand(command, {
         label: args["label"],
         isToggled: () => {
           if (!notebook_tracker.currentWidget) return false;
-          const jupytext_formats = get_selected_format(notebook_tracker)
+          const jupytext_formats = get_selected_formats(notebook_tracker);
 
-          if (formats == "custom")
-            return (
-              jupytext_formats &&
-              [
-                "none",
-                "ipynb,auto:light",
-                "ipynb,auto:percent",
-                "ipynb,auto:hydrogen",
-                "ipynb,md",
-                "ipynb,Rmd"
-              ].indexOf(jupytext_formats) < 0
-            );
-
-          return jupytext_formats == formats;
+          if (format == "custom"){
+              for (const i in jupytext_formats) {
+                  const fmt = jupytext_formats[i];
+                  if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'md', 'Rmd'].indexOf(fmt)==-1)
+                      return true;
+              }
+              return false;
+          }
+          return jupytext_formats.indexOf(format)!=-1;
         },
-        isEnabled: () => {
+          isEnabled: () => {
           if (!notebook_tracker.currentWidget)
               return false;
-          if (formats == "custom" || formats == "none")
-            return true;
-          const notebook_extension: string = notebook_tracker.currentWidget.context.path.split('.').pop();
-          if (notebook_extension == "ipynb")
-            return true;
-          if (notebook_extension == "md")
-            return formats == "ipynb,md";
-          if (notebook_extension == "Rmd")
-            return formats == "ipynb,Rmd";
-          return formats != "ipynb,md" && formats != "ipynb,Rmd";
+
+          const notebook_extension: string | undefined = notebook_tracker.currentWidget.context.path.split('.').pop();
+          if (format===notebook_extension)
+              return false;
+
+          return true;
         },
         execute: () => {
-          const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
+            const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
             "jupytext"
           ) as unknown) as JupytextSection;
-          const jupytext_formats = get_selected_format(notebook_tracker);
-          const target_format = jupytext_formats === formats ? "none": formats;
+          let formats: Array<string> = get_selected_formats(notebook_tracker);
+
+          // Toggle the selected format
           console.log("Jupytext: executing command=" + command);
-          if (formats == "custom") {
+          if (format == "custom") {
             alert(
               "Please edit the notebook metadata directly if you wish a custom configuration."
             );
             return;
           }
+            // Toggle the selected format
+            let notebook_extension: string = notebook_tracker.currentWidget.context.path.split('.').pop();
+            notebook_extension = ['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
 
-          if (target_format == "none") {
+            // Toggle the selected format
+            const index = formats.indexOf(format);
+            if (format === 'none') {
+                // Only keep one format - one that matches the current extension
+                for (const i in formats) {
+                    const fmt = formats[i];
+                    if (fmt.split(':')[0] === notebook_extension) {
+                        formats = [fmt];
+                        break;
+                    }
+                }
+            } else if (index != -1) {
+                formats.splice(index, 1);
+
+                // The current file extension can't be unpaired
+                let ext_found = false;
+                for (const i in formats) {
+                    const fmt = formats[i];
+                    if (fmt.split(':')[0] === notebook_extension) {
+                        ext_found = true;
+                        break;
+                    }
+                }
+
+                if (!ext_found)
+                    return;
+            } else {
+                // We can't have the same extension multiple times
+                const new_formats = [];
+                for (const i in formats) {
+                    const fmt = formats[i];
+                    if (fmt.split(':')[0] !== format.split(':')[0]) {
+                        new_formats.push(fmt)
+                    }
+                }
+
+                formats = new_formats;
+                formats.push(format);
+            }
+
+          if (formats.length === 1 && formats[0] === 'ipynb') {
             if (
               !notebook_tracker.currentWidget.context.model.metadata.has(
                 "jupytext"
@@ -156,11 +236,11 @@ const extension: JupyterFrontEndPlugin<void> = {
           }
 
           // set the desired format
-          if (jupytext) jupytext.formats = target_format;
+          if (jupytext) jupytext.formats = formats.join();
           else
             notebook_tracker.currentWidget.context.model.metadata.set(
               "jupytext",
-              { formats: target_format }
+              { formats: formats.join() }
             );
         }
       });
@@ -190,7 +270,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       rank: 1
     });
 
-    // Metadata in text representation    
+    // Metadata in text representation
     app.commands.addCommand("jupytext_metadata", {
       label: "Include Metadata",
       isToggled: () => {
