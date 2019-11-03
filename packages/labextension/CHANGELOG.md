@@ -1,3 +1,8 @@
+# 1.1.0 (2019-11-03)
+
+- The documentation includes the last version numbers for both Jupytext Python and for this extension (#311)
+- Documentation says clearly that the extension is bundled with the Python package (#350)
+
 # 1.0.2 (2019-07-18)
 
 - Fixed an incorrect `target_format` entry inserted by the version 1.0.1 of the extension.
