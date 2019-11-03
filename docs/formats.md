@@ -8,7 +8,7 @@ Jupytext supports conversion between the `.ipynb` format and many different form
 
 Jupytext can save notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) documents. This format is well adapted to tutorials, books, or more generally notebooks that contain more text than code. Notebooks represented in this form are well rendered by most Markdown editors or renderers, including GitHub.
 
-Like all the Jupytext formats, Jupytext's Markdown notebooks start with an (optional) YAML header. This header is used to store selected notebook metadata like the kernel information, together with Jupytext's format and version information. If you'd like to store more (or less) notebook metadata, please refer to the paragraph on [metadata filtering](#metadata-filtering).
+Like all the Jupytext formats, Jupytext Markdown notebooks start with an (optional) YAML header. This header is used to store selected notebook metadata like the kernel information, together with Jupytext's format and version information. If you'd like to store more (or less) notebook metadata, please refer to the paragraph on [metadata filtering](#metadata-filtering).
 ```
 ---
 jupyter:
@@ -25,7 +25,7 @@ jupyter:
 ---
 ```
 
-In the Markdown format, markdown cells are inserted verbatim and separated with two blank lines. When required (cells with metadata, cells that contain two blank lines or code blocks), Jupytext protects the cell boundary with HTML comments: `<!-- #region -->` and `<!-- #endregion -->`. Cells with explicit boundaries are [foldable](https://code.visualstudio.com/docs/editor/codebasics#_folding) in VS Code, and can accept both a title and/or metadata in JSON format: `<!-- #region This is the title for my protected cell {"key": "value"}-->`.
+In the Markdown format, markdown cells are inserted verbatim and separated with two blank lines.
 
 If you'd like that cell breaks also occurs on Markdown headers, add a `split_at_heading: true` entry in the `jupytext` section in the YAML header, or if you want that option to be the default for all Markdown documents in Jupyter, activate the option on Jupytext's content manager:
 
@@ -39,11 +39,22 @@ Code cells are encoded using the classical triple backticks, followed by the not
     param = 5
     ```
 
-Finally, raw cells are delimited with HTML comments, and accept cell metadata in JSON format:
+Code snippets are turned into code cells in Jupyter as soon as they have an explicit language, when that language is supported in Jupyter. Thus, you have a code snippet that you don't want to execute in Jupyter, you can either
+- remove the language information, 
+- or, add an `active="md"` cell metadata, or a `.noeval` attribute after the language information, e.g. ` ```python .noeval `
+- or, surround the code snippet with explicit Markdown cell markers (see below).
 
-    <!-- #raw {"key": "value"}-->
+Raw cells are delimited with HTML comments, and accept cell metadata in the same key=value format:
+
+    <!-- #raw -->
     raw text
     <!-- #endraw -->
+
+    <!-- #raw key="value"-->
+    raw cell with metadata
+    <!-- #endraw -->
+
+Markdown cells can also have explicit markers: use one of `<!-- #md -->` or `<!-- #markdown -->` or `<!-- #region -->` and the corresponding `<!-- #end... -->` counterpart. Note that the `<!-- #region -->` and `<!-- #endregion -->` cells markers are [foldable](https://code.visualstudio.com/docs/editor/codebasics#_folding) in VS Code, and that you can also insert a title there, e.g. `<!-- #region This is a title for my protected cell -->`. Cell metadata are accepted in the format `key="value"` (`"value"` being encoded in JSON) as for the other cell types.
 
 For a concrete example, see how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.md#).
 
@@ -57,24 +68,19 @@ Jupytext's implementation of R Markdown is very similar to that of the Markdown 
     param = 5
     ```
 
-Python and R notebooks represented in the R Markdown format are expected to run both in Jupyter and RStudio. Note that you can change the default Python environment in RStudio with `RETICULATE_PYTHON` in a `.Renviron` file, see [here](https://github.com/mwouts/jupytext/issues/267#issuecomment-506994930).
+Python and R notebooks represented in the R Markdown format can run both in Jupyter and RStudio. Note that you can change the default Python environment in RStudio with `RETICULATE_PYTHON` in a `.Renviron` file, see [here](https://github.com/mwouts/jupytext/issues/267#issuecomment-506994930).
 
 See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
 
-### Pandoc's Markdown
+### Pandoc Markdown
 
 Pandoc, the _Universal document converter_,  can read and write Jupyter notebooks - see [Pandoc's documentation](https://pandoc.org/MANUAL.html#creating-jupyter-notebooks-with-pandoc).
 
-Pandoc's Markdown format is available in Jupytext as `md:pandoc`. This requires `pandoc` in version 2.7.2 or above - please check Pandoc's version number with `pandoc -v`. Note that you can get the latest version of `pandoc` in a conda environment with
-```
-conda install pandoc -c conda-forge
-```
+In Pandoc Markdown, all cells are marked with pandoc divs (`:::`). The format is therefore slightly more verbose than the Jupytext Markdown format.
 
-Pandoc's format uses explicit cell markers (`:::`) for all cells. See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pandoc.md#) in that format.
+See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pandoc.md#) in the `md:pandoc` format.
 
-Please note that `pandoc`, while preserving the HTML rendering, may reformat the text in some of the Markdown cells. If that is an issue for you, please wait until [jgm/pandoc#5408](https://github.com/jgm/pandoc/issues/5408) gets implemented.
-
-Finally, Jupytext currently strips the output cells before calling `pandoc`. As for the other formats, outputs cells can be preserved in paired notebooks.
+If you wish to use that format, please install `pandoc` in version 2.7.2 or above, with e.g. `conda install pandoc -c conda-forge`.
 
 ## Notebooks as scripts
 
@@ -101,11 +107,11 @@ class A():
         return 2
 ```
 
-Gathering multiple instructions into one cells is possible. For that we use an explicit start-of-cell delimiter that is, by default, `# +` (`// +` in C++, etc). The default end of cell delimiter is `# -`, and can be omitted when followed by another explicit start of cell marker, or the end of the file:
+Code cells can contain multiple code paragraphs. In that case Jupytext uses an explicit start-of-cell delimiter that is, by default, `# +` (`// +` in C++, etc). The default end of cell delimiter is `# -`, and can be omitted when followed by another explicit start of cell marker, or the end of the file:
 
 ```python
 # +
-# A single cell made of two paragraphs
+# A single code cell made of two paragraphs
 a = 1
 
 
@@ -113,12 +119,12 @@ def f(x):
     return x+a
 ```
 
-Metadata can be associated to a given cell using its JSON representation:
+Metadata can be associated to a given cell using a key/value representation:
 ```python
-# + {"key": "value"}
+# + key="value"
 # A code cell with metadata
 
-# + {"key": "value", "cell_type": "markdown"}
+# + [markdown] key="value"
 # A Markdown cell with metadata
 ```
 
@@ -136,11 +142,11 @@ See how our `World population.ipynb` notebook is [represented](https://github.co
 
 ### The `bare` format
 
-A variation of the `light` format is the `bare` format, with no cell marker at all. Please note that this format does not provide round-trip consistency - code cells are split on code paragraphs. By default, this format still includes a YAML header - if you prefer to also remove the header, set `"notebook_metadata_filter": "-all"` in the jupytext section of your notebook metadata.
+The `bare` format is a variation of the `light` format with no cell marker at all. Please note that this format does not provide round-trip consistency - code cells are split on code paragraphs. By default, the `bare` format still includes a YAML header - if you prefer to also remove the header, set `"notebook_metadata_filter": "-all"` in the jupytext section of your notebook metadata.
 
 ### The `percent` format
 
-The `percent` format is a representation of Jupyter notebooks as scripts, in which cells are delimited with a commented double percent sign `# %%`. The `percent` format is currently available for these [languages](https://github.com/mwouts/jupytext/blob/master/jupytext/languages.py).
+The `percent` format is a representation of Jupyter notebooks as scripts, in which all cells are explicitely delimited with a commented double percent sign `# %%`. The `percent` format is currently available for these [languages](https://github.com/mwouts/jupytext/blob/master/jupytext/languages.py).
 
 The format was introduced by Spyder in 2013, and is now supported by many editors, including
 - [Spyder IDE](https://docs.spyder-ide.org/editor.html#defining-code-cells),
@@ -150,11 +156,15 @@ The format was introduced by Spyder in 2013, and is now supported by many editor
 - [Python Tools for Visual Studio](https://docs.microsoft.com/en-us/visualstudio/python/python-interactive-repl-in-visual-studio?view=vs-2019#work-with-code-cells),
 - and [PyCharm Professional](https://www.jetbrains.com/help/pycharm/editing-jupyter-notebook-files.html#edit-content).
 
-Our implementation of the `percent` format is compatible with the original specifications by Spyder. We extended the format to allow markdown cells and cell metadata. Cell headers have the following structure:
+Our implementation of the `percent` format is as follows: cells can have
+- a title
+- a cell type (`markdown`, `md` or `raw`, omitted for code cells)
+- and cell metadata
+like in this example:
+
 ```python
-# %% Optional text [cell type] {optional JSON metadata}
+# %% Optional title [cell type] key="value"
 ```
-where cell type is either omitted (code cells), or `[markdown]` or  `[raw]`. 
 
 In the `percent` format, our previous example becomes:
 ```python
@@ -176,12 +186,12 @@ class A():
         return 2
 ```
 
-In Python scripts, Markdown cells can also use multiline comments:
+In the case of Python scripts, Markdown cells do accept multiline comments:
 ```python
 # %% [markdown]
 """
-This is a multiline
-Markdown cell
+This is a Markdown cell
+that uses multiline comments
 """
 ```
 
@@ -196,11 +206,11 @@ c.ContentsManager.default_cell_markers = '"""'
 ```
 to your `.jupyter/jupyter_notebook_config.py` file.
 
-Open our sample notebook in the `percent` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py).
+See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py) in the `percent` format.
 
 ### The `hydrogen` format
 
-By default, [Jupyter magics](#magic-commands) are commented in the `percent` representation. If you run the percent scripts in Hydrogen, use instead the `hydrogen` format, a variant of the `percent` format that does not comment Jupyter magic commands.
+By default, [Jupyter magics](#magic-commands) are commented in the `percent` representation. If you run the percent scripts in Hydrogen, use the `hydrogen` format, a variant of the `percent` format that does not comment Jupyter magic commands.
 
 ### Sphinx-gallery scripts
 
