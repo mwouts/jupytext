@@ -2,6 +2,9 @@
 // Refer to the documentation at
 // https://github.com/mwouts/jupytext/blob/master/jupytext/nbextension/README.md
 
+// The most convenient way to edit this file is to edit the version installed by pip at
+// share/jupyter/nbextensions/jupytext
+
 define([
     'jquery',
     'base/js/namespace',
@@ -13,36 +16,59 @@ define([
 ) {
     "use strict";
 
-    function getSelectedJupytextFormat() {
-        var formats = Jupyter.notebook.metadata.jupytext ? Jupyter.notebook.metadata.jupytext.formats : null;
-        if (!formats)
-            return 'none';
-
-        if (Jupyter.notebook.metadata.language_info) {
-            var script_ext = Jupyter.notebook.metadata.language_info.file_extension;
-
-            if (formats === 'ipynb,' + script_ext.substring(1) + ':light')
-                return 'ipynb,auto:light';
-            else if (formats === 'ipynb,' + script_ext.substring(1) + ':percent')
-                return 'ipynb,auto:percent';
-            else if (formats === 'ipynb,' + script_ext.substring(1) + ':hydrogen')
-                return 'ipynb,auto:hydrogen';
+    function getSelectedJupytextFormats() {
+        var str_formats = Jupyter.notebook.metadata.jupytext && Jupyter.notebook.metadata.jupytext.formats ? Jupyter.notebook.metadata.jupytext.formats : '';
+        var unfiltered_formats = str_formats.split(',');
+        var formats = [];
+        for (var i in unfiltered_formats) {
+            var fmt = unfiltered_formats[i];
+            if(fmt)
+                formats.push(fmt);
         }
 
-        if (!['ipynb,auto:light', 'ipynb,auto:percent', 'ipynb,auto:hydrogen',
-            'ipynb,md', 'ipynb,Rmd', 'none'].includes(formats))
-            return 'custom';
+        if (Jupyter.notebook.metadata.language_info) {
+            var script_ext = Jupyter.notebook.metadata.language_info.file_extension.substring(1);
+            formats = formats.map(function (fmt) {
+                if (fmt === script_ext)
+                    return 'auto:light';
+                return fmt.replace(script_ext + ':', 'auto:');
+            });
+        }
 
+        var notebook_extension = Jupyter.notebook.notebook_path.split('.').pop();
+        notebook_extension = ['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
+        for (var i in formats) {
+            var ext = formats[i].split(':')[0];
+            if (ext==notebook_extension)
+                return formats;
+        }
+
+        // the notebook extension was not found among the formats
+        if (['ipynb', 'md', 'Rmd'].indexOf(notebook_extension)!=-1)
+            formats.push(notebook_extension);
+        else {
+            var format_name = Jupyter.notebook.metadata.jupytext && Jupyter.notebook.metadata.jupytext.text_representation
+            && Jupyter.notebook.metadata.jupytext.text_representation.format_name ?
+                Jupyter.notebook.metadata.jupytext.text_representation.format_name : 'light';
+            formats.push('auto:' + format_name);
+        }
         return formats;
     }
 
-    function checkSelectedJupytextFormat() {
+    function checkSelectedJupytextFormats() {
 
-        var formats = getSelectedJupytextFormat();
-        console.log('Jupytext.formats=' + formats);
+        var formats = getSelectedJupytextFormats();
+        console.log('Jupytext.formats=' + formats.join());
 
         $('[id^=jupytext_pair_]' + '>.fa').toggleClass('fa-check', false);
-        $('#jupytext_pair_' + formats.replace(':', '_').replace(',', '_') + ' > .fa').toggleClass('fa-check', true);
+        for (var i in formats) {
+            var fmt = formats[i];
+            $('#jupytext_pair_' + fmt.replace(':', '_') + ' > .fa').toggleClass('fa-check', true);
+
+            // any custom format?
+            if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'md', 'Rmd'].indexOf(fmt)==-1)
+                $('#jupytext_pair_custom' + ' > .fa').toggleClass('fa-check', true);
+        }
     }
 
     function checkAutosave() {
@@ -61,23 +87,65 @@ define([
             $('#jupytext_metadata').remove('disabled');
             return;
         }
-
         // Custom metadata filter => we disable the option
         $('#jupytext_metadata > .fa').toggleClass('fa-check', true);
         $('#jupytext_metadata').addClass('disabled');
     }
 
     function onClickedJupytextPair(data) {
-        var formats = $(this).data('formats');
-        if (formats === 'custom') {
+        if (!Jupyter.notebook.notebook_path)
+            return;
+        var format = $(this).data('format');
+        if (format === 'custom') {
             alert("Please use the notebook metadata editor for this (Menu: Edit/Edit Notebook Metadata).");
             return;
         }
-        if (formats === getSelectedJupytextFormat()) {
-            formats = 'none';
+        var formats = getSelectedJupytextFormats();
+        var notebook_extension = Jupyter.notebook.notebook_path.split('.').pop();
+        notebook_extension = ['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
+
+        // Toggle the selected format
+        var index = formats.indexOf(format);
+        if (format==='none') {
+            // Only keep one format - one that matches the current extension
+            for(var i in formats) {
+                var fmt = formats[i];
+                if(fmt.split(':')[0] === notebook_extension) {
+                    formats = [fmt];
+                    break;
+                }
+            }
+        }
+        else if(index!=-1) {
+            formats.splice(index, 1);
+
+            // The current file extension can't be unpaired
+            var ext_found = false;
+            for(var i in formats) {
+                var fmt = formats[i];
+                if(fmt.split(':')[0] === notebook_extension) {
+                    ext_found=true;
+                    break;
+                }
+            }
+
+            if (!ext_found)
+                return;
+        } else {
+            // We can't have the same extension multiple times
+            var new_formats = [];
+            for(var i in formats) {
+                var fmt = formats[i];
+                if(fmt.split(':')[0] !== format.split(':')[0]) {
+                    new_formats.push(fmt)
+                }
+            }
+
+            formats = new_formats;
+            formats.push(format);
         }
 
-        if (formats === 'none') {
+        if (formats.length === 1 & formats[0] === 'ipynb') {
             if (!Jupyter.notebook.metadata.jupytext)
                 return;
             if (Jupyter.notebook.metadata.jupytext.formats)
@@ -87,10 +155,10 @@ define([
         } else {
             if (!Jupyter.notebook.metadata.jupytext)
                 Jupyter.notebook.metadata.jupytext = {};
-            Jupyter.notebook.metadata.jupytext['formats'] = formats;
+            Jupyter.notebook.metadata.jupytext['formats'] = formats.join();
         }
 
-        checkSelectedJupytextFormat();
+        checkSelectedJupytextFormats();
         Jupyter.notebook.set_dirty();
     }
 
@@ -124,22 +192,19 @@ define([
     }
 
     function updateJupytextMenu() {
-        checkSelectedJupytextFormat();
+        checkSelectedJupytextFormats();
         checkAutosave();
         checkIncludeMetadata();
     }
 
-    function jupytext_pair(formats, text, active) {
+    function jupytext_pair(format, text, active) {
         return $('<li/>')
-            .addClass(active ? null : 'disabled')
+            .addClass(typeof active === 'undefined' || active ? null : 'disabled')
             .append($('<a/>')
-                .attr('id', 'jupytext_pair_' + formats.replace(':', '_').replace(',', '_'))
+                .attr('id', 'jupytext_pair_' + format.replace(':', '_'))
                 .text(text)
-                .attr('title',
-                    (formats === 'none') ? 'Jupytext not configured' :
-                        (formats === 'custom' ? 'Custom Jupytext configuration' :
-                            'jupytext.formats=' + formats))
-                .data('formats', formats)
+                .attr('title', format === 'custom' ? 'Custom Jupytext configuration' : 'jupytext.format=' + format)
+                .data('format', format)
                 .css('width', '280px')
                 .attr('href', '#')
                 .on('click', onClickedJupytextPair)
@@ -206,26 +271,21 @@ define([
             JupytextActions.append($('<li/>').addClass('divider'));
 
             var notebook_extension = Jupyter.notebook.notebook_path.split('.').pop();
-            var active = (notebook_extension === 'ipynb' || (notebook_extension !== 'md' && notebook_extension !== 'Rmd'));
-            JupytextActions.append(jupytext_pair('ipynb,auto:light', 'Pair Notebook with light Script', active));
-            JupytextActions.append(jupytext_pair('ipynb,auto:percent', 'Pair Notebook with percent Script', active));
-            JupytextActions.append(jupytext_pair('ipynb,auto:hydrogen', 'Pair Notebook with Hydrogen Script', active));
-
-            active = (notebook_extension === 'ipynb' || notebook_extension === 'md');
-            JupytextActions.append(jupytext_pair('ipynb,md', 'Pair Notebook with Markdown', active));
-
-            active = (notebook_extension === 'ipynb' || notebook_extension === 'Rmd');
-            JupytextActions.append(jupytext_pair('ipynb,Rmd', 'Pair Notebook with R Markdown', active));
-
-            JupytextActions.append(jupytext_pair('custom', 'Custom pairing', true));
+            JupytextActions.append(jupytext_pair('ipynb', 'Pair Notebook with ipynb document', notebook_extension!=='ipynb'));
+            JupytextActions.append(jupytext_pair('auto:light', 'Pair Notebook with light Script'));
+            JupytextActions.append(jupytext_pair('auto:percent', 'Pair Notebook with percent Script'));
+            JupytextActions.append(jupytext_pair('auto:hydrogen', 'Pair Notebook with Hydrogen Script'));
+            JupytextActions.append(jupytext_pair('md', 'Pair Notebook with Markdown', notebook_extension!=='md'));
+            JupytextActions.append(jupytext_pair('Rmd', 'Pair Notebook with R Markdown', notebook_extension!=='Rmd'));
+            JupytextActions.append(jupytext_pair('custom', 'Custom pairing'));
             JupytextActions.append($('<li/>').addClass('divider'));
             JupytextActions.append(toggle_metadata);
             JupytextActions.append($('<li/>').addClass('divider'));
-            JupytextActions.append(jupytext_pair('none', 'Unpair notebook', true));
+            JupytextActions.append(jupytext_pair('none', 'Unpair notebook'));
 
             $('#jupytext_sub_menu').after('<li class="divider"/>');
 
-            checkSelectedJupytextFormat();
+            checkSelectedJupytextFormats();
             checkAutosave();
         }
     };
