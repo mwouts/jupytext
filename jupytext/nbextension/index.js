@@ -145,7 +145,20 @@ define([
             formats.push(format);
         }
 
-        if (formats.length === 1 & formats[0] === 'ipynb') {
+        if (formats.length === 1) {
+            if (notebook_extension !== 'auto')
+                formats = [];
+            else
+            {
+                if (Jupyter.notebook.metadata.jupytext && Jupyter.notebook.metadata.jupytext.text_representation) {
+                    var format_name = formats[0].split(':')[1];
+                    Jupyter.notebook.metadata.jupytext.text_representation.format_name = format_name;
+                    formats = [];
+                }
+            }
+        }
+
+        if (formats.length === 0) {
             if (!Jupyter.notebook.metadata.jupytext)
                 return;
             if (Jupyter.notebook.metadata.jupytext.formats)

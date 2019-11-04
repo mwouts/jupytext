@@ -216,7 +216,17 @@ const extension: JupyterFrontEndPlugin<void> = {
                 formats.push(format);
             }
 
-          if (formats.length === 1 && formats[0] === 'ipynb') {
+          if (formats.length === 1) {
+            if (notebook_extension !== 'auto')
+              formats = [];
+            else if (jupytext && jupytext.text_representation) {
+              const format_name = formats[0].split(':')[1];
+              jupytext.text_representation.format_name = format_name;
+              formats = [];
+            }
+          }
+
+          if (formats.length === 0) {
             if (
               !notebook_tracker.currentWidget.context.model.metadata.has(
                 "jupytext"
@@ -240,9 +250,8 @@ const extension: JupyterFrontEndPlugin<void> = {
           else
             notebook_tracker.currentWidget.context.model.metadata.set(
               "jupytext",
-              { formats: formats.join() }
-            );
-        }
+              { formats: formats.join() });
+      }
       });
 
       console.log("Jupytext: adding command=" + command + " with rank=" + (rank + 1));
