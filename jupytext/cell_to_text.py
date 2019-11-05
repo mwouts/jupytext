@@ -317,7 +317,7 @@ class LightScriptCellExporter(BaseCellExporter):
 
         if self.is_code() and text[-1] == self.comment + ' -':
             # remove end of cell marker when redundant with next explicit marker
-            if not next_text or next_text[0].startswith(self.comment + ' + {'):
+            if not next_text or next_text[0].startswith(self.comment + ' +'):
                 text = text[:-1]
                 # When we do not need the end of cell marker, number of blank lines is the max
                 # between that required at the end of the cell, and that required before the next cell.

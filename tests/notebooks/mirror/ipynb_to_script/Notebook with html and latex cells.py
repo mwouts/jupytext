@@ -8,7 +8,6 @@
 
 # + language="html"
 # <p><a href="https://github.com/mwouts/jupytext", style="color: rgb(0,0,255)">Jupytext</a> on GitHub</p>
-# -
 
 # + language="latex"
 # $\frac{\pi}{2}$
