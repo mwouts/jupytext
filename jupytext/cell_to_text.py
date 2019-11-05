@@ -60,14 +60,16 @@ class BaseCellExporter(object):
         self.lines_to_next_cell = cell.metadata.get('lines_to_next_cell')
         self.lines_to_end_of_cell_marker = cell.metadata.get('lines_to_end_of_cell_marker')
 
-        if cell.cell_type == 'raw' and 'active' not in self.metadata:
+        if cell.cell_type == 'raw' and 'active' not in self.metadata and not any(
+                tag.startswith('active-') for tag in self.metadata.get('tags', [])):
             self.metadata['active'] = ''
 
     def is_code(self):
         """Is this cell a code cell?"""
         if self.cell_type == 'code':
             return True
-        if self.cell_type == 'raw' and 'active' in self.metadata:
+        if self.cell_type == 'raw' and 'active' in self.metadata or any(
+                tag.startswith('active-') for tag in self.metadata.get('tags', [])):
             return True
         return False
 

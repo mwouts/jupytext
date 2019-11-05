@@ -885,3 +885,18 @@ some text, and a fake cell marker
     assert nb.cells[0].source == "some text, and a fake cell marker\n# + [raw]"
     py = jupytext.writes(nb, 'py')
     compare(py, text)
+
+
+def test_active_tag(
+        text='''# + tags=["active-py"]
+interpreter = 'python'
+
+# + tags=["active-ipynb"]
+# interpreter = 'ipython'
+''', ref=new_notebook(cells=[
+            new_raw_cell("interpreter = 'python'", metadata={'tags': ['active-py']}),
+            new_code_cell("interpreter = 'ipython'", metadata={'tags': ['active-ipynb']})])):
+    nb = jupytext.reads(text, 'py')
+    compare_notebooks(nb, ref)
+    py = jupytext.writes(nb, 'py')
+    compare(py, text)
