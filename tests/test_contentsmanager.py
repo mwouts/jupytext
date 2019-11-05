@@ -1574,6 +1574,12 @@ def test_multiple_pairing(tmpdir):
     compare_notebooks(jupytext.read(tmp_py), nb('md edited'))
 
     jupytext.write(nb('py edited'), tmp_py)
+
+    # Loading the md file give the content of that file
+    model = cm.get('notebook.md')
+    compare_notebooks(model['content'], nb('md edited'))
+
+    # Loading the ipynb files gives the content of the most recent text file
     model = cm.get('notebook.ipynb')
     compare_notebooks(model['content'], nb('py edited'))
 
@@ -1581,3 +1587,12 @@ def test_multiple_pairing(tmpdir):
     compare_notebooks(jupytext.read(tmp_ipynb), nb('py edited'))
     compare_notebooks(jupytext.read(tmp_md), nb('py edited'))
     compare_notebooks(jupytext.read(tmp_py), nb('py edited'))
+
+    model_ipynb = cm.get('notebook.ipynb', content=False, load_alternative_format=False)
+    model_md = cm.get('notebook.md', content=False, load_alternative_format=False)
+    model_py = cm.get('notebook.py', content=False, load_alternative_format=False)
+
+    # ipynb is the older, then py, then md
+    # so that we read cell inputs from the py file
+    assert model_ipynb['last_modified'] < model_py['last_modified']
+    assert model_py['last_modified'] < model_md['last_modified']
