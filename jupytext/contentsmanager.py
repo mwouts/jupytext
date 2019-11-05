@@ -352,15 +352,21 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             # Source format is the most recent non ipynb format found on disk
             if path.endswith('.ipynb'):
-                most_recent_timestamp = None
+                source_timestamps = {}
                 for alt_path, alt_fmt in alt_paths:
                     if not alt_path.endswith('.ipynb') and self.exists(alt_path):
-                        alt_model = self._notebook_model(alt_path, content=False)
-                        if most_recent_timestamp is None or alt_model['last_modified'] > most_recent_timestamp:
-                            most_recent_timestamp = alt_model['last_modified']
-                            model_outputs = model
-                            path_inputs = alt_path
-                            fmt_inputs = alt_fmt
+                        source_timestamps[alt_path] = self._notebook_model(alt_path, content=False)['last_modified']
+
+                most_recent_timestamp = None
+                for alt_path in source_timestamps:
+                    alt_ts = source_timestamps[alt_path]
+                    if len(source_timestamps) > 1:
+                        self.log.info(u'File {} was last modified at {}'.format(alt_path, alt_ts))
+                    if most_recent_timestamp is None or alt_ts > most_recent_timestamp:
+                        most_recent_timestamp = alt_ts
+                        model_outputs = model
+                        path_inputs = alt_path
+                        fmt_inputs = alt_fmt
 
                 if most_recent_timestamp is not None:
                     self.log.info(u'Reading SOURCE from {}'.format(path_inputs))
