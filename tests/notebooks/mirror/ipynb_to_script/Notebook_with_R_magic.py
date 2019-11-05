@@ -14,7 +14,6 @@
 
 # + language="R"
 # suppressMessages(require(tidyverse))
-# -
 
 # + language="R"
 # ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color=Species)) + geom_point()

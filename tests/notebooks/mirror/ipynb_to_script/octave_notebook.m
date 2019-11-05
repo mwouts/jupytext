@@ -26,7 +26,6 @@ plot (x, sin (x));
 
 % + language="python"
 % a = 1
-% -
 
 % + language="python"
 % a + 1

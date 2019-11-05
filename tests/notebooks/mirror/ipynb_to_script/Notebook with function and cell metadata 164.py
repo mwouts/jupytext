@@ -17,8 +17,6 @@ def f(x):
     return x
 
 
-# -
-
 # + attributes={"classes": [], "id": "", "n": "10"}
 f(5)
 # -

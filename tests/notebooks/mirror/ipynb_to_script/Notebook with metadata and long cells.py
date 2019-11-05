@@ -41,11 +41,9 @@
 
 # + [markdown] key="value"
 # This is a markdown cell with cell metadata `{"key": "value"}`
-# -
 
 # + .class tags=["parameters"]
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
-# -
 
 # + key="value" active=""
 # This is a raw cell with cell metadata `{"key": "value"}`
