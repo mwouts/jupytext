@@ -76,6 +76,31 @@ def h(y):
     compare(pynb2, pynb)
 
 
+def test_indented_comment(text="""def f():
+    return 1
+
+    # f returns 1
+
+
+def g():
+    return 2
+
+
+# h returns 3
+def h():
+    return 3
+""", ref=new_notebook(cells=[new_code_cell("""def f():
+    return 1
+
+    # f returns 1"""),
+                             new_code_cell('def g():\n    return 2'),
+                             new_code_cell('# h returns 3\ndef h():\n    return 3')])):
+    nb = jupytext.reads(text, 'py')
+    compare_notebooks(nb, ref)
+    py = jupytext.writes(nb, 'py')
+    compare(py, text)
+
+
 def test_read_non_pep8_file(pynb="""# ---
 # title: Non-pep8 file
 # ---

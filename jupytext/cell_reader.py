@@ -18,7 +18,6 @@ from .magics import uncomment_magic, is_magic, unescape_code_start, need_explici
 from .pep8 import pep8_lines_between_cells
 
 _BLANK_LINE = re.compile(r"^\s*$")
-_PY_COMMENT = re.compile(r"^\s*#")
 _PY_INDENTED = re.compile(r"^\s")
 
 
@@ -50,7 +49,7 @@ def paragraph_is_fully_commented(lines, comment, main_language):
 def next_code_is_indented(lines):
     """Is the next unescaped line indented?"""
     for line in lines:
-        if _BLANK_LINE.match(line) or _PY_COMMENT.match(line):
+        if _BLANK_LINE.match(line):
             continue
         return _PY_INDENTED.match(line)
     return False
