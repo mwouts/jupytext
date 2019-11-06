@@ -136,24 +136,26 @@ def compare_notebooks(notebook_actual, notebook_expected, fmt=None, allow_expect
         if (ref_cell.cell_type == 'code' and not allow_missing_code_cell_metadata) or \
                 (ref_cell.cell_type != 'code' and not allow_missing_markdown_cell_metadata):
 
+            ref_metadata = ref_cell.metadata
+            test_metadata = test_cell.metadata
             if allow_filtered_cell_metadata:
-                ref_cell.metadata = {key: ref_cell.metadata[key] for key in ref_cell.metadata
-                                     if key not in _IGNORE_CELL_METADATA}
-                test_cell.metadata = {key: test_cell.metadata[key] for key in test_cell.metadata
-                                      if key not in _IGNORE_CELL_METADATA}
+                ref_metadata = {key: ref_metadata[key] for key in ref_metadata
+                                if key not in _IGNORE_CELL_METADATA}
+                test_metadata = {key: test_metadata[key] for key in test_metadata
+                                 if key not in _IGNORE_CELL_METADATA}
 
-            if ref_cell.metadata != test_cell.metadata:
+            if ref_metadata != test_metadata:
                 if raise_on_first_difference:
                     try:
-                        compare(test_cell.metadata, ref_cell.metadata)
+                        compare(test_metadata, ref_metadata)
                     except AssertionError as error:
                         raise NotebookDifference("Metadata differ on {} cell #{}: {}\nCell content:\n{}"
                                                  .format(test_cell.cell_type, i, str(error), ref_cell.source))
                 else:
-                    modified_cell_metadata.update(set(test_cell.metadata).difference(ref_cell.metadata))
-                    modified_cell_metadata.update(set(ref_cell.metadata).difference(test_cell.metadata))
-                    for key in set(ref_cell.metadata).intersection(test_cell.metadata):
-                        if ref_cell.metadata[key] != test_cell.metadata[key]:
+                    modified_cell_metadata.update(set(test_metadata).difference(ref_metadata))
+                    modified_cell_metadata.update(set(ref_metadata).difference(test_metadata))
+                    for key in set(ref_metadata).intersection(test_metadata):
+                        if ref_metadata[key] != test_metadata[key]:
                             modified_cell_metadata.add(key)
 
         test_lines.extend([line for line in test_cell.source.splitlines() if not _BLANK_LINE.match(line)])
