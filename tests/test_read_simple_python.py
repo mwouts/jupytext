@@ -101,6 +101,22 @@ def h():
     compare(py, text)
 
 
+def test_non_pep8(text="""def f():
+    return 1
+def g():
+    return 2
+
+def h():
+    return 3
+""", ref=new_notebook(
+    cells=[new_code_cell('def f():\n    return 1\ndef g():\n    return 2', metadata={'lines_to_next_cell': 1}),
+           new_code_cell('def h():\n    return 3')])):
+    nb = jupytext.reads(text, 'py')
+    compare_notebooks(nb, ref)
+    py = jupytext.writes(nb, 'py')
+    compare(py, text)
+
+
 def test_read_non_pep8_file(pynb="""# ---
 # title: Non-pep8 file
 # ---
