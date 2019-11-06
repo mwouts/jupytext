@@ -130,11 +130,6 @@ class BaseCellExporter(object):
         # pylint: disable=W0613,R0201
         return text
 
-    def simplify_soc_marker(self, text, prev_text):
-        """Simplify start-of-cell marker when possible"""
-        # pylint: disable=W0613,R0201
-        return text
-
 
 class MarkdownCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as Markdown"""
@@ -285,8 +280,6 @@ class LightScriptCellExporter(BaseCellExporter):
         options = metadata_to_double_percent_options(self.metadata, self.cell_metadata_json)
         if options:
             cell_start.append(options)
-        elif not self.cell_marker_start:
-            cell_start.append('{}')
         lines.append(' '.join(cell_start))
         lines.extend(source)
         lines.append(self.comment + ' {}'.format(endofcell))
@@ -334,17 +327,6 @@ class LightScriptCellExporter(BaseCellExporter):
                     blank_lines = pep8_lines_between_cells(text[:-1], next_text, self.ext)
                     blank_lines = 0 if blank_lines < 2 else 2
                 text = text[:-1] + [''] * blank_lines + text[-1:]
-
-        return text
-
-    def simplify_soc_marker(self, text, prev_text):
-        """Simplify start of cell marker when previous line is blank"""
-        if self.cell_marker_start:
-            return text
-
-        if self.is_code() and text and text[0] == self.comment + ' + {}':
-            if not prev_text or not prev_text[-1].strip():
-                text[0] = self.comment + ' +'
 
         return text
 

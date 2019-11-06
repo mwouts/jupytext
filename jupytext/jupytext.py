@@ -189,17 +189,12 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 if i + 1 < len(cell_exporters) and cell_exporters[i + 1].is_code():
                     text.append('""')
 
-            if i + 1 < len(cell_exporters):
-                lines = cell_exporters[i + 1].simplify_soc_marker(lines, text)
             lines = text + lines
 
         if header_lines_to_next_cell is None:
             header_lines_to_next_cell = pep8_lines_between_cells(header_content, lines, self.implementation.extension)
 
         header.extend([''] * header_lines_to_next_cell)
-
-        if cell_exporters:
-            lines = cell_exporters[0].simplify_soc_marker(lines, header)
 
         return '\n'.join(header + lines)
 
