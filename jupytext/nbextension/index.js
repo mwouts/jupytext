@@ -69,6 +69,12 @@ define([
             if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'md', 'Rmd'].indexOf(fmt)==-1)
                 $('#jupytext_pair_custom' + ' > .fa').toggleClass('fa-check', true);
         }
+
+        // just one format?
+        if (formats.length===1)
+            $('#jupytext_pair_none').parent().addClass('disabled');
+        else
+            $('#jupytext_pair_none').parent().removeClass('disabled');
     }
 
     function checkAutosave() {
@@ -79,17 +85,17 @@ define([
     function checkIncludeMetadata() {
         if (!Jupyter.notebook.metadata.jupytext || !Jupyter.notebook.metadata.jupytext.notebook_metadata_filter) {
             $('#jupytext_metadata > .fa').toggleClass('fa-check', true);
-            $('#jupytext_metadata').remove('disabled');
+            $('#jupytext_metadata').parent().removeClass('disabled');
             return;
         }
         if (Jupyter.notebook.metadata.jupytext.notebook_metadata_filter === "-all") {
             $('#jupytext_metadata > .fa').toggleClass('fa-check', false);
-            $('#jupytext_metadata').remove('disabled');
+            $('#jupytext_metadata').parent().removeClass('disabled');
             return;
         }
         // Custom metadata filter => we disable the option
         $('#jupytext_metadata > .fa').toggleClass('fa-check', true);
-        $('#jupytext_metadata').addClass('disabled');
+        $('#jupytext_metadata').parent().addClass('disabled');
     }
 
     function onClickedJupytextPair(data) {
