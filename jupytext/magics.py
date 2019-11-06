@@ -60,7 +60,7 @@ def need_explicit_marker(source, language='python', global_escape_flag=True, exp
         return False
 
     parser = StringParser(language)
-    for pos, line in enumerate(source):
+    for line in source:
         if not parser.is_quoted() and is_magic(line, language, global_escape_flag, explicitly_code):
             if not is_magic(line, language, global_escape_flag, False):
                 return True
