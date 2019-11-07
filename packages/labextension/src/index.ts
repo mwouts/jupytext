@@ -148,15 +148,20 @@ const extension: JupyterFrontEndPlugin<void> = {
           }
           return jupytext_formats.indexOf(format)!=-1;
         },
-          isEnabled: () => {
-          if (!notebook_tracker.currentWidget)
-              return false;
+        isEnabled: () => {
+            if (!notebook_tracker.currentWidget)
+                return false;
 
-          const notebook_extension: string | undefined = notebook_tracker.currentWidget.context.path.split('.').pop();
-          if (format===notebook_extension)
-              return false;
+            const notebook_extension: string | undefined = notebook_tracker.currentWidget.context.path.split('.').pop();
+            if (format === notebook_extension)
+                return false;
 
-          return true;
+            if (format === 'none') {
+                const formats = get_selected_formats(notebook_tracker);
+                return formats.length > 1;
+            }
+
+            return true;
         },
         execute: () => {
             const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
