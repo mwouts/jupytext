@@ -248,3 +248,13 @@ def test_ipynb_to_scheme_percent(nb_file, extension, no_jupytext_version_number)
     assert_conversion_same_as_mirror(nb_file,
                                      '{}:percent'.format(extension),
                                      'ipynb_to_percent')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_robot'))
+def test_ipynb_to_robot_light(nb_file, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(nb_file, 'auto', 'ipynb_to_script')
+
+
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_robot'))
+def test_ipynb_to_robot_percent(nb_file, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(nb_file, 'auto:percent', 'ipynb_to_percent')
