@@ -8,7 +8,7 @@ import nbformat
 from nbformat.v4.nbbase import new_raw_cell
 from .version import __version__
 from .languages import _SCRIPT_EXTENSIONS, comment_lines
-from .metadata_filter import filter_metadata
+from .metadata_filter import filter_metadata, _DEFAULT_NOTEBOOK_METADATA
 from .pep8 import pep8_lines_between_cells
 
 SafeRepresenter.add_representer(nbformat.NotebookNode, SafeRepresenter.represent_dict)
@@ -18,14 +18,6 @@ _BLANK_RE = re.compile(r"^\s*$")
 _JUPYTER_RE = re.compile(r"^jupyter\s*:\s*$")
 _LEFTSPACE_RE = re.compile(r"^\s")
 _UTF8_HEADER = ' -*- coding: utf-8 -*-'
-
-_DEFAULT_NOTEBOOK_METADATA = ','.join([
-    # Preserve Jupytext section
-    'jupytext',
-    # Preserve kernel specs
-    'kernelspec',
-    # Kernel_info found in Nteract notebooks
-    'kernel_info'])
 
 # Change this to False in tests
 INSERT_AND_CHECK_VERSION_NUMBER = True
