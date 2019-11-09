@@ -2,6 +2,14 @@
 
 from .cell_metadata import _JUPYTEXT_CELL_METADATA
 
+_DEFAULT_NOTEBOOK_METADATA = ','.join([
+    # Preserve Jupytext section
+    'jupytext',
+    # Preserve kernel specs
+    'kernelspec',
+    # Kernel_info found in Nteract notebooks
+    'kernel_info'])
+
 
 def metadata_filter_as_dict(metadata_config):
     """Return the metadata filter represented as either None (no filter),
