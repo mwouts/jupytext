@@ -1,5 +1,5 @@
 import re
-from nbformat.v4.nbbase import new_markdown_cell, new_notebook
+from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from jupytext.compare import compare, compare_notebooks
 import jupytext
 from .utils import skip_if_dict_is_not_ordered
@@ -80,4 +80,22 @@ def test_two_markdown_cell_with_code_works(nb=new_notebook(cells=[
 ])):
     text = jupytext.writes(nb, 'Rmd')
     nb2 = jupytext.reads(text, 'Rmd')
+    compare_notebooks(nb2, nb)
+
+
+def test_tags_in_rmd(rmd='''---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.1'
+      jupytext_version: 1.2.3
+---
+
+```{python tags=c("parameters")}
+p = 1
+```
+''', nb=new_notebook(cells=[new_code_cell('p = 1', metadata={'tags': ['parameters']})])):
+    nb2 = jupytext.reads(rmd, 'Rmd')
     compare_notebooks(nb2, nb)

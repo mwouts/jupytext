@@ -276,8 +276,10 @@ class MarkdownCellReader(BaseCellReader):
         self.split_at_heading = (fmt or {}).get('split_at_heading', False)
         self.in_region = False
         self.in_raw = False
-        if self.format_version in ['1.0', '1.1']:
+        if self.format_version in ['1.0', '1.1'] and self.ext != '.Rmd':
+            # Restore the pattern used in Markdown <= 1.1
             self.start_code_re = re.compile(r"^```(.*)")
+            self.non_jupyter_code_re = re.compile(r"^```\{")
 
     def metadata_and_language_from_option_line(self, line):
         match_region = self.start_region_re.match(line)
