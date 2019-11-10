@@ -535,6 +535,10 @@ def test_update_metadata(py_file, tmpdir, capsys):
     assert 'invalid' in err
 
 
+def normpath(path):
+    return os.path.normpath(path).lower()
+
+
 @pytest.mark.parametrize('py_file', list_notebooks('python'))
 def test_set_kernel_inplace(py_file, tmpdir):
     tmp_py = str(tmpdir.join('notebook.py'))
@@ -545,7 +549,7 @@ def test_set_kernel_inplace(py_file, tmpdir):
 
     nb = read(tmp_py)
     kernel_name = nb.metadata['kernelspec']['name']
-    assert os.path.normpath(get_kernel_spec(kernel_name).argv[0]) in ['python', sys.executable]
+    assert normpath(get_kernel_spec(kernel_name).argv[0]) in ['python', normpath(sys.executable)]
 
 
 @pytest.mark.parametrize('py_file', list_notebooks('python'))
@@ -559,7 +563,7 @@ def test_set_kernel_auto(py_file, tmpdir):
 
     nb = read(tmp_ipynb)
     kernel_name = nb.metadata['kernelspec']['name']
-    assert os.path.normpath(get_kernel_spec(kernel_name).argv[0]) in ['python', sys.executable]
+    assert normpath(get_kernel_spec(kernel_name).argv[0]) in ['python', normpath(sys.executable)]
 
 
 @pytest.mark.parametrize('py_file', list_notebooks('python'))
