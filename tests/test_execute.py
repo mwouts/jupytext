@@ -121,3 +121,30 @@ def test_execute_r(tmpdir):  # pragma: no cover
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
     assert nb.cells[0].outputs[0]['data']['text/markdown'] == '6'
+
+
+@requires_nbconvert
+def test_execute_in_subfolder(tmpdir):
+    tmpdir.mkdir('subfolder')
+
+    tmp_csv = str(tmpdir.join('subfolder', 'inputs.csv'))
+    tmp_py = str(tmpdir.join('subfolder', 'notebook.py'))
+    tmp_ipynb = str(tmpdir.join('subfolder', 'notebook.ipynb'))
+
+    with open(tmp_csv, 'w') as fp:
+        fp.write("1\n2\n")
+
+    with open(tmp_py, 'w') as fp:
+        fp.write("""import ast
+
+with open('inputs.csv') as fp:
+    text = fp.read()
+
+sum(ast.literal_eval(line) for line in text.splitlines())
+""")
+
+    jupytext(args=[tmp_py, '--to', 'ipynb', '--execute'])
+
+    nb = read(tmp_ipynb)
+    assert len(nb.cells) == 3
+    assert nb.cells[2].outputs[0]['data'] == {'text/plain': '3'}
