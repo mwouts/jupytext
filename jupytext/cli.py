@@ -384,7 +384,13 @@ def jupytext_single_file(nb_file, args, log):
         kernel_name = notebook.metadata.get('kernelspec', {}).get('name')
         log("[jupytext] Executing notebook with kernel {}".format(kernel_name))
         exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
-        exec_proc.preprocess(notebook, resources={})
+        if nb_dest is not None and nb_dest != '-':
+            resources = {'metadata': {'path': str(os.path.dirname(nb_dest))}}
+        elif nb_file != '-':
+            resources = {'metadata': {'path': str(os.path.dirname(nb_file))}}
+        else:
+            resources = {}
+        exec_proc.preprocess(notebook, resources=resources)
 
     # III. ### Possible actions ###
     modified = args.update_metadata or args.pipe or args.execute
