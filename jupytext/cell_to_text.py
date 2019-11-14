@@ -41,9 +41,6 @@ class BaseCellExporter(object):
 
         if self.language:
             if magic_args:
-                if self.ext.endswith('.Rmd'):
-                    quote = '"' if "'" in magic_args else "'"
-                    magic_args = quote + magic_args + quote
                 self.metadata['magic_args'] = magic_args
 
             if not self.ext.endswith('.Rmd'):
