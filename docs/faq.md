@@ -63,6 +63,19 @@ Unless you want to version the outputs, you should version *only the text repres
 
 Note that if you version both the `.md` and `.ipynb` files, you can configure `git diff` to [ignore the diffs on the `.ipynb` files](https://github.com/mwouts/jupytext/issues/251).
 
+## I have modified a text file, but git reports no diff for the paired `.ipynb` file
+
+The synchronization between the two files happens when you reload and *save* the notebook in Jupyter, or when you explicitly run `jupytext --sync`. If you want to force the synchronization on every commit, create a file `.git\hooks\pre-commit` with the following content:
+
+```bash
+#!/bin/sh
+jupytext --sync --pre-commit
+```
+
+and make it executable: `chmod u+x .git\hooks\pre-commit`.
+
+Alternatively, VIM users can give a try to the [jupytext.vim](https://github.com/goerz/jupytext.vim) plugin.
+
 ## Jupyter warns me that the file has changed on disk
 
 By default, Jupyter saves your notebook every 2 minutes. Fortunately, it is also aware that you have edited the text file, yielding this message. 
