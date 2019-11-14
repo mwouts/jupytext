@@ -20,6 +20,7 @@
 - `jupytext notebook.py --to ipynb` updates the timestamp of `notebook.py` so that the paired notebook still works in Jupyter (#335, #254)
 - `jupytext --check pytest notebook.ipynb` can be used to run test functions in a notebook (#286)
 - `jupytext --check` and `jupytext --pipe` can run commands that only operate on files: when `{}` is found in the text of the command, `jupytext` saves the text representation of the notebook in a temp file, and replaces `{}` with the name of that file before executing the command. (#286)
+- Documented how to sync notebooks in a pre-commit hook (#338)
 - Added support for Rust/Evxcr, by Jonas Bushart (#351)
 - Added support for [Robot Framework](https://robots-from-jupyter.github.io/), by Asko Soukka (#378)
 - Added support for PowerShell (#349)
