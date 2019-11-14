@@ -103,6 +103,13 @@ def metadata_to_rmd_options(language, metadata, use_runtools=False):
             options += ' {}={},'.format(
                 opt_name, 'c({})'.format(
                     ', '.join(['"{}"'.format(str(v)) for v in opt_value])))
+        elif isinstance(opt_value, (str, unicode)):
+            if opt_value.startswith('#R_CODE#'):
+                options += ' {}={},'.format(opt_name, opt_value[8:])
+            elif '"' not in opt_value:
+                options += ' {}="{}",'.format(opt_name, opt_value)
+            else:
+                options += " {}='{}',".format(opt_name, opt_value)
         else:
             options += ' {}={},'.format(opt_name, str(opt_value))
     if not language:
@@ -267,13 +274,12 @@ def metadata_to_md_options(metadata):
 
 
 def try_eval_metadata(metadata, name):
-    """Evaluate given metadata to a python object, if possible"""
+    """Evaluate the metadata to a python object, if possible"""
     value = metadata[name]
     if not isinstance(value, (str, unicode)):
         return
     if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
-        if name in ['active', 'magic_args', 'language']:
-            metadata[name] = value[1:-1]
+        metadata[name] = value[1:-1]
         return
     if value.startswith('c(') and value.endswith(')'):
         value = '[' + value[2:-1] + ']'
@@ -282,6 +288,8 @@ def try_eval_metadata(metadata, name):
     try:
         metadata[name] = ast.literal_eval(value)
     except (SyntaxError, ValueError):
+        if name != 'name':
+            metadata[name] = '#R_CODE#' + value
         return
 
 

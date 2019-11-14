@@ -36,6 +36,7 @@
 - Markdown cells that contain code are now preserved in a round trip through the Markdown and R Markdown formats (#361)
 - Code cells with a `%%python3` cell magic are now preserved in a round trip through the Markdown format (#365)
 - `jupytext --execute` runs the notebook in its folder (#382)
+- Strings in the metadata of code cells are quoted in the Rmd representation. And we escape R code in chunk options with `#R_CODE#` (#383)
 
 1.2.4 (2019-09-19)
 ------------------

@@ -49,6 +49,6 @@ This is a markdown cell with cell metadata `{"key": "value"}`
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
 ```
 
-```{python key=value, active="", eval=FALSE}
+```{python key="value", active="", eval=FALSE}
 This is a raw cell with cell metadata `{"key": "value"}`
 ```

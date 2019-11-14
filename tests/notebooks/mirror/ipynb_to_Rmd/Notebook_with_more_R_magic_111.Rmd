@@ -20,7 +20,7 @@ df = pd.DataFrame(
 )
 ```
 
-```{r magic_args='-i df'}
+```{r magic_args="-i df"}
 library("ggplot2")
 ggplot(data = df) + geom_point(aes(x = X, y = Y, color = Letter, size = Z))
 ```

@@ -24,7 +24,7 @@ y = np.abs(x)-.5
 ls()
 ```
 
-```{r, results='asis', magic_args='-i x'}
+```{r, results="asis", magic_args="-i x"}
 cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 ```
 """):
@@ -49,7 +49,7 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
                         'source': '%%R\nls()',
                         'outputs': []},
                        {'cell_type': 'code',
-                        'metadata': {'results': "'asis'"},
+                        'metadata': {'results': 'asis'},
                         'execution_count': None,
                         'source': "%%R -i x\ncat(stringi::"
                                   "stri_rand_lipsum(3), sep='\n\n')",
@@ -99,3 +99,23 @@ p = 1
 ''', nb=new_notebook(cells=[new_code_cell('p = 1', metadata={'tags': ['parameters']})])):
     nb2 = jupytext.reads(rmd, 'Rmd')
     compare_notebooks(nb2, nb)
+
+
+def round_trip_cell_metadata(cell_metadata):
+    nb = new_notebook(metadata={'jupytext': {'main_language': 'python'}},
+                      cells=[new_code_cell('1 + 1', metadata=cell_metadata)])
+    text = jupytext.writes(nb, 'Rmd')
+    nb2 = jupytext.reads(text, 'Rmd')
+    compare_notebooks(nb2, nb)
+
+
+def test_comma_in_metadata(cell_metadata={'a': 'b, c'}):
+    round_trip_cell_metadata(cell_metadata)
+
+
+def test_dict_in_metadata(cell_metadata={'a': {'b': 'c'}}):
+    round_trip_cell_metadata(cell_metadata)
+
+
+def test_list_in_metadata(cell_metadata={'d': ['e']}):
+    round_trip_cell_metadata(cell_metadata)
