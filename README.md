@@ -1,4 +1,6 @@
-# Jupyter notebooks as Markdown documents, Julia, Python or R scripts
+![](docs/jupytext_word_cloud.png)
+
+# Jupyter Notebooks as Text
 
 [![Build Status](https://travis-ci.com/mwouts/jupytext.svg?branch=master)](https://travis-ci.com/mwouts/jupytext)
 [![Documentation Status](https://readthedocs.org/projects/jupytext/badge/?version=latest)](https://jupytext.readthedocs.io/en/latest/?badge=latest)
@@ -14,8 +16,6 @@ Jupytext can save Jupyter notebooks as
 It can also convert these documents **into** Jupyter
 Notebooks, allowing you to synchronize content in both
 directions.
-
-![](docs/jupytext_word_cloud.png)
 
 The languages that are currently supported by Jupytext are: Julia, Python, R, Bash, Scheme, Clojure, Matlab, Octave, C++, q/kdb+, IDL, TypeScript, Javascript, Scala, Rust/Evxcr, PowerShell and Robot Framework. Extending Jupytext to more languages should be easy - read more at [CONTRIBUTING.md](https://github.com/mwouts/jupytext/blob/master/CONTRIBUTING.md). In addition, jupytext users can choose between two formats for notebooks as scripts:
 - The `percent` format, compatible with several IDEs, including Spyder, Hydrogen, VScode and PyCharm. In that format, cells are delimited with a commented `%%`.
