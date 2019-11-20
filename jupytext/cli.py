@@ -473,7 +473,8 @@ def jupytext_single_file(nb_file, args, log):
                 write(notebook, alt_path, fmt=alt_fmt)
                 if args.pre_commit:
                     system('git', 'add', alt_path)
-    elif os.path.isfile(nb_file) and nb_dest.endswith('.ipynb') and not nb_file.endswith('.ipynb'):
+    elif os.path.isfile(nb_file) and nb_dest.endswith('.ipynb') and not nb_file.endswith('.ipynb') and \
+            notebook.metadata.get('jupytext', {}).get('formats') is not None:
         # Update the original text file timestamp, as required by our Content Manager
         # Otherwise Jupyter will refuse to open the paired notebook #335
         log("[jupytext] Sync timestamp of '{}'".format(nb_file))

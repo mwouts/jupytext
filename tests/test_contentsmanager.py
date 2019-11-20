@@ -437,12 +437,12 @@ def test_reload_notebook_after_jupytext_cli(nb_file, tmpdir):
     tmp_nbpy = str(tmpdir.join('notebook.py'))
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = 'py,ipynb'
     cm.outdated_text_notebook_margin = 0
     cm.root_dir = str(tmpdir)
 
     # write the paired notebook
     nb = jupytext.read(nb_file)
+    nb.metadata.setdefault('jupytext', {})['formats'] = 'py,ipynb'
     cm.save(model=dict(type='notebook', content=nb), path='notebook.py')
 
     assert os.path.isfile(tmp_ipynb)
