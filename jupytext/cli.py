@@ -56,7 +56,7 @@ def parse_jupytext_args(args=None):
         """Keep the raw formatting in command line help, plus show the default values"""
 
     parser = argparse.ArgumentParser(
-        description='Jupyter notebooks as markdown documents, Julia, Python or R scripts',
+        description='Jupyter Notebooks as Markdown Documents, Julia, Python or R Scripts',
         formatter_class=RawTextArgumentDefaultsHelpFormatter)
 
     # Input

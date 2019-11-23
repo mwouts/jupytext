@@ -1,4 +1,4 @@
-# Jupyter notebooks as Markdown documents, Julia, Python or R scripts
+# Jupyter Notebooks as Markdown Documents, Julia, Python or R Scripts
 
 ![](jupytext_word_cloud.png)
 
