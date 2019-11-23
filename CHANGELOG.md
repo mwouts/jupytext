@@ -1,5 +1,7 @@
-1.3.0 (Unreleased)
+1.3.0 (2019-11-23)
 ------------------
+
+See also [What's new in Jupytext 1.3?](https://gist.github.com/mwouts/724efe5e00654fc2145a4c916796e071).
 
 **Added**
 
