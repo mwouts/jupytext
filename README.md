@@ -1,4 +1,4 @@
-![](docs/jupytext_word_cloud.png)
+![](https://raw.githubusercontent.com/mwouts/jupytext/master/docs/jupytext_word_cloud.png)
 
 [![Build Status](https://travis-ci.com/mwouts/jupytext.svg?branch=master)](https://travis-ci.com/mwouts/jupytext)
 [![Documentation Status](https://readthedocs.org/projects/jupytext/badge/?version=latest)](https://jupytext.readthedocs.io/en/latest/?badge=latest)
