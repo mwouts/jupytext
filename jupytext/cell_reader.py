@@ -12,7 +12,7 @@ except (ImportError, SyntaxError):
     rst2md = None
 
 from .cell_metadata import is_active, text_to_metadata, is_json_metadata, rmd_options_to_metadata
-from .languages import _JUPYTER_LANGUAGES
+from .languages import _JUPYTER_LANGUAGES_LOWER_AND_UPPER
 from .stringparser import StringParser
 from .magics import uncomment_magic, is_magic, unescape_code_start, need_explicit_marker
 from .pep8 import pep8_lines_between_cells
@@ -263,8 +263,8 @@ class BaseCellReader(object):
 class MarkdownCellReader(BaseCellReader):
     """Read notebook cells from Markdown documents"""
     comment = ''
-    start_code_re = re.compile(r"^```({})($|\s(.*)$)".format('|'.join(
-        _JUPYTER_LANGUAGES.union({str.upper(lang) for lang in _JUPYTER_LANGUAGES})).replace('+', '\\+')))
+    start_code_re = re.compile(r"^```({})($|\s(.*)$)".format(
+        '|'.join(_JUPYTER_LANGUAGES_LOWER_AND_UPPER).replace('+', '\\+')))
     non_jupyter_code_re = re.compile(r"^```")
     end_code_re = re.compile(r"^```\s*$")
     start_region_re = re.compile(r"^<!--\s*#(region|markdown|md|raw)(.*)-->\s*$")
