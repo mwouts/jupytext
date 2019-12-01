@@ -31,6 +31,7 @@ _COMMENT_CHARS = [_SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIO
 
 _COMMENT = {_SCRIPT_EXTENSIONS[ext]['language']: _SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS}
 _JUPYTER_LANGUAGES = set(_JUPYTER_LANGUAGES).union(_COMMENT.keys())
+_JUPYTER_LANGUAGES_LOWER_AND_UPPER = _JUPYTER_LANGUAGES.union({str.upper(lang) for lang in _JUPYTER_LANGUAGES})
 
 
 def default_language_from_metadata_and_ext(metadata, ext):
