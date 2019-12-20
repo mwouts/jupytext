@@ -195,14 +195,14 @@ that uses multiline comments
 """
 ```
 
-By default Jupytext will use line comments when it converts your Jupyter notebooks for `percent` scripts. If you prefer to use multiline comments for all text cells, add a `{"jupytext": '{"cell_markers": "\\"\\"\\""}'}` metadata to your notebook, either with the notebook metadata editor in Jupyter, or at the command line:
+By default Jupytext will use line comments when it converts your Jupyter notebooks for `percent` scripts. If you prefer to use multiline comments for all text cells, add a `{"jupytext": '{"cell_markers": "\"\"\",\"\"\""}'}` metadata to your notebook, either with the notebook metadata editor in Jupyter, or at the command line:
 ```bash
-jupytext --update-metadata '{"jupytext": {"cell_markers": "\\"\\"\\""}}' notebook.ipynb --to py:percent
+jupytext --update-metadata '{"jupytext": {"cell_markers": "\"\"\",\"\"\""}}' notebook.ipynb --to py:percent
 ```
 
 If you want to use multiline comments for all your paired notebooks, you could also add
 ```python
-c.ContentsManager.default_cell_markers = '"""'
+c.ContentsManager.default_cell_markers = '""","""'
 ```
 to your `.jupyter/jupyter_notebook_config.py` file.
 
