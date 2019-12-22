@@ -1,0 +1,21 @@
+name: jupytext-dev
+channels:
+  - default
+  - conda-forge
+dependencies:
+  - python==3.7
+  - jupyter
+  - pyyaml
+  - nbconvert
+  - jupyter_contrib_nbextensions
+  - pytest
+  - pytest-xdist
+  - pylint
+  - flake8
+  - black
+  - autopep8
+  - sphinx-gallery
+  - nodejs
+  - pip
+  - setuptools
+  - pandoc
