@@ -389,3 +389,20 @@ def test_default_cell_markers_in_contents_manager_does_not_impact_light_format(t
 
     nb2 = jupytext.read(tmp_py)
     compare_notebooks(nb, nb2)
+
+
+def test_single_triple_quote_works(no_jupytext_version_number, text=
+'''# ---
+# jupyter:
+#   jupytext:
+#     cell_markers: '"""'
+#     formats: ipynb,py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+# ---
+
+# %%
+print("hello")
+''', notebook=new_notebook(cells=[new_code_cell('print("hello")')])):
+    compare_notebooks(jupytext.reads(text, 'py'), notebook)

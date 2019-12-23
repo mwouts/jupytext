@@ -509,7 +509,7 @@ class LightScriptCellReader(ScriptCellReader):
         self.comment = script['comment']
         self.ignore_end_marker = True
         self.explicit_end_marker_required = False
-        if fmt and 'cell_markers' in fmt and fmt['cell_markers'] != '+,-':
+        if fmt and fmt.get('format_name', 'light') == 'light' and 'cell_markers' in fmt and fmt['cell_markers'] != '+,-':
             self.cell_marker_start, self.cell_marker_end = fmt['cell_markers'].split(',', 1)
             self.start_code_re = re.compile('^' + self.comment + r'\s*' + self.cell_marker_start + r'(.*)$')
             self.end_code_re = re.compile('^' + self.comment + r'\s*' + self.cell_marker_end + r'\s*$')
