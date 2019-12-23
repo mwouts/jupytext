@@ -1,3 +1,10 @@
+1.3.1 (2019-12-??)
+------------------
+
+**Fixed**
+- Multiline strings are now accepted in the YAML header (#404). Fix contributed by ZHUO Qiang (#405).
+
+
 1.3.0 (2019-11-23)
 ------------------
 
