@@ -391,8 +391,7 @@ def test_default_cell_markers_in_contents_manager_does_not_impact_light_format(t
     compare_notebooks(nb, nb2)
 
 
-def test_single_triple_quote_works(no_jupytext_version_number, text=
-'''# ---
+def test_single_triple_quote_works(no_jupytext_version_number, text='''# ---
 # jupyter:
 #   jupytext:
 #     cell_markers: '"""'
