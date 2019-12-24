@@ -1068,3 +1068,15 @@ def test_339_require_to(tmpdir):
 
     with pytest.raises(ValueError, match='--to'):
         jupytext([tmp_py, '--test-strict'])
+
+
+def test_399_to_script_then_set_formats(tmpdir):
+    nb = new_notebook(cells=[new_code_cell('1 + 1')])
+    tmp_py = str(tmpdir.join('notebook_first.py'))
+    tmp_ipynb = str(tmpdir.join('notebook_first.ipynb'))
+    nbformat.write(nb, tmp_ipynb)
+
+    jupytext(['--to', 'py:percent', tmp_ipynb])
+    assert os.path.isfile(tmp_py)
+
+    jupytext(['--set-formats', 'ipynb,py:percent', tmp_ipynb])

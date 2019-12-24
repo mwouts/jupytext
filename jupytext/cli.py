@@ -243,7 +243,7 @@ def jupytext(args=None):
             and not args.pipe and not args.check \
             and not args.update_metadata and not args.set_kernel \
             and not args.execute:
-        raise ValueError('Please provide one of --to, --output, --sync, --pipe, '
+        raise ValueError('Please provide one of --to, --output, --set-formats, --sync, --pipe, '
                          '--check, --update_metadata, --set-kernel or --execute')
 
     if args.output and len(args.notebooks) != 1:
@@ -360,8 +360,8 @@ def jupytext_single_file(nb_file, args, log):
         if 'kernelspec' in args.update_metadata and 'main_language' in notebook.metadata.get('jupytext', {}):
             notebook.metadata['jupytext'].pop('main_language')
 
-    # Read paired notebooks
-    if args.sync:
+    # Read paired notebooks, except if the pair is being created
+    if args.sync and args.set_formats is None:
         set_prefix_and_suffix(fmt, notebook, nb_file)
         try:
             notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
