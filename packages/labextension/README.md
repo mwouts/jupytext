@@ -27,11 +27,7 @@ jupyter labextension install jupyterlab-jupytext@0.19
 
 # How to develop this extension
 
-We assume that you have activated the conda environment described in [CONTRIBUTING.md](https://github.com/mwouts/jupytext/blob/master/CONTRIBUTING.md). In addition to that environment, you will need `npm`. Install it with 
-
-```bash
-conda install nodejs
-```
+We assume that you have activated the conda environment described in [CONTRIBUTING.md](https://github.com/mwouts/jupytext/blob/master/CONTRIBUTING.md).
 
 In that environment, install JupyterLab's plugin manager, and the extension with
 ```bash
