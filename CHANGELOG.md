@@ -1,6 +1,9 @@
 1.3.1 (2019-12-??)
 ------------------
 
+**Changed**
+- The `normarker` format replaces the one previously named `bare`.
+
 **Fixed**
 - Multiline strings are now accepted in the YAML header (#404). Fix contributed by ZHUO Qiang (#405).
 - Fixed the instructions on how to use multiline comments for all Markdown cells in the py:percent format, by ZHUO Qiang  (#403).

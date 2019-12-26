@@ -66,7 +66,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
                     cell.outputs = ocell.outputs
 
                     # Append cell metadata that was filtered
-                    if format_name in ['bare', 'sphinx'] or source_is_md_version_one:
+                    if format_name in ['nomarker', 'sphinx'] or source_is_md_version_one:
                         ocell_filtered_metadata = {}
                     else:
                         ocell_filtered_metadata = copy(ocell.metadata)
@@ -83,7 +83,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
         else:
             for i, ocell in enumerate(output_other_cells):
                 if cell.cell_type == ocell.cell_type and same_content(cell.source, ocell.source):
-                    if format_name in ['spin', 'bare', 'sphinx'] or source_is_md_version_one:
+                    if format_name in ['spin', 'nomarker', 'sphinx'] or source_is_md_version_one:
                         ocell_filtered_metadata = {}
                     else:
                         ocell_filtered_metadata = copy(ocell.metadata)
