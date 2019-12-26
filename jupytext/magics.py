@@ -26,7 +26,7 @@ _PYTHON_HELP_OR_BASH_CMD = re.compile(r"^(# |#)*(\?|!)\s*[A-Za-z]")
 # A bash command not followed by an equal sign or a parenthesis is a magic command
 _PYTHON_MAGIC_CMD = re.compile(r"^(# |#)*({})($|\s$|\s[^=,])".format('|'.join(
     # posix
-    ['cat', 'cp', 'mv', 'rm', 'rmdir', 'mkdir'] +
+    ['cat', 'cd', 'cp', 'mv', 'rm', 'rmdir', 'mkdir'] +
     # windows
     ['copy', 'ddir', 'echo', 'ls', 'ldir', 'mkdir', 'ren', 'rmdir'])))
 # Python help commands end with ?
