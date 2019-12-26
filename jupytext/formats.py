@@ -6,6 +6,7 @@ new formats here!
 import os
 import re
 import nbformat
+import warnings
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import MarkdownCellReader, RMarkdownCellReader, \
     LightScriptCellReader, RScriptCellReader, DoublePercentScriptCellReader, HydrogenCellReader, \
@@ -100,7 +101,7 @@ JUPYTEXT_FORMATS = \
             min_readable_version_number='1.1') for ext in _SCRIPT_EXTENSIONS] + \
     [
         NotebookFormatDescription(
-            format_name='bare',
+            format_name='nomarker',
             extension=ext,
             header_prefix=_SCRIPT_EXTENSIONS[ext]['comment'],
             cell_reader_class=LightScriptCellReader,
@@ -462,6 +463,11 @@ def long_form_one_format(jupytext_format, metadata=None, update=None, auto_ext_r
 
     if jupytext_format.rfind(':') >= 0:
         ext, fmt['format_name'] = jupytext_format.rsplit(':', 1)
+        if fmt['format_name'] == 'bare':
+            warnings.warn(
+                "The `bare` format has been renamed to `nomarker` - (see https://github.com/mwouts/jupytext/issues/397)",
+                DeprecationWarning)
+            fmt['format_name'] = 'nomarker'
     else:
         ext = jupytext_format
 
