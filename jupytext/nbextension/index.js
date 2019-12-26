@@ -66,7 +66,7 @@ define([
             $('#jupytext_pair_' + fmt.replace(':', '_') + ' > .fa').toggleClass('fa-check', true);
 
             // any custom format?
-            if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'md', 'Rmd'].indexOf(fmt)==-1)
+            if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'auto:nomarker', 'md', 'Rmd'].indexOf(fmt)==-1)
                 $('#jupytext_pair_custom' + ' > .fa').toggleClass('fa-check', true);
         }
 
@@ -294,6 +294,7 @@ define([
             JupytextActions.append(jupytext_pair('auto:light', 'Pair Notebook with light Script'));
             JupytextActions.append(jupytext_pair('auto:percent', 'Pair Notebook with percent Script'));
             JupytextActions.append(jupytext_pair('auto:hydrogen', 'Pair Notebook with Hydrogen Script'));
+            JupytextActions.append(jupytext_pair('auto:nomarker', 'Pair Notebook with nomarker Script'));
             JupytextActions.append(jupytext_pair('md', 'Pair Notebook with Markdown', notebook_extension!=='md'));
             JupytextActions.append(jupytext_pair('Rmd', 'Pair Notebook with R Markdown', notebook_extension!=='Rmd'));
             JupytextActions.append(jupytext_pair('custom', 'Custom pairing'));
