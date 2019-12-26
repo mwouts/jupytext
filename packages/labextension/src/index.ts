@@ -36,6 +36,10 @@ const JUPYTEXT_FORMATS = [
     label: "Pair Notebook with Hydrogen Script"
   },
   {
+    format: "auto:nomarker",
+    label: "Pair Notebook with nomarker Script"
+  },
+  {
     format: "md",
     label: "Pair Notebook with Markdown"
   },
@@ -141,7 +145,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           if (format == "custom"){
               for (const i in jupytext_formats) {
                   const fmt = jupytext_formats[i];
-                  if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'md', 'Rmd'].indexOf(fmt)==-1)
+                  if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'auto:nomarker', 'md', 'Rmd'].indexOf(fmt)==-1)
                       return true;
               }
               return false;

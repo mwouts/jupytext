@@ -5,6 +5,7 @@ channels:
 dependencies:
   - python==3.7
   - jupyter
+  - jupyterlab
   - pyyaml
   - nbconvert
   - jupyter_contrib_nbextensions
@@ -15,7 +16,8 @@ dependencies:
   - black
   - autopep8
   - sphinx-gallery
-  - nodejs
+  - nodejs<13
+  - yarn
   - pip
   - setuptools
   - pandoc

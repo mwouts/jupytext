@@ -1,3 +1,7 @@
+# 1.1.1 (2019-12-26)
+
+- The `nomarker` format is available through the Jupytext commands (requires `jupytext>=1.3.1`).
+
 # 1.1.0 (2019-11-03)
 
 - Multiple pairings are supported (#290)
