@@ -1,6 +1,9 @@
 1.3.1 (2019-12-??)
 ------------------
 
+**Added**
+- New `nomarker` format in the Jupyter Notebook and JupyterLab extensions (#397)
+
 **Changed**
 - The `normarker` format replaces the one previously named `bare`.
 
