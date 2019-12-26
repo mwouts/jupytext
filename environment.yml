@@ -20,4 +20,5 @@ dependencies:
   - yarn
   - pip
   - setuptools
+  - twine
   - pandoc
