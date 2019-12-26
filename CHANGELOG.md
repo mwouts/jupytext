@@ -4,7 +4,7 @@
 **Fixed**
 - Multiline strings are now accepted in the YAML header (#404). Fix contributed by ZHUO Qiang (#405).
 - Fixed the instructions on how to use multiline comments for all Markdown cells in the py:percent format, by ZHUO Qiang  (#403).
-
+- Do not read paired files when `--set-formats` is being used (fixes #399).
 
 1.3.0 (2019-11-23)
 ------------------
