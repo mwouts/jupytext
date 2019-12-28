@@ -501,6 +501,7 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
 
 @requires_black
 @requires_flake8
+@requires_jupytext_installed
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[:1])
 def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
