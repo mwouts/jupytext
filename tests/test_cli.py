@@ -145,7 +145,7 @@ def test_error_not_notebook_ext_input(tmpdir, capsys):
     with open(tmp_file, 'w') as fp:
         fp.write('\n')
 
-    with pytest.raises(JupytextFormatError, match="Extension '.ext' is not a notebook extension. Please use one of"):
+    with pytest.raises(InconsistentPath, match="is not a notebook. Supported extensions are"):
         jupytext([tmp_file, '--to', 'py'])
 
 
@@ -429,6 +429,13 @@ def test_sync_with_pre_commit_hook(tmpdir):
 
     nb = read(tmp_ipynb)
     compare(nb.cells, [new_markdown_cell('Notebook was edited')])
+
+    # create and commit a jpg file
+    tmp_jpg = str(tmpdir.join('image.jpg'))
+    with open(tmp_jpg, 'wb') as fp:
+        fp.write(b'')
+    git('add', 'image.jpg')
+    git('commit', '-m', 'added image')
 
 
 @requires_jupytext_installed
