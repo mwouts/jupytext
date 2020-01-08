@@ -3,6 +3,7 @@
 import os
 from .formats import long_form_one_format, long_form_multiple_formats
 from .formats import short_form_one_format, short_form_multiple_formats
+from .formats import NOTEBOOK_EXTENSIONS
 
 
 class InconsistentPath(ValueError):
@@ -13,7 +14,11 @@ class InconsistentPath(ValueError):
 def base_path(main_path, fmt):
     """Given a path and options for a format (ext, suffix, prefix), return the corresponding base path"""
     if not fmt:
-        return os.path.splitext(main_path)[0]
+        base, ext = os.path.splitext(main_path)
+        if ext not in NOTEBOOK_EXTENSIONS:
+            raise InconsistentPath("'{}' is not a notebook. Supported extensions are '{}'.".format(
+                main_path, "', '".join(NOTEBOOK_EXTENSIONS)))
+        return base
 
     fmt = long_form_one_format(fmt)
     fmt_ext = fmt['extension']
