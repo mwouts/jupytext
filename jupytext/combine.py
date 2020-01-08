@@ -32,6 +32,12 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     output_code_cells = [cell for cell in nb_outputs.cells if cell.cell_type == 'code']
     output_other_cells = [cell for cell in nb_outputs.cells if cell.cell_type != 'code']
 
+    # nbformat version number taken from the notebook with outputs
+    assert nb_outputs.nbformat == nb_source.nbformat, \
+        "The notebook with outputs is in format {}.{}, please upgrade it to {}.x".format(
+            nb_outputs.nbformat, nb_outputs.nbformat_minor, nb_source.nbformat)
+    nb_source.nbformat_minor = nb_outputs.nbformat_minor
+
     fmt = long_form_one_format(fmt)
     text_repr = nb_source.metadata.get('jupytext', {}).get('text_representation', {})
     ext = fmt.get('extension') or text_repr.get('extension')

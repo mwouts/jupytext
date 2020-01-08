@@ -1,3 +1,10 @@
+1.3.2 (2020-01-08)
+------------------
+
+**Fixed**
+- The `--pre-commit` mode now ignores non-notebook files in the index (#338).
+- `nbformat_minor` is taken from the notebook with outputs When inputs and outputs are merged.
+
 1.3.1 (2019-12-26)
 ------------------
 
