@@ -40,6 +40,14 @@ No, you don't (*). You can edit the paired text file and simply refresh your nav
 
 The `.ipynb` file contains the full notebook. The paired text file only contains the input cells and selected metadata. When the notebook is loaded by Jupyter, input cells are loaded from the text file, while the output cells and the filtered metadata are restored using the `.ipynb` file. When the notebook is saved in Jupyter, the two files are updated to match the current content of the notebook.
 
+## How do I remove pairing?
+
+Paired Jupyter Notebooks contains specific `jupytext` metadata that you may want to remove. You may want to keep the pairing only while editing the files, and when it comes the time to distribute them, it may make sense to remove the pairing. To do so, you can update the metadata in the `.ipynb` files as follows:
+
+~~~
+jupytext --update-metadata '{"jupytext": null}' path/to/notebooks/*.ipynb
+~~~
+
 ## Can I create a notebook from a text file?
 
 Certainly. Open your pre-existing scripts or Markdown files as notebooks with a click in Jupyter Notebook, and with the _Open as Notebook_ menu in JupyterLab.
