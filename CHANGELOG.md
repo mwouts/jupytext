@@ -1,3 +1,9 @@
+1.3.3 (2020-01-??)
+------------------
+
+**Fixed**
+- Code cells in the Markdown format can contain triple backticks inside multiline strings (#419) 
+
 1.3.2 (2020-01-08)
 ------------------
 
