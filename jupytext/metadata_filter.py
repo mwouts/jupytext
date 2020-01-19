@@ -106,9 +106,8 @@ def update_metadata_filters(metadata, jupyter_md, cell_metadata):
             metadata.setdefault('jupytext', {})['notebook_metadata_filter'] = ','.join(nb_md_filter)
 
 
-def apply_metadata_filters(user_filter, default_filter, actual_keys):
-    """Apply the filter and replace 'all' with the actual or filtered keys"""
-
+def filter_metadata(metadata, user_filter, default_filter):
+    """Filter the cell or notebook metadata, according to the user preference"""
     default_filter = metadata_filter_as_dict(default_filter) or {}
     user_filter = metadata_filter_as_dict(user_filter) or {}
 
@@ -124,28 +123,29 @@ def apply_metadata_filters(user_filter, default_filter, actual_keys):
     # notebook default filter = only few metadata
     if default_filter.get('additional'):
         if user_filter.get('additional') == 'all':
-            return actual_keys.difference(user_filter.get('excluded'))
-
-        return (actual_keys
-                .intersection(set(user_filter.get('additional')).union(default_filter.get('additional')))
-                .difference(user_filter.get('excluded')))
+            return subset_metadata(metadata, exclude=user_filter.get('excluded'))
+        return subset_metadata(metadata,
+                               keep_only=set(user_filter.get('additional')).union(default_filter.get('additional')),
+                               exclude=user_filter.get('excluded'))
 
     # cell default filter = all metadata but removed ones
     if user_filter.get('excluded') == 'all':
-        return actual_keys.intersection(user_filter.get('additional'))
+        return subset_metadata(metadata, keep_only=user_filter.get('additional'))
 
-    return (actual_keys.difference(
-        set(user_filter.get('excluded')).union(set(default_filter.get('excluded'))
-                                               .difference(user_filter.get('additional')))))
+    return subset_metadata(metadata, exclude=set(user_filter.get('excluded'))
+                           .union(set(default_filter.get('excluded')).difference(user_filter.get('additional'))))
 
 
-def filter_metadata(metadata, user_filter, default_filter):
-    """Filter the cell or notebook metadata, according to the user preference"""
-    actual_keys = set(metadata.keys())
-    keep_keys = apply_metadata_filters(user_filter, default_filter, actual_keys)
+def subset_metadata(metadata, keep_only=None, exclude=None):
+    """Filter the metadata by reference, according to keep_only and then to exclude"""
+    if keep_only is not None:
+        for key in set(metadata.keys()):
+            if key not in keep_only:
+                metadata.pop(key)
 
-    for key in actual_keys:
-        if key not in keep_keys:
-            metadata.pop(key)
+    if exclude is not None:
+        for key in exclude:
+            if key in set(metadata.keys()):
+                metadata.pop(key)
 
     return metadata
