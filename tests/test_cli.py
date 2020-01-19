@@ -275,6 +275,32 @@ def test_ipynb_to_py_then_update_test(nb_file, tmpdir):
     jupytext(['--test', '--update', '--to', 'ipynb', tmp_nbpy])
 
 
+def test_test_to_ipynb_ignore_version_number_414(tmpdir, text="""# ---
+# jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.4'
+#       jupytext_version: 1.1.0
+#   kernelspec:
+#     display_name: Python 3
+#     language: python
+#     name: python3
+# ---
+
+# A short markdown cell
+
+# Followed by a code cell
+2 + 2
+"""):
+    tmp_py = str(tmpdir.join('script.py'))
+    with open(tmp_py, 'w') as fp:
+        fp.write(text)
+
+    assert jupytext(['--test', '--to', 'ipynb', tmp_py]) == 0
+
+
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
 def test_convert_to_percent_format(nb_file, tmpdir):
     tmp_ipynb = str(tmpdir.join('notebook.ipynb'))

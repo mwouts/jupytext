@@ -2,7 +2,8 @@
 ------------------
 
 **Fixed**
-- Code cells in the Markdown format can contain triple backticks inside multiline strings (#419) 
+- Code cells in the Markdown format can contain triple backticks inside multiline strings (#419)
+- Changes in the YAML header when running `jupytext --test` on text files are ignored (#414).
 
 1.3.2 (2020-01-08)
 ------------------

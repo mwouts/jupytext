@@ -12,6 +12,7 @@ from tempfile import NamedTemporaryFile
 from .jupytext import read, reads, write, writes
 from .formats import _VALID_FORMAT_OPTIONS, _BINARY_FORMAT_OPTIONS, check_file_version
 from .formats import long_form_one_format, long_form_multiple_formats, short_form_one_format, check_auto_ext
+from .languages import _SCRIPT_EXTENSIONS
 from .header import recursive_update
 from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
 from .combine import combine_inputs_with_outputs
@@ -415,7 +416,19 @@ def jupytext_single_file(nb_file, args, log):
                     notebook = reads(dest_text, fmt=dest_fmt)
 
                 text = writes(notebook, fmt=fmt)
-                compare(text, org_text)
+
+                if args.test_strict:
+                    compare(text, org_text)
+                else:
+                    # we ignore the YAML header in the comparison #414
+                    comment = _SCRIPT_EXTENSIONS.get(fmt['extension'], {}).get('comment', '')
+                    # white spaces between the comment char and the YAML delimiters are allowed
+                    if comment:
+                        comment = comment + r'\s*'
+                    yaml_header = re.compile(r'^{}---\s*\n.*\n{}---\s*\n'.format(comment, comment),
+                                             re.MULTILINE | re.DOTALL)
+                    compare(re.sub(yaml_header, '', text),
+                            re.sub(yaml_header, '', org_text))
 
         except (NotebookDifference, AssertionError) as err:
             sys.stdout.write('{}: {}'.format(nb_file, str(err)))
