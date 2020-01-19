@@ -377,10 +377,17 @@ class MarkdownCellReader(BaseCellReader):
                     prev_blank = 0
         else:
             self.cell_type = 'code'
+            parser = StringParser(self.language or self.default_language)
             for i, line in enumerate(lines):
                 # skip cell header
                 if i == 0:
                     continue
+
+                if parser.is_quoted():
+                    parser.read_line(line)
+                    continue
+
+                parser.read_line(line)
                 if self.end_code_re.match(line):
                     return i, i + 1, True
 
