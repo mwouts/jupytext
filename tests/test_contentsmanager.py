@@ -1596,3 +1596,32 @@ def test_multiple_pairing(tmpdir):
     # so that we read cell inputs from the py file
     assert model_ipynb['last_modified'] < model_py['last_modified']
     assert model_py['last_modified'] < model_md['last_modified']
+
+
+@skip_if_dict_is_not_ordered
+@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py'))
+def test_filter_jupytext_version_information_416(nb_file, tmpdir):
+    tmp_py = str(tmpdir.join('notebook.py'))
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.default_notebook_metadata_filter = "-jupytext.text_representation.jupytext_version"
+
+    # load notebook
+    notebook = jupytext.read(nb_file)
+    notebook.metadata['jupytext_formats'] = 'ipynb,py'
+    model = dict(type='notebook', content=notebook)
+
+    # save to ipynb and py
+    cm.save(model=model, path='notebook.ipynb')
+
+    assert os.path.isfile(tmp_py)
+
+    # read py file
+    with open(tmp_py) as fp:
+        text = fp.read()
+
+    assert '---' in text
+    assert 'jupytext:' in text
+    assert 'kernelspec:' in text
+    assert 'jupytext_version:' not in text

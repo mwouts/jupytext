@@ -27,7 +27,7 @@ If you want to pair a notebook to a python script in a subfolder named `scripts`
 
 Jupytext accepts a few additional options. These options should be added to the `"jupytext"` section in the metadata &mdash; use either the metadata editor or the `--opt/--format-options` argument on the command line.
 - `comment_magics`: By default, Jupyter magics are commented when notebooks are exported to any other format than markdown. If you prefer otherwise, use this boolean option, or is global counterpart (see below).
-- `notebook_metadata_filter`: By default, Jupytext only exports the `kernelspec` and `jupytext` metadata to the text files. Set `"jupytext": {"notebook_metadata_filter": "-all"}` if you want that the script has no notebook metadata at all. The value for `notebook_metadata_filter` is a comma separated list of additional/excluded (negated) entries, with `all` a keyword that allows to exclude all entries.
+- `notebook_metadata_filter`: By default, Jupytext only exports the `kernelspec` and `jupytext` metadata to the text files. Set `"jupytext": {"notebook_metadata_filter": "-all"}` if you want that the script has no notebook metadata at all. The value for `notebook_metadata_filter` is a comma separated list of additional/excluded (negated) entries, with `all` a keyword that allows to exclude all entries. Use dots to filter recursively the metadata. For instance, use `notebook_metadata_filter="-jupytext.text_representation.jupytext_version"` to remove the `jupytext_version` field in the `jupytext.text_representation` metadata.
 - `cell_metadata_filter`: By default, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. Add or exclude more cell metadata with this option.
 
 ## Global configuration
@@ -68,6 +68,11 @@ If you want that the text files created by Jupytext have no metadata, you may us
 ```python
 c.ContentsManager.default_notebook_metadata_filter = "-all"
 c.ContentsManager.default_cell_metadata_filter = "-all"
+```
+
+It is possible to filter nested metadata. For example, if you want to preserve the Jupytext metadata, but not the Jupytext version number, you can use:
+```python
+c.ContentsManager.default_notebook_metadata_filter = "-jupytext.text_representation.jupytext_version"
 ```
 
 NB: All these global options (and more) are documented [here](https://github.com/mwouts/jupytext/blob/master/jupytext/contentsmanager.py).
