@@ -139,24 +139,27 @@ def filter_metadata(metadata, user_filter, default_filter):
 
 def subset_metadata(metadata, keep_only=None, exclude=None):
     """Filter the metadata by reference, according to keep_only and then to exclude"""
+    filtered_metadata = copy(metadata)
     if keep_only is not None:
-        for key in set(metadata.keys()):
+        for key in metadata:
             if key not in keep_only:
-                metadata.pop(key)
+                filtered_metadata.pop(key)
 
     if exclude is not None:
         for key in exclude:
-            if key in set(metadata.keys()):
-                metadata.pop(key)
+            if key in set(filtered_metadata.keys()):
+                filtered_metadata.pop(key)
 
-    return metadata
+    return filtered_metadata
 
 
 def restore_filtered_metadata(filtered_metadata, unfiltered_metadata, user_filter, default_filter):
     """Update the filtered metadata with the part of the unfiltered one that matches the filter"""
-    filtered_unfiltered_metadata = copy(unfiltered_metadata)
-    filter_metadata(filtered_unfiltered_metadata, user_filter, default_filter)
+    filtered_unfiltered_metadata = filter_metadata(unfiltered_metadata, user_filter, default_filter)
 
+    metadata = copy(filtered_metadata)
     for key in unfiltered_metadata:
         if key not in filtered_unfiltered_metadata:
-            filtered_metadata[key] = unfiltered_metadata[key]
+            metadata[key] = unfiltered_metadata[key]
+
+    return metadata

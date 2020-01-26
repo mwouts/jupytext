@@ -42,10 +42,11 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     ext = fmt.get('extension') or text_repr.get('extension')
     format_name = fmt.get('format_name') or text_repr.get('format_name')
 
-    restore_filtered_metadata(nb_source.metadata,
-                              nb_outputs.metadata,
-                              nb_source.metadata.get('jupytext', {}).get('notebook_metadata_filter'),
-                              _DEFAULT_NOTEBOOK_METADATA)
+    nb_source.metadata = restore_filtered_metadata(
+        nb_source.metadata,
+        nb_outputs.metadata,
+        nb_source.metadata.get('jupytext', {}).get('notebook_metadata_filter'),
+        _DEFAULT_NOTEBOOK_METADATA)
 
     source_is_md_version_one = ext in ['.md', '.markdown', '.Rmd'] and text_repr.get('format_version') == '1.0'
     if nb_source.metadata.get('jupytext', {}).get('formats') or ext in ['.md', '.markdown', '.Rmd']:
@@ -72,8 +73,8 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
                     cell.outputs = ocell.outputs
 
                     # Restore the filtered output cell metadata
-                    restore_filtered_metadata(cell.metadata, ocell.metadata,
-                                              cell_metadata_filter, _IGNORE_CELL_METADATA)
+                    cell.metadata = restore_filtered_metadata(cell.metadata, ocell.metadata,
+                                                              cell_metadata_filter, _IGNORE_CELL_METADATA)
 
                     output_code_cells = output_code_cells[(i + 1):]
                     break
@@ -81,9 +82,9 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
             for i, ocell in enumerate(output_other_cells):
                 if cell.cell_type == ocell.cell_type and same_content(cell.source, ocell.source):
                     # The 'spin' format does not allow metadata on non-code cells
-                    restore_filtered_metadata(cell.metadata, ocell.metadata,
-                                              '-all' if format_name == 'spin' else cell_metadata_filter,
-                                              _IGNORE_CELL_METADATA)
+                    cell.metadata = restore_filtered_metadata(cell.metadata, ocell.metadata,
+                                                              '-all' if format_name == 'spin' else cell_metadata_filter,
+                                                              _IGNORE_CELL_METADATA)
 
                     output_other_cells = output_other_cells[(i + 1):]
                     break
