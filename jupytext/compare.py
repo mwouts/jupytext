@@ -3,7 +3,6 @@
 import re
 import json
 import difflib
-from copy import copy
 from .cell_metadata import _IGNORE_CELL_METADATA
 from .header import _DEFAULT_NOTEBOOK_METADATA
 from .metadata_filter import filter_metadata
@@ -39,12 +38,9 @@ def compare(actual, expected, return_diff=False):
 
 def filtered_cell(cell, preserve_outputs, cell_metadata_filter):
     """Cell type, metadata and source from given cell"""
-    metadata = copy(cell.metadata)
-    filter_metadata(metadata, cell_metadata_filter, _IGNORE_CELL_METADATA)
-
     filtered = {'cell_type': cell.cell_type,
                 'source': cell.source,
-                'metadata': metadata}
+                'metadata': filter_metadata(cell.metadata, cell_metadata_filter, _IGNORE_CELL_METADATA)}
 
     if preserve_outputs:
         for key in ['execution_count', 'outputs']:
@@ -56,8 +52,7 @@ def filtered_cell(cell, preserve_outputs, cell_metadata_filter):
 
 def filtered_notebook_metadata(notebook):
     """Notebook metadata, filtered for metadata added by Jupytext itself"""
-    metadata = copy(notebook.metadata)
-    metadata = filter_metadata(metadata,
+    metadata = filter_metadata(notebook.metadata,
                                notebook.metadata.get('jupytext', {}).get('notebook_metadata_filter'),
                                _DEFAULT_NOTEBOOK_METADATA)
     if 'jupytext' in metadata:

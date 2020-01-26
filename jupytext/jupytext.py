@@ -108,7 +108,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
             cells = []
             for cell in nb.cells:
-                cell_metadata = filter_metadata(copy(cell.metadata),
+                cell_metadata = filter_metadata(cell.metadata,
                                                 self.fmt.get('cell_metadata_filter'),
                                                 _IGNORE_CELL_METADATA)
                 if cell.cell_type == 'code':
