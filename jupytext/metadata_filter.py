@@ -1,5 +1,6 @@
 """Notebook and cell metadata filtering"""
 
+from copy import copy
 from .cell_metadata import _JUPYTEXT_CELL_METADATA
 
 _DEFAULT_NOTEBOOK_METADATA = ','.join([
@@ -149,3 +150,13 @@ def subset_metadata(metadata, keep_only=None, exclude=None):
                 metadata.pop(key)
 
     return metadata
+
+
+def restore_filtered_metadata(filtered_metadata, unfiltered_metadata, user_filter, default_filter):
+    """Update the filtered metadata with the part of the unfiltered one that matches the filter"""
+    filtered_unfiltered_metadata = copy(unfiltered_metadata)
+    filter_metadata(filtered_unfiltered_metadata, user_filter, default_filter)
+
+    for key in unfiltered_metadata:
+        if key not in filtered_unfiltered_metadata:
+            filtered_metadata[key] = unfiltered_metadata[key]
