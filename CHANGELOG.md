@@ -1,6 +1,9 @@
 1.3.3 (2020-01-??)
 ------------------
 
+**Added**
+- Jupytext has a logo! Many thanks to Kyle Kelley for contributing the actual logo (#423), and to Chris Holdgraf for suggesting this (#260).
+
 **Fixed**
 - Code cells in the Markdown format can contain triple backticks inside multiline strings (#419)
 - Changes in the YAML header when running `jupytext --test` on text files are ignored (#414).
