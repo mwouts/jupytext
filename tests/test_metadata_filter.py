@@ -82,3 +82,18 @@ def test_notebook_metadata_none():
     nb = new_notebook(metadata={'jupytext': {'notebook_metadata_filter': '-all'}})
     text = writes(nb, 'md')
     assert '---' not in text
+
+
+def test_filter_nested_metadata():
+    metadata = {'I': {'1': {'a': 1, 'b': 2}}}
+
+    assert filter_metadata(metadata, 'I', '-all') == {'I': {'1': {'a': 1, 'b': 2}}}
+    assert filter_metadata(metadata, '-I') == {}
+
+    assert filter_metadata(metadata, 'I.1.a', '-all') == {'I': {'1': {'a': 1}}}
+    assert filter_metadata(metadata, '-I.1.b') == {'I': {'1': {'a': 1}}}
+
+    assert filter_metadata(metadata, '-I.1.b', 'I') == {'I': {'1': {'a': 1}}}
+
+    # That one is not supported yet
+    # assert filter_metadata(metadata, 'I.1.a', '-I') == {'I': {'1': {'a': 1}}}
