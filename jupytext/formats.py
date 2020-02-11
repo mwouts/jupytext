@@ -587,14 +587,15 @@ def auto_ext_from_metadata(metadata):
 
 
 def check_auto_ext(fmt, metadata, option):
-    """Raise a ValueError when the .auto extension cannot be determined"""
+    """Replace the auto extension with the actual file extension, and raise a ValueError if it cannot be determined"""
     if fmt['extension'] != '.auto':
-        return
+        return fmt
 
     auto_ext = auto_ext_from_metadata(metadata)
     if auto_ext:
+        fmt = fmt.copy()
         fmt['extension'] = auto_ext
-        return
+        return fmt
 
     raise ValueError("The notebook does not have a 'language_info' metadata. "
                      "Please replace 'auto' with the actual language extension in the {} option (currently {})."

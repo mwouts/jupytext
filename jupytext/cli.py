@@ -315,7 +315,7 @@ def jupytext_single_file(nb_file, args, log):
     # Compute actual extension when using script/auto, and update nb_dest if necessary
     dest_fmt = args.to
     if dest_fmt and dest_fmt['extension'] == '.auto':
-        check_auto_ext(dest_fmt, notebook.metadata, '--to')
+        dest_fmt = check_auto_ext(dest_fmt, notebook.metadata, '--to')
         if not args.output and nb_file != '-':
             nb_dest = full_path(base_path(nb_file, args.input_format), dest_fmt)
 
@@ -625,7 +625,7 @@ def pipe_notebook(notebook, command, fmt='py:percent', update=True, prefix=None)
         command = command + ' {}'
 
     fmt = long_form_one_format(fmt, notebook.metadata, auto_ext_requires_language_info=False)
-    check_auto_ext(fmt, notebook.metadata, '--pipe-fmt')
+    fmt = check_auto_ext(fmt, notebook.metadata, '--pipe-fmt')
     text = writes(notebook, fmt)
 
     command = command.split(' ')
