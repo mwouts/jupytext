@@ -24,7 +24,9 @@ _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.ts': {'language': 'typescript', 'comment': '//'},
                       '.scala': {'language': 'scala', 'comment': '//'},
                       '.rs': {'language': 'rust', 'comment': '//'},
-                      '.robot': {'language': 'robotframework', 'comment': '#'}}
+                      '.robot': {'language': 'robotframework', 'comment': '#'},
+                      '.cs': {'language': 'csharp', 'comment': '//'},
+                      '.fs': {'language': 'fsharp', 'comment': '//'}}
 
 _COMMENT_CHARS = [_SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS if
                   _SCRIPT_EXTENSIONS[ext]['comment'] != '#']
@@ -48,14 +50,14 @@ def default_language_from_metadata_and_ext(metadata, ext):
     if language.startswith('C++'):
         return 'c++'
 
-    return language.lower()
+    return language.lower().replace('#', 'sharp')
 
 
 def same_language(kernel_language, language):
     """Are those the same language?"""
     if kernel_language == language:
         return True
-    if kernel_language.lower() == language:
+    if kernel_language.lower().replace('#', 'sharp') == language:
         return True
     if kernel_language.startswith('C++') and language == 'c++':
         return True
