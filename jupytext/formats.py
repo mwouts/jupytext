@@ -583,6 +583,9 @@ def auto_ext_from_metadata(metadata):
     if auto_ext == '.r':
         return '.R'
 
+    if auto_ext == '.fs':
+        return '.fsx'
+
     return auto_ext
 
 

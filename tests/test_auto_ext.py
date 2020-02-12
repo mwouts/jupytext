@@ -32,6 +32,8 @@ def test_auto_from_kernelspecs_works(nb_file):
         pytest.skip('No file_extension in language_info')
     if expected_ext == '.r':
         expected_ext = '.R'
+    elif expected_ext == '.fs':
+        expected_ext = '.fsx'
     auto_ext = auto_ext_from_metadata(nb.metadata)
     assert auto_ext == expected_ext
 
