@@ -26,6 +26,7 @@ _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.rs': {'language': 'rust', 'comment': '//'},
                       '.robot': {'language': 'robotframework', 'comment': '#'},
                       '.cs': {'language': 'csharp', 'comment': '//'},
+                      '.fsx': {'language': 'fsharp', 'comment': '//'},
                       '.fs': {'language': 'fsharp', 'comment': '//'}}
 
 _COMMENT_CHARS = [_SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS if
