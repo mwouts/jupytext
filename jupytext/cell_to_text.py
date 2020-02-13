@@ -46,7 +46,7 @@ class BaseCellExporter(object):
             if not self.ext.endswith('.Rmd'):
                 self.metadata['language'] = self.language
 
-        self.language = self.language or default_language
+        self.language = self.language or cell.metadata.get('language', default_language)
         self.default_language = default_language
         self.comment = _SCRIPT_EXTENSIONS.get(self.ext, {}).get('comment', '#')
         self.comment_magics = self.fmt.get('comment_magics', self.default_comment_magics)
