@@ -1,3 +1,11 @@
+1.3.4 (2020-02-??)
+------------------
+
+**Fixed**
+- `jupytext --to script *.ipynb` now computes the script extension for each notebook (#428) 
+- Fix shebang handling for languages with non-# comments, by Jonas Bushart (#434)
+
+
 1.3.3 (2020-01-27)
 ------------------
 
