@@ -43,3 +43,26 @@ pub fn fib(x: i32) -> i32 {
 ::std::mem::drop''')
     ]))
     compare(jupytext.writes(nb, 'rs'), text)
+
+
+def test_read_write_script_with_metadata_241(no_jupytext_version_number, rsnb="""#!/usr/bin/env scriptisto
+// ---
+// jupyter:
+//   jupytext:
+//     text_representation:
+//       extension: .rs
+//       format_name: light
+//   kernelspec:
+//     display_name: Rust
+//     language: rust
+//     name: rust
+// ---
+
+let mut a: i32 = 2;
+a += 1;
+"""):
+    nb = jupytext.reads(rsnb, 'rs')
+    assert 'executable' in nb.metadata['jupytext']
+    rsnb2 = jupytext.writes(nb, 'rs')
+
+    compare(rsnb, rsnb2)
