@@ -490,7 +490,7 @@ a = 1
     assert nb.cells[1].source == 'a = 1'
 
     text2 = jupytext.writes(nb, 'md')
-    compare(text2, text.replace('```IDL', '```idl'))
+    compare(text2, text)
 
 
 def test_inactive_cell(text='''```python active="md"

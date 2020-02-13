@@ -33,7 +33,7 @@ _COMMENT_CHARS = [_SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIO
                   _SCRIPT_EXTENSIONS[ext]['comment'] != '#']
 
 _COMMENT = {_SCRIPT_EXTENSIONS[ext]['language']: _SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS}
-_JUPYTER_LANGUAGES = set(_JUPYTER_LANGUAGES).union(_COMMENT.keys())
+_JUPYTER_LANGUAGES = set(_JUPYTER_LANGUAGES).union(_COMMENT.keys()).union(['c#', 'f#', 'cs', 'fs'])
 _JUPYTER_LANGUAGES_LOWER_AND_UPPER = _JUPYTER_LANGUAGES.union({str.upper(lang) for lang in _JUPYTER_LANGUAGES})
 
 
@@ -54,17 +54,25 @@ def default_language_from_metadata_and_ext(metadata, ext):
     return language.lower().replace('#', 'sharp')
 
 
+def usual_language_name(language):
+    """Return the usual language name (one that may be found in _SCRIPT_EXTENSIONS above)"""
+    language = language.lower()
+    if language == 'r':
+        return 'R'
+    if language.startswith('c++'):
+        return 'c++'
+    if language == 'octave':
+        return 'matlab'
+    if language in ['cs', 'c#']:
+        return 'csharp'
+    if language in ['fs', 'f#']:
+        return 'fsharp'
+    return language
+
+
 def same_language(kernel_language, language):
     """Are those the same language?"""
-    if kernel_language == language:
-        return True
-    if kernel_language.lower().replace('#', 'sharp') == language:
-        return True
-    if kernel_language.startswith('C++') and language == 'c++':
-        return True
-    if kernel_language == 'octave' and language == 'matlab':
-        return True
-    return False
+    return usual_language_name(kernel_language) == usual_language_name(language)
 
 
 def set_main_and_cell_language(metadata, cells, ext):
@@ -76,7 +84,7 @@ def set_main_and_cell_language(metadata, cells, ext):
         languages = {'python': 0.5}
         for cell in cells:
             if 'language' in cell['metadata']:
-                language = cell['metadata']['language']
+                language = usual_language_name(cell['metadata']['language'])
                 languages[language] = languages.get(language, 0.0) + 1
 
         main_language = max(languages, key=languages.get)
@@ -88,8 +96,16 @@ def set_main_and_cell_language(metadata, cells, ext):
     # Remove 'language' meta data and add a magic if not main language
     for cell in cells:
         if 'language' in cell['metadata']:
-            language = cell['metadata'].pop('language')
-            if language != main_language and language in _JUPYTER_LANGUAGES:
+            language = cell['metadata']['language']
+            if language == main_language:
+                cell['metadata'].pop('language')
+                continue
+
+            if usual_language_name(language) == main_language:
+                continue
+
+            if language in _JUPYTER_LANGUAGES:
+                cell['metadata'].pop('language')
                 if 'magic_args' in cell['metadata']:
                     magic_args = cell['metadata'].pop('magic_args')
                     cell['source'] = u'%%{} {}\n'.format(language, magic_args) + cell['source']

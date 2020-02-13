@@ -263,7 +263,7 @@ class BaseCellReader(object):
 class MarkdownCellReader(BaseCellReader):
     """Read notebook cells from Markdown documents"""
     comment = ''
-    start_code_re = re.compile(r"^```({})($|\s(.*)$)".format(
+    start_code_re = re.compile(r"^```(\s*)({})($|\s.*$)".format(
         '|'.join(_JUPYTER_LANGUAGES_LOWER_AND_UPPER).replace('+', '\\+')))
     non_jupyter_code_re = re.compile(r"^```")
     end_code_re = re.compile(r"^```\s*$")
