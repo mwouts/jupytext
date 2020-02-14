@@ -28,11 +28,11 @@ Console.WriteLine("Hello World!");
 
 @pytest.mark.parametrize('lang', ['cs', 'c#', 'csharp'])
 def test_csharp_magics(lang):
-    md = f"""```{lang}
+    md = """```{lang}
 #!html
 <b>Hello!</b>
 ```
-"""
+""".format(lang=lang)
     nb = jupytext.reads(md, 'md')
     assert nb.metadata['jupytext']['main_language'] == 'csharp'
     assert len(nb.cells) == 1
