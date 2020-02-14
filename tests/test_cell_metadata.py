@@ -164,3 +164,8 @@ def test_values_with_equal_signs_inside(text='python string="value=5"',
 def test_incorrectly_encoded(text="this is an incorrect expression d={{4 b=3"):
     value = text_to_metadata(text, allow_title=True)
     assert metadata_to_text(*value) == text
+
+
+def test_incorrectly_encoded_json(text='this is an incorrect expression {"d": "}'):
+    value = text_to_metadata(text, allow_title=True)
+    assert metadata_to_text(*value) == text
