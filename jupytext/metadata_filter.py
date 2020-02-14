@@ -75,8 +75,6 @@ def metadata_filter_as_string(metadata_filter):
 def update_metadata_filters(metadata, jupyter_md, cell_metadata):
     """Update or set the notebook and cell metadata filters"""
 
-    cell_metadata = [m for m in cell_metadata if m not in ['language', 'magic_args']]
-
     if 'cell_metadata_filter' in metadata.get('jupytext', {}):
         metadata_filter = metadata_filter_as_dict(metadata.get('jupytext', {})['cell_metadata_filter'])
         if isinstance(metadata_filter.get('excluded'), list):

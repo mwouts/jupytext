@@ -3,7 +3,7 @@
 import re
 import warnings
 from copy import copy
-from .languages import cell_language, comment_lines
+from .languages import cell_language, comment_lines, same_language
 from .cell_metadata import is_active, _IGNORE_CELL_METADATA
 from .cell_metadata import metadata_to_text, metadata_to_rmd_options, metadata_to_double_percent_options
 from .metadata_filter import filter_metadata
@@ -37,14 +37,16 @@ class BaseCellExporter(object):
         self.metadata = filter_metadata(cell.metadata,
                                         self.fmt.get('cell_metadata_filter'),
                                         _IGNORE_CELL_METADATA)
-        self.language, magic_args = cell_language(self.source) if self.parse_cell_language else (None, None)
+        if self.parse_cell_language:
+            self.language, magic_args = cell_language(self.source, default_language)
 
-        if self.language:
             if magic_args:
                 self.metadata['magic_args'] = magic_args
+        else:
+            self.language = None
 
-            if not self.ext.endswith('.Rmd'):
-                self.metadata['language'] = self.language
+        if self.language and not self.ext.endswith('.Rmd'):
+            self.metadata['language'] = self.language
 
         self.language = self.language or cell.metadata.get('language', default_language)
         self.default_language = default_language
@@ -252,7 +254,7 @@ class LightScriptCellExporter(BaseCellExporter):
 
     def code_to_text(self):
         """Return the text representation of a code cell"""
-        active = is_active(self.ext, self.metadata, self.language == self.default_language)
+        active = is_active(self.ext, self.metadata, same_language(self.language, self.default_language))
         source = copy(self.source)
         escape_code_start(source, self.ext, self.language)
         comment_questions = self.metadata.pop('comment_questions', True)
@@ -378,7 +380,7 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
         if self.cell_type != 'code':
             self.metadata['cell_type'] = self.cell_type
 
-        active = is_active(self.ext, self.metadata, self.language == self.default_language)
+        active = is_active(self.ext, self.metadata, same_language(self.language, self.default_language))
         if self.cell_type == 'raw' and 'active' in self.metadata and self.metadata['active'] == '':
             del self.metadata['active']
 
