@@ -266,13 +266,6 @@ def rmd_options_to_metadata(options, use_runtools=False):
     return metadata.get('language') or language, metadata
 
 
-def metadata_to_md_options(metadata):
-    """Encode {'class':None, 'key':'value'} into 'class key="value"' """
-
-    return ' '.join(["{}={}".format(key, dumps(metadata[key]))
-                     if metadata[key] is not None else key for key in metadata])
-
-
 def try_eval_metadata(metadata, name):
     """Evaluate the metadata to a python object, if possible"""
     value = metadata[name]
