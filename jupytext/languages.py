@@ -113,11 +113,17 @@ def set_main_and_cell_language(metadata, cells, ext):
                     cell['source'] = u'%%{}\n'.format(language) + cell['source']
 
 
-def cell_language(source):
+def cell_language(source, default_language):
     """Return cell language and language options, if any"""
     if source:
         line = source[0]
-        if line.startswith('%%'):
+        if default_language == 'csharp':
+            if line.startswith('#!'):
+                lang = line[2:].strip()
+                if lang in _JUPYTER_LANGUAGES:
+                    source.pop(0)
+                    return lang, ''
+        elif line.startswith('%%'):
             magic = line[2:]
             if ' ' in magic:
                 lang, magic_args = magic.split(' ', 1)

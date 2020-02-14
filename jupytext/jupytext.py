@@ -71,21 +71,22 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         if self.implementation.format_name and self.implementation.format_name.startswith('sphinx'):
             cells.append(new_code_cell(source='%matplotlib inline'))
 
-        cell_metadata = set()
         cell_metadata_json = False
 
         while lines:
             reader = self.implementation.cell_reader_class(self.fmt, default_language)
             cell, pos = reader.read(lines)
             cells.append(cell)
-            cell_metadata.update(cell.metadata.keys())
             cell_metadata_json = cell_metadata_json or reader.cell_metadata_json
             if pos <= 0:
                 raise Exception('Blocked at lines ' + '\n'.join(lines[:6]))  # pragma: no cover
             lines = lines[pos:]
 
-        update_metadata_filters(metadata, jupyter_md, cell_metadata)
         set_main_and_cell_language(metadata, cells, self.implementation.extension)
+        cell_metadata = set()
+        for cell in cells:
+            cell_metadata.update(cell.metadata.keys())
+        update_metadata_filters(metadata, jupyter_md, cell_metadata)
 
         if cell_metadata_json:
             metadata.setdefault('jupytext', {}).setdefault('cell_metadata_json', True)
