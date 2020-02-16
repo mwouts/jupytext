@@ -7,6 +7,7 @@
 **Fixed**
 - `jupytext --to script *.ipynb` now computes the script extension for each notebook (#428) 
 - Fix shebang handling for languages with non-# comments, by Jonas Bushart (#434)
+- Indented bash commands are now commented out (#437)
 
 
 1.3.3 (2020-01-27)
