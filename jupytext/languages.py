@@ -37,13 +37,16 @@ _JUPYTER_LANGUAGES = set(_JUPYTER_LANGUAGES).union(_COMMENT.keys()).union(['c#',
 _JUPYTER_LANGUAGES_LOWER_AND_UPPER = _JUPYTER_LANGUAGES.union({str.upper(lang) for lang in _JUPYTER_LANGUAGES})
 
 
-def default_language_from_metadata_and_ext(metadata, ext):
+def default_language_from_metadata_and_ext(metadata, ext, pop_main_language=False):
     """Return the default language given the notebook metadata, and a file extension"""
     default_from_ext = _SCRIPT_EXTENSIONS.get(ext, {}).get('language')
 
-    language = (metadata.get('jupytext', {}).get('main_language')
-                or metadata.get('kernelspec', {}).get('language')
-                or default_from_ext)
+    main_language = metadata.get('jupytext', {}).get('main_language')
+    default_language = metadata.get('kernelspec', {}).get('language') or default_from_ext
+    language = main_language or default_language
+
+    if main_language is not None and main_language == default_language and pop_main_language:
+        metadata['jupytext'].pop('main_language')
 
     if language is None or language == 'R':
         return language
@@ -106,11 +109,12 @@ def set_main_and_cell_language(metadata, cells, ext):
 
             if language in _JUPYTER_LANGUAGES:
                 cell['metadata'].pop('language')
+                magic = '%%' if main_language != 'csharp' else '#!'
                 if 'magic_args' in cell['metadata']:
                     magic_args = cell['metadata'].pop('magic_args')
-                    cell['source'] = u'%%{} {}\n'.format(language, magic_args) + cell['source']
+                    cell['source'] = u'{}{} {}\n'.format(magic, language, magic_args) + cell['source']
                 else:
-                    cell['source'] = u'%%{}\n'.format(language) + cell['source']
+                    cell['source'] = u'{}{}\n'.format(magic, language) + cell['source']
 
 
 def cell_language(source, default_language):

@@ -131,16 +131,15 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             cells=nb.cells)
 
         metadata = nb.metadata
-        default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension) or 'python'
+        default_language = default_language_from_metadata_and_ext(metadata,
+                                                                  self.implementation.extension,
+                                                                  True) or 'python'
         self.update_fmt_with_notebook_options(nb.metadata)
         if 'use_runtools' not in self.fmt:
             for cell in nb.cells:
                 if cell.metadata.get('hide_input', False) or cell.metadata.get('hide_output', False):
                     self.fmt['use_runtools'] = True
                     break
-
-        if 'main_language' in metadata.get('jupytext', {}):
-            del metadata['jupytext']['main_language']
 
         header = encoding_and_executable(nb, metadata, self.ext)
         header_content, header_lines_to_next_cell = metadata_and_cell_to_header(nb, metadata,
