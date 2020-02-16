@@ -94,6 +94,9 @@ def parse_jupytext_args(args=None):
                              "which uses few cell markers (none when possible).\n"
                              "Alternatively, a format compatible with many editors is the 'percent'\n"
                              "format, which uses '# %%%%' as cell markers\n"
+                             "The main formats (markdown, light, percent) are expected to preserve\n"
+                             "notebooks and text documents in a roundtrip. Use the --test and\n"
+                             "--test-strict commands to test the roundtrip on your files.\n"
                              "Read more about the available formats at\n"
                              "https://jupytext.readthedocs.io/en/latest/formats.html\n"
                         )
