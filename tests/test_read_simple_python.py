@@ -935,3 +935,24 @@ interpreter = 'python'
     compare_notebooks(nb, ref)
     py = jupytext.writes(nb, 'py')
     compare(py, text)
+
+
+def test_indented_bash_command(no_jupytext_version_number,
+                               nb=new_notebook(cells=[new_code_cell("""try:
+    !echo jo
+    pass
+except:
+    pass""")]),
+                               text="""try:
+#     !echo jo
+    pass
+except:
+    pass
+"""
+
+                               ):
+    """Reproduces https://github.com/mwouts/jupytext/issues/437"""
+    py = jupytext.writes(nb, 'py')
+    compare(py, text)
+    nb2 = jupytext.reads(py, 'py')
+    compare_notebooks(nb2, nb)
