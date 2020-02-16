@@ -27,13 +27,15 @@ Console.WriteLine("Hello World!");
 
 
 @pytest.mark.parametrize('lang', ['cs', 'c#', 'csharp'])
-def test_csharp_magics(lang):
+def test_csharp_magics(no_jupytext_version_number, lang):
     md = """```{lang}
 #!html
 <b>Hello!</b>
 ```
 """.format(lang=lang)
     nb = jupytext.reads(md, 'md')
+    nb.metadata['jupytext'].pop('notebook_metadata_filter')
+    nb.metadata['jupytext'].pop('cell_metadata_filter')
     assert nb.metadata['jupytext']['main_language'] == 'csharp'
     assert len(nb.cells) == 1
     assert nb.cells[0].cell_type == 'code'
@@ -42,8 +44,35 @@ def test_csharp_magics(lang):
     assert all(line.startswith('//') for line in cs.splitlines()), cs
 
     md2 = jupytext.writes(nb, 'md')
-    md_expected = """```html
+    md_expected = """---
+jupyter:
+  jupytext:
+    main_language: csharp
+---
+
+```html
 <b>Hello!</b>
 ```
 """
     compare(md2, md_expected)
+
+
+def test_read_html_cell_from_md(no_jupytext_version_number):
+    md = """---
+jupyter:
+  jupytext:
+    main_language: csharp
+---
+
+```html
+<b>Hello!</b>
+```
+"""
+
+    nb = jupytext.reads(md, 'md')
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == 'code'
+    compare(nb.cells[0].source, "#!html\n<b>Hello!</b>")
+
+    md2 = jupytext.writes(nb, 'md')
+    compare(md2, md)
