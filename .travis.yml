@@ -58,4 +58,5 @@ script:
   - echo "from IPython.core.display import HTML; HTML(u'\xd7')" | jupytext --from py --to ipynb --set-kernel - --execute > out.ipynb
 after_success:
   - coverage report -m
-  - codecov
+  # Coverage is best with miniconda 3
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.4" ]]; then codecov; fi
