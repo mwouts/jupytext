@@ -53,12 +53,17 @@ ACTIVE_ALL = {'.py': """# + active="ipynb,py,R,Rmd"
                          'outputs': []}}
 
 
+def check_active_cell(ext, active_dict):
+    text = ('' if ext == '.py' else HEADER[ext]) + active_dict[ext]
+    nb = jupytext.reads(text, ext)
+    assert len(nb.cells) == 1
+    compare(jupytext.writes(nb, ext), text)
+    compare(nb.cells[0], active_dict['.ipynb'])
+
+
 @pytest.mark.parametrize('ext', ['.Rmd', '.md', '.py', '.R'])
 def test_active_all(ext, no_jupytext_version_number):
-    nb = jupytext.reads(HEADER[ext] + ACTIVE_ALL[ext], ext)
-    assert len(nb.cells) == 1
-    compare(jupytext.writes(nb, ext), ACTIVE_ALL[ext])
-    compare(nb.cells[0], ACTIVE_ALL['.ipynb'])
+    check_active_cell(ext, ACTIVE_ALL)
 
 
 ACTIVE_IPYNB = {'.py': """# + active="ipynb"
@@ -90,10 +95,7 @@ ACTIVE_IPYNB = {'.py': """# + active="ipynb"
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.md', '.py', '.R'])
 def test_active_ipynb(ext, no_jupytext_version_number):
-    nb = jupytext.reads(HEADER[ext] + ACTIVE_IPYNB[ext], ext)
-    assert len(nb.cells) == 1
-    compare(jupytext.writes(nb, ext), ACTIVE_IPYNB[ext])
-    compare(nb.cells[0], ACTIVE_IPYNB['.ipynb'])
+    check_active_cell(ext, ACTIVE_IPYNB)
 
 
 ACTIVE_IPYNB_RMD_USING_TAG = {'.py': """# + tags=["active-ipynb-Rmd"]
@@ -125,10 +127,7 @@ ACTIVE_IPYNB_RMD_USING_TAG = {'.py': """# + tags=["active-ipynb-Rmd"]
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.md', '.py', '.R'])
 def test_active_ipynb_rmd_using_tags(ext, no_jupytext_version_number):
-    nb = jupytext.reads(HEADER[ext] + ACTIVE_IPYNB_RMD_USING_TAG[ext], ext)
-    assert len(nb.cells) == 1
-    compare(jupytext.writes(nb, ext), ACTIVE_IPYNB_RMD_USING_TAG[ext])
-    compare(nb.cells[0], ACTIVE_IPYNB_RMD_USING_TAG['.ipynb'])
+    check_active_cell(ext, ACTIVE_IPYNB_RMD_USING_TAG)
 
 
 ACTIVE_IPYNB_RSPIN = {'.R': """#+ active="ipynb", eval=FALSE
@@ -176,10 +175,7 @@ ACTIVE_PY_IPYNB = {'.py': """# + active="ipynb,py"
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.md', '.py', '.R'])
 def test_active_py_ipynb(ext, no_jupytext_version_number):
-    nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_IPYNB[ext], ext)
-    assert len(nb.cells) == 1
-    compare(jupytext.writes(nb, ext), ACTIVE_PY_IPYNB[ext])
-    compare(nb.cells[0], ACTIVE_PY_IPYNB['.ipynb'])
+    check_active_cell(ext, ACTIVE_PY_IPYNB)
 
 
 ACTIVE_PY_R_IPYNB = {'.py': """# + active="ipynb,py,R"
@@ -203,10 +199,7 @@ ACTIVE_PY_R_IPYNB = {'.py': """# + active="ipynb,py,R"
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_py_r_ipynb(ext, no_jupytext_version_number):
-    nb = jupytext.reads(HEADER[ext] + ACTIVE_PY_R_IPYNB[ext], ext)
-    assert len(nb.cells) == 1
-    compare(jupytext.writes(nb, ext), ACTIVE_PY_R_IPYNB[ext])
-    compare(nb.cells[0], ACTIVE_PY_R_IPYNB['.ipynb'])
+    check_active_cell(ext, ACTIVE_PY_R_IPYNB)
 
 
 ACTIVE_RMD = {'.py': """# + active="Rmd"
@@ -227,10 +220,7 @@ ACTIVE_RMD = {'.py': """# + active="Rmd"
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_rmd(ext, no_jupytext_version_number):
-    nb = jupytext.reads(HEADER[ext] + ACTIVE_RMD[ext], ext)
-    assert len(nb.cells) == 1
-    compare(jupytext.writes(nb, ext), ACTIVE_RMD[ext])
-    compare(nb.cells[0], ACTIVE_RMD['.ipynb'])
+    check_active_cell(ext, ACTIVE_RMD)
 
 
 ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + tags=["remove_cell"] active="Rmd"
@@ -252,7 +242,4 @@ ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + tags=["remove_cell"] active="Rmd"
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_not_include_rmd(ext, no_jupytext_version_number):
-    nb = jupytext.reads(ACTIVE_NOT_INCLUDE_RMD[ext], ext)
-    assert len(nb.cells) == 1
-    compare(jupytext.writes(nb, ext), ACTIVE_NOT_INCLUDE_RMD[ext])
-    compare(nb.cells[0], ACTIVE_NOT_INCLUDE_RMD['.ipynb'])
+    check_active_cell(ext, ACTIVE_NOT_INCLUDE_RMD)
