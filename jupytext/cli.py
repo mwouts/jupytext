@@ -87,7 +87,7 @@ def parse_jupytext_args(args=None):
                              "- format_name is optional, and can be {} for Markdown\nfiles, and ".format(
                                  ' or '.join(
                                      set(fmt.format_name for fmt in JUPYTEXT_FORMATS if fmt.extension == '.md'))) +
-                             "{} for scripts\n".format(
+                             "{} for scripts.\n".format(
                                  ', '.join(set(fmt.format_name for fmt in JUPYTEXT_FORMATS if fmt.extension == '.py')))
                              +
                              "The default format for scripts is the 'light' format,\n"
