@@ -213,6 +213,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             if model['type'] != 'notebook':
                 return super(JupytextContentsManager, self).save(model, path)
 
+            path = path.strip('/')
             nbk = model['content']
             try:
                 metadata = nbk.get('metadata')
@@ -284,7 +285,9 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
         def get(self, path, content=True, type=None, format=None, load_alternative_format=True):
             """ Takes a path for an entity and returns its model"""
-            os_path = self._get_os_path(path.strip('/'))
+            path = path.strip('/')
+
+            os_path = self._get_os_path(path)
             ext = os.path.splitext(path)[1]
 
             # Not a notebook?

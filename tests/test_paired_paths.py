@@ -67,7 +67,7 @@ def test_prefix_on_root_174():
     formats = long_form_multiple_formats(short_formats)
     assert short_form_multiple_formats(formats) == short_formats
 
-    expected_paths = ['/Untitled.ipynb', '/python/Untitled.py']
+    expected_paths = ['Untitled.ipynb', 'python/Untitled.py']
     for fmt, path in zip(formats, expected_paths):
         compare(paired_paths(path, fmt, formats), list(zip(expected_paths, formats)))
 
