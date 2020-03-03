@@ -4,7 +4,7 @@ import { ICommandPalette } from "@jupyterlab/apputils";
 
 import { INotebookTracker } from "@jupyterlab/notebook";
 
-import { nbformat } from "@jupyterlab/coreutils";
+import * as nbformat from "@jupyterlab/nbformat";
 
 interface JupytextRepresentation {
   format_name: string;
