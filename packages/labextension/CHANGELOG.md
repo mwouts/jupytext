@@ -1,3 +1,7 @@
+# 1.2.0 (2020-03-07)
+
+- This version of the extension is compatible with JupyterLab 2.0. Many thanks to Jean Helie! (#447)
+
 # 1.1.1 (2019-12-26)
 
 - The `nomarker` format is available through the Jupytext commands (requires `jupytext>=1.3.1`).
