@@ -1114,3 +1114,20 @@ def test_399_to_script_then_set_formats(tmpdir):
     assert os.path.isfile(tmp_py)
 
     jupytext(['--set-formats', 'ipynb,py:percent', tmp_ipynb])
+
+
+def test_set_format_with_subfolder(tmpdir):
+    """Here we reproduce issue #450"""
+    py = """# %% [markdown]
+# A short notebook
+"""
+
+    tmpdir.mkdir('python_scripts')
+
+    with open(tmpdir.join('python_scripts').join('01_tabular_data_exploration.py'), 'w') as fp:
+        fp.write(py)
+
+    os.chdir(tmpdir)
+    jupytext(['--set-formats',
+              'python_scripts//py:percent,notebooks//ipynb',
+              'python_scripts/01_tabular_data_exploration.py'])
