@@ -382,13 +382,14 @@ def jupytext_single_file(nb_file, args, log):
             notebook.metadata['jupytext'].pop('main_language')
 
     # Read paired notebooks, except if the pair is being created
-    if args.sync and args.set_formats is None:
+    if args.sync:
         set_prefix_and_suffix(fmt, notebook, nb_file)
-        try:
-            notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
-        except NotAPairedNotebook as err:
-            sys.stderr.write('[jupytext] Warning: ' + str(err) + '\n')
-            return 0
+        if args.set_formats is None:
+            try:
+                notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(notebook, fmt, nb_file, log)
+            except NotAPairedNotebook as err:
+                sys.stderr.write('[jupytext] Warning: ' + str(err) + '\n')
+                return 0
 
     # II. ### Apply commands onto the notebook ###
     # Pipe the notebook into the desired commands
