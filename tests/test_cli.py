@@ -1124,10 +1124,10 @@ def test_set_format_with_subfolder(tmpdir):
 
     tmpdir.mkdir('python_scripts')
 
-    with open(tmpdir.join('python_scripts').join('01_tabular_data_exploration.py'), 'w') as fp:
+    with open(str(tmpdir.join('python_scripts').join('01_tabular_data_exploration.py')), 'w') as fp:
         fp.write(py)
 
-    os.chdir(tmpdir)
+    os.chdir(str(tmpdir))
     jupytext(['--set-formats',
               'python_scripts//py:percent,notebooks//ipynb',
               'python_scripts/01_tabular_data_exploration.py'])
