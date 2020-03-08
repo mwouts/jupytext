@@ -41,6 +41,7 @@ Code cells are encoded using the classical triple backticks, followed by the not
 
 Code snippets are turned into code cells in Jupyter as soon as they have an explicit language, when that language is supported in Jupyter. Thus, you have a code snippet that you don't want to execute in Jupyter, you can either
 - remove the language information, 
+- or, start the code snippet with a triple tilde, e.g. `~~~python`, instead of ` ```python`
 - or, add an `active="md"` cell metadata, or a `.noeval` attribute after the language information, e.g. ` ```python .noeval `
 - or, surround the code snippet with explicit Markdown cell markers (see below).
 
