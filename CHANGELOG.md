@@ -5,6 +5,8 @@
 - The new jupyterlab extension (in version 1.2.0) is compatible with JupyterLab 2.0. Many thanks to Jean Helie! (#449)
 - It is not compatible with JupyterLab 1.x anymore. If you wish, you can install manually the previous version of the extension with `jupyter labextension install jupyterlab-jupytext@1.1.1`.
 
+**Fixed**
+- Display the output/errors of command executed with `jupytext --pipe` or `jupytext --check` (#432)
 
 1.3.5 (2020-03-08)
 ------------------

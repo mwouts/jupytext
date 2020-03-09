@@ -625,13 +625,18 @@ def exec_command(command, input=None):
     """Execute the desired command, and pipe the given input into it"""
     if not isinstance(command, list):
         command = command.split(' ')
+    sys.stdout.write("[jupytext] Executing {}\n".format(' '.join(command)))
     process = subprocess.Popen(command,
                                **(dict(stdout=subprocess.PIPE, stdin=subprocess.PIPE) if input is not None else {}))
     out, err = process.communicate(input=input)
+    if out:
+        sys.stdout.write(out.decode('utf-8'))
+    if err:
+        sys.stderr.write(err.decode('utf-8'))
 
     if process.returncode:
-        sys.stderr.write("The command {} exited with code {}{}"
-                         .format(command, process.returncode, ': {}'.format(err or out) if err or out else ''))
+        sys.stderr.write("[jupytext] Error: The command '{}' exited with code {}\n"
+                         .format(' '.join(command), process.returncode))
         raise SystemExit(process.returncode)
 
     return out
