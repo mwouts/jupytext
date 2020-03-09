@@ -1,5 +1,5 @@
-jupytext>=1.2.0rc0
-jupyterlab>=1.0
+jupytext
+jupyterlab>=2.0
 plotly
 matplotlib
 wordcloud
