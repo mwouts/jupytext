@@ -1,4 +1,4 @@
-# 1.2.0 (2020-03-07)
+# 1.2.0 (2020-03-09)
 
 - This version of the extension is compatible with JupyterLab 2.0. Many thanks to Jean Helie! (#449)
 
