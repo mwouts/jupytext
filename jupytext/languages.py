@@ -27,7 +27,9 @@ _SCRIPT_EXTENSIONS = {'.py': {'language': 'python', 'comment': '#'},
                       '.robot': {'language': 'robotframework', 'comment': '#'},
                       '.cs': {'language': 'csharp', 'comment': '//'},
                       '.fsx': {'language': 'fsharp', 'comment': '//'},
-                      '.fs': {'language': 'fsharp', 'comment': '//'}}
+                      '.fs': {'language': 'fsharp', 'comment': '//'},
+                      '.sos': {'language': 'sos', 'comment': '#'},
+                      }
 
 _COMMENT_CHARS = [_SCRIPT_EXTENSIONS[ext]['comment'] for ext in _SCRIPT_EXTENSIONS if
                   _SCRIPT_EXTENSIONS[ext]['comment'] != '#']
