@@ -1,3 +1,10 @@
+1.4.1 (2020-03-??)
+------------------
+
+**Added**
+-  Script of script (SoS) notebooks are now supported. Thanks to Thomas Pernet-coudrier for contributing the sample notebook (#453).
+ 
+
 1.4.0 (2020-03-09)
 ------------------
 
