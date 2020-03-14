@@ -1,0 +1,83 @@
+---
+jupyter:
+  kernelspec:
+    display_name: SoS
+    language: sos
+    name: sos
+---
+
+<!-- #region Collapsed="false" kernel="SoS" -->
+# Text SOS-kernel with Jupytext
+
+## What is SOS kernel
+
+SoS consists of a ployglot notebook that allows the use of multiple kernels in one Jupyter notebook, and a workflow system that is designed for daily computational research. Basically,
+
+- SoS Polyglot Notebook is a Jupyter Notebook with a SoS kernel.
+- SoS Notebook serves as a super kernel to all other Jupyter kernels and allows the use of multiple kernels in one Jupyter notebook.
+- SoS Workflow System is a Python based workflow system that is designed to be readable, sharable, and suitable for daily data analysis.
+- SoS Workflow System can be used from command line or use SoS Notebook as its IDE.
+
+![](https://vatlab.github.io/sos-docs/doc/media/SoS_Notebook_and_Workflow.png)
+
+### How to install SOS-kernel
+
+Please follow this [link](https://vatlab.github.io/sos-docs/running.html#Conda-installation) to setup SOS
+
+I run some issue with the latest version of R on my Mac, so I had to install an earlier version of R
+
+```
+conda install -c r r=3.5.1
+conda install sos-notebook jupyterlab-sos sos-papermill -c conda-forge
+```
+
+## Related issue with Jupytext
+
+Jupytext works fine with Python/R kernel but converts code cells into markdown cells when using the SOS kernel.
+
+cf the image below. It is a code cell. After saving the notebook and restart it, it converted the code cell into markdown
+
+<img width="734" alt="Screenshot 2020-03-13 at 10 51 18" src="https://user-images.githubusercontent.com/33351426/76610049-9e704600-6518-11ea-861e-b4f691d1a478.png">
+<!-- #endregion -->
+
+<!-- #region Collapsed="false" kernel="SoS" -->
+## Step 1
+
+Please, choose SOS Kernel and then, in the cell code, choose SOS (or any other kernel available), the outcome is the same.
+
+![](https://drive.google.com/uc?export=view&id=1OtyxfwoRyVK23XHnmd9JR-crBgHBL5mt)
+<!-- #endregion -->
+
+```{sos Collapsed="false", kernel="SoS"}
+import pandas as pd 
+import numpy as np
+
+pd.DataFrame({
+    'x': np.random.random(10),
+    'y': np.random.random(10),
+})
+```
+
+<!-- #region Collapsed="false" kernel="python3" -->
+## Step 2
+
+Now, pair it with Jupytex
+
+![](https://drive.google.com/uc?export=view&id=1Wtx-YPAXY8HWHqzCcy4iIgHpzt_9emEn)
+<!-- #endregion -->
+
+<!-- #region Collapsed="false" kernel="python3" -->
+### Step 3
+
+Save the notebook, restart and clear all, **save**, then Shut down kernel. Close the notebook and reopen
+<!-- #endregion -->
+
+<!-- #region Collapsed="false" kernel="python3" -->
+### Step 4
+
+Reopen the notebook. Here is the outcome
+
+![](https://drive.google.com/uc?export=view&id=12C70unbSPv0gHCZaCICEUy7kO7wM93JH)
+
+
+<!-- #endregion -->
