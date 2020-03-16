@@ -9,14 +9,14 @@ nbformat_minor: 2
 
 This is a jupyter notebook that uses the IR kernel.
 
-```{nb-code}
+```{nb-code} r
 sum(1:10)
 ```
 
-```{nb-code}
+```{nb-code} r
 plot(cars)
 ```
 
-```{nb-code}
+```{nb-code} r
 
 ```

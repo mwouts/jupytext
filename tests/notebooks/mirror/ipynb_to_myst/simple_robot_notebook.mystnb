@@ -7,13 +7,13 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code}
+```{nb-code} robotframework
 *** Settings ***
 
 Library  Collections
 ```
 
-```{nb-code}
+```{nb-code} robotframework
 *** Keywords ***
 
 Head
@@ -22,7 +22,7 @@ Head
     [Return]  ${value}
 ```
 
-```{nb-code}
+```{nb-code} robotframework
 *** Tasks ***
 
 Get head

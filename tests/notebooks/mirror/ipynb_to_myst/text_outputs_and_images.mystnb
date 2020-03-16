@@ -15,14 +15,14 @@ This notebook contains outputs of many different types: text, HTML, plots and er
 
 Using `print`, `sys.stdout` and `sys.stderr`
 
-```{nb-code}
+```{nb-code} ipython3
 import sys
 print('using print')
 sys.stdout.write('using sys.stdout.write')
 sys.stderr.write('using sys.stderr.write')
 ```
 
-```{nb-code}
+```{nb-code} ipython3
 import logging
 logging.debug('Debug')
 logging.info('Info')
@@ -34,12 +34,12 @@ logging.error('Error')
 
 Using `pandas`. Here we find two representations: both text and HTML.
 
-```{nb-code}
+```{nb-code} ipython3
 import pandas as pd
 pd.DataFrame([4])
 ```
 
-```{nb-code}
+```{nb-code} ipython3
 from IPython.display import display
 display(pd.DataFrame([5]))
 display(pd.DataFrame([6]))
@@ -47,11 +47,11 @@ display(pd.DataFrame([6]))
 
 # Images
 
-```{nb-code}
+```{nb-code} ipython3
 %matplotlib inline
 ```
 
-```{nb-code}
+```{nb-code} ipython3
 # First plot
 from matplotlib import pyplot as plt
 import numpy as np
@@ -73,6 +73,6 @@ plt.show()
 
 # Errors
 
-```{nb-code}
+```{nb-code} ipython3
 undefined_variable
 ```
