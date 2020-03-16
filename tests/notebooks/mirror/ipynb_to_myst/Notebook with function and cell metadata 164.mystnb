@@ -7,14 +7,14 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code}
+```{nb-code} ipython3
 1 + 1
 ```
 
 A markdown cell
 And below, the cell for function f has non trivial cell metadata. And the next cell as well.
 
-```{nb-code}
+```{nb-code} ipython3
 ---
 attributes:
   classes: []
@@ -25,7 +25,7 @@ def f(x):
     return x
 ```
 
-```{nb-code}
+```{nb-code} ipython3
 ---
 attributes:
   classes: []
@@ -37,6 +37,6 @@ f(5)
 
 More text
 
-```{nb-code}
+```{nb-code} ipython3
 2 + 2
 ```

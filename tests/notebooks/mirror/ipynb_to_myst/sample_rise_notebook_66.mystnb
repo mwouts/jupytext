@@ -11,7 +11,7 @@ nbformat_minor: 2
 
 A markdown cell
 
-```{nb-code}
+```{nb-code} ipython3
 ---
 slideshow:
   slide_type: ''

@@ -27,7 +27,7 @@ with a code block inside it
 
 After that cell we'll have a code cell
 
-```{nb-code}
+```{nb-code} ipython3
 2 + 2
 
 
@@ -48,7 +48,7 @@ of the raw cell
 
 This is a markdown cell with cell metadata `{"key": "value"}`
 
-```{nb-code}
+```{nb-code} ipython3
 ---
 .class: null
 tags:

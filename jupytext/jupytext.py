@@ -128,6 +128,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 cells=cells))
 
         if self.ext in myst_extensions():
+            pygments_lexer = metadata.get("language_info", {}).get("pygments_lexer", None)
             metadata = insert_jupytext_info_and_filter_metadata(metadata, self.ext, self.implementation)
 
             cells = []
@@ -143,7 +144,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 nbformat=nb.nbformat,
                 nbformat_minor=nb.nbformat_minor,
                 metadata=metadata,
-                cells=cells))
+                cells=cells),
+                default_lexer=pygments_lexer)
 
         # Copy the notebook, in order to be sure we do not modify the original notebook
         nb = NotebookNode(

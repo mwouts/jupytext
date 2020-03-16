@@ -4,7 +4,7 @@ myst formatted text documents and notebooks.
 """
 import json
 import logging
-from typing import List, Union
+from typing import List, Optional, Union
 
 import nbformat as nbf
 import yaml
@@ -208,6 +208,7 @@ def notebook_to_myst(
     nb: nbf.NotebookNode,
     code_directive: str = CODE_DIRECTIVE,
     raw_directive: str = RAW_DIRECTIVE,
+    default_lexer: Optional[str] = None
 ):
     string = ""
 
@@ -217,6 +218,8 @@ def notebook_to_myst(
 
     # we add the pygments lexer as a directive argument, for use by syntax highlighters
     pygments_lexer = nb_metadata.get("language_info", {}).get("pygments_lexer", None)
+    if pygments_lexer is None:
+        pygments_lexer = default_lexer
 
     string += "---\n"
     string += yaml.safe_dump(nb_metadata)

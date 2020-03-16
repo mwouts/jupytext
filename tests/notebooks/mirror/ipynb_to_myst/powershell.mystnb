@@ -10,7 +10,7 @@ nbformat_minor: 2
 This is an extract from
 https://github.com/Jaykul/Jupyter-PowerShell/blob/master/LiterateDevOps.ipynb
 
-```{nb-code}
+```{nb-code} powershell
 $imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/2/2f/PowerShell_5.0_icon.png'
 $ImageData = @{ "png" = (Invoke-WebRequest $imageUrl -UseBasicParsing).RawContentStream.GetBuffer() }
 # $ImageData

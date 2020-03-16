@@ -9,7 +9,7 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code}
+```{nb-code} ipython3
 ---
 inputHidden: false
 outputHidden: false
@@ -19,7 +19,7 @@ tags:
 param = 4
 ```
 
-```{nb-code}
+```{nb-code} ipython3
 ---
 inputHidden: false
 outputHidden: false
@@ -27,7 +27,7 @@ outputHidden: false
 import pandas as pd
 ```
 
-```{nb-code}
+```{nb-code} ipython3
 ---
 inputHidden: false
 outputHidden: false
@@ -37,7 +37,7 @@ df = pd.DataFrame({'A': [1, 2], 'B': [3 + param, 4]},
 df
 ```
 
-```{nb-code}
+```{nb-code} ipython3
 ---
 inputHidden: false
 outputHidden: false

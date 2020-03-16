@@ -12,7 +12,7 @@ This is a notebook that contains many hash signs.
 Hopefully its python representation is not recognized as a Sphinx Gallery script...
 ##################################################################
 
-```{nb-code}
+```{nb-code} ipython3
 some = 1
 code = 2
 some+code
