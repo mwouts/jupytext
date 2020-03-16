@@ -4,7 +4,6 @@ pytest-cov
 codecov
 notebook
 jupyter_client
-myst-parser>=0.7.1,<0.8; python_version >= '3.6'
 nbconvert
 sphinx-gallery
 setuptools
