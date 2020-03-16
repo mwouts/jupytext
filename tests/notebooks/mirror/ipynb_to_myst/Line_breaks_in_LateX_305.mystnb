@@ -6,6 +6,7 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 This cell uses no particular cell marker
 
 $$
@@ -17,6 +18,7 @@ $$
 $$
 
 +++
+
 This cell uses no particular cell marker, and a single slash in the $\LaTeX$ equation
 
 $$
@@ -28,6 +30,7 @@ $$
 $$
 
 +++
+
 This cell uses the triple quote cell markers introduced at https://github.com/mwouts/jupytext/issues/305
 
 $$

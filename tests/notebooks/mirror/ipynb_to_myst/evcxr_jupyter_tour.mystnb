@@ -6,6 +6,7 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 # Tour of the EvCxR Jupyter Kernel
 For those not already familiar with Jupyter notebook, it lets you write code into "cells" like the box below. Cells can alternatively contain markdown, like this text here. Each code cell is compiled and executed separately, but variables, defined functions etc persist between cells.
 
@@ -17,6 +18,7 @@ println!("Hello world");
 eprintln!("Hello error");
 format!("Hello {}", "world")
 ```
+
 ## Assigning and making use of variables
 We define a variable `message`, then in the subsequent cell, modify the string and finally print it out. We could also do all this in the one cell if we wanted.
 
@@ -31,6 +33,7 @@ message.push_str("world!");
 ```{nb-code}
 message
 ```
+
 ## Defining and redefining functions
 Next we'll define a function
 
@@ -43,6 +46,7 @@ pub fn fib(x: i32) -> i32 {
 ```{nb-code}
 (1..13).map(fib).collect::<Vec<i32>>()
 ```
+
 Hmm, that doesn't look right. Lets redefine the function. In practice, we'd go back and edit the function above and reevalute it, but here, lets redefine it in a separate cell.
 
 ```{nb-code}
@@ -55,6 +59,7 @@ pub fn fib(x: i32) -> i32 {
 let values = (1..13).map(fib).collect::<Vec<i32>>();
 values
 ```
+
 ## Spawning a separate thread and communicating with it
 We can spawn a thread to do stuff in the background, then continue executing code in other cells.
 
@@ -78,6 +83,7 @@ std::thread::spawn({
 ```{nb-code}
 *counter.lock().unwrap()
 ```
+
 ## Loading external crates
 We can load external crates. This one takes a while to compile, but once it's compiled, subsequent cells shouldn't need to recompile it, so it should be much quicker.
 
@@ -86,6 +92,7 @@ We can load external crates. This one takes a while to compile, but once it's co
 :dep base64 = "0.10.1"
 base64::encode(&vec![1, 2, 3, 4])
 ```
+
 ## Customizing how types are displayed
 We can also customize how our types are displayed, including presenting them as HTML. Here's an example where we define a custom display function for a type `Matrix`.
 
@@ -115,6 +122,7 @@ impl<T: Debug> Matrix<T> {
 let m = Matrix {values: vec![1,2,3,4,5,6,7,8,9], row_size: 3};
 m
 ```
+
 We can also return images, we just need to base64 encode them. First, we set up code for displaying RGB and grayscale images.
 
 ```{nb-code}
@@ -150,6 +158,7 @@ image::ImageBuffer::from_fn(256, 256, |x, y| {
     }
 })
 ```
+
 ## Display of compilation errors
 Here's how compilation errors are presented. Here we forgot an & and passed a String instead of an &str.
 
@@ -157,6 +166,7 @@ Here's how compilation errors are presented. Here we forgot an & and passed a St
 let mut s = String::new();
 s.push_str(format!("foo {}", 42));
 ```
+
 ## Seeing what variables have been defined
 We can print a table of defined variables and their types with the :vars command.
 
@@ -164,6 +174,7 @@ We can print a table of defined variables and their types with the :vars command
 
 :vars
 ```
+
 Other built-in commands can be found via :help
 
 ```{nb-code}

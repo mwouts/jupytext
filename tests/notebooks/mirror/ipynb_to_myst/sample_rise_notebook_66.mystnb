@@ -8,6 +8,7 @@ nbformat_minor: 2
 ---
 
 +++ {"slideshow": {"slide_type": "slide"}}
+
 A markdown cell
 
 ```{nb-code}
@@ -19,4 +20,5 @@ slideshow:
 ```
 
 +++ {"cell_style": "center", "slideshow": {"slide_type": "fragment"}}
+
 Markdown cell two

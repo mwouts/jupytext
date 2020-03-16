@@ -12,6 +12,7 @@ nbformat_minor: 2
 
 print('asdf')
 ```
+
 Thanks for jupytext!
 
 ```{nb-code}

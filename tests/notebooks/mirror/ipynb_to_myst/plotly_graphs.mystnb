@@ -6,12 +6,15 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 This notebook contains complex outputs, including plotly javascript graphs.
 
 +++
+
 # Interactive plots
 
 +++
+
 We use Plotly's connected mode to make the notebook lighter - when connected, the notebook downloads the `plotly.js` library from the web.
 
 ```{nb-code}

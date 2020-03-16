@@ -6,15 +6,18 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 # Part one - various cells
 
 +++
+
 Here we have a markdown cell
 
 
 with two blank lines
 
 +++
+
 Now we have a markdown cell
 with a code block inside it
 
@@ -30,6 +33,7 @@ After that cell we'll have a code cell
 
 3 + 3
 ```
+
 Followed by a raw cell
 
 ```{nb-raw}
@@ -37,9 +41,11 @@ This is
 the content
 of the raw cell
 ```
+
 # Part two - cell metadata
 
 +++ {"key": "value"}
+
 This is a markdown cell with cell metadata `{"key": "value"}`
 
 ```{nb-code}

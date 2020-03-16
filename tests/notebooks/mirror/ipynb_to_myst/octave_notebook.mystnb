@@ -6,6 +6,7 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 A markdown cell
 
 ```{nb-code}
@@ -29,6 +30,7 @@ plot (x, sin (x));
 x = -10:0.1:10;
 plot (x, sin (x));
 ```
+
 And to finish with, a Python cell
 
 ```{nb-code}

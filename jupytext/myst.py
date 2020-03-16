@@ -46,7 +46,10 @@ class MockDirective:
 
 
 def _fmt_md(text):
-    return text.rstrip()
+    text = text.rstrip()
+    while text and text.startswith("\n"):
+        text = text[1:]
+    return text
 
 
 def myst_to_notebook(
@@ -216,7 +219,7 @@ def notebook_to_myst(
                     string += "\n+++ {}\n".format(json.dumps(metadata))
                 else:
                     string += "\n+++\n"
-            string += cell.source
+            string += "\n" + cell.source
             if not cell.source.endswith("\n"):
                 string += "\n"
             last_cell_md = True

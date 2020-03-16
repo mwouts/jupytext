@@ -6,6 +6,7 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 <img src="images/logo-64x64.png"/>
 <h1>Reference Guide for Calysto Scheme</h1>
 
@@ -59,6 +60,7 @@ When you run Calysto Scheme in Jupyter (console, notebook, qtconsole, etc.) you 
 * Python integration
 
 +++
+
 ### LaTeX-style variables
 
 Calysto Scheme allows you to use LaTeX-style variables in code. For example, if you type:
@@ -97,6 +99,7 @@ Calysto Scheme may not implement all of those. Some useful and suggestive ones:
 (define vectorᵢ (vector-ref (vector 0 6 3 2) i))
 vectorᵢ
 ```
+
 ### Rich media
 
 ```{nb-code}
@@ -122,11 +125,13 @@ vectorᵢ
 ```{nb-code}
 (ball.draw canvas)
 ```
+
 ### Shell commands
 
 ```{nb-code}
 ! ls /tmp
 ```
+
 ### Stepper/Debugger
 
 Here is what the debugger looks like:
@@ -136,6 +141,7 @@ Here is what the debugger looks like:
 It has breakpoints (click in left margin). You must press Stop to exit the debugger.
 
 +++
+
 ```scheme
 %%debug
 
@@ -146,6 +152,7 @@ It has breakpoints (click in left margin). You must press Stop to exit the debug
 ```
 
 +++
+
 ### Python Integration
 
 You can import and use any Python library in Calysto Scheme.
@@ -163,11 +170,13 @@ def mypyfunc(a, b):
     return a * b
 ")
 ```
+
 This is a shared environment with Scheme:
 
 ```{nb-code}
 (mypyfunc 4 5)
 ```
+
 You can use `func` to turn a Scheme procedure into a Python function, and `define!` to put it into the shared enviornment with Python:
 
 ```{nb-code}
@@ -177,6 +186,7 @@ You can use `func` to turn a Scheme procedure into a Python function, and `defin
 ```{nb-code}
 (python-eval "mypyfunc2(34)")
 ```
+
 # Differences Between Languages
 
 ## Major differences between Scheme and Python
@@ -212,6 +222,7 @@ Calysto Scheme acts as if it has a call stack, for easier debugging. For example
 ```{nb-code}
 (fact 5)
 ```
+
 To turn off the stack trace on error:
 
 ```scheme
@@ -220,6 +231,7 @@ To turn off the stack trace on error:
 That will allow infinite recursive loops without keeping track of the "stack".
 
 +++
+
 # Calysto Scheme Variables
 
 ## SCHEMEPATH
@@ -236,6 +248,7 @@ SCHEMEPATH
 ```{nb-code}
 SCHEMEPATH
 ```
+
 ## Getting Started
 
 Note that you can use the word `lambda` or \lambda and then press [TAB]
@@ -251,6 +264,7 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
 ```{nb-code}
 (factorial 5)
 ```
+
 ## define-syntax
 (define-syntax NAME RULES): a method for creating macros
 
@@ -432,18 +446,21 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
 ```{nb-code}
 (first 30 fibs)
 ```
+
 ## for-each
 (for-each PROCEDURE LIST): apply PROCEDURE to each item in LIST; like `map` but don't return results
 
 ```{nb-code}
 (for-each (lambda (n) (print n)) '(3 4 5))
 ```
+
 ## format
 (format STRING ITEM ...): format the string with ITEMS as arguments
 
 ```{nb-code}
 (format "This uses formatting ~a ~s ~%" 'apple 'apple)
 ```
+
 ## func
 
 Turns a lambda into a Python function.
@@ -453,6 +470,7 @@ Turns a lambda into a Python function.
 ```{nb-code}
 (func (lambda (n) n))
 ```
+
 ## There's more!
 
 Please see [Calysto Scheme Language](Calysto%20Scheme%20Language.ipynb) for more details on the Calysto Scheme language.
