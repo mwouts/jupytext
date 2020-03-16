@@ -3,7 +3,6 @@ This module contains round-trip conversion between
 myst formatted text documents and notebooks.
 """
 import json
-import logging
 
 import nbformat as nbf
 import yaml
@@ -11,8 +10,6 @@ import yaml
 MYST_FORMAT_NAME = "mystnb"
 CODE_DIRECTIVE = "nb-code"
 RAW_DIRECTIVE = "nb-raw"
-
-LOGGER = logging.getLogger(__name__)
 
 
 def is_myst_available():
@@ -47,6 +44,10 @@ class MockDirective:
     has_content = True
 
 
+class MystMetadataParsingError(Exception):
+    """Error when parsing metadata from myst formatted text"""
+
+
 def _fmt_md(text):
     text = text.rstrip()
     while text and text.startswith("\n"):
@@ -55,12 +56,13 @@ def _fmt_md(text):
 
 
 def myst_to_notebook(
-    text, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, logger=None,
+    text, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE,
 ):
     """Convert text written in the myst format to a notebook.
 
     :param text: the file text
-    :directive: the name of the directive to search for.
+    :code_directive: the name of the directive to search for containing code cells
+    :raw_directive: the name of the directive to search for containing raw cells
 
     NOTE: we assume here that all of these directives are at the top-level,
     i.e. not nested in other directives.
@@ -74,12 +76,11 @@ def myst_to_notebook(
     from mistletoe.block_tokens import Document, CodeFence
 
     from myst_parser.block_tokens import BlockBreak
-    from myst_parser.parse_directives import parse_directive_text
+    from myst_parser.parse_directives import DirectiveParsingError, parse_directive_text
     from myst_parser.docutils_renderer import DocutilsRenderer
 
     code_directive = "{{{0}}}".format(code_directive)
     raw_directive = "{{{0}}}".format(raw_directive)
-    logger = logger or LOGGER
 
     original_context = get_parse_context()
     parse_context = ParseContext(
@@ -95,8 +96,10 @@ def myst_to_notebook(
     try:
         set_parse_context(parse_context)
         doc = Document.read(lines, front_matter=True)
-
-        metadata_nb = doc.front_matter.get_data() if doc.front_matter else {}
+        try:
+            metadata_nb = doc.front_matter.get_data() if doc.front_matter else {}
+        except (yaml.parser.ParserError, yaml.scanner.ScannerError) as error:
+            raise MystMetadataParsingError("Notebook metadata:".format(error))
         nbformat = metadata_nb.pop("nbformat", None)
         nbformat_minor = metadata_nb.pop("nbformat_minor", None)
         kwargs = {"metadata": nbf.from_dict(metadata_nb)}
@@ -125,20 +128,18 @@ def myst_to_notebook(
                 if token.content:
                     try:
                         md_metadata = json.loads(token.content.strip())
-                    except Exception:
-                        logger.warning(
-                            "markdown cell metadata could not be read: {}".format(
-                                token.position
+                    except Exception as err:
+                        raise MystMetadataParsingError(
+                            "markdown cell {1} at {1} could not be read: {2}".format(
+                                len(notebook.cells) + 1, token.position, err
                             )
                         )
-                        md_metadata = {}
                     if not isinstance(md_metadata, dict):
-                        logger.warning(
-                            "markdown cell metadata is not a dict: {}".format(
-                                token.position
+                        raise MystMetadataParsingError(
+                            "markdown cell {0} at {1} is not a dict".format(
+                                len(notebook.cells) + 1, token.position
                             )
                         )
-                        md_metadata = {}
                 else:
                     md_metadata = {}
                 current_line = token.position.line_start
@@ -151,12 +152,19 @@ def myst_to_notebook(
                 # this is reserved for the optional lexer name
                 # TODO: could log warning about if token.arguments != lexer name
 
-                _, options, body_lines = parse_directive_text(
-                    directive_class=MockDirective,
-                    argument_str="",
-                    content=token.children[0].content,
-                    validate_options=False,
-                )
+                try:
+                    _, options, body_lines = parse_directive_text(
+                        directive_class=MockDirective,
+                        argument_str="",
+                        content=token.children[0].content,
+                        validate_options=False,
+                    )
+                except DirectiveParsingError as err:
+                    raise MystMetadataParsingError(
+                        "Code cell {0} at {1} could not be read: {2}".format(
+                            len(notebook.cells) + 1, token.position, err
+                        )
+                    )
 
                 md_source = _fmt_md(
                     "".join(lines.lines[current_line:token.position.line_start - 1])
@@ -203,6 +211,14 @@ def myst_to_notebook(
 def notebook_to_myst(
     nb, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, default_lexer=None
 ):
+    """Parse a notebook to a MyST formatted text document.
+
+    :param nb: the notebook to parse
+    :param code_directive: the name of the directive to use for code cells
+    :param raw_directive: the name of the directive to use for raw cells
+    :param default_lexer: a lexer name to use for annotating code cells
+        (if ``nb.metadata.language_info.pygments_lexer`` is not available)
+    """
     string = ""
 
     nb_metadata = from_nbnode(nb.metadata)
