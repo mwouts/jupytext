@@ -6,6 +6,7 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 This is a jupyter notebook that uses the IR kernel.
 
 ```{nb-code}

@@ -10,6 +10,7 @@ nbformat_minor: 2
 ```{nb-code}
 1 + 1
 ```
+
 A markdown cell
 And below, the cell for function f has non trivial cell metadata. And the next cell as well.
 
@@ -33,6 +34,7 @@ attributes:
 ---
 f(5)
 ```
+
 More text
 
 ```{nb-code}

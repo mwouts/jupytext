@@ -6,9 +6,11 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 This notebook contains outputs of many different types: text, HTML, plots and errors.
 
 +++
+
 # Text outputs
 
 Using `print`, `sys.stdout` and `sys.stderr`
@@ -27,6 +29,7 @@ logging.info('Info')
 logging.warning('Warning')
 logging.error('Error')
 ```
+
 # HTML outputs
 
 Using `pandas`. Here we find two representations: both text and HTML.
@@ -41,6 +44,7 @@ from IPython.display import display
 display(pd.DataFrame([5]))
 display(pd.DataFrame([6]))
 ```
+
 # Images
 
 ```{nb-code}
@@ -66,6 +70,7 @@ plt.imshow(data)
 plt.axis('off')
 plt.show()
 ```
+
 # Errors
 
 ```{nb-code}
