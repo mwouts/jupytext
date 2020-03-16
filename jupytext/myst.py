@@ -31,7 +31,7 @@ CompactDumper.add_representer(dict, represent_dict)
 
 def dump_yaml_blocks(data, compact=True):
     """Where possible, we try to use a more compact metadata style.
-    
+
     For blocks with no nested dicts, the block is denoted by starting colons::
 
         :other: true
