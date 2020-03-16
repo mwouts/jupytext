@@ -6,11 +6,13 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 ```{nb-code}
 *** Settings ***
 
 Library  Collections
 ```
+
 ```{nb-code}
 *** Keywords ***
 
@@ -19,6 +21,7 @@ Head
     ${value}=  Get from list  ${list}  0
     [Return]  ${value}
 ```
+
 ```{nb-code}
 *** Tasks ***
 

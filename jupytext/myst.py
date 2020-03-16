@@ -222,7 +222,7 @@ def notebook_to_myst(
             last_cell_md = True
 
         elif cell.cell_type in ["code", "raw"]:
-            string += "```{{{}}}".format(
+            string += "\n```{{{}}}".format(
                 code_directive if cell.cell_type == "code" else raw_directive
             )
             if pygments_lexer and cell.cell_type == "code":

@@ -6,6 +6,7 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 ```{nb-code}
 %load_ext rpy2.ipython
 import pandas as pd
@@ -19,6 +20,7 @@ df = pd.DataFrame(
     }
 )
 ```
+
 ```{nb-code}
 %%R -i df
 library("ggplot2")

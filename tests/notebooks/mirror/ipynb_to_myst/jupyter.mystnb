@@ -9,15 +9,18 @@ nbformat_minor: 2
 # Jupyter notebook
 
 This notebook is a simple jupyter notebook. It only has markdown and code cells. And it does not contain consecutive markdown cells. We start with an addition:
+
 ```{nb-code}
 a = 1
 b = 2
 a + b
 ```
 Now we return a few tuples
+
 ```{nb-code}
 a, b
 ```
+
 ```{nb-code}
 a, b, a+b
 ```

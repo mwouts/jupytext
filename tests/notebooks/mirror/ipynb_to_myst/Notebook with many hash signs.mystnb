@@ -10,6 +10,7 @@ nbformat_minor: 2
 This is a notebook that contains many hash signs.
 Hopefully its python representation is not recognized as a Sphinx Gallery script...
 ##################################################################
+
 ```{nb-code}
 some = 1
 code = 2

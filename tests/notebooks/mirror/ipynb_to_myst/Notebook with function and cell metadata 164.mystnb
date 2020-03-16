@@ -6,11 +6,13 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 ```{nb-code}
 1 + 1
 ```
 A markdown cell
 And below, the cell for function f has non trivial cell metadata. And the next cell as well.
+
 ```{nb-code}
 ---
 attributes:
@@ -21,6 +23,7 @@ attributes:
 def f(x):
     return x
 ```
+
 ```{nb-code}
 ---
 attributes:
@@ -31,6 +34,7 @@ attributes:
 f(5)
 ```
 More text
+
 ```{nb-code}
 2 + 2
 ```

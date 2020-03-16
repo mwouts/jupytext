@@ -6,6 +6,7 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 1
 ---
+
 ```{nb-code}
 # IJulia rocks! So does Plotly. Check it out
 
@@ -15,6 +16,7 @@ username = ""
 
 Plotly.signin(username, api_key)
 ```
+
 ```{nb-code}
 # Following data taken from http://julialang.org/ frontpage 
 benchmarks = ["fib", "parse_int", "quicksort3", "mandel", "pi_sum", "rand_mat_stat", "rand_mat_mul"]
@@ -61,6 +63,7 @@ s = string("<iframe height='750' id='igraph' scrolling='no' seamless='seamless' 
             "/700/700' width='750'></iframe>")
 display("text/html", s)
 ```
+
 ```{nb-code}
 # checkout https://plot.ly/api/ for more Julia examples!
 # But to show off some other Plotly features:

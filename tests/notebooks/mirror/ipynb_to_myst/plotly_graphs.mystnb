@@ -13,10 +13,12 @@ This notebook contains complex outputs, including plotly javascript graphs.
 
 +++
 We use Plotly's connected mode to make the notebook lighter - when connected, the notebook downloads the `plotly.js` library from the web.
+
 ```{nb-code}
 import plotly.offline as offline
 offline.init_notebook_mode(connected=True)
 ```
+
 ```{nb-code}
 import plotly.graph_objects as go
 fig = go.Figure(

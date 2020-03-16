@@ -6,6 +6,7 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 ```{nb-raw}
 
 ---
@@ -18,9 +19,11 @@ editor_options:
      chunk_output_type console
 ---
 ```
+
 ```{nb-code}
 1+2+3
 ```
+
 ```{nb-code}
 
 ```

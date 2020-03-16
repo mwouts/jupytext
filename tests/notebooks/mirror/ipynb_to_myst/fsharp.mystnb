@@ -7,9 +7,11 @@ nbformat: 4
 nbformat_minor: 2
 ---
 This notebook was inspired by [Plottting with XPlot](https://github.com/dotnet/interactive/blob/master/NotebookExamples/fsharp/Docs/Plotting%20with%20Xplot.ipynb).
+
 ```{nb-code}
 open XPlot.Plotly
 ```
+
 ```{nb-code}
 let bar =
     Bar(

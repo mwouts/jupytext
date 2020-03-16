@@ -9,6 +9,7 @@ nbformat_minor: 2
 
 +++ {"slideshow": {"slide_type": "slide"}}
 A markdown cell
+
 ```{nb-code}
 ---
 slideshow:

@@ -23,6 +23,7 @@ with a code block inside it
 ```
 
 After that cell we'll have a code cell
+
 ```{nb-code}
 2 + 2
 
@@ -30,6 +31,7 @@ After that cell we'll have a code cell
 3 + 3
 ```
 Followed by a raw cell
+
 ```{nb-raw}
 This is 
 the content
@@ -39,6 +41,7 @@ of the raw cell
 
 +++ {"key": "value"}
 This is a markdown cell with cell metadata `{"key": "value"}`
+
 ```{nb-code}
 ---
 .class: null
@@ -47,6 +50,7 @@ tags:
 ---
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
 ```
+
 ```{nb-raw}
 ---
 key: value

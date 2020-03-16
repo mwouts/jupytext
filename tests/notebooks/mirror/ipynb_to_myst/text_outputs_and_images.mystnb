@@ -12,12 +12,14 @@ This notebook contains outputs of many different types: text, HTML, plots and er
 # Text outputs
 
 Using `print`, `sys.stdout` and `sys.stderr`
+
 ```{nb-code}
 import sys
 print('using print')
 sys.stdout.write('using sys.stdout.write')
 sys.stderr.write('using sys.stderr.write')
 ```
+
 ```{nb-code}
 import logging
 logging.debug('Debug')
@@ -28,19 +30,23 @@ logging.error('Error')
 # HTML outputs
 
 Using `pandas`. Here we find two representations: both text and HTML.
+
 ```{nb-code}
 import pandas as pd
 pd.DataFrame([4])
 ```
+
 ```{nb-code}
 from IPython.display import display
 display(pd.DataFrame([5]))
 display(pd.DataFrame([6]))
 ```
 # Images
+
 ```{nb-code}
 %matplotlib inline
 ```
+
 ```{nb-code}
 # First plot
 from matplotlib import pyplot as plt
@@ -61,6 +67,7 @@ plt.axis('off')
 plt.show()
 ```
 # Errors
+
 ```{nb-code}
 undefined_variable
 ```
