@@ -130,7 +130,7 @@ def myst_to_notebook(
                         md_metadata = json.loads(token.content.strip())
                     except Exception as err:
                         raise MystMetadataParsingError(
-                            "markdown cell {1} at {1} could not be read: {2}".format(
+                            "markdown cell {0} at {1} could not be read: {2}".format(
                                 len(notebook.cells) + 1, token.position, err
                             )
                         )
