@@ -22,3 +22,4 @@ dependencies:
   - setuptools
   - twine
   - pandoc
+  - myst-parser
