@@ -99,7 +99,7 @@ def myst_to_notebook(
         try:
             metadata_nb = doc.front_matter.get_data() if doc.front_matter else {}
         except (yaml.parser.ParserError, yaml.scanner.ScannerError) as error:
-            raise MystMetadataParsingError("Notebook metadata:".format(error))
+            raise MystMetadataParsingError("Notebook metadata: {}".format(error))
         nbformat = metadata_nb.pop("nbformat", None)
         nbformat_minor = metadata_nb.pop("nbformat_minor", None)
         kwargs = {"metadata": nbf.from_dict(metadata_nb)}
