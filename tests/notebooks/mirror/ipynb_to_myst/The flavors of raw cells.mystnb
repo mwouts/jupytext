@@ -8,37 +8,32 @@ nbformat_minor: 2
 ---
 
 ```{nb-raw}
----
-raw_mimetype: text/latex
----
+:raw_mimetype: text/latex
+
 $1+1$
 ```
 
 ```{nb-raw}
----
-raw_mimetype: text/restructuredtext
----
+:raw_mimetype: text/restructuredtext
+
 :math:`1+1`
 ```
 
 ```{nb-raw}
----
-raw_mimetype: text/html
----
+:raw_mimetype: text/html
+
 <b>Bold text<b>
 ```
 
 ```{nb-raw}
----
-raw_mimetype: text/markdown
----
+:raw_mimetype: text/markdown
+
 **Bold text**
 ```
 
 ```{nb-raw}
----
-raw_mimetype: text/x-python
----
+:raw_mimetype: text/x-python
+
 1 + 1
 ```
 

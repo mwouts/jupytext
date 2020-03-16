@@ -51,15 +51,13 @@ This is a markdown cell with cell metadata `{"key": "value"}`
 ```{nb-code} ipython3
 ---
 .class: null
-tags:
-- parameters
+tags: [parameters]
 ---
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
 ```
 
 ```{nb-raw}
----
-key: value
----
+:key: value
+
 This is a raw cell with cell metadata `{"key": "value"}`
 ```

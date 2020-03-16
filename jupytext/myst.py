@@ -12,6 +12,46 @@ CODE_DIRECTIVE = "nb-code"
 RAW_DIRECTIVE = "nb-raw"
 
 
+class CompactDumper(yaml.SafeDumper):
+    """This YAML dumper creates a more compact style for lists"""
+
+
+def represent_list(self, data):
+    flow_style = not any(isinstance(i, dict) for i in data)
+    return self.represent_sequence("tag:yaml.org,2002:seq", data, flow_style=flow_style)
+
+
+def represent_dict(self, data):
+    return self.represent_mapping("tag:yaml.org,2002:map", data, flow_style=False)
+
+
+CompactDumper.add_representer(list, represent_list)
+CompactDumper.add_representer(dict, represent_dict)
+
+
+def dump_yaml_blocks(data, compact=True):
+    """Where possible, we try to use a more compact metadata style.
+    
+    For blocks with no nested dicts, the block is denoted by starting colons::
+
+        :other: true
+        :tags: [hide-output, show-input]
+
+    For blocks with nesting the block is enlosed by ``---``::
+
+        ---
+        other:
+            more: true
+        tags: [hide-output, show-input]
+        ---
+    """
+    string = yaml.dump(data, Dumper=CompactDumper)
+    lines = string.splitlines()
+    if compact and all(l and l[0].isalpha() for l in lines):
+        return "\n".join([":{}".format(l) for l in lines]) + "\n\n"
+    return "---\n{}---\n".format(string)
+
+
 def is_myst_available():
     try:
         import myst_parser  # noqa
@@ -230,9 +270,8 @@ def notebook_to_myst(
     if pygments_lexer is None:
         pygments_lexer = default_lexer
 
-    string += "---\n"
-    string += yaml.safe_dump(nb_metadata)
-    string += "---\n"
+    if nb_metadata:
+        string += dump_yaml_blocks(nb_metadata, compact=False)
 
     last_cell_md = False
     for i, cell in enumerate(nb.cells):
@@ -258,9 +297,7 @@ def notebook_to_myst(
             string += "\n"
             metadata = from_nbnode(cell.metadata)
             if metadata:
-                string += "---\n"
-                string += yaml.safe_dump(metadata)
-                string += "---\n"
+                string += dump_yaml_blocks(metadata)
             elif cell.source.startswith("---") or cell.source.startswith(":"):
                 string += "\n"
             string += cell.source
