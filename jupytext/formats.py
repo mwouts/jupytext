@@ -19,6 +19,12 @@ from .stringparser import StringParser
 from .languages import _SCRIPT_EXTENSIONS, _COMMENT_CHARS, same_language
 from .pandoc import pandoc_version, is_pandoc_available
 from .magics import is_magic
+from .myst import (
+    MYST_FORMAT_NAME,
+    is_myst_available,
+    myst_version,
+    myst_extensions,
+)
 
 
 class JupytextFormatError(ValueError):
@@ -161,6 +167,15 @@ if is_pandoc_available():
         cell_reader_class=None,
         cell_exporter_class=None,
         current_version_number=pandoc_version()))
+
+if is_myst_available():
+    JUPYTEXT_FORMATS.extend([NotebookFormatDescription(
+        format_name=MYST_FORMAT_NAME,
+        extension=ext,
+        header_prefix='',
+        cell_reader_class=None,
+        cell_exporter_class=None,
+        current_version_number=myst_version()) for ext in myst_extensions()])
 
 NOTEBOOK_EXTENSIONS = list(dict.fromkeys(['.ipynb'] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
 EXTENSION_PREFIXES = ['.lgt', '.spx', '.pct', '.hyd', '.nb']

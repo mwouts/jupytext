@@ -36,6 +36,7 @@ setup(
     entry_points={'console_scripts': ['jupytext = jupytext.cli:jupytext']},
     tests_require=['pytest'],
     install_requires=['nbformat>=4.0.0', 'pyyaml', 'mock;python_version<"3"'],
+    extras_require={"myst": ["myst-parser~=0.7.1"]},
     license='MIT',
     classifiers=['Development Status :: 5 - Production/Stable',
                  'License :: OSI Approved :: MIT License',

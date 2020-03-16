@@ -1,0 +1,21 @@
+---
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+nbformat: 4
+nbformat_minor: 2
+---
+
++++ {"slideshow": {"slide_type": "slide"}}
+A markdown cell
+```{nb-code}
+---
+slideshow:
+  slide_type: ''
+---
+1+1
+```
+
++++ {"cell_style": "center", "slideshow": {"slide_type": "fragment"}}
+Markdown cell two
