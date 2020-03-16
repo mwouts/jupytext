@@ -7,28 +7,35 @@ nbformat: 4
 nbformat_minor: 2
 ---
 ## A notebook that uses IJavascript kernel
+
 ```{nb-code}
 let x = 5;
 const y = 6;
 var z = 10;
 ```
+
 ```{nb-code}
 x + y;
 ```
+
 ```{nb-code}
 function add(num1, num2) {
     return num1 + num2
 }
 ```
+
 ```{nb-code}
 add(x, y);
 ```
+
 ```{nb-code}
 const arrowAdd = (num1, num2) => num1 + num2;
 ```
+
 ```{nb-code}
 arrowAdd(x, y);
 ```
+
 ```{nb-code}
 const myCar = {
     color: "blue",
@@ -38,20 +45,25 @@ const myCar = {
     doors: [1,2,3,4]
 }
 ```
+
 ```{nb-code}
 console.log("color:", myCar.color);
 ```
+
 ```{nb-code}
 console.log("start:", myCar.start());
 ```
+
 ```{nb-code}
 for (let door of myCar.doors) {
     console.log("I'm door", door)
 }
 ```
+
 ```{nb-code}
 myCar;
 ```
+
 ```{nb-code}
 class User {
   constructor(name){
@@ -62,6 +74,7 @@ class User {
   }
 }
 ```
+
 ```{nb-code}
 let John = new User("John");
 John.sayHello();

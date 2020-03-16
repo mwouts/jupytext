@@ -83,37 +83,47 @@ Calysto Scheme may not implement all of those. Some useful and suggestive ones:
 * \Pi - Π
 * \Sigma - Σ
 * \_i - subscript i, such as vectorᵢ
+
 ```{nb-code}
 (define α 67)
 ```
+
 ```{nb-code}
 α
 ```
+
 ```{nb-code}
 (define i 2)
 (define vectorᵢ (vector-ref (vector 0 6 3 2) i))
 vectorᵢ
 ```
 ### Rich media
+
 ```{nb-code}
 (import "calysto.display")
 ```
+
 ```{nb-code}
 (calysto.display.HTML "This is <b>bold</b>, <i>italics</i>, <u>underlined</u>.")
 ```
+
 ```{nb-code}
 (import "calysto.graphics")
 ```
+
 ```{nb-code}
 (define canvas (calysto.graphics.Canvas))
 ```
+
 ```{nb-code}
 (define ball (calysto.graphics.Circle '(150 150) 100))
 ```
+
 ```{nb-code}
 (ball.draw canvas)
 ```
 ### Shell commands
+
 ```{nb-code}
 ! ls /tmp
 ```
@@ -141,9 +151,11 @@ It has breakpoints (click in left margin). You must press Stop to exit the debug
 You can import and use any Python library in Calysto Scheme.
 
 In addition, if you wish, you can execute expressions and statements in a Python environment:
+
 ```{nb-code}
 (python-eval "1 + 2")
 ```
+
 ```{nb-code}
 (python-exec 
 "
@@ -152,13 +164,16 @@ def mypyfunc(a, b):
 ")
 ```
 This is a shared environment with Scheme:
+
 ```{nb-code}
 (mypyfunc 4 5)
 ```
 You can use `func` to turn a Scheme procedure into a Python function, and `define!` to put it into the shared enviornment with Python:
+
 ```{nb-code}
 (define! mypyfunc2 (func (lambda (n) n)))
 ```
+
 ```{nb-code}
 (python-eval "mypyfunc2(34)")
 ```
@@ -185,6 +200,7 @@ You can use `func` to turn a Scheme procedure into a Python function, and `defin
 ### Stack Trace
 
 Calysto Scheme acts as if it has a call stack, for easier debugging. For example:
+
 ```{nb-code}
 (define fact
     (lambda (n)
@@ -192,6 +208,7 @@ Calysto Scheme acts as if it has a call stack, for easier debugging. For example
            q
            (* n (fact (- n 1))))))
 ```
+
 ```{nb-code}
 (fact 5)
 ```
@@ -207,18 +224,22 @@ That will allow infinite recursive loops without keeping track of the "stack".
 
 ## SCHEMEPATH
 SCHEMEPATH is a list of search directories used with (load NAME). This is a reference, so you should append to it rather than attempting to redefine it.
+
 ```{nb-code}
 SCHEMEPATH
 ```
+
 ```{nb-code}
 (set-cdr! (cdr SCHEMEPATH) (list "/var/modules"))
 ```
+
 ```{nb-code}
 SCHEMEPATH
 ```
 ## Getting Started
 
 Note that you can use the word `lambda` or \lambda and then press [TAB]
+
 ```{nb-code}
 (define factorial
   (λ (n)
@@ -226,20 +247,24 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
       ((zero? n) 1)
       (else (* n (factorial (- n 1)))))))
 ```
+
 ```{nb-code}
 (factorial 5)
 ```
 ## define-syntax
 (define-syntax NAME RULES): a method for creating macros
+
 ```{nb-code}
 (define-syntax time 
   [(time ?exp) (let ((start (current-time)))
                  ?exp
                  (- (current-time) start))])
 ```
+
 ```{nb-code}
 (time (car '(1 2 3 4)))
 ```
+
 ```{nb-code}
 ;;---------------------------------------------------------------------
 ;; collect is like list comprehension in Python
@@ -258,15 +283,19 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
           (cons (f (car values)) (filter-map f pred? (cdr values)))
           (filter-map f pred? (cdr values))))))
 ```
+
 ```{nb-code}
 (collect (* n n) for n in (range 10))
 ```
+
 ```{nb-code}
 (collect (* n n) for n in (range 5 20 3))
 ```
+
 ```{nb-code}
 (collect (* n n) for n in (range 10) if (> n 5))
 ```
+
 ```{nb-code}
 ;;---------------------------------------------------------------------
 ;; for loops
@@ -306,6 +335,7 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
         (f (car values) i)
         (for-iterate2 (+ i 1) (cdr values) f)))))
 ```
+
 ```{nb-code}
 (define matrix2d
   '((10 20)
@@ -319,6 +349,7 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
     ((130 140 150) (160 170 180))
     ((190 200 210) (220 230 240))))
 ```
+
 ```{nb-code}
 (begin 
  (define hello 0)
@@ -326,18 +357,23 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
  hello
  )
 ```
+
 ```{nb-code}
 (for sym in '(a b c d) do (define x 1) (set! x sym) (print x))
 ```
+
 ```{nb-code}
 (for n in (range 10 20 2) do (print n))
 ```
+
 ```{nb-code}
 (for n at (i j) in matrix2d do (print (list n 'coords: i j)))
 ```
+
 ```{nb-code}
 (for n at (i j k) in matrix3d do (print (list n 'coords: i j k)))
 ```
+
 ```{nb-code}
 (define-syntax scons
   [(scons ?x ?y) (cons ?x (lambda () ?y))])
@@ -380,25 +416,31 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
 
 (define ! (lambda (n) (nth n facts)))
 ```
+
 ```{nb-code}
 (! 5)
 ```
+
 ```{nb-code}
 (nth 10 facts)
 ```
+
 ```{nb-code}
 (nth 20 fibs)
 ```
+
 ```{nb-code}
 (first 30 fibs)
 ```
 ## for-each
 (for-each PROCEDURE LIST): apply PROCEDURE to each item in LIST; like `map` but don't return results
+
 ```{nb-code}
 (for-each (lambda (n) (print n)) '(3 4 5))
 ```
 ## format
 (format STRING ITEM ...): format the string with ITEMS as arguments
+
 ```{nb-code}
 (format "This uses formatting ~a ~s ~%" 'apple 'apple)
 ```
@@ -407,6 +449,7 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
 Turns a lambda into a Python function.
 
 (func (lambda ...))
+
 ```{nb-code}
 (func (lambda (n) n))
 ```

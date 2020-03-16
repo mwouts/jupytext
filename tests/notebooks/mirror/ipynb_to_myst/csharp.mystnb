@@ -7,10 +7,12 @@ nbformat: 4
 nbformat_minor: 1
 ---
 We start with...
+
 ```{nb-code}
 Console.WriteLine("Hello World!");
 ```
 Then we do a plot with Plotly, following the [Plotting with XPlot](https://github.com/dotnet/interactive/blob/master/NotebookExamples/csharp/Docs/Plotting%20with%20Xplot.ipynb) example from `dotnet/interactive`:
+
 ```{nb-code}
 using XPlot.Plotly;
 
@@ -26,9 +28,11 @@ chart.WithTitle("A bar plot");
 display(chart);
 ```
 We also test the math outputs as in the [Math and Latex](https://github.com/dotnet/interactive/blob/master/NotebookExamples/csharp/Docs/Math%20and%20LaTeX.ipynb) example:
+
 ```{nb-code}
 (LaTeXString)@"\begin{align} e^{i \pi} = -1\end{align}"
 ```
+
 ```{nb-code}
 (MathString)@"e^{i \pi} = -1"
 ```

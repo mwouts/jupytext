@@ -6,6 +6,7 @@ kernelspec:
 nbformat: 4
 nbformat_minor: 2
 ---
+
 ```{nb-code}
 c = '''
 title: "Quick test"
@@ -17,10 +18,12 @@ editor_options:
      chunk_output_type console
 '''
 ```
+
 ```{nb-code}
 import yaml
 print(yaml.dump(yaml.load(c)))
 ```
+
 ```{nb-code}
 ?next
 ```
