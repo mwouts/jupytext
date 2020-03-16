@@ -56,11 +56,11 @@ def _fmt_md(text):
 
 
 def myst_to_notebook(
-    text: Union[str, List[str]],
-    code_directive: str = CODE_DIRECTIVE,
-    raw_directive: str = RAW_DIRECTIVE,
+    text,
+    code_directive = CODE_DIRECTIVE,
+    raw_directive = RAW_DIRECTIVE,
     logger=None,
-) -> nbf.NotebookNode:
+):
     """Convert text written in the myst format to a notebook.
 
     :param text: the file text
@@ -118,7 +118,7 @@ def myst_to_notebook(
             if isinstance(item.node, BlockBreak):
                 token = item.node  # type: BlockBreak
                 source = _fmt_md(
-                    "".join(lines.lines[current_line : token.position.line_start - 1])
+                    "".join(lines.lines[current_line:token.position.line_start - 1])
                 )
                 if source:
                     notebook.cells.append(
@@ -163,7 +163,7 @@ def myst_to_notebook(
                 )
 
                 md_source = _fmt_md(
-                    "".join(lines.lines[current_line : token.position.line_start - 1])
+                    "".join(lines.lines[current_line:token.position.line_start - 1])
                 )
                 if md_source:
                     notebook.cells.append(
@@ -205,10 +205,10 @@ def myst_to_notebook(
 
 
 def notebook_to_myst(
-    nb: nbf.NotebookNode,
-    code_directive: str = CODE_DIRECTIVE,
-    raw_directive: str = RAW_DIRECTIVE,
-    default_lexer: Optional[str] = None
+    nb,
+    code_directive = CODE_DIRECTIVE,
+    raw_directive = RAW_DIRECTIVE,
+    default_lexer = None
 ):
     string = ""
 
