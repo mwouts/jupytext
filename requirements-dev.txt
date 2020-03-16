@@ -4,6 +4,7 @@ pytest-cov
 codecov
 notebook
 jupyter_client
+myst-parser~=0.7.1
 nbconvert
 sphinx-gallery
 setuptools

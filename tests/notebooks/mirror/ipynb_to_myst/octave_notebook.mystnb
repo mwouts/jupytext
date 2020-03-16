@@ -1,0 +1,36 @@
+---
+kernelspec:
+  display_name: Octave
+  language: octave
+  name: octave
+nbformat: 4
+nbformat_minor: 2
+---
+A markdown cell
+```{nb-code}
+1 + 1
+```
+```{nb-code}
+% a code cell with comments
+2 + 2
+```
+```{nb-code}
+% a simple plot
+x = -10:0.1:10;
+plot (x, sin (x));
+```
+```{nb-code}
+%plot -w 800
+% a simple plot with a magic instruction
+x = -10:0.1:10;
+plot (x, sin (x));
+```
+And to finish with, a Python cell
+```{nb-code}
+%%python
+a = 1
+```
+```{nb-code}
+%%python
+a + 1
+```

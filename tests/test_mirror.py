@@ -13,7 +13,13 @@ from jupytext.compare import compare_notebooks, combine_inputs_with_outputs
 from jupytext.formats import long_form_one_format, check_auto_ext, auto_ext_from_metadata
 from jupytext.languages import _SCRIPT_EXTENSIONS
 from jupytext.paired_paths import full_path
-from .utils import list_notebooks, skip_if_dict_is_not_ordered, requires_pandoc, requires_sphinx_gallery
+from .utils import (
+    list_notebooks,
+    skip_if_dict_is_not_ordered,
+    requires_pandoc,
+    requires_sphinx_gallery,
+    requires_myst,
+)
 
 pytestmark = skip_if_dict_is_not_ordered
 
@@ -123,6 +129,13 @@ def test_ipynb_to_Rmd(nb_file, no_jupytext_version_number):
                          list_notebooks('ipynb', skip='(functional|Notebook with|flavors|invalid|305)'))
 def test_ipynb_to_pandoc(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, 'md:pandoc', 'ipynb_to_pandoc')
+
+
+@requires_myst
+@pytest.mark.parametrize('nb_file',
+                         list_notebooks('ipynb_all', skip='html-demo|julia_functional_geometry|xcpp_by_quantstack'))
+def test_ipynb_to_myst(nb_file, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(nb_file, 'mystnb', 'ipynb_to_myst')
 
 
 @requires_sphinx_gallery

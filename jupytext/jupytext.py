@@ -19,6 +19,7 @@ from .cell_metadata import _IGNORE_CELL_METADATA
 from .languages import default_language_from_metadata_and_ext, set_main_and_cell_language
 from .pep8 import pep8_lines_between_cells
 from .pandoc import md_to_notebook, notebook_to_md
+from .myst import myst_extensions, myst_to_notebook, notebook_to_myst
 
 
 class TextNotebookConverter(NotebookReader, NotebookWriter):
@@ -53,6 +54,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         """Read a notebook represented as text"""
         if self.fmt.get('format_name') == 'pandoc':
             return md_to_notebook(s)
+
+        if self.ext in myst_extensions():
+            return myst_to_notebook(s)
 
         lines = s.splitlines()
 
@@ -118,6 +122,24 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                     cells.append(NotebookNode(source=cell.source, metadata=cell_metadata, cell_type=cell.cell_type))
 
             return notebook_to_md(NotebookNode(
+                nbformat=nb.nbformat,
+                nbformat_minor=nb.nbformat_minor,
+                metadata=metadata,
+                cells=cells))
+
+        if self.ext in myst_extensions():
+            metadata = insert_jupytext_info_and_filter_metadata(metadata, self.ext, self.implementation)
+
+            cells = []
+            for cell in nb.cells:
+                cell_metadata = filter_metadata(cell.metadata,
+                                                self.fmt.get('cell_metadata_filter'),
+                                                _IGNORE_CELL_METADATA)
+                if cell.cell_type == 'code':
+                    cells.append(new_code_cell(source=cell.source, metadata=cell_metadata))
+                else:
+                    cells.append(NotebookNode(source=cell.source, metadata=cell_metadata, cell_type=cell.cell_type))
+            return notebook_to_myst(NotebookNode(
                 nbformat=nb.nbformat,
                 nbformat_minor=nb.nbformat_minor,
                 metadata=metadata,
