@@ -3,6 +3,7 @@ This module contains round-trip conversion between
 myst formatted text documents and notebooks.
 """
 import json
+import logging
 from typing import List, Union
 
 import nbformat as nbf
@@ -11,6 +12,8 @@ import yaml
 MYST_FORMAT_NAME = "mystnb"
 CODE_DIRECTIVE = "nb-code"
 RAW_DIRECTIVE = "nb-raw"
+
+LOGGER = logging.getLogger(__name__)
 
 
 def is_myst_available():
@@ -56,6 +59,7 @@ def myst_to_notebook(
     text: Union[str, List[str]],
     code_directive: str = CODE_DIRECTIVE,
     raw_directive: str = RAW_DIRECTIVE,
+    logger=None,
 ) -> nbf.NotebookNode:
     """Convert text written in the myst format to a notebook.
 
@@ -79,6 +83,7 @@ def myst_to_notebook(
 
     code_directive = "{{{0}}}".format(code_directive)
     raw_directive = "{{{0}}}".format(raw_directive)
+    logger = logger or LOGGER
 
     original_context = get_parse_context()
     parse_context = ParseContext(
@@ -125,10 +130,18 @@ def myst_to_notebook(
                     try:
                         md_metadata = json.loads(token.content.strip())
                     except Exception:
-                        # TODO log warning if content can't be parsed as json
+                        logger.warning(
+                            "markdown cell metadata could not be read: {}".format(
+                                token.position
+                            )
+                        )
                         md_metadata = {}
                     if not isinstance(md_metadata, dict):
-                        # TODO log warning if content isn't a dict
+                        logger.warning(
+                            "markdown cell metadata is not a dict: {}".format(
+                                token.position
+                            )
+                        )
                         md_metadata = {}
                 else:
                     md_metadata = {}
