@@ -621,7 +621,7 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
     return notebook, latest_inputs, latest_outputs
 
 
-def exec_command(command, input=None):
+def exec_command(command, input=None, capture=False):
     """Execute the desired command, and pipe the given input into it"""
     if not isinstance(command, list):
         command = command.split(' ')
@@ -629,7 +629,7 @@ def exec_command(command, input=None):
     process = subprocess.Popen(command,
                                **(dict(stdout=subprocess.PIPE, stdin=subprocess.PIPE) if input is not None else {}))
     out, err = process.communicate(input=input)
-    if out:
+    if out and not capture:
         sys.stdout.write(out.decode('utf-8'))
     if err:
         sys.stderr.write(err.decode('utf-8'))
@@ -673,7 +673,7 @@ def pipe_notebook(notebook, command, fmt='py:percent', update=True, prefix=None)
             tmp.write(text)
             tmp.close()
 
-            exec_command([cmd if cmd != '{}' else tmp.name for cmd in command])
+            exec_command([cmd if cmd != '{}' else tmp.name for cmd in command], capture=update)
 
             if not update:
                 return notebook
@@ -682,7 +682,7 @@ def pipe_notebook(notebook, command, fmt='py:percent', update=True, prefix=None)
         finally:
             os.remove(tmp.name)
     else:
-        cmd_output = exec_command(command, text.encode('utf-8'))
+        cmd_output = exec_command(command, text.encode('utf-8'), capture=update)
 
         if not update:
             return notebook

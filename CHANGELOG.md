@@ -2,7 +2,10 @@
 ------------------
 
 **Added**
--  Script of script (SoS) notebooks are now supported. Thanks to Thomas Pernet-coudrier for contributing the sample notebook (#453).
+- Script of script (SoS) notebooks are now supported. Thanks to Thomas Pernet-coudrier for contributing the sample notebook (#453).
+
+**Fixed**
+- When using `jupytext --pipe cmd`, the output of `cmd` should not appear in the terminal (#432)
  
 
 1.4.0 (2020-03-09)
