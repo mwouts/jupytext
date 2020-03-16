@@ -4,7 +4,6 @@ myst formatted text documents and notebooks.
 """
 import json
 import logging
-from typing import List, Optional, Union
 
 import nbformat as nbf
 import yaml
@@ -56,10 +55,7 @@ def _fmt_md(text):
 
 
 def myst_to_notebook(
-    text,
-    code_directive = CODE_DIRECTIVE,
-    raw_directive = RAW_DIRECTIVE,
-    logger=None,
+    text, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, logger=None,
 ):
     """Convert text written in the myst format to a notebook.
 
@@ -205,10 +201,7 @@ def myst_to_notebook(
 
 
 def notebook_to_myst(
-    nb,
-    code_directive = CODE_DIRECTIVE,
-    raw_directive = RAW_DIRECTIVE,
-    default_lexer = None
+    nb, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, default_lexer=None
 ):
     string = ""
 
