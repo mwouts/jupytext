@@ -7,15 +7,15 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code}
+```{code-cell}
 ls
 ```
 
-```{nb-code}
+```{code-cell}
 # https://coderwall.com/p/euwpig/a-better-git-log
 git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 ```
 
-```{nb-code}
+```{code-cell}
 git lg
 ```

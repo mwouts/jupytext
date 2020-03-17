@@ -7,11 +7,11 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code}
+```{code-cell}
 plt: .p.import`matplotlib.pyplot
 ```
 
-```{nb-code}
+```{code-cell}
 filter: {
     t: ([] x: `float $ x; xh: `float $ x; p: (count x) # R: var x);
     (first t), iterate[R; R]\[first t; 1 _ t] 
@@ -24,21 +24,21 @@ iterate: {[Q; R; x; y]
     }
 ```
 
-```{nb-code}
+```{code-cell}
 price: 100 + sums 0.5 - (n:50)?1.
 ```
 
-```{nb-code}
+```{code-cell}
 output:filter price
 ```
 
-```{nb-code}
+```{code-cell}
 plt[`:plot][til n; output`x; `label pykw "price"];
 plt[`:plot][til n; output`xh;`label pykw "forecast"];
 plt[`:legend][];
 plt[`:show][];
 ```
 
-```{nb-code}
+```{code-cell}
 
 ```

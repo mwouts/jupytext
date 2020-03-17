@@ -7,12 +7,12 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 # This is an unfrozen cell. Works as usual.
 print("I'm a regular cell so I run and print!")
 ```
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 ---
 deletable: false
 editable: false

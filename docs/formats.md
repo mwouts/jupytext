@@ -93,7 +93,7 @@ Similar to the Markdown format, MyST-NB uses code blocks to contain code cells.
 The difference though, is that the metadata is contained in a YAML block:
 
 ````md
-```{nb-code} ipython3
+```{code-cell} ipython3
 ---
 other:
   more: true
@@ -111,7 +111,7 @@ Also, where possible the conversion will use the short-hand metadata format
 (see the [MyST guide](https://myst-parser.readthedocs.io/en/latest/using/syntax.html#parameterizing-directives)):
 
 ````md
-```{nb-code} ipython3
+```{code-cell} ipython3
 :tags: [hide-output, show-input]
 
 print("Hallo!")
@@ -121,7 +121,7 @@ print("Hallo!")
 Raw cells are also represented in a similare fashion:
 
 ````md
-```{nb-raw}
+```{raw-cell}
 :raw_mimetype: text/html
 
 <b>Bold text<b>

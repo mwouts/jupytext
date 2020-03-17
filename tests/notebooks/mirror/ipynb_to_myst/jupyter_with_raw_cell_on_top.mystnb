@@ -7,7 +7,7 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-raw}
+```{raw-cell}
 
 ---
 title: "Quick test"
@@ -20,10 +20,10 @@ editor_options:
 ---
 ```
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 1+2+3
 ```
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 
 ```

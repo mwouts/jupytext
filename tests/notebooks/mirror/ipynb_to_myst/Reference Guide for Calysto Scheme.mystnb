@@ -86,15 +86,15 @@ Calysto Scheme may not implement all of those. Some useful and suggestive ones:
 * \Sigma - Σ
 * \_i - subscript i, such as vectorᵢ
 
-```{nb-code} scheme
+```{code-cell} scheme
 (define α 67)
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 α
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (define i 2)
 (define vectorᵢ (vector-ref (vector 0 6 3 2) i))
 vectorᵢ
@@ -102,33 +102,33 @@ vectorᵢ
 
 ### Rich media
 
-```{nb-code} scheme
+```{code-cell} scheme
 (import "calysto.display")
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (calysto.display.HTML "This is <b>bold</b>, <i>italics</i>, <u>underlined</u>.")
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (import "calysto.graphics")
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (define canvas (calysto.graphics.Canvas))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (define ball (calysto.graphics.Circle '(150 150) 100))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (ball.draw canvas)
 ```
 
 ### Shell commands
 
-```{nb-code} scheme
+```{code-cell} scheme
 ! ls /tmp
 ```
 
@@ -159,11 +159,11 @@ You can import and use any Python library in Calysto Scheme.
 
 In addition, if you wish, you can execute expressions and statements in a Python environment:
 
-```{nb-code} scheme
+```{code-cell} scheme
 (python-eval "1 + 2")
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (python-exec 
 "
 def mypyfunc(a, b):
@@ -173,17 +173,17 @@ def mypyfunc(a, b):
 
 This is a shared environment with Scheme:
 
-```{nb-code} scheme
+```{code-cell} scheme
 (mypyfunc 4 5)
 ```
 
 You can use `func` to turn a Scheme procedure into a Python function, and `define!` to put it into the shared enviornment with Python:
 
-```{nb-code} scheme
+```{code-cell} scheme
 (define! mypyfunc2 (func (lambda (n) n)))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (python-eval "mypyfunc2(34)")
 ```
 
@@ -211,7 +211,7 @@ You can use `func` to turn a Scheme procedure into a Python function, and `defin
 
 Calysto Scheme acts as if it has a call stack, for easier debugging. For example:
 
-```{nb-code} scheme
+```{code-cell} scheme
 (define fact
     (lambda (n)
       (if (= n 1)
@@ -219,7 +219,7 @@ Calysto Scheme acts as if it has a call stack, for easier debugging. For example
            (* n (fact (- n 1))))))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (fact 5)
 ```
 
@@ -237,15 +237,15 @@ That will allow infinite recursive loops without keeping track of the "stack".
 ## SCHEMEPATH
 SCHEMEPATH is a list of search directories used with (load NAME). This is a reference, so you should append to it rather than attempting to redefine it.
 
-```{nb-code} scheme
+```{code-cell} scheme
 SCHEMEPATH
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (set-cdr! (cdr SCHEMEPATH) (list "/var/modules"))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 SCHEMEPATH
 ```
 
@@ -253,7 +253,7 @@ SCHEMEPATH
 
 Note that you can use the word `lambda` or \lambda and then press [TAB]
 
-```{nb-code} scheme
+```{code-cell} scheme
 (define factorial
   (λ (n)
      (cond
@@ -261,25 +261,25 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
       (else (* n (factorial (- n 1)))))))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (factorial 5)
 ```
 
 ## define-syntax
 (define-syntax NAME RULES): a method for creating macros
 
-```{nb-code} scheme
+```{code-cell} scheme
 (define-syntax time 
   [(time ?exp) (let ((start (current-time)))
                  ?exp
                  (- (current-time) start))])
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (time (car '(1 2 3 4)))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 ;;---------------------------------------------------------------------
 ;; collect is like list comprehension in Python
 
@@ -298,19 +298,19 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
           (filter-map f pred? (cdr values))))))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (collect (* n n) for n in (range 10))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (collect (* n n) for n in (range 5 20 3))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (collect (* n n) for n in (range 10) if (> n 5))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 ;;---------------------------------------------------------------------
 ;; for loops
 
@@ -350,7 +350,7 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
         (for-iterate2 (+ i 1) (cdr values) f)))))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (define matrix2d
   '((10 20)
     (30 40)
@@ -364,7 +364,7 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
     ((190 200 210) (220 230 240))))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (begin 
  (define hello 0)
  (for 5 times do (set! hello (+ hello 1)))
@@ -372,23 +372,23 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
  )
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (for sym in '(a b c d) do (define x 1) (set! x sym) (print x))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (for n in (range 10 20 2) do (print n))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (for n at (i j) in matrix2d do (print (list n 'coords: i j)))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (for n at (i j k) in matrix3d do (print (list n 'coords: i j k)))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (define-syntax scons
   [(scons ?x ?y) (cons ?x (lambda () ?y))])
 
@@ -431,33 +431,33 @@ Note that you can use the word `lambda` or \lambda and then press [TAB]
 (define ! (lambda (n) (nth n facts)))
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (! 5)
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (nth 10 facts)
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (nth 20 fibs)
 ```
 
-```{nb-code} scheme
+```{code-cell} scheme
 (first 30 fibs)
 ```
 
 ## for-each
 (for-each PROCEDURE LIST): apply PROCEDURE to each item in LIST; like `map` but don't return results
 
-```{nb-code} scheme
+```{code-cell} scheme
 (for-each (lambda (n) (print n)) '(3 4 5))
 ```
 
 ## format
 (format STRING ITEM ...): format the string with ITEMS as arguments
 
-```{nb-code} scheme
+```{code-cell} scheme
 (format "This uses formatting ~a ~s ~%" 'apple 'apple)
 ```
 
@@ -467,7 +467,7 @@ Turns a lambda into a Python function.
 
 (func (lambda ...))
 
-```{nb-code} scheme
+```{code-cell} scheme
 (func (lambda (n) n))
 ```
 

@@ -9,22 +9,22 @@ nbformat_minor: 2
 
 A markdown cell
 
-```{nb-code}
+```{code-cell}
 1 + 1
 ```
 
-```{nb-code}
+```{code-cell}
 % a code cell with comments
 2 + 2
 ```
 
-```{nb-code}
+```{code-cell}
 % a simple plot
 x = -10:0.1:10;
 plot (x, sin (x));
 ```
 
-```{nb-code}
+```{code-cell}
 %plot -w 800
 % a simple plot with a magic instruction
 x = -10:0.1:10;
@@ -33,12 +33,12 @@ plot (x, sin (x));
 
 And to finish with, a Python cell
 
-```{nb-code}
+```{code-cell}
 %%python
 a = 1
 ```
 
-```{nb-code}
+```{code-cell}
 %%python
 a + 1
 ```

@@ -7,7 +7,7 @@ nbformat: 4
 nbformat_minor: 1
 ---
 
-```{nb-code}
+```{code-cell}
 # This notebook is a semi top-down explanation. This cell needs to be
 # executed first so that the operators and helper functions are defined
 # All of this is explained in the later half of the notebook

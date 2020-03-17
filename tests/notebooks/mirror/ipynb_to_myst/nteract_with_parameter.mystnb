@@ -9,7 +9,7 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 :inputHidden: false
 :outputHidden: false
 :tags: [parameters]
@@ -17,14 +17,14 @@ nbformat_minor: 2
 param = 4
 ```
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 :inputHidden: false
 :outputHidden: false
 
 import pandas as pd
 ```
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 :inputHidden: false
 :outputHidden: false
 
@@ -33,7 +33,7 @@ df = pd.DataFrame({'A': [1, 2], 'B': [3 + param, 4]},
 df
 ```
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 :inputHidden: false
 :outputHidden: false
 

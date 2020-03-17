@@ -40,31 +40,31 @@ A Jupyter kernel for C++ based on the `cling` C++ interpreter and the `xeus` nat
 
 `std::cout` and `std::cerr` are redirected to the notebook frontend.
 
-```{nb-code}
+```{code-cell}
 #include <iostream>
 
 std::cout << "some output" << std::endl;
 ```
 
-```{nb-code}
+```{code-cell}
 std::cerr << "some error" << std::endl;
 ```
 
-```{nb-code}
+```{code-cell}
 #include <stdexcept>
 ```
 
-```{nb-code}
+```{code-cell}
 throw std::runtime_error("Unknown exception");
 ```
 
 Omitting the `;` in the last statement of a cell results in an output being printed
 
-```{nb-code}
+```{code-cell}
 int j = 5;
 ```
 
-```{nb-code}
+```{code-cell}
 j
 ```
 
@@ -76,14 +76,14 @@ j
 
 ## Functions
 
-```{nb-code}
+```{code-cell}
 double sqr(double a)
 {
     return a * a;
 }
 ```
 
-```{nb-code}
+```{code-cell}
 double a = 2.5;
 double asqr = sqr(a);
 asqr
@@ -91,7 +91,7 @@ asqr
 
 ## Classes
 
-```{nb-code}
+```{code-cell}
 class Foo
 {
 public:
@@ -105,14 +105,14 @@ public:
 };
 ```
 
-```{nb-code}
+```{code-cell}
 Foo bar;
 bar.print(1.2);
 ```
 
 ## Polymorphism
 
-```{nb-code}
+```{code-cell}
 class Bar : public Foo
 {
 public:
@@ -126,7 +126,7 @@ public:
 };
 ```
 
-```{nb-code}
+```{code-cell}
 Foo* bar2 = new Bar;
 bar2->print(1.2);
 delete bar2;
@@ -134,7 +134,7 @@ delete bar2;
 
 ## Templates
 
-```{nb-code}
+```{code-cell}
 #include <typeinfo>
 
 template <class T>
@@ -172,19 +172,19 @@ private:
 };
 ```
 
-```{nb-code}
+```{code-cell}
 FooT<double> foot1(1.2);
 foot1.print();
 ```
 
-```{nb-code}
+```{code-cell}
 FooT<int> foot2(4);
 foot2.print();
 ```
 
 ## C++11 / C++14 support
 
-```{nb-code}
+```{code-cell}
 class Foo11
 {
 public:
@@ -195,13 +195,13 @@ public:
 };
 ```
 
-```{nb-code}
+```{code-cell}
 Foo11 f1;
 Foo11 f2(f1);
 Foo11 f3(std::move(f1));
 ```
 
-```{nb-code}
+```{code-cell}
 #include <vector>
 
 std::vector<int> v = { 1, 2, 3};
@@ -209,7 +209,7 @@ auto iter = ++v.begin();
 v
 ```
 
-```{nb-code}
+```{code-cell}
 *iter
 ```
 
@@ -222,7 +222,7 @@ v
  - Documentation for types of the standard library is retrieved on cppreference.com.
  - The quick-help feature can also be enabled for user-defined types and third-party libraries. More documentation on this feature is available at https://xeus-cling.readthedocs.io/en/latest/inline_help.html.
 
-```{nb-code}
+```{code-cell}
 ?std::vector
 ```
 
@@ -238,7 +238,7 @@ More documentation on the rich display system of Jupyter and Xeus-cling is avail
 
 ### Image example
 
-```{nb-code}
+```{code-cell}
 #include <string>
 #include <fstream>
 
@@ -267,14 +267,14 @@ namespace im
 }
 ```
 
-```{nb-code}
+```{code-cell}
 im::image marie("images/marie.png");
 marie
 ```
 
 ### Audio example
 
-```{nb-code}
+```{code-cell}
 #include <string>
 #include <fstream>
 
@@ -306,24 +306,24 @@ namespace au
 }
 ```
 
-```{nb-code}
+```{code-cell}
 au::audio drums("audio/audio.wav");
 drums
 ```
 
 ### Display
 
-```{nb-code}
+```{code-cell}
 #include "xcpp/xdisplay.hpp"
 ```
 
-```{nb-code}
+```{code-cell}
 xcpp::display(drums);
 ```
 
 ### Update-display
 
-```{nb-code}
+```{code-cell}
 #include <string>
 #include "xcpp/xdisplay.hpp"
 
@@ -359,11 +359,11 @@ Original
 </div>)");
 ```
 
-```{nb-code}
+```{code-cell}
 xcpp::display(rect, "some_display_id");
 ```
 
-```{nb-code}
+```{code-cell}
 // Update the rectangle to be blue
 rect.m_content = R"(
 <div style='
@@ -387,16 +387,16 @@ They are defined with the symbol `%` for a line magic and `%%` for a cell magic.
 
 More documentation for magics is available at https://xeus-cling.readthedocs.io/en/latest/magics.html.
 
-```{nb-code}
+```{code-cell}
 #include <algorithm>
 #include <vector>
 ```
 
-```{nb-code}
+```{code-cell}
 std::vector<double> to_shuffle = {1, 2, 3, 4};
 ```
 
-```{nb-code}
+```{code-cell}
 %timeit std::random_shuffle(to_shuffle.begin(), to_shuffle.end());
 ```
 
@@ -408,7 +408,7 @@ std::vector<double> to_shuffle = {1, 2, 3, 4};
 
 `xtensor` is a C++ library for manipulating N-D arrays with an API very similar to that of numpy.
 
-```{nb-code}
+```{code-cell}
 #include <iostream>
 
 #include "xtensor/xarray.hpp"
@@ -428,13 +428,13 @@ xt::view(arr1, 1) + arr2
 
 Together with the C++ Jupyter kernel, `xtensor` offers a similar experience as `NumPy` in the Python Jupyter kernel, including broadcasting and universal functions.
 
-```{nb-code}
+```{code-cell}
 #include <iostream>
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
 ```
 
-```{nb-code}
+```{code-cell}
 xt::xarray<int> arr
   {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
@@ -443,18 +443,18 @@ arr.reshape({3, 3});
 std::cout << arr;
 ```
 
-```{nb-code}
+```{code-cell}
 #include "xtensor-blas/xlinalg.hpp"
 ```
 
-```{nb-code}
+```{code-cell}
 xt::xtensor<double, 2> m = {{1.5, 0.5}, {0.7, 1.0}};
 std::cout << "Matrix rank: " << std::endl << xt::linalg::matrix_rank(m) << std::endl;
 std::cout << "Matrix inverse: " << std::endl << xt::linalg::inv(m) << std::endl;
 std::cout << "Eigen values: " << std::endl << xt::linalg::eigvals(m) << std::endl;
 ```
 
-```{nb-code}
+```{code-cell}
 xt::xarray<double> arg1 = xt::arange<double>(9);
 xt::xarray<double> arg2 = xt::arange<double>(18);
 
@@ -464,6 +464,6 @@ arg2.reshape({2, 3, 3});
 std::cout << xt::linalg::dot(arg1, arg2) << std::endl;
 ```
 
-```{nb-code}
+```{code-cell}
 
 ```

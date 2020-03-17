@@ -7,7 +7,7 @@ nbformat: 4
 nbformat_minor: 1
 ---
 
-```{nb-code}
+```{code-cell}
 # IJulia rocks! So does Plotly. Check it out
 
 using Plotly
@@ -17,7 +17,7 @@ username = ""
 Plotly.signin(username, api_key)
 ```
 
-```{nb-code}
+```{code-cell}
 # Following data taken from http://julialang.org/ frontpage 
 benchmarks = ["fib", "parse_int", "quicksort3", "mandel", "pi_sum", "rand_mat_stat", "rand_mat_mul"]
 platforms = ["Fortran", "Julia", "Python", "R", "Matlab", "Mathematica", "Javascript", "Go"]
@@ -64,7 +64,7 @@ s = string("<iframe height='750' id='igraph' scrolling='no' seamless='seamless' 
 display("text/html", s)
 ```
 
-```{nb-code}
+```{code-cell}
 # checkout https://plot.ly/api/ for more Julia examples!
 # But to show off some other Plotly features:
 x = 1:1500

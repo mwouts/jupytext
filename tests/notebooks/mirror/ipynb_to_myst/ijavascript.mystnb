@@ -9,35 +9,35 @@ nbformat_minor: 2
 
 ## A notebook that uses IJavascript kernel
 
-```{nb-code}
+```{code-cell}
 let x = 5;
 const y = 6;
 var z = 10;
 ```
 
-```{nb-code}
+```{code-cell}
 x + y;
 ```
 
-```{nb-code}
+```{code-cell}
 function add(num1, num2) {
     return num1 + num2
 }
 ```
 
-```{nb-code}
+```{code-cell}
 add(x, y);
 ```
 
-```{nb-code}
+```{code-cell}
 const arrowAdd = (num1, num2) => num1 + num2;
 ```
 
-```{nb-code}
+```{code-cell}
 arrowAdd(x, y);
 ```
 
-```{nb-code}
+```{code-cell}
 const myCar = {
     color: "blue",
     weight: 850,
@@ -47,25 +47,25 @@ const myCar = {
 }
 ```
 
-```{nb-code}
+```{code-cell}
 console.log("color:", myCar.color);
 ```
 
-```{nb-code}
+```{code-cell}
 console.log("start:", myCar.start());
 ```
 
-```{nb-code}
+```{code-cell}
 for (let door of myCar.doors) {
     console.log("I'm door", door)
 }
 ```
 
-```{nb-code}
+```{code-cell}
 myCar;
 ```
 
-```{nb-code}
+```{code-cell}
 class User {
   constructor(name){
     this.name = name;
@@ -76,7 +76,7 @@ class User {
 }
 ```
 
-```{nb-code}
+```{code-cell}
 let John = new User("John");
 John.sayHello();
 ```

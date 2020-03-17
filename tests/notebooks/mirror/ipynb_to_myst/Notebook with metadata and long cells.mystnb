@@ -27,7 +27,7 @@ with a code block inside it
 
 After that cell we'll have a code cell
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 2 + 2
 
 
@@ -36,7 +36,7 @@ After that cell we'll have a code cell
 
 Followed by a raw cell
 
-```{nb-raw}
+```{raw-cell}
 This is 
 the content
 of the raw cell
@@ -48,7 +48,7 @@ of the raw cell
 
 This is a markdown cell with cell metadata `{"key": "value"}`
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 ---
 .class: null
 tags: [parameters]
@@ -56,7 +56,7 @@ tags: [parameters]
 """This is a code cell with metadata `{"tags":["parameters"], ".class":null}`"""
 ```
 
-```{nb-raw}
+```{raw-cell}
 :key: value
 
 This is a raw cell with cell metadata `{"key": "value"}`
