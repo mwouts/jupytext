@@ -196,6 +196,8 @@ def get_format_implementation(ext, format_name=None):
     if formats_for_extension:
         if ext in ['.md', '.markdown'] and format_name == 'pandoc':
             raise JupytextFormatError('Please install pandoc>=2.7.2')
+        if ext in myst_extensions() and format_name == MYST_FORMAT_NAME:
+            raise JupytextFormatError('Please install myst-parser')
 
         raise JupytextFormatError("Format '{}' is not associated to extension '{}'. "
                                   "Please choose one of: {}.".format(format_name, ext,
@@ -539,7 +541,7 @@ def short_form_one_format(jupytext_format):
 
     if jupytext_format.get('format_name'):
         if jupytext_format['extension'] not in ['.md', '.markdown', '.Rmd'] or \
-                jupytext_format['format_name'] == 'pandoc':
+                jupytext_format['format_name'] in ['pandoc', MYST_FORMAT_NAME]:
             fmt = fmt + ':' + jupytext_format['format_name']
 
     return fmt

@@ -67,7 +67,7 @@ def myst_version():
 
 
 def myst_extensions():
-    return [".mystnb", ".mnb"]
+    return [".mystnb", ".mnb", ".md"]
 
 
 def from_nbnode(value):
