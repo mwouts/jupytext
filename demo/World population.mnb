@@ -1,4 +1,11 @@
 ---
+jupytext:
+  formats: ipynb,.pct.py:percent,.lgt.py:light,.spx.py:sphinx,md,Rmd,.pandoc.md:pandoc
+  text_representation:
+    extension: .mnb
+    format_name: mystnb
+    format_version: 0.7.1
+    jupytext_version: 1.4.0+dev
 kernelspec:
   display_name: Python 3
   language: python

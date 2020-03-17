@@ -142,7 +142,7 @@ This is a markdown cell with metadata
 This is a new markdown cell with no metadata
 ```
 
-See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.mystnb#) in the `mystnb` format.
+See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.mnb#) in the `mystnb` format.
 
 If you wish to use that format, please install `conda install -c conda-forge myst-parser`,
 or `pip install jupytext[myst]`.
