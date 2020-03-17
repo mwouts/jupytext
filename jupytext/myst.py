@@ -101,8 +101,8 @@ def myst_to_notebook(
     """Convert text written in the myst format to a notebook.
 
     :param text: the file text
-    :code_directive: the name of the directive to search for containing code cells
-    :raw_directive: the name of the directive to search for containing raw cells
+    :param code_directive: the name of the directive to search for containing code cells
+    :param raw_directive: the name of the directive to search for containing raw cells
 
     NOTE: we assume here that all of these directives are at the top-level,
     i.e. not nested in other directives.
@@ -140,15 +140,10 @@ def myst_to_notebook(
             metadata_nb = doc.front_matter.get_data() if doc.front_matter else {}
         except (yaml.parser.ParserError, yaml.scanner.ScannerError) as error:
             raise MystMetadataParsingError("Notebook metadata: {}".format(error))
-        nbformat = metadata_nb.pop("nbformat", None)
-        nbformat_minor = metadata_nb.pop("nbformat_minor", None)
-        kwargs = {"metadata": nbf.from_dict(metadata_nb)}
-        if nbformat is not None:
-            kwargs["nbformat"] = nbformat
-        if nbformat_minor is not None:
-            kwargs["nbformat_minor"] = nbformat_minor
 
-        notebook = nbf.v4.new_notebook(**kwargs)
+        nbf_version = nbf.v4
+        kwargs = {"metadata": nbf.from_dict(metadata_nb)}
+        notebook = nbf_version.new_notebook(**kwargs)
 
         current_line = 0 if not doc.front_matter else doc.front_matter.position.line_end
         md_metadata = {}
@@ -161,7 +156,7 @@ def myst_to_notebook(
                 )
                 if source:
                     notebook.cells.append(
-                        nbf.v4.new_markdown_cell(
+                        nbf_version.new_markdown_cell(
                             source=source, metadata=nbf.from_dict(md_metadata),
                         )
                     )
@@ -211,7 +206,7 @@ def myst_to_notebook(
                 )
                 if md_source:
                     notebook.cells.append(
-                        nbf.v4.new_markdown_cell(
+                        nbf_version.new_markdown_cell(
                             source=md_source, metadata=nbf.from_dict(md_metadata),
                         )
                     )
@@ -220,14 +215,14 @@ def myst_to_notebook(
 
                 if item.node.language == code_directive:
                     notebook.cells.append(
-                        nbf.v4.new_code_cell(
+                        nbf_version.new_code_cell(
                             source="\n".join(body_lines),
                             metadata=nbf.from_dict(options),
                         )
                     )
                 if item.node.language == raw_directive:
                     notebook.cells.append(
-                        nbf.v4.new_raw_cell(
+                        nbf_version.new_raw_cell(
                             source="\n".join(body_lines),
                             metadata=nbf.from_dict(options),
                         )
@@ -236,7 +231,7 @@ def myst_to_notebook(
         # add the final markdown cell (if present)
         if lines.lines[current_line:]:
             notebook.cells.append(
-                nbf.v4.new_markdown_cell(
+                nbf_version.new_markdown_cell(
                     source=_fmt_md("".join(lines.lines[current_line:])),
                     metadata=nbf.from_dict(md_metadata),
                 )
@@ -249,7 +244,7 @@ def myst_to_notebook(
 
 
 def notebook_to_myst(
-    nb, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, default_lexer=None
+    nb, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, default_lexer=None,
 ):
     """Parse a notebook to a MyST formatted text document.
 
@@ -262,8 +257,6 @@ def notebook_to_myst(
     string = ""
 
     nb_metadata = from_nbnode(nb.metadata)
-    nb_metadata["nbformat"] = nb.nbformat
-    nb_metadata["nbformat_minor"] = nb.nbformat_minor
 
     # we add the pygments lexer as a directive argument, for use by syntax highlighters
     pygments_lexer = nb_metadata.get("language_info", {}).get("pygments_lexer", None)

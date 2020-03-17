@@ -3,8 +3,6 @@ kernelspec:
   display_name: SoS
   language: sos
   name: sos
-nbformat: 4
-nbformat_minor: 4
 ---
 
 +++ {"Collapsed": "false", "kernel": "SoS"}

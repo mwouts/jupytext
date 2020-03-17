@@ -3,8 +3,6 @@ kernelspec:
   display_name: C++14
   language: C++14
   name: xeus-cling-cpp14
-nbformat: 4
-nbformat_minor: 2
 ---
 
 [![xeus-cling](images/xeus-cling.png)](https://github.com/QuantStack/xeus-cling/)

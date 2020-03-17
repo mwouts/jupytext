@@ -3,8 +3,6 @@ kernelspec:
   display_name: Javascript (Node.js)
   language: javascript
   name: javascript
-nbformat: 4
-nbformat_minor: 2
 ---
 
 ## A notebook that uses IJavascript kernel

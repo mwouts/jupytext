@@ -3,8 +3,6 @@ kernelspec:
   display_name: Clojure
   language: clojure
   name: clojure
-nbformat: 4
-nbformat_minor: 2
 ---
 
 # Clojupyter Demo
