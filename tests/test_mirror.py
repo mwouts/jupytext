@@ -135,7 +135,7 @@ def test_ipynb_to_pandoc(nb_file, no_jupytext_version_number):
 @pytest.mark.parametrize('nb_file',
                          list_notebooks('ipynb_all', skip='html-demo|julia_functional_geometry|xcpp_by_quantstack'))
 def test_ipynb_to_myst(nb_file, no_jupytext_version_number):
-    assert_conversion_same_as_mirror(nb_file, 'mystnb', 'ipynb_to_myst')
+    assert_conversion_same_as_mirror(nb_file, 'mnb', 'ipynb_to_myst')
 
 
 @requires_sphinx_gallery
