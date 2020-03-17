@@ -1,9 +1,9 @@
 ---
 jupytext:
-  formats: ipynb,.pct.py:percent,.lgt.py:light,.spx.py:sphinx,md,Rmd,.pandoc.md:pandoc
+  formats: ipynb,.pct.py:percent,.lgt.py:light,.spx.py:sphinx,md,Rmd,.pandoc.md:pandoc,.myst.md:myst
   text_representation:
-    extension: .mnb
-    format_name: mystnb
+    extension: '.md'
+    format_name: myst
     format_version: 0.7.1
     jupytext_version: 1.4.0+dev
 kernelspec:

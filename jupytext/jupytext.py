@@ -19,7 +19,7 @@ from .cell_metadata import _IGNORE_CELL_METADATA
 from .languages import default_language_from_metadata_and_ext, set_main_and_cell_language
 from .pep8 import pep8_lines_between_cells
 from .pandoc import md_to_notebook, notebook_to_md
-from .myst import myst_extensions, myst_to_notebook, notebook_to_myst
+from .myst import myst_extensions, myst_to_notebook, notebook_to_myst, MYST_FORMAT_NAME
 
 
 class TextNotebookConverter(NotebookReader, NotebookWriter):
@@ -55,7 +55,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         if self.fmt.get('format_name') == 'pandoc':
             return md_to_notebook(s)
 
-        if self.ext in myst_extensions():
+        if self.fmt.get('format_name') == MYST_FORMAT_NAME:
             return myst_to_notebook(s)
 
         lines = s.splitlines()
@@ -127,7 +127,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 metadata=metadata,
                 cells=cells))
 
-        if self.ext in myst_extensions():
+        if self.fmt.get('format_name') == MYST_FORMAT_NAME or self.ext in myst_extensions(no_md=True):
             pygments_lexer = metadata.get("language_info", {}).get("pygments_lexer", None)
             metadata = insert_jupytext_info_and_filter_metadata(metadata, self.ext, self.implementation)
 

@@ -83,13 +83,13 @@ See for instance how our `World population.ipynb` notebook is [represented](http
 
 If you wish to use that format, please install `pandoc` in version 2.7.2 or above, with e.g. `conda install pandoc -c conda-forge`.
 
-### MyST-NB Markdown
+### MyST Markdown
 
 [MyST (Markedly Structured Text)][myst-parser] is a markdown flavor that "implements the best parts of reStructuredText". It provides a way to call Sphinx directives and roles from within Markdown,
 using a *slight* extension of CommonMark markdown.
 [MyST-NB][myst-nb] builds on this markdown flavor, to offer direct conversion of Jupyter Notebooks into Sphinx documents.
 
-Similar to the Markdown format, MyST-NB uses code blocks to contain code cells.
+Similar to the jupytext Markdown format, MyST Markdown uses code blocks to contain code cells.
 The difference though, is that the metadata is contained in a YAML block:
 
 ````md
@@ -142,7 +142,7 @@ This is a markdown cell with metadata
 This is a new markdown cell with no metadata
 ```
 
-See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.mnb#) in the `mystnb` format.
+See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.myst.md#) in the `myst` format.
 
 If you wish to use that format, please install `conda install -c conda-forge myst-parser`,
 or `pip install jupytext[myst]`.
