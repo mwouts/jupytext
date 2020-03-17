@@ -22,10 +22,10 @@ def is_myst_available():
 
 
 def myst_version():
-    """The version of myst parser."""
+    """The major version of myst parser."""
     from myst_parser import __version__
 
-    return __version__
+    return ".".join(__version__.split(".")[:2])
 
 
 def myst_extensions(no_md=False):
