@@ -1,3 +1,7 @@
+# 1.2.1 (2020-03-17)
+
+- Addition of MyST-NB format.
+
 # 1.2.0 (2020-03-09)
 
 - This version of the extension is compatible with JupyterLab 2.0. Many thanks to Jean Helie! (#449)
