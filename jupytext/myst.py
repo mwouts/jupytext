@@ -35,12 +35,13 @@ def myst_extensions(no_md=False):
     return [".md", ".myst", ".mystnb", ".mnb"]
 
 
-def matches_mystnb(text, ext=None, requires_meta=True, require_non_md=True):
+def matches_mystnb(text, ext=None, requires_meta=True, require_non_md=True, return_nb=False):
     """Attempt to distinguish a file as mystnb, only given its extension and content.
 
     :param ext: the extension of the file
     :param requires_meta: requires the file to contain top matter metadata
     :param require_non_md: whether to require that a non-markdown cell is present
+    :param return_nb: if a match is found, return the notebook
     """
     if ext and "." + ("."+ext).rsplit(".", 1)[1] in myst_extensions(no_md=True):
         return True
@@ -60,12 +61,12 @@ def matches_mystnb(text, ext=None, requires_meta=True, require_non_md=True):
         pass
     else:
         if format_name == MYST_FORMAT_NAME:
-            return True
+            return nb if return_nb else True
 
     if require_non_md and not any(c.cell_type != "markdown" for c in nb.cells):
         return False
 
-    return True
+    return nb if return_nb else True
 
 
 class CompactDumper(yaml.SafeDumper):
