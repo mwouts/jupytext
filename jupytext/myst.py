@@ -12,6 +12,24 @@ CODE_DIRECTIVE = "code-cell"
 RAW_DIRECTIVE = "raw-cell"
 
 
+def is_myst_available():
+    try:
+        import myst_parser  # noqa
+    except ImportError:
+        return False
+    return True
+
+
+def myst_version():
+    from myst_parser import __version__
+
+    return __version__
+
+
+def myst_extensions():
+    return [".myst.md", ".mnb"]
+
+
 class CompactDumper(yaml.SafeDumper):
     """This YAML dumper creates a more compact style for lists"""
 
@@ -50,24 +68,6 @@ def dump_yaml_blocks(data, compact=True):
     if compact and all(l and l[0].isalpha() for l in lines):
         return "\n".join([":{}".format(l) for l in lines]) + "\n\n"
     return "---\n{}---\n".format(string)
-
-
-def is_myst_available():
-    try:
-        import myst_parser  # noqa
-    except ImportError:
-        return False
-    return True
-
-
-def myst_version():
-    from myst_parser import __version__
-
-    return __version__
-
-
-def myst_extensions():
-    return [".mystnb", ".mnb"]
 
 
 def from_nbnode(value):
