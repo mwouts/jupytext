@@ -4,6 +4,7 @@ from jupytext.myst import (
     myst_to_notebook,
     CODE_DIRECTIVE,
     MystMetadataParsingError,
+    matches_mystnb,
 )
 from .utils import requires_myst
 
@@ -64,3 +65,32 @@ def test_bad_markdown_metadata2():
             """
             )
         )
+
+
+@requires_myst
+def test_matches_mystnb():
+    assert matches_mystnb("") is False
+    assert matches_mystnb("```{code-cell}\n```") is False
+    assert matches_mystnb("---\njupytext: true\n---") is False
+    text = dedent(
+        """\
+        ---
+        {{a
+        ---
+        ```{code-cell}
+        :b: {{c
+        ```
+        """
+    )
+    assert matches_mystnb(text) is True
+    text = dedent(
+        """\
+        ---
+        jupytext:
+            text_representation:
+                format_name: myst
+                extension: .md
+        ---
+        """
+    )
+    assert matches_mystnb(text) is True

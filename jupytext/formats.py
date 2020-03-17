@@ -24,6 +24,7 @@ from .myst import (
     is_myst_available,
     myst_version,
     myst_extensions,
+    matches_mystnb,
 )
 
 
@@ -231,6 +232,8 @@ def read_format_from_metadata(text, ext):
 
 def guess_format(text, ext):
     """Guess the format and format options of the file, given its extension and content"""
+    if matches_mystnb(text, ext):
+        return MYST_FORMAT_NAME, {}
     lines = text.splitlines()
 
     metadata = read_metadata(text, ext)
@@ -465,11 +468,14 @@ def long_form_one_format(jupytext_format, metadata=None, update=None, auto_ext_r
     if not jupytext_format:
         return {}
 
-    common_name_to_ext = {'notebook': 'ipynb',
-                          'rmarkdown': 'Rmd',
-                          'markdown': 'md',
-                          'script': 'auto',
-                          'c++': 'cpp'}
+    common_name_to_ext = {
+        'notebook': 'ipynb',
+        'rmarkdown': 'Rmd',
+        'markdown': 'md',
+        'script': 'auto',
+        'c++': 'cpp',
+        'myst': 'md'
+    }
     if jupytext_format.lower() in common_name_to_ext:
         jupytext_format = common_name_to_ext[jupytext_format.lower()]
 

@@ -7,12 +7,13 @@ import json
 import nbformat as nbf
 import yaml
 
-MYST_FORMAT_NAME = "mystnb"
+MYST_FORMAT_NAME = "myst"
 CODE_DIRECTIVE = "code-cell"
 RAW_DIRECTIVE = "raw-cell"
 
 
 def is_myst_available():
+    """Whether the myst-parser package is available."""
     try:
         import myst_parser  # noqa
     except ImportError:
@@ -21,13 +22,50 @@ def is_myst_available():
 
 
 def myst_version():
+    """The version of myst parser."""
     from myst_parser import __version__
 
     return __version__
 
 
-def myst_extensions():
-    return [".myst.md", ".mnb"]
+def myst_extensions(no_md=False):
+    """The allowed extensions for the myst format."""
+    if no_md:
+        return [".myst", ".mystnb", ".mnb"]
+    return [".md", ".myst", ".mystnb", ".mnb"]
+
+
+def matches_mystnb(text, ext=None, requires_meta=True, require_non_md=True):
+    """Attempt to distinguish a file as mystnb, only given its extension and content.
+
+    :param ext: the extension of the file
+    :param requires_meta: requires the file to contain top matter metadata
+    :param require_non_md: whether to require that a non-markdown cell is present
+    """
+    if ext and (ext+".").rsplit(".", 1)[1] in ["myst", "mystnb"]:
+        return True
+    if requires_meta and not text.startswith("---"):
+        return False
+    try:
+        nb = myst_to_notebook(text, ignore_bad_meta=True)
+    except Exception:
+        return False
+
+    from jupytext.formats import format_name_for_ext
+
+    # Is the format information available in the jupytext text representation?
+    try:
+        format_name = format_name_for_ext(nb.metadata, ext or ".md")
+    except AttributeError:
+        pass
+    else:
+        if format_name == MYST_FORMAT_NAME:
+            return True
+
+    if require_non_md and not any(c.cell_type != "markdown" for c in nb.cells):
+        return False
+
+    return True
 
 
 class CompactDumper(yaml.SafeDumper):
@@ -96,13 +134,14 @@ def _fmt_md(text):
 
 
 def myst_to_notebook(
-    text, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE,
+    text, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, ignore_bad_meta=False
 ):
     """Convert text written in the myst format to a notebook.
 
     :param text: the file text
     :param code_directive: the name of the directive to search for containing code cells
     :param raw_directive: the name of the directive to search for containing raw cells
+    :param ignore_bad_meta: ignore metadata that cannot be parsed as JSON/YAML
 
     NOTE: we assume here that all of these directives are at the top-level,
     i.e. not nested in other directives.
@@ -136,11 +175,12 @@ def myst_to_notebook(
     try:
         set_parse_context(parse_context)
         doc = Document.read(lines, front_matter=True)
+        metadata_nb = {}
         try:
             metadata_nb = doc.front_matter.get_data() if doc.front_matter else {}
         except (yaml.parser.ParserError, yaml.scanner.ScannerError) as error:
-            raise MystMetadataParsingError("Notebook metadata: {}".format(error))
-
+            if not ignore_bad_meta:
+                raise MystMetadataParsingError("Notebook metadata: {}".format(error))
         nbf_version = nbf.v4
         kwargs = {"metadata": nbf.from_dict(metadata_nb)}
         notebook = nbf_version.new_notebook(**kwargs)
@@ -161,20 +201,23 @@ def myst_to_notebook(
                         )
                     )
                 if token.content:
+                    md_metadata = {}
                     try:
                         md_metadata = json.loads(token.content.strip())
                     except Exception as err:
-                        raise MystMetadataParsingError(
-                            "markdown cell {0} at {1} could not be read: {2}".format(
-                                len(notebook.cells) + 1, token.position, err
+                        if not ignore_bad_meta:
+                            raise MystMetadataParsingError(
+                                "markdown cell {0} at {1} could not be read: {2}".format(
+                                    len(notebook.cells) + 1, token.position, err
+                                )
                             )
-                        )
                     if not isinstance(md_metadata, dict):
-                        raise MystMetadataParsingError(
-                            "markdown cell {0} at {1} is not a dict".format(
-                                len(notebook.cells) + 1, token.position
+                        if not ignore_bad_meta:
+                            raise MystMetadataParsingError(
+                                "markdown cell {0} at {1} is not a dict".format(
+                                    len(notebook.cells) + 1, token.position
+                                )
                             )
-                        )
                 else:
                     md_metadata = {}
                 current_line = token.position.line_start
@@ -187,6 +230,7 @@ def myst_to_notebook(
                 # this is reserved for the optional lexer name
                 # TODO: could log warning about if token.arguments != lexer name
 
+                options, body_lines = {}, []
                 try:
                     _, options, body_lines = parse_directive_text(
                         directive_class=MockDirective,
@@ -195,11 +239,12 @@ def myst_to_notebook(
                         validate_options=False,
                     )
                 except DirectiveParsingError as err:
-                    raise MystMetadataParsingError(
-                        "Code cell {0} at {1} could not be read: {2}".format(
-                            len(notebook.cells) + 1, token.position, err
+                    if not ignore_bad_meta:
+                        raise MystMetadataParsingError(
+                            "Code cell {0} at {1} could not be read: {2}".format(
+                                len(notebook.cells) + 1, token.position, err
+                            )
                         )
-                    )
 
                 md_source = _fmt_md(
                     "".join(lines.lines[current_line:token.position.line_start - 1])
