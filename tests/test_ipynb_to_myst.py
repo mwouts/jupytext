@@ -105,6 +105,6 @@ def test_matches_mystnb():
 
 
 def test_not_installed():
-    with mock.patch('jupytext.formats.JUPYTEXT_FORMATS', return_value=[]) as x:
+    with mock.patch('jupytext.formats.JUPYTEXT_FORMATS', return_value=[]):
         with pytest.raises(JupytextFormatError):
             get_format_implementation(".myst")
