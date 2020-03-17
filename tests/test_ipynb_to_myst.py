@@ -1,5 +1,10 @@
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
 from textwrap import dedent
 import pytest
+from jupytext.formats import get_format_implementation, JupytextFormatError
 from jupytext.myst import (
     myst_to_notebook,
     CODE_DIRECTIVE,
@@ -97,3 +102,9 @@ def test_matches_mystnb():
         """
     )
     assert matches_mystnb(text) is True
+
+
+def test_not_installed():
+    with mock.patch('jupytext.formats.JUPYTEXT_FORMATS', return_value=[]) as x:
+        with pytest.raises(JupytextFormatError):
+            get_format_implementation(".myst")
