@@ -5,6 +5,7 @@ from jupytext.myst import (
     CODE_DIRECTIVE,
     MystMetadataParsingError,
     matches_mystnb,
+    myst_extensions
 )
 from .utils import requires_myst
 
@@ -72,6 +73,8 @@ def test_matches_mystnb():
     assert matches_mystnb("") is False
     assert matches_mystnb("```{code-cell}\n```") is False
     assert matches_mystnb("---\njupytext: true\n---") is False
+    for ext in myst_extensions(no_md=True):
+        assert matches_mystnb("", ext=ext) is True
     text = dedent(
         """\
         ---
