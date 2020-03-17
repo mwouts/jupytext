@@ -3,8 +3,6 @@ kernelspec:
   display_name: .NET (C#)
   language: C#
   name: .net-csharp
-nbformat: 4
-nbformat_minor: 1
 ---
 
 We start with...

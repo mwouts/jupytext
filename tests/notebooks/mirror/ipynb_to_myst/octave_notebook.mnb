@@ -3,8 +3,6 @@ kernelspec:
   display_name: Octave
   language: octave
   name: octave
-nbformat: 4
-nbformat_minor: 2
 ---
 
 A markdown cell

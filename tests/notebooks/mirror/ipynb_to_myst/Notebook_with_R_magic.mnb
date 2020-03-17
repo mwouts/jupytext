@@ -3,8 +3,6 @@ kernelspec:
   display_name: Python 2
   language: python
   name: python2
-nbformat: 4
-nbformat_minor: 2
 ---
 
 # A notebook with R cells

@@ -3,8 +3,6 @@ kernelspec:
   display_name: IDL [conda env:gdl] *
   language: IDL
   name: conda-env-gdl-idl
-nbformat: 4
-nbformat_minor: 2
 ---
 
 ## GDL demo notebook

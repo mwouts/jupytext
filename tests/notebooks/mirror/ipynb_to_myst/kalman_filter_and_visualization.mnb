@@ -3,8 +3,6 @@ kernelspec:
   display_name: Q 3.5
   language: q
   name: qpk
-nbformat: 4
-nbformat_minor: 2
 ---
 
 ```{code-cell}

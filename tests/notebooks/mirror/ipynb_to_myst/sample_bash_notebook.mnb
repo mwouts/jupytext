@@ -3,8 +3,6 @@ kernelspec:
   display_name: Bash
   language: bash
   name: bash
-nbformat: 4
-nbformat_minor: 2
 ---
 
 ```{code-cell}

@@ -3,8 +3,6 @@ kernelspec:
   display_name: Calysto Scheme (Python)
   language: scheme
   name: calysto_scheme
-nbformat: 4
-nbformat_minor: 2
 ---
 
 <img src="images/logo-64x64.png"/>

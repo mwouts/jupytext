@@ -1,6 +1,10 @@
 from textwrap import dedent
 import pytest
-from jupytext.myst import myst_to_notebook, CODE_DIRECTIVE, MystMetadataParsingError
+from jupytext.myst import (
+    myst_to_notebook,
+    CODE_DIRECTIVE,
+    MystMetadataParsingError,
+)
 from .utils import requires_myst
 
 
