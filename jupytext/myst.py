@@ -42,7 +42,7 @@ def matches_mystnb(text, ext=None, requires_meta=True, require_non_md=True):
     :param requires_meta: requires the file to contain top matter metadata
     :param require_non_md: whether to require that a non-markdown cell is present
     """
-    if ext and (ext+".").rsplit(".", 1)[1] in ["myst", "mystnb"]:
+    if ext and "." + ("."+ext).rsplit(".", 1)[1] in myst_extensions(no_md=True):
         return True
     if requires_meta and not text.startswith("---"):
         return False
