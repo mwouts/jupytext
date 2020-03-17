@@ -7,7 +7,7 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 %%time
 
 print('asdf')
@@ -15,6 +15,6 @@ print('asdf')
 
 Thanks for jupytext!
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 
 ```

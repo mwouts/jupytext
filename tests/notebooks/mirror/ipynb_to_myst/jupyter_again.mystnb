@@ -7,7 +7,7 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 c = '''
 title: "Quick test"
 output:
@@ -19,11 +19,11 @@ editor_options:
 '''
 ```
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 import yaml
 print(yaml.dump(yaml.load(c)))
 ```
 
-```{nb-code} ipython3
+```{code-cell} ipython3
 ?next
 ```

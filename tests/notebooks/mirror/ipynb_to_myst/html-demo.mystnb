@@ -18,11 +18,11 @@ This notebook demonstrates some of the more advanced features of Clojupyter.
 
 To display HTML, you'll need to require a clojupyter helper function to change the cell output
 
-```{nb-code}
+```{code-cell}
 (require '[clojupyter.misc.display :as display])
 ```
 
-```{nb-code}
+```{code-cell}
 (println ">> should print some text")
 ;; displaying html
 (display/hiccup-html 
@@ -34,7 +34,7 @@ To display HTML, you'll need to require a clojupyter helper function to change t
 
 We can also use this to render SVG:
 
-```{nb-code}
+```{code-cell}
 (display/hiccup-html
     [:svg {:height 100 :width 100 :xmlns "http://www.w3.org/2000/svg"}
             [:circle {:cx 50 :cy 40 :r 40 :fill "red"}]])
@@ -44,16 +44,16 @@ We can also use this to render SVG:
 
 You can fetch external Clojure dependcies using the `clojupyter.misc.helper` namespace. 
 
-```{nb-code}
+```{code-cell}
 (require '[clojupyter.misc.helper :as helper])
 ```
 
-```{nb-code}
+```{code-cell}
 (helper/add-dependencies '[org.clojure/data.json "0.2.6"])
 (require '[clojure.data.json :as json])
 ```
 
-```{nb-code}
+```{code-cell}
 (json/write-str {:a 1 :b [2, 3] :c "c"})
 ```
 
@@ -63,13 +63,13 @@ Since you can render arbitrary HTML using `display/hiccup-html`, it's pretty eas
 
 First, we use a cell to add javascript to the running notebook:
 
-```{nb-code}
+```{code-cell}
 (helper/add-javascript "https://code.highcharts.com/highcharts.js")
 ```
 
 Now we define a function which takes Clojure data and returns hiccup HTML to display:
 
-```{nb-code}
+```{code-cell}
 (defn plot-highchart [highchart-json]
   (let [id (str (java.util.UUID/randomUUID))
         code (format "Highcharts.chart('%s', %s );" id, (json/write-str highchart-json))]
@@ -80,7 +80,7 @@ Now we define a function which takes Clojure data and returns hiccup HTML to dis
 
 Now we can make generate interactive plots (try hovering over plot):
 
-```{nb-code}
+```{code-cell}
 (def raw-data (map #(+ (* 22 (+ % (Math/random)) 78)) (range)))
 (def data-1 (take 500 raw-data))
 (def data-2 (take 500 (drop 500 raw-data)))
@@ -90,6 +90,6 @@ Now we can make generate interactive plots (try hovering over plot):
                  :series [{:data data-1} {:data data-2}]})
 ```
 
-```{nb-code}
+```{code-cell}
 
 ```

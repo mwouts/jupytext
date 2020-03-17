@@ -9,13 +9,13 @@ nbformat_minor: 1
 
 We start with...
 
-```{nb-code} csharp
+```{code-cell} csharp
 Console.WriteLine("Hello World!");
 ```
 
 Then we do a plot with Plotly, following the [Plotting with XPlot](https://github.com/dotnet/interactive/blob/master/NotebookExamples/csharp/Docs/Plotting%20with%20Xplot.ipynb) example from `dotnet/interactive`:
 
-```{nb-code} csharp
+```{code-cell} csharp
 using XPlot.Plotly;
 
 var bar = new Graph.Bar
@@ -32,10 +32,10 @@ display(chart);
 
 We also test the math outputs as in the [Math and Latex](https://github.com/dotnet/interactive/blob/master/NotebookExamples/csharp/Docs/Math%20and%20LaTeX.ipynb) example:
 
-```{nb-code} csharp
+```{code-cell} csharp
 (LaTeXString)@"\begin{align} e^{i \pi} = -1\end{align}"
 ```
 
-```{nb-code} csharp
+```{code-cell} csharp
 (MathString)@"e^{i \pi} = -1"
 ```

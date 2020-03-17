@@ -7,7 +7,7 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code} scala
+```{code-cell} scala
 // This is just a simple scala notebook
 
 object SampleObject {
@@ -17,6 +17,6 @@ object SampleObject {
 val result = SampleObject.calculation(1, 2)
 ```
 
-```{nb-code} scala
+```{code-cell} scala
 println(result * 10)
 ```

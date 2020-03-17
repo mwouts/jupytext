@@ -13,7 +13,7 @@ For those not already familiar with Jupyter notebook, it lets you write code int
 ## Printing to outputs and evaluating expressions
 Lets print something to stdout and stderr then return a final expression to see how that's presented. Note that stdout and stderr are separate streams, so may not appear in the same order is their respective print statements.
 
-```{nb-code}
+```{code-cell}
 println!("Hello world");
 eprintln!("Hello error");
 format!("Hello {}", "world")
@@ -22,40 +22,40 @@ format!("Hello {}", "world")
 ## Assigning and making use of variables
 We define a variable `message`, then in the subsequent cell, modify the string and finally print it out. We could also do all this in the one cell if we wanted.
 
-```{nb-code}
+```{code-cell}
 let mut message = "Hello ".to_owned();
 ```
 
-```{nb-code}
+```{code-cell}
 message.push_str("world!");
 ```
 
-```{nb-code}
+```{code-cell}
 message
 ```
 
 ## Defining and redefining functions
 Next we'll define a function
 
-```{nb-code}
+```{code-cell}
 pub fn fib(x: i32) -> i32 {
     if x <= 2 {0} else {fib(x - 2) + fib(x - 1)}
 }
 ```
 
-```{nb-code}
+```{code-cell}
 (1..13).map(fib).collect::<Vec<i32>>()
 ```
 
 Hmm, that doesn't look right. Lets redefine the function. In practice, we'd go back and edit the function above and reevalute it, but here, lets redefine it in a separate cell.
 
-```{nb-code}
+```{code-cell}
 pub fn fib(x: i32) -> i32 {
     if x <= 2 {2} else {fib(x - 2) + fib(x - 1)}
 }
 ```
 
-```{nb-code}
+```{code-cell}
 let values = (1..13).map(fib).collect::<Vec<i32>>();
 values
 ```
@@ -63,7 +63,7 @@ values
 ## Spawning a separate thread and communicating with it
 We can spawn a thread to do stuff in the background, then continue executing code in other cells.
 
-```{nb-code}
+```{code-cell}
 use std::sync::{Mutex, Arc};
 let counter = Arc::new(Mutex::new(0i32));
 std::thread::spawn({
@@ -76,18 +76,18 @@ std::thread::spawn({
 }});
 ```
 
-```{nb-code}
+```{code-cell}
 *counter.lock().unwrap()
 ```
 
-```{nb-code}
+```{code-cell}
 *counter.lock().unwrap()
 ```
 
 ## Loading external crates
 We can load external crates. This one takes a while to compile, but once it's compiled, subsequent cells shouldn't need to recompile it, so it should be much quicker.
 
-```{nb-code}
+```{code-cell}
 
 :dep base64 = "0.10.1"
 base64::encode(&vec![1, 2, 3, 4])
@@ -96,7 +96,7 @@ base64::encode(&vec![1, 2, 3, 4])
 ## Customizing how types are displayed
 We can also customize how our types are displayed, including presenting them as HTML. Here's an example where we define a custom display function for a type `Matrix`.
 
-```{nb-code}
+```{code-cell}
 use std::fmt::Debug;
 pub struct Matrix<T> {pub values: Vec<T>, pub row_size: usize}
 impl<T: Debug> Matrix<T> {
@@ -118,14 +118,14 @@ impl<T: Debug> Matrix<T> {
 }
 ```
 
-```{nb-code}
+```{code-cell}
 let m = Matrix {values: vec![1,2,3,4,5,6,7,8,9], row_size: 3};
 m
 ```
 
 We can also return images, we just need to base64 encode them. First, we set up code for displaying RGB and grayscale images.
 
-```{nb-code}
+```{code-cell}
 extern crate image;
 extern crate base64;
 pub trait EvcxrResult {fn evcxr_display(&self);}
@@ -149,7 +149,7 @@ impl EvcxrResult for image::GrayImage {
 }
 ```
 
-```{nb-code}
+```{code-cell}
 image::ImageBuffer::from_fn(256, 256, |x, y| {
     if (x as i32 - y as i32).abs() < 3 {
         image::Rgb([0, 0, 255])
@@ -162,7 +162,7 @@ image::ImageBuffer::from_fn(256, 256, |x, y| {
 ## Display of compilation errors
 Here's how compilation errors are presented. Here we forgot an & and passed a String instead of an &str.
 
-```{nb-code}
+```{code-cell}
 let mut s = String::new();
 s.push_str(format!("foo {}", 42));
 ```
@@ -170,18 +170,18 @@ s.push_str(format!("foo {}", 42));
 ## Seeing what variables have been defined
 We can print a table of defined variables and their types with the :vars command.
 
-```{nb-code}
+```{code-cell}
 
 :vars
 ```
 
 Other built-in commands can be found via :help
 
-```{nb-code}
+```{code-cell}
 
 :help
 ```
 
-```{nb-code}
+```{code-cell}
 
 ```

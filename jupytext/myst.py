@@ -8,8 +8,8 @@ import nbformat as nbf
 import yaml
 
 MYST_FORMAT_NAME = "mystnb"
-CODE_DIRECTIVE = "nb-code"
-RAW_DIRECTIVE = "nb-raw"
+CODE_DIRECTIVE = "code-cell"
+RAW_DIRECTIVE = "raw-cell"
 
 
 class CompactDumper(yaml.SafeDumper):

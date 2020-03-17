@@ -7,7 +7,7 @@ nbformat: 4
 nbformat_minor: 2
 ---
 
-```{nb-code}
+```{code-cell}
 let x: number = 5;
 const y: number = 6;
 var z: string = "hi";
@@ -15,19 +15,19 @@ console.log(z);
 x + y;
 ```
 
-```{nb-code}
+```{code-cell}
 function add(num1: number, num2: number): number {
     return num1 + num2
 }
 add(x, y);
 ```
 
-```{nb-code}
+```{code-cell}
 const arrowAdd = (num1: number, num2: number) => num1 + num2;
 arrowAdd(x, y);
 ```
 
-```{nb-code}
+```{code-cell}
 class User {
   constructor(private name: string) {
     this.name = name;
