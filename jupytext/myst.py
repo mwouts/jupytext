@@ -36,7 +36,13 @@ def myst_extensions(no_md=False):
 
 
 def matches_mystnb(
-    text, ext=None, requires_meta=True, require_non_md=True, return_nb=False
+    text,
+    ext=None,
+    requires_meta=True,
+    require_non_md=True,
+    return_nb=False,
+    ignore_bad_meta=True,
+    store_line_numbers=False,
 ):
     """Attempt to distinguish a file as mystnb, only given its extension and content.
 
@@ -50,7 +56,9 @@ def matches_mystnb(
     if requires_meta and not text.startswith("---"):
         return False
     try:
-        nb = myst_to_notebook(text, ignore_bad_meta=True)
+        nb = myst_to_notebook(
+            text, ignore_bad_meta=ignore_bad_meta, store_line_numbers=store_line_numbers
+        )
     except Exception:
         return False
 
