@@ -4,13 +4,16 @@ except ImportError:
     import mock
 from textwrap import dedent
 import pytest
+from nbformat import from_dict
+
+from jupytext.compare import compare_notebooks
 from jupytext.formats import get_format_implementation, JupytextFormatError
 from jupytext.myst import (
     myst_to_notebook,
     CODE_DIRECTIVE,
     MystMetadataParsingError,
     matches_mystnb,
-    myst_extensions
+    myst_extensions,
 )
 from .utils import requires_myst
 
@@ -105,6 +108,60 @@ def test_matches_mystnb():
 
 
 def test_not_installed():
-    with mock.patch('jupytext.formats.JUPYTEXT_FORMATS', return_value=[]):
+    with mock.patch("jupytext.formats.JUPYTEXT_FORMATS", return_value=[]):
         with pytest.raises(JupytextFormatError):
             get_format_implementation(".myst")
+
+
+def test_store_line_numbers():
+    notebook = myst_to_notebook(
+        dedent(
+            """\
+            ---
+            a: 1
+            ---
+            abc
+            +++
+            def
+            ```{{{0}}}
+            ---
+            b: 2
+            ---
+            c = 3
+            ```
+            xyz
+            """
+        ).format(CODE_DIRECTIVE),
+        store_line_numbers=True,
+    )
+    expected = {
+        "nbformat": 4,
+        "nbformat_minor": 4,
+        "metadata": {"a": 1},
+        "cells": [
+            {
+                "cell_type": "markdown",
+                "source": "abc",
+                "metadata": {"_source_lines": [3, 4]},
+            },
+            {
+                "cell_type": "markdown",
+                "source": "def",
+                "metadata": {"_source_lines": [5, 6]},
+            },
+            {
+                "cell_type": "code",
+                "metadata": {"b": 2, "_source_lines": [7, 12]},
+                "execution_count": None,
+                "source": "c = 3",
+                "outputs": [],
+            },
+            {
+                "cell_type": "markdown",
+                "source": "xyz",
+                "metadata": {"_source_lines": [12, 13]},
+            },
+        ],
+    }
+    notebook.nbformat_minor = 4
+    compare_notebooks(notebook, from_dict(expected))

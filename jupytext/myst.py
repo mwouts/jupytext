@@ -35,7 +35,9 @@ def myst_extensions(no_md=False):
     return [".md", ".myst", ".mystnb", ".mnb"]
 
 
-def matches_mystnb(text, ext=None, requires_meta=True, require_non_md=True, return_nb=False):
+def matches_mystnb(
+    text, ext=None, requires_meta=True, require_non_md=True, return_nb=False
+):
     """Attempt to distinguish a file as mystnb, only given its extension and content.
 
     :param ext: the extension of the file
@@ -43,7 +45,7 @@ def matches_mystnb(text, ext=None, requires_meta=True, require_non_md=True, retu
     :param require_non_md: whether to require that a non-markdown cell is present
     :param return_nb: if a match is found, return the notebook
     """
-    if ext and "." + ("."+ext).rsplit(".", 1)[1] in myst_extensions(no_md=True):
+    if ext and "." + ("." + ext).rsplit(".", 1)[1] in myst_extensions(no_md=True):
         return True
     if requires_meta and not text.startswith("---"):
         return False
@@ -135,7 +137,11 @@ def _fmt_md(text):
 
 
 def myst_to_notebook(
-    text, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, ignore_bad_meta=False
+    text,
+    code_directive=CODE_DIRECTIVE,
+    raw_directive=RAW_DIRECTIVE,
+    ignore_bad_meta=False,
+    store_line_numbers=False,
 ):
     """Convert text written in the myst format to a notebook.
 
@@ -143,6 +149,8 @@ def myst_to_notebook(
     :param code_directive: the name of the directive to search for containing code cells
     :param raw_directive: the name of the directive to search for containing raw cells
     :param ignore_bad_meta: ignore metadata that cannot be parsed as JSON/YAML
+    :param store_line_numbers: add a `_source_lines` key to cell metadata,
+        mapping to the source text.
 
     NOTE: we assume here that all of these directives are at the top-level,
     i.e. not nested in other directives.
@@ -196,9 +204,15 @@ def myst_to_notebook(
                     "".join(lines.lines[current_line:token.position.line_start - 1])
                 )
                 if source:
+                    md_metadata = nbf.from_dict(md_metadata)
+                    if store_line_numbers:
+                        md_metadata["_source_lines"] = [
+                            current_line,
+                            token.position.line_start - 1,
+                        ]
                     notebook.cells.append(
                         nbf_version.new_markdown_cell(
-                            source=source, metadata=nbf.from_dict(md_metadata),
+                            source=source, metadata=md_metadata,
                         )
                     )
                 if token.content:
@@ -251,35 +265,48 @@ def myst_to_notebook(
                     "".join(lines.lines[current_line:token.position.line_start - 1])
                 )
                 if md_source:
+                    md_metadata = nbf.from_dict(md_metadata)
+                    if store_line_numbers:
+                        md_metadata["_source_lines"] = [
+                            current_line,
+                            token.position.line_start - 1,
+                        ]
                     notebook.cells.append(
                         nbf_version.new_markdown_cell(
-                            source=md_source, metadata=nbf.from_dict(md_metadata),
+                            source=md_source, metadata=md_metadata,
                         )
                     )
                 current_line = token.position.line_end
                 md_metadata = {}
 
+                cell_metadata = nbf.from_dict(options)
+                if store_line_numbers:
+                    cell_metadata["_source_lines"] = [
+                        token.position.line_start,
+                        token.position.line_end,
+                    ]
                 if item.node.language == code_directive:
                     notebook.cells.append(
                         nbf_version.new_code_cell(
-                            source="\n".join(body_lines),
-                            metadata=nbf.from_dict(options),
+                            source="\n".join(body_lines), metadata=cell_metadata,
                         )
                     )
                 if item.node.language == raw_directive:
                     notebook.cells.append(
                         nbf_version.new_raw_cell(
-                            source="\n".join(body_lines),
-                            metadata=nbf.from_dict(options),
+                            source="\n".join(body_lines), metadata=cell_metadata,
                         )
                     )
 
         # add the final markdown cell (if present)
         if lines.lines[current_line:]:
+            md_metadata = nbf.from_dict(md_metadata)
+            if store_line_numbers:
+                md_metadata["_source_lines"] = [current_line, len(lines.lines)]
             notebook.cells.append(
                 nbf_version.new_markdown_cell(
                     source=_fmt_md("".join(lines.lines[current_line:])),
-                    metadata=nbf.from_dict(md_metadata),
+                    metadata=md_metadata,
                 )
             )
 
