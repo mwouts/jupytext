@@ -113,6 +113,7 @@ def test_not_installed():
             get_format_implementation(".myst")
 
 
+@requires_myst
 def test_store_line_numbers():
     notebook = myst_to_notebook(
         dedent(
