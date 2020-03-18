@@ -1,8 +1,9 @@
-1.4.1 (2020-03-??)
+1.4.1 (2020-03-19)
 ------------------
 
 **Added**
 - Script of script (SoS) notebooks are now supported. Thanks to Thomas Pernet-coudrier for contributing the sample notebook (#453).
+- New MyST Markdown format (`md:myst`), developed by the [ExecutableBookProject](https://github.com/ExecutableBookProject) team. Read more about the MyST Markdown format in the [documentation](https://jupytext.readthedocs.io/en/latest/formats.html#myst-markdown). And many thanks to Chris Sewell for contributing the actual implementation! (#447 #456 #458)
 
 **Fixed**
 - When using `jupytext --pipe cmd`, the output of `cmd` should not appear in the terminal (#432)
