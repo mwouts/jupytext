@@ -41,7 +41,6 @@ def matches_mystnb(
     requires_meta=True,
     require_non_md=True,
     return_nb=False,
-    ignore_bad_meta=True,
     store_line_numbers=False,
 ):
     """Attempt to distinguish a file as mystnb, only given its extension and content.
@@ -50,14 +49,22 @@ def matches_mystnb(
     :param requires_meta: requires the file to contain top matter metadata
     :param require_non_md: whether to require that a non-markdown cell is present
     :param return_nb: if a match is found, return the notebook
+    :param store_line_numbers: add a `_source_lines` key to cell metadata,
+        mapping to the source text.
     """
     if ext and "." + ("." + ext).rsplit(".", 1)[1] in myst_extensions(no_md=True):
-        return True
+        return (
+            myst_to_notebook(
+                text, ignore_bad_meta=True, store_line_numbers=store_line_numbers
+            )
+            if return_nb
+            else True
+        )
     if requires_meta and not text.startswith("---"):
         return False
     try:
         nb = myst_to_notebook(
-            text, ignore_bad_meta=ignore_bad_meta, store_line_numbers=store_line_numbers
+            text, ignore_bad_meta=True, store_line_numbers=store_line_numbers
         )
     except Exception:
         return False
