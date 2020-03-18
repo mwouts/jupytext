@@ -1,3 +1,7 @@
+# 1.2.2 (2020-03-18)
+
+- MyST Markdown now uses the `.md` extension.
+
 # 1.2.1 (2020-03-17)
 
 - Addition of MyST-NB format.
