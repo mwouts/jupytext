@@ -1,4 +1,4 @@
-jupytext
+jupytext[myst]
 jupyterlab>=2.0
 plotly
 matplotlib
