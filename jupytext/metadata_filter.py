@@ -9,7 +9,10 @@ _DEFAULT_NOTEBOOK_METADATA = ','.join([
     # Preserve kernel specs
     'kernelspec',
     # Kernel_info found in Nteract notebooks
-    'kernel_info'])
+    'kernel_info',
+    # Used in MyST notebooks
+    'orphan', 'tocdepth'
+])
 
 
 def metadata_filter_as_dict(metadata_config):
