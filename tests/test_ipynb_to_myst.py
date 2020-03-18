@@ -115,7 +115,7 @@ def test_not_installed():
 
 @requires_myst
 def test_store_line_numbers():
-    notebook = myst_to_notebook(
+    notebook = matches_mystnb(
         dedent(
             """\
             ---
@@ -134,6 +134,7 @@ def test_store_line_numbers():
             """
         ).format(CODE_DIRECTIVE),
         store_line_numbers=True,
+        return_nb=True
     )
     expected = {
         "nbformat": 4,
