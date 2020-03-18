@@ -149,7 +149,7 @@ def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
     nb_now = read(tmp_py)
     nb_now.metadata['jupytext'].pop('text_representation')
     nb_black.metadata = {key: nb_black.metadata[key] for key in nb_black.metadata
-                         if key in _DEFAULT_NOTEBOOK_METADATA}
+                         if key in _DEFAULT_NOTEBOOK_METADATA.split(',')}
     compare(nb_now, nb_black)
 
 
