@@ -1,10 +1,6 @@
-# 1.2.2 (2020-03-18)
+# 1.2.1 (2020-03-18)
 
-- MyST Markdown now uses the `.md` extension.
-
-# 1.2.1 (2020-03-17)
-
-- Addition of MyST-NB format.
+- The extension can pair a notebook to the new MyST Markdown format, developed by the [ExecutableBookProject](https://github.com/ExecutableBookProject) team. Thanks to Chris Sewell for his PRs! (#447 #456 #458)
 
 # 1.2.0 (2020-03-09)
 
