@@ -147,9 +147,12 @@ See for instance how our `World population.ipynb` notebook is [represented](http
 If you wish to use that format, please install `conda install -c conda-forge myst-parser`,
 or `pip install jupytext[myst]`.
 
+**Tip**: You can use the [myst-highlight] VS Code extension to provide better syntax highlighting for this format.
+
 [myst-parser]: https://myst-parser.readthedocs.io
 [myst-nb]: https://myst-nb.readthedocs.io
 [block break]: https://myst-parser.readthedocs.io/en/latest/using/syntax.html#block-breaks
+[myst-highlight]: https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight
 
 ## Notebooks as scripts
 
