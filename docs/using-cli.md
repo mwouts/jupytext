@@ -7,7 +7,6 @@ The package provides a `jupytext` script for command line conversion between the
 ```bash
 jupytext --to py notebook.ipynb                 # convert notebook.ipynb to a .py file
 jupytext --to py:percent notebook.ipynb         # convert notebook.ipynb to a .py file in the double percent format
-jupytext --to py:percent --comment-magics false notebook.ipynb   # same as above + do not comment magic commands
 jupytext --to markdown notebook.ipynb           # convert notebook.ipynb to a .md file
 jupytext --output script.py notebook.ipynb      # convert notebook.ipynb to a script.py file
 
