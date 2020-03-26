@@ -37,7 +37,7 @@ def test_jupytext_commands_in_the_documentation_work(tmpdir, nb_file):
                 continue
             if 'pytest {}' in cmd:
                 continue
-            print(f'Testing: {cmd}')
+            print('Testing: {}'.format(cmd))
             args = shlex.split(re.sub(r'#.*', '', cmd))[1:]
             assert not jupytext_cli(args), cmd
             cmd_tested += 1
