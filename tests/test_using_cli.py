@@ -5,13 +5,14 @@ import shlex
 import pytest
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
-from .utils import list_notebooks
+from .utils import list_notebooks, requires_black
 
 doc_path = os.path.join(
     os.path.dirname(os.path.realpath(__file__)),
     '..', 'docs')
 
 
+@requires_black
 @pytest.mark.skipif(not os.path.isdir(doc_path), reason='Documentation folder is missing')
 @pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[-1:])
 def test_jupytext_commands_in_the_documentation_work(tmpdir, nb_file):
