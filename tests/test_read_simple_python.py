@@ -956,3 +956,11 @@ except:
     compare(py, text)
     nb2 = jupytext.reads(py, 'py')
     compare_notebooks(nb2, nb)
+
+
+def test_two_raw_cells_are_preserved(
+        nb=new_notebook(cells=[new_raw_cell("---\nX\n---"), new_raw_cell("Y")])):
+    """Test the pattern described at https://github.com/mwouts/jupytext/issues/466"""
+    py = jupytext.writes(nb, 'py')
+    nb2 = jupytext.reads(py, 'py')
+    compare_notebooks(nb2, nb)
