@@ -21,8 +21,8 @@ def test_jupytext_commands_in_the_documentation_work(tmpdir, nb_file):
     using_cli_nb = jupytext.read(using_cli)
 
     # Run the commands in tmpdir on a sample notebook
-    shutil.copy(nb_file, tmpdir.join('notebook.ipynb'))
-    os.chdir(tmpdir)
+    shutil.copy(nb_file, str(tmpdir.join('notebook.ipynb')))
+    os.chdir(str(tmpdir))
 
     cmd_tested = 0
     for cell in using_cli_nb.cells:
