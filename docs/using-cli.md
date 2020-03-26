@@ -7,6 +7,7 @@ The package provides a `jupytext` script for command line conversion between the
 ```bash
 jupytext --to py notebook.ipynb                 # convert notebook.ipynb to a .py file
 jupytext --to py:percent notebook.ipynb         # convert notebook.ipynb to a .py file in the double percent format
+jupytext --to py:percent --opt comment_magics=false notebook.ipynb   # same as above + do not comment magic commands
 jupytext --to markdown notebook.ipynb           # convert notebook.ipynb to a .md file
 jupytext --output script.py notebook.ipynb      # convert notebook.ipynb to a script.py file
 
@@ -22,7 +23,7 @@ jupytext --from ipynb --to py:percent           # read ipynb from stdin and writ
 Jupytext has a `--sync` mode that updates all the paired representations of a notebook based on timestamps: 
 ```bash
 jupytext --set-formats ipynb,py notebook.ipynb  # Turn notebook.ipynb into a paired ipynb/py notebook
-jupytext --sync notebook.ipynb                    # Update whichever of notebook.ipynb/notebook.py is outdated
+jupytext --sync notebook.ipynb                  # Update whichever of notebook.ipynb/notebook.py is outdated
 ```
 
 For convenience, when creating a notebook from text you can execute it:
