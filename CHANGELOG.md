@@ -6,6 +6,7 @@
 
 **Fixed**
 - Fixed the CLI example for not commenting out magic commands: `--opt comment_magics=false`. In addition, most of the `jupytext` commands in `using-cli.md` are now tested! (#465)
+- `jupytext.read` and `jupytext.write` now give more meaningful errors when the format information is incorrect (#462)
 
 1.4.1 (2020-03-19)
 ------------------

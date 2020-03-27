@@ -474,7 +474,8 @@ def long_form_one_format(jupytext_format, metadata=None, update=None, auto_ext_r
         'markdown': 'md',
         'script': 'auto',
         'c++': 'cpp',
-        'myst': 'md'
+        'myst': 'md:myst',
+        'pandoc': 'md:pandoc'
     }
     if jupytext_format.lower() in common_name_to_ext:
         jupytext_format = common_name_to_ext[jupytext_format.lower()]
@@ -491,8 +492,15 @@ def long_form_one_format(jupytext_format, metadata=None, update=None, auto_ext_r
                 "The `bare` format has been renamed to `nomarker` - (see https://github.com/mwouts/jupytext/issues/397)",
                 DeprecationWarning)
             fmt['format_name'] = 'nomarker'
-    else:
+    elif not jupytext_format or '.' in jupytext_format or ('.' + jupytext_format) in NOTEBOOK_EXTENSIONS + ['.auto']:
         ext = jupytext_format
+    elif jupytext_format in _VALID_FORMAT_NAMES:
+        fmt['format_name'] = jupytext_format
+        ext = ''
+    else:
+        raise JupytextFormatError(
+            "'{}' is not a notebook extension (one of {}), nor a notebook format (one of {})".format(
+                jupytext_format, ', '.join(NOTEBOOK_EXTENSIONS), ', '.join(_VALID_FORMAT_NAMES)))
 
     if ext.rfind('.') > 0:
         fmt['suffix'], ext = os.path.splitext(ext)
@@ -565,12 +573,17 @@ def short_form_multiple_formats(jupytext_formats):
 _VALID_FORMAT_INFO = ['extension', 'format_name', 'suffix', 'prefix']
 _BINARY_FORMAT_OPTIONS = ['comment_magics', 'split_at_heading', 'rst2md', 'cell_metadata_json', 'use_runtools']
 _VALID_FORMAT_OPTIONS = _BINARY_FORMAT_OPTIONS + ['notebook_metadata_filter', 'cell_metadata_filter', 'cell_markers']
+_VALID_FORMAT_NAMES = {fmt.format_name for fmt in JUPYTEXT_FORMATS}
 
 
 def validate_one_format(jupytext_format):
     """Validate extension and options for the given format"""
     if not isinstance(jupytext_format, dict):
         raise JupytextFormatError('Jupytext format should be a dictionary')
+
+    if 'format_name' in jupytext_format and jupytext_format['format_name'] not in _VALID_FORMAT_NAMES:
+        raise JupytextFormatError('{} is not a valid format name. Please choose one of {}'.format(
+            jupytext_format.get('format_name'), ', '.join(_VALID_FORMAT_NAMES)))
 
     for key in jupytext_format:
         if key not in _VALID_FORMAT_INFO + _VALID_FORMAT_OPTIONS:
