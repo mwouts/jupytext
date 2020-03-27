@@ -1,6 +1,9 @@
 1.4.2 (2020-03-??)
 ------------------
 
+**Changed**
+- Use `os.path.samefile` when searching for the kernel that corresponds to the current environment (`--set-kernel -`)
+
 **Fixed**
 - Fixed the CLI example for not commenting out magic commands: `--opt comment_magics=false`. In addition, most of the `jupytext` commands in `using-cli.md` are now tested! (#465)
 
