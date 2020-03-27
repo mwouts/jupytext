@@ -1,5 +1,6 @@
 """Find kernel specifications for a given language"""
 
+import os
 import sys
 from .reraise import reraise
 from .languages import same_language
@@ -29,7 +30,8 @@ def kernelspec_from_language(language):
             # Return the kernel that matches the current Python executable
             for name in find_kernel_specs():
                 kernel_specs = get_kernel_spec(name)
-                if kernel_specs.language == 'python' and kernel_specs.argv[0] == sys.executable:
+                cmd = kernel_specs.argv[0]
+                if kernel_specs.language == 'python' and os.path.isfile(cmd) and os.path.samefile(cmd, sys.executable):
                     return {'name': name, 'language': language, 'display_name': kernel_specs.display_name}
 
             # If none was found, return the first kernel that has 'python' as argv[0]
