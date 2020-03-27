@@ -5,7 +5,7 @@ import jupytext
 from jupytext.formats import guess_format, divine_format, read_format_from_metadata, rearrange_jupytext_metadata
 from jupytext.formats import long_form_multiple_formats, short_form_multiple_formats, update_jupytext_formats_metadata
 from jupytext.formats import get_format_implementation, validate_one_format, JupytextFormatError
-from .utils import list_notebooks, requires_myst
+from .utils import list_notebooks, requires_myst, requires_pandoc
 
 
 @pytest.mark.parametrize('nb_file', list_notebooks('python'))
@@ -224,6 +224,7 @@ def test_set_auto_ext():
         long_form_multiple_formats('ipynb,auto:percent', {})
 
 
+@requires_pandoc
 def test_pandoc_format_is_preserved():
     formats_org = 'ipynb,md,.pandoc.md:pandoc,py:light'
     long = long_form_multiple_formats(formats_org)
