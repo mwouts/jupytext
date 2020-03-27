@@ -165,7 +165,7 @@ def tmp_py(tmpdir):
 
 
 def test_error_not_notebook_ext_to(tmp_ipynb):
-    with pytest.raises(JupytextFormatError, match="Extension '.ext' is not a notebook extension. Please use one of"):
+    with pytest.raises(JupytextFormatError, match="'ext' is not a notebook extension"):
         jupytext([tmp_ipynb, '--to', 'ext'])
 
 
