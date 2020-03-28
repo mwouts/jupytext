@@ -8,6 +8,7 @@ class StringParser:
     is quoted or not"""
     single = None
     triple = None
+    triple_start = None
 
     def __init__(self, language):
         self.ignore = language is None
@@ -29,6 +30,8 @@ class StringParser:
         if not self.is_quoted() and self.comment is not None and line.startswith(self.comment):
             return
 
+        self.triple_start = -1
+
         for i, char in enumerate(line):
             if char not in ['"', "'"]:
                 continue
@@ -46,13 +49,14 @@ class StringParser:
                 continue
 
             if self.triple == char:
-                if line[i - 2:i + 1] == 3 * char:
+                if line[i - 2:i + 1] == 3 * char and i >= self.triple_start + 3:
                     self.triple = None
                     continue
             if self.triple is not None:
                 continue
             if line[i - 2:i + 1] == 3 * char:
                 self.triple = char
+                self.triple_start = i
                 continue
             self.single = char
 
