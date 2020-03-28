@@ -405,3 +405,21 @@ def test_single_triple_quote_works(no_jupytext_version_number, text='''# ---
 print("hello")
 ''', notebook=new_notebook(cells=[new_code_cell('print("hello")')])):
     compare_notebooks(jupytext.reads(text, 'py'), notebook)
+
+
+def test_docstring_with_quadruple_quote(nb=new_notebook(cells=[
+    new_code_cell('''def fun_1(df):
+  """"
+  docstring starting with 4 double quotes and ending with 3
+  """
+  return df'''),
+    new_code_cell('''def fun_2(df):
+  """
+  docstring
+  """
+  return df''')
+])):
+    """Reproduces https://github.com/mwouts/jupytext/issues/460"""
+    py = jupytext.writes(nb, 'py:percent')
+    nb2 = jupytext.reads(py, 'py')
+    compare_notebooks(nb2, nb)
