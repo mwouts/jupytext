@@ -694,3 +694,34 @@ jupyter:
     nb = jupytext.reads(org, 'md')
     text = jupytext.writes(nb, 'md')
     compare(text, target)
+
+
+def test_custom_metadata(no_jupytext_version_number,
+                         nb=new_notebook(metadata={
+                             "author": "John Doe",
+                             "title": "Some serious math",
+                             "jupytext": {
+                                 "notebook_metadata_filter": "title,author"
+                             },
+                             "kernelspec": {
+                                 "display_name": "Python 3",
+                                 "language": "python",
+                                 "name": "python3"
+                             }}),
+                         md="""---
+jupyter:
+  author: John Doe
+  jupytext:
+    notebook_metadata_filter: title,author
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  title: Some serious math
+---
+"""):
+    """Here we test the addition of custom metadata, cf. https://github.com/mwouts/jupytext/issues/469"""
+    md2 = jupytext.writes(nb, 'md')
+    compare(md2, md)
+    nb2 = jupytext.reads(md, 'md')
+    compare_notebooks(nb2, nb)
