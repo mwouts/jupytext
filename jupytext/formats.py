@@ -232,7 +232,7 @@ def read_format_from_metadata(text, ext):
 
 def guess_format(text, ext):
     """Guess the format and format options of the file, given its extension and content"""
-    if matches_mystnb(text, ext):
+    if is_myst_available() and matches_mystnb(text, ext):
         return MYST_FORMAT_NAME, {}
     lines = text.splitlines()
 
