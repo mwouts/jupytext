@@ -8,7 +8,7 @@ Jupytext supports conversion between the `.ipynb` format and many different form
 
 Jupytext can save notebooks as [Markdown](https://daringfireball.net/projects/markdown/syntax) documents. This format is well adapted to tutorials, books, or more generally notebooks that contain more text than code. Notebooks represented in this form are well rendered by most Markdown editors or renderers, including GitHub.
 
-Like all the Jupytext formats, Jupytext Markdown notebooks start with an (optional) YAML header. This header is used to store selected notebook metadata like the kernel information, together with Jupytext's format and version information. If you'd like to store more (or less) notebook metadata, please refer to the paragraph on [metadata filtering](#metadata-filtering).
+Like all the Jupytext formats, Jupytext Markdown notebooks start with an (optional) YAML header. This header is used to store selected notebook metadata like the kernel information, together with Jupytext's format and version information.
 ```
 ---
 jupyter:
@@ -24,6 +24,9 @@ jupyter:
     name: python3
 ---
 ```
+
+You can add custom notebook metadata like `author` or `title` under the `jupyter:` section, it will be synchronized with the notebook metadata. 
+And if you wish to export more metadata from the notebook, have a look at the paragraph on [metadata filtering](#metadata-filtering).
 
 In the Markdown format, markdown cells are inserted verbatim and separated with two blank lines.
 
@@ -307,7 +310,9 @@ Our sample notebook is also represented in `sphinx` format [here](https://github
 
 All the Jupytext formats (except Sphinx Gallery scripts) store a selection of the notebook metadata in a YAML header at the top of the text file. By default, Jupytext only includes the `kernelspec` and `jupytext` metadata (the remaining notebook metadata are preserved in the `.ipynb` document when you use paired notebook). 
 
-If you want to include more (or less) jupyter metadata here, add a `notebook_metadata_filter` option to the `jupytext` metadata. The value for `notebook_metadata_filter` is a comma separated list of additional/excluded (negated) entries, with `all` a keyword that allows to exclude all entries. For instance, if you don't want to store any notebook metadata in the text file, use `notebook_metadata_filter: -all`. If you want to store the whole, unfiltered notebook metadata then use `notebook_metadata_filter: all`. And if you want the default, plus a few specific section, use e.g. `notebook_metadata_filter: section_one,section_two`.
+If you want to include more (or less) jupyter metadata here, add a `notebook_metadata_filter` option to the `jupytext` metadata.
+The additional metadata will be added to the `jupyter:` section in the YAML header (or, at the root of the YAML header for the `md:pandoc` and `md:myst` formats).
+The value for `notebook_metadata_filter` is a comma separated list of additional/excluded (negated) entries, with `all` a keyword that allows to exclude all entries. For instance, if you don't want to store any notebook metadata in the text file, use `notebook_metadata_filter: -all`. If you want to store the whole, unfiltered notebook metadata then use `notebook_metadata_filter: all`. And if you want the default, plus a few specific section, use e.g. `notebook_metadata_filter: section_one,section_two`.
 
 Similarly, cell metadata can be filtered with the `cell_metadata_filter` option. To minimize the differences when a notebook is edited, Jupytext's default cell metadata filter does not include the `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` cell metadata in the text representation.
 
