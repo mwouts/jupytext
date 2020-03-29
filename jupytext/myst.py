@@ -3,20 +3,25 @@ This module contains round-trip conversion between
 myst formatted text documents and notebooks.
 """
 import json
+import warnings
 
 import nbformat as nbf
 import yaml
 
 MYST_FORMAT_NAME = "myst"
-CODE_DIRECTIVE = "code-cell"
-RAW_DIRECTIVE = "raw-cell"
+CODE_DIRECTIVE = "{code-cell}"
+RAW_DIRECTIVE = "{raw-cell}"
 
 
 def is_myst_available():
     """Whether the myst-parser package is available."""
     try:
-        import myst_parser  # noqa
+        from myst_parser import __version__  # noqa
     except ImportError:
+        return False
+    major, minor = __version__.split(".")[:2]
+    if int(major) < 1 and int(minor) < 8:
+        warnings.warn("The installed myst-parser version is less than the required 0.8")
         return False
     return True
 
@@ -39,51 +44,56 @@ def matches_mystnb(
     text,
     ext=None,
     requires_meta=True,
-    require_non_md=True,
-    return_nb=False,
-    store_line_numbers=False,
+    code_directive=CODE_DIRECTIVE,
+    raw_directive=RAW_DIRECTIVE,
 ):
-    """Attempt to distinguish a file as mystnb, only given its extension and content.
+    """Attempt to distinguish a file as myst, only given its extension and content.
 
     :param ext: the extension of the file
     :param requires_meta: requires the file to contain top matter metadata
-    :param require_non_md: whether to require that a non-markdown cell is present
-    :param return_nb: if a match is found, return the notebook
-    :param store_line_numbers: add a `_source_lines` key to cell metadata,
-        mapping to the source text.
+    :param code_directive: the name of the directive to search for containing code cells
+    :param raw_directive: the name of the directive to search for containing raw cells
     """
+    # is the extension uniquely associated with myst (i.e. not just .md)
     if ext and "." + ("." + ext).rsplit(".", 1)[1] in myst_extensions(no_md=True):
-        return (
-            myst_to_notebook(
-                text, ignore_bad_meta=True, store_line_numbers=store_line_numbers
-            )
-            if return_nb
-            else True
-        )
+        return True
+
+    # might the text contain metadata front matter
     if requires_meta and not text.startswith("---"):
         return False
-    try:
-        nb = myst_to_notebook(
-            text, ignore_bad_meta=True, store_line_numbers=store_line_numbers
-        )
-    except Exception:
-        return False
 
-    from jupytext.formats import format_name_for_ext
+    from myst_parser.main import default_parser
+
+    # parse markdown file up to the block level (i.e. don't worry about inline text)
+    parser = default_parser("html", disable_syntax=["inline"])
+    tokens = parser.parse(text + "\n")
 
     # Is the format information available in the jupytext text representation?
-    try:
-        format_name = format_name_for_ext(nb.metadata, ext or ".md")
-    except AttributeError:
-        pass
-    else:
-        if format_name == MYST_FORMAT_NAME:
-            return nb if return_nb else True
+    if tokens[0].type == "front_matter":
+        from jupytext.formats import format_name_for_ext
 
-    if require_non_md and not any(c.cell_type != "markdown" for c in nb.cells):
-        return False
+        try:
+            metadata = yaml.safe_load(tokens[0].content)
+        except (yaml.parser.ParserError, yaml.scanner.ScannerError):
+            pass
+        else:
+            try:
+                format_name = format_name_for_ext(metadata, ext or ".md")
+            except AttributeError:
+                pass
+            else:
+                if format_name == MYST_FORMAT_NAME:
+                    return True
 
-    return nb if return_nb else True
+    # is there at least on fenced code block with a code/raw directive language
+    for token in tokens:
+        if token.type == "fence" and (
+            token.info.startswith(code_directive)
+            or token.info.startswith(raw_directive)
+        ):
+            return True
+
+    return False
 
 
 class CompactDumper(yaml.SafeDumper):
@@ -144,18 +154,57 @@ class MystMetadataParsingError(Exception):
     """Error when parsing metadata from myst formatted text"""
 
 
-def _fmt_md(text):
+def strip_blank_lines(text):
     text = text.rstrip()
     while text and text.startswith("\n"):
         text = text[1:]
     return text
 
 
+def read_fenced_cell(token, cell_index, cell_type):
+    from myst_parser.parse_directives import DirectiveParsingError, parse_directive_text
+
+    try:
+        _, options, body_lines = parse_directive_text(
+            directive_class=MockDirective,
+            argument_str="",
+            content=token.content,
+            validate_options=False,
+        )
+    except DirectiveParsingError as err:
+        raise MystMetadataParsingError(
+            "{0} cell {1} at line {2} could not be read: {3}".format(
+                cell_type, cell_index, token.map[0] + 1, err
+            )
+        )
+    return options, body_lines
+
+
+def read_cell_metadata(token, cell_index):
+    metadata = {}
+    if token.content:
+        try:
+            metadata = json.loads(token.content.strip())
+        except Exception as err:
+            raise MystMetadataParsingError(
+                "Markdown cell {0} at line {1} could not be read: {2}".format(
+                    cell_index, token.map[0] + 1, err
+                )
+            )
+        if not isinstance(metadata, dict):
+            raise MystMetadataParsingError(
+                "Markdown cell {0} at line {1} is not a dict".format(
+                    cell_index, token.map[0] + 1
+                )
+            )
+
+    return metadata
+
+
 def myst_to_notebook(
     text,
     code_directive=CODE_DIRECTIVE,
     raw_directive=RAW_DIRECTIVE,
-    ignore_bad_meta=False,
     store_line_numbers=False,
 ):
     """Convert text written in the myst format to a notebook.
@@ -163,170 +212,91 @@ def myst_to_notebook(
     :param text: the file text
     :param code_directive: the name of the directive to search for containing code cells
     :param raw_directive: the name of the directive to search for containing raw cells
-    :param ignore_bad_meta: ignore metadata that cannot be parsed as JSON/YAML
     :param store_line_numbers: add a `_source_lines` key to cell metadata,
         mapping to the source text.
+
+    :raises MystMetadataParsingError if the metadata block is not valid JSON/YAML
 
     NOTE: we assume here that all of these directives are at the top-level,
     i.e. not nested in other directives.
     """
-    from mistletoe.base_elements import SourceLines
-    from mistletoe.parse_context import (
-        ParseContext,
-        get_parse_context,
-        set_parse_context,
-    )
-    from mistletoe.block_tokens import Document, CodeFence
+    from myst_parser.main import default_parser
 
-    from myst_parser.block_tokens import BlockBreak
-    from myst_parser.parse_directives import DirectiveParsingError, parse_directive_text
-    from myst_parser.docutils_renderer import DocutilsRenderer
+    # parse markdown file up to the block level (i.e. don't worry about inline text)
+    parser = default_parser("html", disable_syntax=["inline"])
+    tokens = parser.parse(text + "\n")
+    lines = text.splitlines()
+    md_start_line = 0
 
-    code_directive = "{{{0}}}".format(code_directive)
-    raw_directive = "{{{0}}}".format(raw_directive)
-
-    original_context = get_parse_context()
-    parse_context = ParseContext(
-        find_blocks=DocutilsRenderer.default_block_tokens,
-        find_spans=DocutilsRenderer.default_span_tokens,
-    )
-
-    if isinstance(text, SourceLines):
-        lines = text
-    else:
-        lines = SourceLines(text, standardize_ends=True)
-
-    try:
-        set_parse_context(parse_context)
-        doc = Document.read(lines, front_matter=True)
-        metadata_nb = {}
+    # get the document metadata
+    metadata_nb = {}
+    if tokens[0].type == "front_matter":
+        metadata = tokens.pop(0)
+        md_start_line = metadata.map[1]
         try:
-            metadata_nb = doc.front_matter.get_data() if doc.front_matter else {}
+            metadata_nb = yaml.safe_load(metadata.content)
         except (yaml.parser.ParserError, yaml.scanner.ScannerError) as error:
-            if not ignore_bad_meta:
-                raise MystMetadataParsingError("Notebook metadata: {}".format(error))
-        nbf_version = nbf.v4
-        kwargs = {"metadata": nbf.from_dict(metadata_nb)}
-        notebook = nbf_version.new_notebook(**kwargs)
+            raise MystMetadataParsingError("Notebook metadata: {}".format(error))
 
-        current_line = 0 if not doc.front_matter else doc.front_matter.position.line_end
-        md_metadata = {}
+    # create an empty notebook
+    nbf_version = nbf.v4
+    kwargs = {"metadata": nbf.from_dict(metadata_nb)}
+    notebook = nbf_version.new_notebook(**kwargs)
 
-        for item in doc.walk(["CodeFence", "BlockBreak"]):
-            if isinstance(item.node, BlockBreak):
-                token = item.node  # type: BlockBreak
-                source = _fmt_md(
-                    "".join(lines.lines[current_line:token.position.line_start - 1])
-                )
-                if source:
-                    md_metadata = nbf.from_dict(md_metadata)
-                    if store_line_numbers:
-                        md_metadata["_source_lines"] = [
-                            current_line,
-                            token.position.line_start - 1,
-                        ]
-                    notebook.cells.append(
-                        nbf_version.new_markdown_cell(
-                            source=source, metadata=md_metadata,
-                        )
-                    )
-                if token.content:
-                    md_metadata = {}
-                    try:
-                        md_metadata = json.loads(token.content.strip())
-                    except Exception as err:
-                        if not ignore_bad_meta:
-                            raise MystMetadataParsingError(
-                                "markdown cell {0} at {1} could not be read: {2}".format(
-                                    len(notebook.cells) + 1, token.position, err
-                                )
-                            )
-                    if not isinstance(md_metadata, dict):
-                        if not ignore_bad_meta:
-                            raise MystMetadataParsingError(
-                                "markdown cell {0} at {1} is not a dict".format(
-                                    len(notebook.cells) + 1, token.position
-                                )
-                            )
-                else:
-                    md_metadata = {}
-                current_line = token.position.line_start
-            if isinstance(item.node, CodeFence) and item.node.language in [
-                code_directive,
-                raw_directive,
-            ]:
-                token = item.node  # type: CodeFence
-                # Note: we ignore anything after the directive on the first line
-                # this is reserved for the optional lexer name
-                # TODO: could log warning about if token.arguments != lexer name
-
-                options, body_lines = {}, []
-                try:
-                    _, options, body_lines = parse_directive_text(
-                        directive_class=MockDirective,
-                        argument_str="",
-                        content=token.children[0].content,
-                        validate_options=False,
-                    )
-                except DirectiveParsingError as err:
-                    if not ignore_bad_meta:
-                        raise MystMetadataParsingError(
-                            "Code cell {0} at {1} could not be read: {2}".format(
-                                len(notebook.cells) + 1, token.position, err
-                            )
-                        )
-
-                md_source = _fmt_md(
-                    "".join(lines.lines[current_line:token.position.line_start - 1])
-                )
-                if md_source:
-                    md_metadata = nbf.from_dict(md_metadata)
-                    if store_line_numbers:
-                        md_metadata["_source_lines"] = [
-                            current_line,
-                            token.position.line_start - 1,
-                        ]
-                    notebook.cells.append(
-                        nbf_version.new_markdown_cell(
-                            source=md_source, metadata=md_metadata,
-                        )
-                    )
-                current_line = token.position.line_end
-                md_metadata = {}
-
-                cell_metadata = nbf.from_dict(options)
-                if store_line_numbers:
-                    cell_metadata["_source_lines"] = [
-                        token.position.line_start,
-                        token.position.line_end,
-                    ]
-                if item.node.language == code_directive:
-                    notebook.cells.append(
-                        nbf_version.new_code_cell(
-                            source="\n".join(body_lines), metadata=cell_metadata,
-                        )
-                    )
-                if item.node.language == raw_directive:
-                    notebook.cells.append(
-                        nbf_version.new_raw_cell(
-                            source="\n".join(body_lines), metadata=cell_metadata,
-                        )
-                    )
-
-        # add the final markdown cell (if present)
-        if lines.lines[current_line:]:
-            md_metadata = nbf.from_dict(md_metadata)
-            if store_line_numbers:
-                md_metadata["_source_lines"] = [current_line, len(lines.lines)]
+    def _flush_markdown(start_line, token, md_metadata):
+        """When we find a cell we check if there is preceding text.o"""
+        endline = token.map[0] if token else len(lines)
+        md_source = strip_blank_lines("\n".join(lines[start_line:endline]))
+        meta = nbf.from_dict(md_metadata)
+        if store_line_numbers:
+            meta["_source_lines"] = [start_line, endline]
+        if md_source:
             notebook.cells.append(
-                nbf_version.new_markdown_cell(
-                    source=_fmt_md("".join(lines.lines[current_line:])),
-                    metadata=md_metadata,
-                )
+                nbf_version.new_markdown_cell(source=md_source, metadata=meta,)
             )
 
-    finally:
-        set_parse_context(original_context)
+    # iterate through the tokens to identify notebook cells
+    nesting_level = 0
+    md_metadata = {}
+
+    for token in tokens:
+
+        nesting_level += token.nesting
+
+        if nesting_level != 0:
+            # we ignore fenced block that are nested, e.g. as part of lists, etc
+            continue
+
+        if token.type == "fence" and token.info.startswith(code_directive):
+            _flush_markdown(md_start_line, token, md_metadata)
+            options, body_lines = read_fenced_cell(token, len(notebook.cells), "Code")
+            meta = nbf.from_dict(options)
+            if store_line_numbers:
+                meta["_source_lines"] = [token.map[0] + 1, token.map[1]]
+            notebook.cells.append(
+                nbf_version.new_code_cell(source="\n".join(body_lines), metadata=meta)
+            )
+            md_metadata = {}
+            md_start_line = token.map[1]
+
+        elif token.type == "fence" and token.info.startswith(raw_directive):
+            _flush_markdown(md_start_line, token, md_metadata)
+            options, body_lines = read_fenced_cell(token, len(notebook.cells), "Raw")
+            meta = nbf.from_dict(options)
+            if store_line_numbers:
+                meta["_source_lines"] = [token.map[0] + 1, token.map[1]]
+            notebook.cells.append(
+                nbf_version.new_raw_cell(source="\n".join(body_lines), metadata=meta)
+            )
+            md_metadata = {}
+            md_start_line = token.map[1]
+
+        elif token.type == "myst_block_break":
+            _flush_markdown(md_start_line, token, md_metadata)
+            md_metadata = read_cell_metadata(token, len(notebook.cells))
+            md_start_line = token.map[1]
+
+    _flush_markdown(md_start_line, None, md_metadata)
 
     return notebook
 
@@ -370,7 +340,7 @@ def notebook_to_myst(
             last_cell_md = True
 
         elif cell.cell_type in ["code", "raw"]:
-            string += "\n```{{{}}}".format(
+            string += "\n```{}".format(
                 code_directive if cell.cell_type == "code" else raw_directive
             )
             if pygments_lexer and cell.cell_type == "code":
