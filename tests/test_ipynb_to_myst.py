@@ -40,7 +40,7 @@ def test_bad_code_metadata():
         myst_to_notebook(
             dedent(
                 """\
-            ```{{{0}}}
+            ```{0}
             ---
             {{a
             ---
@@ -105,6 +105,16 @@ def test_matches_mystnb():
         """
     )
     assert matches_mystnb(text) is True
+    text = dedent(
+        """\
+        ---
+        a: 1
+        ---
+        > ```{code-cell}
+          ```
+        """
+    )
+    assert matches_mystnb(text) is True
 
 
 def test_not_installed():
@@ -115,7 +125,7 @@ def test_not_installed():
 
 @requires_myst
 def test_store_line_numbers():
-    notebook = matches_mystnb(
+    notebook = myst_to_notebook(
         dedent(
             """\
             ---
@@ -124,7 +134,7 @@ def test_store_line_numbers():
             abc
             +++
             def
-            ```{{{0}}}
+            ```{0}
             ---
             b: 2
             ---
@@ -134,7 +144,6 @@ def test_store_line_numbers():
             """
         ).format(CODE_DIRECTIVE),
         store_line_numbers=True,
-        return_nb=True
     )
     expected = {
         "nbformat": 4,
