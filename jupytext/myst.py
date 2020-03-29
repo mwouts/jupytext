@@ -64,9 +64,13 @@ def matches_mystnb(
 
     from myst_parser.main import default_parser
 
-    # parse markdown file up to the block level (i.e. don't worry about inline text)
-    parser = default_parser("html", disable_syntax=["inline"])
-    tokens = parser.parse(text + "\n")
+    try:
+        # parse markdown file up to the block level (i.e. don't worry about inline text)
+        parser = default_parser("html", disable_syntax=["inline"])
+        tokens = parser.parse(text + "\n")
+    except Exception as err:
+        warnings.warn("myst-parse failed unexpectedly: {}".format(err))
+        return False
 
     # Is the format information available in the jupytext text representation?
     if tokens[0].type == "front_matter":
