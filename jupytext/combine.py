@@ -21,9 +21,12 @@ def black_invariant(text, chars=None):
 
 def same_content(ref, test, endswith=False):
     """Is the content of two cells the same, up to reformating by black"""
-    if endswith:
-        return black_invariant(ref).endswith(black_invariant(test))
-    return black_invariant(ref) == black_invariant(test)
+    ref = black_invariant(ref)
+    test = black_invariant(test)
+
+    if endswith and test:
+        return ref.endswith(test)
+    return ref == test
 
 
 def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
