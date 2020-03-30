@@ -48,16 +48,26 @@ class StringParser:
             if not self.python:
                 continue
 
-            if self.triple == char:
-                if line[i - 2:i + 1] == 3 * char and i >= self.triple_start + 3:
+            if line[i - 2:i + 1] == 3 * char and i >= self.triple_start + 3:
+                # End of a triple quote
+                if self.triple == char:
                     self.triple = None
+                    self.triple_start = i
                     continue
-            if self.triple is not None:
-                continue
-            if line[i - 2:i + 1] == 3 * char:
+
+                # Are we looking for a different triple quote?
+                if self.triple is not None:
+                    continue
+
+                # Triple quote starting
                 self.triple = char
                 self.triple_start = i
                 continue
+
+            # Inside a multiline quote
+            if self.triple is not None:
+                continue
+
             self.single = char
 
         # Line ended

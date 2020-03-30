@@ -53,3 +53,19 @@ comment that starts with four quotes
         sp.read_line(line)
 
     assert quoted == [1, 2]
+
+
+def test_long_string_ends_with_four_quotes(text="""'''This is a multiline
+comment that ends with four quotes
+''''
+
+1 + 1
+"""):
+    quoted = []
+    sp = StringParser('python')
+    for i, line in enumerate(text.splitlines()):
+        if sp.is_quoted():
+            quoted.append(i)
+        sp.read_line(line)
+
+    assert quoted == [1, 2]
