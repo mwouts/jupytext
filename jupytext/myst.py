@@ -43,7 +43,7 @@ def myst_extensions(no_md=False):
 def matches_mystnb(
     text,
     ext=None,
-    requires_meta=True,
+    requires_meta=False,
     code_directive=CODE_DIRECTIVE,
     raw_directive=RAW_DIRECTIVE,
 ):
