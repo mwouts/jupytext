@@ -73,7 +73,7 @@ def matches_mystnb(
         return False
 
     # Is the format information available in the jupytext text representation?
-    if tokens[0].type == "front_matter":
+    if tokens and tokens[0].type == "front_matter":
         from jupytext.formats import format_name_for_ext
 
         try:
