@@ -4,9 +4,7 @@ except ImportError:
     import mock
 from textwrap import dedent
 import pytest
-from nbformat import from_dict
 
-from jupytext.compare import compare_notebooks
 from jupytext.formats import get_format_implementation, JupytextFormatError
 from jupytext.myst import (
     myst_to_notebook,
