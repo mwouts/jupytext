@@ -94,15 +94,15 @@ def map_outputs_to_inputs(cells_inputs, cells_outputs):
     n_out = len(cells_outputs)
     outputs_map = [None] * n_in
 
-    # First rule: match based on cell type, content, in increasing order
-    current_j = 0
+    # First rule: match based on cell type, content, in increasing order, for each cell type
+    first_unmatched_output_per_cell_type = {}
     for i in range(n_in):
         cell_input = cells_inputs[i]
-        for j in range(current_j, n_out):
+        for j in range(first_unmatched_output_per_cell_type.get(cell_input.cell_type, 0), n_out):
             cell_output = cells_outputs[j]
             if cell_input.cell_type == cell_output.cell_type and same_content(cell_input.source, cell_output.source):
                 outputs_map[i] = j
-                current_j = j + 1
+                first_unmatched_output_per_cell_type[cell_input.cell_type] = j + 1
                 break
 
     # Second rule: match unused outputs based on cell type and content
@@ -124,7 +124,7 @@ def map_outputs_to_inputs(cells_inputs, cells_outputs):
                     unused_ouputs.remove(j)
                     break
 
-    # Fourth rule: match based on increasing index, for non-empty cells
+    # Fourth rule: match based on increasing index (and cell type) for non-empty cells
     if not unused_ouputs:
         return outputs_map
 
@@ -140,7 +140,7 @@ def map_outputs_to_inputs(cells_inputs, cells_outputs):
 
         cell_input = cells_inputs[i]
         cell_output = cells_outputs[j]
-        if cell_input.cell_type == cell_output.cell_type and cell_input.source:
+        if cell_input.cell_type == cell_output.cell_type and cell_input.source.strip() != '':
             outputs_map[i] = j
             unused_ouputs.remove(j)
             prev_j = j
