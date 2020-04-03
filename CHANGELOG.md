@@ -1,9 +1,10 @@
-1.4.2 (2020-03-??)
+1.4.2 (2020-04-??)
 ------------------
 
 **Changed**
 - Use `os.path.samefile` when searching for the kernel that corresponds to the current environment (`--set-kernel -`)
 - The outputs from the `.ipynb` file are matched with the input cells from the text file with less strict rules. In this version, a search and replace on the text file will not remove the outputs any more (#464).
+- Update parsing of myst notebooks to new (markdown-it based) parser (please upgrade to `myst-parser` to version) (#473)
 
 **Fixed**
 - Fixed the CLI example for not commenting out magic commands: `--opt comment_magics=false`. In addition, most of the `jupytext` commands in `using-cli.md` are now tested! (#465)
