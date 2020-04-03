@@ -58,7 +58,7 @@ If you want to preserve (or filter out) certain notebook or cell metadata, chang
 jupytext --to md --update-metadata '{"jupytext": {"notebook_metadata_filter":"all"}}' notebook.ipynb
 ```
 
-Read more on the default and possible values for the metadata filters in [this section](using-server.md#metadata-filtering).
+Read more on the default and possible values for the metadata filters in [this section](using-server.html#metadata-filtering).
 
 
 ## Jupytext as a Git pre-commit hook
