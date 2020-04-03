@@ -689,6 +689,10 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
 
         if self.metadata and 'cell_type' in self.metadata:
             self.cell_type = self.metadata.pop('cell_type')
+        elif not is_active('.ipynb', self.metadata):
+            if self.metadata.get('active') == '':
+                del self.metadata['active']
+            self.cell_type = 'raw'
         else:
             self.cell_type = 'code'
 

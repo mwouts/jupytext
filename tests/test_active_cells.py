@@ -243,3 +243,43 @@ ACTIVE_NOT_INCLUDE_RMD = {'.py': """# + tags=["remove_cell"] active="Rmd"
 @pytest.mark.parametrize('ext', ['.Rmd', '.py', '.R'])
 def test_active_not_include_rmd(ext, no_jupytext_version_number):
     check_active_cell(ext, ACTIVE_NOT_INCLUDE_RMD)
+
+
+def test_active_cells_from_py_percent(text="""# %% active="py"
+print('should only be displayed in py file')
+
+# %% tags=["active-py"]
+print('should only be displayed in py file')
+
+# %% active="ipynb"
+# print('only in jupyter')
+"""):
+    """Example taken from https://github.com/mwouts/jupytext/issues/477"""
+    nb = jupytext.reads(text, 'py:percent')
+    assert nb.cells[0].cell_type == 'raw'
+    assert nb.cells[1].cell_type == 'raw'
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[2].source == "print('only in jupyter')"
+
+    text2 = jupytext.writes(nb, 'py:percent')
+    compare(text2, text)
+
+
+def test_active_cells_from_py_light(text="""# + active="py"
+print('should only be displayed in py file')
+
+# + tags=["active-py"]
+print('should only be displayed in py file')
+
+# + active="ipynb"
+# print('only in jupyter')
+"""):
+    """Example adapted from https://github.com/mwouts/jupytext/issues/477"""
+    nb = jupytext.reads(text, 'py')
+    assert nb.cells[0].cell_type == 'raw'
+    assert nb.cells[1].cell_type == 'raw'
+    assert nb.cells[2].cell_type == 'code'
+    assert nb.cells[2].source == "print('only in jupyter')"
+
+    text2 = jupytext.writes(nb, 'py')
+    compare(text2, text)
