@@ -377,12 +377,12 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
 
     def cell_to_text(self):
         """Return the text representation for the cell"""
-        if self.cell_type != 'code':
-            self.metadata['cell_type'] = self.cell_type
-
         active = is_active(self.ext, self.metadata, same_language(self.language, self.default_language))
         if self.cell_type == 'raw' and 'active' in self.metadata and self.metadata['active'] == '':
             del self.metadata['active']
+
+        if not self.is_code():
+            self.metadata['cell_type'] = self.cell_type
 
         options = metadata_to_double_percent_options(self.metadata, self.cell_metadata_json)
         if options.startswith('%') or not options:
@@ -390,7 +390,7 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
         else:
             lines = [self.comment + ' %% ' + options]
 
-        if self.cell_type == 'code' and active:
+        if self.is_code() and active:
             source = copy(self.source)
             comment_magic(source, self.language, self.comment_magics)
             if source == ['']:
