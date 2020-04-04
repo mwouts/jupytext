@@ -140,11 +140,12 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                     cells.append(new_code_cell(source=cell.source, metadata=cell_metadata))
                 else:
                     cells.append(NotebookNode(source=cell.source, metadata=cell_metadata, cell_type=cell.cell_type))
-            return notebook_to_myst(NotebookNode(
-                nbformat=nb.nbformat,
-                nbformat_minor=nb.nbformat_minor,
-                metadata=metadata,
-                cells=cells),
+            return notebook_to_myst(
+                NotebookNode(
+                    nbformat=nb.nbformat,
+                    nbformat_minor=nb.nbformat_minor,
+                    metadata=metadata,
+                    cells=cells),
                 default_lexer=pygments_lexer)
 
         # Copy the notebook, in order to be sure we do not modify the original notebook

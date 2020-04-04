@@ -77,30 +77,30 @@ def parse_jupytext_args(args=None):
                              'on the notebooks found in the git index, which have an\n'
                              'extension that matches the (optional) --from argument.\n')
     # Destination format & act on metadata
-    parser.add_argument('--to',
-                        help="Destination format: either 'notebook' (extension .ipynb),\n"
-                             "'markdown' (.md), 'rmarkdown' (.Rmd), 'script', a supported\n"
-                             "extension, or an explicit extension/format description\n"
-                             "[prefix_path//][suffix.]ext[:format_name], where\n" +
-                             "- ext is one of {}, or auto\n"
-                        .format(', '.join(ext[1:] for ext in NOTEBOOK_EXTENSIONS)) +
-                             "- format_name is optional, and can be {} for Markdown\nfiles, and ".format(
-                                 ' or '.join(
-                                     set(fmt.format_name for fmt in JUPYTEXT_FORMATS if fmt.extension == '.md'))) +
-                             "{} for scripts.\n".format(
-                                 ', '.join(set(fmt.format_name for fmt in JUPYTEXT_FORMATS if fmt.extension == '.py')))
-                             +
-                             "The default format for scripts is the 'light' format,\n"
-                             "which uses few cell markers (none when possible).\n"
-                             "Alternatively, a format compatible with many editors is the\n"
-                             "'percent' format, which uses '# %%%%' as cell markers\n"
-                             "The main formats (markdown, light, percent) preserve\n"
-                             "notebooks and text documents in a roundtrip. Use the\n"
-                             "--test and and --test-strict commands to test the roundtrip\n"
-                             "on your files.\n"
-                             "Read more about the available formats at\n"
-                             "https://jupytext.readthedocs.io/en/latest/formats.html\n"
-                        )
+    parser.add_argument(
+        '--to',
+        help=("Destination format: either 'notebook' (extension .ipynb),\n"
+              "'markdown' (.md), 'rmarkdown' (.Rmd), 'script', a supported\n"
+              "extension, or an explicit extension/format description\n"
+              "[prefix_path//][suffix.]ext[:format_name], where\n" +
+              "- ext is one of {}, or auto\n".format(', '.join(ext[1:] for ext in NOTEBOOK_EXTENSIONS)) +
+              "- format_name is optional, and can be {} for Markdown\nfiles, and ".format(
+                  ' or '.join(
+                      set(fmt.format_name for fmt in JUPYTEXT_FORMATS if fmt.extension == '.md'))) +
+              "{} for scripts.\n".format(
+                  ', '.join(set(fmt.format_name for fmt in JUPYTEXT_FORMATS if fmt.extension == '.py')))
+              +
+              "The default format for scripts is the 'light' format,\n"
+              "which uses few cell markers (none when possible).\n"
+              "Alternatively, a format compatible with many editors is the\n"
+              "'percent' format, which uses '# %%%%' as cell markers\n"
+              "The main formats (markdown, light, percent) preserve\n"
+              "notebooks and text documents in a roundtrip. Use the\n"
+              "--test and and --test-strict commands to test the roundtrip\n"
+              "on your files.\n"
+              "Read more about the available formats at\n"
+              "https://jupytext.readthedocs.io/en/latest/formats.html\n")
+    )
     parser.add_argument('--format-options', '--opt',
                         action='append',
                         help='Set format options with e.g.\n'
@@ -446,7 +446,7 @@ def jupytext_single_file(nb_file, args, log):
                     # white spaces between the comment char and the YAML delimiters are allowed
                     if comment:
                         comment = comment + r'\s*'
-                    yaml_header = re.compile(r'^{}---\s*\n.*\n{}---\s*\n'.format(comment, comment),
+                    yaml_header = re.compile(r'^{comment}---\s*\n.*\n{comment}---\s*\n'.format(comment=comment),
                                              re.MULTILINE | re.DOTALL)
                     compare(re.sub(yaml_header, '', text),
                             re.sub(yaml_header, '', org_text))
