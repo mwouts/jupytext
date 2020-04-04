@@ -232,14 +232,15 @@ def read_format_from_metadata(text, ext):
 
 def guess_format(text, ext):
     """Guess the format and format options of the file, given its extension and content"""
-    if is_myst_available() and matches_mystnb(text, ext):
-        return MYST_FORMAT_NAME, {}
-    lines = text.splitlines()
-
     metadata = read_metadata(text, ext)
 
     if 'text_representation' in metadata.get('jupytext', {}):
         return format_name_for_ext(metadata, ext), {}
+
+    if is_myst_available() and matches_mystnb(text, ext):
+        return MYST_FORMAT_NAME, {}
+
+    lines = text.splitlines()
 
     # Is this a Hydrogen-like script?
     # Or a Sphinx-gallery script?
