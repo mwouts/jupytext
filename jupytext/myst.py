@@ -14,7 +14,8 @@ try:
     from myst_parser.main import default_parser
     from myst_parser.parse_directives import DirectiveParsingError, parse_directive_text
 except ImportError as err:
-    myst_parser = DirectiveParsingError = None
+    myst_parser = None
+    DirectiveParsingError = Exception
     default_parser = parse_directive_text = reraise(err)
 
 MYST_FORMAT_NAME = "myst"
