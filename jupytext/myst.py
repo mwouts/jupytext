@@ -7,6 +7,15 @@ import warnings
 
 import nbformat as nbf
 import yaml
+from .reraise import reraise
+
+try:
+    import myst_parser
+    from myst_parser.main import default_parser
+    from myst_parser.parse_directives import DirectiveParsingError, parse_directive_text
+except ImportError as err:
+    myst_parser = DirectiveParsingError = None
+    default_parser = parse_directive_text = reraise(err)
 
 MYST_FORMAT_NAME = "myst"
 CODE_DIRECTIVE = "{code-cell}"
@@ -15,11 +24,9 @@ RAW_DIRECTIVE = "{raw-cell}"
 
 def is_myst_available():
     """Whether the myst-parser package is available."""
-    try:
-        from myst_parser import __version__  # noqa
-    except ImportError:
+    if myst_parser is None:
         return False
-    major, minor = __version__.split(".")[:2]
+    major, minor = myst_parser.__version__.split(".")[:2]
     if int(major) < 1 and int(minor) < 8:
         warnings.warn("The installed myst-parser version is less than the required 0.8")
         return False
@@ -28,9 +35,7 @@ def is_myst_available():
 
 def myst_version():
     """The major version of myst parser."""
-    from myst_parser import __version__
-
-    return ".".join(__version__.split(".")[:2])
+    return ".".join(myst_parser.__version__.split(".")[:2])
 
 
 def myst_extensions(no_md=False):
@@ -62,32 +67,28 @@ def matches_mystnb(
     if requires_meta and not text.startswith("---"):
         return False
 
-    from myst_parser.main import default_parser
-
     try:
         # parse markdown file up to the block level (i.e. don't worry about inline text)
         parser = default_parser("html", disable_syntax=["inline"])
         tokens = parser.parse(text + "\n")
-    except Exception as err:
+    except (TypeError, ValueError) as err:
         warnings.warn("myst-parse failed unexpectedly: {}".format(err))
         return False
 
     # Is the format information available in the jupytext text representation?
     if tokens and tokens[0].type == "front_matter":
-        from jupytext.formats import format_name_for_ext
-
         try:
             metadata = yaml.safe_load(tokens[0].content)
         except (yaml.parser.ParserError, yaml.scanner.ScannerError):
             pass
         else:
             try:
-                format_name = format_name_for_ext(metadata, ext or ".md")
+                if (metadata.get('jupytext', {})
+                        .get('text_representation', {})
+                        .get('format_name', '') == MYST_FORMAT_NAME):
+                    return True
             except AttributeError:
                 pass
-            else:
-                if format_name == MYST_FORMAT_NAME:
-                    return True
 
     # is there at least on fenced code block with a code/raw directive language
     for token in tokens:
@@ -105,11 +106,13 @@ class CompactDumper(yaml.SafeDumper):
 
 
 def represent_list(self, data):
+    """Compact lists"""
     flow_style = not any(isinstance(i, dict) for i in data)
     return self.represent_sequence("tag:yaml.org,2002:seq", data, flow_style=flow_style)
 
 
 def represent_dict(self, data):
+    """Compact dicts"""
     return self.represent_mapping("tag:yaml.org,2002:map", data, flow_style=False)
 
 
@@ -159,6 +162,7 @@ class MystMetadataParsingError(Exception):
 
 
 def strip_blank_lines(text):
+    """Remove initial blank lines"""
     text = text.rstrip()
     while text and text.startswith("\n"):
         text = text[1:]
@@ -166,8 +170,7 @@ def strip_blank_lines(text):
 
 
 def read_fenced_cell(token, cell_index, cell_type):
-    from myst_parser.parse_directives import DirectiveParsingError, parse_directive_text
-
+    """Return cell options and body"""
     try:
         _, options, body_lines = parse_directive_text(
             directive_class=MockDirective,
@@ -185,6 +188,7 @@ def read_fenced_cell(token, cell_index, cell_type):
 
 
 def read_cell_metadata(token, cell_index):
+    """Return cell metadata"""
     metadata = {}
     if token.content:
         try:
@@ -224,8 +228,6 @@ def myst_to_notebook(
     NOTE: we assume here that all of these directives are at the top-level,
     i.e. not nested in other directives.
     """
-    from myst_parser.main import default_parser
-
     # parse markdown file up to the block level (i.e. don't worry about inline text)
     parser = default_parser("html", disable_syntax=["inline"])
     tokens = parser.parse(text + "\n")
