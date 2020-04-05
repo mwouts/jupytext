@@ -17,3 +17,8 @@ repos:
     - id: end-of-file-fixer
     - id: trailing-whitespace
     - id: flake8
+
+  - repo: https://github.com/psf/black
+    rev: stable
+    hooks:
+    - id: black
