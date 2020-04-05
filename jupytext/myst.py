@@ -47,11 +47,11 @@ def myst_extensions(no_md=False):
 
 
 def matches_mystnb(
-        text,
-        ext=None,
-        requires_meta=True,
-        code_directive=CODE_DIRECTIVE,
-        raw_directive=RAW_DIRECTIVE,
+    text,
+    ext=None,
+    requires_meta=True,
+    code_directive=CODE_DIRECTIVE,
+    raw_directive=RAW_DIRECTIVE,
 ):
     """Attempt to distinguish a file as myst, only given its extension and content.
 
@@ -84,9 +84,12 @@ def matches_mystnb(
             pass
         else:
             try:
-                if (metadata.get('jupytext', {})
-                        .get('text_representation', {})
-                        .get('format_name', '') == MYST_FORMAT_NAME):
+                if (
+                    metadata.get("jupytext", {})
+                    .get("text_representation", {})
+                    .get("format_name", "")
+                    == MYST_FORMAT_NAME
+                ):
                     return True
             except AttributeError:
                 pass
@@ -94,8 +97,8 @@ def matches_mystnb(
     # is there at least on fenced code block with a code/raw directive language
     for token in tokens:
         if token.type == "fence" and (
-                token.info.startswith(code_directive)
-                or token.info.startswith(raw_directive)
+            token.info.startswith(code_directive)
+            or token.info.startswith(raw_directive)
         ):
             return True
 
@@ -211,10 +214,10 @@ def read_cell_metadata(token, cell_index):
 
 
 def myst_to_notebook(
-        text,
-        code_directive=CODE_DIRECTIVE,
-        raw_directive=RAW_DIRECTIVE,
-        add_source_map=False,
+    text,
+    code_directive=CODE_DIRECTIVE,
+    raw_directive=RAW_DIRECTIVE,
+    add_source_map=False,
 ):
     """Convert text written in the myst format to a notebook.
 
@@ -309,7 +312,7 @@ def myst_to_notebook(
 
 
 def notebook_to_myst(
-        nb, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, default_lexer=None,
+    nb, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, default_lexer=None,
 ):
     """Parse a notebook to a MyST formatted text document.
 

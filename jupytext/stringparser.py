@@ -6,13 +6,14 @@ from .languages import _COMMENT
 class StringParser:
     """A simple file parser that can tell whether the first character of a line
     is quoted or not"""
+
     single = None
     triple = None
     triple_start = None
 
     def __init__(self, language):
         self.ignore = language is None
-        self.python = language != 'R'
+        self.python = language != "R"
         self.comment = _COMMENT.get(language)
 
     def is_quoted(self):
@@ -27,7 +28,11 @@ class StringParser:
             return
 
         # Do not search for quotes when the line is commented out (and not quoted)
-        if not self.is_quoted() and self.comment is not None and line.startswith(self.comment):
+        if (
+            not self.is_quoted()
+            and self.comment is not None
+            and line.startswith(self.comment)
+        ):
             return
 
         self.triple_start = -1
@@ -36,7 +41,7 @@ class StringParser:
             if char not in ['"', "'"]:
                 continue
             # Is the char escaped?
-            if line[i - 1:i] == '\\':
+            if line[i - 1 : i] == "\\":
                 continue
 
             if self.single == char:
@@ -48,7 +53,7 @@ class StringParser:
             if not self.python:
                 continue
 
-            if line[i - 2:i + 1] == 3 * char and i >= self.triple_start + 3:
+            if line[i - 2 : i + 1] == 3 * char and i >= self.triple_start + 3:
                 # End of a triple quote
                 if self.triple == char:
                     self.triple = None
