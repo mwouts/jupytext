@@ -1,0 +1,19 @@
+# Install pre-commit hooks via
+# pre-commit install
+
+exclude: >
+    (?x)^(
+      \.vscode/settings\.json|
+      demo/.*|
+      tests/notebooks/.*|
+    )$
+repos:
+
+  - repo: git://github.com/pre-commit/pre-commit-hooks
+    rev: v2.2.3
+    hooks:
+    - id: check-json
+    - id: check-yaml
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+    - id: flake8
