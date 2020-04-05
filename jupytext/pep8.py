@@ -11,7 +11,7 @@ def next_instruction_is_function_or_class(lines):
             continue
         if line.startswith('def ') or line.startswith('class '):
             return True
-        if line.startswith(('#', '@', ' ')):
+        if line.startswith(('#', '@', ' ', ')')):
             continue
         return False
 
@@ -35,7 +35,7 @@ def cell_ends_with_function_or_class(lines):
             if i > 0 and not lines[i - 1].strip():
                 return False
             continue
-        if line.startswith('#') or line.startswith(' '):
+        if line.startswith(("#", ' ', ')')):
             continue
         if line.startswith('def ') or line.startswith('class '):
             return True

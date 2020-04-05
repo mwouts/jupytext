@@ -964,3 +964,27 @@ def test_two_raw_cells_are_preserved(
     py = jupytext.writes(nb, 'py')
     nb2 = jupytext.reads(py, 'py')
     compare_notebooks(nb2, nb)
+
+
+def test_no_metadata_on_multiline_decorator(text="""import pytest
+
+
+@pytest.mark.parametrize(
+    "arg",
+    [
+        'a',
+        'b',
+        'c'
+    ],
+)
+def test_arg(arg):
+    assert isinstance(arg, str)
+"""):
+    """Applying black on the code of jupytext 1.4.2 turns some pytest parameters into multi-lines ones, and
+    causes a few failures in test_pep8.py:test_no_metadata_when_py_is_pep8"""
+    nb = jupytext.reads(text, 'py')
+    assert len(nb.cells) == 2
+    for cell in nb.cells:
+        assert cell.cell_type == 'code'
+    assert nb.cells[0].source == 'import pytest'
+    assert nb.cells[0].metadata == {}
