@@ -40,7 +40,7 @@ Console.WriteLine($"Hello {name.ToUpper()}!");"""
         nb.cells[1].metadata,
         {
             "language": "cs",
-            "incorrectly_encoded_metadata": "--region methods --source-file .\\myapp\\Program.cs --project .\\myapp\\myapp.csproj",
+            "incorrectly_encoded_metadata": "--region methods --source-file .\\myapp\\Program.cs --project .\\myapp\\myapp.csproj",  # noqa: E501
         },
     )
 

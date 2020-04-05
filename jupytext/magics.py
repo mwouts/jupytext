@@ -48,7 +48,7 @@ _PYTHON_MAGIC_CMD = re.compile(
         "|".join(
             # posix
             ["cat", "cd", "cp", "mv", "rm", "rmdir", "mkdir"]
-            +
+            +  # noqa: W504
             # windows
             ["copy", "ddir", "echo", "ls", "ldir", "mkdir", "ren", "rmdir"]
         )
