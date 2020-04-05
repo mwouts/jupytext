@@ -25,7 +25,7 @@
 
 **Fixed**
 - When using `jupytext --pipe cmd`, the output of `cmd` should not appear in the terminal (#432)
- 
+
 
 1.4.0 (2020-03-09)
 ------------------
@@ -49,10 +49,10 @@
 ------------------
 
 **Added**
-- C# and F# Jupyter notebooks are now supported (#427, #429) 
+- C# and F# Jupyter notebooks are now supported (#427, #429)
 
 **Fixed**
-- `jupytext --to script *.ipynb` now computes the script extension for each notebook (#428) 
+- `jupytext --to script *.ipynb` now computes the script extension for each notebook (#428)
 - Fix shebang handling for languages with non-# comments, by Jonas Bushart (#434)
 - Indented bash commands are now commented out (#437)
 - The main formats are documented in `jupytext --help` (#426, #433)

@@ -20,7 +20,7 @@ jupytext --to md --output - notebook.ipynb      # display the markdown version o
 jupytext --from ipynb --to py:percent           # read ipynb from stdin and write double percent script on stdout
 ```
 
-Jupytext has a `--sync` mode that updates all the paired representations of a notebook based on timestamps: 
+Jupytext has a `--sync` mode that updates all the paired representations of a notebook based on timestamps:
 ```bash
 jupytext --set-formats ipynb,py notebook.ipynb  # Turn notebook.ipynb into a paired ipynb/py notebook
 jupytext --sync notebook.ipynb                  # Update whichever of notebook.ipynb/notebook.py is outdated
@@ -28,13 +28,13 @@ jupytext --sync notebook.ipynb                  # Update whichever of notebook.i
 
 For convenience, when creating a notebook from text you can execute it:
 ```bash
-jupytext --set-kernel - notebook.md             # set a kernel metadata on the given notebook that points to the current python executable 
-jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipynb file and run it 
+jupytext --set-kernel - notebook.md             # set a kernel metadata on the given notebook that points to the current python executable
+jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipynb file and run it
 ```
 
 If you wanted to convert a collection of Markdown files to paired notebooks, and execute them in the current Python environment, you could run:
 ```bash
-jupytext --set-formats ipynb,md --execute *.md 
+jupytext --set-formats ipynb,md --execute *.md
 ```
 
 You may also find useful to `--pipe` the text representation of a notebook into tools like `black`:

@@ -25,7 +25,7 @@ jupyter:
 ---
 ```
 
-You can add custom notebook metadata like `author` or `title` under the `jupyter:` section, it will be synchronized with the notebook metadata. 
+You can add custom notebook metadata like `author` or `title` under the `jupyter:` section, it will be synchronized with the notebook metadata.
 And if you wish to export more metadata from the notebook, have a look at the paragraph on [metadata filtering](#metadata-filtering).
 
 In the Markdown format, markdown cells are inserted verbatim and separated with two blank lines.
@@ -43,7 +43,7 @@ Code cells are encoded using the classical triple backticks, followed by the not
     ```
 
 Code snippets are turned into code cells in Jupyter as soon as they have an explicit language, when that language is supported in Jupyter. Thus, you have a code snippet that you don't want to execute in Jupyter, you can either
-- remove the language information, 
+- remove the language information,
 - or, start the code snippet with a triple tilde, e.g. `~~~python`, instead of ` ```python`
 - or, add an `active="md"` cell metadata, or a `.noeval` attribute after the language information, e.g. ` ```python .noeval `
 - or, surround the code snippet with explicit Markdown cell markers (see below).
@@ -308,7 +308,7 @@ Our sample notebook is also represented in `sphinx` format [here](https://github
 
 ### Metadata filtering
 
-All the Jupytext formats (except Sphinx Gallery scripts) store a selection of the notebook metadata in a YAML header at the top of the text file. By default, Jupytext only includes the `kernelspec` and `jupytext` metadata (the remaining notebook metadata are preserved in the `.ipynb` document when you use paired notebook). 
+All the Jupytext formats (except Sphinx Gallery scripts) store a selection of the notebook metadata in a YAML header at the top of the text file. By default, Jupytext only includes the `kernelspec` and `jupytext` metadata (the remaining notebook metadata are preserved in the `.ipynb` document when you use paired notebook).
 
 If you want to include more (or less) jupyter metadata here, add a `notebook_metadata_filter` option to the `jupytext` metadata.
 The additional metadata will be added to the `jupyter:` section in the YAML header (or, at the root of the YAML header for the `md:pandoc` and `md:myst` formats).
@@ -318,7 +318,7 @@ Similarly, cell metadata can be filtered with the `cell_metadata_filter` option.
 
 ### Magic commands
 
-Jupyter notebooks often include _magic commands_ like `%load_ext` or `%matplotlib inline`. These commands are Jupyter specific and cannot be executed by the classical interpreter. 
+Jupyter notebooks often include _magic commands_ like `%load_ext` or `%matplotlib inline`. These commands are Jupyter specific and cannot be executed by the classical interpreter.
 
 By default, magic commands are commented out in all the Jupytext formats, with the exception of the Markdown format (not meant to be executed) and the Hydrogen format. You can change this by setting a `comment_magics` option (`true` or `false`) in the Jupytext section.
 

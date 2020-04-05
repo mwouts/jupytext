@@ -93,9 +93,9 @@ In JupyterLab, Jupytext adds a set of commands to the command palette:
 
 ![JupyterLab extension](https://raw.githubusercontent.com/mwouts/jupyterlab-jupytext/master/jupytext_commands.png)
 
-The lab extension is included in the Python package. Unless you need to use an older version of the extension you don't have to either install or update the extension manually from [npm](https://www.npmjs.com/). 
- 
-If you are wondering why the npm and the Python packages have different version, it's because the npm package is updated less often than the Python one. The latest versions are respectively [![npm version](https://badge.fury.io/js/jupyterlab-jupytext.svg)](https://badge.fury.io/js/jupyterlab-jupytext) and [![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext). 
+The lab extension is included in the Python package. Unless you need to use an older version of the extension you don't have to either install or update the extension manually from [npm](https://www.npmjs.com/).
+
+If you are wondering why the npm and the Python packages have different version, it's because the npm package is updated less often than the Python one. The latest versions are respectively [![npm version](https://badge.fury.io/js/jupyterlab-jupytext.svg)](https://badge.fury.io/js/jupyterlab-jupytext) and [![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext).
 
 Installing Jupytext will trigger a build of JupyterLab the next time you open it. If you prefer, you can trigger the build manually with
 ```
@@ -105,7 +105,7 @@ jupyter lab build
 The version of the extension that is shipped with Jupytext requires JupyterLab 1.0. If you prefer to continue using JupyterLab in version 0.35, you should install the version 0.19 of the extension:
 ```
 jupyter labextension install jupyterlab-jupytext@0.19
-``` 
+```
 
 ## Using Jupytext
 
@@ -131,7 +131,7 @@ The package provides a `jupytext` script for command line conversion between the
 ```bash
 jupytext --to py notebook.ipynb                 # convert notebook.ipynb to a .py file
 jupytext --to notebook notebook.py              # convert notebook.py to an .ipynb file with no outputs
-jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipynb file and run it 
+jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipynb file and run it
 jupytext --update --to notebook notebook.py     # update the input cells in the .ipynb file and preserve outputs and metadata
 jupytext --set-formats ipynb,py notebook.ipynb  # Turn notebook.ipynb into a paired ipynb/py notebook
 jupytext --sync notebook.ipynb                  # Update all paired representations of notebook.ipynb

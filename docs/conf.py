@@ -14,12 +14,13 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+from recommonmark.transform import AutoStructify
+
 # -- Project information -----------------------------------------------------
 
 project = "Jupytext"
 copyright = "2018-2019, The Jupytext Team"
 author = "The Jupytext Team"
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -60,8 +61,6 @@ html_static_path = []
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "jupytext"
-
-from recommonmark.transform import AutoStructify
 
 
 def setup(app):
