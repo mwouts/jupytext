@@ -30,7 +30,7 @@ requires_nbconvert = pytest.mark.skipif(not tool_version('jupyter nbconvert'), r
 requires_sphinx_gallery = pytest.mark.skipif(not rst2md, reason='sphinx_gallery is not available')
 requires_pandoc = pytest.mark.skipif(not is_pandoc_available(), reason='pandoc>=2.7.2 is not available')
 requires_ir_kernel = pytest.mark.skipif(kernelspec_from_language('R') is None, reason='irkernel is not installed')
-requires_myst = pytest.mark.skipif(not is_myst_available(), reason='myst_parser not founnd')
+requires_myst = pytest.mark.skipif(not is_myst_available(), reason='myst_parser not found')
 
 
 def list_notebooks(path='ipynb', skip='World'):
