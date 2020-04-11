@@ -38,6 +38,3 @@ jobs:
       - name: Test with pytest
         run: |
           coverage run --source=. -m py.test
-      - name: Upload coverage
-        run: |
-          coverage report -m
