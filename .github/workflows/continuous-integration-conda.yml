@@ -22,7 +22,7 @@ jobs:
         run: |
           # Show path and content
           pwd
-          tree -L 1
+          ls
       - name: Create conda env
         run: conda env create --file environment.yml
       - name: Conda activate

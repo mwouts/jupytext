@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.4, 3.5, 3.6, 3.7, 3.8]
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
 
     steps:
       - name: Checkout
@@ -30,7 +30,7 @@ jobs:
         run: |
           # Show path and content
           pwd
-          tree -L 1
+          ls
           # stop the build if there are Python syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           all Python files should follow PEP8 (except some notebooks, see setup.cfg)
