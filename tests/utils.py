@@ -46,7 +46,7 @@ requires_ir_kernel = pytest.mark.skipif(
     kernelspec_from_language("R") is None, reason="irkernel is not installed"
 )
 requires_myst = pytest.mark.skipif(
-    not is_myst_available(), reason="myst_parser not founnd"
+    not is_myst_available(), reason="myst_parser not found"
 )
 
 

@@ -1,0 +1,40 @@
+name: CI (conda)
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        python-version: [2.7, 3.7]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Miniconda
+        uses: goanpeca/setup-miniconda@v1
+        with:
+          auto-update-conda: true
+          auto-activate-base: false
+          miniconda-version: 'latest'
+          python-version: ${{ matrix.python-version }}
+          environment-file: environment.yml
+          activate-environment: jupytext-dev
+      - name: Lint with flake8
+        shell: pwsh
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # all Python files should follow PEP8 (except some notebooks, see setup.cfg)
+          flake8 jupytext tests
+          # exit-zero treats all errors as warnings.  The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --statistics
+      - name: Install from source (required for the pre-commit tests)
+        shell: pwsh
+        run: pip install .
+      - name: Test with pytest
+        shell: pwsh
+        run: coverage run --source=. -m py.test
+      - name: Upload coverage
+        shell: pwsh
+        run: coverage report -m

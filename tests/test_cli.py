@@ -26,7 +26,7 @@ from jupytext.paired_paths import paired_paths, InconsistentPath
 from jupytext.formats import long_form_one_format, JupytextFormatError
 from .utils import list_notebooks, skip_if_dict_is_not_ordered
 from .utils import requires_black, requires_flake8, requires_sphinx_gallery
-from .utils import requires_jupytext_installed, requires_pandoc
+from .utils import requires_jupytext_installed, requires_pandoc, requires_myst
 
 
 def test_str2bool():
@@ -363,6 +363,11 @@ def git_in_tmpdir(tmpdir):
         print(out)
         return out
 
+    git("init")
+    git("status")
+    git("config", "user.name", "jupytext-test-cli")
+    git("config", "user.email", "jupytext@tests.com")
+
     return git
 
 
@@ -374,8 +379,6 @@ def test_pre_commit_hook(tmpdir):
     nb = new_notebook(cells=[])
 
     git = git_in_tmpdir(tmpdir)
-    git("init")
-    git("status")
     hook = str(tmpdir.join(".git/hooks/pre-commit"))
     with open(hook, "w") as fp:
         fp.write("#!/bin/sh\n" "jupytext --to py:light --pre-commit\n")
@@ -401,8 +404,6 @@ def test_pre_commit_hook(tmpdir):
 def test_sync_with_pre_commit_hook(tmpdir):
     # Init git and create a pre-commit hook
     git = git_in_tmpdir(tmpdir)
-    git("init")
-    git("status")
     hook = str(tmpdir.join(".git/hooks/pre-commit"))
     with open(hook, "w") as fp:
         fp.write("#!/bin/sh\n" "jupytext --sync --pre-commit\n")
@@ -484,8 +485,6 @@ def test_pre_commit_hook_in_subfolder(tmpdir):
     nb = new_notebook(cells=[])
 
     git = git_in_tmpdir(tmpdir)
-    git("init")
-    git("status")
     hook = str(tmpdir.join(".git/hooks/pre-commit"))
     with open(hook, "w") as fp:
         fp.write(
@@ -517,8 +516,6 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     nb = new_notebook(cells=[])
 
     git = git_in_tmpdir(tmpdir)
-    git("init")
-    git("status")
     hook = str(tmpdir.join(".git/hooks/pre-commit"))
     with open(hook, "w") as fp:
         fp.write(
@@ -556,8 +553,6 @@ def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
     metadata = read(nb_file).metadata
 
     git = git_in_tmpdir(tmpdir)
-    git("init")
-    git("status")
     hook = str(tmpdir.join(".git/hooks/pre-commit"))
     with open(hook, "w") as fp:
         fp.write(
@@ -605,8 +600,6 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
         return system(*args, cwd=str(tmpdir))
 
     git = git_in_tmpdir(tmpdir)
-    git("init")
-    git("status")
 
     def hook():
         with mock.patch("jupytext.cli.system", system_in_tmpdir):
@@ -1227,3 +1220,40 @@ def test_set_format_with_subfolder(tmpdir):
             "python_scripts/01_tabular_data_exploration.py",
         ]
     )
+
+
+@requires_myst
+@requires_pandoc
+@pytest.mark.parametrize("format_name", ["md", "md:myst", "md:pandoc"])
+def test_create_header_with_set_formats(format_name, tmpdir):
+    """Test jupytext --set-formats <format_name> #485"""
+
+    tmp_md = str(tmpdir.join("notebook.md"))
+    with open(tmp_md, "w") as fp:
+        fp.write("\n")
+
+    os.chdir(str(tmpdir))
+    jupytext(["--set-formats", format_name, "notebook.md"])
+
+    nb = read(tmp_md)
+    assert nb["metadata"]["jupytext"]["formats"] == format_name
+
+
+@requires_myst
+@requires_pandoc
+@pytest.mark.parametrize(
+    "format_name", ["md", "md:myst", "md:pandoc", "py:light", "py:percent"]
+)
+def test_create_header_with_set_formats_and_set_kernel(format_name, tmpdir):
+    """Test jupytext --set-formats <format_name> --set-kernel - #485"""
+
+    ext = format_name.split(":")[0]
+    tmp_nb = str(tmpdir.join("notebook.{}".format(ext)))
+    with open(tmp_nb, "w") as fp:
+        fp.write("\n")
+
+    jupytext(["--set-formats", format_name, "--set-kernel", "-", tmp_nb])
+
+    nb = read(tmp_nb)
+    assert nb["metadata"]["jupytext"]["formats"] == format_name
+    assert "kernelspec" in nb["metadata"]

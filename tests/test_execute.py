@@ -5,7 +5,7 @@ from jupytext.cli import jupytext
 
 
 @requires_nbconvert
-def test_pipe_nbconvert_execute(tmpdir):
+def test_pipe_nbconvert_execute(tmpdir, caplog):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
 
@@ -26,6 +26,8 @@ def test_pipe_nbconvert_execute(tmpdir):
             "jupyter nbconvert --stdin --stdout --to notebook --execute",
         ]
     )
+    if "Timeout" in caplog.text:
+        pytest.skip(caplog.text)  # Issue 489
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
@@ -33,7 +35,7 @@ def test_pipe_nbconvert_execute(tmpdir):
 
 
 @requires_nbconvert
-def test_pipe_nbconvert_execute_sync(tmpdir):
+def test_pipe_nbconvert_execute_sync(tmpdir, caplog):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
 
@@ -55,6 +57,8 @@ def test_pipe_nbconvert_execute_sync(tmpdir):
             "jupyter nbconvert --stdin --stdout --to notebook --execute",
         ]
     )
+    if "Timeout" in caplog.text:
+        pytest.skip(caplog.text)  # Issue 489
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
@@ -62,7 +66,7 @@ def test_pipe_nbconvert_execute_sync(tmpdir):
 
 
 @requires_nbconvert
-def test_execute(tmpdir):
+def test_execute(tmpdir, caplog):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
 
@@ -73,6 +77,8 @@ def test_execute(tmpdir):
         )
 
     jupytext(args=[tmp_py, "--to", "ipynb", "--execute"])
+    if "Timeout" in caplog.text:
+        pytest.skip(caplog.text)  # Issue 489
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
@@ -121,7 +127,7 @@ a + 1
 
 
 @requires_nbconvert
-def test_execute_sync(tmpdir):
+def test_execute_sync(tmpdir, caplog):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
 
@@ -132,6 +138,8 @@ def test_execute_sync(tmpdir):
         )
 
     jupytext(args=[tmp_py, "--set-formats", "py,ipynb", "--sync", "--execute"])
+    if "Timeout" in caplog.text:
+        pytest.skip(caplog.text)  # Issue 489
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
@@ -140,7 +148,7 @@ def test_execute_sync(tmpdir):
 
 @requires_nbconvert
 @requires_ir_kernel
-def test_execute_r(tmpdir):  # pragma: no cover
+def test_execute_r(tmpdir, caplog):  # pragma: no cover
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_md = str(tmpdir.join("notebook.md"))
 
@@ -153,6 +161,8 @@ def test_execute_r(tmpdir):  # pragma: no cover
         )
 
     jupytext(args=[tmp_md, "--to", "ipynb", "--execute"])
+    if "Timeout" in caplog.text:
+        pytest.skip(caplog.text)  # Issue 489
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
@@ -160,7 +170,7 @@ def test_execute_r(tmpdir):  # pragma: no cover
 
 
 @requires_nbconvert
-def test_execute_in_subfolder(tmpdir):
+def test_execute_in_subfolder(tmpdir, caplog):
     tmpdir.mkdir("subfolder")
 
     tmp_csv = str(tmpdir.join("subfolder", "inputs.csv"))
@@ -182,6 +192,8 @@ sum(ast.literal_eval(line) for line in text.splitlines())
         )
 
     jupytext(args=[tmp_py, "--to", "ipynb", "--execute"])
+    if "Timeout" in caplog.text:
+        pytest.skip(caplog.text)  # Issue 489
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 3

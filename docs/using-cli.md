@@ -28,7 +28,8 @@ jupytext --sync notebook.ipynb                  # Update whichever of notebook.i
 
 For convenience, when creating a notebook from text you can execute it:
 ```bash
-jupytext --set-kernel - notebook.md             # set a kernel metadata on the given notebook that points to the current python executable
+jupytext --set-kernel - notebook.md             # create a YAML header with kernel metadata matching the current python executable
+jupytext --set-formats md:myst notebook.md      # create a YAML header with an explicit jupytext format
 jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipynb file and run it
 ```
 
