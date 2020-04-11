@@ -17,7 +17,7 @@ _HEADER_RE = re.compile(r"^---\s*$")
 _BLANK_RE = re.compile(r"^\s*$")
 _JUPYTER_RE = re.compile(r"^jupyter\s*:\s*$")
 _LEFTSPACE_RE = re.compile(r"^\s")
-_UTF8_HEADER = ' -*- coding: utf-8 -*-'
+_UTF8_HEADER = " -*- coding: utf-8 -*-"
 
 # Change this to False in tests
 INSERT_AND_CHECK_VERSION_NUMBER = True
@@ -33,28 +33,28 @@ def uncomment_line(line, prefix):
     """Remove prefix (and space) from line"""
     if not prefix:
         return line
-    if line.startswith(prefix + ' '):
-        return line[len(prefix) + 1:]
+    if line.startswith(prefix + " "):
+        return line[len(prefix) + 1 :]
     if line.startswith(prefix):
-        return line[len(prefix):]
+        return line[len(prefix) :]
     return line
 
 
 def encoding_and_executable(notebook, metadata, ext):
     """Return encoding and executable lines for a notebook, if applicable"""
     lines = []
-    comment = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment')
-    jupytext_metadata = metadata.get('jupytext', {})
+    comment = _SCRIPT_EXTENSIONS.get(ext, {}).get("comment")
+    jupytext_metadata = metadata.get("jupytext", {})
 
-    if comment is not None and 'executable' in jupytext_metadata:
-        lines.append('#!' + jupytext_metadata.pop('executable'))
+    if comment is not None and "executable" in jupytext_metadata:
+        lines.append("#!" + jupytext_metadata.pop("executable"))
 
-    if 'encoding' in jupytext_metadata:
-        lines.append(jupytext_metadata.pop('encoding'))
+    if "encoding" in jupytext_metadata:
+        lines.append(jupytext_metadata.pop("encoding"))
     elif comment is not None:
         for cell in notebook.cells:
             try:
-                cell.source.encode('ascii')
+                cell.source.encode("ascii")
             except (UnicodeEncodeError, UnicodeDecodeError):
                 lines.append(comment + _UTF8_HEADER)
                 break
@@ -66,17 +66,22 @@ def insert_jupytext_info_and_filter_metadata(metadata, ext, text_format):
     """Update the notebook metadata to include Jupytext information, and filter
     the notebook metadata according to the default or user filter"""
     if insert_or_test_version_number():
-        metadata.setdefault('jupytext', {})['text_representation'] = {
-            'extension': ext,
-            'format_name': text_format.format_name,
-            'format_version': text_format.current_version_number,
-            'jupytext_version': __version__}
+        metadata.setdefault("jupytext", {})["text_representation"] = {
+            "extension": ext,
+            "format_name": text_format.format_name,
+            "format_version": text_format.current_version_number,
+            "jupytext_version": __version__,
+        }
 
-    if 'jupytext' in metadata and not metadata['jupytext']:
-        del metadata['jupytext']
+    if "jupytext" in metadata and not metadata["jupytext"]:
+        del metadata["jupytext"]
 
-    notebook_metadata_filter = metadata.get('jupytext', {}).get('notebook_metadata_filter')
-    return filter_metadata(metadata, notebook_metadata_filter, _DEFAULT_NOTEBOOK_METADATA)
+    notebook_metadata_filter = metadata.get("jupytext", {}).get(
+        "notebook_metadata_filter"
+    )
+    return filter_metadata(
+        metadata, notebook_metadata_filter, _DEFAULT_NOTEBOOK_METADATA
+    )
 
 
 def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
@@ -90,22 +95,26 @@ def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
     lines_to_next_cell = None
     if notebook.cells:
         cell = notebook.cells[0]
-        if cell.cell_type == 'raw':
-            lines = cell.source.strip('\n\t ').splitlines()
-            if len(lines) >= 2 \
-                    and _HEADER_RE.match(lines[0]) \
-                    and _HEADER_RE.match(lines[-1]):
+        if cell.cell_type == "raw":
+            lines = cell.source.strip("\n\t ").splitlines()
+            if (
+                len(lines) >= 2
+                and _HEADER_RE.match(lines[0])
+                and _HEADER_RE.match(lines[-1])
+            ):
                 header = lines[1:-1]
-                lines_to_next_cell = cell.metadata.get('lines_to_next_cell')
+                lines_to_next_cell = cell.metadata.get("lines_to_next_cell")
                 notebook.cells = notebook.cells[1:]
 
     metadata = insert_jupytext_info_and_filter_metadata(metadata, ext, text_format)
 
     if metadata:
-        header.extend(yaml.safe_dump({'jupyter': metadata}, default_flow_style=False).splitlines())
+        header.extend(
+            yaml.safe_dump({"jupyter": metadata}, default_flow_style=False).splitlines()
+        )
 
     if header:
-        header = ['---'] + header + ['---']
+        header = ["---"] + header + ["---"]
 
     return comment_lines(header, text_format.header_prefix), lines_to_next_cell
 
@@ -139,21 +148,23 @@ def header_to_metadata_and_cell(lines, header_prefix, ext=None):
     start = 0
     i = -1
 
-    comment = '#' if header_prefix == "#'" else header_prefix
+    comment = "#" if header_prefix == "#'" else header_prefix
 
-    encoding_re = re.compile(r'^[ \t\f]*{}.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)'.format(comment))
+    encoding_re = re.compile(
+        r"^[ \t\f]*{}.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)".format(comment)
+    )
 
     for i, line in enumerate(lines):
-        if i == 0 and line.startswith('#!'):
-            metadata.setdefault('jupytext', {})['executable'] = line[2:]
+        if i == 0 and line.startswith("#!"):
+            metadata.setdefault("jupytext", {})["executable"] = line[2:]
             start = i + 1
             continue
         if i == 0 or (i == 1 and not encoding_re.match(lines[0])):
             encoding = encoding_re.match(line)
             if encoding:
-                if encoding.group(1) != 'utf-8':
-                    raise ValueError('Encodings other than utf-8 are not supported')
-                metadata.setdefault('jupytext', {})['encoding'] = line
+                if encoding.group(1) != "utf-8":
+                    raise ValueError("Encodings other than utf-8 are not supported")
+                metadata.setdefault("jupytext", {})["encoding"] = line
                 start = i + 1
                 continue
 
@@ -183,7 +194,7 @@ def header_to_metadata_and_cell(lines, header_prefix, ext=None):
 
     if ended:
         if jupyter:
-            recursive_update(metadata, yaml.safe_load('\n'.join(jupyter))['jupyter'])
+            recursive_update(metadata, yaml.safe_load("\n".join(jupyter))["jupyter"])
 
         lines_to_next_cell = 1
         if len(lines) > i + 1:
@@ -196,9 +207,13 @@ def header_to_metadata_and_cell(lines, header_prefix, ext=None):
             lines_to_next_cell = 0
 
         if header:
-            cell = new_raw_cell(source='\n'.join(['---'] + header + ['---']),
-                                metadata={} if lines_to_next_cell == pep8_lines_between_cells(
-                                    ['---'], lines[i + 1:], ext) else {'lines_to_next_cell': lines_to_next_cell})
+            cell = new_raw_cell(
+                source="\n".join(["---"] + header + ["---"]),
+                metadata={}
+                if lines_to_next_cell
+                == pep8_lines_between_cells(["---"], lines[i + 1 :], ext)
+                else {"lines_to_next_cell": lines_to_next_cell},
+            )
         else:
             cell = None
 

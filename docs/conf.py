@@ -14,12 +14,13 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+from recommonmark.transform import AutoStructify
+
 # -- Project information -----------------------------------------------------
 
 project = "Jupytext"
 copyright = "2018-2019, The Jupytext Team"
 author = "The Jupytext Team"
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -51,7 +52,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 #
 html_theme = "sphinx_rtd_theme"
 pygments_style = "sphinx"
-master_doc = 'index'  # Makes `index.md` the main file
+master_doc = "index"  # Makes `index.md` the main file
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -60,8 +61,6 @@ html_static_path = []
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "jupytext"
-
-from recommonmark.transform import AutoStructify
 
 
 def setup(app):

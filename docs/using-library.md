@@ -10,7 +10,7 @@ format.
 ```python
 import jupytext
 
-# Read a notebook from a file 
+# Read a notebook from a file
 ntbk = jupytext.read('notebook.md')
 
 # Read a notebook from a string

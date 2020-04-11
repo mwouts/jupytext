@@ -5,45 +5,65 @@ from .stringparser import StringParser
 from .languages import _SCRIPT_EXTENSIONS, _COMMENT, usual_language_name
 
 # A magic expression is a line or cell or metakernel magic (#94, #61) escaped zero, or multiple times
-_MAGIC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
-    r"^({0} |{0})*(%|%%|%%%)[a-zA-Z]".format(_SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS}
-_MAGIC_FORCE_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
-    r"^({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*escape".format(
-        _SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS}
-_MAGIC_NOT_ESC_RE = {_SCRIPT_EXTENSIONS[ext]['language']: re.compile(
-    r"^({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*noescape".format(
-        _SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS}
-_LINE_CONTINUATION_RE = re.compile(r'.*\\\s*$')
+_MAGIC_RE = {
+    _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
+        r"^({0} |{0})*(%|%%|%%%)[a-zA-Z]".format(_SCRIPT_EXTENSIONS[ext]["comment"])
+    )
+    for ext in _SCRIPT_EXTENSIONS
+}
+_MAGIC_FORCE_ESC_RE = {
+    _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
+        r"^({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*escape".format(
+            _SCRIPT_EXTENSIONS[ext]["comment"]
+        )
+    )
+    for ext in _SCRIPT_EXTENSIONS
+}
+_MAGIC_NOT_ESC_RE = {
+    _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
+        r"^({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*noescape".format(
+            _SCRIPT_EXTENSIONS[ext]["comment"]
+        )
+    )
+    for ext in _SCRIPT_EXTENSIONS
+}
+_LINE_CONTINUATION_RE = re.compile(r".*\\\s*$")
 
 # Rust magics start with single ':' #351
-_MAGIC_RE['rust'] = re.compile(r"^(// |//)*:[a-zA-Z]")
-_MAGIC_FORCE_ESC_RE['rust'] = re.compile(r"^(// |//)*:[a-zA-Z](.*)//\s*escape")
-_MAGIC_FORCE_ESC_RE['rust'] = re.compile(r"^(// |//)*:[a-zA-Z](.*)//\s*noescape")
+_MAGIC_RE["rust"] = re.compile(r"^(// |//)*:[a-zA-Z]")
+_MAGIC_FORCE_ESC_RE["rust"] = re.compile(r"^(// |//)*:[a-zA-Z](.*)//\s*escape")
+_MAGIC_FORCE_ESC_RE["rust"] = re.compile(r"^(// |//)*:[a-zA-Z](.*)//\s*noescape")
 
 # C# magics start with '#!'
-_MAGIC_RE['csharp'] = re.compile(r"^(// |//)*#![a-zA-Z]")
-_MAGIC_FORCE_ESC_RE['csharp'] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*escape")
-_MAGIC_FORCE_ESC_RE['csharp'] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*noescape")
+_MAGIC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z]")
+_MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*escape")
+_MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*noescape")
 
 # Commands starting with a question or exclamation mark have to be escaped
 _PYTHON_HELP_OR_BASH_CMD = re.compile(r"^(# |#)*\s*(\?|!)\s*[A-Za-z]")
 
 # A bash command not followed by an equal sign or a parenthesis is a magic command
-_PYTHON_MAGIC_CMD = re.compile(r"^(# |#)*({})($|\s$|\s[^=,])".format('|'.join(
-    # posix
-    ['cat', 'cd', 'cp', 'mv', 'rm', 'rmdir', 'mkdir'] +
-    # windows
-    ['copy', 'ddir', 'echo', 'ls', 'ldir', 'mkdir', 'ren', 'rmdir'])))
+_PYTHON_MAGIC_CMD = re.compile(
+    r"^(# |#)*({})($|\s$|\s[^=,])".format(
+        "|".join(
+            # posix
+            ["cat", "cd", "cp", "mv", "rm", "rmdir", "mkdir"]
+            +  # noqa: W504
+            # windows
+            ["copy", "ddir", "echo", "ls", "ldir", "mkdir", "ren", "rmdir"]
+        )
+    )
+)
 # Python help commands end with ?
 _IPYTHON_MAGIC_HELP = re.compile(r"^(# )*[^\s]*\?\s*$")
 
-_SCRIPT_LANGUAGES = [_SCRIPT_EXTENSIONS[ext]['language'] for ext in _SCRIPT_EXTENSIONS]
+_SCRIPT_LANGUAGES = [_SCRIPT_EXTENSIONS[ext]["language"] for ext in _SCRIPT_EXTENSIONS]
 
 
 def is_magic(line, language, global_escape_flag=True, explicitly_code=False):
     """Is the current line a (possibly escaped) Jupyter magic, and should it be commented?"""
     language = usual_language_name(language)
-    if language in ['octave', 'matlab'] or language not in _SCRIPT_LANGUAGES:
+    if language in ["octave", "matlab"] or language not in _SCRIPT_LANGUAGES:
         return False
     if _MAGIC_FORCE_ESC_RE[language].match(line):
         return True
@@ -51,7 +71,7 @@ def is_magic(line, language, global_escape_flag=True, explicitly_code=False):
         return False
     if _MAGIC_RE[language].match(line):
         return True
-    if language != 'python':
+    if language != "python":
         return False
     if _PYTHON_HELP_OR_BASH_CMD.match(line):
         return True
@@ -60,28 +80,37 @@ def is_magic(line, language, global_escape_flag=True, explicitly_code=False):
     return _PYTHON_MAGIC_CMD.match(line)
 
 
-def need_explicit_marker(source, language='python', global_escape_flag=True, explicitly_code=True):
+def need_explicit_marker(
+    source, language="python", global_escape_flag=True, explicitly_code=True
+):
     """Does this code needs an explicit cell marker?"""
-    if language != 'python' or not global_escape_flag or not explicitly_code:
+    if language != "python" or not global_escape_flag or not explicitly_code:
         return False
 
     parser = StringParser(language)
     for line in source:
-        if not parser.is_quoted() and is_magic(line, language, global_escape_flag, explicitly_code):
+        if not parser.is_quoted() and is_magic(
+            line, language, global_escape_flag, explicitly_code
+        ):
             if not is_magic(line, language, global_escape_flag, False):
                 return True
         parser.read_line(line)
     return False
 
 
-def comment_magic(source, language='python', global_escape_flag=True, explicitly_code=True):
+def comment_magic(
+    source, language="python", global_escape_flag=True, explicitly_code=True
+):
     """Escape Jupyter magics with '# '"""
     parser = StringParser(language)
     next_is_magic = False
     for pos, line in enumerate(source):
-        if not parser.is_quoted() and (next_is_magic or is_magic(line, language, global_escape_flag, explicitly_code)):
-            source[pos] = _COMMENT[language] + ' ' + line
-            next_is_magic = language == 'python' and _LINE_CONTINUATION_RE.match(line)
+        if not parser.is_quoted() and (
+            next_is_magic
+            or is_magic(line, language, global_escape_flag, explicitly_code)
+        ):
+            source[pos] = _COMMENT[language] + " " + line
+            next_is_magic = language == "python" and _LINE_CONTINUATION_RE.match(line)
         parser.read_line(line)
     return source
 
@@ -89,30 +118,43 @@ def comment_magic(source, language='python', global_escape_flag=True, explicitly
 def unesc(line, language):
     """Uncomment once a commented line"""
     comment = _COMMENT[language]
-    if line.startswith(comment + ' '):
-        return line[len(comment) + 1:]
+    if line.startswith(comment + " "):
+        return line[len(comment) + 1 :]
     if line.startswith(comment):
-        return line[len(comment):]
+        return line[len(comment) :]
     return line
 
 
-def uncomment_magic(source, language='python', global_escape_flag=True, explicitly_code=True):
+def uncomment_magic(
+    source, language="python", global_escape_flag=True, explicitly_code=True
+):
     """Unescape Jupyter magics"""
     parser = StringParser(language)
     next_is_magic = False
     for pos, line in enumerate(source):
-        if not parser.is_quoted() and (next_is_magic or is_magic(line, language, global_escape_flag, explicitly_code)):
+        if not parser.is_quoted() and (
+            next_is_magic
+            or is_magic(line, language, global_escape_flag, explicitly_code)
+        ):
             source[pos] = unesc(line, language)
-            next_is_magic = language == 'python' and _LINE_CONTINUATION_RE.match(line)
+            next_is_magic = language == "python" and _LINE_CONTINUATION_RE.match(line)
         parser.read_line(line)
     return source
 
 
-_ESCAPED_CODE_START = {'.Rmd': re.compile(r"^(# |#)*```{.*}"),
-                       '.md': re.compile(r"^(# |#)*```"),
-                       '.markdown': re.compile(r"^(# |#)*```")}
-_ESCAPED_CODE_START.update({ext: re.compile(
-    r"^({0} |{0})*({0}|{0} )\+".format(_SCRIPT_EXTENSIONS[ext]['comment'])) for ext in _SCRIPT_EXTENSIONS})
+_ESCAPED_CODE_START = {
+    ".Rmd": re.compile(r"^(# |#)*```{.*}"),
+    ".md": re.compile(r"^(# |#)*```"),
+    ".markdown": re.compile(r"^(# |#)*```"),
+}
+_ESCAPED_CODE_START.update(
+    {
+        ext: re.compile(
+            r"^({0} |{0})*({0}|{0} )\+".format(_SCRIPT_EXTENSIONS[ext]["comment"])
+        )
+        for ext in _SCRIPT_EXTENSIONS
+    }
+)
 
 
 def is_escaped_code_start(line, ext):
@@ -120,17 +162,19 @@ def is_escaped_code_start(line, ext):
     return _ESCAPED_CODE_START[ext].match(line)
 
 
-def escape_code_start(source, ext, language='python'):
+def escape_code_start(source, ext, language="python"):
     """Escape code start with '# '"""
     parser = StringParser(language)
     for pos, line in enumerate(source):
         if not parser.is_quoted() and is_escaped_code_start(line, ext):
-            source[pos] = _SCRIPT_EXTENSIONS.get(ext, {}).get('comment', '#') + ' ' + line
+            source[pos] = (
+                _SCRIPT_EXTENSIONS.get(ext, {}).get("comment", "#") + " " + line
+            )
         parser.read_line(line)
     return source
 
 
-def unescape_code_start(source, ext, language='python'):
+def unescape_code_start(source, ext, language="python"):
     """Unescape code start"""
     parser = StringParser(language)
     for pos, line in enumerate(source):

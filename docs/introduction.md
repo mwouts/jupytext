@@ -31,7 +31,7 @@ There are multiple ways to use `jupytext`:
 Jupytext implements a series of text formats for notebooks, which are documented [here](formats.md).
 
 In short: the Markdown representation of notebooks fits well the notebooks that contain narratives, while notebooks that mostly contain code are conveniently saved as scripts. The most popular formats for notebooks as scripts are:
-- the `percent` format (in which cells are delimited with `# %%`) also used by Spyder, VSCode, PyCharm, and others, 
+- the `percent` format (in which cells are delimited with `# %%`) also used by Spyder, VSCode, PyCharm, and others,
 - and the `light` format which was developed to support this project. `light` uses as few cell markers as possible and is particularly suited for importing a pre-existing python script as a notebook with cell divisions automatically inferred from paragraph breaks in the source code.
 
 ## Demo time

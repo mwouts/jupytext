@@ -1,8 +1,9 @@
-Next release (2020-04-??)
--------------------------
+1.5.0 (2020-04-??)
+------------------
 
 **Added**
 - Jupytext is tested in `pip` and `conda` environments, on Linux, Mac OS and Windows, using Github actions (#487)
+- Pre-commit checks and automatic reformatting of Jupytext's code with `pre-commit`, `black` and `flake8` (#483)
 - Documented that the YAML header can be created with either `--set-kernel`, `--set-formats`, or both (#485)
 
 **Fixed**
@@ -35,7 +36,7 @@ Next release (2020-04-??)
 
 **Fixed**
 - When using `jupytext --pipe cmd`, the output of `cmd` should not appear in the terminal (#432)
- 
+
 
 1.4.0 (2020-03-09)
 ------------------
@@ -59,10 +60,10 @@ Next release (2020-04-??)
 ------------------
 
 **Added**
-- C# and F# Jupyter notebooks are now supported (#427, #429) 
+- C# and F# Jupyter notebooks are now supported (#427, #429)
 
 **Fixed**
-- `jupytext --to script *.ipynb` now computes the script extension for each notebook (#428) 
+- `jupytext --to script *.ipynb` now computes the script extension for each notebook (#428)
 - Fix shebang handling for languages with non-# comments, by Jonas Bushart (#434)
 - Indented bash commands are now commented out (#437)
 - The main formats are documented in `jupytext --help` (#426, #433)

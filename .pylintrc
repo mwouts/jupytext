@@ -1,3 +1,7 @@
 [MASTER]
 
 max-line-length=127
+
+[MESSAGES CONTROL]
+# Disable C0330 warnings, cf https://github.com/psf/black/issues/48
+disable=bad-continuation

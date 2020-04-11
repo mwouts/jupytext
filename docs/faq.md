@@ -86,7 +86,7 @@ Alternatively, VIM users can give a try to the [jupytext.vim](https://github.com
 
 ## Jupyter warns me that the file has changed on disk
 
-By default, Jupyter saves your notebook every 2 minutes. Fortunately, it is also aware that you have edited the text file, yielding this message. 
+By default, Jupyter saves your notebook every 2 minutes. Fortunately, it is also aware that you have edited the text file, yielding this message.
 
 You should simply click on _Reload_.
 

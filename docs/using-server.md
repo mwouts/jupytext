@@ -108,6 +108,6 @@ If do not want to classify scripts or Markdown documents as notebooks, please us
 
 ```python
 c.ContentsManager.notebook_extensions = "ipynb,Rmd"
-``` 
+```
 
 Please note that, with the above setting, Jupyter will not let you open scripts as notebooks. If you still want to do so, use Jupytext command line (see below) to first convert or pair the script to an `.ipynb` notebook.

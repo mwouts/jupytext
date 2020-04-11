@@ -1,7 +1,10 @@
 import pytest
 from jupytext.compare import compare
 from jupytext import read, reads, writes
-from jupytext.pep8 import next_instruction_is_function_or_class, cell_ends_with_function_or_class
+from jupytext.pep8 import (
+    next_instruction_is_function_or_class,
+    cell_ends_with_function_or_class,
+)
 from jupytext.pep8 import cell_ends_with_code, cell_has_code, pep8_lines_between_cells
 from .utils import list_notebooks
 
@@ -29,7 +32,7 @@ with two lines or more'''
 """
     assert cell_ends_with_function_or_class(text.splitlines())
 
-    lines = ['#', '#']
+    lines = ["#", "#"]
     assert not cell_ends_with_function_or_class(lines)
 
     text = """# two blank line after this class
@@ -53,7 +56,7 @@ def f(x):
 # And a comment here"""
     assert not cell_ends_with_function_or_class(text.splitlines())
 
-    assert not cell_ends_with_function_or_class(['', '#'])
+    assert not cell_ends_with_function_or_class(["", "#"])
 
 
 def test_pep8_lines_between_cells():
@@ -65,7 +68,7 @@ def test_pep8_lines_between_cells():
 
     assert cell_ends_with_code(prev_lines)
     assert next_instruction_is_function_or_class(next_lines)
-    assert pep8_lines_between_cells(prev_lines, next_lines, '.py') == 2
+    assert pep8_lines_between_cells(prev_lines, next_lines, ".py") == 2
 
 
 def test_pep8_lines_between_cells_bis():
@@ -80,7 +83,7 @@ a = 5
 
     assert cell_ends_with_function_or_class(prev_lines)
     assert cell_has_code(next_lines)
-    assert pep8_lines_between_cells(prev_lines, next_lines, '.py') == 2
+    assert pep8_lines_between_cells(prev_lines, next_lines, ".py") == 2
 
     next_lines = """# A markdown cell
 
@@ -90,7 +93,7 @@ a = 5
 
     assert cell_ends_with_function_or_class(prev_lines)
     assert not cell_has_code(next_lines)
-    assert pep8_lines_between_cells(prev_lines, next_lines, '.py') == 1
+    assert pep8_lines_between_cells(prev_lines, next_lines, ".py") == 1
 
 
 def test_pep8():
@@ -126,11 +129,11 @@ def g(x):
 # code cell #4
 x = 4
 """
-    nb = reads(text, 'py')
+    nb = reads(text, "py")
     for cell in nb.cells:
         assert not cell.metadata
 
-    text2 = writes(nb, 'py')
+    text2 = writes(nb, "py")
     compare(text2, text)
 
 
@@ -145,24 +148,30 @@ def f(x):
 # Separated from f by just one line
 # As there is no code here
 """
-    nb = reads(text, 'py')
+    nb = reads(text, "py")
     for cell in nb.cells:
         assert not cell.metadata
 
-    text2 = writes(nb, 'py')
+    text2 = writes(nb, "py")
     compare(text2, text)
 
 
-@pytest.mark.parametrize('py_file', [py_file for py_file in list_notebooks('../jupytext') + list_notebooks('.') if
-                                     py_file.endswith('.py') and 'folding_markers' not in py_file])
+@pytest.mark.parametrize(
+    "py_file",
+    [
+        py_file
+        for py_file in list_notebooks("../jupytext") + list_notebooks(".")
+        if py_file.endswith(".py") and "folding_markers" not in py_file
+    ],
+)
 def test_no_metadata_when_py_is_pep8(py_file):
     """This test assumes that all Python files in the jupytext folder follow PEP8 rules"""
     nb = read(py_file)
 
     for i, cell in enumerate(nb.cells):
-        if 'title' in cell.metadata:
-            cell.metadata.pop('title')
+        if "title" in cell.metadata:
+            cell.metadata.pop("title")
         if i == 0 and not cell.source:
-            assert cell.metadata == {'lines_to_next_cell': 0}, py_file
+            assert cell.metadata == {"lines_to_next_cell": 0}, py_file
         else:
             assert not cell.metadata, (py_file, cell.source)

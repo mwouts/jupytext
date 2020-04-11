@@ -2,89 +2,129 @@ import pytest
 from jupytext.compare import compare
 from nbformat.v4.nbbase import new_notebook
 import jupytext
-from jupytext.formats import guess_format, divine_format, read_format_from_metadata, rearrange_jupytext_metadata
-from jupytext.formats import long_form_multiple_formats, short_form_multiple_formats, update_jupytext_formats_metadata
-from jupytext.formats import get_format_implementation, validate_one_format, JupytextFormatError
+from jupytext.formats import (
+    guess_format,
+    divine_format,
+    read_format_from_metadata,
+    rearrange_jupytext_metadata,
+)
+from jupytext.formats import (
+    long_form_multiple_formats,
+    short_form_multiple_formats,
+    update_jupytext_formats_metadata,
+)
+from jupytext.formats import (
+    get_format_implementation,
+    validate_one_format,
+    JupytextFormatError,
+)
 from .utils import list_notebooks, requires_myst, requires_pandoc
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('python'))
+@pytest.mark.parametrize("nb_file", list_notebooks("python"))
 def test_guess_format_light(nb_file):
     with open(nb_file) as stream:
-        assert guess_format(stream.read(), ext='.py')[0] == 'light'
+        assert guess_format(stream.read(), ext=".py")[0] == "light"
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('percent'))
+@pytest.mark.parametrize("nb_file", list_notebooks("percent"))
 def test_guess_format_percent(nb_file):
     with open(nb_file) as stream:
-        assert guess_format(stream.read(), ext='.py')[0] == 'percent'
+        assert guess_format(stream.read(), ext=".py")[0] == "percent"
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('sphinx'))
+@pytest.mark.parametrize("nb_file", list_notebooks("sphinx"))
 def test_guess_format_sphinx(nb_file):
     with open(nb_file) as stream:
-        assert guess_format(stream.read(), ext='.py')[0] == 'sphinx'
+        assert guess_format(stream.read(), ext=".py")[0] == "sphinx"
 
 
 def test_guess_format_hydrogen():
     text = """# %%
 cat hello.txt
 """
-    assert guess_format(text, ext='.py')[0] == 'hydrogen'
+    assert guess_format(text, ext=".py")[0] == "hydrogen"
 
 
 def test_divine_format():
-    assert divine_format('{"cells":[]}') == 'ipynb'
-    assert divine_format('''def f(x):
-    x + 1''') == 'py:light'
-    assert divine_format('''# %%
+    assert divine_format('{"cells":[]}') == "ipynb"
+    assert (
+        divine_format(
+            """def f(x):
+    x + 1"""
+        )
+        == "py:light"
+    )
+    assert (
+        divine_format(
+            """# %%
 def f(x):
     x + 1
 
 # %%
 def g(x):
     x + 2
-''') == 'py:percent'
-    assert divine_format('''This is a markdown file
+"""
+        )
+        == "py:percent"
+    )
+    assert (
+        divine_format(
+            """This is a markdown file
 with one code block
 
 ```
 1 + 1
 ```
-''') == 'md'
-    assert divine_format(''';; ---
+"""
+        )
+        == "md"
+    )
+    assert (
+        divine_format(
+            """;; ---
 ;; jupyter:
 ;;   jupytext:
 ;;     text_representation:
 ;;       extension: .ss
 ;;       format_name: percent
-;; ---''') == 'ss:percent'
+;; ---"""
+        )
+        == "ss:percent"
+    )
 
 
 def test_get_format_implementation():
-    assert get_format_implementation('.py').format_name == 'light'
-    assert get_format_implementation('.py', 'percent').format_name == 'percent'
+    assert get_format_implementation(".py").format_name == "light"
+    assert get_format_implementation(".py", "percent").format_name == "percent"
     with pytest.raises(JupytextFormatError):
-        get_format_implementation('.py', 'wrong_format')
+        get_format_implementation(".py", "wrong_format")
 
 
-def test_script_with_magics_not_percent(script="""# %%time
-1 + 2"""):
-    assert guess_format(script, '.py')[0] == 'light'
+def test_script_with_magics_not_percent(
+    script="""# %%time
+1 + 2""",
+):
+    assert guess_format(script, ".py")[0] == "light"
 
 
-def test_script_with_spyder_cell_is_percent(script="""#%%
-1 + 2"""):
-    assert guess_format(script, '.py')[0] == 'percent'
+def test_script_with_spyder_cell_is_percent(
+    script="""#%%
+1 + 2""",
+):
+    assert guess_format(script, ".py")[0] == "percent"
 
 
-def test_script_with_percent_cell_and_magic_is_hydrogen(script="""#%%
+def test_script_with_percent_cell_and_magic_is_hydrogen(
+    script="""#%%
 %matplotlib inline
-"""):
-    assert guess_format(script, '.py')[0] == 'hydrogen'
+""",
+):
+    assert guess_format(script, ".py")[0] == "hydrogen"
 
 
-def test_script_with_percent_cell_and_kernelspec(script="""# ---
+def test_script_with_percent_cell_and_kernelspec(
+    script="""# ---
 # jupyter:
 #   kernelspec:
 #     display_name: Python3
@@ -94,16 +134,20 @@ def test_script_with_percent_cell_and_kernelspec(script="""# ---
 
 # %%
 a = 1
-"""):
-    assert guess_format(script, '.py')[0] == 'percent'
+""",
+):
+    assert guess_format(script, ".py")[0] == "percent"
 
 
-def test_script_with_spyder_cell_with_name_is_percent(script="""#%% cell name
-1 + 2"""):
-    assert guess_format(script, '.py')[0] == 'percent'
+def test_script_with_spyder_cell_with_name_is_percent(
+    script="""#%% cell name
+1 + 2""",
+):
+    assert guess_format(script, ".py")[0] == "percent"
 
 
-def test_read_format_from_metadata(script="""---
+def test_read_format_from_metadata(
+    script="""---
 jupyter:
   jupytext:
     formats: ipynb,pct.py:percent,lgt.py:light,spx.py:sphinx,md,Rmd
@@ -112,71 +156,122 @@ jupyter:
       format_name: percent
       format_version: '1.1'
       jupytext_version: 0.8.0
----"""):
-    assert read_format_from_metadata(script, '.Rmd') is None
+---""",
+):
+    assert read_format_from_metadata(script, ".Rmd") is None
 
 
 def test_update_jupytext_formats_metadata():
-    nb = new_notebook(metadata={'jupytext': {'formats': 'py'}})
-    update_jupytext_formats_metadata(nb.metadata, 'py:light')
-    assert nb.metadata['jupytext']['formats'] == 'py:light'
+    nb = new_notebook(metadata={"jupytext": {"formats": "py"}})
+    update_jupytext_formats_metadata(nb.metadata, "py:light")
+    assert nb.metadata["jupytext"]["formats"] == "py:light"
 
-    nb = new_notebook(metadata={'jupytext': {'formats': 'ipynb,py'}})
-    update_jupytext_formats_metadata(nb.metadata, 'py:light')
-    assert nb.metadata['jupytext']['formats'] == 'ipynb,py:light'
+    nb = new_notebook(metadata={"jupytext": {"formats": "ipynb,py"}})
+    update_jupytext_formats_metadata(nb.metadata, "py:light")
+    assert nb.metadata["jupytext"]["formats"] == "ipynb,py:light"
 
 
 def test_decompress_formats():
-    assert long_form_multiple_formats('ipynb') == [{'extension': '.ipynb'}]
-    assert long_form_multiple_formats('ipynb,md') == [{'extension': '.ipynb'}, {'extension': '.md'}]
-    assert long_form_multiple_formats('ipynb,py:light') == [{'extension': '.ipynb'},
-                                                            {'extension': '.py', 'format_name': 'light'}]
-    assert long_form_multiple_formats(['ipynb', '.py:light']) == [{'extension': '.ipynb'},
-                                                                  {'extension': '.py', 'format_name': 'light'}]
-    assert long_form_multiple_formats('.pct.py:percent') == [
-        {'extension': '.py', 'suffix': '.pct', 'format_name': 'percent'}]
+    assert long_form_multiple_formats("ipynb") == [{"extension": ".ipynb"}]
+    assert long_form_multiple_formats("ipynb,md") == [
+        {"extension": ".ipynb"},
+        {"extension": ".md"},
+    ]
+    assert long_form_multiple_formats("ipynb,py:light") == [
+        {"extension": ".ipynb"},
+        {"extension": ".py", "format_name": "light"},
+    ]
+    assert long_form_multiple_formats(["ipynb", ".py:light"]) == [
+        {"extension": ".ipynb"},
+        {"extension": ".py", "format_name": "light"},
+    ]
+    assert long_form_multiple_formats(".pct.py:percent") == [
+        {"extension": ".py", "suffix": ".pct", "format_name": "percent"}
+    ]
 
 
 def test_compress_formats():
-    assert short_form_multiple_formats([{'extension': '.ipynb'}]) == 'ipynb'
-    assert short_form_multiple_formats([{'extension': '.ipynb'}, {'extension': '.md'}]) == 'ipynb,md'
-    assert short_form_multiple_formats(
-        [{'extension': '.ipynb'}, {'extension': '.py', 'format_name': 'light'}]) == 'ipynb,py:light'
-    assert short_form_multiple_formats([{'extension': '.ipynb'},
-                                        {'extension': '.py', 'format_name': 'light'},
-                                        {'extension': '.md', 'comment_magics': True}]) == 'ipynb,py:light,md'
-    assert short_form_multiple_formats(
-        [{'extension': '.py', 'suffix': '.pct', 'format_name': 'percent'}]) == '.pct.py:percent'
+    assert short_form_multiple_formats([{"extension": ".ipynb"}]) == "ipynb"
+    assert (
+        short_form_multiple_formats([{"extension": ".ipynb"}, {"extension": ".md"}])
+        == "ipynb,md"
+    )
+    assert (
+        short_form_multiple_formats(
+            [{"extension": ".ipynb"}, {"extension": ".py", "format_name": "light"}]
+        )
+        == "ipynb,py:light"
+    )
+    assert (
+        short_form_multiple_formats(
+            [
+                {"extension": ".ipynb"},
+                {"extension": ".py", "format_name": "light"},
+                {"extension": ".md", "comment_magics": True},
+            ]
+        )
+        == "ipynb,py:light,md"
+    )
+    assert (
+        short_form_multiple_formats(
+            [{"extension": ".py", "suffix": ".pct", "format_name": "percent"}]
+        )
+        == ".pct.py:percent"
+    )
 
 
 def test_rearrange_jupytext_metadata():
-    metadata = {'nbrmd_formats': 'ipynb,py'}
+    metadata = {"nbrmd_formats": "ipynb,py"}
     rearrange_jupytext_metadata(metadata)
-    compare(metadata, {'jupytext': {'formats': 'ipynb,py'}})
+    compare(metadata, {"jupytext": {"formats": "ipynb,py"}})
 
-    metadata = {'jupytext_formats': 'ipynb,py'}
+    metadata = {"jupytext_formats": "ipynb,py"}
     rearrange_jupytext_metadata(metadata)
-    compare(metadata, {'jupytext': {'formats': 'ipynb,py'}})
+    compare(metadata, {"jupytext": {"formats": "ipynb,py"}})
 
-    metadata = {'executable': '#!/bin/bash'}
+    metadata = {"executable": "#!/bin/bash"}
     rearrange_jupytext_metadata(metadata)
-    compare(metadata, {'jupytext': {'executable': '#!/bin/bash'}})
+    compare(metadata, {"jupytext": {"executable": "#!/bin/bash"}})
 
 
 def test_rearrange_jupytext_metadata_metadata_filter():
-    metadata = {'jupytext': {'metadata_filter': {'notebook': {'additional': ['one', 'two'], 'excluded': 'all'},
-                                                 'cells': {'additional': 'all', 'excluded': ['three', 'four']}}}}
+    metadata = {
+        "jupytext": {
+            "metadata_filter": {
+                "notebook": {"additional": ["one", "two"], "excluded": "all"},
+                "cells": {"additional": "all", "excluded": ["three", "four"]},
+            }
+        }
+    }
     rearrange_jupytext_metadata(metadata)
-    compare(metadata, {'jupytext': {'notebook_metadata_filter': 'one,two,-all',
-                                    'cell_metadata_filter': 'all,-three,-four'}})
+    compare(
+        metadata,
+        {
+            "jupytext": {
+                "notebook_metadata_filter": "one,two,-all",
+                "cell_metadata_filter": "all,-three,-four",
+            }
+        },
+    )
 
 
 def test_rearrange_jupytext_metadata_add_dot_in_suffix():
-    metadata = {'jupytext': {'text_representation': {'jupytext_version': '0.8.6'},
-                             'formats': 'ipynb,pct.py,lgt.py'}}
+    metadata = {
+        "jupytext": {
+            "text_representation": {"jupytext_version": "0.8.6"},
+            "formats": "ipynb,pct.py,lgt.py",
+        }
+    }
     rearrange_jupytext_metadata(metadata)
-    compare(metadata, {'jupytext': {'text_representation': {'jupytext_version': '0.8.6'},
-                                    'formats': 'ipynb,.pct.py,.lgt.py'}})
+    compare(
+        metadata,
+        {
+            "jupytext": {
+                "text_representation": {"jupytext_version": "0.8.6"},
+                "formats": "ipynb,.pct.py,.lgt.py",
+            }
+        },
+    )
 
 
 def test_fix_139():
@@ -199,34 +294,34 @@ def test_fix_139():
 1 + 1
 """
 
-    nb = jupytext.reads(text, 'py:light')
-    text2 = jupytext.writes(nb, 'py:light')
-    assert 'cell_metadata_filter: -all' in text2
-    assert 'lines_to_next_cell' not in text2
+    nb = jupytext.reads(text, "py:light")
+    text2 = jupytext.writes(nb, "py:light")
+    assert "cell_metadata_filter: -all" in text2
+    assert "lines_to_next_cell" not in text2
 
 
 def test_validate_one_format():
     with pytest.raises(JupytextFormatError):
-        validate_one_format('py:percent')
+        validate_one_format("py:percent")
 
     with pytest.raises(JupytextFormatError):
         validate_one_format({})
 
     with pytest.raises(JupytextFormatError):
-        validate_one_format({'extension': '.py', 'unknown_option': True})
+        validate_one_format({"extension": ".py", "unknown_option": True})
 
     with pytest.raises(JupytextFormatError):
-        validate_one_format({'extension': '.py', 'comment_magics': 'TRUE'})
+        validate_one_format({"extension": ".py", "comment_magics": "TRUE"})
 
 
 def test_set_auto_ext():
     with pytest.raises(ValueError):
-        long_form_multiple_formats('ipynb,auto:percent', {})
+        long_form_multiple_formats("ipynb,auto:percent", {})
 
 
 @requires_pandoc
 def test_pandoc_format_is_preserved():
-    formats_org = 'ipynb,md,.pandoc.md:pandoc,py:light'
+    formats_org = "ipynb,md,.pandoc.md:pandoc,py:light"
     long = long_form_multiple_formats(formats_org)
     formats_new = short_form_multiple_formats(long)
 
@@ -237,20 +332,20 @@ def test_pandoc_format_is_preserved():
 def test_write_as_myst(tmpdir):
     """Inspired by https://github.com/mwouts/jupytext/issues/462"""
     nb = new_notebook()
-    tmp_md = str(tmpdir.join('notebook.md'))
+    tmp_md = str(tmpdir.join("notebook.md"))
 
-    jupytext.write(nb, tmp_md, fmt='myst')
+    jupytext.write(nb, tmp_md, fmt="myst")
 
     with open(tmp_md) as fp:
         md = fp.read()
 
-    assert 'myst' in md
+    assert "myst" in md
 
 
 def test_write_raises_when_fmt_does_not_exists(tmpdir):
     """Inspired by https://github.com/mwouts/jupytext/issues/462"""
     nb = new_notebook()
-    tmp_md = str(tmpdir.join('notebook.md'))
+    tmp_md = str(tmpdir.join("notebook.md"))
 
     with pytest.raises(JupytextFormatError):
-        jupytext.write(nb, tmp_md, fmt='unknown_format')
+        jupytext.write(nb, tmp_md, fmt="unknown_format")

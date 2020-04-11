@@ -9,36 +9,43 @@ from .utils import list_notebooks
 
 def test_combine():
     nb_source = new_notebook(
-        cells=[new_markdown_cell('Markdown text'),
-               new_code_cell('a=3'),
-               new_code_cell('a+1'),
-               new_code_cell('a+1'),
-               new_markdown_cell('Markdown text'),
-               new_code_cell('a+2')])
+        cells=[
+            new_markdown_cell("Markdown text"),
+            new_code_cell("a=3"),
+            new_code_cell("a+1"),
+            new_code_cell("a+1"),
+            new_markdown_cell("Markdown text"),
+            new_code_cell("a+2"),
+        ]
+    )
 
     nb_outputs = new_notebook(
-        cells=[new_markdown_cell('Markdown text'),
-               new_code_cell('a=3'),
-               new_code_cell('a+1'),
-               new_code_cell('a+2'),
-               new_markdown_cell('Markdown text')])
+        cells=[
+            new_markdown_cell("Markdown text"),
+            new_code_cell("a=3"),
+            new_code_cell("a+1"),
+            new_code_cell("a+2"),
+            new_markdown_cell("Markdown text"),
+        ]
+    )
 
-    nb_outputs.cells[2].outputs = ['4']
-    nb_outputs.cells[3].outputs = ['5']
+    nb_outputs.cells[2].outputs = ["4"]
+    nb_outputs.cells[3].outputs = ["5"]
 
     combine_inputs_with_outputs(nb_source, nb_outputs)
 
-    assert nb_source.cells[2].outputs == ['4']
+    assert nb_source.cells[2].outputs == ["4"]
     assert nb_source.cells[3].outputs == []
-    assert nb_source.cells[5].outputs == ['5']
+    assert nb_source.cells[5].outputs == ["5"]
 
 
 def test_read_text_and_combine_with_outputs(tmpdir):
-    tmp_ipynb = 'notebook.ipynb'
-    tmp_script = 'notebook.py'
+    tmp_ipynb = "notebook.ipynb"
+    tmp_script = "notebook.py"
 
-    with(open(str(tmpdir.join(tmp_script)), 'w')) as fp:
-        fp.write("""# ---
+    with (open(str(tmpdir.join(tmp_script)), "w")) as fp:
+        fp.write(
+            """# ---
 # jupyter:
 #   jupytext_formats: ipynb,py:light
 # ---
@@ -48,10 +55,12 @@ def test_read_text_and_combine_with_outputs(tmpdir):
 2+2
 
 3+3
-""")
+"""
+        )
 
-    with(open(str(tmpdir.join(tmp_ipynb)), 'w')) as fp:
-        fp.write("""{
+    with (open(str(tmpdir.join(tmp_ipynb)), "w")) as fp:
+        fp.write(
+            """{
  "cells": [
   {
    "cell_type": "code",
@@ -98,7 +107,8 @@ def test_read_text_and_combine_with_outputs(tmpdir):
  "nbformat": 4,
  "nbformat_minor": 2
 }
-""")
+"""
+        )
 
     # create contents manager
     cm = jupytext.TextFileContentsManager()
@@ -106,21 +116,21 @@ def test_read_text_and_combine_with_outputs(tmpdir):
 
     # load notebook from script
     model = cm.get(tmp_script)
-    nb = model['content']
+    nb = model["content"]
 
-    assert nb.cells[0]['source'] == '1+1'
-    assert nb.cells[1]['source'] == '2+2'
-    assert nb.cells[2]['source'] == '3+3'
+    assert nb.cells[0]["source"] == "1+1"
+    assert nb.cells[1]["source"] == "2+2"
+    assert nb.cells[2]["source"] == "3+3"
 
     # No output for the second cell, which is not in the ipynb
-    assert nb.cells[0]['outputs']
-    assert not nb.cells[1]['outputs']
-    assert nb.cells[2]['outputs']
+    assert nb.cells[0]["outputs"]
+    assert not nb.cells[1]["outputs"]
+    assert nb.cells[2]["outputs"]
 
     assert len(nb.cells) == 3
 
 
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_all'))
+@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_all"))
 def test_combine_stable(nb_file):
     nb_org = jupytext.read(nb_file)
     nb_source = deepcopy(nb_org)
@@ -138,66 +148,67 @@ def test_combine_stable(nb_file):
 
 def test_combine_reorder():
     nb_source = new_notebook(
-        cells=[new_markdown_cell('Markdown text'),
-               new_code_cell('1+1'),
-               new_code_cell('2+2'),
-               new_code_cell('3+3'),
-               new_markdown_cell('Markdown text'),
-               new_code_cell('4+4')])
+        cells=[
+            new_markdown_cell("Markdown text"),
+            new_code_cell("1+1"),
+            new_code_cell("2+2"),
+            new_code_cell("3+3"),
+            new_markdown_cell("Markdown text"),
+            new_code_cell("4+4"),
+        ]
+    )
 
     nb_outputs = new_notebook(
-        cells=[new_markdown_cell('Markdown text'),
-               new_code_cell('2+2'),
-               new_code_cell('4+4'),
-               new_code_cell('1+1'),
-               new_code_cell('3+3'),
-               new_markdown_cell('Markdown text')])
+        cells=[
+            new_markdown_cell("Markdown text"),
+            new_code_cell("2+2"),
+            new_code_cell("4+4"),
+            new_code_cell("1+1"),
+            new_code_cell("3+3"),
+            new_markdown_cell("Markdown text"),
+        ]
+    )
 
-    nb_outputs.cells[1].outputs = ['4']
-    nb_outputs.cells[2].outputs = ['8']
-    nb_outputs.cells[3].outputs = ['2']
-    nb_outputs.cells[4].outputs = ['6']
+    nb_outputs.cells[1].outputs = ["4"]
+    nb_outputs.cells[2].outputs = ["8"]
+    nb_outputs.cells[3].outputs = ["2"]
+    nb_outputs.cells[4].outputs = ["6"]
 
     combine_inputs_with_outputs(nb_source, nb_outputs)
 
-    assert nb_source.cells[1].outputs == ['2']
-    assert nb_source.cells[2].outputs == ['4']
-    assert nb_source.cells[3].outputs == ['6']
-    assert nb_source.cells[5].outputs == ['8']
+    assert nb_source.cells[1].outputs == ["2"]
+    assert nb_source.cells[2].outputs == ["4"]
+    assert nb_source.cells[3].outputs == ["6"]
+    assert nb_source.cells[5].outputs == ["8"]
 
 
 def test_combine_split():
-    nb_source = new_notebook(
-        cells=[new_code_cell('1+1'),
-               new_code_cell('2+2')])
+    nb_source = new_notebook(cells=[new_code_cell("1+1"), new_code_cell("2+2")])
 
-    nb_outputs = new_notebook(
-        cells=[new_code_cell('1+1\n2+2')])
+    nb_outputs = new_notebook(cells=[new_code_cell("1+1\n2+2")])
 
-    nb_outputs.cells[0].outputs = ['4']
+    nb_outputs.cells[0].outputs = ["4"]
 
     combine_inputs_with_outputs(nb_source, nb_outputs)
 
     assert nb_source.cells[0].outputs == []
-    assert nb_source.cells[1].outputs == ['4']
+    assert nb_source.cells[1].outputs == ["4"]
 
 
 def test_combine_refactor():
     nb_source = new_notebook(
-        cells=[new_code_cell('a=1'),
-               new_code_cell('a+1'),
-               new_code_cell('a+2')])
+        cells=[new_code_cell("a=1"), new_code_cell("a+1"), new_code_cell("a+2")]
+    )
 
     nb_outputs = new_notebook(
-        cells=[new_code_cell('b=1'),
-               new_code_cell('b+1'),
-               new_code_cell('b+2')])
+        cells=[new_code_cell("b=1"), new_code_cell("b+1"), new_code_cell("b+2")]
+    )
 
-    nb_outputs.cells[1].outputs = ['2']
-    nb_outputs.cells[2].outputs = ['3']
+    nb_outputs.cells[1].outputs = ["2"]
+    nb_outputs.cells[2].outputs = ["3"]
 
     combine_inputs_with_outputs(nb_source, nb_outputs)
 
     assert nb_source.cells[0].outputs == []
-    assert nb_source.cells[1].outputs == ['2']
-    assert nb_source.cells[2].outputs == ['3']
+    assert nb_source.cells[1].outputs == ["2"]
+    assert nb_source.cells[2].outputs == ["3"]

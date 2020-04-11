@@ -5,7 +5,7 @@ And there are many ways you can contribute...
 
 ## Spread the word
 
-You like Jupytext? Probably your friends and colleagues will like it too. 
+You like Jupytext? Probably your friends and colleagues will like it too.
 Show them what you've been able to do with: version control, collaboration on notebooks, refactoring of notebooks, notebooks integrated in library, notebook generated from Markdown documents...
 
 By the way, we're also interested to know how you use Jupytext! There may well be applications we've not thought of!
@@ -42,10 +42,16 @@ conda activate jupytext-dev
 pip install -e .
 ```
 
+We use the [pre-commit](https://pre-commit.com) package to run pre-commit scripts like `black` and `flake8` on the code.
+Install it with
+```
+pre-commit install
+```
+
 Tests are executed with `pytest`. You can run them in parallel with for instance
 ```
 pytest -n 5
-``` 
+```
 
 Build the `jupytext` package and install it with
 ```
