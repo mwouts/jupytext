@@ -2,6 +2,7 @@ Next release (2020-04-??)
 -------------------------
 
 **Added**
+- Jupytext is tested in `pip` and `conda` environments, on Linux, Mac OS and Windows, using Github actions (#487)
 - Documented that the YAML header can be created with either `--set-kernel`, `--set-formats`, or both (#485)
 
 1.4.2 (2020-04-05)
