@@ -5,6 +5,9 @@ Next release (2020-04-??)
 - Jupytext is tested in `pip` and `conda` environments, on Linux, Mac OS and Windows, using Github actions (#487)
 - Documented that the YAML header can be created with either `--set-kernel`, `--set-formats`, or both (#485)
 
+**Fixed**
+- Skip the `jupytext --execute` tests when the warning _Timeout waiting for IOPub output_ occurs, which is the case intermittently on Windows (#489)
+
 1.4.2 (2020-04-05)
 ------------------
 
