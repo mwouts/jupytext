@@ -11,12 +11,19 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: goanpeca/setup-miniconda@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Miniconda
+        uses: goanpeca/setup-miniconda@v1
         with:
-         auto-update-conda: true
-         python-version: ${{ matrix.python-version }}
-      - name: Conda env
-        shell: pwsh
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+      - name: Debug
+        run: |
+          # Show path and content
+          pwd
+          tree -L 1
+      - name: Create conda env
         run: conda env create --file environment.yml
       - name: Conda activate
         run: conda activate jupytext-dev
@@ -28,6 +35,8 @@ jobs:
           flake8 jupytext tests
           # exit-zero treats all errors as warnings.  The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --statistics
+      - name: Install from source (required for the pre-commit tests)
+        run: pip install .
       - name: Test with pytest
         run: |
           coverage run --source=. -m py.test
