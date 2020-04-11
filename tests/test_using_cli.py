@@ -5,7 +5,7 @@ import pytest
 import jupytext
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 from jupytext.cli import jupytext as jupytext_cli
-from .utils import requires_black
+from .utils import requires_black, requires_myst
 
 doc_path = os.path.join(
     os.path.dirname(os.path.realpath(__file__)),
@@ -13,6 +13,7 @@ doc_path = os.path.join(
 
 
 @requires_black
+@requires_myst
 @pytest.mark.skipif(not os.path.isdir(doc_path), reason='Documentation folder is missing')
 def test_jupytext_commands_in_the_documentation_work(tmpdir):
     # Read the documentation as a bash notebook
