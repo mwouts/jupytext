@@ -349,6 +349,11 @@ def git_in_tmpdir(tmpdir):
         print(out)
         return out
 
+    git('init')
+    git('status')
+    git('config', 'user.name', 'jupytext-test-cli')
+    git('config', 'user.email', 'jupytext@tests.com')
+
     return git
 
 
@@ -360,8 +365,6 @@ def test_pre_commit_hook(tmpdir):
     nb = new_notebook(cells=[])
 
     git = git_in_tmpdir(tmpdir)
-    git('init')
-    git('status')
     hook = str(tmpdir.join('.git/hooks/pre-commit'))
     with open(hook, 'w') as fp:
         fp.write('#!/bin/sh\n'
@@ -388,8 +391,6 @@ def test_pre_commit_hook(tmpdir):
 def test_sync_with_pre_commit_hook(tmpdir):
     # Init git and create a pre-commit hook
     git = git_in_tmpdir(tmpdir)
-    git('init')
-    git('status')
     hook = str(tmpdir.join('.git/hooks/pre-commit'))
     with open(hook, 'w') as fp:
         fp.write('#!/bin/sh\n'
@@ -472,8 +473,6 @@ def test_pre_commit_hook_in_subfolder(tmpdir):
     nb = new_notebook(cells=[])
 
     git = git_in_tmpdir(tmpdir)
-    git('init')
-    git('status')
     hook = str(tmpdir.join('.git/hooks/pre-commit'))
     with open(hook, 'w') as fp:
         fp.write('#!/bin/sh\n'
@@ -504,8 +503,6 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     nb = new_notebook(cells=[])
 
     git = git_in_tmpdir(tmpdir)
-    git('init')
-    git('status')
     hook = str(tmpdir.join('.git/hooks/pre-commit'))
     with open(hook, 'w') as fp:
         fp.write('#!/bin/sh\n'
@@ -541,8 +538,6 @@ def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
     metadata = read(nb_file).metadata
 
     git = git_in_tmpdir(tmpdir)
-    git('init')
-    git('status')
     hook = str(tmpdir.join('.git/hooks/pre-commit'))
     with open(hook, 'w') as fp:
         fp.write('#!/bin/sh\n'
@@ -586,8 +581,6 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
         return system(*args, cwd=str(tmpdir))
 
     git = git_in_tmpdir(tmpdir)
-    git('init')
-    git('status')
 
     def hook():
         with mock.patch('jupytext.cli.system', system_in_tmpdir):
