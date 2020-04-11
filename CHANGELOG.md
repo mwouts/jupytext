@@ -1,3 +1,9 @@
+Next release (2020-04-??)
+-------------------------
+
+**Added**
+- Documented that the YAML header can be created with either `--set-kernel`, `--set-formats`, or both (#485)
+
 1.4.2 (2020-04-05)
 ------------------
 
