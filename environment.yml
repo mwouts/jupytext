@@ -11,6 +11,8 @@ dependencies:
   - jupyter_contrib_nbextensions
   - pytest
   - pytest-xdist
+  - pytest-cov
+  - codecov
   - pylint
   - flake8
   - black
