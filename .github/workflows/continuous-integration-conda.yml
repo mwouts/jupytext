@@ -22,11 +22,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           environment-file: environment.yml
           activate-environment: jupytext-dev
-      - name: Debug
-        run: |
-          # Show path and content
-          pwd
-          ls
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
