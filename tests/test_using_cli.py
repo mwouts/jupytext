@@ -1,11 +1,11 @@
 import os
 import re
-import shutil
 import shlex
 import pytest
 import jupytext
+from nbformat.v4.nbbase import new_notebook, new_code_cell
 from jupytext.cli import jupytext as jupytext_cli
-from .utils import list_notebooks, requires_black
+from .utils import requires_black
 
 doc_path = os.path.join(
     os.path.dirname(os.path.realpath(__file__)),
@@ -14,15 +14,14 @@ doc_path = os.path.join(
 
 @requires_black
 @pytest.mark.skipif(not os.path.isdir(doc_path), reason='Documentation folder is missing')
-@pytest.mark.parametrize('nb_file', list_notebooks('ipynb_py')[-1:])
-def test_jupytext_commands_in_the_documentation_work(tmpdir, nb_file):
+def test_jupytext_commands_in_the_documentation_work(tmpdir):
     # Read the documentation as a bash notebook
     using_cli = os.path.join(doc_path, 'using-cli.md')
     assert os.path.isfile(using_cli)
     using_cli_nb = jupytext.read(using_cli)
 
     # Run the commands in tmpdir on a sample notebook
-    shutil.copy(nb_file, str(tmpdir.join('notebook.ipynb')))
+    jupytext.write(new_notebook(cells=[new_code_cell('1+1')]), str(tmpdir.join('notebook.ipynb')))
     os.chdir(str(tmpdir))
 
     cmd_tested = 0
