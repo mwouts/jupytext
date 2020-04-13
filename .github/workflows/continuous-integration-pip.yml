@@ -35,5 +35,4 @@ jobs:
       - name: Install from source (required for the pre-commit tests)
         run: pip install .
       - name: Test with pytest
-        run: |
-          coverage run --source=. -m py.test
+        run: coverage run --source=. -m py.test
