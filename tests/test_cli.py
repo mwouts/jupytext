@@ -913,11 +913,14 @@ def test_set_kernel_works_with_pipes_326(capsys):
     assert "kernelspec" in nb.metadata
 
 
-def test_utf8_out_331(capsys):
+def test_utf8_out_331(capsys, caplog):
     py = u"from IPython.core.display import HTML; HTML(u'\xd7')"
 
     with mock.patch("sys.stdin", StringIO(py)):
         jupytext(["--to", "ipynb", "--execute", "-"])
+
+    if "Timeout" in caplog.text:
+        pytest.skip(caplog.text)  # Issue 489
 
     out, err = capsys.readouterr()
     assert err == ""
