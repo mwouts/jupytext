@@ -1,9 +1,11 @@
 ![](https://raw.githubusercontent.com/mwouts/jupytext/master/docs/logo.png)
 
-[![Build Status](https://travis-ci.com/mwouts/jupytext.svg?branch=master)](https://travis-ci.com/mwouts/jupytext)
+![CI (pip)](https://github.com/mwouts/jupytext/workflows/CI%20(pip)/badge.svg)
+![CI (conda)](https://github.com/mwouts/jupytext/workflows/CI%20(conda)/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/jupytext/badge/?version=latest)](https://jupytext.readthedocs.io/en/latest/?badge=latest)
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=master)](https://codecov.io/github/mwouts/jupytext?branch=master)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/mwouts/jupytext.svg)](https://lgtm.com/projects/g/mwouts/jupytext/context:python)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 ![GitHub language count](https://img.shields.io/github/languages/count/mwouts/jupytext)
 
 Have you always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningful diffs when doing version control? Then... Jupytext may well be the tool you're looking for!
