@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import pytest
 from nbformat.v4.nbbase import (
     new_notebook,
     new_code_cell,
@@ -434,7 +435,8 @@ def test_default_cell_markers_in_contents_manager_does_not_impact_light_format(t
             "jupytext": {"formats": "ipynb,py", "notebook_metadata_filter": "-all"}
         },
     )
-    cm.save(model=dict(type="notebook", content=nb), path="notebook.ipynb")
+    with pytest.warns(UserWarning, match="Ignored cell markers"):
+        cm.save(model=dict(type="notebook", content=nb), path="notebook.ipynb")
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
