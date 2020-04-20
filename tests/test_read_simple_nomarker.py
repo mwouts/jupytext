@@ -46,7 +46,8 @@ def h(x):
         text = writes(nb2, "py:bare")
     with pytest.warns(DeprecationWarning, match="nomarker"):
         nb3 = reads(text, "py:bare")
-    combine_inputs_with_outputs(nb3, nb2, "py:bare")
+    with pytest.warns(DeprecationWarning, match="nomarker"):
+        combine_inputs_with_outputs(nb3, nb2, "py:bare")
     nb3.metadata.pop("jupytext")
 
     compare(nb3, nb2)
