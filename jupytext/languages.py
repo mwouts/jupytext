@@ -51,6 +51,8 @@ _SCRIPT_EXTENSIONS = {
     ".fsx": {"language": "fsharp", "comment": "//"},
     ".fs": {"language": "fsharp", "comment": "//"},
     ".sos": {"language": "sos", "comment": "#"},
+    ".java": {"language": "java", "comment": "//"},
+    ".groovy": {"language": "groovy", "comment": "//"},
 }
 
 _COMMENT_CHARS = [
