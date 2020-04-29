@@ -1,9 +1,10 @@
-1.5.0 (2020-04-??)
+1.5.0 (2020-05-??)
 ------------------
 
 **Added**
 - Jupytext is tested in `pip` and `conda` environments, on Linux, Mac OS and Windows, using Github actions (#487)
 - Pre-commit checks and automatic reformatting of Jupytext's code with `pre-commit`, `black` and `flake8` (#483)
+- Groovy and Java are now supported, thanks to Przemek Wesołek's contribution (#500)
 - Mention that the YAML header can be created with either `--set-kernel`, `--set-formats`, or both (#485)
 - Mention that one should use double quotes, not single quotes, around `jupytext --check` commands like `"pytest {}"` on Windows (#475)
 
