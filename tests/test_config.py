@@ -1,5 +1,9 @@
 import os
-from jupytext.config import find_jupytext_configuration_file
+import pytest
+from jupytext.config import (
+    find_jupytext_configuration_file,
+    load_jupytext_configuration_file,
+)
 
 
 def test_find_jupytext_configuration_file(tmpdir):
@@ -27,3 +31,46 @@ def test_find_jupytext_configuration_file(tmpdir):
     assert os.path.samefile(
         find_jupytext_configuration_file(str(nested)), str(local_config)
     )
+
+
+@pytest.mark.parametrize(
+    "config_file",
+    ["jupytext", "jupytext.toml", "jupytext.yml", "jupytext.json", "jupytext.py"],
+)
+def test_load_jupytext_configuration_file(tmpdir, config_file):
+    full_config_path = tmpdir.join(config_file)
+
+    if config_file.endswith(("jupytext", ".toml")):
+        full_config_path.write(
+            """default_jupytext_formats = "ipynb,py:percent"
+default_notebook_metadata_filter = "all"
+default_cell_metadata_filter = "all"
+"""
+        )
+    elif config_file.endswith(".yml"):
+        full_config_path.write(
+            """default_jupytext_formats: ipynb,py:percent
+default_notebook_metadata_filter: all
+default_cell_metadata_filter: all
+"""
+        )
+    elif config_file.endswith(".json"):
+        full_config_path.write(
+            """{"default_jupytext_formats": "ipynb,py:percent",
+"default_notebook_metadata_filter": "all",
+"default_cell_metadata_filter": "all"
+}
+"""
+        )
+    elif config_file.endswith(".py"):
+        full_config_path.write(
+            """c.default_jupytext_formats = "ipynb,py:percent"
+c.default_notebook_metadata_filter = "all"
+c.default_cell_metadata_filter = "all"
+"""
+        )
+
+    config = load_jupytext_configuration_file(str(full_config_path))
+    assert config.default_jupytext_formats == "ipynb,py:percent"
+    assert config.default_notebook_metadata_filter == "all"
+    assert config.default_cell_metadata_filter == "all"

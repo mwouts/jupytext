@@ -9,8 +9,6 @@ try:
 except ImportError:
     import mock
 from tornado.web import HTTPError
-from traitlets import Unicode, Float, Bool, Enum
-from traitlets.config import Configurable
 
 # import notebook.transutils before notebook.services.contents.filemanager #75
 try:
@@ -23,7 +21,6 @@ from .jupytext import create_prefix_dir as create_prefix_dir_from_path
 from .combine import combine_inputs_with_outputs
 from .formats import rearrange_jupytext_metadata, check_file_version
 from .formats import (
-    NOTEBOOK_EXTENSIONS,
     long_form_one_format,
     long_form_multiple_formats,
 )
@@ -36,6 +33,7 @@ from .paired_paths import (
     InconsistentPath,
 )
 from .kernels import set_kernelspec_from_language
+from .config import JupytextConfiguration
 
 
 def preferred_format(incomplete_format, preferred_formats):
@@ -82,7 +80,7 @@ def _jupytext_reads(fmt):
 def build_jupytext_contents_manager_class(base_contents_manager_class):
     """Derives a TextFileContentsManager class from the given base class"""
 
-    class JupytextContentsManager(base_contents_manager_class, Configurable):
+    class JupytextContentsManager(base_contents_manager_class, JupytextConfiguration):
         """
         A FileContentsManager Class that reads and stores notebooks to classical
         Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd), Julia (.jl),
@@ -98,88 +96,6 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 ext if ext.startswith(".") else "." + ext
                 for ext in self.notebook_extensions.split(",")
             ]
-
-        default_jupytext_formats = Unicode(
-            u"",
-            help="Save notebooks to these file extensions. "
-            "Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R "
-            "comma separated. If you want another format than the "
-            "default one, append the format name to the extension, "
-            "e.g. ipynb,py:percent to save the notebook to "
-            "hydrogen/spyder/vscode compatible scripts",
-            config=True,
-        )
-
-        preferred_jupytext_formats_save = Unicode(
-            u"",
-            help="Preferred format when saving notebooks as text, per extension. "
-            'Use "jl:percent,py:percent,R:percent" if you want to save '
-            "Julia, Python and R scripts in the double percent format and "
-            'only write "jupytext_formats": "py" in the notebook metadata.',
-            config=True,
-        )
-
-        preferred_jupytext_formats_read = Unicode(
-            u"",
-            help="Preferred format when reading notebooks from text, per "
-            'extension. Use "py:sphinx" if you want to read all python '
-            "scripts as Sphinx gallery scripts.",
-            config=True,
-        )
-
-        default_notebook_metadata_filter = Unicode(
-            u"",
-            help="Cell metadata that should be save in the text representations. "
-            "Examples: 'all', '-all', 'widgets,nteract', 'kernelspec,jupytext-all'",
-            config=True,
-        )
-
-        default_cell_metadata_filter = Unicode(
-            u"",
-            help="Notebook metadata that should be saved in the text representations. "
-            "Examples: 'all', 'hide_input,hide_output'",
-            config=True,
-        )
-
-        comment_magics = Enum(
-            values=[True, False],
-            allow_none=True,
-            help="Should Jupyter magic commands be commented out in the text representation?",
-            config=True,
-        )
-
-        split_at_heading = Bool(
-            False,
-            help="Split markdown cells on headings (Markdown and R Markdown formats only)",
-            config=True,
-        )
-
-        sphinx_convert_rst2md = Bool(
-            False,
-            help="When opening a Sphinx Gallery script, convert the reStructuredText to markdown",
-            config=True,
-        )
-
-        outdated_text_notebook_margin = Float(
-            1.0,
-            help="Refuse to overwrite inputs of a ipynb notebooks with those of a "
-            "text notebook when the text notebook plus margin is older than "
-            "the ipynb notebook",
-            config=True,
-        )
-
-        default_cell_markers = Unicode(
-            u"",
-            help='Start and end cell markers for the light format, comma separated. Use "{{{,}}}" to mark cells'
-            'as foldable regions in Vim, and "region,endregion" to mark cells as Vscode/PyCharm regions',
-            config=True,
-        )
-
-        notebook_extensions = Unicode(
-            u",".join(NOTEBOOK_EXTENSIONS),
-            help="A comma separated list of notebook extensions",
-            config=True,
-        )
 
         def drop_paired_notebook(self, path):
             """Remove the current notebook from the list of paired notebooks"""
@@ -212,37 +128,6 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     short_form_one_format(alt_fmt),
                     short_formats,
                 )
-
-        def set_default_format_options(self, format_options, read=False):
-            """Set default format option"""
-            if self.default_notebook_metadata_filter:
-                format_options.setdefault(
-                    "notebook_metadata_filter", self.default_notebook_metadata_filter
-                )
-            if self.default_cell_metadata_filter:
-                format_options.setdefault(
-                    "cell_metadata_filter", self.default_cell_metadata_filter
-                )
-            if self.comment_magics is not None:
-                format_options.setdefault("comment_magics", self.comment_magics)
-            if self.split_at_heading:
-                format_options.setdefault("split_at_heading", self.split_at_heading)
-            if not read and self.default_cell_markers:
-                format_options.setdefault("cell_markers", self.default_cell_markers)
-            if read and self.sphinx_convert_rst2md:
-                format_options.setdefault("rst2md", self.sphinx_convert_rst2md)
-
-        def default_formats(self, path):
-            """Return the default formats, if they apply to the current path #157"""
-            formats = long_form_multiple_formats(self.default_jupytext_formats)
-            for fmt in formats:
-                try:
-                    base_path(path, fmt)
-                    return self.default_jupytext_formats
-                except InconsistentPath:
-                    continue
-
-            return None
 
         def create_prefix_dir(self, path, fmt):
             """Create the prefix dir, if missing"""

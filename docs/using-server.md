@@ -75,7 +75,7 @@ It is possible to filter nested metadata. For example, if you want to preserve t
 c.ContentsManager.default_notebook_metadata_filter = "-jupytext.text_representation.jupytext_version"
 ```
 
-NB: All these global options (and more) are documented [here](https://github.com/mwouts/jupytext/blob/master/jupytext/contentsmanager.py).
+NB: All these global options (and more) are documented [here](https://github.com/mwouts/jupytext/blob/master/jupytext/config.py).
 
 ## Can I edit a notebook simultaneously in Jupyter and in a text editor?
 
