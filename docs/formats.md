@@ -227,7 +227,7 @@ The format was introduced by Spyder in 2013, and is now supported by many editor
 - [Spyder IDE](https://docs.spyder-ide.org/editor.html#defining-code-cells),
 - [Hydrogen](https://nteract.gitbooks.io/hydrogen/docs/Usage/NotebookFiles.html#notebook-export), a package for Atom,
 - [VS
-  Code](https://code.visualstudio.com/docs/python/jupyter-support#_jupyter-code-cells),
+  Code](https://code.visualstudio.com/docs/python/jupyter-support-py#_jupyter-code-cells),
 - [Python Tools for Visual Studio](https://docs.microsoft.com/en-us/visualstudio/python/python-interactive-repl-in-visual-studio?view=vs-2019#work-with-code-cells),
 - and [PyCharm Professional](https://www.jetbrains.com/help/pycharm/editing-jupyter-notebook-files.html#edit-content).
 
