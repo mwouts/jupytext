@@ -20,10 +20,7 @@ from .jupytext import reads, writes
 from .jupytext import create_prefix_dir as create_prefix_dir_from_path
 from .combine import combine_inputs_with_outputs
 from .formats import rearrange_jupytext_metadata, check_file_version
-from .formats import (
-    long_form_one_format,
-    long_form_multiple_formats,
-)
+from .formats import long_form_multiple_formats
 from .formats import short_form_one_format, short_form_multiple_formats
 from .paired_paths import (
     paired_paths,
@@ -33,34 +30,7 @@ from .paired_paths import (
     InconsistentPath,
 )
 from .kernels import set_kernelspec_from_language
-from .config import JupytextConfiguration
-
-
-def preferred_format(incomplete_format, preferred_formats):
-    """Return the preferred format for the given extension"""
-    incomplete_format = long_form_one_format(incomplete_format)
-    if "format_name" in incomplete_format:
-        return incomplete_format
-
-    for fmt in long_form_multiple_formats(preferred_formats):
-        if (
-            (
-                incomplete_format["extension"] == fmt["extension"]
-                or (
-                    fmt["extension"] == ".auto"
-                    and incomplete_format["extension"]
-                    not in [".md", ".markdown", ".Rmd", ".ipynb"]
-                )
-            )
-            and incomplete_format.get("suffix")
-            == fmt.get("suffix", incomplete_format.get("suffix"))
-            and incomplete_format.get("prefix")
-            == fmt.get("prefix", incomplete_format.get("prefix"))
-        ):
-            fmt.update(incomplete_format)
-            return fmt
-
-    return incomplete_format
+from .config import JupytextConfiguration, preferred_format
 
 
 def _jupytext_writes(fmt):
