@@ -1260,3 +1260,22 @@ def test_create_header_with_set_formats_and_set_kernel(format_name, tmpdir):
     nb = read(tmp_nb)
     assert nb["metadata"]["jupytext"]["formats"] == format_name
     assert "kernelspec" in nb["metadata"]
+
+
+def test_set_option_split_at_heading(tmpdir):
+    tmp_rmd = tmpdir.join("notebook.Rmd")
+    tmp_rmd.write(
+        """A paragraph
+
+# H1 Header
+"""
+    )
+
+    jupytext([str(tmp_rmd), "--opt", "split_at_heading=true"])
+    assert "split_at_heading: true" in tmp_rmd.read()
+    nb = read(str(tmp_rmd))
+
+    nb_expected = new_notebook(
+        cells=[new_markdown_cell("A paragraph"), new_markdown_cell("# H1 Header")]
+    )
+    compare_notebooks(nb, nb_expected)
