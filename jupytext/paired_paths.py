@@ -13,7 +13,7 @@ class InconsistentPath(ValueError):
 
 def base_path(main_path, fmt):
     """Given a path and options for a format (ext, suffix, prefix), return the corresponding base path"""
-    if not fmt:
+    if not fmt or (isinstance(fmt, dict) and "extension" not in fmt):
         base, ext = os.path.splitext(main_path)
         if ext not in NOTEBOOK_EXTENSIONS:
             raise InconsistentPath(

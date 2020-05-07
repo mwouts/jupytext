@@ -347,12 +347,13 @@ def jupytext(args=None):
         and not args.pipe
         and not args.check
         and not args.update_metadata
+        and not args.format_options
         and not args.set_kernel
         and not args.execute
     ):
         raise ValueError(
             "Please provide one of --to, --output, --set-formats, --sync, --pipe, "
-            "--check, --update_metadata, --set-kernel or --execute"
+            "--check, --update-metadata, --format-options, --set-kernel or --execute"
         )
 
     if args.output and len(args.notebooks) != 1:
@@ -487,6 +488,14 @@ def jupytext_single_file(nb_file, args, log):
         log("[jupytext] Setting kernel {}".format(kernelspec.get("name")))
         args.update_metadata["kernelspec"] = kernelspec
 
+    # Are we updating a text file that has a metadata filter? #212
+    if args.update_metadata or args.format_options:
+        if (
+            notebook.metadata.get("jupytext", {}).get("notebook_metadata_filter")
+            == "-all"
+        ):
+            notebook.metadata.get("jupytext", {}).pop("notebook_metadata_filter")
+
     # Update the metadata
     if args.update_metadata:
         log(
@@ -494,19 +503,14 @@ def jupytext_single_file(nb_file, args, log):
                 json.dumps(args.update_metadata)
             )
         )
-        # Are we updating a text file that has a metadata filter? #212
-        if (
-            notebook.metadata.get("jupytext", {}).get("notebook_metadata_filter")
-            == "-all"
-        ):
-            notebook.metadata.get("jupytext", {}).pop("notebook_metadata_filter")
-        recursive_update(notebook.metadata, args.update_metadata)
 
         if (
             "kernelspec" in args.update_metadata
             and "main_language" in notebook.metadata.get("jupytext", {})
         ):
             notebook.metadata["jupytext"].pop("main_language")
+
+        recursive_update(notebook.metadata, args.update_metadata)
 
     # Read paired notebooks, except if the pair is being created
     if args.sync:
