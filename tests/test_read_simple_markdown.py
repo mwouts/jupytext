@@ -265,6 +265,25 @@ def test_split_on_header_after_two_blank_lines(
     compare(markdown2, markdown)
 
 
+def test_split_at_heading_in_metadata(
+    markdown="""---
+jupyter:
+  jupytext:
+    split_at_heading: true
+---
+
+A paragraph
+
+# H1 Header
+""",
+    nb_expected=new_notebook(
+        cells=[new_markdown_cell("A paragraph"), new_markdown_cell("# H1 Header")]
+    ),
+):
+    nb = jupytext.reads(markdown, ".md")
+    compare_notebooks(nb, nb_expected)
+
+
 def test_code_cell_with_metadata(
     markdown="""```python tags=["parameters"]
 a = 1
