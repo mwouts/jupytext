@@ -142,8 +142,8 @@ def dump_yaml_blocks(data, compact=True):
     """
     string = yaml.dump(data, Dumper=CompactDumper)
     lines = string.splitlines()
-    if compact and all(l and l[0].isalpha() for l in lines):
-        return "\n".join([":{}".format(l) for l in lines]) + "\n\n"
+    if compact and all(line and line[0].isalpha() for line in lines):
+        return "\n".join([":{}".format(line) for line in lines]) + "\n\n"
     return "---\n{}---\n".format(string)
 
 
