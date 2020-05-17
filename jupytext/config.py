@@ -170,33 +170,51 @@ def preferred_format(incomplete_format, preferred_formats):
     return incomplete_format
 
 
-def find_jupytext_configuration_file(dir):
+def find_jupytext_configuration_file(path):
     """Return the first jupytext configuration file in the current directory, or any parent directory"""
+    while not os.path.isdir(path):
+        parent = os.path.dirname(path)
+        if parent == path:
+            return None
+        path = parent
+
     for filename in VALID_JUPYTEXT_CONFIGURATION_FILE_NAMES:
-        full_path = os.path.join(dir, filename)
+        full_path = os.path.join(path, filename)
         if os.path.isfile(full_path):
             return full_path
-    parent_dir = os.path.dirname(dir)
-    if os.path.samefile(dir, parent_dir):
+    parent_dir = os.path.dirname(path)
+    if os.path.samefile(path, parent_dir):
         return None
     return find_jupytext_configuration_file(parent_dir)
 
 
-def load_jupytext_configuration_file(path):
-    """Read the Jupytext config files, and return a JupytextConfig object"""
+def load_jupytext_configuration_file(jupytext_config_file):
+    """Read a Jupytext config file, and return a JupytextConfig object"""
 
-    if path.endswith((".toml", "jupytext")):
+    if jupytext_config_file.endswith((".toml", "jupytext")):
         import toml
 
-        config = toml.load(path)
+        config = toml.load(jupytext_config_file)
         return JupytextConfiguration(**config)
 
-    if path.endswith((".yml", ".yaml")):
-        with open(path) as fp:
+    if jupytext_config_file.endswith((".yml", ".yaml")):
+        with open(jupytext_config_file) as fp:
             config = yaml.safe_load(fp)
         return JupytextConfiguration(**config)
 
-    if path.endswith(".py"):
-        return JupytextConfiguration(**PyFileConfigLoader(path).load_config())
+    if jupytext_config_file.endswith(".py"):
+        return JupytextConfiguration(
+            **PyFileConfigLoader(jupytext_config_file).load_config()
+        )
 
-    return JupytextConfiguration(**JSONFileConfigLoader(path).load_config())
+    return JupytextConfiguration(
+        **JSONFileConfigLoader(jupytext_config_file).load_config()
+    )
+
+
+def load_jupytext_config(nb_file):
+    """Return the jupytext configuration file in the same folder, or in a parent folder, of the current file, if any"""
+    config_file = find_jupytext_configuration_file(nb_file)
+    if config_file is None:
+        return None
+    return load_jupytext_configuration_file(config_file)
