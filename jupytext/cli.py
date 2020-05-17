@@ -20,9 +20,16 @@ from .formats import (
 )
 from .languages import _SCRIPT_EXTENSIONS
 from .header import recursive_update
-from .paired_paths import paired_paths, base_path, full_path, InconsistentPath
+from .paired_paths import (
+    paired_paths,
+    base_path,
+    full_path,
+    InconsistentPath,
+    find_base_path_and_format,
+)
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference, compare
+from .config import load_jupytext_config, prepare_notebook_for_save
 from .kernels import kernelspec_from_language, find_kernel_specs, get_kernel_spec
 from .reraise import reraise
 from .version import __version__
@@ -370,6 +377,7 @@ def jupytext(args=None):
     notebooks = []
     for pattern in args.notebooks:
         if "*" in pattern or "?" in pattern:
+            # Exclude the .jupytext.py configuration file
             notebooks.extend(glob.glob(pattern))
         else:
             notebooks.append(pattern)
@@ -403,6 +411,8 @@ def jupytext_single_file(nb_file, args, log):
         )
     )
 
+    config = load_jupytext_config(os.path.abspath(nb_file))
+
     # Just acting on metadata / pipe => save in place
     if not nb_dest and not args.sync:
         nb_dest = nb_file
@@ -412,6 +422,8 @@ def jupytext_single_file(nb_file, args, log):
 
     # I. ### Read the notebook ###
     fmt = copy(args.input_format) or {}
+    if config:
+        config.set_default_format_options(fmt)
     set_format_options(fmt, args.format_options)
     log(
         "[jupytext] Reading {}{}".format(
@@ -436,6 +448,11 @@ def jupytext_single_file(nb_file, args, log):
             }
         elif ext:
             fmt = {"extension": ext}
+
+    if config and "formats" not in notebook.metadata.get("jupytext", {}):
+        default_formats = config.default_formats(nb_file)
+        if default_formats:
+            notebook.metadata.setdefault("jupytext", {})["formats"] = default_formats
 
     # Compute actual extension when using script/auto, and update nb_dest if necessary
     dest_fmt = args.to
@@ -546,6 +563,9 @@ def jupytext_single_file(nb_file, args, log):
         else:
             resources = {}
         exec_proc.preprocess(notebook, resources=resources)
+
+    if nb_dest != "-":
+        prepare_notebook_for_save(notebook, config, nb_dest)
 
     # III. ### Possible actions ###
     modified = args.update_metadata or args.pipe or args.execute
@@ -754,6 +774,11 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
     max_mtime_outputs = None
     latest_inputs = None
     latest_outputs = None
+
+    jupytext_formats = long_form_multiple_formats(formats)
+    _, fmt_with_prefix_suffix = find_base_path_and_format(nb_file, jupytext_formats)
+    fmt.update(fmt_with_prefix_suffix)
+
     for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats):
         if not os.path.isfile(alt_path):
             continue

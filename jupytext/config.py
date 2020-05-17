@@ -218,6 +218,8 @@ def load_jupytext_config(nb_file):
     config_file = find_jupytext_configuration_file(nb_file)
     if config_file is None:
         return None
+    if os.path.isfile(nb_file) and os.path.samefile(config_file, nb_file):
+        return None
     return load_jupytext_configuration_file(config_file)
 
 
@@ -226,7 +228,9 @@ def prepare_notebook_for_save(nbk, config, path):
     metadata = nbk.get("metadata")
     rearrange_jupytext_metadata(metadata)
     jupytext_metadata = metadata.setdefault("jupytext", {})
-    jupytext_formats = jupytext_metadata.get("formats") or config.default_formats(path)
+    jupytext_formats = jupytext_metadata.get("formats") or (
+        config.default_formats(path) if config else None
+    )
 
     if not jupytext_formats:
         text_representation = jupytext_metadata.get("text_representation", {})
@@ -245,12 +249,12 @@ def prepare_notebook_for_save(nbk, config, path):
     )
 
     # Set preferred formats if not format name is given yet
-    jupytext_formats = [
-        preferred_format(f, config.preferred_jupytext_formats_save)
-        for f in jupytext_formats
-    ]
-
-    config.set_default_format_options(jupytext_metadata)
+    if config:
+        jupytext_formats = [
+            preferred_format(f, config.preferred_jupytext_formats_save)
+            for f in jupytext_formats
+        ]
+        config.set_default_format_options(jupytext_metadata)
 
     if not jupytext_metadata:
         metadata.pop("jupytext")
