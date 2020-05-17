@@ -19,7 +19,7 @@ except ImportError:
 from .jupytext import reads, writes
 from .jupytext import create_prefix_dir as create_prefix_dir_from_path
 from .combine import combine_inputs_with_outputs
-from .formats import rearrange_jupytext_metadata, check_file_version
+from .formats import check_file_version
 from .formats import long_form_multiple_formats
 from .formats import short_form_one_format, short_form_multiple_formats
 from .paired_paths import (
@@ -30,7 +30,12 @@ from .paired_paths import (
     InconsistentPath,
 )
 from .kernels import set_kernelspec_from_language
-from .config import JupytextConfiguration, preferred_format
+from .config import (
+    JupytextConfiguration,
+    preferred_format,
+    load_jupytext_config,
+    prepare_notebook_for_save,
+)
 
 
 def _jupytext_writes(fmt):
@@ -111,43 +116,10 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             path = path.strip("/")
             nbk = model["content"]
             try:
-                metadata = nbk.get("metadata")
-                rearrange_jupytext_metadata(metadata)
-                jupytext_metadata = metadata.setdefault("jupytext", {})
-                jupytext_formats = jupytext_metadata.get(
-                    "formats"
-                ) or self.default_formats(path)
-
-                if not jupytext_formats:
-                    text_representation = jupytext_metadata.get(
-                        "text_representation", {}
-                    )
-                    ext = os.path.splitext(path)[1]
-                    fmt = {"extension": ext}
-
-                    if ext == text_representation.get(
-                        "extension"
-                    ) and text_representation.get("format_name"):
-                        fmt["format_name"] = text_representation.get("format_name")
-
-                    jupytext_formats = [fmt]
-
-                jupytext_formats = long_form_multiple_formats(
-                    jupytext_formats, metadata, auto_ext_requires_language_info=False
-                )
-
-                # Set preferred formats if not format name is given yet
-                jupytext_formats = [
-                    preferred_format(f, self.preferred_jupytext_formats_save)
-                    for f in jupytext_formats
-                ]
-
+                config = self.get_config(path)
+                jupytext_formats = prepare_notebook_for_save(nbk, config, path)
                 base, fmt = find_base_path_and_format(path, jupytext_formats)
                 self.update_paired_notebooks(path, fmt, jupytext_formats)
-                self.set_default_format_options(jupytext_metadata)
-
-                if not jupytext_metadata:
-                    metadata.pop("jupytext")
 
                 # Save as ipynb first
                 return_value = None
@@ -222,11 +194,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     path, content, type, format
                 )
 
-            fmt = preferred_format(ext, self.preferred_jupytext_formats_read)
+            config = self.get_config(path)
+            fmt = preferred_format(ext, config.preferred_jupytext_formats_read)
             if ext == ".ipynb":
                 model = self._notebook_model(path, content=content)
             else:
-                self.set_default_format_options(fmt, read=True)
+                config.set_default_format_options(fmt, read=True)
                 with mock.patch("nbformat.reads", _jupytext_reads(fmt)):
                     model = self._notebook_model(path, content=content)
 
@@ -252,7 +225,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             nbk = model["content"]
             jupytext_formats = nbk.metadata.get("jupytext", {}).get(
                 "formats"
-            ) or self.default_formats(path)
+            ) or config.default_formats(path)
             jupytext_formats = long_form_multiple_formats(
                 jupytext_formats, nbk.metadata, auto_ext_requires_language_info=False
             )
@@ -274,7 +247,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             if len(alt_paths) > 1 and ext == ".ipynb":
                 # Apply default options (like saving and reloading would do)
                 jupytext_metadata = model["content"]["metadata"].get("jupytext", {})
-                self.set_default_format_options(jupytext_metadata, read=True)
+                config.set_default_format_options(jupytext_metadata, read=True)
                 if jupytext_metadata:
                     model["content"]["metadata"]["jupytext"] = jupytext_metadata
 
@@ -340,7 +313,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             try:
                 if model_outputs and model_outputs["last_modified"] > model[
                     "last_modified"
-                ] + timedelta(seconds=self.outdated_text_notebook_margin):
+                ] + timedelta(seconds=config.outdated_text_notebook_margin):
                     raise HTTPError(
                         400,
                         """{out} (last modified {out_last})
@@ -426,6 +399,10 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             self.drop_paired_notebook(old_path)
             self.update_paired_notebooks(new_path, fmt, formats)
+
+        def get_config(self, path):
+            nb_file = self._get_os_path(path.strip("/"))
+            return load_jupytext_config(nb_file) or self
 
     return JupytextContentsManager
 

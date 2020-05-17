@@ -8,6 +8,7 @@ from .formats import (
     NOTEBOOK_EXTENSIONS,
     long_form_one_format,
     long_form_multiple_formats,
+    rearrange_jupytext_metadata,
 )
 from .paired_paths import (
     base_path,
@@ -218,3 +219,40 @@ def load_jupytext_config(nb_file):
     if config_file is None:
         return None
     return load_jupytext_configuration_file(config_file)
+
+
+def prepare_notebook_for_save(nbk, config, path):
+    """Apply the given configuration to the notebook before saving it"""
+    metadata = nbk.get("metadata")
+    rearrange_jupytext_metadata(metadata)
+    jupytext_metadata = metadata.setdefault("jupytext", {})
+    jupytext_formats = jupytext_metadata.get("formats") or config.default_formats(path)
+
+    if not jupytext_formats:
+        text_representation = jupytext_metadata.get("text_representation", {})
+        ext = os.path.splitext(path)[1]
+        fmt = {"extension": ext}
+
+        if ext == text_representation.get("extension") and text_representation.get(
+            "format_name"
+        ):
+            fmt["format_name"] = text_representation.get("format_name")
+
+        jupytext_formats = [fmt]
+
+    jupytext_formats = long_form_multiple_formats(
+        jupytext_formats, metadata, auto_ext_requires_language_info=False
+    )
+
+    # Set preferred formats if not format name is given yet
+    jupytext_formats = [
+        preferred_format(f, config.preferred_jupytext_formats_save)
+        for f in jupytext_formats
+    ]
+
+    config.set_default_format_options(jupytext_metadata)
+
+    if not jupytext_metadata:
+        metadata.pop("jupytext")
+
+    return jupytext_formats
