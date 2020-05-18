@@ -280,3 +280,46 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
 
     assert "notebook.py" in git("ls-tree", "-r", "master", "--name-only")
     assert os.path.isfile(tmp_py)
+
+
+def test_pre_commit_hook_with_subfolders_issue_506(tmpdir):
+    """I have the following directory structure, where the nb/test.ipynb is paired with the py/test.py.
+
+    ├── nb
+    │   └── test.ipynb
+    └── py
+        └── test.py
+    """
+
+    nb_file = tmpdir.mkdir("nb").join("test.ipynb")
+    py_file = tmpdir.mkdir("py").join("test.py")
+
+    """The notebook and Python file are paired with "jupytext": {"formats": "py//py,nb//ipynb"}.
+        (using jupytext --set-formats py//py,nb//ipynb nb/test.ipynb)"""
+    write(
+        new_notebook(
+            cells=[new_markdown_cell("A Markdown cell")],
+            metadata={"jupytext": {"formats": "py//py,nb//ipynb"}},
+        ),
+        str(nb_file),
+    )
+
+    """This works fine when syncing with jupytext --sync nb/test.ipynb
+    but when syncing with jupytext --sync --pre-commit I get the following exception: (...)"""
+    git = git_in_tmpdir(tmpdir)
+    hook = str(tmpdir.join(".git/hooks/pre-commit"))
+    with open(hook, "w") as fp:
+        fp.write("#!/bin/sh\n" "jupytext --sync --pre-commit\n")
+
+    st = os.stat(hook)
+    os.chmod(hook, st.st_mode | stat.S_IEXEC)
+
+    assert not os.path.isfile(str(py_file))
+
+    git("add", "nb/test.ipynb")
+    git("status")
+    git("commit", "-m", "notebook created")
+    git("status")
+
+    assert os.path.isfile(str(py_file))
+    assert "A Markdown cell" in py_file.read()
