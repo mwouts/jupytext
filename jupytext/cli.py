@@ -27,6 +27,7 @@ from .paired_paths import (
     InconsistentPath,
     find_base_path_and_format,
 )
+from .pairs import write_pair
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference, compare
 from .config import load_jupytext_config, prepare_notebook_for_save
@@ -660,20 +661,17 @@ def jupytext_single_file(nb_file, args, log):
             inputs_nb_file = outputs_nb_file = None
         formats = notebook.metadata["jupytext"]["formats"]
 
-        for ipynb in [True, False]:
-            # Write first format last so that it is the most recent file
-            for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats)[::-1]:
-                # Write ipynb first for compatibility with our contents manager
-                if alt_path.endswith(".ipynb") != ipynb:
-                    continue
-                # Do not write the ipynb file if it was not modified
-                # But, always write text representations to make sure they are the most recent
-                if alt_path == inputs_nb_file and alt_path == outputs_nb_file:
-                    continue
-                log("[jupytext] Updating '{}'".format(alt_path))
-                write(notebook, alt_path, fmt=alt_fmt)
-                if args.pre_commit:
-                    system("git", "add", alt_path)
+        def write_function(path, fmt):
+            # Do not write the ipynb file if it was not modified
+            # But, always write text representations to make sure they are the most recent
+            if path == inputs_nb_file and path == outputs_nb_file:
+                return
+            log("[jupytext] Updating '{}'".format(path))
+            write(notebook, path, fmt=fmt)
+            if args.pre_commit:
+                system("git", "add", path)
+
+        write_pair(nb_file, formats, write_function)
     elif (
         os.path.isfile(nb_file)
         and nb_dest.endswith(".ipynb")
