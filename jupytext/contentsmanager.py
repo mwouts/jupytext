@@ -83,18 +83,19 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 if alt_path in self.paired_notebooks:
                     self.drop_paired_notebook(alt_path)
 
-        def update_paired_notebooks(self, path, fmt, formats):
+        def update_paired_notebooks(self, path, formats):
             """Update the list of paired notebooks to include/update the current pair"""
             if not formats:
                 self.drop_paired_notebook(path)
                 return
 
+            formats = long_form_multiple_formats(formats)
+            base, fmt = find_base_path_and_format(path, formats)
             new_paired_paths = paired_paths(path, fmt, formats)
             for alt_path, _ in new_paired_paths:
                 self.drop_paired_notebook(alt_path)
 
-            long_formats = long_form_multiple_formats(formats)
-            if len(long_formats) == 1 and set(long_formats[0]) <= {"extension"}:
+            if len(formats) == 1 and set(formats[0]) <= {"extension"}:
                 return
 
             short_formats = short_form_multiple_formats(formats)
@@ -119,7 +120,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 config = self.get_config(path)
                 jupytext_formats = prepare_notebook_for_save(nbk, config, path)
                 base, fmt = find_base_path_and_format(path, jupytext_formats)
-                self.update_paired_notebooks(path, fmt, jupytext_formats)
+                self.update_paired_notebooks(path, jupytext_formats)
 
                 # Save as ipynb first
                 return_value = None
@@ -236,7 +237,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 try:
                     _, fmt = find_base_path_and_format(path, jupytext_formats)
                     alt_paths = paired_paths(path, fmt, jupytext_formats)
-                    self.update_paired_notebooks(path, fmt, jupytext_formats)
+                    self.update_paired_notebooks(path, jupytext_formats)
                 except InconsistentPath as err:
                     self.log.info("Unable to read paired notebook: %s", str(err))
             else:
@@ -398,7 +399,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     )
 
             self.drop_paired_notebook(old_path)
-            self.update_paired_notebooks(new_path, fmt, formats)
+            self.update_paired_notebooks(new_path, formats)
 
         def get_config(self, path):
             nb_file = self._get_os_path(path.strip("/"))

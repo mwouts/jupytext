@@ -106,15 +106,15 @@ def test_cm_paired_paths():
     cm.paired_notebooks = dict()
 
     three = "ipynb,py,md"
-    cm.update_paired_notebooks("nb.ipynb", "ipynb", three)
+    cm.update_paired_notebooks("nb.ipynb", three)
     assert cm.paired_notebooks == {
         "nb." + fmt: (fmt, three) for fmt in three.split(",")
     }
 
     two = "ipynb,Rmd"
-    cm.update_paired_notebooks("nb.ipynb", "ipynb", two)
+    cm.update_paired_notebooks("nb.ipynb", two)
     assert cm.paired_notebooks == {"nb." + fmt: (fmt, two) for fmt in two.split(",")}
 
     one = "ipynb"
-    cm.update_paired_notebooks("nb.ipynb", "ipynb", one)
+    cm.update_paired_notebooks("nb.ipynb", one)
     assert cm.paired_notebooks == {}
