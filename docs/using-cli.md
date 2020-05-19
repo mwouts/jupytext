@@ -82,7 +82,7 @@ jupytext --from ipynb --pipe black --check flake8 --pre-commit
 jupytext --from ipynb --to python//py:light --pre-commit
 ```
 
-If you don't want notebooks to be committed (and only commit the representations), you can ask the pre-commit hook to unstage notebooks after conversion by adding the following line:
+If you don't want notebooks to be committed (and only commit the text representations), you can ask the pre-commit hook to unstage notebooks after conversion by adding the following line:
 ```bash
 git reset HEAD **/*.ipynb
 ```
