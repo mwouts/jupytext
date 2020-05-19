@@ -29,6 +29,7 @@ from .paired_paths import (
     full_path,
     InconsistentPath,
 )
+from .pairs import write_pair
 from .kernels import set_kernelspec_from_language
 from .config import (
     JupytextConfiguration,
@@ -119,31 +120,9 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             try:
                 config = self.get_config(path)
                 jupytext_formats = prepare_notebook_for_save(nbk, config, path)
-                base, fmt = find_base_path_and_format(path, jupytext_formats)
                 self.update_paired_notebooks(path, jupytext_formats)
 
-                # Save as ipynb first
-                return_value = None
-                value = None
-                for fmt in jupytext_formats[::-1]:
-                    if fmt["extension"] != ".ipynb":
-                        continue
-
-                    alt_path = full_path(base, fmt)
-                    self.create_prefix_dir(alt_path, fmt)
-                    self.log.info("Saving %s", os.path.basename(alt_path))
-                    value = super(JupytextContentsManager, self).save(model, alt_path)
-                    if alt_path == path:
-                        return_value = value
-
-                # And then to the other formats, in reverse order so that
-                # the first format is the most recent
-                for fmt in jupytext_formats[::-1]:
-                    if fmt["extension"] == ".ipynb":
-                        continue
-
-                    alt_path = full_path(base, fmt)
-                    self.create_prefix_dir(alt_path, fmt)
+                def save_one_file(path, fmt):
                     if "format_name" in fmt and fmt["extension"] not in [
                         ".md",
                         ".markdown",
@@ -151,22 +130,21 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     ]:
                         self.log.info(
                             "Saving %s in format %s:%s",
-                            os.path.basename(alt_path),
+                            os.path.basename(path),
                             fmt["extension"][1:],
                             fmt["format_name"],
                         )
                     else:
-                        self.log.info("Saving %s", os.path.basename(alt_path))
-                    with mock.patch("nbformat.writes", _jupytext_writes(fmt)):
-                        value = super(JupytextContentsManager, self).save(
-                            model, alt_path
-                        )
-                        if alt_path == path:
-                            return_value = value
+                        self.log.info("Saving %s", os.path.basename(path))
 
-                # Update modified timestamp to match that of the pair #207
-                return_value["last_modified"] = value["last_modified"]
-                return return_value
+                    self.create_prefix_dir(path, fmt)
+                    if fmt["extension"] == ".ipynb":
+                        return super(JupytextContentsManager, self).save(model, path)
+
+                    with mock.patch("nbformat.writes", _jupytext_writes(fmt)):
+                        return super(JupytextContentsManager, self).save(model, path)
+
+                return write_pair(path, jupytext_formats, save_one_file)
 
             except Exception as err:
                 raise HTTPError(400, str(err))
