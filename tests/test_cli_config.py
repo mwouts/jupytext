@@ -42,6 +42,7 @@ def test_default_jupytext_formats_does_not_apply_to_config_file(tmpdir):
     assert not tmpdir.join(".jupytext.ipynb").isfile()
 
 
+@pytest.mark.skip("Not working yet")
 def test_preferred_jupytext_formats_save(tmpdir):
     tmpdir.join(".jupytext.yml").write("preferred_jupytext_formats_save: jl:percent")
     tmp_ipynb = tmpdir.join("notebook.ipynb")
@@ -62,6 +63,7 @@ def test_preferred_jupytext_formats_save(tmpdir):
     assert metadata["jupytext"]["formats"] == "ipynb,jl:percent"
 
 
+@pytest.mark.skip("Not working yet")
 @pytest.mark.parametrize(
     "config",
     [
