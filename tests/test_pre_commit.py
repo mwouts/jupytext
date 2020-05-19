@@ -301,7 +301,7 @@ def test_pre_commit_hook_with_subfolders_issue_506(tmpdir):
             cells=[new_markdown_cell("A Markdown cell")],
             metadata={"jupytext": {"formats": "py//py,nb//ipynb"}},
         ),
-        str(nb_file),
+        str(py_file),
     )
 
     """This works fine when syncing with jupytext --sync nb/test.ipynb
@@ -314,12 +314,12 @@ def test_pre_commit_hook_with_subfolders_issue_506(tmpdir):
     st = os.stat(hook)
     os.chmod(hook, st.st_mode | stat.S_IEXEC)
 
-    assert not os.path.isfile(str(py_file))
+    assert not os.path.isfile(str(nb_file))
 
-    git("add", "nb/test.ipynb")
+    git("add", "py/test.py")
     git("status")
     git("commit", "-m", "notebook created")
     git("status")
 
-    assert os.path.isfile(str(py_file))
-    assert "A Markdown cell" in py_file.read()
+    assert os.path.isfile(str(nb_file))
+    assert read(str(nb_file)).cells[0].source == "A Markdown cell"
