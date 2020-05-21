@@ -60,7 +60,7 @@ If you want to preserve (or filter out) certain notebook or cell metadata, chang
 jupytext --to md --update-metadata '{"jupytext": {"notebook_metadata_filter":"all"}}' notebook.ipynb
 ```
 
-Read more on the default and possible values for the metadata filters in [this section](using-server.html#metadata-filtering).
+Read more on the default and possible values for the metadata filters in [this section](config.html#metadata-filtering).
 
 
 ## Jupytext as a Git pre-commit hook
@@ -139,7 +139,7 @@ jupytext --test --update notebook.ipynb --to py:percent
 Note that `jupytext --test` compares the resulting notebooks according to its expectations. If you wish to proceed to a strict comparison of the two notebooks, use `jupytext --test-strict`, and use the flag `-x` to report with more details on the first difference, if any.
 
 Please note that
-- Scripts opened with Jupyter have a default [metadata filter](using-server.html#metadata-filtering) that prevents additional notebook or cell
+- Scripts opened with Jupyter have a default [metadata filter](config.html#metadata-filtering) that prevents additional notebook or cell
 metadata to be added back to the script. Remove the filter if you want to store Jupytext's settings, or the kernel information, in the text file.
 - Cell metadata are available in the `light` and `percent` formats, as well as in the Markdown and R Markdown formats. R scripts in `spin` format support cell metadata for code cells only. Sphinx Gallery scripts in `sphinx` format do not support cell metadata.
-- By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in the sections for [notebook specific](using-server.html#per-notebook-configuration) and [global settings](using-server.html#metadata-filtering) for metadata filtering.
+- By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in the sections for [notebook specific](config.html#per-notebook-configuration) and [global settings](config.html#metadata-filtering) for metadata filtering.

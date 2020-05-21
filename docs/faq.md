@@ -14,7 +14,7 @@ Open the notebook that you want to version control. _Pair_ the notebook to a scr
 
 Save the notebook, and you get two copies of the notebook: the original `*.ipynb` file, together with its paired text representation.
 
-Read more about how to use Jupytext in the [documentation](using-server.md).
+Read more about how to use Jupytext in the [documentation](config.md).
 
 ## Which Jupytext format do you recommend?
 
