@@ -15,7 +15,7 @@ from .paired_paths import (
     InconsistentPath,
 )
 
-VALID_JUPYTEXT_CONFIGURATION_FILE_NAMES = [
+JUPYTEXT_CONFIG_FILES = [
     "jupytext",
     "jupytext.toml",
     "jupytext.yml",
@@ -24,9 +24,7 @@ VALID_JUPYTEXT_CONFIGURATION_FILE_NAMES = [
     "jupytext.py",
 ]
 
-VALID_JUPYTEXT_CONFIGURATION_FILE_NAMES.extend(
-    ["." + filename for filename in VALID_JUPYTEXT_CONFIGURATION_FILE_NAMES]
-)
+JUPYTEXT_CONFIG_FILES.extend(["." + filename for filename in JUPYTEXT_CONFIG_FILES])
 
 
 class JupytextConfiguration(Configurable):
@@ -95,7 +93,7 @@ class JupytextConfiguration(Configurable):
         1.0,
         help="Refuse to overwrite inputs of a ipynb notebooks with those of a "
         "text notebook when the text notebook plus margin is older than "
-        "the ipynb notebook",
+        "the ipynb notebook (NB: This option is ignored by Jupytext CLI)",
         config=True,
     )
 
@@ -171,21 +169,56 @@ def preferred_format(incomplete_format, preferred_formats):
     return incomplete_format
 
 
-def find_jupytext_configuration_file(path):
-    """Return the first jupytext configuration file in the current directory, or any parent directory"""
-    while not os.path.isdir(path):
-        parent = os.path.dirname(path)
-        if parent == path:
-            return None
-        path = parent
+def global_jupytext_configuration_directories():
+    """Return the directories in which Jupytext will search for a configuration file"""
 
-    for filename in VALID_JUPYTEXT_CONFIGURATION_FILE_NAMES:
-        full_path = os.path.join(path, filename)
-        if os.path.isfile(full_path):
-            return full_path
-    parent_dir = os.path.dirname(path)
-    if os.path.samefile(path, parent_dir):
+    config_dirs = []
+
+    if "XDG_CONFIG_HOME" in os.environ:
+        config_dirs.extend(os.environ["XDG_CONFIG_HOME"].split(":"))
+    elif "HOME" in os.environ:
+        config_dirs.append(os.path.join(os.environ["HOME"], ".config"))
+        config_dirs.append(os.environ["HOME"])
+
+    if "XDG_CONFIG_DIRS" in os.environ:
+        config_dirs.extend(os.environ["XDG_CONFIG_DIRS"].split(":"))
+    else:
+        config_dirs.extend(["/usr/local/share/", "/usr/share/"])
+
+    for config_dir in config_dirs:
+        for config_dir_jupytext_or_not in [
+            os.path.join(config_dir, "jupytext"),
+            config_dir,
+        ]:
+            yield config_dir_jupytext_or_not
+
+
+def find_global_jupytext_configuration_file():
+    """Return the global Jupytext configuration file, if any"""
+
+    for config_dir in global_jupytext_configuration_directories():
+        config_file = find_jupytext_configuration_file(config_dir, False)
+        if config_file:
+            return config_file
+
+    return None
+
+
+def find_jupytext_configuration_file(path, search_parent_dirs=True):
+    """Return the first jupytext configuration file in the current directory, or any parent directory"""
+    if os.path.isdir(path):
+        for filename in JUPYTEXT_CONFIG_FILES:
+            full_path = os.path.join(path, filename)
+            if os.path.isfile(full_path):
+                return full_path
+
+    if not search_parent_dirs:
         return None
+
+    parent_dir = os.path.dirname(path)
+    if parent_dir == path:
+        return find_global_jupytext_configuration_file()
+
     return find_jupytext_configuration_file(parent_dir)
 
 
