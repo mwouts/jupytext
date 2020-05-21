@@ -27,7 +27,7 @@ from .paired_paths import (
     InconsistentPath,
     find_base_path_and_format,
 )
-from .pairs import write_pair
+from .pairs import write_pair, latest_inputs_and_outputs, read_pair
 from .combine import combine_inputs_with_outputs
 from .compare import test_round_trip_conversion, NotebookDifference, compare
 from .config import load_jupytext_config, prepare_notebook_for_save
@@ -768,43 +768,26 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
     if not formats:
         raise NotAPairedNotebook("'{}' is not a paired notebook".format(nb_file))
 
-    max_mtime_inputs = None
-    max_mtime_outputs = None
-    latest_inputs = None
-    latest_outputs = None
-
-    jupytext_formats = long_form_multiple_formats(formats)
-    _, fmt_with_prefix_suffix = find_base_path_and_format(nb_file, jupytext_formats)
+    formats = long_form_multiple_formats(formats)
+    _, fmt_with_prefix_suffix = find_base_path_and_format(nb_file, formats)
     fmt.update(fmt_with_prefix_suffix)
 
-    for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats):
-        if not os.path.isfile(alt_path):
-            continue
-        info = os.lstat(alt_path)
-        if not max_mtime_inputs or info.st_mtime > max_mtime_inputs:
-            max_mtime_inputs = info.st_mtime
-            latest_inputs, input_fmt = alt_path, alt_fmt
+    def get_timestamp(path):
+        if not os.path.isfile(path):
+            return None
+        return os.lstat(path).st_mtime
 
-        if alt_path.endswith(".ipynb"):
-            if not max_mtime_outputs or info.st_mtime > max_mtime_outputs:
-                max_mtime_outputs = info.st_mtime
-                latest_outputs = alt_path
+    def read_one_file(path, fmt):
+        if path == nb_file:
+            return notebook
 
-    if latest_outputs and latest_outputs != latest_inputs:
-        log("[jupytext] Loading input cells from '{}'".format(latest_inputs))
-        inputs = (
-            notebook if latest_inputs == nb_file else read(latest_inputs, fmt=input_fmt)
-        )
-        check_file_version(inputs, latest_inputs, latest_outputs)
-        log("[jupytext] Loading output cells from '{}'".format(latest_outputs))
-        outputs = notebook if latest_outputs == nb_file else read(latest_outputs)
-        combine_inputs_with_outputs(inputs, outputs, fmt=input_fmt)
-        return inputs, latest_inputs, latest_outputs
+        log("[jupytext] Loading '{}'".format(path))
+        return read(path, fmt=fmt)
 
-    log("[jupytext] Loading notebook from '{}'".format(latest_inputs))
-    if latest_inputs != nb_file:
-        notebook = read(latest_inputs, fmt=input_fmt)
-    return notebook, latest_inputs, latest_outputs
+    inputs, outputs = latest_inputs_and_outputs(nb_file, fmt, formats, get_timestamp)
+    notebook = read_pair(inputs, outputs, read_one_file)
+
+    return notebook, inputs.path, outputs.path
 
 
 def exec_command(command, input=None, capture=False):
