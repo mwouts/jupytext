@@ -6,7 +6,10 @@ from jupytext.header import header_to_metadata_and_cell
 
 
 def test_default_jupytext_formats(tmpdir):
-    tmpdir.join(".jupytext").write('default_jupytext_formats = "ipynb,py"')
+    tmpdir.join(".jupytext").write(
+        '''# Default pairing
+default_jupytext_formats = "ipynb,py"'''
+    )
     test = tmpdir.join("test.py")
     test.write("1 + 1\n")
 
