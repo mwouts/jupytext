@@ -18,8 +18,6 @@ except ImportError:
 
 from .jupytext import reads, writes
 from .jupytext import create_prefix_dir as create_prefix_dir_from_path
-from .combine import combine_inputs_with_outputs
-from .formats import check_file_version
 from .formats import long_form_multiple_formats
 from .formats import short_form_one_format, short_form_multiple_formats
 from .paired_paths import (
@@ -29,7 +27,7 @@ from .paired_paths import (
     full_path,
     InconsistentPath,
 )
-from .pairs import write_pair
+from .pairs import write_pair, read_pair, latest_inputs_and_outputs
 from .kernels import set_kernelspec_from_language
 from .config import (
     JupytextConfiguration,
@@ -202,26 +200,27 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             # We will now read a second file if this is a paired notebooks.
             nbk = model["content"]
-            jupytext_formats = nbk.metadata.get("jupytext", {}).get(
+            formats = nbk.metadata.get("jupytext", {}).get(
                 "formats"
             ) or config.default_formats(path)
-            jupytext_formats = long_form_multiple_formats(
-                jupytext_formats, nbk.metadata, auto_ext_requires_language_info=False
+            formats = long_form_multiple_formats(
+                formats, nbk.metadata, auto_ext_requires_language_info=False
             )
 
             # Compute paired notebooks from formats
             alt_paths = [(path, fmt)]
-            if jupytext_formats:
+            if formats:
                 try:
-                    _, fmt = find_base_path_and_format(path, jupytext_formats)
-                    alt_paths = paired_paths(path, fmt, jupytext_formats)
-                    self.update_paired_notebooks(path, jupytext_formats)
+                    _, fmt = find_base_path_and_format(path, formats)
+                    alt_paths = paired_paths(path, fmt, formats)
+                    self.update_paired_notebooks(path, formats)
                 except InconsistentPath as err:
                     self.log.info("Unable to read paired notebook: %s", str(err))
             else:
                 if path in self.paired_notebooks:
                     fmt, formats = self.paired_notebooks.get(path)
                     alt_paths = paired_paths(path, fmt, formats)
+                    formats = long_form_multiple_formats(formats)
 
             if len(alt_paths) > 1 and ext == ".ipynb":
                 # Apply default options (like saving and reloading would do)
@@ -230,69 +229,38 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 if jupytext_metadata:
                     model["content"]["metadata"]["jupytext"] = jupytext_metadata
 
-            org_model = model
-            fmt_inputs = fmt
-            path_inputs = path_outputs = path
-            model_outputs = None
+            def get_timestamp(alt_path):
+                if not self.exists(alt_path):
+                    return None
+                if alt_path == path:
+                    model["last_modified"]
+                return self._notebook_model(alt_path, content=False)["last_modified"]
 
-            # Source format is the most recent non ipynb format found on disk
-            if path.endswith(".ipynb"):
-                source_timestamps = {}
-                for alt_path, alt_fmt in alt_paths:
-                    if not alt_path.endswith(".ipynb") and self.exists(alt_path):
-                        source_timestamps[alt_path] = self._notebook_model(
-                            alt_path, content=False
-                        )["last_modified"]
+            def read_one_file(alt_path, alt_fmt):
+                if alt_path == path:
+                    return model["content"]
+                if alt_path.endswith(".ipynb"):
+                    self.log.info(u"Reading OUTPUTS from {}".format(alt_path))
+                    return self._notebook_model(alt_path, content=True)["content"]
 
-                most_recent_timestamp = None
-                for alt_path in source_timestamps:
-                    alt_ts = source_timestamps[alt_path]
-                    if len(source_timestamps) > 1:
-                        self.log.info(
-                            u"File {} was last modified at {}".format(alt_path, alt_ts)
-                        )
-                    if most_recent_timestamp is None or alt_ts > most_recent_timestamp:
-                        most_recent_timestamp = alt_ts
-                        model_outputs = model
-                        path_inputs = alt_path
-                        fmt_inputs = alt_fmt
+                self.log.info(u"Reading SOURCE from {}".format(alt_path))
+                config.set_default_format_options(alt_fmt, read=True)
+                with mock.patch("nbformat.reads", _jupytext_reads(alt_fmt)):
+                    return self._notebook_model(alt_path, content=True)["content"]
 
-                if most_recent_timestamp is not None:
-                    self.log.info(u"Reading SOURCE from {}".format(path_inputs))
-                    model = self.get(
-                        path_inputs,
-                        content=content,
-                        type="notebook",
-                        format=format,
-                        load_alternative_format=False,
-                    )
-
-            # Outputs taken from ipynb if in group, if file exists
-            else:
-                for alt_path, _ in alt_paths:
-                    if alt_path.endswith(".ipynb") and self.exists(alt_path):
-                        self.log.info(u"Reading OUTPUTS from {}".format(alt_path))
-                        path_outputs = alt_path
-                        model_outputs = self.get(
-                            alt_path,
-                            content=content,
-                            type="notebook",
-                            format=format,
-                            load_alternative_format=False,
-                        )
-                        break
-
-            try:
-                check_file_version(model["content"], path_inputs, path_outputs)
-            except Exception as err:
-                raise HTTPError(400, str(err))
+            inputs, outputs = latest_inputs_and_outputs(
+                path, fmt, formats, get_timestamp, contents_manager_mode=True
+            )
 
             # Before we combine the two files, we make sure we're not overwriting ipynb cells
             # with an outdated text file
             try:
-                if model_outputs and model_outputs["last_modified"] > model[
-                    "last_modified"
-                ] + timedelta(seconds=config.outdated_text_notebook_margin):
+                if (
+                    outputs.timestamp
+                    and outputs.timestamp
+                    > inputs.timestamp
+                    + timedelta(seconds=config.outdated_text_notebook_margin)
+                ):
                     raise HTTPError(
                         400,
                         """{out} (last modified {out_last})
@@ -304,20 +272,21 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                             c.ContentsManager.outdated_text_notebook_margin = 5 # in seconds # or float("inf")
                         to your .jupyter/jupyter_notebook_config.py file
                         """.format(
-                            src=path_inputs,
-                            src_last=model["last_modified"],
-                            out=path_outputs,
-                            out_last=model_outputs["last_modified"],
+                            src=inputs.path,
+                            src_last=inputs.timestamp,
+                            out=outputs.path,
+                            out_last=outputs.timestamp,
                         ),
                     )
             except OverflowError:
                 pass
 
-            if model_outputs:
-                combine_inputs_with_outputs(
-                    model["content"], model_outputs["content"], fmt_inputs
-                )
-            elif not path.endswith(".ipynb"):
+            try:
+                model["content"] = read_pair(inputs, outputs, read_one_file)
+            except Exception as err:
+                raise HTTPError(400, str(err))
+
+            if not outputs.timestamp:
                 set_kernelspec_from_language(model["content"])
 
             # Trust code cells when they have no output
@@ -328,10 +297,6 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     and cell.metadata.get("trusted") is False
                 ):
                     cell.metadata["trusted"] = True
-
-            # Path and name of the notebook is the one of the original path
-            model["path"] = org_model["path"]
-            model["name"] = org_model["name"]
 
             return model
 

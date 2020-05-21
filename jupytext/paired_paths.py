@@ -62,13 +62,32 @@ def base_path(main_path, fmt):
         notebook_file_name = notebook_file_name[len(prefix_file_name) :]
 
     if prefix_dir:
-        if not notebook_dir.endswith(prefix_dir):
-            raise InconsistentPath(
-                u"Notebook directory '{}' was expected to end with directory prefix '{}'".format(
-                    notebook_dir, prefix_dir
+        parent_notebook_dir = notebook_dir
+        parent_prefix_dir = prefix_dir
+        actual_folders = list()
+        while parent_prefix_dir:
+            parent_prefix_dir, expected_folder = os.path.split(parent_prefix_dir)
+            if expected_folder == "..":
+                if not actual_folders:
+                    raise InconsistentPath(
+                        u"Notebook directory '{}' does not match prefix '{}'".format(
+                            notebook_dir, prefix_dir
+                        )
+                    )
+                parent_notebook_dir = os.path.join(
+                    parent_notebook_dir, actual_folders.pop()
                 )
-            )
-        notebook_dir = notebook_dir[: -len(prefix_dir)]
+            else:
+                parent_notebook_dir, actual_folder = os.path.split(parent_notebook_dir)
+                actual_folders.append(actual_folder)
+
+                if actual_folder != expected_folder:
+                    raise InconsistentPath(
+                        u"Notebook directory '{}' does not match prefix '{}'".format(
+                            notebook_dir, prefix_dir
+                        )
+                    )
+        notebook_dir = parent_notebook_dir
 
     if not notebook_dir:
         return notebook_file_name
@@ -100,9 +119,15 @@ def full_path(base, fmt):
             notebook_file_name = prefix_file_name + notebook_file_name
 
         if prefix_dir:
+            dotdot = ".." + sep
+            while prefix_dir.startswith(dotdot):
+                prefix_dir = prefix_dir[len(dotdot) :]
+                notebook_dir = os.path.dirname(notebook_dir)
+
             # Do not add a path separator when notebook_dir is '/'
             if notebook_dir and not notebook_dir.endswith(sep):
                 notebook_dir = notebook_dir + sep
+
             notebook_dir = notebook_dir + prefix_dir
 
         if notebook_dir and not notebook_dir.endswith(sep):
