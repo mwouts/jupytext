@@ -558,15 +558,13 @@ def jupytext_single_file(nb_file, args, log):
         log("[jupytext] Executing notebook with kernel {}".format(kernel_name))
         exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
         if nb_dest is not None and nb_dest != "-":
+
             resources = {"metadata": {"path": str(os.path.dirname(nb_dest))}}
         elif nb_file != "-":
             resources = {"metadata": {"path": str(os.path.dirname(nb_file))}}
         else:
             resources = {}
         exec_proc.preprocess(notebook, resources=resources)
-
-    if nb_dest != "-":
-        prepare_notebook_for_save(notebook, config, nb_dest)
 
     # III. ### Possible actions ###
     modified = args.update_metadata or args.pipe or args.execute
@@ -659,7 +657,6 @@ def jupytext_single_file(nb_file, args, log):
         # Also update the original notebook if the notebook was modified
         if modified:
             inputs_nb_file = outputs_nb_file = None
-        formats = notebook.metadata["jupytext"]["formats"]
 
         def write_function(path, fmt):
             # Do not write the ipynb file if it was not modified
@@ -671,6 +668,7 @@ def jupytext_single_file(nb_file, args, log):
             if args.pre_commit:
                 system("git", "add", path)
 
+        formats = prepare_notebook_for_save(notebook, config, nb_file)
         write_pair(nb_file, formats, write_function)
     elif (
         os.path.isfile(nb_file)
