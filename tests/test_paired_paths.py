@@ -1,7 +1,7 @@
 import pytest
 from jupytext.compare import compare
 from jupytext.contentsmanager import TextFileContentsManager
-from jupytext.paired_paths import InconsistentPath, paired_paths, base_path
+from jupytext.paired_paths import InconsistentPath, paired_paths, base_path, full_path
 from jupytext.formats import (
     long_form_one_format,
     long_form_multiple_formats,
@@ -26,6 +26,16 @@ def test_base_path():
     assert base_path("dir/prefix_NAME.ipynb", fmt) == "NAME"
     with pytest.raises(InconsistentPath):
         base_path("dir/incorrect_prefix_NAME.ipynb", fmt)
+
+
+def test_base_path_dotdot():
+    fmt = long_form_one_format("../scripts//py")
+    assert base_path("scripts/test.py", fmt=fmt) == "scripts/test"
+
+
+def test_full_path_dotdot():
+    fmt = long_form_one_format("../scripts//py")
+    assert full_path("scripts/test", fmt=fmt) == "scripts/test.py"
 
 
 def test_many_and_suffix():
