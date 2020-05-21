@@ -228,35 +228,32 @@ def prepare_notebook_for_save(nbk, config, path):
     metadata = nbk.get("metadata")
     rearrange_jupytext_metadata(metadata)
     jupytext_metadata = metadata.setdefault("jupytext", {})
-    jupytext_formats = jupytext_metadata.get("formats") or (
+    formats = jupytext_metadata.get("formats") or (
         config.default_formats(path) if config else None
     )
 
-    if not jupytext_formats:
-        text_representation = jupytext_metadata.get("text_representation", {})
+    if not formats:
+        text_repr = jupytext_metadata.get("text_representation", {})
         ext = os.path.splitext(path)[1]
         fmt = {"extension": ext}
 
-        if ext == text_representation.get("extension") and text_representation.get(
-            "format_name"
-        ):
-            fmt["format_name"] = text_representation.get("format_name")
+        if ext == text_repr.get("extension") and text_repr.get("format_name"):
+            fmt["format_name"] = text_repr.get("format_name")
 
-        jupytext_formats = [fmt]
+        formats = [fmt]
 
-    jupytext_formats = long_form_multiple_formats(
-        jupytext_formats, metadata, auto_ext_requires_language_info=False
+    formats = long_form_multiple_formats(
+        formats, metadata, auto_ext_requires_language_info=False
     )
 
     # Set preferred formats if not format name is given yet
     if config:
-        jupytext_formats = [
-            preferred_format(f, config.preferred_jupytext_formats_save)
-            for f in jupytext_formats
+        formats = [
+            preferred_format(f, config.preferred_jupytext_formats_save) for f in formats
         ]
         config.set_default_format_options(jupytext_metadata)
 
     if not jupytext_metadata:
         metadata.pop("jupytext")
 
-    return jupytext_formats
+    return formats
