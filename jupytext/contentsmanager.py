@@ -70,7 +70,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             # Configuration cache, useful when notebooks are listed in a given directory
             self.cached_config = namedtuple("cached_config", "path timestamp config")
 
-            return super(JupytextContentsManager, self).__init__(**kwargs)
+            super(JupytextContentsManager, self).__init__(**kwargs)
 
         def all_nb_extensions(self):
             """All extensions that should be classified as notebooks"""
@@ -97,7 +97,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 return
 
             formats = long_form_multiple_formats(formats)
-            base, fmt = find_base_path_and_format(path, formats)
+            _, fmt = find_base_path_and_format(path, formats)
             new_paired_paths = paired_paths(path, fmt, formats)
             for alt_path, _ in new_paired_paths:
                 self.drop_paired_notebook(alt_path)
@@ -241,7 +241,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 if not self.exists(alt_path):
                     return None
                 if alt_path == path:
-                    model["last_modified"]
+                    return model["last_modified"]
                 return self._notebook_model(alt_path, content=False)["last_modified"]
 
             def read_one_file(alt_path, alt_fmt):
@@ -353,6 +353,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             self.update_paired_notebooks(new_path, formats)
 
         def get_config(self, path):
+            """Return the Jupytext configuration for the given path"""
             nb_file = self._get_os_path(path.strip("/"))
             parent_dir = os.path.dirname(nb_file)
 

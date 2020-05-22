@@ -1,3 +1,5 @@
+"""Functions to read or write paired notebooks"""
+
 from collections import namedtuple
 from .formats import (
     long_form_one_format,
@@ -77,16 +79,16 @@ def latest_inputs_and_outputs(
             ):
                 continue
 
-        ts = get_timestamp(alt_path)
-        if ts is None:
+        timestamp = get_timestamp(alt_path)
+        if timestamp is None:
             continue
 
         if alt_fmt["extension"] == ".ipynb":
-            if not timestamp_outputs or ts > timestamp_outputs:
-                timestamp_outputs = ts
+            if not timestamp_outputs or timestamp > timestamp_outputs:
+                timestamp_outputs = timestamp
                 outputs_path, output_fmt = alt_path, alt_fmt
-        elif not timestamp_inputs or ts > timestamp_inputs:
-            timestamp_inputs = ts
+        elif not timestamp_inputs or timestamp > timestamp_inputs:
+            timestamp_inputs = timestamp
             inputs_path, input_fmt = alt_path, alt_fmt
 
     if not timestamp_inputs or (
@@ -104,7 +106,7 @@ def latest_inputs_and_outputs(
 
 
 def read_pair(inputs, outputs, read_one_file):
-
+    """Read a notebook given its inputs and outputs path and formats"""
     if not outputs.path or outputs.path == inputs.path:
         return read_one_file(inputs.path, inputs.fmt)
 

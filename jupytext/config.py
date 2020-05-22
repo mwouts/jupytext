@@ -33,6 +33,8 @@ JUPYTEXT_CEILING_DIRECTORIES = [
 
 
 class JupytextConfiguration(Configurable):
+    """Jupytext Configuration's options"""
+
     default_jupytext_formats = Unicode(
         u"",
         help="Save notebooks to these file extensions. "
@@ -242,8 +244,8 @@ def load_jupytext_configuration_file(jupytext_config_file):
         return JupytextConfiguration(**config)
 
     if jupytext_config_file.endswith((".yml", ".yaml")):
-        with open(jupytext_config_file) as fp:
-            config = yaml.safe_load(fp)
+        with open(jupytext_config_file) as stream:
+            config = yaml.safe_load(stream)
         return JupytextConfiguration(**config)
 
     if jupytext_config_file.endswith(".py"):
