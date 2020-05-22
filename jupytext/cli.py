@@ -66,49 +66,43 @@ def str2bool(value):
 def parse_jupytext_args(args=None):
     """Command line parser for jupytext"""
 
-    class RawTextArgumentDefaultsHelpFormatter(
-        argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter
-    ):
-        """Keep the raw formatting in command line help, plus show the default values"""
-
     parser = argparse.ArgumentParser(
         description="Jupyter Notebooks as Markdown Documents, Julia, Python or R Scripts",
-        formatter_class=RawTextArgumentDefaultsHelpFormatter,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
     # Input
     parser.add_argument(
         "notebooks",
-        help="One or more notebook(s).\n"
-        "Notebook is read from stdin when this argument\n"
-        "is empty.",
+        help="One or more notebook(s). "
+        "Notebook is read from stdin when this argument is empty.",
         nargs="*",
     )
     parser.add_argument(
         "--from",
         dest="input_format",
-        help="Jupytext format for the input(s). Inferred from the\n"
+        help="Jupytext format for the input(s). Inferred from the "
         "file extension and content when missing.",
     )
     parser.add_argument(
         "--pre-commit",
         action="store_true",
-        help="Ignore the notebook argument, and instead apply Jupytext\n"
-        "on the notebooks found in the git index, which have an\n"
-        "extension that matches the (optional) --from argument.\n",
+        help="Ignore the notebook argument, and instead apply Jupytext "
+        "on the notebooks found in the git index, which have an "
+        "extension that matches the (optional) --from argument.",
     )
     # Destination format & act on metadata
     parser.add_argument(
         "--to",
         help=(
-            "Destination format: either 'notebook' (extension .ipynb),\n"
-            "'markdown' (.md), 'rmarkdown' (.Rmd), 'script', a supported\n"
-            "extension, or an explicit extension/format description\n"
-            "[prefix_path//][suffix.]ext[:format_name], where\n"
-            + "- ext is one of {}, or auto\n".format(
+            "Destination format: either 'notebook' (extension .ipynb), "
+            "'markdown' (.md), 'rmarkdown' (.Rmd), 'script', a supported "
+            "extension, or an explicit extension/format description "
+            "[[root_folder/][path/][prefix]/][suffix.]ext[:format_name], where "
+            + "ext is one of {}, or auto,".format(
                 ", ".join(ext[1:] for ext in NOTEBOOK_EXTENSIONS)
             )
-            + "- format_name is optional, and can be {} for Markdown\nfiles, and ".format(
+            + "format_name is optional, and can be {} for Markdown files, and ".format(
                 " or ".join(
                     set(
                         fmt.format_name
@@ -117,7 +111,7 @@ def parse_jupytext_args(args=None):
                     )
                 )
             )
-            + "{} for scripts.\n".format(
+            + "{} for scripts. ".format(
                 ", ".join(
                     set(
                         fmt.format_name
@@ -126,56 +120,50 @@ def parse_jupytext_args(args=None):
                     )
                 )
             )
-            + "The default format for scripts is the 'light' format,\n"
-            "which uses few cell markers (none when possible).\n"
-            "Alternatively, a format compatible with many editors is the\n"
-            "'percent' format, which uses '# %%%%' as cell markers\n"
-            "The main formats (markdown, light, percent) preserve\n"
-            "notebooks and text documents in a roundtrip. Use the\n"
-            "--test and and --test-strict commands to test the roundtrip\n"
-            "on your files.\n"
-            "Read more about the available formats at\n"
-            "https://jupytext.readthedocs.io/en/latest/formats.html\n"
+            + "The default format for scripts is the 'light' format, "
+            "which uses few cell markers (none when possible). "
+            "Alternatively, a format compatible with many editors is the "
+            "'percent' format, which uses '# %%%%' as cell markers "
+            "The main formats (markdown, light, percent) preserve "
+            "notebooks and text documents in a roundtrip. Use the "
+            "--test and and --test-strict commands to test the roundtrip on your files. "
+            "Read more about the available formats at "
+            "https://jupytext.readthedocs.io/en/latest/formats.html"
         ),
     )
     parser.add_argument(
         "--format-options",
         "--opt",
         action="append",
-        help="Set format options with e.g.\n"
-        "    --opt comment_magics=true\n"
-        "    --opt notebook_metadata_filter=-kernelspec.\n",
+        help="Set format options with e.g. "
+        "'--opt comment_magics=true' or '--opt notebook_metadata_filter=-kernelspec'.",
     )
     parser.add_argument(
         "--set-formats",
         type=str,
-        help="Set jupytext.formats metadata to the given value. Use this to\n"
-        "activate pairing on a notebook, with e.g.\n"
-        "    --set-formats ipynb,py:light.\n"
-        "The --set-formats option also triggers the creation/update\n"
-        "of all paired files",
+        help="Set jupytext.formats metadata to the given value. Use this to "
+        "activate pairing on a notebook, with e.g. '--set-formats ipynb,py:light'. "
+        "The --set-formats option also triggers the creation/update of all paired files",
     )
     parser.add_argument(
         "--set-kernel",
         "-k",
         type=str,
-        help="Set the kernel with the given name on the notebook.\n"
-        "Use\n"
-        "    --set-kernel -\n"
-        "to set a kernel matching the current\n"
-        "environment on Python notebooks, and matching the notebook\n"
-        "language otherwise (get the list of available kernels with\n"
+        help="Set the kernel with the given name on the notebook. "
+        "Use '--set-kernel -' to set a kernel matching the current "
+        "environment on Python notebooks, and matching the notebook "
+        "language otherwise (get the list of available kernels with "
         "'jupyter kernelspec list')",
     )
     parser.add_argument(
         "--update-metadata",
         default={},
         type=json.loads,
-        help="Update the notebook metadata with the desired dictionary.\n"
-        "Argument must be given in JSON format. For instance, if you\n"
-        "want to activate a pairing in the generated file, use e.g.\n"
-        """    --update-metadata '{"jupytext":{"formats":"ipynb,py:light"}}'\n"""
-        "See also the '--opt' and '--set-formats' options for other ways\n"
+        help="Update the notebook metadata with the desired dictionary. "
+        "Argument must be given in JSON format. For instance, if you "
+        "want to activate a pairing in the generated file, use e.g. "
+        """--update-metadata '{"jupytext":{"formats":"ipynb,py:light"}}' """
+        "See also the --opt and --set-formats options for other ways "
         "to operate on the Jupytext metadata.",
     )
 
@@ -183,15 +171,15 @@ def parse_jupytext_args(args=None):
     parser.add_argument(
         "-o",
         "--output",
-        help="Destination file. Defaults to the original file,\n"
-        "with prefix/suffix/extension changed according to\n"
-        "the destination format.\n"
+        help="Destination file. Defaults to the original file, "
+        "with prefix/suffix/extension changed according to "
+        "the destination format. "
         "Use '-' to print the notebook on stdout.",
     )
     parser.add_argument(
         "--update",
         action="store_true",
-        help="Preserve the output cells when the destination\n"
+        help="Preserve the output cells when the destination "
         "notebook is a .ipynb file that already exists",
     )
 
@@ -206,16 +194,15 @@ def parse_jupytext_args(args=None):
     action.add_argument(
         "--paired-paths",
         "-p",
-        help="List the locations of the alternative representations\n"
-        "for this notebook.",
+        help="List the locations of the alternative representations for this notebook.",
         action="store_true",
     )
     action.add_argument(
         "--sync",
         "-s",
-        help="Synchronize the content of the paired representations of\n"
-        "the given notebook. Input cells are taken from the file that\n"
-        "was last modified, and outputs are read from the ipynb file,\n"
+        help="Synchronize the content of the paired representations of "
+        "the given notebook. Input cells are taken from the file that "
+        "was last modified, and outputs are read from the ipynb file, "
         "if present.",
         action="store_true",
     )
@@ -223,62 +210,61 @@ def parse_jupytext_args(args=None):
         "--warn-only",
         "-w",
         action="store_true",
-        help="Only issue a warning and continue processing other notebooks\n"
+        help="Only issue a warning and continue processing other notebooks "
         "when the conversion of a given notebook fails",
     )
     action.add_argument(
         "--test",
         action="store_true",
-        help="Test that notebook is stable under a round trip conversion,\n"
+        help="Test that notebook is stable under a round trip conversion, "
         "up to the expected changes",
     )
     action.add_argument(
         "--test-strict",
         action="store_true",
-        help="Test that notebook is strictly stable under a round trip\n" "conversion",
+        help="Test that notebook is strictly stable under a round trip conversion",
     )
     parser.add_argument(
         "--stop",
         "-x",
         dest="stop_on_first_error",
         action="store_true",
-        help="In --test mode, stop on first round trip conversion error, and report\n"
-        "stack traceback",
+        help="In --test mode, stop on first round trip conversion error, and report stack traceback",
     )
 
     # Pipe notebook inputs into other commands
     parser.add_argument(
         "--pipe",
         action="append",
-        help="Pipe the text representation (in format --pipe-fmt) of the notebook into\n"
-        "another program, and read the notebook back. For instance, reformat\n"
-        "your notebook with:\n"
-        "    jupytext notebook.ipynb --pipe black\n"
-        "If you want to reformat it and sync the paired representation, execute:\n"
-        "    jupytext notebook.ipynb --sync --pipe black\n"
-        "In case the program that you want to execute does not accept pipes, use {}\n"
-        "as a placeholder for a temporary file name into which jupytext will\n"
-        "write the text representation of the notebook, e.g.:\n"
-        "    jupytext notebook.ipynb --pipe 'black {}'\n",
+        help="Pipe the text representation (in format --pipe-fmt) of the notebook into "
+        "another program, and read the notebook back. For instance, reformat "
+        "your notebook with: "
+        "'jupytext notebook.ipynb --pipe black' "
+        "If you want to reformat it and sync the paired representation, execute: "
+        "'jupytext notebook.ipynb --sync --pipe black' "
+        "In case the program that you want to execute does not accept pipes, use {} "
+        "as a placeholder for a temporary file name into which jupytext will "
+        "write the text representation of the notebook, e.g.: "
+        "jupytext notebook.ipynb --pipe 'black {}'",
     )
     parser.add_argument(
         "--check",
         action="append",
-        help="Pipe the text representation (in format --pipe-fmt) of the notebook into\n"
-        "another program, and test that the returned value is non zero. For\n"
-        "instance, test that your notebook is pep8 compliant with:\n"
-        "    jupytext notebook.ipynb --check flake8\n"
-        "or run pytest on your notebook with:\n"
-        "    jupytext notebook.ipynb --check pytest\n"
-        "In case the program that you want to execute does not accept pipes, use {}\n"
-        "as a placeholder for a temporary file name into which jupytext will\n"
-        "write the text representation of the notebook, e.g.:\n"
-        "    jupytext notebook.ipynb --check 'pytest {}'\n",
+        help="Pipe the text representation (in format --pipe-fmt) of the notebook into "
+        "another program, and test that the returned value is non zero. For "
+        "instance, test that your notebook is pep8 compliant with: "
+        "'jupytext notebook.ipynb --check flake8' "
+        "or run pytest on your notebook with: "
+        "'jupytext notebook.ipynb --check pytest' "
+        "In case the program that you want to execute does not accept pipes, use {} "
+        "as a placeholder for a temporary file name into which jupytext will "
+        "write the text representation of the notebook, e.g.: "
+        "jupytext notebook.ipynb --check 'pytest {}'",
     )
     parser.add_argument(
         "--pipe-fmt",
         default="auto:percent",
-        help="The format in which the notebook should be piped to other programs,\n"
+        help="The format in which the notebook should be piped to other programs, "
         "when using the --pipe and/or --check commands.",
     )
 
@@ -294,7 +280,7 @@ def parse_jupytext_args(args=None):
         "-q",
         action="store_true",
         default=False,
-        help="Quiet mode: do not comment about files being updated\n" "or created",
+        help="Quiet mode: do not comment about files being updated or created",
     )
 
     return parser.parse_args(args)
