@@ -25,6 +25,11 @@ JUPYTEXT_CONFIG_FILES = [
 ]
 
 JUPYTEXT_CONFIG_FILES.extend(["." + filename for filename in JUPYTEXT_CONFIG_FILES])
+JUPYTEXT_CEILING_DIRECTORIES = [
+    path
+    for path in os.environ.get("JUPYTEXT_CEILING_DIRECTORIES", "").split(":")
+    if path
+]
 
 
 class JupytextConfiguration(Configurable):
@@ -214,6 +219,11 @@ def find_jupytext_configuration_file(path, search_parent_dirs=True):
 
     if not search_parent_dirs:
         return None
+
+    if JUPYTEXT_CEILING_DIRECTORIES and os.path.isdir(path):
+        for ceiling_dir in JUPYTEXT_CEILING_DIRECTORIES:
+            if os.path.isdir(ceiling_dir) and os.path.samefile(path, ceiling_dir):
+                return None
 
     parent_dir = os.path.dirname(path)
     if parent_dir == path:

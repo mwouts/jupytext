@@ -40,6 +40,10 @@ from jupytext.config import find_jupytext_configuration_file
 find_jupytext_configuration_file('.')
 ```
 
+If you want to limit the search for a configuration file to a certain set of directories, set the search boundaries with a global variable `JUPYTEXT_CEILING_DIRECTORIES` - a colon-separated list of absolute paths.
+
+If set, Jupytext will stop searching for configuration files when it meets one of these path. This can be helpful to avoid searching for configuration files on slow filesystems. It can also be useful if you don't want to use a global configuration - for instance, when running `pytest` on Jupytext, we use `JUPYTEXT_CEILING_DIRECTORIES="/tmp"`.
+
 ## Configuring paired notebooks globally
 
 Say you want to always associate every `.ipynb` notebook with a `.md` file  (and reciprocally). This is done by adding the following to your `jupytext.toml` or `.jupytext.toml` Jupyter configuration file:
