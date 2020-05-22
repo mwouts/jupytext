@@ -20,7 +20,7 @@ Jupytext accepts a few additional options. These options should be added to the 
 - `notebook_metadata_filter`: By default, Jupytext only exports the `kernelspec` and `jupytext` metadata to the text files. Set `"jupytext": {"notebook_metadata_filter": "-all"}` if you want that the script has no notebook metadata at all. The value for `notebook_metadata_filter` is a comma separated list of additional/excluded (negated) entries, with `all` a keyword that allows to exclude all entries. Use dots to filter recursively the metadata. For instance, use `notebook_metadata_filter="-jupytext.text_representation.jupytext_version"` to remove the `jupytext_version` field in the `jupytext.text_representation` metadata.
 - `cell_metadata_filter`: By default, cell metadata `autoscroll`, `collapsed`, `scrolled`, `trusted` and `ExecuteTime` are not included in the text representation. Add or exclude more cell metadata with this option.
 
-## Global configuration
+## Jupytext configuration file
 
 Jupytext's contents manager, and the command line interface, can load some configuration options
 from a configuration file.
@@ -32,22 +32,38 @@ global_jupytext_configuration_directories()
 ```
 which include `XDG_CONFIG_HOME` (defaults to `$HOME/.config`) and `XDG_CONFIG_DIR`.
 
-The name for the configuration file can be any of `jupytext.config.JUPYTEXT_CONFIG_FILES`, i.e. `.jupytext` (in TOML), `jupytext.toml`, `jupytext.yml`, `jupytext.yaml`, `jupytext.json` or `jupytext.py` (and their dot-file versions).
+The name for the configuration file can be any of `jupytext.config.JUPYTEXT_CONFIG_FILES`, i.e. `.jupytext` (in TOML), `jupytext.toml`, `jupytext.yml`, `jupytext.yaml`, `jupytext.json` or `jupytext.py`, and their dot-file versions.
 
-We start with the default format pairing. Say you want to always associate every `.ipynb` notebook with a `.md` file  (and reciprocally). This is simply done by adding the following to your `jupytext.toml` or `.jupytext.toml` Jupyter configuration file:
+If you want to know, for a given directory, which configuration file Jupytext is using, please execute:
+```python
+from jupytext.config import find_jupytext_configuration_file
+find_jupytext_configuration_file('.')
+```
+
+## Configuring paired notebooks globally
+
+Say you want to always associate every `.ipynb` notebook with a `.md` file  (and reciprocally). This is done by adding the following to your `jupytext.toml` or `.jupytext.toml` Jupyter configuration file:
 ```
 # Always pair ipynb notebooks to md files
 default_jupytext_formats = "ipynb,md"
 ```
 
-If you prefer using a default `ipynb` - `py:percent` pairing, and use `jupytext.yml` as a configuration file, then you could have
- ```
+If you prefer using a default `ipynb` - `py:percent` pairing, then that would be:
+```
+# Always pair ipynb notebooks to py:percent files
+default_jupytext_formats = "ipynb,py:percent"
+```
+
+And if you prefer to use `jupytext.yml`, in YAML format, as your configuration file, then you could use:
+```
 # Always pair ipynb notebooks to py:percent files
 default_jupytext_formats: "ipynb,py:percent"
 ```
 
-To disable global pairing for an individual notebook, set formats to a single format, e.g.:
-`"jupytext": {"formats": "ipynb"}`
+To disable global pairing for an individual notebook, set formats to a single format, with e.g.:
+```bash
+jupytext --set-formats ipynb notebook.ipynb
+```
 
 ## Metadata filtering
 
@@ -70,4 +86,6 @@ It is possible to filter nested metadata. For example, if you want to preserve t
 default_notebook_metadata_filter = "-jupytext.text_representation.jupytext_version"
 ```
 
-NB: All these options (and more) are documented [here](https://github.com/mwouts/jupytext/blob/master/jupytext/config.py).
+## More options
+
+There are a couple more options available - please have a look at the `JupytextConfiguration` class in [config.py](https://github.com/mwouts/jupytext/blob/master/jupytext/config.py).
