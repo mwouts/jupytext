@@ -179,7 +179,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     path, content, type, format
                 )
 
-            config = self.get_config(path)
+            config = self.get_config(path, use_cache=content is False)
             fmt = preferred_format(ext, config.preferred_jupytext_formats_read)
             if ext == ".ipynb":
                 model = self._notebook_model(path, content=content)
@@ -352,13 +352,19 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             self.drop_paired_notebook(old_path)
             self.update_paired_notebooks(new_path, formats)
 
-        def get_config(self, path):
+        def get_config(self, path, use_cache=False):
             """Return the Jupytext configuration for the given path"""
             nb_file = self._get_os_path(path.strip("/"))
             parent_dir = os.path.dirname(nb_file)
 
-            if parent_dir != self.cached_config.path or (
-                self.cached_config.timestamp + timedelta(minutes=1) < datetime.now()
+            # When listing the notebooks for the tree view, we use a one-second
+            # cache for the configuration file
+            if (
+                not use_cache
+                or parent_dir != self.cached_config.path
+                or (
+                    self.cached_config.timestamp + timedelta(seconds=1) < datetime.now()
+                )
             ):
                 self.cached_config.path = parent_dir
                 self.cached_config.timestamp = datetime.now()
