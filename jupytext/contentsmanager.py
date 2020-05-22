@@ -1,7 +1,8 @@
 """ContentsManager that allows to open Rmd, py, R and ipynb files as notebooks
 """
 import os
-from datetime import timedelta
+from datetime import timedelta, datetime
+from collections import namedtuple
 import nbformat
 
 try:
@@ -61,8 +62,15 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
         Python (.py) or R scripts (.R)
         """
 
-        # Dictionary: notebook path => (fmt, formats) where fmt is the current format, and formats the paired formats.
-        paired_notebooks = dict()
+        def __init__(self, **kwargs):
+            # Dictionary: notebook path => (fmt, formats) where
+            # fmt is the current format, and formats the paired formats.
+            self.paired_notebooks = dict()
+
+            # Configuration cache, useful when notebooks are listed in a given directory
+            self.cached_config = namedtuple("cached_config", "path timestamp config")
+
+            return super(JupytextContentsManager, self).__init__(**kwargs)
 
         def all_nb_extensions(self):
             """All extensions that should be classified as notebooks"""
@@ -346,7 +354,16 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
         def get_config(self, path):
             nb_file = self._get_os_path(path.strip("/"))
-            return load_jupytext_config(nb_file) or self
+            parent_dir = os.path.dirname(nb_file)
+
+            if parent_dir != self.cached_config.path or (
+                self.cached_config.timestamp + timedelta(minutes=1) < datetime.now()
+            ):
+                self.cached_config.path = parent_dir
+                self.cached_config.timestamp = datetime.now()
+                self.cached_config.config = load_jupytext_config(parent_dir)
+
+            return self.cached_config.config or self
 
     return JupytextContentsManager
 
