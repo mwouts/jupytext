@@ -11,6 +11,7 @@
 
 **Fixed**
 - Skip the `jupytext --execute` tests when the warning _Timeout waiting for IOPub output_ occurs, which is the case intermittently on Windows (#489)
+- Fixed wrong paired paths when syncing with the --pre-commit flag (#506)
 
 1.4.2 (2020-04-05)
 ------------------
