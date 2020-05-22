@@ -3,6 +3,7 @@
 
 **Added**
 - Jupytext can use a local or global [configuration file](https://github.com/mwouts/jupytext/blob/master/docs/config.md) (#508)
+- Jupytext can pair notebooks in trees. Use e.g. `notebooks///ipynb,scripts///py:percent` if you want to replicate the arborescence of notebooks under `notebooks` in a folder named `scripts` (#424)
 - Jupytext is tested in `pip` and `conda` environments, on Linux, Mac OS and Windows, using Github actions (#487)
 - Pre-commit checks and automatic reformatting of Jupytext's code with `pre-commit`, `black` and `flake8` (#483)
 - Groovy and Java are now supported, thanks to Przemek Wesołek's contribution (#500)
