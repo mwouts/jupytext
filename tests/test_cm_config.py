@@ -1,5 +1,9 @@
 import os
-from unittest.mock import patch, MagicMock
+
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 import jupytext
 
@@ -34,9 +38,9 @@ def test_config_file_is_called_just_once(tmpdir, n=2):
     for nb_file in nb_files:
         jupytext.write(SAMPLE_NOTEBOOK, nb_file)
 
-    mock_config = MagicMock(return_value=None)
+    mock_config = mock.MagicMock(return_value=None)
 
-    with patch("jupytext.contentsmanager.load_jupytext_config", mock_config):
+    with mock.patch("jupytext.contentsmanager.load_jupytext_config", mock_config):
         for i in range(n):
             cm.get("notebook{}.ipynb".format(i), content=False)
 
