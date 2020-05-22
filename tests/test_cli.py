@@ -1013,3 +1013,35 @@ def test_set_option_split_at_heading(tmpdir):
         cells=[new_markdown_cell("A paragraph"), new_markdown_cell("# H1 Header")]
     )
     compare_notebooks(nb, nb_expected)
+
+
+def test_pair_in_tree(tmpdir):
+    nb_file = tmpdir.mkdir("notebooks").mkdir("subfolder").join("example.ipynb")
+    py_file = tmpdir.mkdir("scripts").mkdir("subfolder").join("example.py")
+
+    write(new_notebook(cells=[new_markdown_cell("A markdown cell")]), str(nb_file))
+
+    jupytext(["--set-formats", "notebooks///ipynb,scripts///py:percent", str(nb_file)])
+
+    assert py_file.exists()
+    assert "A markdown cell" in py_file.read()
+
+
+def test_pair_in_tree_and_parent(tmpdir):
+    nb_file = (
+        tmpdir.mkdir("notebooks")
+        .mkdir("subfolder")
+        .mkdir("a")
+        .mkdir("b")
+        .join("example.ipynb")
+    )
+    py_file = tmpdir.mkdir("scripts").mkdir("subfolder").mkdir("c").join("example.py")
+
+    write(new_notebook(cells=[new_markdown_cell("A markdown cell")]), str(nb_file))
+
+    jupytext(
+        ["--set-formats", "notebooks//a/b//ipynb,scripts//c//py:percent", str(nb_file)]
+    )
+
+    assert py_file.exists()
+    assert "A markdown cell" in py_file.read()
