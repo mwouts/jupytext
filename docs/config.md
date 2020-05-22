@@ -1,3 +1,5 @@
+# Configuration
+
 ## Per-notebook configuration
 
 The pairing information for one or multiple notebooks can be set on the command line:
