@@ -48,6 +48,10 @@ def base_path(main_path, fmt):
     if not prefix:
         return base
 
+    if "//" in prefix:
+        prefix_root, prefix = prefix.rsplit("//", 1)
+    else:
+        prefix_root = ""
     prefix_dir, prefix_file_name = os.path.split(prefix)
     notebook_dir, notebook_file_name = os.path.split(base)
     sep = base[len(notebook_dir) : -len(notebook_file_name)]
@@ -89,6 +93,18 @@ def base_path(main_path, fmt):
                     )
         notebook_dir = parent_notebook_dir
 
+    if prefix_root:
+        long_prefix_root = sep + prefix_root + sep
+        long_notebook_dir = sep + notebook_dir + sep
+        if long_prefix_root not in long_notebook_dir:
+            raise InconsistentPath(
+                u"Notebook directory '{}' does not match prefix root '{}'".format(
+                    notebook_dir, prefix_root
+                )
+            )
+        notebook_dir = "///".join(long_notebook_dir.rsplit(long_prefix_root, 1))
+        notebook_dir = notebook_dir[len(sep) : -len(sep)]
+
     if not notebook_dir:
         return notebook_file_name
 
@@ -108,12 +124,30 @@ def full_path(base, fmt):
     full = base
 
     if prefix:
+        if "//" in prefix:
+            prefix_root, prefix = prefix.rsplit("//", 1)
+        else:
+            prefix_root = ""
         prefix_dir, prefix_file_name = os.path.split(prefix)
         notebook_dir, notebook_file_name = os.path.split(base)
 
         # Local path separator (\\ on windows)
         sep = base[len(notebook_dir) : -len(notebook_file_name)] or "/"
         prefix_dir = prefix_dir.replace("/", sep)
+
+        if (prefix_root != "") != ("//" in notebook_dir):
+            raise InconsistentPath(
+                u"Notebook base name '{}' is not compatible with fmt={}. Make sure you use prefix roots "
+                u"in either none, or all of the paired formats".format(
+                    base, short_form_one_format(fmt)
+                )
+            )
+
+        if prefix_root:
+            long_prefix_root = prefix_root + sep
+            long_notebook_dir = sep + notebook_dir + sep
+            long_notebook_dir = long_prefix_root.join(long_notebook_dir.rsplit("//", 1))
+            notebook_dir = long_notebook_dir[len(sep) : -len(sep)]
 
         if prefix_file_name:
             notebook_file_name = prefix_file_name + notebook_file_name

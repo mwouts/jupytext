@@ -38,6 +38,34 @@ def test_full_path_dotdot():
     assert full_path("scripts/test", fmt=fmt) == "scripts/test.py"
 
 
+def test_base_path_in_tree_from_root():
+    fmt = long_form_one_format("scripts///py")
+    assert base_path("scripts/subfolder/test.py", fmt=fmt) == "//subfolder/test"
+    assert base_path("/scripts/subfolder/test.py", fmt=fmt) == "///subfolder/test"
+
+
+def test_base_path_in_tree_from_non_root():
+    fmt = long_form_one_format("scripts///py")
+    assert (
+        base_path("/parent_folder/scripts/subfolder/test.py", fmt=fmt)
+        == "/parent_folder///subfolder/test"
+    )
+
+
+def test_full_path_in_tree_from_root():
+    fmt = long_form_one_format("notebooks///ipynb")
+    assert full_path("//subfolder/test", fmt=fmt) == "notebooks/subfolder/test.ipynb"
+    assert full_path("///subfolder/test", fmt=fmt) == "/notebooks/subfolder/test.ipynb"
+
+
+def test_full_path_in_tree_from_non_root():
+    fmt = long_form_one_format("notebooks///ipynb")
+    assert (
+        full_path("/parent_folder///subfolder/test", fmt=fmt)
+        == "/parent_folder/notebooks/subfolder/test.ipynb"
+    )
+
+
 def test_many_and_suffix():
     formats = long_form_multiple_formats("ipynb,.pct.py,_lgt.py")
     expected_paths = ["notebook.ipynb", "notebook.pct.py", "notebook_lgt.py"]

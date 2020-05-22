@@ -8,14 +8,14 @@ jupytext --set-formats ipynb,py [--sync] notebook.ipynb
 ```
 You can pair a notebook to as many text representations as you want (see our _World population_ notebook in the demo folder). Format specifications are of the form
 ```
-[[path/][prefix]/][suffix.]ext[:format_name]
+[[root_folder//][path/][prefix]/][suffix.]ext[:format_name]
 ```
 where
 - `ext` is one of `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`, `q`. Use the `auto` extension to have the script extension chosen according to the Jupyter kernel.
 - `format_name` (optional) is either `light` (default for scripts), `nomarker`, `percent`, `hydrogen`, `sphinx` (Python only), `spin` (R only) &mdash; see the [format specifications](formats.md).
-- `path`, `prefix` and `suffix` allow to save the text representation to files with different names, or in a different folder.
+- `root_folder`, `path`, `prefix` and `suffix` allow to save the text representation to files with different names, or in a different folder.
 
-If you want to pair a notebook to a python script in a subfolder named `scripts`, set the formats metadata to `ipynb,scripts//py`. If the notebook is in a `notebooks` folder and you want the text representation to be in a `scripts` folder at the same level, set the Jupytext formats to `notebooks//ipynb,scripts//py`.
+If you want to pair a notebook to a python script in a subfolder named `scripts`, set the formats metadata to `ipynb,scripts//py`. If the notebook is in a `notebooks` folder and you want the text representation to be in a `scripts` folder at the same level, set the Jupytext formats to `notebooks//ipynb,scripts//py`. If you want to pair the notebooks in subtrees, use e.g. `notebooks///ipynb,scripts///py` (and make sure you don't use `notebooks` and trees in subfolder names).
 
 Jupytext accepts a few additional options. These options should be added to the `"jupytext"` section in the metadata &mdash; use either the metadata editor or the `--opt/--format-options` argument on the command line.
 - `comment_magics`: By default, Jupyter magics are commented when notebooks are exported to any other format than markdown. If you prefer otherwise, use this boolean option, or is global counterpart (see below).
