@@ -11,15 +11,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Cache conda
+        uses: actions/cache@v1
+        with:
+          path: ~/conda_pkgs_dir
+          key: conda-${{ matrix.os }}-python-${{ matrix.python-version }}-${{ hashFiles('environment-ci.yml') }}
       - name: Setup Miniconda
         uses: goanpeca/setup-miniconda@v1
         with:
-          auto-update-conda: true
+          auto-update-conda: false
           auto-activate-base: false
-          miniconda-version: 'latest'
+          activate-environment: jupytext-ci
           python-version: ${{ matrix.python-version }}
-          environment-file: environment.yml
-          activate-environment: jupytext-dev
+          channels: defaults,conda-forge
+          channel-priority: strict
+          environment-file: environment-ci.yml
+          use-only-tar-bz2: true
       - name: Lint with flake8
         shell: pwsh
         run: |
@@ -29,9 +36,24 @@ jobs:
           flake8 jupytext tests
           # exit-zero treats all errors as warnings.  The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --statistics
-      - name: Install from source (required for the pre-commit tests)
+      - name: Install from source
         shell: pwsh
-        run: pip install .
+        # This is required for the pre-commit tests
+        run: |
+          $ErrorActionPreference='silentlycontinue'
+          pip install .
+          exit 0
+      - name: Install optional dependencies
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='silentlycontinue'
+          # install black if available (Python 3.6 and above), and autopep8 for testing the pipe mode
+          pip install black
+          pip install autopep8
+          # install sphinx_gallery and matplotlib if available (may not work on pypy)
+          pip install sphinx_gallery
+          pip install myst-parser
+          exit 0
       - name: Test with pytest
         shell: pwsh
         run: pytest --cov=./ --cov-report=xml
