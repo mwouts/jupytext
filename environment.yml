@@ -13,7 +13,6 @@ dependencies:
   - pytest
   - pytest-xdist
   - pytest-cov
-  - codecov
   - pre-commit
   - pylint
   - flake8

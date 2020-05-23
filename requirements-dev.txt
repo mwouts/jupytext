@@ -1,7 +1,6 @@
 flake8
 pytest>=3.6
 pytest-cov
-codecov
 notebook
 jupyter_client
 nbconvert

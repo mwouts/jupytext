@@ -35,4 +35,6 @@ jobs:
       - name: Install from source (required for the pre-commit tests)
         run: pip install .
       - name: Test with pytest
-        run: coverage run --source=. -m py.test
+        run: pytest --cov=./ --cov-report=xml
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
