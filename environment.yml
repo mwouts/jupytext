@@ -1,6 +1,6 @@
 name: jupytext-dev
 channels:
-  - default
+  - defaults
   - conda-forge
 dependencies:
   - python
