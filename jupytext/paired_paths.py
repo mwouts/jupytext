@@ -11,6 +11,17 @@ class InconsistentPath(ValueError):
     information it contains"""
 
 
+def split(path):
+    """Split the current path in parent path / current directory or file, using either / or the local path separator"""
+    if "/" not in path and os.path.sep not in path:
+        return "", path
+
+    if path.rfind("/") < path.rfind(os.path.sep):
+        return path.rsplit(os.path.sep, 1)
+
+    return path.rsplit("/", 1)
+
+
 def base_path(main_path, fmt):
     """Given a path and options for a format (ext, suffix, prefix), return the corresponding base path"""
     if not fmt or (isinstance(fmt, dict) and "extension" not in fmt):
@@ -52,8 +63,8 @@ def base_path(main_path, fmt):
         prefix_root, prefix = prefix.rsplit("//", 1)
     else:
         prefix_root = ""
-    prefix_dir, prefix_file_name = os.path.split(prefix)
-    notebook_dir, notebook_file_name = os.path.split(base)
+    prefix_dir, prefix_file_name = split(prefix)
+    notebook_dir, notebook_file_name = split(base)
     sep = base[len(notebook_dir) : -len(notebook_file_name)]
 
     if prefix_file_name:
@@ -128,8 +139,8 @@ def full_path(base, fmt):
             prefix_root, prefix = prefix.rsplit("//", 1)
         else:
             prefix_root = ""
-        prefix_dir, prefix_file_name = os.path.split(prefix)
-        notebook_dir, notebook_file_name = os.path.split(base)
+        prefix_dir, prefix_file_name = split(prefix)
+        notebook_dir, notebook_file_name = split(base)
 
         # Local path separator (\\ on windows)
         sep = base[len(notebook_dir) : -len(notebook_file_name)] or "/"
