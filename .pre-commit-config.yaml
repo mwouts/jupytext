@@ -9,13 +9,17 @@ exclude: >
     )$
 repos:
 
-  - repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v2.2.3
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.1.0
     hooks:
     - id: check-json
     - id: check-yaml
     - id: end-of-file-fixer
     - id: trailing-whitespace
+
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.2
+    hooks:
     - id: flake8
 
   - repo: https://github.com/psf/black
