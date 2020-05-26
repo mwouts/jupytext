@@ -8,5 +8,5 @@ tags:
 - script
 Link: README.md
 Icon: jupytext_menu_zoom.png
-Main: index.js
+Main: jupytext.js
 Compatibility: 5.x, 6.x

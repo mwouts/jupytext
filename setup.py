@@ -40,7 +40,7 @@ setup(
         (
             "share/jupyter/nbextensions/jupytext",
             [
-                "jupytext/nbextension/index.js",
+                "jupytext/nbextension/jupytext.js",
                 "jupytext/nbextension/README.md",
                 "jupytext/nbextension/jupytext_menu.png",
                 "jupytext/nbextension/jupytext_menu_zoom.png",
