@@ -10,7 +10,7 @@ With Jupytext, collaborating on Jupyter notebooks with Git becomes as easy as co
 
 The setup is straightforward:
 - Open your favorite notebook in Jupyter notebook
-- [Associate](paired-notebooks.html#) a `.py` representation (for instance) to that notebook
+- [Associate](paired-notebooks.md#) a `.py` representation (for instance) to that notebook
 - Save the notebook, and put the Python script under Git control. Sharing the `.ipynb` file is possible, but not required.
 
 Collaborating then works as follows:
