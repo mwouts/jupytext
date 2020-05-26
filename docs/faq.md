@@ -63,7 +63,7 @@ jupytext --set-formats ipynb,md --execute *.md  # convert all .md files to paire
 
 ## I want a specific cell to be commented out in the paired script
 
-That's possible! See how to [activate or deactivate cells](formats.md#active-and-inactive-cells).
+That's possible! See how to [activate or deactivate cells](formats.html#active-and-inactive-cells).
 
 ## Which files should I version control?
 
