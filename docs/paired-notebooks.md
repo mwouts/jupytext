@@ -32,7 +32,7 @@ When that occurs, please choose the version in which you made the latest changes
 
 ## How to open scripts with either the text or notebook view in Jupyter?
 
-With Jupytext's contents manager for Jupyter, scripts and Markdown documents gain a notebook icon. If you don't see the notebook icon, double check the [contents manager configuration](https://github.com/mwouts/jupytext/blob/master/README.md#jupytexts-contents-manager).
+With Jupytext's contents manager for Jupyter, scripts and Markdown documents gain a notebook icon. If you don't see the notebook icon, double check the [contents manager configuration](install.html#jupytexts-contents-manager).
 
 By default, Jupyter Notebook open scripts and Markdown documents as notebooks. If you want to open them with the text editor, select the document and click on _edit_:
 

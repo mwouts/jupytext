@@ -10,7 +10,7 @@ The text representation only contains the part of the notebook that you wrote (n
 
 ## How do I use Jupytext?
 
-Open the notebook that you want to version control. _Pair_ the notebook to a script or a Markdown file using either the [Jupytext Menu](https://github.com/mwouts/jupytext/blob/master/README.md#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook or the [Jupytext Commands](https://github.com/mwouts/jupytext/blob/master/README.md#jupytext-commands-in-jupyterlab) in JupyterLab.
+Open the notebook that you want to version control. _Pair_ the notebook to a script or a Markdown file using either the [Jupytext Menu](install.html#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook or the [Jupytext Commands](install.html#jupytext-commands-in-jupyterlab) in JupyterLab.
 
 Save the notebook, and you get two copies of the notebook: the original `*.ipynb` file, together with its paired text representation.
 
