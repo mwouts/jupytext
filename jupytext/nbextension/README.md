@@ -23,8 +23,8 @@ If you wish to develop this extension, install the javascript file locally with:
 
 ```bash
 cd jupytext/nbextension
-jupyter nbextension install index.js --symlink --user
+jupyter nbextension install jupytext.js --symlink --user
 jupyter nbextension enable jupytext --user
 ```
 
-Then, make the desired changes to `index.js` and reload the extension by simply refreshing the notebook (Ctrl+R). In case your OS does not allow symlinks, edit the copy of `index.js` that is actually used by Jupyter (refer to the output of `jupyter nbextension install --user index.js`).
+Then, make the desired changes to `jupytext.js` and reload the extension by simply refreshing the notebook (Ctrl+R). In case your OS does not allow symlinks, edit the copy of `jupytext.js` that is actually used by Jupyter (refer to the output of `jupyter nbextension install --user jupytext.js`).

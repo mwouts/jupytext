@@ -61,7 +61,7 @@ pip install dist/jupytext-XXX.tar.gz
 
 ## Jupytext's extension for Jupyter Notebook
 
-Our extension for Jupyter Notebook adds a Jupytext entry to Jupyter Notebook Menu. The code is found at `jupytext/nbextension/index.js`. Instructions to develop that extension are at `jupytext/nbextension/README.md`.
+Our extension for Jupyter Notebook adds a Jupytext entry to Jupyter Notebook Menu. The code is found at `jupytext/nbextension/jupytext.js`. Instructions to develop that extension are at `jupytext/nbextension/README.md`.
 
 ## Jupytext's extension for JupyterLab
 
