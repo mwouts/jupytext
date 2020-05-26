@@ -183,12 +183,16 @@ def global_jupytext_configuration_directories():
 
     if "XDG_CONFIG_HOME" in os.environ:
         config_dirs.extend(os.environ["XDG_CONFIG_HOME"].split(":"))
+    elif "USERPROFILE" in os.environ:
+        config_dirs.append(os.environ["USERPROFILE"])
     elif "HOME" in os.environ:
         config_dirs.append(os.path.join(os.environ["HOME"], ".config"))
         config_dirs.append(os.environ["HOME"])
 
     if "XDG_CONFIG_DIRS" in os.environ:
         config_dirs.extend(os.environ["XDG_CONFIG_DIRS"].split(":"))
+    elif "ALLUSERSPROFILE" in os.environ:
+        config_dirs.append(os.environ["ALLUSERSPROFILE"])
     else:
         config_dirs.extend(["/usr/local/share/", "/usr/share/"])
 
