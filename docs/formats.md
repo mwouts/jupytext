@@ -1,4 +1,4 @@
-# Supported formats
+# Notebook formats
 
 Jupytext supports conversion between the `.ipynb` format and many different formats. This page describes each format, as well as some considerations for each.
 
