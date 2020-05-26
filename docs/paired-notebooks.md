@@ -2,9 +2,19 @@
 
 Jupytext can write a given notebook to multiple files. In addition to the original notebook file, Jupytext can save the input cells to a text file &mdash; either a script or a Markdown document. Put the text file under version control for a clear commit history. Or refactor the paired script, and reimport the updated input cells by simply refreshing the notebook in Jupyter.
 
-Select the pairing for a given notebook using either the [Jupytext menu](install.html#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or the [Jupytext commands](install.html#jupytext-commands-in-jupyterlab) in JupyterLab.
+## How to pair a notebook to multiple formats
 
-These command simply add a `"jupytext": {"formats": "ipynb,md"}`-like entry in the notebook metadata. You could also set that metadata yourself with _Edit/Edit Notebook Metadata_ in Jupyter Notebook. In JupyterLab, use [this extension](https://github.com/yuvipanda/jupyterlab-nbmetadata).
+In Jupyter Notebook, pair your notebook to one or more text formats with the [Jupytext menu](install.html#jupytext-menu-in-jupyter-notebook):
+
+![](https://raw.githubusercontent.com/mwouts/jupytext_nbextension/master/jupytext_menu.png)
+
+In JupyterLab, use the [Jupytext commands](install.html#jupytext-commands-in-jupyterlab):
+
+![](https://raw.githubusercontent.com/mwouts/jupyterlab-jupytext/master/jupytext_commands.png)
+
+These command simply add a `"jupytext": {"formats": "ipynb,md"}`-like entry in the notebook metadata.
+
+You can also configure the notebook pairing on the command line, and set a default pairing for all the notebooks either globally or in a subfolder - see [here](config.md#).
 
 ## Can I edit a notebook simultaneously in Jupyter and in a text editor?
 
