@@ -2,7 +2,7 @@
 
 ## Writing notebooks as plain text
 
-You like to work with scripts? The good news is that plain scripts, which you can draft and test in your favorite IDE, open transparently as notebooks in Jupyter when using Jupytext. Run the notebook in Jupyter to generate the outputs, [associate](config.html#paired-notebooks) an `.ipynb` representation, save and share your research as either a plain script or as a traditional Jupyter notebook with outputs.
+You like to work with scripts? The good news is that plain scripts, which you can draft and test in your favorite IDE, open transparently as notebooks in Jupyter when using Jupytext. Run the notebook in Jupyter to generate the outputs, [associate](paired-notebooks.md) an `.ipynb` representation, save and share your research as either a plain script or as a traditional Jupyter notebook with outputs.
 
 ## Collaborating on Jupyter Notebooks
 
@@ -10,7 +10,7 @@ With Jupytext, collaborating on Jupyter notebooks with Git becomes as easy as co
 
 The setup is straightforward:
 - Open your favorite notebook in Jupyter notebook
-- [Associate](paired-notebooks.md#) a `.py` representation (for instance) to that notebook
+- [Associate](paired-notebooks.md) a `.py` representation (for instance) to that notebook
 - Save the notebook, and put the Python script under Git control. Sharing the `.ipynb` file is possible, but not required.
 
 Collaborating then works as follows:
