@@ -30,7 +30,7 @@ from a configuration file.
 The configuration file should be either in the local or a parent directory, or in any directory listed in
 ```python
 from jupytext.config import global_jupytext_configuration_directories
-global_jupytext_configuration_directories()
+list(global_jupytext_configuration_directories())
 ```
 which include `XDG_CONFIG_HOME` (defaults to `$HOME/.config`) and `XDG_CONFIG_DIR`.
 
