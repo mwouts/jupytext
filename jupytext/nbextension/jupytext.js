@@ -8,11 +8,13 @@
 define([
     'jquery',
     'base/js/namespace',
-    'base/js/events'
+    'base/js/events',
+    'base/js/utils',
 ], function (
     $,
     Jupyter,
-    events
+    events,
+    utils
 ) {
     "use strict";
 
@@ -231,6 +233,57 @@ define([
             );
     }
 
+    function new_text_notebook(ext='.md') {
+        // Differences with KernelSelector.prototype.new_notebook from
+        // https://github.com/jupyter/notebook/blob/
+        // 6e9256b0641a85baf664e846515085bac2c082a3/notebook/static/notebook/js/kernelselector.js
+        // - added ext argument
+        // - kernel_name is the currently selected one
+        // - "that" replaced with Jupyter
+
+        var w = window.open('', IPython._target);
+        // Create a new notebook in the same path as the current
+        // notebook's path.
+        var parent = utils.url_path_split(Jupyter.notebook.notebook_path)[0];
+        Jupyter.notebook.contents.new_untitled(parent, {type: "notebook", ext:ext}).then(
+            function (data) {
+                var url = utils.url_path_join(
+                    Jupyter.notebook.base_url, 'notebooks',
+                    utils.encode_uri_components(data.path)
+                );
+                url += "?kernel_name=" + Jupyter.notebook.metadata.kernelspec.name;
+                w.location = url;
+            },
+            function(error) {
+                w.close();
+                dialog.modal({
+                    title : i18n.msg._('Creating Notebook Failed'),
+                    body : i18n.msg.sprintf(i18n.msg._("The error was: %s"), error.message),
+                    buttons : {'OK' : {'class' : 'btn-primary'}}
+                });
+            }
+        );
+    };
+
+    function text_notebook_entry(ext, title) {
+        return $('<li/>')
+            .append($('<a/>')
+                .attr('id', 'new_notebook_' + ext.replace('.', ''))
+                .text(title)
+                .attr('title', title)
+                .data('ext', ext)
+                .css('width', '280px')
+                .attr('href', '#')
+                .on('click', onClickedTextNotebook)
+                .prepend($('<i/>').addClass('fa menu-icon pull-right'))
+            );
+    };
+
+    function onClickedTextNotebook(data) {
+        const ext = $(this).data('ext');
+        new_text_notebook(ext);
+    };
+
     var jupytext_menu = function () {
         if ($('#jupytext_menu').length === 0) {
 
@@ -308,6 +361,29 @@ define([
 
             checkSelectedJupytextFormats();
             checkAutosave();
+
+            // New Text Notebook menu
+            var NewTextNotebook = $('<a/>').attr('href', '#')
+                .addClass('dropdown-toogle')
+                .attr('data-toggle', 'dropdown')
+                .attr('aria-expanded', 'false')
+                .text('New Text Notebook')
+                .attr('title', 'New Notebook saved as a Text file');
+
+            var TextNotebooks = $('<ul/>')
+                .attr('id', 'new_text_notebook_submenu')
+                .addClass("dropdown-menu");
+
+            $('#open_notebook').before('<li id="new_text_notebook"/>');
+            $('#new_text_notebook').addClass('dropdown-submenu').append(NewTextNotebook).append(TextNotebooks);
+            TextNotebooks.append(text_notebook_entry('.md', 'Markdown'));
+
+            if (Jupyter.notebook.metadata.language_info) {
+                var script_ext = Jupyter.notebook.metadata.language_info.file_extension;
+                var language_name = Jupyter.notebook.metadata.language_info.name;
+                language_name = language_name.charAt(0).toUpperCase()+ language_name.slice(1)
+                TextNotebooks.append(text_notebook_entry(script_ext, language_name + ' script'));
+            }
         }
     };
 
