@@ -4,6 +4,7 @@ import os
 from .formats import long_form_one_format, long_form_multiple_formats
 from .formats import short_form_one_format, short_form_multiple_formats
 from .formats import NOTEBOOK_EXTENSIONS
+from .config import find_jupytext_configuration_file
 
 
 class InconsistentPath(ValueError):
@@ -67,6 +68,14 @@ def base_path(main_path, fmt):
     notebook_dir, notebook_file_name = split(base)
     sep = base[len(notebook_dir) : -len(notebook_file_name)]
 
+    base_dir = None
+    config_file = find_jupytext_configuration_file(notebook_dir)
+    if config_file:
+        config_file_dir = os.path.dirname(config_file)
+        if notebook_dir.startswith(config_file_dir):
+            base_dir = config_file_dir
+            notebook_dir = notebook_dir[len(config_file_dir) :]
+
     if prefix_file_name:
         if not notebook_file_name.startswith(prefix_file_name):
             raise InconsistentPath(
@@ -115,6 +124,9 @@ def base_path(main_path, fmt):
             )
         notebook_dir = "///".join(long_notebook_dir.rsplit(long_prefix_root, 1))
         notebook_dir = notebook_dir[len(sep) : -len(sep)]
+
+    if base_dir:
+        notebook_dir = base_dir + notebook_dir
 
     if not notebook_dir:
         return notebook_file_name
