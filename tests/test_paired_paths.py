@@ -66,6 +66,47 @@ def test_full_path_in_tree_from_non_root():
     )
 
 
+def test_path_in_tree_limited_to_config_dir(tmpdir):
+    root_nb_dir = tmpdir.mkdir("notebooks")
+    nb_dir = root_nb_dir.mkdir("notebooks")
+    src_dir = root_nb_dir.mkdir("scripts")
+    other_dir = root_nb_dir.mkdir("other")
+
+    formats = "notebooks///ipynb,scripts///py"
+    fmt = long_form_multiple_formats(formats)[0]
+
+    # Notebook in nested 'notebook' dir is paired
+    notebook_in_nb_dir = nb_dir.join("subfolder").join("nb.ipynb")
+
+    assert set(
+        path for (path, _) in paired_paths(str(notebook_in_nb_dir), fmt, formats)
+    ) == {str(notebook_in_nb_dir), str(src_dir.join("subfolder").join("nb.py"))}
+
+    # Notebook in base 'notebook' dir is paired if no config file is found
+    notebook_in_other_dir = other_dir.mkdir("subfolder").join("nb.ipynb")
+    assert set(
+        path for (path, _) in paired_paths(str(notebook_in_other_dir), fmt, formats)
+    ) == {
+        str(notebook_in_other_dir),
+        str(tmpdir.join("scripts").join("other").join("subfolder").join("nb.py")),
+    }
+
+    # When a config file exists
+    root_nb_dir.join("jupytext.toml").write("\n")
+
+    # Notebook in nested 'notebook' dir is still paired
+    assert set(
+        path for (path, _) in paired_paths(str(notebook_in_nb_dir), fmt, formats)
+    ) == {str(notebook_in_nb_dir), str(src_dir.join("subfolder").join("nb.py"))}
+
+    # But the notebook in base 'notebook' dir is not paired any more
+    with pytest.raises(
+        InconsistentPath,
+        match="Notebook directory '/other/subfolder' does not match prefix root 'notebooks'",
+    ):
+        paired_paths(str(notebook_in_other_dir), fmt, formats)
+
+
 def test_many_and_suffix():
     formats = long_form_multiple_formats("ipynb,.pct.py,_lgt.py")
     expected_paths = ["notebook.ipynb", "notebook.pct.py", "notebook_lgt.py"]

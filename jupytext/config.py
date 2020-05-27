@@ -10,10 +10,6 @@ from .formats import (
     long_form_multiple_formats,
     rearrange_jupytext_metadata,
 )
-from .paired_paths import (
-    base_path,
-    InconsistentPath,
-)
 
 JUPYTEXT_CONFIG_FILES = [
     "jupytext",
@@ -138,6 +134,11 @@ class JupytextConfiguration(Configurable):
 
     def default_formats(self, path):
         """Return the default formats, if they apply to the current path #157"""
+        from .paired_paths import (
+            base_path,
+            InconsistentPath,
+        )
+
         formats = long_form_multiple_formats(self.default_jupytext_formats)
         for fmt in formats:
             try:
