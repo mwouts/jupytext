@@ -1,6 +1,7 @@
 """ContentsManager that allows to open Rmd, py, R and ipynb files as notebooks
 """
 import os
+import itertools
 from datetime import timedelta, datetime
 from collections import namedtuple
 import nbformat
@@ -314,9 +315,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             We override the base function because that one does not take the 'ext' argument
             into account when type=="notebook". See https://github.com/mwouts/jupytext/issues/443
             """
-            if type != "notebook":
-                return super(JupytextContentsManager, self).new_untitled(path)
+            if type != "notebook" and ext != ".ipynb":
+                return super(JupytextContentsManager, self).new_untitled(
+                    path, type, ext
+                )
 
+            ext = ext or ".ipynb"
             path = path.strip("/")
             if not self.dir_exists(path):
                 raise HTTPError(404, "No such directory: %s" % path)
@@ -324,9 +328,30 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             model = {"type": "notebook"}
             untitled = self.untitled_notebook
 
-            name = self.increment_filename(untitled + ext, path)
+            name = self.increment_notebook_filename(untitled + ext, path)
             path = u"{0}/{1}".format(path, name)
             return self.new(model, path)
+
+        def increment_notebook_filename(self, filename, path=""):
+            """Increment a notebook filename until it is unique, regardless of extension"""
+            # Extract the full suffix from the filename (e.g. .tar.gz)
+            path = path.strip("/")
+            basename, dot, ext = filename.partition(".")
+            ext = dot + ext
+
+            for i in itertools.count():
+                if i:
+                    insert_i = "{}".format(i)
+                else:
+                    insert_i = ""
+                basename_i = basename + insert_i
+                name = basename_i + ext
+                if not any(
+                    self.exists(u"{}/{}{}".format(path, basename_i, nb_ext))
+                    for nb_ext in self.notebook_extensions.split(",")
+                ):
+                    break
+            return name
 
         def trust_notebook(self, path):
             """Trust the current notebook"""
