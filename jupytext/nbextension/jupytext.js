@@ -265,10 +265,10 @@ define([
         );
     };
 
-    function text_notebook_entry(ext, title) {
+    function text_notebook_entry(type, title, ext=null) {
         return $('<li/>')
             .append($('<a/>')
-                .attr('id', 'new_notebook_' + ext.replace('.', ''))
+                .attr('id', 'new_notebook_' + type)
                 .text(title)
                 .attr('title', title)
                 .data('ext', ext)
@@ -281,7 +281,24 @@ define([
 
     function onClickedTextNotebook(data) {
         const ext = $(this).data('ext');
-        new_text_notebook(ext);
+        if (ext) { new_text_notebook(ext); };
+    };
+
+    function updateNewScriptNotebookMenu() {
+        if (Jupyter.notebook.metadata.language_info) {
+            var script_ext = Jupyter.notebook.metadata.language_info.file_extension;
+            var language_name = Jupyter.notebook.metadata.language_info.name;
+            language_name = language_name.charAt(0).toUpperCase() + language_name.slice(1);
+            var title = language_name + ' script';
+            $('#new_notebook_script').parent().removeClass('disabled');
+            $('#new_notebook_script').data('ext', script_ext);
+            $('#new_notebook_script').attr('title', title);
+            $('#new_notebook_script').text(title);
+            }
+        else {
+            $('#new_notebook_script').parent().addClass('disabled');
+            $('#new_notebook_script').data('ext', null);
+        };
     };
 
     var jupytext_menu = function () {
@@ -368,7 +385,8 @@ define([
                 .attr('data-toggle', 'dropdown')
                 .attr('aria-expanded', 'false')
                 .text('New Text Notebook')
-                .attr('title', 'New Notebook saved as a Text file');
+                .attr('title', 'New Notebook saved as a text file')
+                .on('mouseover', updateNewScriptNotebookMenu);
 
             var TextNotebooks = $('<ul/>')
                 .attr('id', 'new_text_notebook_submenu')
@@ -376,14 +394,8 @@ define([
 
             $('#open_notebook').before('<li id="new_text_notebook"/>');
             $('#new_text_notebook').addClass('dropdown-submenu').append(NewTextNotebook).append(TextNotebooks);
-            TextNotebooks.append(text_notebook_entry('.md', 'Markdown'));
-
-            if (Jupyter.notebook.metadata.language_info) {
-                var script_ext = Jupyter.notebook.metadata.language_info.file_extension;
-                var language_name = Jupyter.notebook.metadata.language_info.name;
-                language_name = language_name.charAt(0).toUpperCase()+ language_name.slice(1)
-                TextNotebooks.append(text_notebook_entry(script_ext, language_name + ' script'));
-            }
+            TextNotebooks.append(text_notebook_entry('md', 'Markdown', '.md'));
+            TextNotebooks.append(text_notebook_entry('script', 'Script'));
         }
     };
 
