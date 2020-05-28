@@ -1,5 +1,5 @@
 {
   "load_extensions": {
-    "jupytext/index": true
+    "jupytext/jupytext": true
   }
 }
