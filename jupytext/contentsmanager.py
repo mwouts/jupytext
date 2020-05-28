@@ -308,6 +308,26 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             return model
 
+        def new_untitled(self, path="", type="", ext=""):
+            """Create a new untitled file or directory in path
+
+            We override the base function because that one does not take the 'ext' argument
+            into account when type=="notebook". See https://github.com/mwouts/jupytext/issues/443
+            """
+            if type != "notebook":
+                return super(JupytextContentsManager, self).new_untitled(path)
+
+            path = path.strip("/")
+            if not self.dir_exists(path):
+                raise HTTPError(404, "No such directory: %s" % path)
+
+            model = {"type": "notebook"}
+            untitled = self.untitled_notebook
+
+            name = self.increment_filename(untitled + ext, path)
+            path = u"{0}/{1}".format(path, name)
+            return self.new(model, path)
+
         def trust_notebook(self, path):
             """Trust the current notebook"""
             if path.endswith(".ipynb") or path not in self.paired_notebooks:

@@ -1702,3 +1702,11 @@ def test_filter_jupytext_version_information_416(nb_file, tmpdir):
     assert "jupytext:" in text
     assert "kernelspec:" in text
     assert "jupytext_version:" not in text
+
+
+def test_new_untitled(tmpdir):
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    assert cm.new_untitled(type="notebook", ext=".md")["path"] == "Untitled.md"
+    assert cm.new_untitled(type="notebook", ext=".md")["path"] == "Untitled1.md"
