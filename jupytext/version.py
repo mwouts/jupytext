@@ -1,3 +1,3 @@
 """Jupytext's version number"""
 
-__version__ = "1.5.0.rc1+dev"
+__version__ = "1.5.0.rc2"
