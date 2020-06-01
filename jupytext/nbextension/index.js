@@ -8,11 +8,13 @@
 define([
     'jquery',
     'base/js/namespace',
+    'base/js/dialog',
     'base/js/events',
     'base/js/utils',
 ], function (
     $,
     Jupyter,
+    dialog,
     events,
     utils
 ) {
