@@ -1045,3 +1045,42 @@ def test_pair_in_tree_and_parent(tmpdir):
 
     assert py_file.exists()
     assert "A markdown cell" in py_file.read()
+
+
+@requires_pandoc
+def test_sync_pipe_config(tmpdir):
+    """Sync a notebook to a script paired in a tree, and reformat the markdown cells using pandoc"""
+
+    tmpdir.join("jupytext.toml").write(
+        """# By default, the notebooks in this repository are in the notebooks subfolder
+# and they are paired to scripts in the script subfolder.
+default_jupytext_formats = "notebooks///ipynb,scripts///py:percent"
+"""
+    )
+
+    nb_file = tmpdir.mkdir("notebooks").join("wrap_markdown.ipynb")
+    long_text = "This is a " + ("very " * 24) + "long sentence."
+    assert len(long_text) > 100
+    nb = new_notebook(cells=[new_markdown_cell(long_text)])
+    write(nb, str(nb_file))
+
+    jupytext(
+        [
+            "--sync",
+            "--pipe-fmt",
+            "ipynb",
+            "--pipe",
+            "pandoc --from ipynb --to ipynb --atx-headers",
+            str(nb_file),
+        ]
+    )
+
+    py_text = tmpdir.join("scripts").join("wrap_markdown.py").read()
+    assert "This is a very very" in py_text
+    for line in py_text.splitlines():
+        assert len(line) <= 79
+
+    nb = read(nb_file, as_version=4)
+    text = nb.cells[0].source
+    assert len(text.splitlines()) == 3
+    assert text != long_text

@@ -23,6 +23,13 @@ def split(path):
     return path.rsplit("/", 1)
 
 
+def separator(path):
+    """Return the local path separator (always / in the contents manager)"""
+    if os.path.sep == "\\" and "\\" in path:
+        return "\\"
+    return "/"
+
+
 def base_path(main_path, fmt):
     """Given a path and options for a format (ext, suffix, prefix), return the corresponding base path"""
     if not fmt or (isinstance(fmt, dict) and "extension" not in fmt):
@@ -66,7 +73,7 @@ def base_path(main_path, fmt):
         prefix_root = ""
     prefix_dir, prefix_file_name = split(prefix)
     notebook_dir, notebook_file_name = split(base)
-    sep = base[len(notebook_dir) : -len(notebook_file_name)]
+    sep = separator(base)
 
     base_dir = None
     config_file = find_jupytext_configuration_file(notebook_dir)
@@ -122,7 +129,8 @@ def base_path(main_path, fmt):
                     notebook_dir, prefix_root
                 )
             )
-        notebook_dir = "///".join(long_notebook_dir.rsplit(long_prefix_root, 1))
+        left, right = long_notebook_dir.rsplit(long_prefix_root, 1)
+        notebook_dir = left + sep + "//" + right
         notebook_dir = notebook_dir[len(sep) : -len(sep)]
 
     if base_dir:
@@ -130,10 +138,6 @@ def base_path(main_path, fmt):
 
     if not notebook_dir:
         return notebook_file_name
-
-    # Does notebook_dir ends with a path separator?
-    if notebook_dir[-1:] == sep:
-        return notebook_dir + notebook_file_name
 
     return notebook_dir + sep + notebook_file_name
 
@@ -152,25 +156,24 @@ def full_path(base, fmt):
         else:
             prefix_root = ""
         prefix_dir, prefix_file_name = split(prefix)
-        notebook_dir, notebook_file_name = split(base)
 
         # Local path separator (\\ on windows)
-        sep = base[len(notebook_dir) : -len(notebook_file_name)] or "/"
+        sep = separator(base)
         prefix_dir = prefix_dir.replace("/", sep)
 
-        if (prefix_root != "") != ("//" in notebook_dir):
+        if (prefix_root != "") != ("//" in base):
             raise InconsistentPath(
                 u"Notebook base name '{}' is not compatible with fmt={}. Make sure you use prefix roots "
                 u"in either none, or all of the paired formats".format(
                     base, short_form_one_format(fmt)
                 )
             )
-
         if prefix_root:
-            long_prefix_root = prefix_root + sep
-            long_notebook_dir = sep + notebook_dir + sep
-            long_notebook_dir = long_prefix_root.join(long_notebook_dir.rsplit("//", 1))
-            notebook_dir = long_notebook_dir[len(sep) : -len(sep)]
+            left, right = base.rsplit("//", 1)
+            right_dir, notebook_file_name = split(right)
+            notebook_dir = left + prefix_root + sep + right_dir
+        else:
+            notebook_dir, notebook_file_name = split(base)
 
         if prefix_file_name:
             notebook_file_name = prefix_file_name + notebook_file_name
