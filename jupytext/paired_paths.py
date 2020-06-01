@@ -131,6 +131,10 @@ def base_path(main_path, fmt):
             )
         left, right = long_notebook_dir.rsplit(long_prefix_root, 1)
         notebook_dir = left + sep + "//" + right
+
+        # We are going to remove the last char, but we need to insert it back in the end...
+        if not right:
+            sep = notebook_dir[-1]
         notebook_dir = notebook_dir[len(sep) : -len(sep)]
 
     if base_dir:

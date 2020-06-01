@@ -1,3 +1,4 @@
+import os
 import pytest
 
 try:
@@ -96,6 +97,14 @@ def test_paired_paths_windows():
         paired_paths(nb_file, "notebooks///ipynb", formats)
 
 
+def test_paired_paths_windows_no_subfolder():
+    nb_file = "C:\\Users\\notebooks\\notebooks\\nb.ipynb"
+    formats = "notebooks///ipynb,scripts///py"
+    with mock.patch("os.path.sep", "\\"):
+        assert base_path(nb_file, "notebooks///ipynb") == "C:\\Users\\notebooks\\//nb"
+        paired_paths(nb_file, "notebooks///ipynb", formats)
+
+
 def test_path_in_tree_limited_to_config_dir(tmpdir):
     root_nb_dir = tmpdir.mkdir("notebooks")
     nb_dir = root_nb_dir.mkdir("notebooks")
@@ -130,10 +139,13 @@ def test_path_in_tree_limited_to_config_dir(tmpdir):
     ) == {str(notebook_in_nb_dir), str(src_dir.join("subfolder").join("nb.py"))}
 
     # But the notebook in base 'notebook' dir is not paired any more
-    with pytest.raises(
-        InconsistentPath,
-        match="Notebook directory '/other/subfolder' does not match prefix root 'notebooks'",
-    ):
+    alert = (
+        "Notebook directory '/other/subfolder' does not match prefix root 'notebooks'"
+        if os.path.sep == "/"
+        # we escape twice the backslash because pytest.raises matches it as a regular expression
+        else "Notebook directory '\\\\other\\\\subfolder' does not match prefix root 'notebooks'"
+    )
+    with pytest.raises(InconsistentPath, match=alert):
         paired_paths(str(notebook_in_other_dir), fmt, formats)
 
 
