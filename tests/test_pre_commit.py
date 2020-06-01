@@ -14,7 +14,7 @@ from jupytext import read, write
 from jupytext.cli import jupytext, system
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks, skip_if_dict_is_not_ordered
-from .utils import requires_black, requires_flake8
+from .utils import requires_black, requires_flake8, requires_pandoc
 from .utils import requires_jupytext_installed
 
 
@@ -323,3 +323,49 @@ def test_pre_commit_hook_with_subfolders_issue_506(tmpdir):
 
     assert os.path.isfile(str(nb_file))
     assert read(str(nb_file)).cells[0].source == "A Markdown cell"
+
+
+@requires_pandoc
+def test_wrap_markdown_cell(tmpdir):
+    """Use a pre-commit hook to sync a notebook to a script paired in a tree, and reformat
+    the markdown cells using pandoc"""
+
+    tmpdir.join("jupytext.toml").write(
+        """# By default, the notebooks in this repository are in the notebooks subfolder
+    # and they are paired to scripts in the script subfolder.
+    default_jupytext_formats = "notebooks///ipynb,scripts///py:percent"
+    """
+    )
+
+    git = git_in_tmpdir(tmpdir)
+    hook = str(tmpdir.join(".git/hooks/pre-commit"))
+    with open(hook, "w") as fp:
+        fp.write(
+            "#!/bin/sh\n"
+            "jupytext --pre-commit --sync --pipe-fmt ipynb --pipe \\\n"
+            "    'pandoc --from ipynb --to ipynb --atx-headers'\n"
+        )
+
+    st = os.stat(hook)
+    os.chmod(hook, st.st_mode | stat.S_IEXEC)
+
+    nb_file = tmpdir.mkdir("notebooks").mkdir("subfolder").join("wrap_markdown.ipynb")
+    long_text = "This is a " + ("very " * 24) + "long sentence."
+    nb = new_notebook(cells=[new_markdown_cell(long_text)])
+    write(nb, str(nb_file))
+
+    nb = read(str(nb_file))
+    assert nb.cells[0].source == long_text
+
+    git("add", str(nb_file))
+    git("commit", "-m", "'notebook with long cells'")
+
+    py_text = tmpdir.join("scripts").join("subfolder").join("wrap_markdown.py").read()
+    assert "This is a very very" in py_text
+    for line in py_text.splitlines():
+        assert len(line) <= 79
+
+    nb = read(nb_file, as_version=4)
+    text = nb.cells[0].source
+    assert len(text.splitlines()) >= 2
+    assert text != long_text
