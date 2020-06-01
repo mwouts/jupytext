@@ -358,35 +358,6 @@ define([
                     .prepend($("<i/>").addClass("fa menu-icon pull-right"))
             );
 
-            $('#trust_notebook').before('<li id="jupytext_sub_menu"/>');
-            $('#jupytext_sub_menu').addClass('dropdown-submenu').append(JupytextMenu).append(JupytextActions);
-            JupytextActions.append(jupytext_link);
-            JupytextActions.append($('<li/>').addClass('divider'));
-            JupytextActions.append(jupytext_faq);
-            JupytextActions.append($('<li/>').addClass('divider'));
-            JupytextActions.append(toggle_autosave);
-            JupytextActions.append($('<li/>').addClass('divider'));
-
-            var notebook_extension = Jupyter.notebook.notebook_path.split('.').pop();
-            JupytextActions.append(jupytext_pair('ipynb', 'Pair Notebook with ipynb document', notebook_extension!=='ipynb'));
-            JupytextActions.append(jupytext_pair('auto:light', 'Pair Notebook with light Script'));
-            JupytextActions.append(jupytext_pair('auto:percent', 'Pair Notebook with percent Script'));
-            JupytextActions.append(jupytext_pair('auto:hydrogen', 'Pair Notebook with Hydrogen Script'));
-            JupytextActions.append(jupytext_pair('auto:nomarker', 'Pair Notebook with nomarker Script'));
-            JupytextActions.append(jupytext_pair('md', 'Pair Notebook with Markdown'));
-            JupytextActions.append(jupytext_pair('md:myst', 'Pair Notebook with MyST Markdown'));
-            JupytextActions.append(jupytext_pair('Rmd', 'Pair Notebook with R Markdown', notebook_extension!=='Rmd'));
-            JupytextActions.append(jupytext_pair('custom', 'Custom pairing'));
-            JupytextActions.append($('<li/>').addClass('divider'));
-            JupytextActions.append(toggle_metadata);
-            JupytextActions.append($('<li/>').addClass('divider'));
-            JupytextActions.append(jupytext_pair('none', 'Unpair notebook'));
-
-            $('#jupytext_sub_menu').after('<li class="divider"/>');
-
-            checkSelectedJupytextFormats();
-            checkAutosave();
-
             // New Text Notebook menu
             var NewTextNotebook = $('<a/>').attr('href', '#')
                 .addClass('dropdown-toogle')
@@ -410,6 +381,34 @@ define([
             TextNotebooks.append(text_notebook_entry('MyST Markdown', '.md:myst'));
             TextNotebooks.append($('<li/>').addClass('divider'));
             TextNotebooks.append(text_notebook_entry('R Markdown', '.Rmd'));
+
+            // Jupytext menu
+            $('#open_notebook').before('<li id="jupytext_sub_menu"/>');
+            $('#jupytext_sub_menu').addClass('dropdown-submenu').append(JupytextMenu).append(JupytextActions);
+            JupytextActions.append(jupytext_link);
+            JupytextActions.append($('<li/>').addClass('divider'));
+            JupytextActions.append(jupytext_faq);
+            JupytextActions.append($('<li/>').addClass('divider'));
+            JupytextActions.append(toggle_autosave);
+            JupytextActions.append($('<li/>').addClass('divider'));
+
+            var notebook_extension = Jupyter.notebook.notebook_path.split('.').pop();
+            JupytextActions.append(jupytext_pair('ipynb', 'Pair Notebook with ipynb document', notebook_extension!=='ipynb'));
+            JupytextActions.append(jupytext_pair('auto:light', 'Pair Notebook with light Script'));
+            JupytextActions.append(jupytext_pair('auto:percent', 'Pair Notebook with percent Script'));
+            JupytextActions.append(jupytext_pair('auto:hydrogen', 'Pair Notebook with Hydrogen Script'));
+            JupytextActions.append(jupytext_pair('auto:nomarker', 'Pair Notebook with nomarker Script'));
+            JupytextActions.append(jupytext_pair('md', 'Pair Notebook with Markdown'));
+            JupytextActions.append(jupytext_pair('md:myst', 'Pair Notebook with MyST Markdown'));
+            JupytextActions.append(jupytext_pair('Rmd', 'Pair Notebook with R Markdown', notebook_extension!=='Rmd'));
+            JupytextActions.append(jupytext_pair('custom', 'Custom pairing'));
+            JupytextActions.append($('<li/>').addClass('divider'));
+            JupytextActions.append(toggle_metadata);
+            JupytextActions.append($('<li/>').addClass('divider'));
+            JupytextActions.append(jupytext_pair('none', 'Unpair notebook'));
+
+            checkSelectedJupytextFormats();
+            checkAutosave();
         }
     };
 
