@@ -77,7 +77,7 @@ def _jupyter_nbextension_paths():  # pragma: no cover
             # directory in the `nbextension/` namespace
             dest="jupytext",
             # _also_ in the `nbextension/` namespace
-            require="jupytext/jupytext",
+            require="jupytext/index",
         )
     ]
 

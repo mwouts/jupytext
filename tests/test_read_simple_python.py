@@ -943,7 +943,7 @@ def test_round_trip_python_with_js_cell():
         cells=[
             new_code_cell(
                 """import notebook.nbextensions
-notebook.nbextensions.install_nbextension('jupytext.js', user=True)"""
+notebook.nbextensions.install_nbextension('index.js', user=True)"""
             ),
             new_code_cell(
                 """%%javascript
@@ -961,7 +961,7 @@ def test_round_trip_python_with_js_cell_no_cell_metadata():
         cells=[
             new_code_cell(
                 """import notebook.nbextensions
-notebook.nbextensions.install_nbextension('jupytext.js', user=True)"""
+notebook.nbextensions.install_nbextension('index.js', user=True)"""
             ),
             new_code_cell(
                 """%%javascript
