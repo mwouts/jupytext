@@ -265,10 +265,11 @@ define([
         );
     };
 
-    function text_notebook_entry(type, title, ext=null) {
+    function text_notebook_entry(title, ext = null) {
+        const new_script_notebook_id = 'new_notebook_' + ext.replace('.', '').replace(':', '_');
         return $('<li/>')
             .append($('<a/>')
-                .attr('id', 'new_notebook_' + type)
+                .attr('id', new_script_notebook_id)
                 .text(title)
                 .attr('title', title)
                 .data('ext', ext)
@@ -285,20 +286,25 @@ define([
     };
 
     function updateNewScriptNotebookMenu() {
-        if (Jupyter.notebook.metadata.language_info) {
-            var script_ext = Jupyter.notebook.metadata.language_info.file_extension;
-            var language_name = Jupyter.notebook.metadata.language_info.name;
-            language_name = language_name.charAt(0).toUpperCase() + language_name.slice(1);
-            var title = language_name + ' script';
-            $('#new_notebook_script').parent().removeClass('disabled');
-            $('#new_notebook_script').data('ext', script_ext);
-            $('#new_notebook_script').attr('title', title);
-            $('#new_notebook_script').text(title);
+        var format_name;
+        for (format_name of ['light', 'percent', 'hydrogen', 'nomarker']) {
+            const new_script_notebook_menu = $('#new_notebook_auto_' + format_name);
+            if (Jupyter.notebook.metadata.language_info) {
+                var script_ext = Jupyter.notebook.metadata.language_info.file_extension + ':' + format_name;
+                var language_name = Jupyter.notebook.metadata.language_info.name;
+                language_name = language_name.charAt(0).toUpperCase() + language_name.slice(1);
+                var title = language_name + ' Script in ' + format_name + ' format';
+                new_script_notebook_menu.parent().removeClass('disabled');
+                new_script_notebook_menu.data('ext', script_ext);
+                new_script_notebook_menu.attr('title', title);
+                new_script_notebook_menu.text(title);
+            } else {
+                new_script_notebook_menu.parent().addClass('disabled');
+                new_script_notebook_menu.data('ext', null);
             }
-        else {
-            $('#new_notebook_script').parent().addClass('disabled');
-            $('#new_notebook_script').data('ext', null);
-        };
+            ;
+        }
+        ;
     };
 
     var jupytext_menu = function () {
@@ -394,8 +400,14 @@ define([
 
             $('#open_notebook').before('<li id="new_text_notebook"/>');
             $('#new_text_notebook').addClass('dropdown-submenu').append(NewTextNotebook).append(TextNotebooks);
-            TextNotebooks.append(text_notebook_entry('md', 'Markdown', '.md'));
-            TextNotebooks.append(text_notebook_entry('script', 'Script'));
+            var format_name;
+            for (format_name of ['light', 'percent', 'hydrogen', 'nomarker'])
+                TextNotebooks.append(text_notebook_entry('Script in ' + format_name + ' format', '.auto:' + format_name));
+            TextNotebooks.append($('<li/>').addClass('divider'));
+            TextNotebooks.append(text_notebook_entry('Markdown', '.md'));
+            TextNotebooks.append(text_notebook_entry('MyST Markdown', '.md:myst'));
+            TextNotebooks.append($('<li/>').addClass('divider'));
+            TextNotebooks.append(text_notebook_entry('R Markdown', '.Rmd'));
         }
     };
 

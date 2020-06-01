@@ -321,15 +321,26 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 )
 
             ext = ext or ".ipynb"
+            if ":" in ext:
+                ext, format_name = ext.split(":", 1)
+            else:
+                format_name = ""
+
             path = path.strip("/")
             if not self.dir_exists(path):
                 raise HTTPError(404, "No such directory: %s" % path)
 
-            model = {"type": "notebook"}
             untitled = self.untitled_notebook
-
             name = self.increment_notebook_filename(untitled + ext, path)
             path = u"{0}/{1}".format(path, name)
+
+            model = {"type": "notebook"}
+            if format_name:
+                model["format"] = "json"
+                model["content"] = nbformat.v4.nbbase.new_notebook(
+                    metadata={"jupytext": {"formats": ext + ":" + format_name}}
+                )
+
             return self.new(model, path)
 
         def increment_notebook_filename(self, filename, path=""):
