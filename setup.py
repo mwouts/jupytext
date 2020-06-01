@@ -43,7 +43,6 @@ setup(
                 "jupytext/nbextension/index.js",
                 "jupytext/nbextension/README.md",
                 "jupytext/nbextension/jupytext_menu.png",
-                "jupytext/nbextension/jupytext_menu_zoom.png",
                 "jupytext/nbextension/jupytext.yml",
             ],
         ),
