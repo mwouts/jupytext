@@ -1,4 +1,9 @@
 import pytest
+
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
 from jupytext.compare import compare
 from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.paired_paths import InconsistentPath, paired_paths, base_path, full_path
@@ -52,10 +57,24 @@ def test_base_path_in_tree_from_non_root():
     )
 
 
+def test_base_path_in_tree_from_non_root_no_subfolder():
+    nb_file = "/parent/notebooks/wrap_markdown.ipynb"
+    formats = "notebooks///ipynb,scripts///py:percent"
+    fmt = "notebooks///ipynb"
+    assert base_path(nb_file, fmt) == "/parent///wrap_markdown"
+    paired_paths(nb_file, fmt, formats)
+
+
 def test_full_path_in_tree_from_root():
     fmt = long_form_one_format("notebooks///ipynb")
     assert full_path("//subfolder/test", fmt=fmt) == "notebooks/subfolder/test.ipynb"
     assert full_path("///subfolder/test", fmt=fmt) == "/notebooks/subfolder/test.ipynb"
+
+
+def test_full_path_in_tree_from_root_no_subfolder():
+    fmt = long_form_one_format("notebooks///ipynb")
+    assert full_path("//test", fmt=fmt) == "notebooks/test.ipynb"
+    assert full_path("///test", fmt=fmt) == "/notebooks/test.ipynb"
 
 
 def test_full_path_in_tree_from_non_root():
@@ -64,6 +83,17 @@ def test_full_path_in_tree_from_non_root():
         full_path("/parent_folder///subfolder/test", fmt=fmt)
         == "/parent_folder/notebooks/subfolder/test.ipynb"
     )
+
+
+def test_paired_paths_windows():
+    nb_file = "C:\\Users\\notebooks\\notebooks\\subfolder\\nb.ipynb"
+    formats = "notebooks///ipynb,scripts///py"
+    with mock.patch("os.path.sep", "\\"):
+        assert (
+            base_path(nb_file, "notebooks///ipynb")
+            == "C:\\Users\\notebooks\\//subfolder\\nb"
+        )
+        paired_paths(nb_file, "notebooks///ipynb", formats)
 
 
 def test_path_in_tree_limited_to_config_dir(tmpdir):
