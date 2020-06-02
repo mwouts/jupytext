@@ -8,6 +8,7 @@ _JUPYTER_LANGUAGES = [
     "python",
     "python2",
     "python3",
+    "coconut",
     "javascript",
     "js",
     "perl",
@@ -30,6 +31,7 @@ _JUPYTER_LANGUAGES = [
 # Please add more languages here (and add a few tests) - see CONTRIBUTING.md
 _SCRIPT_EXTENSIONS = {
     ".py": {"language": "python", "comment": "#"},
+    ".coco": {"language": "coconut", "comment": "#"},
     ".R": {"language": "R", "comment": "#"},
     ".r": {"language": "R", "comment": "#"},
     ".jl": {"language": "julia", "comment": "#"},
