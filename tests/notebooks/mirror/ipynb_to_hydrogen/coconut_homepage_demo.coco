@@ -1,0 +1,103 @@
+# ---
+# jupyter:
+#   kernelspec:
+#     display_name: Coconut
+#     language: coconut
+#     name: coconut
+# ---
+
+# %% [markdown]
+# Taken fron [coconut-lang.org](coconut-lang.org)
+
+# %% [markdown]
+# pipeline-style programming
+
+# %%
+"hello, world!" |> print
+
+# %% [markdown]
+#  prettier lambdas
+
+# %%
+x -> x ** 2
+
+# %% [markdown]
+# partial application
+
+# %%
+range(10) |> map$(pow$(?, 2)) |> list
+
+# %% [markdown]
+# pattern-matching
+
+# %%
+match [head] + tail in [0, 1, 2, 3]:
+    print(head, tail)
+
+# %% [markdown]
+# destructuring assignment
+
+# %%
+{"list": [0] + rest} = {"list": [0, 1, 2, 3]}
+
+# %% [markdown]
+# infix notation
+
+# %%
+# 5 `mod` 3 == 2
+
+# %% [markdown]
+# operator functions
+
+# %%
+product = reduce$(*)
+
+# %% [markdown]
+# function composition
+
+# %%
+# (f..g..h)(x, y, z)
+
+# %% [markdown]
+# lazy lists
+
+# %%
+# (| first_elem() |) :: rest_elems()
+
+# %% [markdown]
+# parallel programming
+
+# %%
+range(100) |> parallel_map$(pow$(2)) |> list
+
+# %% [markdown]
+# tail call optimization
+
+# %%
+def factorial(n, acc=1):
+    case n:
+        match 0:
+            return acc
+        match _ is int if n > 0:
+            return factorial(n-1, acc*n)
+
+# %% [markdown]
+# algebraic data types
+
+# %%
+data Empty()
+data Leaf(n)
+data Node(l, r)
+
+def size(Empty()) = 0
+
+addpattern def size(Leaf(n)) = 1
+
+addpattern def size(Node(l, r)) = size(l) + size(r)
+
+# %% [markdown]
+# and much more!
+#
+# Like what you see? Don't forget to star Coconut on GitHub!
+
+# %%
