@@ -60,6 +60,12 @@ jobs:
           exit 0
       - name: Test with pytest
         shell: pwsh
-        run: pytest --cov=./ --cov-report=xml
+        run: |
+          if("${{ matrix.os }}" -eq "windows-latest"){
+             pytest
+          } else {
+             pytest --cov=./ --cov-report=xml
+          }
       - name: Upload coverage
         uses: codecov/codecov-action@v1
+        if: ${{ matrix.os != 'windows-latest' }}
