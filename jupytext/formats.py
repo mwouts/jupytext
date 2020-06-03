@@ -39,6 +39,7 @@ from .myst import (
     myst_extensions,
     matches_mystnb,
 )
+from .version import __version__
 
 
 class JupytextFormatError(ValueError):
@@ -421,15 +422,28 @@ def check_file_version(notebook, source_path, outputs_path):
     if (fmt.min_readable_version_number or current) <= version <= current:
         return
 
+    jupytext_version_in_file = (
+        notebook.metadata.get("jupytext", {})
+        .get("text_representation", {})
+        .get("jupytext_version", "N/A")
+    )
+
     raise JupytextFormatError(
-        "File {} is in format/version={}/{} (current version is {}). "
-        "It would not be safe to override the source of {} with that file. "
-        "Please remove one or the other file.".format(
-            os.path.basename(source_path),
-            format_name,
-            version,
-            current,
-            os.path.basename(outputs_path),
+        "The file {source_path} was generated with jupytext version {jupytext_version_in_file} "
+        "but you have {jupytext_version} installed. Please upgrade jupytext to version "
+        "{jupytext_version_in_file}, or remove either {source_path} or {output_path}. "
+        "This error occurs because {source_path} is in the {format_name} format in version {format_version}, "
+        "while jupytext version {jupytext_version} installed at {jupytext_path} can only read the "
+        "{format_name} format in versions {min_format_version} to {current_format_version}.".format(
+            source_path=os.path.basename(source_path),
+            output_path=os.path.basename(outputs_path),
+            format_name=format_name,
+            format_version=version,
+            jupytext_version_in_file=jupytext_version_in_file,
+            jupytext_version=__version__,
+            jupytext_path=os.path.dirname(os.path.dirname(__file__)),
+            min_format_version=fmt.min_readable_version_number or current,
+            current_format_version=current,
         )
     )
 

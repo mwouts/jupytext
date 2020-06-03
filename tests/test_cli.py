@@ -257,8 +257,17 @@ def test_combine_lower_version_raises(tmpdir):
         fp.write(
             """# ---
 # jupyter:
-#   jupytext_formats: ipynb,py
-#   jupytext_format_version: '0.0'
+#   jupytext:
+#     formats: ipynb,py:light
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '55.4'
+#       jupytext_version: 42.1.1
+#   kernelspec:
+#     display_name: Python 3
+#     language: python
+#     name: python3
 # ---
 
 # New cell
@@ -268,7 +277,14 @@ def test_combine_lower_version_raises(tmpdir):
     nb = new_notebook(metadata={"jupytext_formats": "ipynb,py"})
     write(nb, tmp_ipynb)
 
-    with pytest.raises(ValueError, match="Please remove one or the other file"):
+    with pytest.raises(
+        ValueError,
+        match="The file notebook.py was generated with jupytext version 42.1.1 but you have .* installed. "
+        "Please upgrade jupytext to version 42.1.1, or remove either notebook.py or notebook.ipynb. "
+        "This error occurs because notebook.py is in the light format in version 55.4, "
+        "while jupytext version .* installed at .* can only read the light format in versions .*",
+    ):
+
         jupytext([tmp_nbpy, "--to", "ipynb", "--update"])
 
 
