@@ -49,6 +49,7 @@ _SCRIPT_EXTENSIONS = {
     ".scala": {"language": "scala", "comment": "//"},
     ".rs": {"language": "rust", "comment": "//"},
     ".robot": {"language": "robotframework", "comment": "#"},
+    ".resource": {"language": "robotframework", "comment": "#"},
     ".cs": {"language": "csharp", "comment": "//"},
     ".fsx": {"language": "fsharp", "comment": "//"},
     ".fs": {"language": "fsharp", "comment": "//"},
