@@ -769,6 +769,9 @@ def auto_ext_from_metadata(metadata):
     if auto_ext == ".fs":
         return ".fsx"
 
+    if auto_ext == ".resource":
+        return ".robot"
+
     return auto_ext
 
 
