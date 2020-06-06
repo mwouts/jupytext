@@ -657,6 +657,9 @@ def test_utf8_out_331(capsys, caplog):
         pytest.skip(caplog.text)  # Issue 489
 
     out, err = capsys.readouterr()
+    if "Timeout" in err:
+        pytest.skip(err)  # Issue 489
+
     assert err == ""
     nb = reads(out, "ipynb")
     assert len(nb.cells) == 1
