@@ -23,12 +23,11 @@ jobs:
       - name: Setup Miniconda
         uses: goanpeca/setup-miniconda@v1
         with:
-          auto-update-conda: false
+          auto-update-conda: true
           auto-activate-base: false
           activate-environment: jupytext-ci
           python-version: ${{ matrix.python-version }}
           channels: defaults,conda-forge
-          channel-priority: strict
           environment-file: environment-ci.yml
           use-only-tar-bz2: true
       - name: Lint with flake8
@@ -51,13 +50,18 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference='silentlycontinue'
+          # Install mock on Python 2.7
+          conda install mock --freeze-installed
           # install black if available (Python 3.6 and above), and autopep8 for testing the pipe mode
-          pip install black
-          pip install autopep8
-          # install sphinx_gallery and matplotlib if available (may not work on pypy)
-          pip install sphinx_gallery
-          pip install myst-parser
+          conda install black --freeze-installed
+          conda install autopep8 --freeze-installed
+          # install sphinx_gallery and matplotlib if available
+          conda install sphinx_gallery --freeze-installed
+          conda install myst-parser --freeze-installed
           exit 0
+      - name: Conda list
+        shell: pwsh
+        run: conda list
       - name: Test with pytest
         shell: pwsh
         run: |
