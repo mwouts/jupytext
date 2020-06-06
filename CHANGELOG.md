@@ -12,6 +12,7 @@
 - Mention that the YAML header can be created with either `--set-kernel`, `--set-formats`, or both (#485)
 - Mention that one should use double quotes, not single quotes, around `jupytext --check` commands like `"pytest {}"` on Windows (#475)
 - Improve the error message when a file is in a version that can't be read by Jupytext (#531)
+- Add support for `.resource` files from the Robot Framework, thanks to Hiski Valli (#535)
 
 **Fixed**
 - Skip the `jupytext --execute` tests when the warning _Timeout waiting for IOPub output_ occurs, which is the case intermittently on Windows (#489)
