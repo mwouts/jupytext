@@ -282,6 +282,7 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
     assert os.path.isfile(tmp_py)
 
 
+@requires_jupytext_installed
 def test_pre_commit_hook_with_subfolders_issue_506(tmpdir):
     """I have the following directory structure, where the nb/test.ipynb is paired with the py/test.py.
 
@@ -326,6 +327,7 @@ def test_pre_commit_hook_with_subfolders_issue_506(tmpdir):
 
 
 @requires_pandoc
+@requires_jupytext_installed
 def test_wrap_markdown_cell(tmpdir):
     """Use a pre-commit hook to sync a notebook to a script paired in a tree, and reformat
     the markdown cells using pandoc"""
