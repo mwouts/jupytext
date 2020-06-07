@@ -26,3 +26,9 @@ dependencies:
   - twine
   - pandoc>=2.9
   - myst-parser
+  # make html in docs folder
+  - sphinx
+  - recommonmark
+  - pip:
+    - sphinx_copybutton
+    - sphinx_rtd_theme
