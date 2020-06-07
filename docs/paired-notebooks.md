@@ -46,7 +46,13 @@ In JupyterLab this is slightly different. Scripts and Markdown document also hav
 If do not want to classify scripts or Markdown documents as notebooks, please use the `notebook_extension` option. For instance, if you want to get the notebook icon only for `.ipynb` and `.Rmd` files, set
 
 ```python
+c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
 c.ContentsManager.notebook_extensions = "ipynb,Rmd"
 ```
+in your `.jupyter/jupyter_notebook_config.py`, or
+```
+notebook_extensions = "ipynb,Rmd"
+```
+in your local or global [`jupytext.toml`](config.md) file.
 
 Please note that, with the above setting, Jupyter will not let you open scripts as notebooks. If you still want to do so, use Jupytext command line (see below) to first convert or pair the script to an `.ipynb` notebook.
