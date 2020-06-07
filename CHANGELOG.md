@@ -1,22 +1,24 @@
-1.5.0 (2020-05-??)
+1.5.0 (2020-06-07)
 ------------------
 
 **Added**
 - Jupytext can use a local or global [configuration file](https://github.com/mwouts/jupytext/blob/master/docs/config.md) (#508)
-- Jupytext can pair notebooks in trees. Use e.g. `notebooks///ipynb,scripts///py:percent` if you want to replicate the arborescence of notebooks under `notebooks` in a folder named `scripts` (#424)
-- The extension for Jupyter Notebook adds a _New Text Notebook_ menu that creates text-only notebooks (#443)
-- Jupytext is tested in `pip` and `conda` environments, on Linux, Mac OS and Windows, using Github actions (#487)
-- Pre-commit checks and automatic reformatting of Jupytext's code with `pre-commit`, `black` and `flake8` (#483)
-- Groovy and Java are now supported, thanks to Przemek Wesołek's contribution (#500)
+- Jupytext can pair notebooks in trees. Use e.g. `notebooks///ipynb,scripts///py:percent` if you want to replicate the tree of notebooks under `notebooks` in a folder named `scripts` (#424)
+- The extension for Jupyter Notebook has a _New Text Notebook_ menu that creates text-only notebooks (#443)
+- Groovy and Java are now supported, thanks to Przemek Wesołek (#500)
 - The Coconut language is also supported, thanks to Thurston Sexton (#532)
-- Mention that the YAML header can be created with either `--set-kernel`, `--set-formats`, or both (#485)
-- Mention that one should use double quotes, not single quotes, around `jupytext --check` commands like `"pytest {}"` on Windows (#475)
-- Improve the error message when a file is in a version that can't be read by Jupytext (#531)
-- Add support for `.resource` files from the Robot Framework, thanks to Hiski Valli (#535)
+- Resource files with `.resource` extension from the Robot Framework are supported, thanks to Hiski Valli (#535)
+- Jupytext is tested in `pip` and `conda` environments, on Linux, Mac OS and Windows, using Github actions (#487)
+- Jupytext uses pre-commit checks and automatic reformatting with `pre-commit`, `black` and `flake8` (#483)
+- Documentation improvements:
+  - Mention that the YAML header can be created with either `--set-kernel`, `--set-formats`, or both (#485)
+  - Mention that one should use double quotes, not single quotes, around `jupytext --check` commands like `"pytest {}"` on Windows (#475)
+  - Improved error message when a file is in a version that can't be read by Jupytext (#531)
 
 **Fixed**
 - Skip the `jupytext --execute` tests when the warning _Timeout waiting for IOPub output_ occurs, which is the case intermittently on Windows (#489)
 - Fixed wrong paired paths when syncing with the --pre-commit flag (#506)
+
 
 1.4.2 (2020-04-05)
 ------------------
