@@ -81,7 +81,7 @@ jupyter notebook # or lab
 
 Jupytext includes an extensions for Jupyter Notebook that adds a Jupytext section in the File menu.
 
-![Jupyter notebook extension](https://raw.githubusercontent.com/mwouts/jupytext_nbextension/master/jupytext_menu.png)
+![Jupyter notebook extension](https://raw.githubusercontent.com/mwouts/jupytext/master/jupytext/nbextension/jupytext_menu.png)
 
 If the extension was not automatically installed, install and activate it with
 ```
@@ -93,7 +93,7 @@ jupyter nbextension enable --py jupytext [--user]
 
 In JupyterLab, Jupytext adds a set of commands to the command palette:
 
-![JupyterLab extension](https://raw.githubusercontent.com/mwouts/jupyterlab-jupytext/master/jupytext_commands.png)
+![JupyterLab extension](https://raw.githubusercontent.com/mwouts/jupytext/master/packages/labextension/jupytext_commands.png)
 
 The lab extension is included in the Python package. Unless you need to use an older version of the extension you don't have to either install or update the extension manually from [npm](https://www.npmjs.com/).
 
