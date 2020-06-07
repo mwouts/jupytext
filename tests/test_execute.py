@@ -15,7 +15,7 @@ def skip_if_timeout(caplog, capsys):
 
 
 @requires_nbconvert
-def test_pipe_nbconvert_execute(tmpdir, caplog, capsys):
+def test_pipe_nbconvert_execute(tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
 
@@ -33,10 +33,9 @@ def test_pipe_nbconvert_execute(tmpdir, caplog, capsys):
             "--pipe-fmt",
             "ipynb",
             "--pipe",
-            "jupyter nbconvert --stdin --stdout --to notebook --execute",
+            "jupyter nbconvert --stdin --stdout --to notebook --execute --NotebookClient.iopub_timeout=60",
         ]
     )
-    skip_if_timeout(caplog, capsys)
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
@@ -44,7 +43,7 @@ def test_pipe_nbconvert_execute(tmpdir, caplog, capsys):
 
 
 @requires_nbconvert
-def test_pipe_nbconvert_execute_sync(tmpdir, caplog, capsys):
+def test_pipe_nbconvert_execute_sync(tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
 
@@ -63,10 +62,9 @@ def test_pipe_nbconvert_execute_sync(tmpdir, caplog, capsys):
             "--pipe-fmt",
             "ipynb",
             "--pipe",
-            "jupyter nbconvert --stdin --stdout --to notebook --execute",
+            "jupyter nbconvert --stdin --stdout --to notebook --execute --NotebookClient.iopub_timeout=60",
         ]
     )
-    skip_if_timeout(caplog, capsys)
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
