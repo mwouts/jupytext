@@ -1,3 +1,10 @@
+1.5.1 (2020-06-??)
+------------------
+
+**Fixed**
+- Filtered out `__pycache__` and `.pyc` files from the pip package.
+
+
 1.5.0 (2020-06-07)
 ------------------
 
