@@ -56,7 +56,7 @@ jobs:
           conda install black --freeze-installed
           conda install autopep8 --freeze-installed
           # install sphinx_gallery and matplotlib if available
-          conda install sphinx_gallery --freeze-installed
+          conda install sphinx-gallery --freeze-installed
           conda install myst-parser --freeze-installed
           exit 0
       - name: Conda list
