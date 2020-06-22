@@ -40,12 +40,12 @@ jobs:
           # exit-zero treats all errors as warnings.  The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --statistics
       - name: Install from source
-        shell: pwsh
         # This is required for the pre-commit tests
-        run: |
-          $ErrorActionPreference='silentlycontinue'
-          pip install .
-          exit 0
+        shell: pwsh
+        run: pip install .
+      - name: Create kernel
+        shell: pwsh
+        run: python -m ipykernel install --name jupytext-ci --user
       - name: Install optional dependencies
         shell: pwsh
         run: |
