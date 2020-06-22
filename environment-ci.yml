@@ -13,6 +13,7 @@ dependencies:
   - pip
   - pytest
   - pytest-cov
+  - coverage
   - flake8
   - pandoc>=2.9
   # pathlib is required on Python 2
