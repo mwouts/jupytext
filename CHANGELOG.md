@@ -3,6 +3,8 @@
 
 **Fixed**
 - Filtered out `__pycache__` and `.pyc` files from the pip package.
+- Added `coverage` as a dependency on the conda CI workflow to allow coverage to be uploaded.
+- Skipped Python 2.7 on the conda CI due to an "ImportError: No module named functools_lru_cache" when executing notebooks.
 
 
 1.5.0 (2020-06-07)
