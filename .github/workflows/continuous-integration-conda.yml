@@ -11,6 +11,9 @@ jobs:
           # This one fails, cf. https://github.com/mwouts/jupytext/runs/736344037
           - os: windows-latest
             python-version: 2.7
+          # Jupyter commands fail with "ImportError: No module named functools_lru_cache",
+          # Cf. https://github.com/mwouts/jupytext/runs/793874319
+          - python-version: 2.7
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
