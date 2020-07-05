@@ -11,9 +11,6 @@ jobs:
           # This one fails, cf. https://github.com/mwouts/jupytext/runs/736344037
           - os: windows-latest
             python-version: 2.7
-          # Jupyter commands fail with "ImportError: No module named functools_lru_cache",
-          # Cf. https://github.com/mwouts/jupytext/runs/793874319
-          - python-version: 2.7
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -48,7 +45,13 @@ jobs:
         run: pip install .
       - name: Create kernel
         shell: pwsh
-        run: python -m ipykernel install --name jupytext-ci --user
+        run: |
+          if("${{ matrix.python-version }}" -eq "2.7"){
+            # Fix "ImportError: No module named functools_lru_cache" when running Jupyter commands
+            # Cf. https://github.com/mwouts/jupytext/runs/793874319
+            conda install backports.functools_lru_cache
+          }
+          python -m ipykernel install --name jupytext-ci --user
       - name: Install optional dependencies
         shell: pwsh
         run: |
