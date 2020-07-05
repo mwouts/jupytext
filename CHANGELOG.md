@@ -1,11 +1,11 @@
-1.5.1 (2020-06-??)
+1.5.1 (2020-07-05)
 ------------------
 
 **Fixed**
+- Added `toml` as a dependency (#552).
 - Filtered out `__pycache__` and `.pyc` files from the pip package.
-- Added `toml` as a dependency.
-- Added `coverage` as a dependency on the conda CI workflow to allow coverage to be uploaded.
-- Skipped Python 2.7 on the conda CI due to an "ImportError: No module named functools_lru_cache" when executing notebooks.
+- Fixed coverage upload by adding `coverage` as a dependency to the conda CI workflow.
+- Fixed the conda CI / Python 2.7 job by explicitly installing `backports.functools_lru_cache` (#554).
 
 
 1.5.0 (2020-06-07)

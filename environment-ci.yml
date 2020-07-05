@@ -1,5 +1,5 @@
 # This environment is smaller than the dev environment.
-# In particular it does not include JupyterLab, commmunity notebook extensions,
+# In particular it does not include JupyterLab, community notebook extensions,
 # nor the libraries that are not available for Python 2.7
 name: jupytext-ci
 channels:
