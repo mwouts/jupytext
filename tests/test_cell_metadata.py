@@ -4,6 +4,7 @@ from jupytext.cell_metadata import (
     rmd_options_to_metadata,
     metadata_to_rmd_options,
     parse_rmd_options,
+    parse_key_equal_value,
 )
 from jupytext.cell_metadata import (
     _IGNORE_CELL_METADATA,
@@ -211,3 +212,17 @@ def test_incorrectly_encoded(text="this is an incorrect expression d={{4 b=3"):
 def test_incorrectly_encoded_json(text='this is an incorrect expression {"d": "}'):
     value = text_to_metadata(text, allow_title=True)
     assert metadata_to_text(*value) == text
+
+
+def test_parse_key_value():
+    assert parse_key_equal_value("key='value' key2=5.0") == {
+        "key": "value",
+        "key2": 5.0,
+    }
+
+
+def test_parse_key_value_key():
+    assert parse_key_equal_value("key='value' key2") == {
+        "key": "value",
+        "key2": None,
+    }
