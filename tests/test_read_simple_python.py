@@ -1136,7 +1136,7 @@ except:
         ]
     ),
     text="""try:
-#     !echo jo
+    # !echo jo
     pass
 except:
     pass
@@ -1182,3 +1182,23 @@ def test_arg(arg):
         assert cell.cell_type == "code"
     assert nb.cells[0].source == "import pytest"
     assert nb.cells[0].metadata == {}
+
+
+def test_indented_magic_commands(
+    text="""if True:
+    # # !rm file 1
+    # !rm file 2
+""",
+):
+
+    nb = jupytext.reads(text, "py")
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == "code"
+    compare(
+        nb.cells[0].source,
+        """if True:
+    # !rm file 1
+    !rm file 2""",
+    )
+    assert nb.cells[0].metadata == {}
+    compare(jupytext.writes(nb, "py"), text)

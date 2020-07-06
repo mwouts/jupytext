@@ -250,3 +250,10 @@ def test_configure_magic(no_jupytext_version_number):
 """,
     )
     compare_notebooks(jupytext.reads(text, "py"), nb)
+
+
+def test_indented_magic():
+    assert is_magic("    !rm file", "python")
+    assert is_magic("    # !rm file", "python")
+    assert comment_magic(["    !rm file"]) == ["    # !rm file"]
+    assert uncomment_magic(["    # !rm file"]) == ["    !rm file"]

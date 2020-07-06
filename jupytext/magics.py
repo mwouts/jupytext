@@ -40,11 +40,11 @@ _MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*escape
 _MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*noescape")
 
 # Commands starting with a question or exclamation mark have to be escaped
-_PYTHON_HELP_OR_BASH_CMD = re.compile(r"^(# |#)*\s*(\?|!)\s*[A-Za-z]")
+_PYTHON_HELP_OR_BASH_CMD = re.compile(r"^\s*(# |#)*\s*(\?|!)\s*[A-Za-z]")
 
 # A bash command not followed by an equal sign or a parenthesis is a magic command
 _PYTHON_MAGIC_CMD = re.compile(
-    r"^(# |#)*({})($|\s$|\s[^=,])".format(
+    r"^\s*(# |#)*({})($|\s$|\s[^=,])".format(
         "|".join(
             # posix
             ["cat", "cd", "cp", "mv", "rm", "rmdir", "mkdir"]
@@ -55,7 +55,7 @@ _PYTHON_MAGIC_CMD = re.compile(
     )
 )
 # Python help commands end with ?
-_IPYTHON_MAGIC_HELP = re.compile(r"^(# )*[^\s]*\?\s*$")
+_IPYTHON_MAGIC_HELP = re.compile(r"^\s*(# )*[^\s]*\?\s*$")
 
 _SCRIPT_LANGUAGES = [_SCRIPT_EXTENSIONS[ext]["language"] for ext in _SCRIPT_EXTENSIONS]
 
@@ -109,7 +109,15 @@ def comment_magic(
             next_is_magic
             or is_magic(line, language, global_escape_flag, explicitly_code)
         ):
-            source[pos] = _COMMENT[language] + " " + line
+            if next_is_magic:
+                # this is the continuation line of a magic command on the previous line,
+                # so we don't want to indent the comment
+                unindented = line
+                indent = ""
+            else:
+                unindented = line.lstrip()
+                indent = line[: len(line) - len(unindented)]
+            source[pos] = indent + _COMMENT[language] + " " + unindented
             next_is_magic = language == "python" and _LINE_CONTINUATION_RE.match(line)
         parser.read_line(line)
     return source
@@ -118,10 +126,12 @@ def comment_magic(
 def unesc(line, language):
     """Uncomment once a commented line"""
     comment = _COMMENT[language]
-    if line.startswith(comment + " "):
-        return line[len(comment) + 1 :]
-    if line.startswith(comment):
-        return line[len(comment) :]
+    unindented = line.lstrip()
+    indent = line[: len(line) - len(unindented)]
+    if unindented.startswith(comment + " "):
+        return indent + unindented[len(comment) + 1 :]
+    if unindented.startswith(comment):
+        return indent + unindented[len(comment) :]
     return line
 
 
