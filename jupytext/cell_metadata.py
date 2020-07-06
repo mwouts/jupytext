@@ -64,10 +64,6 @@ _IGNORE_CELL_METADATA = ",".join(
 _IDENTIFIER_RE = re.compile(r"^[a-zA-Z_\.]+[a-zA-Z0-9_\.]*$")
 
 
-def _r_logical_values(pybool):
-    return "TRUE" if pybool else "FALSE"
-
-
 class RLogicalValueError(Exception):
     """Incorrect value for R boolean"""
 
