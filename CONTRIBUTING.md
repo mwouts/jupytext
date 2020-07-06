@@ -39,6 +39,7 @@ Most of Jupytext's code is written in Python. To develop the Python part of Jupy
 cd jupytext
 conda env create --file environment.yml  # or conda env update --file ...
 conda activate jupytext-dev
+python -m ipykernel install --name jupytext-dev --user
 pip install -e .
 ```
 
