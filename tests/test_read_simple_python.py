@@ -10,6 +10,7 @@ from jupytext.compare import compare
 import jupytext
 from jupytext.compare import compare_notebooks
 from .utils import skip_if_dict_is_not_ordered
+import pytest
 
 
 def test_read_simple_file(
@@ -1184,21 +1185,39 @@ def test_arg(arg):
     assert nb.cells[0].metadata == {}
 
 
-def test_indented_magic_commands(
-    text="""if True:
+@pytest.mark.parametrize(
+    "script,cell",
+    [
+        (
+            """if True:
     # # !rm file 1
     # !rm file 2
 """,
-):
-
-    nb = jupytext.reads(text, "py")
-    assert len(nb.cells) == 1
-    assert nb.cells[0].cell_type == "code"
-    compare(
-        nb.cells[0].source,
-        """if True:
+            """if True:
     # !rm file 1
     !rm file 2""",
-    )
+        ),
+        (
+            """# +
+if True:
+    # help?
+    # ?help
+    # # ?help
+    # # help?
+""",
+            """if True:
+    help?
+    ?help
+    # ?help
+    # help?""",
+        ),
+    ],
+)
+def test_indented_magic_commands(script, cell):
+
+    nb = jupytext.reads(script, "py")
+    assert len(nb.cells) == 1
+    assert nb.cells[0].cell_type == "code"
+    compare(nb.cells[0].source, cell)
     assert nb.cells[0].metadata == {}
-    compare(jupytext.writes(nb, "py"), text)
+    compare(jupytext.writes(nb, "py"), script)
