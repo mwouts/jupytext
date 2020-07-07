@@ -44,7 +44,7 @@ _PYTHON_HELP_OR_BASH_CMD = re.compile(r"^\s*(# |#)*\s*(\?|!)\s*[A-Za-z]")
 
 # A bash command not followed by an equal sign or a parenthesis is a magic command
 _PYTHON_MAGIC_CMD = re.compile(
-    r"^\s*(# |#)*({})($|\s$|\s[^=,])".format(
+    r"^(# |#)*({})($|\s$|\s[^=,])".format(
         "|".join(
             # posix
             ["cat", "cd", "cp", "mv", "rm", "rmdir", "mkdir"]
