@@ -66,6 +66,14 @@ def test_base_path_in_tree_from_non_root_no_subfolder():
     paired_paths(nb_file, fmt, formats)
 
 
+def test_base_path_in_tree_from_non_root_no_subfolder_dotdot():
+    nb_file = "/parent/notebooks/wrap_markdown.ipynb"
+    formats = "notebooks/../notebooks///ipynb,script/../scripts///py:percent"
+    fmt = "notebooks///ipynb"
+    assert base_path(nb_file, fmt) == "/parent///wrap_markdown"
+    paired_paths(nb_file, fmt, formats)
+
+
 def test_full_path_in_tree_from_root():
     fmt = long_form_one_format("notebooks///ipynb")
     assert full_path("//subfolder/test", fmt=fmt) == "notebooks/subfolder/test.ipynb"

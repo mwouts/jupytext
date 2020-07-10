@@ -224,6 +224,7 @@ def find_base_path_and_format(main_path, formats):
 
 def paired_paths(main_path, fmt, formats):
     """Return the list of paired notebooks, given main path, and the list of formats"""
+    main_path = os.path.normpath(main_path)
     if not formats:
         return [(main_path, {"extension": os.path.splitext(main_path)[1]})]
 
@@ -231,7 +232,7 @@ def paired_paths(main_path, fmt, formats):
 
     # Is there a format that matches the main path?
     base = base_path(main_path, fmt)
-    paths = [full_path(base, f) for f in formats]
+    paths = [os.path.normpath(full_path(base, f)) for f in formats]
 
     if main_path not in paths:
         raise InconsistentPath(
