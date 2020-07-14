@@ -105,6 +105,12 @@ def test_paired_paths_windows_no_subfolder():
         paired_paths(nb_file, "notebooks///ipynb", formats)
 
 
+def test_paired_path_dotdot_564():
+    main_path = "examples/tutorials/colabs/rigid_object_tutorial.ipynb"
+    formats = "../nb_python//py:percent,../colabs//ipynb"
+    paired_paths(main_path, "ipynb", formats)
+
+
 def test_path_in_tree_limited_to_config_dir(tmpdir):
     root_nb_dir = tmpdir.mkdir("notebooks")
     nb_dir = root_nb_dir.mkdir("notebooks")
