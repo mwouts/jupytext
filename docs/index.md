@@ -1,7 +1,5 @@
 # Jupyter Notebooks as Markdown Documents, Julia, Python or R Scripts
 
-![](logo.png)
-
 ## Contents
 
 * [Introduction](introduction.md)
