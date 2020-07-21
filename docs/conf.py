@@ -19,7 +19,7 @@ from recommonmark.transform import AutoStructify
 # -- Project information -----------------------------------------------------
 
 project = "Jupytext"
-copyright = "2018-2019, The Jupytext Team"
+copyright = "2018-2020, The Jupytext Team"
 author = "The Jupytext Team"
 
 # -- General configuration ---------------------------------------------------
@@ -49,8 +49,18 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
-html_theme = "sphinx_rtd_theme"
+html_theme = "alabaster"
+
+html_sidebars = {"**": ["about.html", "navigation.html", "searchbox.html"]}
+
+html_theme_options = {
+    "github_button": True,
+    "github_user": "mwouts",
+    "github_repo": "jupytext",
+    "github_type": "star",
+    "logo": "logo.svg",
+}
+
 pygments_style = "sphinx"
 master_doc = "index"  # Makes `index.md` the main file
 
