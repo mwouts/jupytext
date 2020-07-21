@@ -457,10 +457,18 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
         options = metadata_to_double_percent_options(
             self.metadata, self.cell_metadata_json
         )
+        indent = ""
+        if self.is_code() and active and self.source:
+            first_line = self.source[0]
+            if first_line.strip():
+                left_space = re.compile(r"^(\s*)").match(first_line)
+                if left_space:
+                    indent = left_space.groups()[0]
+
         if options.startswith("%") or not options:
-            lines = [self.comment + " %%" + options]
+            lines = [indent + self.comment + " %%" + options]
         else:
-            lines = [self.comment + " %% " + options]
+            lines = [indent + self.comment + " %% " + options]
 
         if self.is_code() and active:
             source = copy(self.source)

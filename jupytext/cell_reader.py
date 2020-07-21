@@ -747,9 +747,9 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
         script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = default_language or script["language"]
         self.comment = script["comment"]
-        self.start_code_re = re.compile(r"^{}\s*%%(%*)\s(.*)$".format(self.comment))
+        self.start_code_re = re.compile(r"^\s*{}\s*%%(%*)\s(.*)$".format(self.comment))
         self.alternative_start_code_re = re.compile(
-            r"^{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(self.comment)
+            r"^\s*{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(self.comment)
         )
         self.explicit_soc = True
 
