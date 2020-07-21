@@ -6,6 +6,7 @@
 
 **Fixed**
 - Preserve indentation when commenting out magic commands (#437)
+- Fixed MyBinder - `jupytext.py` is not a configuration file (#559, #567)
 
 
 1.5.1 (2020-07-05)

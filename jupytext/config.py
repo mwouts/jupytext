@@ -17,10 +17,11 @@ JUPYTEXT_CONFIG_FILES = [
     "jupytext.yml",
     "jupytext.yaml",
     "jupytext.json",
-    "jupytext.py",
 ]
 
-JUPYTEXT_CONFIG_FILES.extend(["." + filename for filename in JUPYTEXT_CONFIG_FILES])
+JUPYTEXT_CONFIG_FILES.extend(
+    ["." + filename for filename in JUPYTEXT_CONFIG_FILES] + [".jupytext.py"]
+)
 JUPYTEXT_CEILING_DIRECTORIES = [
     path
     for path in os.environ.get("JUPYTEXT_CEILING_DIRECTORIES", "").split(":")
