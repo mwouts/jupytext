@@ -1,8 +1,8 @@
-1.5.1+dev
----------
+1.5.2 (2020-07-21)
+------------------
 
 **Changed**
-- The documentation now uses the Alabaster theme
+- The documentation uses the Alabaster theme
 
 **Fixed**
 - Preserve indentation when commenting out magic commands (#437)
