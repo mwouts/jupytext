@@ -33,6 +33,18 @@ def test_find_jupytext_configuration_file(tmpdir):
     )
 
 
+def test_jupytext_py_is_not_a_configuration_file(tmpdir):
+    jupytext_py = tmpdir.join("jupytext.py")
+    jupytext_py.write("# Not a config file!")
+
+    assert find_jupytext_configuration_file(str(tmpdir)) is None
+
+    dot_jupytext_py = tmpdir.join(".jupytext.py")
+    dot_jupytext_py.write("# This is a config file!")
+
+    assert find_jupytext_configuration_file(str(tmpdir)) == str(dot_jupytext_py)
+
+
 @pytest.mark.parametrize(
     "config_file",
     ["jupytext", "jupytext.toml", "jupytext.yml", "jupytext.json", "jupytext.py"],
