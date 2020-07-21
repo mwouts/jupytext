@@ -1103,3 +1103,19 @@ default_jupytext_formats = "notebooks///ipynb,scripts///py:percent"
     text = nb.cells[0].source
     assert len(text.splitlines()) == 3
     assert text != long_text
+
+
+def test_sync_script_dotdot_folder_564(tmpdir):
+    """Reproduce the setting of issue #564"""
+    nb_file = tmpdir.mkdir("colabs").mkdir("colabs").join("rigid_object_tutorial.ipynb")
+    py_file = tmpdir.join("colabs").mkdir("nb_python").join("rigid_object_tutorial.py")
+    py_file.write("1 + 1\n")
+
+    jupytext(
+        ["--set-formats", "../nb_python//py:percent,../colabs//ipynb", str(py_file)]
+    )
+
+    assert nb_file.exists()
+
+    jupytext(["--sync", str(py_file)])
+    jupytext(["--sync", str(nb_file)])
