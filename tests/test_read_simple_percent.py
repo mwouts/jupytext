@@ -502,3 +502,32 @@ def test_docstring_with_quadruple_quote(
     py = jupytext.writes(nb, "py:percent")
     nb2 = jupytext.reads(py, "py")
     compare_notebooks(nb2, nb)
+
+
+def test_cell_marker_has_same_indentation_as_code(
+    text="""# %%
+if __name__ == '__main__':
+    print(1)
+
+    # %%
+    # INDENTED COMMENT
+    print(2)
+""",
+    nb_expected=new_notebook(
+        cells=[
+            new_code_cell(
+                """if __name__ == '__main__':
+    print(1)"""
+            ),
+            new_code_cell(
+                """    # INDENTED COMMENT
+    print(2)"""
+            ),
+        ]
+    ),
+):
+    """The cell marker should have the same indentation as the first code line. See issue #562"""
+    nb_actual = jupytext.reads(text, fmt="py:percent")
+    compare_notebooks(nb_actual, nb_expected)
+    text_actual = jupytext.writes(nb_actual, fmt="py:percent")
+    compare(text_actual, text)
