@@ -14,7 +14,7 @@ In JupyterLab, use the [Jupytext commands](install.html#jupytext-commands-in-jup
 
 These command simply add a `"jupytext": {"formats": "ipynb,md"}`-like entry in the notebook metadata.
 
-You can also configure the notebook pairing on the command line, and set a default pairing for all the notebooks either globally or in a subfolder - see [here](config.html#).
+You can also configure the notebook pairing on the command line, and set a default pairing for all the notebooks either globally or in a subfolder - see [here](config.md).
 
 ## Can I edit a notebook simultaneously in Jupyter and in a text editor?
 
