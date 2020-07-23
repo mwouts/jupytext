@@ -1,18 +1,23 @@
 # Stop everything if one command fails
 set -e
 
-# Install the bash kernel
-python -m bash_kernel.install
-
-# Trust our notebook
-jupyter trust demo/World\ population.ipynb
-
-# Build jupyter lab to include the Jupytext extension
-jupyter lab build
+# Install from sources
+# NB: If you want to use Jupytext on your binder, don't install it from source,
+# just add "jupytext" to your "binder/requirements.txt" instead.
+pip install .[myst]
 
 # Create the notebook for our jupytext demo
 jupytext demo/get_started.md --to ipynb --update-metadata '{"jupytext":null}'
 
 # Remove the markdown representation
-# the demo starts with just the ipynb file
+# (the demo starts with just the ipynb file)
 rm demo/get_started.md
+
+# Trust our World Population notebook
+jupyter trust demo/World\ population.ipynb
+
+# Install the bash kernel
+python -m bash_kernel.install
+
+# Build jupyter lab to include the Jupytext extension
+jupyter lab build

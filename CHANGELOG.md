@@ -1,3 +1,10 @@
+1.6.0-dev (2020-08-??)
+----------------------
+
+**Changed**
+- Install Jupytext from source on MyBinder to avoid cache issues (#567)
+
+
 1.5.2 (2020-07-21)
 ------------------
 
