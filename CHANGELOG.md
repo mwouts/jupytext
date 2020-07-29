@@ -6,6 +6,7 @@
 
 **Changed**
 - Install Jupytext from source on MyBinder to avoid cache issues (#567)
+- Skip the tests that execute a notebook on Windows to avoid timeout issues (#489)
 
 **Fixed**
 - Configured coverage targets in `codecov.yml`

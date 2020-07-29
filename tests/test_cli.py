@@ -24,7 +24,12 @@ from jupytext.compare import compare_notebooks
 from jupytext.paired_paths import paired_paths, InconsistentPath
 from jupytext.formats import long_form_one_format, JupytextFormatError
 from .utils import list_notebooks, requires_sphinx_gallery
-from .utils import requires_jupytext_installed, requires_pandoc, requires_myst
+from .utils import (
+    requires_jupytext_installed,
+    requires_pandoc,
+    requires_myst,
+    skip_on_windows,
+)
 
 
 def test_str2bool():
@@ -663,18 +668,14 @@ def test_set_kernel_works_with_pipes_326(capsys):
     assert "kernelspec" in nb.metadata
 
 
+@skip_on_windows
 def test_utf8_out_331(capsys, caplog):
     py = u"from IPython.core.display import HTML; HTML(u'\xd7')"
 
     with mock.patch("sys.stdin", StringIO(py)):
         jupytext(["--to", "ipynb", "--execute", "-"])
 
-    if "Timeout" in caplog.text:
-        pytest.skip(caplog.text)  # Issue 489
-
     out, err = capsys.readouterr()
-    if "Timeout" in err:
-        pytest.skip(err)  # Issue 489
 
     assert err == ""
     nb = reads(out, "ipynb")
