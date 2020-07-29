@@ -43,6 +43,12 @@ You may also find useful to `--pipe` the text representation of a notebook into 
 jupytext --sync --pipe black notebook.ipynb    # read most recent version of notebook, reformat with black, save
 ```
 
+To reorder the imports in your notebook, use
+```bash
+jupytext --pipe 'isort - --treat-comment-as-code "# %%" --float-to-top' notebook.ipynb
+```
+(remove the `--float-to-top` argument if you prefer to run `isort` per cell).
+
 For programs that don't accept pipes, use `{}` as a placeholder for the name of a temporary file that will contain the text representation of the notebook. For instance, run `pytest` on your notebook with:
 ```bash
 jupytext --check 'pytest {}' notebook.ipynb    # export the notebook in format py:percent in a temp file, run pytest

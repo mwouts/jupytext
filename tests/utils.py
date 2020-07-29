@@ -27,6 +27,7 @@ requires_jupytext_installed = pytest.mark.skipif(
     not tool_version("jupytext"), reason="jupytext is not installed"
 )
 requires_black = pytest.mark.skipif(not tool_version("black"), reason="black not found")
+requires_isort = pytest.mark.skipif(not tool_version("isort"), reason="isort not found")
 requires_flake8 = pytest.mark.skipif(
     not tool_version("flake8"), reason="flake8 not found"
 )

@@ -17,6 +17,7 @@ dependencies:
   - pylint
   - flake8
   - black
+  - isort
   - autopep8
   - sphinx-gallery
   - nodejs<13

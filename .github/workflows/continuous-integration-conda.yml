@@ -60,6 +60,8 @@ jobs:
           conda install mock --freeze-installed
           # install black if available (Python 3.6 and above), and autopep8 for testing the pipe mode
           conda install black --freeze-installed
+          # install isort from source
+          pip install git+https://github.com/timothycrosley/isort.git
           conda install autopep8 --freeze-installed
           # install sphinx_gallery and matplotlib if available
           conda install sphinx-gallery --freeze-installed

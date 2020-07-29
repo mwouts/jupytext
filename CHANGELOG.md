@@ -4,6 +4,7 @@
 **Added**
 - Activated GitHub code scanning alerts
 - New option `hide_notebook_metadata` to encapsulate the notebook metadata in an HTML comment (#527)
+- Tested `isort` on notebooks (#553)
 
 **Changed**
 - Install Jupytext from source on MyBinder to avoid cache issues (#567)
@@ -13,6 +14,7 @@
 **Fixed**
 - Configured coverage targets in `codecov.yml`
 - Only scripts can have an encoding comment, not Markdown or R Markdown files (#576)
+- Support spaces in `--pipe` commands (#562)
 
 
 1.5.2 (2020-07-21)
