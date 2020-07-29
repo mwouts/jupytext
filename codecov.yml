@@ -1,0 +1,18 @@
+codecov:
+    notify:
+        after_n_builds: 10  # wait for the 10 GitHub jobs before notifying
+
+coverage:
+  status:
+    project:
+      default: false  # disable the default status that measures entire project
+      tests:
+        paths: "tests/"
+        target: 99.8%
+      source:
+        paths: "jupytext/"
+        target: 97%
+        threshold': .2%
+    patch:
+      default:
+        target: 80%  # new contributions should have a coverage at least equal to target

@@ -4,6 +4,9 @@
 **Changed**
 - Install Jupytext from source on MyBinder to avoid cache issues (#567)
 
+**Fixed**
+- Configured coverage targets in `codecov.yml`
+
 
 1.5.2 (2020-07-21)
 ------------------
