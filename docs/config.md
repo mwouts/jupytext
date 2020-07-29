@@ -105,6 +105,8 @@ It is possible to filter nested metadata. For example, if you want to preserve t
 default_notebook_metadata_filter = "-jupytext.text_representation.jupytext_version"
 ```
 
+Finally, to hide the notebook metadata in an HTML comment in Markdown files, use the option `hide_notebook_metadata`.
+
 ### More options
 
 There are a couple more options available - please have a look at the `JupytextConfiguration` class in [config.py](https://github.com/mwouts/jupytext/blob/master/jupytext/config.py).

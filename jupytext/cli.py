@@ -409,9 +409,14 @@ def jupytext_single_file(nb_file, args, log):
 
     # I. ### Read the notebook ###
     fmt = copy(args.input_format) or {}
-    if config:
-        config.set_default_format_options(fmt)
-    set_format_options(fmt, args.format_options)
+    if not fmt:
+        ext = os.path.splitext(nb_file)[1]
+        if ext:
+            fmt = {"extension": ext}
+    if fmt:
+        if config:
+            config.set_default_format_options(fmt)
+        set_format_options(fmt, args.format_options)
     log(
         "[jupytext] Reading {}{}".format(
             nb_file if nb_file != "-" else "stdin",
@@ -422,19 +427,12 @@ def jupytext_single_file(nb_file, args, log):
     )
 
     notebook = read(nb_file, fmt=fmt)
-    if not fmt:
+    if "extension" in fmt and "format_name" not in fmt:
         text_representation = notebook.metadata.get("jupytext", {}).get(
             "text_representation", {}
         )
-        ext = os.path.splitext(nb_file)[1]
-        if text_representation.get("extension") == ext:
-            fmt = {
-                key: text_representation[key]
-                for key in text_representation
-                if key in ["extension", "format_name"]
-            }
-        elif ext:
-            fmt = {"extension": ext}
+        if text_representation.get("extension") == fmt["extension"]:
+            fmt["format_name"] = text_representation["format_name"]
 
     if config and "formats" not in notebook.metadata.get("jupytext", {}):
         default_formats = config.default_formats(nb_file)
