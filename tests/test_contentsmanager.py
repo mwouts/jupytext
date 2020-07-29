@@ -1667,10 +1667,10 @@ def test_multiple_pairing(tmpdir):
     model_md = cm.get("notebook.md", content=False, load_alternative_format=False)
     model_py = cm.get("notebook.py", content=False, load_alternative_format=False)
 
-    # ipynb is the older, then py, then md
+    # ipynb is the oldest one, then py, then md
     # so that we read cell inputs from the py file
-    assert model_ipynb["last_modified"] < model_py["last_modified"]
-    assert model_py["last_modified"] < model_md["last_modified"]
+    assert model_ipynb["last_modified"] <= model_py["last_modified"]
+    assert model_py["last_modified"] <= model_md["last_modified"]
 
 
 @skip_if_dict_is_not_ordered
