@@ -137,10 +137,7 @@ def test_combine_stable(nb_file):
     nb_outputs = deepcopy(nb_org)
 
     for cell in nb_source.cells:
-        try:
-            cell.outputs = []
-        except KeyError:
-            continue
+        cell.outputs = []
 
     combine_inputs_with_outputs(nb_source, nb_outputs)
     compare_notebooks(nb_source, nb_org)
