@@ -8,7 +8,7 @@ coverage:
       default: false  # disable the default status that measures entire project
       tests:
         paths: "tests/"
-        target: 99.8%
+        target: 100%
       source:
         paths: "jupytext/"
         target: 97%

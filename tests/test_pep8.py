@@ -170,7 +170,7 @@ def test_no_metadata_when_py_is_pep8(py_file):
 
     for i, cell in enumerate(nb.cells):
         if "title" in cell.metadata:
-            cell.metadata.pop("title")
+            cell.metadata.pop("title")  # pragma: no cover
         if i == 0 and not cell.source:
             assert cell.metadata == {"lines_to_next_cell": 0}, py_file
         else:
