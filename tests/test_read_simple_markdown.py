@@ -916,3 +916,37 @@ jupyter:
     compare(md2, md)
     nb2 = jupytext.reads(md, "md")
     compare_notebooks(nb2, nb)
+
+
+def test_hide_notebook_metadata(
+    no_jupytext_version_number,
+    nb=new_notebook(
+        metadata={
+            "jupytext": {"hide_notebook_metadata": True},
+            "kernelspec": {
+                "display_name": "Python 3",
+                "language": "python",
+                "name": "python3",
+            },
+        }
+    ),
+    md="""<!--
+
+---
+jupyter:
+  jupytext:
+    hide_notebook_metadata: true
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+-->
+""",
+):
+    """Test the hide_notebook_metadata option"""
+    md2 = jupytext.writes(nb, "md")
+    compare(md2, md)
+    nb2 = jupytext.reads(md, "md")
+    compare_notebooks(nb2, nb)

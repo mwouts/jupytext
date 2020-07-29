@@ -116,6 +116,12 @@ def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
     if header:
         header = ["---"] + header + ["---"]
 
+        if (
+            metadata.get("jupytext", {}).get("hide_notebook_metadata", False)
+            and text_format.format_name == "markdown"
+        ):
+            header = ["<!--", ""] + header + ["", "-->"]
+
     return comment_lines(header, text_format.header_prefix), lines_to_next_cell
 
 
@@ -142,10 +148,13 @@ def header_to_metadata_and_cell(lines, header_prefix, ext=None):
 
     header = []
     jupyter = []
-    injupyter = False
+    in_jupyter = False
+    in_html_div = False
+
+    start = 0
+    started = False
     ended = False
     metadata = {}
-    start = 0
     i = -1
 
     comment = "#" if header_prefix == "#'" else header_prefix
@@ -167,27 +176,37 @@ def header_to_metadata_and_cell(lines, header_prefix, ext=None):
                 metadata.setdefault("jupytext", {})["encoding"] = line
                 start = i + 1
                 continue
-
         if not line.startswith(header_prefix):
             break
+        if not comment:
+            if line.strip().startswith("<!--"):
+                in_html_div = True
+                continue
+
+        if in_html_div:
+            if ended:
+                if "-->" in line:
+                    break
+            if not started and not line.strip():
+                continue
 
         line = uncomment_line(line, header_prefix)
-
-        if i == start:
-            if _HEADER_RE.match(line):
+        if _HEADER_RE.match(line):
+            if not started:
+                started = True
                 continue
-            break
-
-        if i > start and _HEADER_RE.match(line):
-            ended = True
-            break
+            else:
+                ended = True
+                if in_html_div:
+                    continue
+                break
 
         if _JUPYTER_RE.match(line):
-            injupyter = True
+            in_jupyter = True
         elif line and not _LEFTSPACE_RE.match(line):
-            injupyter = False
+            in_jupyter = False
 
-        if injupyter:
+        if in_jupyter:
             jupyter.append(line)
         else:
             header.append(line)

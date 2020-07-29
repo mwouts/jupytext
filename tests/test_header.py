@@ -148,3 +148,41 @@ jupyter:
     compare(actual, markdown)
     nb2 = jupytext.reads(markdown, ".md")
     compare(nb2, notebook)
+
+
+def test_header_in_html_comment():
+    text = """<!--
+
+---
+jupyter:
+  title: Sample header
+---
+
+-->
+"""
+    lines = text.splitlines()
+    metadata, _, cell, _ = header_to_metadata_and_cell(lines, "")
+
+    assert metadata == {"title": "Sample header"}
+    assert cell is None
+
+
+def test_header_to_html_comment(no_jupytext_version_number):
+    metadata = {"jupytext": {"mainlanguage": "python", "hide_notebook_metadata": True}}
+    nb = new_notebook(metadata=metadata, cells=[])
+    header, lines_to_next_cell = metadata_and_cell_to_header(
+        nb, metadata, get_format_implementation(".md"), ".md"
+    )
+    compare(
+        "\n".join(header),
+        """<!--
+
+---
+jupyter:
+  jupytext:
+    hide_notebook_metadata: true
+    mainlanguage: python
+---
+
+-->""",
+    )

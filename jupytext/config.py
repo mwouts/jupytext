@@ -62,14 +62,21 @@ class JupytextConfiguration(Configurable):
 
     default_notebook_metadata_filter = Unicode(
         u"",
-        help="Cell metadata that should be save in the text representations. "
+        help="Notebook metadata that should be save in the text representations. "
         "Examples: 'all', '-all', 'widgets,nteract', 'kernelspec,jupytext-all'",
+        config=True,
+    )
+
+    hide_notebook_metadata = Enum(
+        values=[True, False],
+        allow_none=True,
+        help="Should the notebook metadata be wrapped into an HTML comment in the Markdown format?",
         config=True,
     )
 
     default_cell_metadata_filter = Unicode(
         u"",
-        help="Notebook metadata that should be saved in the text representations. "
+        help="Cell metadata that should be saved in the text representations. "
         "Examples: 'all', 'hide_input,hide_output'",
         config=True,
     )
@@ -123,6 +130,10 @@ class JupytextConfiguration(Configurable):
         if self.default_cell_metadata_filter:
             format_options.setdefault(
                 "cell_metadata_filter", self.default_cell_metadata_filter
+            )
+        if self.hide_notebook_metadata is not None:
+            format_options.setdefault(
+                "hide_notebook_metadata", self.hide_notebook_metadata
             )
         if self.comment_magics is not None:
             format_options.setdefault("comment_magics", self.comment_magics)

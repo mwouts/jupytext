@@ -3,6 +3,7 @@ from nbformat.v4.nbbase import new_notebook, new_code_cell
 from jupytext.cli import jupytext
 from jupytext.jupytext import read, write
 from jupytext.header import header_to_metadata_and_cell
+from jupytext.compare import compare
 
 
 def test_default_jupytext_formats(tmpdir):
@@ -89,3 +90,38 @@ def test_save_using_preferred_and_default_format(config, tmpdir):
     # read py file
     nb_py = read(str(tmp_py))
     assert nb_py.metadata["jupytext"]["text_representation"]["format_name"] == "percent"
+
+
+def test_hide_notebook_metadata(tmpdir, no_jupytext_version_number):
+    tmpdir.join(".jupytext").write("hide_notebook_metadata = true")
+    tmp_ipynb = tmpdir.join("notebook.ipynb")
+    tmp_md = tmpdir.join("notebook.md")
+
+    nb = new_notebook(
+        cells=[new_code_cell("1 + 1")], metadata={"jupytext": {"formats": "ipynb,md"}}
+    )
+
+    write(nb, str(tmp_ipynb))
+    jupytext([str(tmp_ipynb), "--sync"])
+
+    with open(str(tmp_md)) as stream:
+        text_md = stream.read()
+
+    compare(
+        text_md,
+        """<!--
+
+---
+jupyter:
+  jupytext:
+    formats: ipynb,md
+    hide_notebook_metadata: true
+---
+
+-->
+
+```python
+1 + 1
+```
+""",
+    )
