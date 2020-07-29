@@ -1,5 +1,4 @@
 import os
-import re
 import shlex
 import pytest
 import jupytext
@@ -36,12 +35,23 @@ def test_jupytext_commands_in_the_documentation_work(tmpdir):
         for cmd in cell.source.splitlines():
             if not cmd.startswith("jupytext"):
                 continue
+
+            # Do not test commands that involve reading a notebook from stdin
             if "read ipynb from stdin" in cmd:
                 continue
+
+            # We can't run pytest inside pytest
             if "pytest {}" in cmd:
                 continue
+
+            # We need to remove the comments that may follow the jupytext command
+            if "#" in cmd:
+                left, comment = cmd.rsplit("#", 1)
+                if '"' not in comment:
+                    cmd = left
+
             print("Testing: {}".format(cmd))
-            args = shlex.split(re.sub(r"#.*", "", cmd))[1:]
+            args = shlex.split(cmd)[1:]
             assert not jupytext_cli(args), cmd
             cmd_tested += 1
 

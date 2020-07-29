@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import glob
+import shlex
 import subprocess
 import argparse
 import json
@@ -774,8 +775,7 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
 
 def exec_command(command, input=None, capture=False):
     """Execute the desired command, and pipe the given input into it"""
-    if not isinstance(command, list):
-        command = command.split(" ")
+    assert isinstance(command, list)
     sys.stdout.write("[jupytext] Executing {}\n".format(" ".join(command)))
     process = subprocess.Popen(
         command,
@@ -816,7 +816,7 @@ def pipe_notebook(notebook, command, fmt="py:percent", update=True, prefix=None)
     fmt = check_auto_ext(fmt, notebook.metadata, "--pipe-fmt")
     text = writes(notebook, fmt)
 
-    command = command.split(" ")
+    command = shlex.split(command)
     if "{}" in command:
         if prefix is not None:
             prefix = prefix + (" " if " " in prefix else "_")
