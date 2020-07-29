@@ -1,20 +1,11 @@
-from .utils import requires_nbconvert, requires_ir_kernel
+from .utils import requires_nbconvert, requires_ir_kernel, skip_on_windows
 import pytest
 from jupytext import read
 from jupytext.cli import jupytext
 
 
-def skip_if_timeout(caplog, capsys):
-    """Skip the test if a timeout occurs when executing the notebook. See Issue 489"""
-    if "Timeout" in caplog.text:
-        pytest.skip(caplog.text)
-
-    _, err = capsys.readouterr()
-    if "Timeout" in err:
-        pytest.skip(err)
-
-
 @requires_nbconvert
+@skip_on_windows
 def test_pipe_nbconvert_execute(tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
@@ -33,7 +24,7 @@ def test_pipe_nbconvert_execute(tmpdir):
             "--pipe-fmt",
             "ipynb",
             "--pipe",
-            "jupyter nbconvert --stdin --stdout --to notebook --execute --NotebookClient.iopub_timeout=60",
+            "jupyter nbconvert --stdin --stdout --to notebook --execute",
         ]
     )
 
@@ -43,6 +34,7 @@ def test_pipe_nbconvert_execute(tmpdir):
 
 
 @requires_nbconvert
+@skip_on_windows
 def test_pipe_nbconvert_execute_sync(tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
@@ -62,7 +54,7 @@ def test_pipe_nbconvert_execute_sync(tmpdir):
             "--pipe-fmt",
             "ipynb",
             "--pipe",
-            "jupyter nbconvert --stdin --stdout --to notebook --execute --NotebookClient.iopub_timeout=60",
+            "jupyter nbconvert --stdin --stdout --to notebook --execute",
         ]
     )
 
@@ -72,6 +64,7 @@ def test_pipe_nbconvert_execute_sync(tmpdir):
 
 
 @requires_nbconvert
+@skip_on_windows
 def test_execute(tmpdir, caplog, capsys):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
@@ -83,7 +76,6 @@ def test_execute(tmpdir, caplog, capsys):
         )
 
     jupytext(args=[tmp_py, "--to", "ipynb", "--execute"])
-    skip_if_timeout(caplog, capsys)
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
@@ -109,6 +101,7 @@ A readme with correct instructions
 
 
 @requires_nbconvert
+@skip_on_windows
 def test_execute_readme_not_ok(tmpdir):
     tmp_md = str(tmpdir.join("notebook.md"))
 
@@ -132,6 +125,7 @@ a + 1
 
 
 @requires_nbconvert
+@skip_on_windows
 def test_execute_sync(tmpdir, caplog, capsys):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
@@ -143,7 +137,6 @@ def test_execute_sync(tmpdir, caplog, capsys):
         )
 
     jupytext(args=[tmp_py, "--set-formats", "py,ipynb", "--sync", "--execute"])
-    skip_if_timeout(caplog, capsys)
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
@@ -152,6 +145,7 @@ def test_execute_sync(tmpdir, caplog, capsys):
 
 @requires_nbconvert
 @requires_ir_kernel
+@skip_on_windows
 def test_execute_r(tmpdir, caplog, capsys):  # pragma: no cover
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_md = str(tmpdir.join("notebook.md"))
@@ -165,7 +159,6 @@ def test_execute_r(tmpdir, caplog, capsys):  # pragma: no cover
         )
 
     jupytext(args=[tmp_md, "--to", "ipynb", "--execute"])
-    skip_if_timeout(caplog, capsys)
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 1
@@ -173,6 +166,7 @@ def test_execute_r(tmpdir, caplog, capsys):  # pragma: no cover
 
 
 @requires_nbconvert
+@skip_on_windows
 def test_execute_in_subfolder(tmpdir, caplog, capsys):
     tmpdir.mkdir("subfolder")
 
@@ -195,7 +189,6 @@ sum(ast.literal_eval(line) for line in text.splitlines())
         )
 
     jupytext(args=[tmp_py, "--to", "ipynb", "--execute"])
-    skip_if_timeout(caplog, capsys)
 
     nb = read(tmp_ipynb)
     assert len(nb.cells) == 3

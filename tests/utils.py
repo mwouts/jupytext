@@ -49,6 +49,7 @@ requires_ir_kernel = pytest.mark.skipif(
 requires_myst = pytest.mark.skipif(
     not is_myst_available(), reason="myst_parser not found"
 )
+skip_on_windows = pytest.mark.skipif(sys.platform.startswith("win"), reason="Issue 489")
 
 
 def list_notebooks(path="ipynb", skip="World"):
