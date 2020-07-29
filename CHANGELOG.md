@@ -1,6 +1,9 @@
 1.6.0-dev (2020-08-??)
 ----------------------
 
+**Added**
+- Activated GitHub code scanning alerts
+
 **Changed**
 - Install Jupytext from source on MyBinder to avoid cache issues (#567)
 
