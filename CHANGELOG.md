@@ -16,9 +16,10 @@ error will occur if the required dependencies, resp. `myst-parser` and `pandoc`,
 **Fixed**
 - Configured coverage targets in `codecov.yml`
 - Only scripts can have an encoding comment, not Markdown or R Markdown files (#576)
-- Support spaces in `--pipe` commands (#562)
+- Spaces in `--pipe` commands are supported (#562)
 - Use `>=` and `<` rather than `~=` in the `extras_require` of `setup.py` (#589)
 - Bash commands starting with special characters are now correctly detected, thanks to Aaron Gokaslan (#587)
+- MyST Markdown files are recognized as such even if `myst` is missing (#556)
 
 
 1.5.2 (2020-07-21)

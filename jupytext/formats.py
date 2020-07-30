@@ -5,6 +5,7 @@ new formats here!
 
 import os
 import re
+import yaml
 import warnings
 import nbformat
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
@@ -260,6 +261,18 @@ def read_metadata(text, ext):
     metadata, _, _, _ = header_to_metadata_and_cell(lines, comment, ext)
     if ext in [".r", ".R"] and not metadata:
         metadata, _, _, _ = header_to_metadata_and_cell(lines, "#'", ext)
+
+    # MyST has the metadata at the root level
+    if not metadata and ext in myst_extensions() and text.startswith("---"):
+        for header in yaml.safe_load_all(text):
+            if (
+                header.get("jupytext", {})
+                .get("text_representation", {})
+                .get("format_name")
+                == "myst"
+            ):
+                return header
+            return metadata
 
     return metadata
 
