@@ -5,7 +5,7 @@ except ImportError:
 from textwrap import dedent
 import pytest
 from nbformat.v4.nbbase import new_notebook
-
+from tornado.web import HTTPError
 from jupytext.formats import get_format_implementation, JupytextFormatError
 from jupytext.myst import (
     myst_to_notebook,
@@ -149,12 +149,42 @@ def test_add_source_map():
     assert notebook.metadata.source_map == [3, 5, 7, 12]
 
 
+PLEASE_INSTALL_MYST = "The MyST Markdown format requires 'myst_parser>=0.8'."
+
+
 @requires_no_myst
-def test_meaningfull_error_when_myst_is_missing(tmpdir):
+def test_meaningfull_error_write_myst_missing(tmpdir):
     nb_file = tmpdir.join("notebook.ipynb")
     jupytext.write(new_notebook(), str(nb_file))
 
-    with pytest.raises(
-        ImportError, match="The MyST Markdown format requires 'myst_parser>=0.8'."
-    ):
+    with pytest.raises(ImportError, match=PLEASE_INSTALL_MYST):
         jupytext_cli([str(nb_file), "--to", "md:myst"])
+
+
+@requires_no_myst
+def test_meaningfull_error_open_myst_missing(tmpdir):
+    md_file = tmpdir.join("notebook.md")
+    md_file.write(
+        """---
+jupytext:
+  text_representation:
+    extension: '.md'
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
+1 + 1
+"""
+    )
+
+    with pytest.raises(ImportError, match=PLEASE_INSTALL_MYST):
+        jupytext_cli([str(md_file), "--to", "ipynb"])
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    with pytest.raises(HTTPError, match=PLEASE_INSTALL_MYST):
+        cm.get("notebook.md")
