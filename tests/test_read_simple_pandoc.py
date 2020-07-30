@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+import pytest
 from jupytext.compare import compare
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell
 from jupytext.compare import compare_notebooks
+from jupytext.cli import jupytext as jupytext_cli
+from jupytext.pandoc import PandocError
 import jupytext
-from .utils import requires_pandoc
+from .utils import requires_pandoc, requires_no_pandoc
 
 
 @requires_pandoc
@@ -73,3 +76,14 @@ This is the greek letter $\\pi$: π"""
     nb2 = jupytext.reads(markdown, "md:pandoc")
     nb2.metadata.pop("jupytext")
     compare_notebooks(nb, nb2, "md:pandoc")
+
+
+@requires_no_pandoc
+def test_meaningfull_error_when_pandoc_is_missing(tmpdir):
+    nb_file = tmpdir.join("notebook.ipynb")
+    jupytext.write(new_notebook(), str(nb_file))
+
+    with pytest.raises(
+        PandocError, match="The Pandoc Markdown format requires 'pandoc>=2.7.2'"
+    ):
+        jupytext_cli([str(nb_file), "--to", "md:pandoc"])

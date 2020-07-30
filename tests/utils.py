@@ -44,12 +44,16 @@ requires_pandoc = pytest.mark.skipif(
     not is_pandoc_available() or sys.version_info < (3,),
     reason="pandoc>=2.7.2 is not available",
 )
+requires_no_pandoc = pytest.mark.skipif(
+    is_pandoc_available(), reason="Pandoc is installed"
+)
 requires_ir_kernel = pytest.mark.skipif(
     kernelspec_from_language("R") is None, reason="irkernel is not installed"
 )
 requires_myst = pytest.mark.skipif(
     not is_myst_available(), reason="myst_parser not found"
 )
+requires_no_myst = pytest.mark.skipif(is_myst_available(), reason="myst is available")
 skip_on_windows = pytest.mark.skipif(sys.platform.startswith("win"), reason="Issue 489")
 
 

@@ -34,9 +34,19 @@ def is_myst_available():
     return True
 
 
+def raise_if_myst_is_not_available():
+    if not is_myst_available():
+        raise ImportError(
+            "The MyST Markdown format requires 'myst_parser>=0.8'. "
+            "Install it with e.g. 'pip install jupytext[myst]'"
+        )
+
+
 def myst_version():
     """The major version of myst parser."""
-    return ".".join(myst_parser.__version__.split(".")[:2])
+    if is_myst_available():
+        return ".".join(myst_parser.__version__.split(".")[:2])
+    return "N/A"
 
 
 def myst_extensions(no_md=False):
@@ -232,6 +242,8 @@ def myst_to_notebook(
     NOTE: we assume here that all of these directives are at the top-level,
     i.e. not nested in other directives.
     """
+    raise_if_myst_is_not_available()
+
     # parse markdown file up to the block level (i.e. don't worry about inline text)
     parser = default_parser("html", disable_syntax=["inline"])
     tokens = parser.parse(text + "\n")
@@ -322,6 +334,7 @@ def notebook_to_myst(
     :param default_lexer: a lexer name to use for annotating code cells
         (if ``nb.metadata.language_info.pygments_lexer`` is not available)
     """
+    raise_if_myst_is_not_available()
     string = ""
 
     nb_metadata = from_nbnode(nb.metadata)

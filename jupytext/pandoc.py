@@ -37,31 +37,45 @@ def pandoc(args, filein=None, fileout=None):
 def is_pandoc_available():
     """Is Pandoc>=2.7.2 available?"""
     try:
-        pandoc_version()
+        raise_if_pandoc_is_not_available()
         return True
-    except (IOError, OSError, PandocError):
+    except PandocError:
         return False
 
 
-def pandoc_version():
-    """Pandoc's version number"""
-    version = pandoc(u"--version").splitlines()[0].split()[1]
-
+def raise_if_pandoc_is_not_available():
     try:
         from pkg_resources import parse_version
     except ImportError:
         raise PandocError("Please install pkg_resources")
 
+    version = pandoc_version()
+    if version == "N/A":
+        raise PandocError(
+            "The Pandoc Markdown format requires 'pandoc>=2.7.2', "
+            "but pandoc was not found"
+        )
+
     if parse_version(version) < parse_version("2.7.2"):
         raise PandocError(
-            "Please install pandoc>=2.7.2 (found version {})".format(version)
+            "The Pandoc Markdown format requires 'pandoc>=2.7.2', "
+            "but pandoc version {} was not found".format(version)
         )
 
     return version
 
 
+def pandoc_version():
+    """Pandoc's version number"""
+    try:
+        return pandoc(u"--version").splitlines()[0].split()[1]
+    except (IOError, OSError):
+        return "N/A"
+
+
 def md_to_notebook(text):
     """Convert a Markdown text to a Jupyter notebook, using Pandoc"""
+    raise_if_pandoc_is_not_available()
     tmp_file = tempfile.NamedTemporaryFile(delete=False)
     tmp_file.write(text.encode("utf-8"))
     tmp_file.close()
@@ -81,6 +95,7 @@ def md_to_notebook(text):
 
 def notebook_to_md(notebook):
     """Convert a notebook to its Markdown representation, using Pandoc"""
+    raise_if_pandoc_is_not_available()
     tmp_file = tempfile.NamedTemporaryFile(delete=False)
     tmp_file.write(ipynb_writes(notebook).encode("utf-8"))
     tmp_file.close()
