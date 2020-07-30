@@ -12,6 +12,7 @@
 
 **Fixed**
 - Configured coverage targets in `codecov.yml`
+- Only scripts can have an encoding comment, not Markdown or R Markdown files (#576)
 
 
 1.5.2 (2020-07-21)

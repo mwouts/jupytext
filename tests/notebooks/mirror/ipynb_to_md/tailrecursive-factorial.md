@@ -1,7 +1,7 @@
-// -*- coding: utf-8 -*-
 ---
 jupyter:
   jupytext:
+    encoding: '// -*- coding: utf-8 -*-'
     formats: ipynb,groovy:light
   kernelspec:
     display_name: Groovy
