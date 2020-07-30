@@ -10,6 +10,8 @@
 - Install Jupytext from source on MyBinder to avoid cache issues (#567)
 - Skip the tests that execute a notebook on Windows to avoid timeout issues (#489)
 - The `# %%` cell marker has the same indentation as the first line in the cell (#562)
+- The `md:myst` and `md:pandoc` are always included in the Jupytext formats, and an informative runtime
+error will occur if the required dependencies, resp. `myst-parser` and `pandoc`, are not installed. (#556)
 
 **Fixed**
 - Configured coverage targets in `codecov.yml`
