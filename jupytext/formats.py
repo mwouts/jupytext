@@ -30,7 +30,7 @@ from .cell_to_text import (
 from .metadata_filter import metadata_filter_as_string
 from .stringparser import StringParser
 from .languages import _SCRIPT_EXTENSIONS, _COMMENT_CHARS, same_language
-from .pandoc import pandoc_version, is_pandoc_available
+from .pandoc import pandoc_version
 from .magics import is_magic
 from .myst import (
     MYST_FORMAT_NAME,
@@ -191,12 +191,7 @@ JUPYTEXT_FORMATS = (
             cell_exporter_class=SphinxGalleryCellExporter,
             # Version 1.0 on 2018-09-22 - jupytext v0.7.0rc0 : Initial version
             current_version_number="1.1",
-        )
-    ]
-)
-
-if is_pandoc_available():
-    JUPYTEXT_FORMATS.append(
+        ),
         NotebookFormatDescription(
             format_name="pandoc",
             extension=".md",
@@ -204,23 +199,20 @@ if is_pandoc_available():
             cell_reader_class=None,
             cell_exporter_class=None,
             current_version_number=pandoc_version(),
+        ),
+    ]
+    + [
+        NotebookFormatDescription(
+            format_name=MYST_FORMAT_NAME,
+            extension=ext,
+            header_prefix="",
+            cell_reader_class=None,
+            cell_exporter_class=None,
+            current_version_number=myst_version(),
         )
-    )
-
-if is_myst_available():
-    JUPYTEXT_FORMATS.extend(
-        [
-            NotebookFormatDescription(
-                format_name=MYST_FORMAT_NAME,
-                extension=ext,
-                header_prefix="",
-                cell_reader_class=None,
-                cell_exporter_class=None,
-                current_version_number=myst_version(),
-            )
-            for ext in myst_extensions()
-        ]
-    )
+        for ext in myst_extensions()
+    ]
+)
 
 NOTEBOOK_EXTENSIONS = list(
     dict.fromkeys([".ipynb"] + [fmt.extension for fmt in JUPYTEXT_FORMATS])
