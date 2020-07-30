@@ -49,15 +49,16 @@ def encoding_and_executable(notebook, metadata, ext):
     if comment is not None and "executable" in jupytext_metadata:
         lines.append("#!" + jupytext_metadata.pop("executable"))
 
-    if "encoding" in jupytext_metadata:
-        lines.append(jupytext_metadata.pop("encoding"))
-    elif comment is not None:
-        for cell in notebook.cells:
-            try:
-                cell.source.encode("ascii")
-            except (UnicodeEncodeError, UnicodeDecodeError):
-                lines.append(comment + _UTF8_HEADER)
-                break
+    if comment is not None:
+        if "encoding" in jupytext_metadata:
+            lines.append(jupytext_metadata.pop("encoding"))
+        else:
+            for cell in notebook.cells:
+                try:
+                    cell.source.encode("ascii")
+                except (UnicodeEncodeError, UnicodeDecodeError):
+                    lines.append(comment + _UTF8_HEADER)
+                    break
 
     return lines
 
