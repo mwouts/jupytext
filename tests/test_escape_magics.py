@@ -171,7 +171,6 @@ def test_force_comment_using_contents_manager(tmpdir):
         "! ./script.sh args",
         "!~/script.sh args",
         "! ~/script.sh args",
-        "!~/script.sh args",
         "!../script.sh $ENV $USER",
         "! ../script.sh $ENV $USER",
         "!$HOME/script.sh $ENV $USER",
