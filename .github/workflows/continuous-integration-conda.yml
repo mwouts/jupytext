@@ -65,7 +65,8 @@ jobs:
           conda install autopep8 --freeze-installed
           # install sphinx_gallery and matplotlib if available
           conda install sphinx-gallery --freeze-installed
-          conda install myst-parser --freeze-installed
+          # myst-parser
+          conda install 'myst-parser>=0.8' 'myst-parser<0.9' --freeze-installed
           exit 0
       - name: Conda list
         shell: pwsh
