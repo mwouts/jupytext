@@ -52,7 +52,11 @@ jupytext --update-metadata '{"jupytext": null}' path/to/notebooks/*.ipynb
 
 Certainly. Open your pre-existing scripts or Markdown files as notebooks with a click in Jupyter Notebook, and with the _Open as Notebook_ menu in JupyterLab.
 
-The text formats do not store the output cells. If you want to preserve these when you refresh the notebook, be sure to pair the text file to an `.ipynb` file.
+In Jupyter Notebook you can also create text notebooks with the _New Text Notebook_ menu.
+
+Output cells appear in the browser when you execute the notebook, but they are not written to the disk when you save the notebook.
+
+The output cells are lost when you reload the notebook - if you want to avoid this, just _pair_ the text file to an `.ipynb` file.
 
 If you want to convert text formats to notebooks programmatically, use one of
 ```bash
