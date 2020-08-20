@@ -16,6 +16,7 @@
 - Only scripts can have an encoding comment, not Markdown or R Markdown files (#576)
 - Support spaces in `--pipe` commands (#562)
 - Use `>=` and `<` rather than `~=` in the `extras_require` of `setup.py` (#589)
+- Bash commands starting with special characters are now correctly detected, thanks to Aaron Gokaslan (#587)
 
 
 1.5.2 (2020-07-21)
