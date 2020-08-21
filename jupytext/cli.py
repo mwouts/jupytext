@@ -8,6 +8,7 @@ import shlex
 import subprocess
 import argparse
 import json
+import warnings
 from copy import copy
 from tempfile import NamedTemporaryFile
 from .jupytext import read, reads, write, writes
@@ -351,6 +352,19 @@ def jupytext(args=None):
 
     if args.output and len(args.notebooks) != 1:
         raise ValueError("Please input a single notebook when using --output")
+
+    # Warn if '--to' is used in place of '--output'
+    if (
+        not args.output
+        and args.output_format
+        and "." in args.output_format
+        and not args.output_format.startswith(".")
+        and "//" not in args.output_format
+    ):
+        warnings.warn(
+            "You have passed a file name to the '--to' option, "
+            "when a format description was expected. Maybe you want to use the '-o' option instead?"
+        )
 
     if args.input_format:
         args.input_format = long_form_one_format(args.input_format)
