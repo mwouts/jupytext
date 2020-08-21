@@ -361,6 +361,11 @@ def jupytext(args=None):
         and not args.output_format.startswith(".")
         and "//" not in args.output_format
     ):
+
+        def single_line(msg, *args, **kwargs):
+            return "[warning] {}\n".format(msg)
+
+        warnings.formatwarning = single_line
         warnings.warn(
             "You have passed a file name to the '--to' option, "
             "when a format description was expected. Maybe you want to use the '-o' option instead?"
