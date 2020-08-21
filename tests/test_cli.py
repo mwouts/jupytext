@@ -1120,3 +1120,23 @@ def test_sync_script_dotdot_folder_564(tmpdir):
 
     jupytext(["--sync", str(py_file)])
     jupytext(["--sync", str(nb_file)])
+
+
+def test_jupytext_to_file_emits_a_warning(tmpdir):
+    """The user may type
+        jupytext notebook.ipynb --to script.py
+    meaning
+        jupytext notebook.ipynb -o script.py
+    """
+    os.chdir(str(tmpdir))
+
+    nb_file = tmpdir.join("notebook.ipynb")
+    write(new_notebook(), str(nb_file))
+
+    with pytest.warns(None) as record:
+        jupytext(["notebook.ipynb", "-o", "script.py"])
+
+    assert len(record) == 0
+
+    with pytest.warns(UserWarning, match="Maybe you want to use the '-o' option"):
+        jupytext(["notebook.ipynb", "--to", "script.py"])

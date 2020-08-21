@@ -5,6 +5,7 @@
 - Activated GitHub code scanning alerts
 - New option `hide_notebook_metadata` to encapsulate the notebook metadata in an HTML comment (#527)
 - Tested `isort` on notebooks (#553)
+- `jupytext notebook.ipynb --to filename.py` will warn that `--to` is used in place of `--output`.
 
 **Changed**
 - Install Jupytext from source on MyBinder to avoid cache issues (#567)
