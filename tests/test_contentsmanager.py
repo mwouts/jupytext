@@ -202,7 +202,7 @@ def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
 
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("py_file", list_notebooks("percent"))
-def test_pair_plain_script(py_file, tmpdir):
+def test_pair_plain_script(py_file, tmpdir, caplog):
     tmp_py = "notebook.py"
     tmp_ipynb = "notebook.ipynb"
 
@@ -213,6 +213,8 @@ def test_pair_plain_script(py_file, tmpdir):
     nb = jupytext.read(py_file)
     nb.metadata["jupytext"]["formats"] = "ipynb,py:hydrogen"
     cm.save(model=dict(type="notebook", content=nb), path=tmp_py)
+
+    assert "'Include Metadata' is off" in caplog.text
 
     assert os.path.isfile(str(tmpdir.join(tmp_py)))
     assert os.path.isfile(str(tmpdir.join(tmp_ipynb)))
