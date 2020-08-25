@@ -148,6 +148,19 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     if fmt["extension"] == ".ipynb":
                         return super(JupytextContentsManager, self).save(model, path)
 
+                    if (
+                        model["content"]["metadata"]
+                        .get("jupytext", {})
+                        .get("notebook_metadata_filter")
+                        == "-all"
+                    ):
+                        self.log.warning(
+                            "Stripping metadata from {} as 'Include Metadata' is off "
+                            "(toggle 'Include Metadata' in the Jupytext Menu or Commands if desired)".format(
+                                path
+                            )
+                        )
+
                     with mock.patch("nbformat.writes", _jupytext_writes(fmt)):
                         return super(JupytextContentsManager, self).save(model, path)
 
