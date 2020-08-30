@@ -29,6 +29,7 @@ error will occur if the required dependencies, resp. `markdown-it-py` and `pando
 - Spaces in `--pipe` commands are supported (#562)
 - Bash commands starting with special characters are now correctly detected, thanks to Aaron Gokaslan (#587)
 - MyST Markdown files are recognized as such even if `myst` is missing (#556)
+- Build JupyterLab with `dev-build=False` and `minimize=False` on mybinder to avoid build errors
 
 
 1.5.2 (2020-07-21)
