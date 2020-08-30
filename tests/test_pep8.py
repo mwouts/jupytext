@@ -96,6 +96,30 @@ a = 5
     assert pep8_lines_between_cells(prev_lines, next_lines, ".py") == 1
 
 
+def test_pep8_lines_between_cells_ter():
+    prev_lines = ["from jupytext.cell_to_text import RMarkdownCellExporter"]
+
+    next_lines = '''@pytest.mark.parametrize(
+    "lines",
+    [
+        "# text",
+        """# # %%R
+# # comment
+# 1 + 1
+# 2 + 2
+""",
+    ],
+)
+def test_paragraph_is_fully_commented(lines):
+    assert paragraph_is_fully_commented(
+        lines.splitlines(), comment="#", main_language="python"
+    )'''.splitlines()
+
+    assert cell_ends_with_code(prev_lines)
+    assert next_instruction_is_function_or_class(next_lines)
+    assert pep8_lines_between_cells(prev_lines, next_lines, ".py") == 2
+
+
 def test_pep8():
     text = """import os
 

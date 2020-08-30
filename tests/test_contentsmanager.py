@@ -1714,3 +1714,4 @@ def test_new_untitled(tmpdir):
     assert cm.new_untitled(type="notebook", ext=".md")["path"] == "Untitled1.md"
     assert cm.new_untitled(type="notebook", ext=".py")["path"] == "Untitled2.py"
     assert cm.new_untitled(type="notebook")["path"] == "Untitled3.ipynb"
+    assert cm.new_untitled(type="notebook", ext=".py:percent")["path"] == "Untitled4.py"

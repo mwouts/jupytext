@@ -1,6 +1,35 @@
+import pytest
 from nbformat.v4.nbbase import new_markdown_cell
-from jupytext.cell_reader import RMarkdownCellReader, LightScriptCellReader, uncomment
+from jupytext.cell_reader import (
+    RMarkdownCellReader,
+    LightScriptCellReader,
+    uncomment,
+    paragraph_is_fully_commented,
+)
 from jupytext.cell_to_text import RMarkdownCellExporter
+
+
+@pytest.mark.parametrize(
+    "lines",
+    [
+        "# text",
+        """# # %%R
+# # comment
+# 1 + 1
+# 2 + 2
+""",
+    ],
+)
+def test_paragraph_is_fully_commented(lines):
+    assert paragraph_is_fully_commented(
+        lines.splitlines(), comment="#", main_language="python"
+    )
+
+
+def test_paragraph_is_not_fully_commented(lines="# text\nnot fully commented out"):
+    assert not paragraph_is_fully_commented(
+        lines.splitlines(), comment="#", main_language="python"
+    )
 
 
 def test_uncomment():

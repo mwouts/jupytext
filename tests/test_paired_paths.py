@@ -245,3 +245,7 @@ def test_cm_paired_paths():
     one = "ipynb"
     cm.update_paired_notebooks("nb.ipynb", one)
     assert cm.paired_notebooks == {}
+
+    zero = ""
+    cm.update_paired_notebooks("nb.ipynb", zero)
+    assert cm.paired_notebooks == {}

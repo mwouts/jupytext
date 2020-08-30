@@ -6,7 +6,11 @@ from textwrap import dedent
 import pytest
 from nbformat.v4.nbbase import new_notebook
 from tornado.web import HTTPError
-from jupytext.formats import get_format_implementation, JupytextFormatError
+from jupytext.formats import (
+    get_format_implementation,
+    JupytextFormatError,
+    guess_format,
+)
 from jupytext.myst import (
     myst_to_notebook,
     CODE_DIRECTIVE,
@@ -116,6 +120,7 @@ def test_matches_mystnb():
         """
     )
     assert matches_mystnb(text) is True
+    assert guess_format(text, ".md") == ("myst", {})
 
 
 def test_not_installed():

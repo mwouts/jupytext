@@ -234,11 +234,6 @@ def get_format_implementation(ext, format_name=None):
             formats_for_extension.append(fmt.format_name)
 
     if formats_for_extension:
-        if ext in [".md", ".markdown"] and format_name == "pandoc":
-            raise JupytextFormatError("Please install pandoc>=2.7.2")
-        if ext in myst_extensions() and format_name == MYST_FORMAT_NAME:
-            raise JupytextFormatError("Please install myst-parser")
-
         raise JupytextFormatError(
             "Format '{}' is not associated to extension '{}'. "
             "Please choose one of: {}.".format(
@@ -291,7 +286,7 @@ def guess_format(text, ext):
     if "text_representation" in metadata.get("jupytext", {}):
         return format_name_for_ext(metadata, ext), {}
 
-    if is_myst_available() and matches_mystnb(text, ext):
+    if is_myst_available() and ext in myst_extensions() and matches_mystnb(text, ext):
         return MYST_FORMAT_NAME, {}
 
     lines = text.splitlines()
@@ -403,8 +398,10 @@ def check_file_version(notebook, source_path, outputs_path):
         return
 
     _, ext = os.path.splitext(source_path)
-    if ext.endswith(".ipynb"):
-        return
+    assert not ext.endswith(".ipynb"), "source_path={} should be a text file".format(
+        source_path
+    )
+
     version = (
         notebook.metadata.get("jupytext", {})
         .get("text_representation", {})
