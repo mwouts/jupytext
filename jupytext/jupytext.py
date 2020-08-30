@@ -116,7 +116,10 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 )  # pragma: no cover
             lines = lines[pos:]
 
-        set_main_and_cell_language(metadata, cells, self.implementation.extension)
+        custom_cell_magics = self.fmt.get("custom_cell_magics", "").split(",")
+        set_main_and_cell_language(
+            metadata, cells, self.implementation.extension, custom_cell_magics
+        )
         cell_metadata = set()
         for cell in cells:
             cell_metadata.update(cell.metadata.keys())

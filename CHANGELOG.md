@@ -7,6 +7,7 @@
 - New option `root_level_metadata_as_raw_cell`. Set it to `False` if you don't want to see root level metadata
 of R Markdown notebooks as a raw cell in Jupyter (#415)
 - New option `doxygen_equation_markers` to translate Markdown equations into Doxygen equations (#517)
+- New option `custom_cell_magics` to comment out cells starting with user-specific cell magics (#513)
 - Tested `isort` on notebooks (#553)
 - `jupytext notebook.ipynb --to filename.py` will warn that `--to` is used in place of `--output`.
 - Warn if 'Include Metadata' is off when saving text files in Jupyter (#561)
@@ -19,7 +20,7 @@ of R Markdown notebooks as a raw cell in Jupyter (#415)
 - The `# %%` cell marker has the same indentation as the first line in the cell (#562)
 - The `md:myst` and `md:pandoc` are always included in the Jupytext formats, and an informative runtime
 error will occur if the required dependencies, resp. `markdown-it-py` and `pandoc`, are not installed. (#556)
-- Jupytext now depends on `markdown-it-py` and always feature the MyST-Markdown format (Python 3.6 and above, #591)
+- Jupytext now depends on `markdown-it-py` and always features the MyST-Markdown format (Python 3.6 and above, #591)
 
 **Fixed**
 - Configured coverage targets in `codecov.yml`

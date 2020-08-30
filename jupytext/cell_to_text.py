@@ -44,7 +44,10 @@ class BaseCellExporter(object):
             cell.metadata, self.fmt.get("cell_metadata_filter"), _IGNORE_CELL_METADATA
         )
         if self.parse_cell_language:
-            self.language, magic_args = cell_language(self.source, default_language)
+            custom_cell_magics = self.fmt.get("custom_cell_magics", "").split(",")
+            self.language, magic_args = cell_language(
+                self.source, default_language, custom_cell_magics
+            )
 
             if magic_args:
                 self.metadata["magic_args"] = magic_args

@@ -136,6 +136,14 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
+    custom_cell_magics = Unicode(
+        "",
+        help='A comma separated list of cell magics. Use e.g. custom_cell_magics = "configure,local" '
+        'if you want code cells starting with the Spark magic cell commands "configure" and "local" '
+        "to be commented out when converted to scripts.",
+        config=True,
+    )
+
     def set_default_format_options(self, format_options, read=False):
         """Set default format option"""
         if self.default_notebook_metadata_filter:
@@ -166,6 +174,8 @@ class JupytextConfiguration(Configurable):
             format_options.setdefault("cell_markers", self.default_cell_markers)
         if read and self.sphinx_convert_rst2md:
             format_options.setdefault("rst2md", self.sphinx_convert_rst2md)
+        if self.custom_cell_magics:
+            format_options.setdefault("custom_cell_magics", self.custom_cell_magics)
 
     def default_formats(self, path):
         """Return the default formats, if they apply to the current path #157"""
