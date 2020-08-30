@@ -15,6 +15,7 @@
 - The `# %%` cell marker has the same indentation as the first line in the cell (#562)
 - The `md:myst` and `md:pandoc` are always included in the Jupytext formats, and an informative runtime
 error will occur if the required dependencies, resp. `myst-parser` and `pandoc`, are not installed. (#556)
+- Jupytext now depends on `markdown-it-py` and always feature the MyST-Markdown format (Python 3.6 and above, #591)  
 
 **Fixed**
 - Configured coverage targets in `codecov.yml`

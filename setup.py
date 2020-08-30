@@ -53,9 +53,16 @@ setup(
     ],
     entry_points={"console_scripts": ["jupytext = jupytext.cli:jupytext"]},
     tests_require=["pytest"],
-    install_requires=["nbformat>=4.0.0", "pyyaml", "toml", 'mock;python_version<"3"'],
+    install_requires=[
+        "markdown-it-py~=0.5.2; python_version >= '3.6'",
+        "nbformat>=4.0.0",
+        "pyyaml",
+        "toml",
+        'mock; python_version<"3"',
+    ],
     extras_require={
-        "myst": ["myst-parser~=0.8.0; python_version >= '3.6'"],
+        # left for back-compatibility
+        "myst": [],
         "toml": ["toml"],
     },
     license="MIT",

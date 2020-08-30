@@ -65,7 +65,7 @@ jobs:
           # install sphinx_gallery and matplotlib if available
           conda install sphinx-gallery --freeze-installed
           # myst-parser
-          conda install 'myst-parser>=0.8' 'myst-parser<0.9' --freeze-installed
+          conda install 'markdown-it-py>=0.5' 'markdown-it-py<0.6' --freeze-installed
           exit 0
       - name: Conda list
         shell: pwsh
