@@ -149,7 +149,7 @@ def test_add_source_map():
     assert notebook.metadata.source_map == [3, 5, 7, 12]
 
 
-PLEASE_INSTALL_MYST = "The MyST Markdown format requires 'myst_parser>=0.8'."
+PLEASE_INSTALL_MYST = "The MyST Markdown format requires .*"
 
 
 @requires_no_myst

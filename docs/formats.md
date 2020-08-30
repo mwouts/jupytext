@@ -90,7 +90,7 @@ If you wish to use that format, please install `pandoc` in version 2.7.2 or abov
 
 [MyST (Markedly Structured Text)][myst-parser] is a markdown flavor that "implements the best parts of reStructuredText". It provides a way to call Sphinx directives and roles from within Markdown,
 using a *slight* extension of CommonMark markdown.
-[MyST-NB][myst-nb] builds on this markdown flavor, to offer direct conversion of Jupyter Notebooks into Sphinx documents.
+[MyST-NB][myst-nb] and [Jupyter Book][jupyter-book] builds on this markdown flavor, to offer direct conversion of Jupyter Notebooks into Sphinx documents.
 
 Similar to the jupytext Markdown format, MyST Markdown uses code blocks to contain code cells.
 The difference though, is that the metadata is contained in a YAML block:
@@ -121,7 +121,7 @@ print("Hallo!")
 ```
 ````
 
-Raw cells are also represented in a similare fashion:
+Raw cells are also represented in a similar fashion:
 
 ````md
 ```{raw-cell}
@@ -147,13 +147,13 @@ This is a new markdown cell with no metadata
 
 See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.myst.md#) in the `myst` format.
 
-If you wish to use that format, please install `conda install -c conda-forge myst-parser`,
-or `pip install jupytext[myst]`.
+**Note**: The `myst` format requires Python >= 3.6
 
 **Tip**: You can use the [myst-highlight] VS Code extension to provide better syntax highlighting for this format.
 
 [myst-parser]: https://myst-parser.readthedocs.io
 [myst-nb]: https://myst-nb.readthedocs.io
+[jupyter-book]: https://jupyterbook.org
 [block break]: https://myst-parser.readthedocs.io/en/latest/using/syntax.html#block-breaks
 [myst-highlight]: https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight
 
