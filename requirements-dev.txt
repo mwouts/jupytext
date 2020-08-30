@@ -10,3 +10,5 @@ toml
 
 # Python 2
 pathlib
+
+#isort>=5.3.0 #Python 3.6 and above

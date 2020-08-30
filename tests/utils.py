@@ -23,11 +23,22 @@ def tool_version(tool):
         return None
 
 
+def isort_version():
+    try:
+        import isort
+
+        return isort.__version__
+    except ImportError:
+        return None
+
+
 requires_jupytext_installed = pytest.mark.skipif(
     not tool_version("jupytext"), reason="jupytext is not installed"
 )
 requires_black = pytest.mark.skipif(not tool_version("black"), reason="black not found")
-requires_isort = pytest.mark.skipif(not tool_version("isort"), reason="isort not found")
+requires_isort = pytest.mark.skipif(
+    not isort_version() or isort_version() <= "5.3.0", reason="isort not found",
+)
 requires_flake8 = pytest.mark.skipif(
     not tool_version("flake8"), reason="flake8 not found"
 )

@@ -19,8 +19,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-          # install black if available (Python 3.6 and above), and autopep8 for testing the pipe mode
+          # install black, isort if available (Python 3.6 and above), and autopep8 for testing the pipe mode
           pip install black || true
+          pip install isort>=5.3.0 || true
           pip install autopep8 || true
           # install sphinx_gallery and matplotlib if available (may not work on pypy)
           pip install sphinx_gallery || true
