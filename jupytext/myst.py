@@ -31,8 +31,8 @@ def is_myst_available():
 def raise_if_myst_is_not_available():
     if not is_myst_available():
         raise ImportError(
-            "The MyST Markdown format requires 'myst_parser>=0.8'. "
-            "Install it with e.g. 'pip install jupytext[myst]'"
+            "The MyST Markdown format requires python >= 3.6 "
+            "and markdown-it-py~=0.5.2"
         )
 
 
