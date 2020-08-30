@@ -123,7 +123,7 @@ def same_language(kernel_language, language):
     return usual_language_name(kernel_language) == usual_language_name(language)
 
 
-def set_main_and_cell_language(metadata, cells, ext):
+def set_main_and_cell_language(metadata, cells, ext, custom_cell_magics):
     """Set main language for the given collection of cells, and
     use magics for cells that use other languages"""
     main_language = default_language_from_metadata_and_ext(metadata, ext)
@@ -152,7 +152,7 @@ def set_main_and_cell_language(metadata, cells, ext):
             if usual_language_name(language) == main_language:
                 continue
 
-            if language in _JUPYTER_LANGUAGES:
+            if language in _JUPYTER_LANGUAGES or language in custom_cell_magics:
                 cell["metadata"].pop("language")
                 magic = "%%" if main_language != "csharp" else "#!"
                 if "magic_args" in cell["metadata"]:
@@ -165,7 +165,7 @@ def set_main_and_cell_language(metadata, cells, ext):
                     cell["source"] = u"{}{}\n".format(magic, language) + cell["source"]
 
 
-def cell_language(source, default_language):
+def cell_language(source, default_language, custom_cell_magics):
     """Return cell language and language options, if any"""
     if source:
         line = source[0]
@@ -183,7 +183,7 @@ def cell_language(source, default_language):
                 lang = magic
                 magic_args = ""
 
-            if lang in _JUPYTER_LANGUAGES:
+            if lang in _JUPYTER_LANGUAGES or lang in custom_cell_magics:
                 source.pop(0)
                 return lang, magic_args
 
