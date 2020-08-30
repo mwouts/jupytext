@@ -10,6 +10,7 @@ of R Markdown notebooks as a raw cell in Jupyter (#415)
 - New option `custom_cell_magics` to comment out cells starting with user-specific cell magics (#513)
 - Tested `isort` on notebooks (#553)
 - `jupytext notebook.ipynb --to filename.py` will warn that `--to` is used in place of `--output`.
+- `jupytext --set-formats filename.py` will suggest to use `--sync` instead of `--set-formats` (#544)
 - Warn if 'Include Metadata' is off when saving text files in Jupyter (#561)
 - Test that notebooks paired through a configuration file are left unmodified (#598)
 - Test that metadata filters in the configuration files are taken into account when using `jupytext --to` (#543)
