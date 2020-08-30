@@ -404,7 +404,10 @@ def jupytext(args=None):
 def jupytext_single_file(nb_file, args, log):
     """Apply the jupytext commmand, with given arguments, to a single file"""
     if nb_file == "-" and args.sync:
-        raise ValueError("Cannot sync a notebook on stdin")
+        msg = "Missing notebook path."
+        if args.set_formats is not None and os.path.isfile(args.set_formats):
+            msg += " Maybe you mean 'jupytext --sync {}' ?".format(args.set_formats)
+        raise ValueError(msg)
 
     nb_dest = args.output or (
         None
