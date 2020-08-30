@@ -4,6 +4,7 @@ import re
 from copy import copy
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from .languages import _SCRIPT_EXTENSIONS
+from .doxygen import doxygen_to_markdown
 
 # Sphinx Gallery is an optional dependency. And we intercept the SyntaxError for #301
 try:
@@ -122,6 +123,7 @@ class BaseCellReader(object):
         self.cell_type = None
         self.language = None
         self.cell_metadata_json = fmt.get("cell_metadata_json", False)
+        self.doxygen_equation_markers = fmt.get("doxygen_equation_markers", False)
 
     def read(self, lines):
         """Read one cell from the given lines, and return the cell,
@@ -457,6 +459,8 @@ class MarkdownCellReader(BaseCellReader):
     def uncomment_code_and_magics(self, lines):
         if self.cell_type == "code" and self.comment_magics:
             lines = uncomment_magic(lines, self.language)
+        if self.cell_type == "markdown" and self.doxygen_equation_markers:
+            lines = doxygen_to_markdown("\n".join(lines)).splitlines()
         return lines
 
 
