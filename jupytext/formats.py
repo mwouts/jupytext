@@ -702,6 +702,7 @@ _BINARY_FORMAT_OPTIONS = [
     "rst2md",
     "cell_metadata_json",
     "use_runtools",
+    "doxygen_equation_markers",
 ]
 _VALID_FORMAT_OPTIONS = _BINARY_FORMAT_OPTIONS + [
     "notebook_metadata_filter",

@@ -459,6 +459,8 @@ def jupytext_single_file(nb_file, args, log):
 
     # Compute actual extension when using script/auto, and update nb_dest if necessary
     dest_fmt = args.output_format
+    if dest_fmt and config:
+        config.set_default_format_options(dest_fmt)
     if dest_fmt and dest_fmt["extension"] == ".auto":
         dest_fmt = check_auto_ext(dest_fmt, notebook.metadata, "--to")
         if not args.output and nb_file != "-":

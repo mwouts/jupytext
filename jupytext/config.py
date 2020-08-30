@@ -100,6 +100,13 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
+    doxygen_equation_markers = Bool(
+        False,
+        help="Should equation markers use the DOxygen format? "
+        "(see https://github.com/mwouts/jupytext/issues/517)",
+        config=True,
+    )
+
     outdated_text_notebook_margin = Float(
         1.0,
         help="Refuse to overwrite inputs of a ipynb notebooks with those of a "
@@ -139,6 +146,10 @@ class JupytextConfiguration(Configurable):
             format_options.setdefault("comment_magics", self.comment_magics)
         if self.split_at_heading:
             format_options.setdefault("split_at_heading", self.split_at_heading)
+        if self.doxygen_equation_markers:
+            format_options.setdefault(
+                "doxygen_equation_markers", self.doxygen_equation_markers
+            )
         if not read and self.default_cell_markers:
             format_options.setdefault("cell_markers", self.default_cell_markers)
         if read and self.sphinx_convert_rst2md:
