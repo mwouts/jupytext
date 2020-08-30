@@ -22,7 +22,7 @@ jobs:
       - name: install pandoc
         uses: r-lib/actions/setup-pandoc@v1
         with:
-          pandoc-version: '2.7.3'
+          pandoc-version: '2.9'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip

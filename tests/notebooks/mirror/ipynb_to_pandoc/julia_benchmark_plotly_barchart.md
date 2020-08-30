@@ -1,7 +1,7 @@
 ---
 jupyter:
   kernelspec:
-    display_name: 'Julia 1.1.1'
+    display_name: Julia 1.1.1
     language: julia
     name: 'julia-1.1'
   nbformat: 4
