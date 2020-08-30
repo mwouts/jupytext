@@ -7,3 +7,4 @@ nbconvert
 sphinx-gallery
 setuptools
 toml
+isort
