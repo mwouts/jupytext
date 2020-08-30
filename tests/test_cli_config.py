@@ -1,9 +1,27 @@
 import pytest
+import nbformat
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 from jupytext.cli import jupytext
 from jupytext.jupytext import read, write
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.compare import compare
+
+
+def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
+    cfg_file = tmpdir.join(".jupytext.yml")
+    nb_file = tmpdir.join("notebook.ipynb")
+    py_file = tmpdir.join("notebook.py")
+
+    cfg_file.write("default_jupytext_formats: 'ipynb,py'\n")
+    nbformat.write(new_notebook(), str(nb_file))
+
+    jupytext([str(nb_file), "--sync"])
+
+    assert nb_file.isfile()
+    assert py_file.isfile()
+
+    nb = nbformat.read(nb_file, as_version=4)
+    assert 'jupytext' not in nb.metadata
 
 
 def test_default_jupytext_formats(tmpdir):
