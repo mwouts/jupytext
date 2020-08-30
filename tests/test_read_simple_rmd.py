@@ -1,7 +1,15 @@
 import re
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
+import pytest
+import nbformat
+from nbformat.v4.nbbase import (
+    new_notebook,
+    new_markdown_cell,
+    new_raw_cell,
+    new_code_cell,
+)
 from jupytext.compare import compare, compare_notebooks
 import jupytext
+from jupytext.cli import jupytext as jupytext_cli
 from .utils import skip_if_dict_is_not_ordered
 
 
@@ -154,3 +162,57 @@ def test_dict_in_metadata(cell_metadata={"a": {"b": "c"}}):
 
 def test_list_in_metadata(cell_metadata={"d": ["e"]}):
     round_trip_cell_metadata(cell_metadata)
+
+
+@pytest.mark.parametrize("root_level_metadata_as_raw_cell", [True, False])
+def test_root_level_metadata_as_raw_cell(
+    tmpdir,
+    root_level_metadata_as_raw_cell,
+    rmd="""---
+author: R Markdown document author
+title: R Markdown notebook title
+---
+
+```{r}
+1 + 1
+```
+""",
+):
+    nb_file = tmpdir.join("notebook.ipynb")
+    rmd_file = tmpdir.join("notebook.Rmd")
+    cfg_file = tmpdir.join("jupytext.toml")
+
+    cfg_file.write(
+        "root_level_metadata_as_raw_cell = {}".format(
+            "true" if root_level_metadata_as_raw_cell else "false"
+        )
+    )
+    rmd_file.write(rmd)
+
+    jupytext_cli([str(rmd_file), "--to", "ipynb"])
+
+    nb = nbformat.read(str(nb_file), as_version=4)
+
+    if root_level_metadata_as_raw_cell:
+        assert len(nb.cells) == 2
+        compare(
+            nb.cells[0],
+            new_raw_cell(
+                """---
+author: R Markdown document author
+title: R Markdown notebook title
+---"""
+            ),
+        )
+        compare(nb.cells[1], new_code_cell("1 + 1"))
+    else:
+        assert len(nb.cells) == 1
+        compare(nb.cells[0], new_code_cell("1 + 1"))
+        assert nb.metadata["jupytext"]["root_level_metadata"] == {
+            "title": "R Markdown notebook title",
+            "author": "R Markdown document author",
+        }
+
+    # Writing back to Rmd should preserve the original document
+    jupytext_cli([str(nb_file), "--to", "Rmd"])
+    compare(rmd_file.read(), rmd)

@@ -85,7 +85,9 @@ def insert_jupytext_info_and_filter_metadata(metadata, ext, text_format):
     )
 
 
-def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
+def metadata_and_cell_to_header(
+    notebook, metadata, text_format, ext, root_level_metadata_as_raw_cell=True
+):
     """
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
@@ -94,7 +96,13 @@ def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
     header = []
 
     lines_to_next_cell = None
-    if notebook.cells:
+    root_level_metadata = {}
+
+    if not root_level_metadata_as_raw_cell:
+        root_level_metadata = metadata.get("jupytext", {}).pop(
+            "root_level_metadata", {}
+        )
+    elif notebook.cells:
         cell = notebook.cells[0]
         if cell.cell_type == "raw":
             lines = cell.source.strip("\n\t ").splitlines()
@@ -110,8 +118,11 @@ def metadata_and_cell_to_header(notebook, metadata, text_format, ext):
     metadata = insert_jupytext_info_and_filter_metadata(metadata, ext, text_format)
 
     if metadata:
+        root_level_metadata["jupyter"] = metadata
+
+    if root_level_metadata:
         header.extend(
-            yaml.safe_dump({"jupyter": metadata}, default_flow_style=False).splitlines()
+            yaml.safe_dump(root_level_metadata, default_flow_style=False).splitlines()
         )
 
     if header:
@@ -141,7 +152,9 @@ def recursive_update(target, update):
     return target
 
 
-def header_to_metadata_and_cell(lines, header_prefix, ext=None):
+def header_to_metadata_and_cell(
+    lines, header_prefix, ext=None, root_level_metadata_as_raw_cell=True
+):
     """
     Return the metadata, a boolean to indicate if a jupyter section was found,
      the first cell of notebook if some metadata is found outside of the jupyter section, and next loc in text
@@ -227,13 +240,20 @@ def header_to_metadata_and_cell(lines, header_prefix, ext=None):
             lines_to_next_cell = 0
 
         if header:
-            cell = new_raw_cell(
-                source="\n".join(["---"] + header + ["---"]),
-                metadata={}
-                if lines_to_next_cell
-                == pep8_lines_between_cells(["---"], lines[i + 1 :], ext)
-                else {"lines_to_next_cell": lines_to_next_cell},
-            )
+            if root_level_metadata_as_raw_cell:
+                cell = new_raw_cell(
+                    source="\n".join(["---"] + header + ["---"]),
+                    metadata={}
+                    if lines_to_next_cell
+                    == pep8_lines_between_cells(["---"], lines[i + 1 :], ext)
+                    else {"lines_to_next_cell": lines_to_next_cell},
+                )
+            else:
+                cell = None
+                root_level_metadata = yaml.safe_load("\n".join(header))
+                metadata.setdefault("jupytext", {})[
+                    "root_level_metadata"
+                ] = root_level_metadata
         else:
             cell = None
 

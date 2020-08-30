@@ -74,6 +74,14 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
+    root_level_metadata_as_raw_cell = Bool(
+        True,
+        help="Should the root level metadata of text documents (like the fields 'title' or 'author' in "
+        "R Markdown document) appear as a raw cell in the notebook (True), or go to the notebook"
+        "metadata?",
+        config=True,
+    )
+
     default_cell_metadata_filter = Unicode(
         u"",
         help="Cell metadata that should be saved in the text representations. "
@@ -141,6 +149,10 @@ class JupytextConfiguration(Configurable):
         if self.hide_notebook_metadata is not None:
             format_options.setdefault(
                 "hide_notebook_metadata", self.hide_notebook_metadata
+            )
+        if self.root_level_metadata_as_raw_cell is False:
+            format_options.setdefault(
+                "root_level_metadata_as_raw_cell", self.root_level_metadata_as_raw_cell
             )
         if self.comment_magics is not None:
             format_options.setdefault("comment_magics", self.comment_magics)

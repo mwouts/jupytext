@@ -698,6 +698,7 @@ _VALID_FORMAT_INFO = ["extension", "format_name", "suffix", "prefix"]
 _BINARY_FORMAT_OPTIONS = [
     "comment_magics",
     "hide_notebook_metadata",
+    "root_level_metadata_as_raw_cell",
     "split_at_heading",
     "rst2md",
     "cell_metadata_json",
