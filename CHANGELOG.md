@@ -1,4 +1,4 @@
-1.6.0-dev (2020-08-??)
+1.6.0 (2020-08-??)
 ----------------------
 
 **Added**
@@ -14,6 +14,7 @@ of R Markdown notebooks as a raw cell in Jupyter (#415)
 - Warn if 'Include Metadata' is off when saving text files in Jupyter (#561)
 - Test that notebooks paired through a configuration file are left unmodified (#598)
 - Test that metadata filters in the configuration files are taken into account when using `jupytext --to` (#543)
+- New argument `--run-path` to execute the notebooks at the desired location (#595)
 
 **Changed**
 - Install Jupytext from source on MyBinder to avoid cache issues (#567)

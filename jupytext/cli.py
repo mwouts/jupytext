@@ -267,6 +267,11 @@ def parse_jupytext_args(args=None):
         action="store_true",
         help="Execute the notebook with the given kernel",
     )
+    parser.add_argument(
+        "--run-path",
+        type=str,
+        help="Execute the notebook at the given path (defaults to the notebook parent directory)",
+    )
 
     parser.add_argument(
         "--quiet",
@@ -325,6 +330,9 @@ def jupytext(args=None):
             raise ValueError("--paired-paths applies to a single notebook")
         print_paired_paths(args.notebooks[0], args.input_format)
         return 1
+
+    if args.run_path:
+        args.execute = True
 
     if (
         (args.test or args.test_strict)
@@ -564,11 +572,29 @@ def jupytext_single_file(nb_file, args, log):
         kernel_name = notebook.metadata.get("kernelspec", {}).get("name")
         log("[jupytext] Executing notebook with kernel {}".format(kernel_name))
         exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
-        if nb_dest is not None and nb_dest != "-":
 
-            resources = {"metadata": {"path": str(os.path.dirname(nb_dest))}}
+        if nb_dest is not None and nb_dest != "-":
+            nb_path = os.path.dirname(nb_dest)
         elif nb_file != "-":
-            resources = {"metadata": {"path": str(os.path.dirname(nb_file))}}
+            nb_path = os.path.dirname(nb_file)
+        else:
+            nb_path = None
+
+        run_path = args.run_path or nb_path
+        if args.run_path and not os.path.isdir(run_path):
+            # is this a relative directory?
+            for base_dir in [nb_path, os.getcwd()]:
+                try_path = os.path.join(base_dir, run_path)
+                if os.path.isdir(try_path):
+                    run_path = try_path
+                    break
+            if not os.path.isdir(run_path):
+                raise ValueError(
+                    "--run-path={} is not a valid path".format(args.run_path)
+                )
+
+        if run_path:
+            resources = {"metadata": {"path": run_path}}
         else:
             resources = {}
         exec_proc.preprocess(notebook, resources=resources)

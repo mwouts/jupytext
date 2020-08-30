@@ -1,7 +1,8 @@
-from .utils import requires_nbconvert, requires_ir_kernel, skip_on_windows
+import shutil
 import pytest
 from jupytext import read
 from jupytext.cli import jupytext
+from .utils import requires_nbconvert, requires_ir_kernel, skip_on_windows
 
 
 @requires_nbconvert
@@ -168,11 +169,11 @@ def test_execute_r(tmpdir, caplog, capsys):  # pragma: no cover
 @requires_nbconvert
 @skip_on_windows
 def test_execute_in_subfolder(tmpdir, caplog, capsys):
-    tmpdir.mkdir("subfolder")
+    subfolder = tmpdir.mkdir("subfolder")
 
-    tmp_csv = str(tmpdir.join("subfolder", "inputs.csv"))
-    tmp_py = str(tmpdir.join("subfolder", "notebook.py"))
-    tmp_ipynb = str(tmpdir.join("subfolder", "notebook.ipynb"))
+    tmp_csv = str(subfolder.join("inputs.csv"))
+    tmp_py = str(subfolder.join("notebook.py"))
+    tmp_ipynb = str(subfolder.join("notebook.ipynb"))
 
     with open(tmp_csv, "w") as fp:
         fp.write("1\n2\n")
@@ -191,5 +192,35 @@ sum(ast.literal_eval(line) for line in text.splitlines())
     jupytext(args=[tmp_py, "--to", "ipynb", "--execute"])
 
     nb = read(tmp_ipynb)
+    assert len(nb.cells) == 3
+    assert nb.cells[2].outputs[0]["data"] == {"text/plain": "3"}
+
+    tmp2_py = str(tmpdir.mkdir("another_folder").join("notebook.py"))
+    tmp2_ipynb = str(tmpdir.join("another_folder", "notebook.ipynb"))
+
+    shutil.copy(tmp_py, tmp2_py)
+
+    # Executing without run-path fails
+    import nbconvert
+
+    with pytest.raises(
+        nbconvert.preprocessors.execute.CellExecutionError,
+        match="No such file or directory: 'inputs.csv'",
+    ):
+        jupytext(args=[tmp2_py, "--to", "ipynb", "--execute"])
+
+    # Raise if folder does not exists
+    with pytest.raises(ValueError, match="is not a valid path"):
+        jupytext(args=[tmp2_py, "--to", "ipynb", "--run-path", "wrong_path"])
+
+    # Execute in full path
+    jupytext(args=[tmp2_py, "--to", "ipynb", "--run-path", str(subfolder)])
+    nb = read(tmp2_ipynb)
+    assert len(nb.cells) == 3
+    assert nb.cells[2].outputs[0]["data"] == {"text/plain": "3"}
+
+    # Execute in path relative to notebook dir
+    jupytext(args=[tmp2_py, "--to", "ipynb", "--run-path", "../subfolder"])
+    nb = read(tmp2_ipynb)
     assert len(nb.cells) == 3
     assert nb.cells[2].outputs[0]["data"] == {"text/plain": "3"}
