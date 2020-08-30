@@ -11,6 +11,7 @@ of R Markdown notebooks as a raw cell in Jupyter (#415)
 - `jupytext notebook.ipynb --to filename.py` will warn that `--to` is used in place of `--output`.
 - Warn if 'Include Metadata' is off when saving text files in Jupyter (#561)
 - Test that notebooks paired through a configuration file are left unmodified (#598)
+- Test that metadata filters in the configuration files are taken into account when using `jupytext --to` (#543)
 
 **Changed**
 - Install Jupytext from source on MyBinder to avoid cache issues (#567)
