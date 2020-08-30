@@ -192,6 +192,7 @@ def test_decompress_formats():
 
 def test_compress_formats():
     assert short_form_multiple_formats([{"extension": ".ipynb"}]) == "ipynb"
+    assert short_form_multiple_formats("ipynb") == "ipynb"
     assert (
         short_form_multiple_formats([{"extension": ".ipynb"}, {"extension": ".md"}])
         == "ipynb,md"
@@ -303,6 +304,9 @@ def test_fix_139():
 def test_validate_one_format():
     with pytest.raises(JupytextFormatError):
         validate_one_format("py:percent")
+
+    with pytest.raises(JupytextFormatError):
+        validate_one_format({"extension": "py", "format_name": "invalid"})
 
     with pytest.raises(JupytextFormatError):
         validate_one_format({})

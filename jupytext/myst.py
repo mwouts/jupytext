@@ -87,7 +87,9 @@ def matches_mystnb(
     try:
         tokens = get_parser().parse(text + "\n")
     except (TypeError, ValueError) as err:
-        warnings.warn("myst-parse failed unexpectedly: {}".format(err))
+        warnings.warn(
+            "myst-parser failed unexpectedly: {}".format(err)
+        )  # pragma: no cover
         return False
 
     # Is the format information available in the jupytext text representation?

@@ -9,7 +9,7 @@ from .doxygen import doxygen_to_markdown
 # Sphinx Gallery is an optional dependency. And we intercept the SyntaxError for #301
 try:
     from sphinx_gallery.notebook import rst2md
-except (ImportError, SyntaxError):
+except (ImportError, SyntaxError):  # pragma: no cover
     rst2md = None
 
 from .cell_metadata import (
@@ -963,7 +963,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):  # pylint: disable=W0223
                 else:
                     raise ImportError(
                         "Could not import rst2md from sphinx_gallery.notebook"
-                    )
+                    )  # pragma: no cover
 
         self.content = source
 

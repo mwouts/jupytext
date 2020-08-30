@@ -514,7 +514,7 @@ class SphinxGalleryCellExporter(BaseCellExporter):  # pylint: disable=W0223
             raise ValueError(
                 "The 'rst2md' option is a read only option. The reverse conversion is not "
                 "implemented. Please either deactivate the option, or save to another format."
-            )
+            )  # pragma: no cover
 
     def cell_to_text(self):
         """Return the text representation for the cell"""
