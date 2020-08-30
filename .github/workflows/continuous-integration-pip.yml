@@ -5,7 +5,7 @@ jobs:
   build:
     strategy:
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

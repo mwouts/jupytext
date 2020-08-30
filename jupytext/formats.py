@@ -35,7 +35,6 @@ from .pandoc import pandoc_version
 from .magics import is_magic
 from .myst import (
     MYST_FORMAT_NAME,
-    is_myst_available,
     myst_version,
     myst_extensions,
     matches_mystnb,
@@ -291,7 +290,7 @@ def guess_format(text, ext):
     if "text_representation" in metadata.get("jupytext", {}):
         return format_name_for_ext(metadata, ext), {}
 
-    if is_myst_available() and matches_mystnb(text, ext):
+    if matches_mystnb(text, ext):
         return MYST_FORMAT_NAME, {}
 
     lines = text.splitlines()

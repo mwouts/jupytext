@@ -6,7 +6,6 @@ from jupytext.cli import system
 from jupytext.cell_reader import rst2md
 from jupytext.pandoc import is_pandoc_available
 from jupytext.kernels import kernelspec_from_language
-from jupytext.myst import is_myst_available
 
 skip_if_dict_is_not_ordered = pytest.mark.skipif(
     sys.version_info < (3, 6),
@@ -50,10 +49,6 @@ requires_no_pandoc = pytest.mark.skipif(
 requires_ir_kernel = pytest.mark.skipif(
     kernelspec_from_language("R") is None, reason="irkernel is not installed"
 )
-requires_myst = pytest.mark.skipif(
-    not is_myst_available(), reason="myst_parser not found"
-)
-requires_no_myst = pytest.mark.skipif(is_myst_available(), reason="myst is available")
 skip_on_windows = pytest.mark.skipif(sys.platform.startswith("win"), reason="Issue 489")
 
 

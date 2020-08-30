@@ -4,49 +4,25 @@ myst formatted text documents and notebooks.
 """
 import json
 import warnings
+import re
+from textwrap import dedent
 
 import nbformat as nbf
 import yaml
-from .reraise import reraise
 
-try:
-    import myst_parser
-    from myst_parser.main import default_parser
-    from myst_parser.parse_directives import DirectiveParsingError, parse_directive_text
-except ImportError as err:
-    myst_parser = None
-    DirectiveParsingError = Exception
-    default_parser = parse_directive_text = reraise(err)
+from markdown_it import MarkdownIt
+from markdown_it.extensions.front_matter import front_matter_plugin
+from markdown_it.extensions.myst_blocks import myst_block_plugin
+from markdown_it.extensions.myst_role import myst_role_plugin
 
 MYST_FORMAT_NAME = "myst"
 CODE_DIRECTIVE = "{code-cell}"
 RAW_DIRECTIVE = "{raw-cell}"
 
 
-def is_myst_available():
-    """Whether the myst-parser package is available."""
-    if myst_parser is None:
-        return False
-    major, minor = myst_parser.__version__.split(".")[:2]
-    if int(major) < 1 and int(minor) < 8:
-        warnings.warn("The installed myst-parser version is less than the required 0.8")
-        return False
-    return True
-
-
-def raise_if_myst_is_not_available():
-    if not is_myst_available():
-        raise ImportError(
-            "The MyST Markdown format requires 'myst_parser>=0.8'. "
-            "Install it with e.g. 'pip install jupytext[myst]'"
-        )
-
-
 def myst_version():
-    """The major version of myst parser."""
-    if is_myst_available():
-        return ".".join(myst_parser.__version__.split(".")[:2])
-    return "N/A"
+    """The version of myst."""
+    return 0.12
 
 
 def myst_extensions(no_md=False):
@@ -54,6 +30,20 @@ def myst_extensions(no_md=False):
     if no_md:
         return [".myst", ".mystnb", ".mnb"]
     return [".md", ".myst", ".mystnb", ".mnb"]
+
+
+def get_parser():
+    """Return the markdown-it parser to use."""
+    parser = (
+        MarkdownIt("commonmark")
+        .enable("table")
+        .use(front_matter_plugin)
+        .use(myst_block_plugin)
+        .use(myst_role_plugin)
+        # we only need to parse block level components (for efficiency)
+        .disable("inline", True)
+    )
+    return parser
 
 
 def matches_mystnb(
@@ -79,9 +69,7 @@ def matches_mystnb(
         return False
 
     try:
-        # parse markdown file up to the block level (i.e. don't worry about inline text)
-        parser = default_parser("html", disable_syntax=["inline"])
-        tokens = parser.parse(text + "\n")
+        tokens = get_parser().parse(text + "\n")
     except (TypeError, ValueError) as err:
         warnings.warn("myst-parse failed unexpectedly: {}".format(err))
         return False
@@ -164,15 +152,59 @@ def from_nbnode(value):
     return value
 
 
-class MockDirective:
-    option_spec = {"options": True}
-    required_arguments = 0
-    optional_arguments = 1
-    has_content = True
-
-
 class MystMetadataParsingError(Exception):
     """Error when parsing metadata from myst formatted text"""
+
+
+def read_fenced_cell(token, cell_index, cell_type):
+    """Parse (and validate) the full directive text."""
+    content = token.content
+    error_msg = "{0} cell {1} at line {2} could not be read: ".format(
+        cell_type, cell_index, token.map[0] + 1
+    )
+
+    body_lines, options = parse_directive_options(content, error_msg)
+
+    # remove first line of body if blank
+    # this is to allow space between the options and the content
+    if body_lines and not body_lines[0].strip():
+        body_lines = body_lines[1:]
+
+    return options, body_lines
+
+
+def parse_directive_options(content: str, error_msg: str):
+    """Parse (and validate) the directive option section."""
+    options = {}
+    if content.startswith("---"):
+        content = "\n".join(content.splitlines()[1:])
+        match = re.search(r"^-{3,}", content, re.MULTILINE)
+        if match:
+            yaml_block = content[: match.start()]
+            content = content[match.end() + 1 :]
+        else:
+            yaml_block = content
+            content = ""
+        yaml_block = dedent(yaml_block)
+        try:
+            options = yaml.safe_load(yaml_block) or {}
+        except (yaml.parser.ParserError, yaml.scanner.ScannerError) as error:
+            raise MystMetadataParsingError(error_msg + "Invalid YAML; " + str(error))
+    elif content.lstrip().startswith(":"):
+        content_lines = content.splitlines()  # type: list
+        yaml_lines = []
+        while content_lines:
+            if not content_lines[0].lstrip().startswith(":"):
+                break
+            yaml_lines.append(content_lines.pop(0).lstrip()[1:])
+        yaml_block = "\n".join(yaml_lines)
+        content = "\n".join(content_lines)
+        try:
+            options = yaml.safe_load(yaml_block) or {}
+        except (yaml.parser.ParserError, yaml.scanner.ScannerError) as error:
+            raise MystMetadataParsingError(error_msg + "Invalid YAML; " + str(error))
+
+    return content.splitlines(), options
 
 
 def strip_blank_lines(text):
@@ -181,24 +213,6 @@ def strip_blank_lines(text):
     while text and text.startswith("\n"):
         text = text[1:]
     return text
-
-
-def read_fenced_cell(token, cell_index, cell_type):
-    """Return cell options and body"""
-    try:
-        _, options, body_lines = parse_directive_text(
-            directive_class=MockDirective,
-            argument_str="",
-            content=token.content,
-            validate_options=False,
-        )
-    except DirectiveParsingError as err:
-        raise MystMetadataParsingError(
-            "{0} cell {1} at line {2} could not be read: {3}".format(
-                cell_type, cell_index, token.map[0] + 1, err
-            )
-        )
-    return options, body_lines
 
 
 def read_cell_metadata(token, cell_index):
@@ -242,11 +256,8 @@ def myst_to_notebook(
     NOTE: we assume here that all of these directives are at the top-level,
     i.e. not nested in other directives.
     """
-    raise_if_myst_is_not_available()
 
-    # parse markdown file up to the block level (i.e. don't worry about inline text)
-    parser = default_parser("html", disable_syntax=["inline"])
-    tokens = parser.parse(text + "\n")
+    tokens = get_parser().parse(text + "\n")
     lines = text.splitlines()
     md_start_line = 0
 
@@ -334,7 +345,6 @@ def notebook_to_myst(
     :param default_lexer: a lexer name to use for annotating code cells
         (if ``nb.metadata.language_info.pygments_lexer`` is not available)
     """
-    raise_if_myst_is_not_available()
     string = ""
 
     nb_metadata = from_nbnode(nb.metadata)

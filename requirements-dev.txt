@@ -7,6 +7,3 @@ nbconvert
 sphinx-gallery
 setuptools
 toml
-
-# Python 2
-pathlib

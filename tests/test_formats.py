@@ -18,7 +18,7 @@ from jupytext.formats import (
     validate_one_format,
     JupytextFormatError,
 )
-from .utils import list_notebooks, requires_myst, requires_pandoc
+from .utils import list_notebooks, requires_pandoc
 
 
 @pytest.mark.parametrize("nb_file", list_notebooks("python"))
@@ -328,7 +328,6 @@ def test_pandoc_format_is_preserved():
     compare(formats_new, formats_org)
 
 
-@requires_myst
 def test_write_as_myst(tmpdir):
     """Inspired by https://github.com/mwouts/jupytext/issues/462"""
     nb = new_notebook()

@@ -27,7 +27,6 @@ from .utils import list_notebooks, requires_sphinx_gallery
 from .utils import (
     requires_jupytext_installed,
     requires_pandoc,
-    requires_myst,
     skip_on_windows,
 )
 
@@ -979,7 +978,6 @@ def test_set_format_with_subfolder(tmpdir):
     )
 
 
-@requires_myst
 @requires_pandoc
 @pytest.mark.parametrize("format_name", ["md", "md:myst", "md:pandoc"])
 def test_create_header_with_set_formats(format_name, tmpdir):
@@ -996,7 +994,6 @@ def test_create_header_with_set_formats(format_name, tmpdir):
     assert nb["metadata"]["jupytext"]["formats"] == format_name
 
 
-@requires_myst
 @requires_pandoc
 @pytest.mark.parametrize(
     "format_name", ["md", "md:myst", "md:pandoc", "py:light", "py:percent"]

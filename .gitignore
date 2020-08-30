@@ -14,6 +14,8 @@ future
 gits*
 .ipynb_checkpoints
 docs/_build
+.DS_Store
+.tox
 
 # Will be created by postBuild
 demo/get_started.ipynb

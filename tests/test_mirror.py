@@ -22,7 +22,6 @@ from .utils import (
     skip_if_dict_is_not_ordered,
     requires_pandoc,
     requires_sphinx_gallery,
-    requires_myst,
 )
 
 pytestmark = skip_if_dict_is_not_ordered
@@ -139,7 +138,6 @@ def test_ipynb_to_pandoc(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, "md:pandoc", "ipynb_to_pandoc")
 
 
-@requires_myst
 @pytest.mark.parametrize(
     "nb_file",
     list_notebooks(
