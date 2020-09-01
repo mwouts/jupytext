@@ -1,36 +1,37 @@
-1.6.0rc0 (2020-08-31)
----------------------
+1.6.0 (2020-09-01)
+------------------
 
 **Added**
-- Activated GitHub code scanning alerts
 - New option `hide_notebook_metadata` to encapsulate the notebook metadata in an HTML comment (#527)
 - New option `root_level_metadata_as_raw_cell`. Set it to `False` if you don't want to see root level metadata
 of R Markdown notebooks as a raw cell in Jupyter (#415)
 - New option `doxygen_equation_markers` to translate Markdown equations into Doxygen equations (#517)
 - New option `custom_cell_magics` to comment out cells starting with user-specific cell magics (#513)
-- Tested `isort` on notebooks (#553)
+- Documented how to use `isort` on notebooks (#553)
 - `jupytext notebook.ipynb --to filename.py` will warn that `--to` is used in place of `--output`.
 - `jupytext --set-formats filename.py` will suggest to use `--sync` instead of `--set-formats` (#544)
 - Warn if 'Include Metadata' is off when saving text files in Jupyter (#561)
 - Test that notebooks paired through a configuration file are left unmodified (#598)
 - Test that metadata filters in the configuration files are taken into account when using `jupytext --to` (#543)
 - New argument `--run-path` to execute the notebooks at the desired location (#595)
+- Activated GitHub code scanning alerts
 
 **Changed**
-- Install Jupytext from source on MyBinder to avoid cache issues (#567)
-- Skip the tests that execute a notebook on Windows to avoid timeout issues (#489)
-- The `# %%` cell marker has the same indentation as the first line in the cell (#562)
+- Jupytext now depends on `markdown-it-py` (Python 3.6 and above) and always features the MyST-Markdown format,
+thanks to Chris Sewell (#591)
 - The `md:myst` and `md:pandoc` are always included in the Jupytext formats, and an informative runtime
 error will occur if the required dependencies, resp. `markdown-it-py` and `pandoc`, are not installed. (#556)
-- Jupytext now depends on `markdown-it-py` and always features the MyST-Markdown format (Python 3.6 and above, #591)
+- The `# %%` cell marker has the same indentation as the first line in the cell (#562)
+- Jupytext is now installed from source on MyBinder to avoid cache issues (#567)
+- The tests that execute a notebook are now skipped on Windows to avoid timeout issues (#489)
 
 **Fixed**
-- Configured coverage targets in `codecov.yml`
 - Only scripts can have an encoding comment, not Markdown or R Markdown files (#576)
 - Spaces in `--pipe` commands are supported (#562)
 - Bash commands starting with special characters are now correctly detected, thanks to Aaron Gokaslan (#587)
-- MyST Markdown files are recognized as such even if `myst` is missing (#556)
+- MyST Markdown files are recognized as such even if MyST-Markdown is not available (#556)
 - Build JupyterLab with `dev-build=False` and `minimize=False` on mybinder to avoid build errors
+- Configured coverage targets in `codecov.yml`
 
 
 1.5.2 (2020-07-21)
