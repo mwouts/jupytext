@@ -4,7 +4,7 @@ pytest-cov
 notebook
 jupyter_client
 nbconvert
-sphinx-gallery
+sphinx-gallery<=0.7.0
 setuptools
 toml
 

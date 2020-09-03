@@ -1,3 +1,10 @@
+1.6.1-dev (2020-09-??)
+----------------------
+
+**Fixed**
+- Freeze optional dependency on `sphinx-gallery` to version `~=0.7.0` (#614)
+
+
 1.6.0 (2020-09-01)
 ------------------
 
