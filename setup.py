@@ -64,6 +64,7 @@ setup(
         # left for back-compatibility
         "myst": [],
         "toml": ["toml"],
+        "rst2md": ["sphinx-gallery~=0.7.0"],
     },
     license="MIT",
     classifiers=[

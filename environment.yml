@@ -19,14 +19,13 @@ dependencies:
   - black
   - isort
   - autopep8
-  - sphinx-gallery
-  - nodejs<13
+  - sphinx-gallery<0.8
+  - nodejs
   - yarn
   - pip
   - setuptools
   - twine
   - pandoc>=2.9
-  - myst-parser
   # make html in docs folder
   - sphinx
   - recommonmark

@@ -24,7 +24,7 @@ jobs:
           pip install isort>=5.3.0 || true
           pip install autopep8 || true
           # install sphinx_gallery and matplotlib if available (may not work on pypy)
-          pip install sphinx_gallery || true
+          pip install sphinx_gallery~=0.7.0 || true
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
