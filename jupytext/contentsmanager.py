@@ -33,6 +33,7 @@ from .pairs import write_pair, read_pair, latest_inputs_and_outputs
 from .kernels import set_kernelspec_from_language
 from .config import (
     JupytextConfiguration,
+    JupytextConfigurationError,
     preferred_format,
     load_jupytext_config,
     prepare_notebook_for_save,
@@ -435,9 +436,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     self.cached_config.timestamp + timedelta(seconds=1) < datetime.now()
                 )
             ):
-                self.cached_config.path = parent_dir
-                self.cached_config.timestamp = datetime.now()
-                self.cached_config.config = load_jupytext_config(parent_dir)
+                try:
+                    self.cached_config.path = parent_dir
+                    self.cached_config.timestamp = datetime.now()
+                    self.cached_config.config = load_jupytext_config(parent_dir)
+                except JupytextConfigurationError as err:
+                    raise HTTPError(400, "{}".format(err))
 
             return self.cached_config.config or self
 

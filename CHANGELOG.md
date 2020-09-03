@@ -1,6 +1,9 @@
 1.6.1-dev (2020-09-??)
 ----------------------
 
+**Added**
+- Configuration errors are reported in the console and/or in Jupyter (#613)
+
 **Fixed**
 - Freeze optional dependency on `sphinx-gallery` to version `~=0.7.0` (#614)
 
