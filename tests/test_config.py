@@ -3,6 +3,7 @@ import pytest
 from jupytext.config import (
     find_jupytext_configuration_file,
     load_jupytext_configuration_file,
+    JupytextConfiguration,
 )
 
 
@@ -83,6 +84,7 @@ c.default_cell_metadata_filter = "all"
         )
 
     config = load_jupytext_configuration_file(str(full_config_path))
+    config = JupytextConfiguration(**config)
     assert config.default_jupytext_formats == "ipynb,py:percent"
     assert config.default_notebook_metadata_filter == "all"
     assert config.default_cell_metadata_filter == "all"

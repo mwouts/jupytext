@@ -6,6 +6,8 @@ except ImportError:
     import mock
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from nbformat import read
+import pytest
+from tornado.web import HTTPError
 import jupytext
 
 SAMPLE_NOTEBOOK = new_notebook(
@@ -64,4 +66,39 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
     assert py_file.isfile()
 
     nb = read(nb_file, as_version=4)
-    assert 'jupytext' not in nb.metadata
+    assert "jupytext" not in nb.metadata
+
+
+@pytest.mark.parametrize(
+    "cfg_file,cfg_text",
+    [
+        # Should be false, not False
+        ("jupytext.toml", "hide_notebook_metadata = False"),
+        ("jupytext.toml", 'hide_notebook_metadata = "False"'),
+        ("jupytext.toml", "not_a_jupytext_option = true"),
+        ("jupytext.json", '{"notebook_metadata_filter":"-all",}'),
+        (".jupytext.py", "c.not_a_jupytext_option = True"),
+        (".jupytext.py", "c.hide_notebook_metadata = true"),
+    ],
+)
+def test_incorrect_config_message(tmpdir, cfg_file, cfg_text):
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    cfg_file = tmpdir.join(cfg_file)
+    cfg_file.write(cfg_text)
+
+    tmpdir.join("empty.ipynb").write("{}")
+
+    expected_message = "The Jupytext configuration file {} is incorrect".format(
+        cfg_file
+    )
+
+    # This is a regexp so we have to escape the path separator on Windows
+    expected_message = expected_message.replace("\\", "\\\\")
+
+    with pytest.raises(HTTPError, match=expected_message):
+        cm.get("empty.ipynb", type="notebook", content=False)
+
+    with pytest.raises(HTTPError, match=expected_message):
+        cm.save(dict(type="notebook", content=SAMPLE_NOTEBOOK), "notebook.ipynb")
