@@ -342,8 +342,6 @@ def load_jupytext_config(nb_file):
         )
     return config
 
-    return
-
 
 def prepare_notebook_for_save(nbk, config, path):
     """Apply the given configuration to the notebook before saving it"""
