@@ -548,7 +548,7 @@ def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
     cm.preferred_jupytext_formats_save = "py:percent"
     cm.default_jupytext_formats = "ipynb,python//py"
 
-    # save to ipynb and oy
+    # save to ipynb and py
     cm.save(model=dict(type="notebook", content=nb), path="notebook.ipynb")
 
     # read py file
@@ -563,7 +563,7 @@ def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
     cm.preferred_jupytext_formats_save = "python//py:percent"
     cm.default_jupytext_formats = "ipynb,python//py"
 
-    # save to ipynb and oy
+    # save to ipynb and py
     cm.save(model=dict(type="notebook", content=nb), path="notebook.ipynb")
 
     # read py file
@@ -1717,6 +1717,20 @@ def test_new_untitled(tmpdir):
     assert cm.new_untitled(type="notebook", ext=".py:percent")["path"] == "Untitled4.py"
 
 
+def test_nested_prefix(tmpdir):
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # save to ipynb and py
+    nb = new_notebook(
+        cells=[new_code_cell("1+1"), new_markdown_cell("Some text")],
+        metadata={"jupytext": {"formats": "ipynb,nested/prefix//.py"}},
+    )
+    cm.save(model=dict(type="notebook", content=nb), path="notebook.ipynb")
+
+    assert tmpdir.join("nested").join("prefix").join("notebook.py").isfile()
+
+
 def test_jupytext_jupyter_fs_manager(tmpdir):
     """Test the basic get/save functions of Jupytext with a fs manager
     https://github.com/mwouts/jupytext/issues/618"""
@@ -1727,6 +1741,7 @@ def test_jupytext_jupyter_fs_manager(tmpdir):
 
     cm_class = jupytext.build_jupytext_contents_manager_class(FSManager)
     cm = cm_class("osfs://{local_dir}".format(local_dir=tmpdir))
+    cm.default_jupytext_formats = ""
 
     # save a few files
     text = "some text\n"

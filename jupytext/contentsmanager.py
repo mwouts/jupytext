@@ -19,7 +19,6 @@ except ImportError:
     pass
 
 from .jupytext import reads, writes
-from .jupytext import create_prefix_dir as create_prefix_dir_from_path
 from .formats import long_form_multiple_formats
 from .formats import short_form_one_format, short_form_multiple_formats
 from .paired_paths import (
@@ -34,8 +33,10 @@ from .kernels import set_kernelspec_from_language
 from .config import (
     JupytextConfiguration,
     JupytextConfigurationError,
+    JUPYTEXT_CONFIG_FILES,
+    load_jupytext_configuration_file,
+    validate_jupytext_configuration_file,
     preferred_format,
-    load_jupytext_config,
     prepare_notebook_for_save,
 )
 
@@ -116,12 +117,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
         def create_prefix_dir(self, path, fmt):
             """Create the prefix dir, if missing"""
-            try:
-                create_prefix_dir_from_path(self._get_os_path(path.strip("/")), fmt)
-            except AttributeError:
-                # Some contents managers may not have _get_os_path, see
-                # https://github.com/mwouts/jupytext/issues/618
-                return
+            if "prefix" in fmt and "/" in path:
+                parent_dir = self.get_parent_dir(path)
+                if not self.dir_exists(parent_dir):
+                    self.create_prefix_dir(parent_dir, fmt)
+                    self.log.info("Creating directory %s", parent_dir)
+                    self.save(dict(type="directory"), parent_dir)
 
         def save(self, model, path=""):
             """Save the file model and return the model with no content."""
@@ -425,16 +426,47 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             self.drop_paired_notebook(old_path)
             self.update_paired_notebooks(new_path, formats)
 
+        def get_parent_dir(self, path):
+            """The parent directory"""
+            if "/" in path:
+                return path.rsplit("/", 1)[0]
+            return ""
+
+        def get_config_file(self, directory):
+            """Return the jupytext configuration file, if any"""
+            if not self.dir_exists(directory):
+                return None
+
+            for jupytext_config_file in JUPYTEXT_CONFIG_FILES:
+                path = directory + "/" + jupytext_config_file
+                if self.file_exists(path):
+                    return path
+
+            if not directory:
+                return None
+
+            parent_dir = self.get_parent_dir(directory)
+            return self.get_config_file(parent_dir)
+
+        def load_config_file(self, config_file):
+            """Load the configuration file"""
+            if config_file is None:
+                return None
+            self.log.info("Loading Jupytext configuration file at %s", config_file)
+            if config_file.endswith(".py"):
+                config_dict = load_jupytext_configuration_file(
+                    self._get_os_path(config_file)
+                )
+            else:
+                model = self.get(config_file, content=True, type="file")
+                config_dict = load_jupytext_configuration_file(
+                    config_file, model["content"]
+                )
+            return validate_jupytext_configuration_file(config_file, config_dict)
+
         def get_config(self, path, use_cache=False):
             """Return the Jupytext configuration for the given path"""
-            try:
-                nb_file = self._get_os_path(path.strip("/"))
-            except AttributeError:
-                # Some contents managers may not have _get_os_path, see
-                # https://github.com/mwouts/jupytext/issues/618
-                return self
-
-            parent_dir = os.path.dirname(nb_file)
+            parent_dir = self.get_parent_dir(path)
 
             # When listing the notebooks for the tree view, we use a one-second
             # cache for the configuration file
@@ -446,9 +478,10 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 )
             ):
                 try:
+                    config_file = self.get_config_file(parent_dir)
+                    self.cached_config.config = self.load_config_file(config_file)
                     self.cached_config.path = parent_dir
                     self.cached_config.timestamp = datetime.now()
-                    self.cached_config.config = load_jupytext_config(parent_dir)
                 except JupytextConfigurationError as err:
                     raise HTTPError(400, "{}".format(err))
 
