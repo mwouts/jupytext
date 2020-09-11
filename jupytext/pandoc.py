@@ -44,6 +44,7 @@ def is_pandoc_available():
 
 
 def raise_if_pandoc_is_not_available():
+    """Raise with an informative error message if pandoc is not available"""
     try:
         from pkg_resources import parse_version
     except ImportError:
