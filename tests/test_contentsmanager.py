@@ -1715,3 +1715,52 @@ def test_new_untitled(tmpdir):
     assert cm.new_untitled(type="notebook", ext=".py")["path"] == "Untitled2.py"
     assert cm.new_untitled(type="notebook")["path"] == "Untitled3.ipynb"
     assert cm.new_untitled(type="notebook", ext=".py:percent")["path"] == "Untitled4.py"
+
+
+def test_jupytext_jupyter_fs_manager(tmpdir):
+    """Test the basic get/save functions of Jupytext with a fs manager
+    https://github.com/mwouts/jupytext/issues/618"""
+    try:
+        from jupyterfs.fsmanager import FSManager
+    except ImportError:
+        pytest.skip("jupyterfs is not available")
+
+    cm_class = jupytext.build_jupytext_contents_manager_class(FSManager)
+    cm = cm_class("osfs://{local_dir}".format(local_dir=tmpdir))
+
+    # save a few files
+    text = "some text\n"
+    cm.save(dict(type="file", content=text, format="text"), path="text.md")
+    nb = new_notebook(
+        cells=[new_markdown_cell("A markdown cell"), new_code_cell("1 + 1")]
+    )
+    cm.save(dict(type="notebook", content=nb), "notebook.ipynb")
+    cm.save(dict(type="notebook", content=nb), "text_notebook.md")
+
+    # list the directory
+    directory = cm.get("/")
+    assert set(file["name"] for file in directory["content"]) == {
+        "text.md",
+        "text_notebook.md",
+        "notebook.ipynb",
+    }
+
+    # get the files
+    model = cm.get("/text.md", type="file")
+    assert model["type"] == "file"
+    assert model["content"] == text
+
+    model = cm.get("/text.md", type="notebook")
+    assert model["type"] == "notebook"
+    # We only compare the cells, as kernelspecs are added to the notebook metadata
+    compare(model["content"].cells, [new_markdown_cell(text.strip())])
+
+    for nb_file in ["notebook.ipynb", "text_notebook.md"]:
+        model = cm.get(nb_file)
+        assert model["type"] == "notebook"
+        actual_cells = model["content"].cells
+
+        # saving adds 'trusted=True' to the code cell metadata
+        for cell in actual_cells:
+            cell.metadata = {}
+        compare(actual_cells, nb.cells)

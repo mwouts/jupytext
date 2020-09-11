@@ -64,7 +64,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
         Python (.py) or R scripts (.R)
         """
 
-        def __init__(self, **kwargs):
+        def __init__(self, *args, **kwargs):
             # Dictionary: notebook path => (fmt, formats) where
             # fmt is the current format, and formats the paired formats.
             self.paired_notebooks = dict()
@@ -72,7 +72,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             # Configuration cache, useful when notebooks are listed in a given directory
             self.cached_config = namedtuple("cached_config", "path timestamp config")
 
-            super(JupytextContentsManager, self).__init__(**kwargs)
+            super(JupytextContentsManager, self).__init__(*args, **kwargs)
 
         def all_nb_extensions(self):
             """All extensions that should be classified as notebooks"""
@@ -116,7 +116,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
         def create_prefix_dir(self, path, fmt):
             """Create the prefix dir, if missing"""
-            create_prefix_dir_from_path(self._get_os_path(path.strip("/")), fmt)
+            try:
+                create_prefix_dir_from_path(self._get_os_path(path.strip("/")), fmt)
+            except AttributeError:
+                # Some contents managers may not have _get_os_path, see
+                # https://github.com/mwouts/jupytext/issues/618
+                return
 
         def save(self, model, path=""):
             """Save the file model and return the model with no content."""
@@ -180,14 +185,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
         ):
             """ Takes a path for an entity and returns its model"""
             path = path.strip("/")
-
-            os_path = self._get_os_path(path)
             ext = os.path.splitext(path)[1]
 
             # Not a notebook?
             if (
-                not self.exists(path)
-                or os.path.isdir(os_path)
+                not self.file_exists(path)
+                or self.dir_exists(path)
                 or (type != "notebook" if type else ext not in self.all_nb_extensions())
             ):
                 return super(JupytextContentsManager, self).get(
@@ -424,7 +427,13 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
         def get_config(self, path, use_cache=False):
             """Return the Jupytext configuration for the given path"""
-            nb_file = self._get_os_path(path.strip("/"))
+            try:
+                nb_file = self._get_os_path(path.strip("/"))
+            except AttributeError:
+                # Some contents managers may not have _get_os_path, see
+                # https://github.com/mwouts/jupytext/issues/618
+                return self
+
             parent_dir = os.path.dirname(nb_file)
 
             # When listing the notebooks for the tree view, we use a one-second
