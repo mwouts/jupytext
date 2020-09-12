@@ -33,4 +33,3 @@ dependencies:
   - tox-conda
   - pip:
     - sphinx_copybutton
-    - sphinx_rtd_theme
