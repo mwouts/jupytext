@@ -25,6 +25,7 @@ _JUPYTER_LANGUAGES = [
     "robotframework",
     "spark",
     "sql",
+    "cython",
 ]
 
 # Supported file extensions (and languages)
