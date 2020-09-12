@@ -36,6 +36,7 @@ def test_local_config_overrides_cm_config(tmpdir):
 def test_config_file_is_called_just_once(tmpdir, n=2):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
+    tmpdir.join("jupytext.toml").write("")
     nb_files = [str(tmpdir.join("notebook{}.ipynb".format(i))) for i in range(n)]
 
     for nb_file in nb_files:
@@ -43,7 +44,9 @@ def test_config_file_is_called_just_once(tmpdir, n=2):
 
     mock_config = mock.MagicMock(return_value=None)
 
-    with mock.patch("jupytext.contentsmanager.load_jupytext_config", mock_config):
+    with mock.patch(
+        "jupytext.contentsmanager.load_jupytext_configuration_file", mock_config
+    ):
         for i in range(n):
             cm.get("notebook{}.ipynb".format(i), content=False)
 
@@ -85,17 +88,12 @@ def test_incorrect_config_message(tmpdir, cfg_file, cfg_text):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    cfg_file = tmpdir.join(cfg_file)
-    cfg_file.write(cfg_text)
-
+    tmpdir.join(cfg_file).write(cfg_text)
     tmpdir.join("empty.ipynb").write("{}")
 
-    expected_message = "The Jupytext configuration file {} is incorrect".format(
+    expected_message = "The Jupytext configuration file .*{} is incorrect".format(
         cfg_file
     )
-
-    # This is a regexp so we have to escape the path separator on Windows
-    expected_message = expected_message.replace("\\", "\\\\")
 
     with pytest.raises(HTTPError, match=expected_message):
         cm.get("empty.ipynb", type="notebook", content=False)

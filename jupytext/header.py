@@ -209,11 +209,10 @@ def header_to_metadata_and_cell(
             if not started:
                 started = True
                 continue
-            else:
-                ended = True
-                if in_html_div:
-                    continue
-                break
+            ended = True
+            if in_html_div:
+                continue
+            break
 
         if _JUPYTER_RE.match(line):
             in_jupyter = True

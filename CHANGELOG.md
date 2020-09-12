@@ -6,7 +6,7 @@
 
 **Fixed**
 - Freeze optional dependency on `sphinx-gallery` to version `~=0.7.0` (#614)
-
+- Jupytext's contents manager can be used with `jupyterfs` (#618)
 
 1.6.0 (2020-09-01)
 ------------------

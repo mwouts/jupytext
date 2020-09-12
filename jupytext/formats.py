@@ -5,8 +5,8 @@ new formats here!
 
 import os
 import re
-import yaml
 import warnings
+import yaml
 import nbformat
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .cell_reader import (
