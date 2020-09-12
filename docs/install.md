@@ -10,7 +10,7 @@ pip install jupytext --upgrade
 ```
 or
 ```bash
-conda install -c conda-forge jupytext
+conda install jupytext -c conda-forge
 ```
 
 If you want to use Jupytext within Jupyter Notebook or JupyterLab, make sure you install Jupytext in the Python environment where the Jupyter server runs. If that environment is read-only, for instance if your server is started using JupyterHub, install Jupytext in user mode with:
