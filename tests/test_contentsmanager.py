@@ -1779,3 +1779,36 @@ def test_jupytext_jupyter_fs_manager(tmpdir):
         for cell in actual_cells:
             cell.metadata = {}
         compare(actual_cells, nb.cells)
+
+
+def test_config_jupytext_jupyter_fs_manager(tmpdir):
+    """Test the configuration of Jupytext with a fs manager"""
+    try:
+        from jupyterfs.fsmanager import FSManager
+    except ImportError:
+        pytest.skip("jupyterfs is not available")
+
+    tmpdir.join("jupytext.toml").write('default_jupytext_formats = "ipynb,py"')
+
+    cm_class = jupytext.build_jupytext_contents_manager_class(FSManager)
+    cm = cm_class("osfs://{local_dir}".format(local_dir=tmpdir))
+    cm.default_jupytext_formats = ""
+
+    # save a few files
+    nb = new_notebook()
+    cm.save(dict(type="file", content="text", format="text"), path="text.md")
+    cm.save(dict(type="notebook", content=nb), "script.py")
+    cm.save(dict(type="notebook", content=nb), "text_notebook.md")
+    cm.save(dict(type="notebook", content=nb), "notebook.ipynb")
+
+    # list the directory
+    directory = cm.get("/")
+    assert set(file["name"] for file in directory["content"]) == {
+        "jupytext.toml",
+        "text.md",
+        "text_notebook.md",
+        "notebook.ipynb",
+        "notebook.py",
+        "script.py",
+        "script.ipynb",
+    }
