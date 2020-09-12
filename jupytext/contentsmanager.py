@@ -34,6 +34,7 @@ from .config import (
     JupytextConfiguration,
     JupytextConfigurationError,
     JUPYTEXT_CONFIG_FILES,
+    find_global_jupytext_configuration_file,
     load_jupytext_configuration_file,
     validate_jupytext_configuration_file,
     preferred_format,
@@ -434,16 +435,13 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
         def get_config_file(self, directory):
             """Return the jupytext configuration file, if any"""
-            if not self.dir_exists(directory):
-                return None
-
             for jupytext_config_file in JUPYTEXT_CONFIG_FILES:
                 path = directory + "/" + jupytext_config_file
                 if self.file_exists(path):
                     return path
 
             if not directory:
-                return None
+                return find_global_jupytext_configuration_file()
 
             parent_dir = self.get_parent_dir(directory)
             return self.get_config_file(parent_dir)
