@@ -19,6 +19,13 @@ You think the documentation could be improved? You've spotted a typo, or you thi
 You have seen an issue with Jupytext, or you can't find your way in the [documentation](https://jupytext.readthedocs.io)?
 Please let us know, and provide enough information so that we can reproduce the problem.
 
+## Test the development version
+
+If you want to test a feature that has been integrated in `master` but not delivered yet to `pip` or `conda`, use
+```
+pip install git+https://github.com/mwouts/jupytext.git
+```
+
 ## Propose enhancements
 
 You want to submit an enhancement on Jupytext? Unless this is a small change, we usually prefer that you let us know beforehand: open an issue that describe the problem you want to solve.
@@ -76,7 +83,6 @@ Install the documentation tools with
 ```
 conda activate jupytext-dev
 cd docs
-pip install -r doc-requirements.txt
 ```
 and build the HTML documentation locally with
 ```
