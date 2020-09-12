@@ -1,4 +1,4 @@
-# Usecases for Jupytext
+# Sample Use Cases for Jupytext
 
 ## Writing notebooks as plain text
 
