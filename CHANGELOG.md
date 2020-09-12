@@ -4,6 +4,7 @@
 **Changed**
 - Jupytext's contents manager uses the parent CM's `get` and `save` methods to read and save text files, and explicitly calls `jupytext.reads` and `jupytext.writes` to do the conversion. We don't use `mock` nor internal parent methods any more. Thanks to Max Klein for helping making this work! (#634, #635)
 - Thanks to the above, Jupytext can work on top of contents manager that don't derive from `FileContentsManager`, and in particular with `jupyterfs` (#618)
+- The documentation was reorganized. `README.md` was simplified and now includes many links to the documentation.
 
 **Added**
 - Configuration errors are reported in the console and/or in Jupyter (#613)
