@@ -91,7 +91,7 @@ def test_incorrect_config_message(tmpdir, cfg_file, cfg_text):
     tmpdir.join(cfg_file).write(cfg_text)
     tmpdir.join("empty.ipynb").write("{}")
 
-    expected_message = "The Jupytext configuration file .*/{} is incorrect".format(
+    expected_message = "The Jupytext configuration file .*{} is incorrect".format(
         cfg_file
     )
 
