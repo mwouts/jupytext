@@ -5,6 +5,7 @@ import re
 import time
 import pytest
 import itertools
+import logging
 import shutil
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from tornado.web import HTTPError
@@ -1731,29 +1732,41 @@ def test_nested_prefix(tmpdir):
     assert tmpdir.join("nested").join("prefix").join("notebook.py").isfile()
 
 
-def test_jupytext_jupyter_fs_manager(tmpdir):
-    """Test the basic get/save functions of Jupytext with a fs manager
-    https://github.com/mwouts/jupytext/issues/618"""
+def fs_meta_manager(tmpdir):
     try:
-        from jupyterfs.fsmanager import FSManager
+        from jupyterfs.metamanager import MetaManager
     except ImportError:
         pytest.skip("jupyterfs is not available")
 
-    cm_class = jupytext.build_jupytext_contents_manager_class(FSManager)
-    cm = cm_class("osfs://{local_dir}".format(local_dir=tmpdir))
-    cm.default_jupytext_formats = ""
+    cm_class = jupytext.build_jupytext_contents_manager_class(MetaManager)
+    logger = logging.getLogger("jupyter-fs")
+    cm = cm_class(parent=None, log=logger)
+    cm.initResource(
+        {
+            "url": "osfs://{}".format(tmpdir),
+        }
+    )
+    return cm
+
+
+def test_jupytext_jupyter_fs_metamanager(tmpdir):
+    """Test the basic get/save functions of Jupytext with a fs manager
+    https://github.com/mwouts/jupytext/issues/618"""
+    cm = fs_meta_manager(tmpdir)
+    # the hash that corresponds to the osfs
+    osfs = [h for h in cm._managers if h != ""][0]
 
     # save a few files
     text = "some text\n"
-    cm.save(dict(type="file", content=text, format="text"), path="text.md")
+    cm.save(dict(type="file", content=text, format="text"), path=osfs + ":text.md")
     nb = new_notebook(
         cells=[new_markdown_cell("A markdown cell"), new_code_cell("1 + 1")]
     )
-    cm.save(dict(type="notebook", content=nb), "notebook.ipynb")
-    cm.save(dict(type="notebook", content=nb), "text_notebook.md")
+    cm.save(dict(type="notebook", content=nb), osfs + ":notebook.ipynb")
+    cm.save(dict(type="notebook", content=nb), osfs + ":text_notebook.md")
 
     # list the directory
-    directory = cm.get("/")
+    directory = cm.get(osfs + ":/")
     assert set(file["name"] for file in directory["content"]) == {
         "text.md",
         "text_notebook.md",
@@ -1761,17 +1774,17 @@ def test_jupytext_jupyter_fs_manager(tmpdir):
     }
 
     # get the files
-    model = cm.get("/text.md", type="file")
+    model = cm.get(osfs + ":/text.md", type="file")
     assert model["type"] == "file"
     assert model["content"] == text
 
-    model = cm.get("/text.md", type="notebook")
+    model = cm.get(osfs + ":text.md", type="notebook")
     assert model["type"] == "notebook"
     # We only compare the cells, as kernelspecs are added to the notebook metadata
     compare(model["content"].cells, [new_markdown_cell(text.strip())])
 
     for nb_file in ["notebook.ipynb", "text_notebook.md"]:
-        model = cm.get(nb_file)
+        model = cm.get(osfs + ":" + nb_file)
         assert model["type"] == "notebook"
         actual_cells = model["content"].cells
 
@@ -1781,28 +1794,22 @@ def test_jupytext_jupyter_fs_manager(tmpdir):
         compare(actual_cells, nb.cells)
 
 
-def test_config_jupytext_jupyter_fs_manager(tmpdir):
+def test_config_jupytext_jupyter_fs_meta_manager(tmpdir):
     """Test the configuration of Jupytext with a fs manager"""
-    try:
-        from jupyterfs.fsmanager import FSManager
-    except ImportError:
-        pytest.skip("jupyterfs is not available")
-
     tmpdir.join("jupytext.toml").write('default_jupytext_formats = "ipynb,py"')
-
-    cm_class = jupytext.build_jupytext_contents_manager_class(FSManager)
-    cm = cm_class("osfs://{local_dir}".format(local_dir=tmpdir))
-    cm.default_jupytext_formats = ""
+    cm = fs_meta_manager(tmpdir)
+    # the hash that corresponds to the osfs
+    osfs = [h for h in cm._managers if h != ""][0]
 
     # save a few files
     nb = new_notebook()
-    cm.save(dict(type="file", content="text", format="text"), path="text.md")
-    cm.save(dict(type="notebook", content=nb), "script.py")
-    cm.save(dict(type="notebook", content=nb), "text_notebook.md")
-    cm.save(dict(type="notebook", content=nb), "notebook.ipynb")
+    cm.save(dict(type="file", content="text", format="text"), path=osfs + ":text.md")
+    cm.save(dict(type="notebook", content=nb), osfs + ":script.py")
+    cm.save(dict(type="notebook", content=nb), osfs + ":text_notebook.md")
+    cm.save(dict(type="notebook", content=nb), osfs + ":notebook.ipynb")
 
     # list the directory
-    directory = cm.get("/")
+    directory = cm.get(osfs + ":/")
     assert set(file["name"] for file in directory["content"]) == {
         "jupytext.toml",
         "text.md",
