@@ -449,16 +449,18 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
         jupytext_metadata.pop("text_representation", {})
         if not jupytext_metadata:
             metadata.pop("jupytext", {})
-        return nbformat.writes(
-            NotebookNode(
-                nbformat=notebook.nbformat,
-                nbformat_minor=notebook.nbformat_minor,
-                metadata=metadata,
-                cells=notebook.cells,
-            ),
-            version,
-            **kwargs,
-        )
+        return [
+            nbformat.writes(
+                NotebookNode(
+                    nbformat=notebook.nbformat,
+                    nbformat_minor=notebook.nbformat_minor,
+                    metadata=metadata,
+                    cells=notebook.cells,
+                ),
+                version,
+                **kwargs,
+            )
+        ]
 
     if not format_name:
         format_name = format_name_for_ext(metadata, ext, explicit_default=False)

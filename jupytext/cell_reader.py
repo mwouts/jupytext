@@ -1,6 +1,7 @@
 """Read notebook cells from their text representation"""
 
 import re
+import io
 from copy import copy
 from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
 from .languages import _SCRIPT_EXTENSIONS
@@ -87,6 +88,24 @@ def last_two_lines_blank(source):
         and _BLANK_LINE.match(source[-1])
     )
 
+def get_pyref_name(line):
+    """Return file name from include code flag"""
+    return line[len("!INCLUDECODE"):].strip('" ')
+
+def is_custom_pyref_name(pyref: str):
+    """Test for custom pyref names given as ipynb tags"""
+    if pyref.lstrip("_")[:3].isdigit():
+        return False
+    return True
+
+
+def get_lines_pyref(pyref_name):
+    """Return lines from python reference file"""
+    with io.open(pyref_name, encoding="utf-8") as file:
+        lines = [line.rstrip("\n") for line in file]
+        # lines = [line.rstrip('\n') for line in file]
+    return lines
+
 
 class BaseCellReader(object):
     """A class that can read notebook cells from their text representation"""
@@ -124,6 +143,7 @@ class BaseCellReader(object):
         self.language = None
         self.cell_metadata_json = fmt.get("cell_metadata_json", False)
         self.doxygen_equation_markers = fmt.get("doxygen_equation_markers", False)
+        self.is_pyref_include = False
 
     def read(self, lines):
         """Read one cell from the given lines, and return the cell,
@@ -197,7 +217,11 @@ class BaseCellReader(object):
             cell_start = 1
 
         # Cell content
-        source = lines[cell_start:cell_end_marker]
+        if self.is_pyref_include:
+            pyref_name = get_pyref_name(lines[0])
+            source = get_lines_pyref(pyref_name)
+        else:
+            source = lines[cell_start:cell_end_marker]
         self.org_content = copy(source)
 
         # Exactly two empty lines at the end of cell (caused by PEP8)?
@@ -219,9 +243,14 @@ class BaseCellReader(object):
         # Uncomment content
         self.explicit_soc = cell_start > 0
         self.content = self.extract_content(source)
-
         # Is this an inactive cell?
-        if self.cell_type == "code":
+        if self.is_pyref_include:
+            if is_custom_pyref_name(pyref_name):
+                if self.metadata.get("tags"):
+                    self.metadata["tags"].append(pyref_name)
+                else:
+                    self.metadata["tags"] = [pyref_name]
+        elif self.cell_type == "code":
             if not is_active(".ipynb", self.metadata):
                 if self.metadata.get("active") == "":
                     del self.metadata["active"]
@@ -316,6 +345,7 @@ class MarkdownCellReader(BaseCellReader):
     start_region_re = re.compile(r"^<!--\s*#(region|markdown|md|raw)(.*)-->\s*$")
     end_region_re = None
     default_comment_magics = False
+    include_code_cells = True
 
     def __init__(self, fmt=None, default_language=None):
         super(MarkdownCellReader, self).__init__(fmt, default_language)
@@ -348,6 +378,9 @@ class MarkdownCellReader(BaseCellReader):
                 self.metadata["title"] = title
             if region_name in ["markdown", "md"]:
                 self.metadata["region_name"] = region_name
+        elif self.include_code_cells and line.startswith("!INCLUDECODE"):
+            self.cell_type = "code"
+            self.is_pyref_include = True
         elif self.start_code_re.match(line):
             self.language, self.metadata = self.options_to_metadata(
                 self.start_code_re.findall(line)[0]
@@ -371,6 +404,9 @@ class MarkdownCellReader(BaseCellReader):
             for i, line in enumerate(lines):
                 if self.end_region_re.match(line):
                     return i, i + 1, True
+        elif self.is_pyref_include:
+            self.cell_type = "code"
+            return 0, 1, True
         elif self.metadata is None:
             # default markdown: (last) two consecutive blank lines, except when in code blocks
             self.cell_type = "markdown"
@@ -406,7 +442,9 @@ class MarkdownCellReader(BaseCellReader):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False
-
+                if self.include_code_cells and line.startswith("!INCLUDECODE"):
+                    self.cell_type = "code"
+                    return 0, 1, True
                 if self.start_code_re.match(line):
                     # Cells with a .noeval attribute are markdown cells #347
                     _, metadata = self.options_to_metadata(
