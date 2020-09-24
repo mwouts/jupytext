@@ -29,7 +29,7 @@ from .header import (
 )
 from .header import encoding_and_executable, insert_or_test_version_number
 from .metadata_filter import update_metadata_filters, filter_metadata
-from .cell_metadata import _IGNORE_CELL_METADATA
+from .cell_metadata import _IGNORE_CELL_METADATA, get_pyref_tag
 from .languages import (
     default_language_from_metadata_and_ext,
     set_main_and_cell_language,
@@ -48,6 +48,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         self.implementation = get_format_implementation(
             self.ext, self.fmt.get("format_name")
         )
+        self.include_code_cells = True
 
     def update_fmt_with_notebook_options(self, metadata):
         """Update format options with the values in the notebook metadata, and record those
@@ -263,18 +264,34 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         )
         split_at_heading = self.fmt.get("split_at_heading", False)
 
-        for cell in nb.cells:
+        code_cell_cnt = 0
+        code_cell_refs = {}
+        code_cell_source = []
+        for ix, cell in enumerate(nb.cells):
             if looking_for_first_markdown_cell and cell.cell_type == "markdown":
                 cell.metadata.setdefault("cell_marker", '"""')
                 looking_for_first_markdown_cell = False
-
+            if self.include_code_cells and cell.cell_type == "code":
+                code_cell_cnt += 1
+                name_ref = get_pyref_tag(cell.metadata)
+                if name_ref:
+                    # if explicit file name is provided in tags
+                    code_cell_ref = f"{name_ref}.py"
+                else:
+                    # ascending numbering otherwise
+                    code_cell_ref = f"_{code_cell_cnt:03d}.py"
+                code_cell_refs[ix] = code_cell_ref
+                code_cell_source.append((code_cell_ref, "\n".join([cell.source])))
             cell_exporters.append(
                 self.implementation.cell_exporter_class(
                     cell, default_language, self.fmt
                 )
             )
 
-        texts = [cell.cell_to_text() for cell in cell_exporters]
+        texts = [
+            cell.cell_to_text(code_cell_ref=code_cell_refs.get(ix))
+            for ix, cell in enumerate(cell_exporters)
+        ]
         lines = []
 
         # concatenate cells in reverse order to determine how many blank lines (pep8)
@@ -325,7 +342,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         header.extend([""] * header_lines_to_next_cell)
 
-        return "\n".join(header + lines)
+        return ["\n".join(header + lines)] + code_cell_source
 
 
 def reads(text, fmt, as_version=nbformat.NO_CONVERT, **kwargs):
@@ -440,7 +457,7 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
                 cells=notebook.cells,
             ),
             version,
-            **kwargs
+            **kwargs,
         )
 
     if not format_name:
@@ -490,12 +507,20 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
             fmt is not None
         ), "'fmt' argument in jupytext.write is mandatory unless fp is a file name"
 
-    content = writes(nb, version=version, fmt=fmt, **kwargs)
-    if isinstance(content, bytes):
-        content = content.decode("utf8")
-    fp.write(content)
-    if not content.endswith(u"\n"):
-        fp.write(u"\n")
+    contents = writes(nb, version=version, fmt=fmt, **kwargs)
+    for ix, content in enumerate(contents):
+        if ix == 0:
+            if isinstance(content, bytes):
+                content = content.decode("utf8")
+            fp.write(content)
+            if not content.endswith(u"\n"):
+                fp.write(u"\n")
+            continue
+        # write optional additional content
+        fc = content[0]
+        content_source = content[1]
+        with io.open(fc, "w", encoding="utf-8") as stream:
+            stream.write(content_source)
 
 
 def create_prefix_dir(nb_file, fmt):

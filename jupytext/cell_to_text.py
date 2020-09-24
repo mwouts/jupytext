@@ -3,6 +3,7 @@
 import re
 import warnings
 from copy import copy
+from typing import Optional
 from .languages import cell_language, comment_lines, same_language
 from .cell_metadata import is_active, _IGNORE_CELL_METADATA
 from .cell_metadata import (
@@ -166,6 +167,7 @@ class BaseCellExporter(object):
 class MarkdownCellExporter(BaseCellExporter):
     """A class that represent a notebook cell as Markdown"""
 
+    include_code_cells = True
     default_comment_magics = False
     cell_reader = MarkdownCellReader
 
@@ -187,7 +189,7 @@ class MarkdownCellExporter(BaseCellExporter):
 
         return [region_start] + self.source + ["<!-- #end{} -->".format(code)]
 
-    def cell_to_text(self):
+    def cell_to_text(self, code_cell_ref: Optional[str] = None):
         """Return the text representation of a cell"""
         if self.cell_type == "markdown":
             if self.doxygen_equation_markers and self.cell_type == "markdown":
@@ -206,10 +208,12 @@ class MarkdownCellExporter(BaseCellExporter):
                 )
             return self.source
 
-        return self.code_to_text()
+        return self.code_to_text(code_cell_ref=code_cell_ref)
 
-    def code_to_text(self):
+    def code_to_text(self, code_cell_ref: Optional[str] = None):
         """Return the text representation of a code cell"""
+        if self.include_code_cells:
+            return self.code_to_include(code_cell_ref=code_cell_ref)
         source = copy(self.source)
         comment_magic(source, self.language, self.comment_magics)
 
@@ -222,6 +226,21 @@ class MarkdownCellExporter(BaseCellExporter):
 
         options = metadata_to_text(self.language, self.metadata)
         return ["```" + options] + source + ["```"]
+
+    def code_to_include(self, code_cell_ref: str):
+        """Return the code-include representation of a code cell"""
+        source = copy(self.source)
+        comment_magic(source, self.language, self.comment_magics)
+
+        if self.metadata.get("active") == "":
+            self.metadata.pop("active")
+
+        self.language = self.metadata.pop("language", self.language)
+        if self.cell_type == "raw" and not is_active(self.ext, self.metadata, False):
+            return self.html_comment(self.metadata, "raw")
+
+        options = metadata_to_text(self.language, self.metadata)
+        return [f'!INCLUDECODE "{code_cell_ref}"']
 
 
 class RMarkdownCellExporter(MarkdownCellExporter):

@@ -329,6 +329,14 @@ def is_active(ext, metadata, default=True):
     return ext.replace(".", "") in re.split(r"\.|,", metadata["active"])
 
 
+def get_pyref_tag(metadata):
+    """Returns python file reference from tags, if exists"""
+    for tag in metadata.get("tags", []):
+        if tag.endswith(".py"):
+            return tag[:-3]
+    return
+
+
 def metadata_to_double_percent_options(metadata, plain_json):
     """Metadata to double percent lines"""
     text = []
