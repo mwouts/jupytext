@@ -672,11 +672,15 @@ def short_form_one_format(jupytext_format):
         fmt = jupytext_format["prefix"] + "/" + fmt
 
     if jupytext_format.get("format_name"):
-        if jupytext_format["extension"] not in [
-            ".md",
-            ".markdown",
-            ".Rmd",
-        ] or jupytext_format["format_name"] in ["pandoc", MYST_FORMAT_NAME]:
+        if (
+            jupytext_format["extension"]
+            not in [
+                ".md",
+                ".markdown",
+                ".Rmd",
+            ]
+            or jupytext_format["format_name"] in ["pandoc", MYST_FORMAT_NAME]
+        ):
             fmt = fmt + ":" + jupytext_format["format_name"]
 
     return fmt

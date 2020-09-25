@@ -354,7 +354,10 @@ def myst_to_notebook(
 
 
 def notebook_to_myst(
-    nb, code_directive=CODE_DIRECTIVE, raw_directive=RAW_DIRECTIVE, default_lexer=None,
+    nb,
+    code_directive=CODE_DIRECTIVE,
+    raw_directive=RAW_DIRECTIVE,
+    default_lexer=None,
 ):
     """Parse a notebook to a MyST formatted text document.
 

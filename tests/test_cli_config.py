@@ -21,7 +21,7 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
     assert py_file.isfile()
 
     nb = nbformat.read(nb_file, as_version=4)
-    assert 'jupytext' not in nb.metadata
+    assert "jupytext" not in nb.metadata
 
 
 def test_default_jupytext_formats(tmpdir):

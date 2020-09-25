@@ -66,9 +66,9 @@ to your .jupyter/jupyter_notebook_config.py file.
 
 def _jupyter_nbextension_paths():  # pragma: no cover
     """Allows commands like
-     jupyter nbextension install --py jupytext
-     jupyter nbextension enable --py jupytext
-     jupyter labextension install jupyterlab-jupytext"""
+    jupyter nbextension install --py jupytext
+    jupyter nbextension enable --py jupytext
+    jupyter labextension install jupyterlab-jupytext"""
     return [
         dict(
             section="notebook",
