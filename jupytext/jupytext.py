@@ -369,8 +369,7 @@ def reads(text, fmt, as_version=nbformat.NO_CONVERT, **kwargs):
 
 
 def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, **kwargs):
-    """"
-    Read a notebook from a file name or a file object
+    """Read a notebook from a file name or a file object
 
     :param fp: a file name or a file object
     :param as_version: see nbformat.read
@@ -409,8 +408,7 @@ def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, **kwargs):
 
 
 def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
-    """"
-    Write a notebook to a file name or a file object
+    """Write a notebook to a file name or a file object
 
     :param notebook: the notebook
     :param fmt: the jupytext format like `md`, `py:percent`, ...
@@ -455,8 +453,7 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
 
 
 def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
-    """"
-    Write a notebook to a file name or a file object
+    """Write a notebook to a file name or a file object
 
     :param nb: the notebook
     :param fp: a file name or a file object

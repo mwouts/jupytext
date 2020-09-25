@@ -585,7 +585,7 @@ class RScriptCellReader(ScriptCellReader):
 class LightScriptCellReader(ScriptCellReader):
     """Read notebook cells from plain Python or Julia files. Cells
     are identified by line breaks, unless they start with an
-    explicit marker '# +' """
+    explicit marker '# +'"""
 
     default_comment_magics = True
     cell_marker_start = None
