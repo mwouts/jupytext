@@ -9,6 +9,7 @@ dependencies:
   - pyyaml
   - toml
   - nbconvert
+  - ipykernel
   - jupyter_contrib_nbextensions
   - pytest
   - pytest-xdist
@@ -29,6 +30,7 @@ dependencies:
   # make html in docs folder
   - sphinx
   - recommonmark
+  - tox-conda
   - pip:
     - sphinx_copybutton
     - sphinx_rtd_theme
