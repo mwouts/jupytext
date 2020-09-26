@@ -54,6 +54,8 @@ Tests are executed with `pytest`. You can run them in parallel with for instance
 pytest -n 5
 ```
 
+We also have a `tox.ini` file available if you wish to test your contribution on multiple version of Python before making a PR - just run `tox`.
+
 Build the `jupytext` package and install it with
 ```
 python setup.py sdist bdist_wheel
