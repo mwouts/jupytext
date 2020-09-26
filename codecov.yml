@@ -1,6 +1,5 @@
 codecov:
-    notify:
-        after_n_builds: 10  # wait for the 10 GitHub jobs before notifying
+  require_ci_to_pass: yes
 
 coverage:
   status:
