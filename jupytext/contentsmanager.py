@@ -437,20 +437,21 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     return path
 
             if not directory:
-                return find_global_jupytext_configuration_file()
+                return None
 
             parent_dir = self.get_parent_dir(directory)
             return self.get_config_file(parent_dir)
 
-        def load_config_file(self, config_file):
+        def load_config_file(self, config_file, is_os_path=False):
             """Load the configuration file"""
             if config_file is None:
                 return None
             self.log.info("Loading Jupytext configuration file at %s", config_file)
-            if config_file.endswith(".py"):
-                config_dict = load_jupytext_configuration_file(
-                    self._get_os_path(config_file)
-                )
+            if config_file.endswith(".py") and not is_os_path:
+                config_file = self._get_os_path(config_file)
+                is_os_path = True
+            if is_os_path:
+                config_dict = load_jupytext_configuration_file(config_file)
             else:
                 model = self.super.get(config_file, content=True, type="file")
                 config_dict = load_jupytext_configuration_file(
