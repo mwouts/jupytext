@@ -3,11 +3,12 @@
 
 **Changed**
 - Jupytext's contents manager uses the parent CM's `get` and `save` methods to read and save text files, and explicitly calls `jupytext.reads` and `jupytext.writes` to do the conversion. We don't use `mock` nor internal parent methods any more. Thanks to Max Klein for helping making this work! (#634, #635)
-- Thanks to the above, Jupytext can work on top of contents manager that don't derive from `FileContentsManager`, and in particular with `jupyterfs` (#618)
+- Thanks to the above, Jupytext can work on top of contents manager that don't derive from `FileContentsManager`, and in particular it works with `jupyterfs` (#618)
 - The documentation was reorganized. `README.md` was simplified and now includes many links to the documentation.
 - The documentation now uses `myst_parser` rather than `recommonmark`. And we use `conda` on RTD (#650, #652)
 - The `readf` and `writef` functions were dropped (they had been deprecated in favor of `read` and `write` in June 2019, v1.2.0)
 - The description & dependencies of the JupyterLab extension were updated (#654)
+- The `--set-kernel -` command, on a Python notebook, gives an explicit error when no kernel is not found that matches the current Python executable.
 
 **Added**
 - Configuration errors are reported in the console and/or in Jupyter (#613)

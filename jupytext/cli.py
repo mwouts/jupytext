@@ -499,9 +499,6 @@ def jupytext_single_file(nb_file, args, log):
                 )
 
             kernelspec = kernelspec_from_language(language)
-
-            if not kernelspec:
-                raise ValueError("Found no kernel for {}".format(language))
         else:
             try:
                 kernelspec = get_kernel_spec(set_kernel)
