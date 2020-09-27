@@ -100,3 +100,26 @@ def test_incorrect_config_message(tmpdir, cfg_file, cfg_text):
 
     with pytest.raises(HTTPError, match=expected_message):
         cm.save(dict(type="notebook", content=SAMPLE_NOTEBOOK), "notebook.ipynb")
+
+
+def test_global_config_file(tmpdir):
+    cm_dir = tmpdir.join("cm_dir").mkdir()
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(cm_dir)
+
+    tmpdir.join("jupytext.toml").write('default_jupytext_formats = "ipynb,Rmd"')
+
+    def fake_global_config_directory():
+        return [str(tmpdir)]
+
+    with mock.patch(
+        "jupytext.config.global_jupytext_configuration_directories",
+        fake_global_config_directory,
+    ):
+        nb = new_notebook(cells=[new_code_cell("1+1")])
+        model = dict(content=nb, type="notebook")
+        cm.save(model, "notebook.ipynb")
+        assert set(model["path"] for model in cm.get("/", content=True)["content"]) == {
+            "notebook.ipynb",
+            "notebook.Rmd",
+        }
