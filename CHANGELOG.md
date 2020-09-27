@@ -3,10 +3,13 @@
 
 **Added**
 - Configuration errors are reported in the console and/or in Jupyter (#613)
+- The GitHub actions run on both push events and pull requests, and duplicates jobs are skipped (#605)
+- Jupytext has a `tox.ini` file, thanks to Chris Sewell (#605)
 
 **Fixed**
 - Freeze optional dependency on `sphinx-gallery` to version `~=0.7.0` (#614)
 - Jupytext's contents manager can be used with `jupyterfs` (#618)
+
 
 1.6.0 (2020-09-01)
 ------------------
