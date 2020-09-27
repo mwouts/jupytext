@@ -1166,3 +1166,6 @@ def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir):
 
     with pytest.raises(ValueError, match="jupytext --sync notebook.md"):
         jupytext(["--set-formats", "notebook.md"])
+
+    # Remove the config file, otherwise test_jupytext_jupyter_fs_metamanager fails later on!
+    cfg_file.remove()
