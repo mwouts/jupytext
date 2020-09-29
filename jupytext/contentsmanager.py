@@ -162,8 +162,9 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
                 return write_pair(path, jupytext_formats, save_one_file)
 
-            except Exception as err:
-                raise HTTPError(400, str(err))
+            except Exception as e:
+                self.log.error(u'Error while saving file: %s %s', path, e, exc_info=True)
+                raise HTTPError(500, u'Unexpected error while saving file: %s %s' % (path, e))
 
         def get(
             self,

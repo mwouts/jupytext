@@ -1,5 +1,3 @@
-.idea
-.vscode
 .build
 .cache
 .coverage
@@ -18,3 +16,13 @@ docs/_build
 
 # Will be created by postBuild
 demo/get_started.ipynb
+
+# jetbrains ide stuff
+*.iml
+.idea/
+
+# vscode ide stuff
+*.code-workspace
+.history
+.vscode/*
+!.vscode/*.template
