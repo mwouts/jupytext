@@ -4,6 +4,7 @@ from jupytext.compare import compare
 from jupytext.magics import comment_magic, uncomment_magic, unesc, is_magic
 from jupytext.compare import compare_notebooks
 import jupytext
+from .utils import notebook_model
 
 
 def test_unesc():
@@ -144,12 +145,12 @@ def test_force_comment_using_contents_manager(tmpdir):
 
     nb = new_notebook(cells=[new_code_cell("%pylab inline")])
 
-    cm.save(model=dict(type="notebook", content=nb), path=tmp_py)
+    cm.save(model=notebook_model(nb), path=tmp_py)
     with open(str(tmpdir.join(tmp_py))) as stream:
         assert "# %pylab inline" in stream.read().splitlines()
 
     cm.comment_magics = False
-    cm.save(model=dict(type="notebook", content=nb), path=tmp_py)
+    cm.save(model=notebook_model(nb), path=tmp_py)
     with open(str(tmpdir.join(tmp_py))) as stream:
         assert "%pylab inline" in stream.read().splitlines()
 

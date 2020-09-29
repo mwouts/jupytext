@@ -6,7 +6,7 @@ from tornado.web import HTTPError
 import jupytext
 from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.compare import compare_notebooks
-from .utils import list_notebooks
+from .utils import list_notebooks, notebook_model
 
 
 @pytest.mark.parametrize("nb_file", list_notebooks(skip="66"))
@@ -20,7 +20,7 @@ def test_rmd_is_ok(nb_file, tmpdir):
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    cm.save(model=dict(type="notebook", content=nb), path=tmp_ipynb)
+    cm.save(model=notebook_model(nb), path=tmp_ipynb)
 
     nb2 = jupytext.read(str(tmpdir.join(tmp_rmd)))
 
@@ -37,7 +37,7 @@ def test_ipynb_is_ok(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
     cm.default_jupytext_formats = "ipynb,Rmd"
 
-    cm.save(model=dict(type="notebook", content=nb), path=tmp_rmd)
+    cm.save(model=notebook_model(nb), path=tmp_rmd)
 
     nb2 = jupytext.read(str(tmpdir.join(tmp_ipynb)))
     compare_notebooks(nb2, nb)
@@ -54,7 +54,7 @@ def test_all_files_created(nb_file, tmpdir):
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    cm.save(model=dict(type="notebook", content=nb), path=tmp_ipynb)
+    cm.save(model=notebook_model(nb), path=tmp_ipynb)
 
     nb2 = jupytext.read(str(tmpdir.join(tmp_py)))
     compare_notebooks(nb2, nb)
@@ -73,7 +73,7 @@ def test_no_files_created_on_no_format(tmpdir):
     cm.default_jupytext_formats = ""
 
     cm.save(
-        model=dict(type="notebook", content=new_notebook(nbformat=4, metadata=dict())),
+        model=notebook_model(new_notebook(nbformat=4, metadata=dict())),
         path=tmp_ipynb,
     )
 
@@ -121,8 +121,6 @@ def test_no_rmd_on_not_v4(tmpdir):
     cm.default_jupytext_formats = "ipynb,Rmd"
 
     with pytest.raises(NotebookValidationError):
-        cm.save(
-            model=dict(type="notebook", content=new_notebook(nbformat=3)), path=tmp_rmd
-        )
+        cm.save(model=notebook_model(new_notebook(nbformat=3)), path=tmp_rmd)
 
     assert not os.path.isfile(str(tmpdir.join(tmp_ipynb)))
