@@ -12,6 +12,4 @@ coverage:
         paths: "jupytext/"
         target: 97%
         threshold': .2%
-    patch:
-      default:
-        target: 80%  # new contributions should have a coverage at least equal to target
+    patch: off  # disable codecov/patch
