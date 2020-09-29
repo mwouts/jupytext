@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import json
 import pytest
 from jupytext.cli import system
 from jupytext.cell_reader import rst2md
@@ -107,3 +108,8 @@ def list_notebooks(path="ipynb", skip="World"):
 
     # ignore ".ipynb_checkpoints" sub-folder
     return [nb_file for nb_file in notebooks if os.path.isfile(nb_file)]
+
+
+def notebook_model(nb):
+    """Return a notebook model, with content a dictionary rather than a notebook object"""
+    return dict(type="notebook", content=json.loads(json.dumps(nb)))

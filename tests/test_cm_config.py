@@ -9,6 +9,7 @@ from nbformat import read
 import pytest
 from tornado.web import HTTPError
 import jupytext
+from .utils import notebook_model
 
 SAMPLE_NOTEBOOK = new_notebook(
     cells=[new_markdown_cell("A Markdown cell"), new_code_cell("# A code cell\n1 + 1")]
@@ -24,11 +25,11 @@ def test_local_config_overrides_cm_config(tmpdir):
     with open(str(nested.join(".jupytext.yml")), "w") as fp:
         fp.write("default_jupytext_formats: ''\n")
 
-    cm.save(dict(type="notebook", content=SAMPLE_NOTEBOOK), "notebook.ipynb")
+    cm.save(notebook_model(SAMPLE_NOTEBOOK), "notebook.ipynb")
     assert os.path.isfile(str(tmpdir.join("notebook.ipynb")))
     assert os.path.isfile(str(tmpdir.join("notebook.py")))
 
-    cm.save(dict(type="notebook", content=SAMPLE_NOTEBOOK), "nested/notebook.ipynb")
+    cm.save(notebook_model(SAMPLE_NOTEBOOK), "nested/notebook.ipynb")
     assert os.path.isfile(str(nested.join("notebook.ipynb")))
     assert not os.path.isfile(str(nested.join("notebook.py")))
 
@@ -64,7 +65,7 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
 
     cfg_file.write("default_jupytext_formats: 'ipynb,py'\n")
 
-    cm.save(dict(type="notebook", content=SAMPLE_NOTEBOOK), "notebook.ipynb")
+    cm.save(notebook_model(SAMPLE_NOTEBOOK), "notebook.ipynb")
     assert nb_file.isfile()
     assert py_file.isfile()
 
@@ -99,7 +100,7 @@ def test_incorrect_config_message(tmpdir, cfg_file, cfg_text):
         cm.get("empty.ipynb", type="notebook", content=False)
 
     with pytest.raises(HTTPError, match=expected_message):
-        cm.save(dict(type="notebook", content=SAMPLE_NOTEBOOK), "notebook.ipynb")
+        cm.save(notebook_model(SAMPLE_NOTEBOOK), "notebook.ipynb")
 
 
 def test_global_config_file(tmpdir):
@@ -117,7 +118,7 @@ def test_global_config_file(tmpdir):
         fake_global_config_directory,
     ):
         nb = new_notebook(cells=[new_code_cell("1+1")])
-        model = dict(content=nb, type="notebook")
+        model = notebook_model(nb)
         cm.save(model, "notebook.ipynb")
         assert set(model["path"] for model in cm.get("/", content=True)["content"]) == {
             "notebook.ipynb",

@@ -10,6 +10,7 @@ from nbformat.v4.nbbase import (
 )
 from jupytext.compare import compare, compare_notebooks
 import jupytext
+from .utils import notebook_model
 
 
 def test_read_simple_file(
@@ -352,7 +353,7 @@ def test_cell_markers_option_in_contents_manager(tmpdir):
             }
         },
     )
-    cm.save(model=dict(type="notebook", content=nb), path="notebook.ipynb")
+    cm.save(model=notebook_model(nb), path="notebook.ipynb")
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
@@ -395,7 +396,7 @@ def test_default_cell_markers_in_contents_manager(tmpdir):
             }
         },
     )
-    cm.save(model=dict(type="notebook", content=nb), path="notebook.ipynb")
+    cm.save(model=notebook_model(nb), path="notebook.ipynb")
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
@@ -436,7 +437,7 @@ def test_default_cell_markers_in_contents_manager_does_not_impact_light_format(t
         },
     )
     with pytest.warns(UserWarning, match="Ignored cell markers"):
-        cm.save(model=dict(type="notebook", content=nb), path="notebook.ipynb")
+        cm.save(model=notebook_model(nb), path="notebook.ipynb")
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
