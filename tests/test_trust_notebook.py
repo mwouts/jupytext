@@ -115,3 +115,31 @@ def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(
         assert cell.metadata.get("trusted", True)
 
     compare_notebooks(nb2["content"], model["content"])
+
+
+@pytest.mark.parametrize("nb_file", list_notebooks("percent", skip="hash sign"))
+def test_text_notebooks_can_be_trusted(nb_file, tmpdir, no_jupytext_version_number):
+    cm = TextFileContentsManager()
+    root, file = os.path.split(nb_file)
+    py_file = str(tmpdir.join(file))
+    shutil.copy(nb_file, py_file)
+
+    cm.root_dir = str(tmpdir)
+    model = cm.get(file)
+    model["type"] == "notebook"
+    cm.save(model, file)
+
+    # Unsign notebook
+    nb = model["content"]
+    for cell in nb.cells:
+        if "trusted" in cell.metadata:
+            cell.metadata.pop("trusted")
+
+    cm.notary.unsign(nb)
+
+    # Trust and reload
+    cm.trust_notebook(file)
+
+    model = cm.get(file)
+    for cell in model["content"].cells:
+        assert cell.metadata.get("trusted", True)
