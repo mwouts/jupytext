@@ -204,7 +204,10 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     try:
                         model["content"] = jupytext.reads(model["content"], fmt=fmt)
                     except Exception as err:
-                        raise HTTPError(400, str(err))
+                        self.log.error(
+                            u"Error while reading file: %s %s", path, err, exc_info=True
+                        )
+                        raise HTTPError(500, str(err))
 
             if not load_alternative_format:
                 return model
@@ -241,7 +244,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     alt_paths = paired_paths(path, fmt, formats)
                     self.update_paired_notebooks(path, formats)
                 except InconsistentPath as err:
-                    self.log.info("Unable to read paired notebook: %s", str(err))
+                    self.log.error(
+                        u"Unable to read paired notebook: %s %s",
+                        path,
+                        err,
+                        exc_info=True,
+                    )
             else:
                 if path in self.paired_notebooks:
                     fmt, formats = self.paired_notebooks.get(path)
@@ -292,7 +300,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     + timedelta(seconds=config.outdated_text_notebook_margin)
                 ):
                     raise HTTPError(
-                        400,
+                        500,
                         """{out} (last modified {out_last})
                         seems more recent than {src} (last modified {src_last})
                         Please either:
@@ -313,8 +321,13 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             try:
                 model["content"] = read_pair(inputs, outputs, read_one_file)
+            except HTTPError:
+                raise
             except Exception as err:
-                raise HTTPError(400, str(err))
+                self.log.error(
+                    u"Error while reading file: %s %s", path, err, exc_info=True
+                )
+                raise HTTPError(500, str(err))
 
             if not outputs.timestamp:
                 set_kernelspec_from_language(model["content"])
@@ -414,8 +427,17 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             # Is the new file name consistent with suffix?
             try:
                 new_base = base_path(new_path, fmt)
+            except HTTPError:
+                raise
             except Exception as err:
-                raise HTTPError(400, str(err))
+                self.log.error(
+                    u"Error while renaming file from %s to %s: %s",
+                    old_path,
+                    new_path,
+                    err,
+                    exc_info=True,
+                )
+                raise HTTPError(500, str(err))
 
             for old_alt_path, alt_fmt in old_alt_paths:
                 new_alt_path = full_path(new_base, alt_fmt)
@@ -492,7 +514,13 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     self.cached_config.path = parent_dir
                     self.cached_config.timestamp = datetime.now()
                 except JupytextConfigurationError as err:
-                    raise HTTPError(400, "{}".format(err))
+                    self.log.error(
+                        u"Error while reading config file: %s %s",
+                        config_file,
+                        err,
+                        exc_info=True,
+                    )
+                    raise HTTPError(500, "{}".format(err))
 
             if self.cached_config.config is not None:
                 self.log.debug(
