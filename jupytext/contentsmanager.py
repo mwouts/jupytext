@@ -155,7 +155,9 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     text_model = dict(
                         type="file",
                         format="text",
-                        content=jupytext.writes(model["content"], fmt=fmt),
+                        content=jupytext.writes(
+                            nbformat.from_dict(model["content"]), fmt=fmt
+                        ),
                     )
 
                     return self.super.save(text_model, path)
@@ -163,8 +165,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 return write_pair(path, jupytext_formats, save_one_file)
 
             except Exception as e:
-                self.log.error(u'Error while saving file: %s %s', path, e, exc_info=True)
-                raise HTTPError(500, u'Unexpected error while saving file: %s %s' % (path, e))
+                self.log.error(
+                    u"Error while saving file: %s %s", path, e, exc_info=True
+                )
+                raise HTTPError(
+                    500, u"Unexpected error while saving file: %s %s" % (path, e)
+                )
 
         def get(
             self,
