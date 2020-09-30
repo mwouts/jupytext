@@ -143,3 +143,18 @@ jupyter:
 ```
 """,
     )
+
+
+def test_cli_config_on_windows_issue_629(tmpdir):
+    cfg_file = tmpdir.join("jupytext.yml")
+    cfg_file.write(
+        """default_jupytext_formats: "notebooks///ipynb,scripts///py:percent"
+default_notebook_metadata_filter: "jupytext"
+"""
+    )
+
+    tmpdir.mkdir("scripts").join("test.py").write("# %%\n 1+1\n")
+
+    jupytext(["--sync", str(tmpdir.join("scripts").join("*.py"))])
+
+    assert tmpdir.join("notebooks").join("test.ipynb").exists()
