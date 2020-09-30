@@ -1,6 +1,9 @@
 name: CI (pip)
-on: [ push, pull_request ]
-
+on:
+  push:
+    paths-ignore:
+      - 'CHANGELOG.md'
+  pull_request:
 
 jobs:
   skip_duplicate:
