@@ -14,6 +14,7 @@
 **Fixed**
 - Optional dependency on `sphinx-gallery` frozen to version `~=0.7.0` (#614)
 - Codecov/patch reports should be OK now (#639)
+- Jupytext tests work on non-English locales (#636)
 
 
 1.6.0 (2020-09-01)

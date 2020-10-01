@@ -1706,11 +1706,17 @@ def test_new_untitled(tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    assert cm.new_untitled(type="notebook")["path"] == "Untitled.ipynb"
-    assert cm.new_untitled(type="notebook", ext=".md")["path"] == "Untitled1.md"
-    assert cm.new_untitled(type="notebook", ext=".py")["path"] == "Untitled2.py"
-    assert cm.new_untitled(type="notebook")["path"] == "Untitled3.ipynb"
-    assert cm.new_untitled(type="notebook", ext=".py:percent")["path"] == "Untitled4.py"
+    # untitled is "Untitled" only when the locale is English #636
+    untitled, ext = cm.new_untitled(type="notebook")["path"].split(".")
+    assert untitled
+    assert ext == "ipynb"
+
+    assert cm.new_untitled(type="notebook", ext=".md")["path"] == untitled + "1.md"
+    assert cm.new_untitled(type="notebook", ext=".py")["path"] == untitled + "2.py"
+    assert cm.new_untitled(type="notebook")["path"] == untitled + "3.ipynb"
+    assert (
+        cm.new_untitled(type="notebook", ext=".py:percent")["path"] == untitled + "4.py"
+    )
 
 
 def test_nested_prefix(tmpdir):
