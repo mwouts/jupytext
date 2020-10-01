@@ -7,6 +7,7 @@
 
 **Added**
 - Configuration errors are reported in the console and/or in Jupyter (#613)
+- Jupytext's Contents Manager internal errors are logged on the console, and trigger an HTTP Error 500 (#638)
 - The GitHub actions run on both push events and pull requests, and duplicate jobs are skipped (#605)
 - Jupytext has a `tox.ini` file, thanks to Chris Sewell (#605)
 
