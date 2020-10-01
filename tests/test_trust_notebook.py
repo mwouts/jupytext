@@ -43,8 +43,7 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir, no_jupytext_version_num
     # Unsign and test notebook
     nb = model["content"]
     for cell in nb.cells:
-        if "trusted" in cell.metadata:
-            cell.metadata.pop("trusted")
+        cell.metadata.pop("trusted", True)
 
     cm.notary.unsign(nb)
 
@@ -96,8 +95,7 @@ def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(
     # Unsign notebook
     nb = model["content"]
     for cell in nb.cells:
-        if "trusted" in cell.metadata:
-            cell.metadata.pop("trusted")
+        cell.metadata.pop("trusted", True)
 
     cm.notary.unsign(nb)
 
@@ -132,8 +130,7 @@ def test_text_notebooks_can_be_trusted(nb_file, tmpdir, no_jupytext_version_numb
     # Unsign notebook
     nb = model["content"]
     for cell in nb.cells:
-        if "trusted" in cell.metadata:
-            cell.metadata.pop("trusted")
+        cell.metadata.pop("trusted", True)
 
     cm.notary.unsign(nb)
 
