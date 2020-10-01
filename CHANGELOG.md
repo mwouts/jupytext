@@ -1,14 +1,18 @@
-1.6.1-dev (2020-09-??)
+1.6.1-dev (2020-10-??)
 ----------------------
+
+**Changed**
+- Jupytext's contents manager uses the parent CM's `get` and `save` methods to read and save text files, and explicitly calls `jupytext.reads` and `jupytext.writes` to do the conversion. We don't use `mock` nor internal parent methods any more. Thanks to Max Klein for helping making this work! (#634, #635)
+- Thanks to the above, Jupytext can work on top of contents manager that don't derive from `FileContentsManager`, and in particular with `jupyterfs` (#618)
 
 **Added**
 - Configuration errors are reported in the console and/or in Jupyter (#613)
-- The GitHub actions run on both push events and pull requests, and duplicates jobs are skipped (#605)
+- The GitHub actions run on both push events and pull requests, and duplicate jobs are skipped (#605)
 - Jupytext has a `tox.ini` file, thanks to Chris Sewell (#605)
 
 **Fixed**
-- Freeze optional dependency on `sphinx-gallery` to version `~=0.7.0` (#614)
-- Jupytext's contents manager can be used with `jupyterfs` (#618)
+- Optional dependency on `sphinx-gallery` frozen to version `~=0.7.0` (#614)
+- Codecov/patch reports should be OK now (#639)
 
 
 1.6.0 (2020-09-01)
