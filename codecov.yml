@@ -1,5 +1,5 @@
-codecov:
-  require_ci_to_pass: yes
+comment:
+  after_n_builds: 2
 
 coverage:
   status:
