@@ -4,7 +4,7 @@ Have you always wished Jupyter notebooks were plain text documents? Wished you c
 
 Jupytext is a plugin for Jupyter that can save Jupyter notebooks as either
 - Markdown files (or [MyST Markdown](formats.md#myst-markdown) files, or [R Markdown](formats.md#r-markdown) documents)
-- as scripts in [many languages](languages.md).
+- Scripts in [many languages](languages.md).
 
 ## Use cases
 
@@ -15,7 +15,7 @@ Common [use cases](examples.md) for Jupytext are:
 
 ## Install
 
-You can install Jupytext with either
+You can install Jupytext with
 - `pip install jupytext`
 - or `conda install jupytext -c conda-forge`.
 
@@ -36,7 +36,7 @@ To pair a given `.ipynb` or text notebook to an additional notebook format, use 
 </details>
 
 <details>
-  <summary>the <i>"pair notebook with..."</i> menu entry in Jupyter Notebook</summary>
+  <summary>the <i>"pair notebook with..."</i> menu entries in Jupyter Notebook</summary>
 
 [![](https://raw.githubusercontent.com/mwouts/jupytext/master/jupytext/nbextension/jupytext_menu.png)](install.md#jupytext-menu-in-jupyter-notebook)
 </details>
@@ -83,7 +83,7 @@ If your notebook contains more text than code, if you are writing a documentatio
 
 ## More resources?
 
-If you're new to Jupytext, you may want to start with the [FAQ](faq.md) or the [Tutorials](tutorials.md).
+If you're new to Jupytext, you may want to start with the [FAQ](faq.md) or with the [Tutorials](tutorials.md).
 
 ## Contents
 
