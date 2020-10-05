@@ -5,7 +5,12 @@ from setuptools import setup, find_packages
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
-    long_description = f.read()
+    # replace Markdown links (docs/[NAME].md with (https://jupytext.readthedocs.io/en/latest/[NAME].html
+    long_description = re.sub(
+        r"\(docs/([A-Za-z-_]*).md",
+        "(https://jupytext.readthedocs.io/en/latest/\\1.html",
+        f.read(),
+    )
 
 with open(path.join(this_directory, "jupytext/version.py")) as f:
     version_file = f.read()
