@@ -85,6 +85,8 @@ If your notebook contains more text than code, if you are writing a documentatio
 
 If you're new to Jupytext, you may want to start with the [FAQ](faq.md) or with the [Tutorials](tutorials.md).
 
+## Table of Contents
+
 ```{toctree}
 :maxdepth: 1
 install.md
