@@ -85,16 +85,17 @@ If your notebook contains more text than code, if you are writing a documentatio
 
 If you're new to Jupytext, you may want to start with the [FAQ](faq.md) or with the [Tutorials](tutorials.md).
 
-## Contents
-
-* [Installation](install.md)
-* [Paired Notebooks](paired-notebooks.md)
-* [Configuration](config.md)
-* [Notebook Formats](formats.md)
-* [Supported Languages](languages.md)
-* [Using at the Command Line](using-cli.md)
-* [Using as a pre-commit hook](using-pre-commit.md)
-* [Using as a Python library](using-library.md)
-* [Sample Use Cases](examples.md)
-* [Frequently Asked Questions](faq.md)
-* [Demos and Tutorials](tutorials.md)
+```{toctree}
+:maxdepth: 1
+install.md
+paired-notebooks.md
+config.md
+formats.md
+languages.md
+using-cli.md
+using-pre-commit.md
+using-library.md
+examples.md
+faq.md
+tutorials.md
+```
