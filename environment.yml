@@ -29,7 +29,7 @@ dependencies:
   - pandoc>=2.9
   # make html in docs folder
   - sphinx
-  - recommonmark
   - tox-conda
   - pip:
     - sphinx_copybutton
+    - myst_parser

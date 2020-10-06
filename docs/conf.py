@@ -14,8 +14,6 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-from recommonmark.transform import AutoStructify
-
 # -- Project information -----------------------------------------------------
 
 project = "Jupytext"
@@ -27,7 +25,7 @@ author = "The Jupytext Team"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx_copybutton", "recommonmark"]
+extensions = ["sphinx_copybutton", "myst_parser"]
 
 html_context = {
     "display_github": True,  # Integrate GitHub
@@ -71,10 +69,3 @@ html_static_path = ["_static"]
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "jupytext"
-
-
-def setup(app):
-    app.add_config_value(
-        "recommonmark_config", {"auto_toc_tree_section": "Contents"}, True
-    )
-    app.add_transform(AutoStructify)

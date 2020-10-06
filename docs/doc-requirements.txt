@@ -1,4 +1,4 @@
 sphinx
 sphinx_copybutton
 jupytext
-recommonmark
+myst_parser
