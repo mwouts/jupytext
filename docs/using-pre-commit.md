@@ -1,4 +1,4 @@
-# Pre-commit hooks
+# Using as a pre-commit hook
 
 ## Jupytext as a Git pre-commit hook
 
