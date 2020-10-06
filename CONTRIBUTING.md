@@ -82,10 +82,12 @@ Our extension for JupyterLab adds a series of Jupytext commands to JupyterLab. T
 
 Install the documentation tools with
 ```
-conda activate jupytext-dev
+conda env create --file docs/environment.yml
+conda activate jupytext-docs
 cd docs
 ```
 and build the HTML documentation locally with
 ```
+rm -rf _build
 make html
 ```
