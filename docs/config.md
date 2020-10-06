@@ -13,7 +13,7 @@ You can pair a notebook to as many text representations as you want (see our _Wo
 where
 - `ext` is one of `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`, `q`. Use the `auto` extension to have the script extension chosen according to the Jupyter kernel.
 - `format_name` (optional) is either `light` (default for scripts), `nomarker`, `percent`, `hydrogen`, `sphinx` (Python only), `spin` (R only) &mdash; see the [format specifications](formats.md).
-- `root_folder`, `path`, `prefix` and `suffix` allow to save the text representation to files with different names, or in different folders (see the [configuration files examples](config.html#configuring-paired-notebooks-globally)).
+- `root_folder`, `path`, `prefix` and `suffix` allow to save the text representation to files with different names, or in different folders (see the [configuration files examples](config.md#configuring-paired-notebooks-globally)).
 
 Jupytext accepts a few additional options. These options should be added to the `"jupytext"` section in the metadata &mdash; use either the metadata editor or the `--opt/--format-options` argument on the command line.
 - `comment_magics`: By default, Jupyter magics are commented when notebooks are exported to any other format than markdown. If you prefer otherwise, use this boolean option, or its global counterpart (see below).
