@@ -1,4 +1,4 @@
-# Supported languages
+# Supported Languages
 
 Jupytext works with notebooks in any of the following languages:
 

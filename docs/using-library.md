@@ -1,4 +1,4 @@
-# Using the Jupytext Python library
+# Using as a Python library
 
 Jupytext provides the same `read`, `write`, `reads` and `writes` functions as `nbformat`.
 You can use `jupytext`'s functions as drop-in replacements for `nbformat`'s ones.

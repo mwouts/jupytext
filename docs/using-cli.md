@@ -1,4 +1,4 @@
-# Using Jupytext at the command line
+# Using at the Command Line
 
 ## Command line conversion
 
