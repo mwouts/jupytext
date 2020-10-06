@@ -48,7 +48,7 @@ with e.g.
 ```
 jupytext --set-formats ipynb,py:percent notebook.ipynb
 ```
-see the [documentation](config/md#per-notebook-configuration).
+see the [documentation](config.md#per-notebook-configuration).
 </details>
 
 <details>
@@ -58,7 +58,7 @@ with e.g. the following content:
 ```
 default_jupytext_formats = "ipynb,py:percent"
 ```
-see the [documentation](config/md#configuring-paired-notebooks-globally).
+see the [documentation](config.md#configuring-paired-notebooks-globally).
 </details>
 </ul>
 
