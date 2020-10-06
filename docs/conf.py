@@ -27,6 +27,9 @@ author = "The Jupytext Team"
 # ones.
 extensions = ["sphinx_copybutton", "myst_parser"]
 
+# Auto-generated header anchors
+myst_heading_anchors = 3
+
 html_context = {
     "display_github": True,  # Integrate GitHub
     "github_user": "mwouts",  # Username
