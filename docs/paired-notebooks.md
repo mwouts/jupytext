@@ -4,11 +4,11 @@ Jupytext can write a given notebook to multiple files. In addition to the origin
 
 ## How to pair a notebook to multiple formats
 
-In Jupyter Notebook, pair your notebook to one or more text formats with the [Jupytext menu](install.html#jupytext-menu-in-jupyter-notebook):
+In Jupyter Notebook, pair your notebook to one or more text formats with the [Jupytext menu](install.md#jupytext-menu-in-jupyter-notebook):
 
 ![](https://raw.githubusercontent.com/mwouts/jupytext_nbextension/master/jupytext_menu.png)
 
-In JupyterLab, use the [Jupytext commands](install.html#jupytext-commands-in-jupyterlab):
+In JupyterLab, use the [Jupytext commands](install.md#jupytext-commands-in-jupyterlab):
 
 ![](https://raw.githubusercontent.com/mwouts/jupyterlab-jupytext/master/jupytext_commands.png)
 
@@ -32,7 +32,7 @@ When that occurs, please choose the version in which you made the latest changes
 
 ## How to open scripts with either the text or notebook view in Jupyter?
 
-With Jupytext's contents manager for Jupyter, scripts and Markdown documents gain a notebook icon. If you don't see the notebook icon, double check the [contents manager configuration](install.html#jupytexts-contents-manager).
+With Jupytext's contents manager for Jupyter, scripts and Markdown documents gain a notebook icon. If you don't see the notebook icon, double check the [contents manager configuration](install.md#jupytexts-contents-manager).
 
 By default, Jupyter Notebook open scripts and Markdown documents as notebooks. If you want to open them with the text editor, select the document and click on _edit_:
 

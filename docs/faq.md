@@ -10,7 +10,7 @@ The text representation only contains the part of the notebook that you wrote (n
 
 ## How do I use Jupytext?
 
-Open the notebook that you want to version control. _Pair_ the notebook to a script or a Markdown file using either the [Jupytext Menu](install.html#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook or the [Jupytext Commands](install.html#jupytext-commands-in-jupyterlab) in JupyterLab.
+Open the notebook that you want to version control. _Pair_ the notebook to a script or a Markdown file using either the [Jupytext Menu](install.md#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook or the [Jupytext Commands](install.md#jupytext-commands-in-jupyterlab) in JupyterLab.
 
 Save the notebook, and you get two copies of the notebook: the original `*.ipynb` file, together with its paired text representation.
 
@@ -67,7 +67,7 @@ jupytext --set-formats ipynb,md --execute *.md  # convert all .md files to paire
 
 ## I want a specific cell to be commented out in the paired script
 
-That's possible! See how to [activate or deactivate cells](formats.html#active-and-inactive-cells).
+That's possible! See how to [activate or deactivate cells](formats.md#active-and-inactive-cells).
 
 ## Which files should I version control?
 

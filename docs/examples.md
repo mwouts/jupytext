@@ -27,7 +27,7 @@ In the animation below we propose a quick demo of Jupytext. While the example re
 
 - We start with a Jupyter notebook.
 - The notebook includes a plot of the world population. The plot legend is not in order of decreasing population, we'll fix this.
-- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we select _Pair Notebook with a light Script_ in either the [Jupytext menu](install.html#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or in the [Jupytext commands](install.html#jupytext-commands-in-jupyterlab) in JupyterLab. This has the effect of adding a `"jupytext": {"formats": "ipynb,py:light"},` entry to the notebook metadata.
+- We want the notebook to be saved as both a `.ipynb` and a `.py` file: we select _Pair Notebook with a light Script_ in either the [Jupytext menu](install.md#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook, or in the [Jupytext commands](install.md#jupytext-commands-in-jupyterlab) in JupyterLab. This has the effect of adding a `"jupytext": {"formats": "ipynb,py:light"},` entry to the notebook metadata.
 - The Python script can be opened with PyCharm:
   - Navigating in the code and documentation is easier than in Jupyter.
   - The console is convenient for quick tests. We don't need to create cells for this.
