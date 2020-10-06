@@ -1,0 +1,11 @@
+name: jupytext-docs
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.7
+  - sphinx
+  - pip
+  - pip:
+      - myst_parser
+      - sphinx_copybutton
