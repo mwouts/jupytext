@@ -13,6 +13,7 @@
 - Jupytext's Contents Manager internal errors are logged on the console, and trigger an HTTP Error 500 (#638)
 - The GitHub actions run on both push events and pull requests, and duplicate jobs are skipped (#605)
 - Jupytext has a `tox.ini` file, thanks to Chris Sewell (#605)
+- Jupytext is tested against Python 3.9
 
 **Fixed**
 - Optional dependency on `sphinx-gallery` frozen to version `~=0.7.0` (#614)
