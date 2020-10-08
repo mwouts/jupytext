@@ -6,6 +6,7 @@
 - Thanks to the above, Jupytext can work on top of contents manager that don't derive from `FileContentsManager`, and in particular with `jupyterfs` (#618)
 - The documentation was reorganized. `README.md` was simplified and now includes many links to the documentation.
 - The documentation now uses `myst_parser` rather than `recommonmark`. And we use `conda` on RTD (#650, #652)
+- The `readf` and `writef` functions were dropped (they had been deprecated in favor of `read` and `write` in June 2019, v1.2.0)
 
 **Added**
 - Configuration errors are reported in the console and/or in Jupyter (#613)
