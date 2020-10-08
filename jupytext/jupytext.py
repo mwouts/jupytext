@@ -4,7 +4,6 @@ import os
 import io
 import sys
 import logging
-import warnings
 from copy import copy, deepcopy
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 from nbformat.v4.nbbase import new_notebook, new_code_cell, NotebookNode
@@ -504,25 +503,3 @@ def create_prefix_dir(nb_file, fmt):
                 logging.WARNING, "[jupytext] creating missing directory %s", nb_dir
             )
             os.makedirs(nb_dir)
-
-
-def readf(nb_file, fmt=None):  # pragma: no cover
-    """Read a notebook from the file with given name"""
-    warnings.warn(
-        "readf is deprecated. Please use read instead, and pass the fmt "
-        "argument with an explicit fmt=... (see https://github.com/mwouts/jupytext/issues/262)",
-        DeprecationWarning,
-    )
-
-    return read(fp=nb_file, fmt=fmt)
-
-
-def writef(notebook, nb_file, fmt=None):  # pragma: no cover
-    """Write a notebook to the file with given name"""
-    warnings.warn(
-        "writef is deprecated. Please use write instead, and pass the fmt "
-        "argument with an explicit fmt=... (see https://github.com/mwouts/jupytext/issues/262)",
-        DeprecationWarning,
-    )
-
-    return write(nb=notebook, fp=nb_file, fmt=fmt)

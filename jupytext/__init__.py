@@ -1,6 +1,6 @@
 """Read and write Jupyter notebooks as text files"""
 
-from .jupytext import read, write, readf, writef, writes, reads
+from .jupytext import read, write, writes, reads
 from .formats import NOTEBOOK_EXTENSIONS, guess_format, get_format_implementation
 from .reraise import reraise
 from .version import __version__
@@ -54,7 +54,7 @@ def load_jupyter_server_extension(app):  # pragma: no cover
 
     except Exception:
         app.log.error(
-            """[Jupytext Server Extension] An error occured. Please deactivate the server extension with
+            """[Jupytext Server Extension] An error occurred. Please deactivate the server extension with
     jupyter serverextension disable jupytext
 and configure the contents manager manually by adding
     c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
@@ -85,8 +85,6 @@ def _jupyter_nbextension_paths():  # pragma: no cover
 __all__ = [
     "read",
     "write",
-    "readf",
-    "writef",
     "writes",
     "reads",
     "NOTEBOOK_EXTENSIONS",
