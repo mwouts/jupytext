@@ -37,12 +37,14 @@ When Jupytext is installed, `.py` and `.md` files have a notebook icon. And you 
 <details>
   <summary>With a click on the text file in Jupyter Notebook</summary>
 
-![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/TextNotebooks.png)
+[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/TextNotebooks.png)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)
+(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo))
 </details>
 <details>
   <summary>With a right click and <i>open with notebook</i> in Jupyter Lab</summary>
 
-![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/ContextMenuLab.png)
+[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/ContextMenuLab.png)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb)
+(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb))
 </details>
 </ul>
 
