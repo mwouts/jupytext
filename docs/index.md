@@ -21,9 +21,21 @@ You can install Jupytext with
 
 Then, restart your Jupyter server (for more installation details, see the [install section](install.md) in the documentation).
 
-## Paired notebooks
+When Jupytext is installed, `.py` and `.md` files have a notebook icon. And you can really open and run these files as notebooks
+<ul>
+<details>
+  <summary>With a click on the text file in Jupyter Notebook</summary>
 
-When Jupytext is installed, `.py` and `.md` files have a notebook icon. And you can really open and run these file as notebooks in Jupyter (single click in Jupyter Notebook; right click, _open with notebook_ in Jupyter Lab).
+![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/TextNotebooks.png)
+</details>
+<details>
+  <summary>With a right click and <i>open with notebook</i> in Jupyter Lab</summary>
+
+![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/ContextMenuLab.png)
+</details>
+</ul>
+
+## Paired notebooks
 
 The most convenient way to use Jupytext is probably through [paired notebooks](paired-notebooks.md).
 
