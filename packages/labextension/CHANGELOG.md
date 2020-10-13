@@ -1,3 +1,8 @@
+# 1.2.2 (2020-10-13)
+
+- The description of the `jupyterlab-jupytext` extension was updated (#654)
+- The explicit dependency on the `jupytext` Python package was documented in `package.json` (#654)
+
 # 1.2.1 (2020-03-18)
 
 - The extension can pair a notebook to the new MyST Markdown format, developed by the [ExecutableBookProject](https://github.com/ExecutableBookProject) team. Thanks to Chris Sewell for his PRs! (#447 #456 #458)
