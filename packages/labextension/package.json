@@ -1,7 +1,7 @@
 {
   "name": "jupyterlab-jupytext",
-  "version": "1.2.1",
-  "description": "A JupyterLab extension for Jupytext",
+  "version": "1.2.2",
+  "description": "Save Jupyter Notebooks as Scripts or Markdown files that work well with version control & external text editors",
   "keywords": [
     "jupyter",
     "jupytext",
@@ -29,6 +29,21 @@
     "clean": "rimraf lib",
     "prepare": "npm run clean && npm run build",
     "watch": "tsc -w"
+  },
+  "jupyterlab": {
+    "discovery": {
+      "server": {
+        "managers": [
+          "pip",
+          "conda"
+        ],
+        "base": {
+          "name": "jupytext"
+        }
+      }
+    },
+    "extension": true,
+    "schemaDir": "schema"
   },
   "dependencies": {
     "@jupyterlab/application": "^2.0",
