@@ -1,5 +1,5 @@
 import pytest
-from nbformat.v4.nbbase import new_notebook
+from nbformat.v4.nbbase import new_notebook, new_code_cell
 from jupytext import reads, writes
 from jupytext.metadata_filter import filter_metadata, metadata_filter_as_dict
 
@@ -120,3 +120,25 @@ def test_filter_nested_metadata():
 
     # That one is not supported yet
     # assert filter_metadata(metadata, 'I.1.a', '-I') == {'I': {'1': {'a': 1}}}
+
+
+def test_filter_out_execution_metadata():
+    nb = new_notebook(
+        cells=[
+            new_code_cell(
+                "1 + 1",
+                metadata={
+                    "execution": {
+                        "iopub.execute_input": "2020-10-12T19:13:45.306603Z",
+                        "iopub.status.busy": "2020-10-12T19:13:45.306233Z",
+                        "iopub.status.idle": "2020-10-12T19:13:45.316103Z",
+                        "shell.execute_reply": "2020-10-12T19:13:45.315429Z",
+                        "shell.execute_reply.started": "2020-10-12T19:13:45.306577Z",
+                    }
+                },
+            )
+        ]
+    )
+
+    text = writes(nb, fmt="py:percent")
+    assert "execution" not in text
