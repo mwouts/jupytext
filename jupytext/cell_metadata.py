@@ -56,6 +56,7 @@ _IGNORE_CELL_METADATA = ",".join(
         "collapsed",
         "scrolled",
         "trusted",
+        "execution",
         "ExecuteTime",
     ]
     + _JUPYTEXT_CELL_METADATA
