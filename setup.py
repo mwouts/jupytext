@@ -53,7 +53,7 @@ setup(
         ),
         (
             "share/jupyter/lab/extensions",
-            ["packages/labextension/jupyterlab-jupytext-1.2.2.tgz"],
+            ["packages/labextension/jupyterlab-jupytext-1.2.3.tgz"],
         ),
     ],
     entry_points={"console_scripts": ["jupytext = jupytext.cli:jupytext"]},
