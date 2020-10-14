@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-jupytext",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Save Jupyter Notebooks as Scripts or Markdown files that work well with version control & external text editors",
   "keywords": [
     "jupyter",
@@ -54,8 +54,5 @@
   "devDependencies": {
     "rimraf": "^3.0.0",
     "typescript": "~3.7.3"
-  },
-  "jupyterlab": {
-    "extension": true
   }
 }

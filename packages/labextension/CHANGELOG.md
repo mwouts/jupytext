@@ -1,3 +1,7 @@
+# 1.2.3 (2020-10-14)
+
+- Remove duplicate `jupyterlab` entry in `package.json` (#654)
+
 # 1.2.2 (2020-10-13)
 
 - The description of the `jupyterlab-jupytext` extension was updated (#654)
