@@ -15,11 +15,13 @@
 - The GitHub actions run on both push events and pull requests, and duplicate jobs are skipped (#605)
 - Jupytext has a `tox.ini` file, thanks to Chris Sewell (#605)
 - Jupytext is tested against Python 3.9
+- The `execution` cell metadata is now filtered by default (#656)
 
 **Fixed**
 - Optional dependency on `sphinx-gallery` frozen to version `~=0.7.0` (#614)
 - Codecov/patch reports should be OK now (#639)
 - Jupytext tests work on non-English locales (#636)
+- Cell metadata that are already present in text notebook can be filtered out using a config file (#656)
 
 
 1.6.0 (2020-09-01)
