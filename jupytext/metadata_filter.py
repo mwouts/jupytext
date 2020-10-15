@@ -81,7 +81,15 @@ def metadata_filter_as_string(metadata_filter):
 def update_metadata_filters(metadata, jupyter_md, cell_metadata):
     """Update or set the notebook and cell metadata filters"""
 
-    if "cell_metadata_filter" in metadata.get("jupytext", {}):
+    if not jupyter_md:
+        # Set a metadata filter equal to the current metadata in script
+        metadata.setdefault("jupytext", {})["notebook_metadata_filter"] = "-all"
+        metadata["jupytext"].setdefault(
+            "cell_metadata_filter",
+            metadata_filter_as_string({"additional": cell_metadata, "excluded": "all"}),
+        )
+    elif "cell_metadata_filter" in metadata.get("jupytext", {}):
+        # Update the existing metadata filter
         metadata_filter = metadata_filter_as_dict(
             metadata.get("jupytext", {})["cell_metadata_filter"]
         )
@@ -97,14 +105,6 @@ def update_metadata_filters(metadata, jupyter_md, cell_metadata):
         metadata.setdefault("jupytext", {})[
             "cell_metadata_filter"
         ] = metadata_filter_as_string(metadata_filter)
-
-    if not jupyter_md:
-        # Set a metadata filter equal to the current metadata in script
-        cell_metadata = {"additional": cell_metadata, "excluded": "all"}
-        metadata.setdefault("jupytext", {})["notebook_metadata_filter"] = "-all"
-        metadata.setdefault("jupytext", {})[
-            "cell_metadata_filter"
-        ] = metadata_filter_as_string(cell_metadata)
     else:
         # Update the notebook metadata filter to include existing entries 376
         nb_md_filter = (
