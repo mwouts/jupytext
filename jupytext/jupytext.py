@@ -407,7 +407,7 @@ def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, **kwargs):
 
 
 def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
-    """Write a notebook to a file name or a file object
+    """Return text representation of the notebook
 
     :param notebook: the notebook
     :param fmt: the jupytext format like `md`, `py:percent`, ...
