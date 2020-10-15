@@ -1,6 +1,7 @@
 import pytest
 from nbformat.v4.nbbase import new_notebook, new_code_cell
 from jupytext import reads, writes
+from jupytext.cli import jupytext as jupytext_cli
 from jupytext.metadata_filter import filter_metadata, metadata_filter_as_dict
 
 
@@ -142,3 +143,28 @@ def test_filter_out_execution_metadata():
 
     text = writes(nb, fmt="py:percent")
     assert "execution" not in text
+
+
+def test_default_config_has_priority_over_current_metadata(
+    tmpdir,
+    text="""# %% some_metadata_key=5
+1 + 1
+""",
+):
+    py_file = tmpdir.join("notebook.py")
+    py_file.write(text)
+
+    cfg_file = tmpdir.join("jupytext.toml")
+    cfg_file.write(
+        """default_jupytext_formats = "ipynb,py:percent"
+default_cell_metadata_filter = "-some_metadata_key"
+"""
+    )
+
+    jupytext_cli([str(py_file), "--sync"])
+    assert (
+        py_file.read()
+        == """# %%
+1 + 1
+"""
+    )
