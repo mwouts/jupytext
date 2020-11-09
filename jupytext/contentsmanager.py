@@ -300,15 +300,15 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     + timedelta(seconds=config.outdated_text_notebook_margin)
                 ):
                     raise HTTPError(
-                        500,
+                        400,
                         """{out} (last modified {out_last})
                         seems more recent than {src} (last modified {src_last})
                         Please either:
                         - open {src} in a text editor, make sure it is up to date, and save it,
                         - or delete {src} if not up to date,
                         - or increase check margin by adding, say,
-                            c.ContentsManager.outdated_text_notebook_margin = 5 # in seconds # or float("inf")
-                        to your .jupyter/jupyter_notebook_config.py file
+                            outdated_text_notebook_margin = 5  # default is 1 (second)
+                        to your jupytext.toml file
                         """.format(
                             src=inputs.path,
                             src_last=inputs.timestamp,
