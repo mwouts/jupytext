@@ -52,6 +52,8 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --statistics
       - name: Install from source (required for the pre-commit tests)
         run: pip install .
+      - name: Install a Jupyter Kernel
+        run: python -m ipykernel install --name python_kernel --user
       - name: Test with pytest
         run: pytest --cov=./ --cov-report=xml
       - name: Upload coverage
