@@ -114,6 +114,6 @@ def read_pair(inputs, outputs, read_one_file):
     check_file_version(notebook, inputs.path, outputs.path)
 
     outputs = read_one_file(outputs.path, outputs.fmt)
-    combine_inputs_with_outputs(notebook, outputs, fmt=inputs.fmt)
+    notebook = combine_inputs_with_outputs(notebook, outputs, fmt=inputs.fmt)
 
     return notebook

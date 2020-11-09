@@ -34,7 +34,7 @@ def h(x):
 
     text = writes(nb1, "py:nomarker")
     nb2 = reads(text, "py:nomarker")
-    combine_inputs_with_outputs(nb2, nb1, "py:nomarker")
+    nb2 = combine_inputs_with_outputs(nb2, nb1, "py:nomarker")
     nb2.metadata.pop("jupytext")
 
     assert len(nb2.cells) == 7
@@ -47,7 +47,7 @@ def h(x):
     with pytest.warns(DeprecationWarning, match="nomarker"):
         nb3 = reads(text, "py:bare")
     with pytest.warns(DeprecationWarning, match="nomarker"):
-        combine_inputs_with_outputs(nb3, nb2, "py:bare")
+        nb3 = combine_inputs_with_outputs(nb3, nb2, "py:bare")
     nb3.metadata.pop("jupytext")
 
     compare(nb3, nb2)
