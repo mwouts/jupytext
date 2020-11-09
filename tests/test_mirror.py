@@ -94,7 +94,7 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
 
         compare_notebooks(nb_mirror, notebook, fmt)
 
-        combine_inputs_with_outputs(nb_mirror, notebook)
+        nb_mirror = combine_inputs_with_outputs(nb_mirror, notebook)
         compare_notebooks(nb_mirror, notebook, fmt, compare_outputs=True)
 
 

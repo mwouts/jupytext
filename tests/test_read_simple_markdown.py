@@ -482,7 +482,7 @@ a raw cell
     for cell in nb_meta.cells:
         cell.metadata = {"key": "value"}
 
-    combine_inputs_with_outputs(nb_source, nb_meta)
+    nb_source = combine_inputs_with_outputs(nb_source, nb_meta)
     for cell in nb_source.cells:
         assert cell.metadata == {"key": "value"}, cell.source
 

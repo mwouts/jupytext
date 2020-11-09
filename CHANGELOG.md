@@ -1,4 +1,4 @@
-1.7.0-rc0 (2020-10-05)
+1.7.0-rc1 (2020-11-09)
 ----------------------
 
 **Changed**
@@ -23,6 +23,7 @@
 - Codecov/patch reports should be OK now (#639)
 - Jupytext tests work on non-English locales (#636)
 - Cell metadata that are already present in text notebook can be filtered out using a config file (#656)
+- Optional cell attributes like attachments are preserved (#671)
 
 
 1.6.0 (2020-09-01)

@@ -334,7 +334,7 @@ def test_round_trip_conversion(
     round_trip = reads(text, fmt)
 
     if update:
-        combine_inputs_with_outputs(round_trip, notebook, fmt)
+        round_trip = combine_inputs_with_outputs(round_trip, notebook, fmt)
 
     compare_notebooks(
         round_trip,

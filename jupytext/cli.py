@@ -663,7 +663,7 @@ def jupytext_single_file(nb_file, args, log):
                 raise ValueError("--update is only for ipynb files")
             action = " (destination file updated)"
             check_file_version(notebook, nb_file, nb_dest)
-            combine_inputs_with_outputs(notebook, read(nb_dest), fmt=fmt)
+            notebook = combine_inputs_with_outputs(notebook, read(nb_dest), fmt=fmt)
         elif os.path.isfile(nb_dest):
             action = " (destination file replaced)"
         else:
@@ -909,7 +909,7 @@ def pipe_notebook(notebook, command, fmt="py:percent", update=True, prefix=None)
         piped_notebook = reads(cmd_output.decode("utf-8"), fmt)
 
     if fmt["extension"] != ".ipynb":
-        combine_inputs_with_outputs(piped_notebook, notebook, fmt)
+        piped_notebook = combine_inputs_with_outputs(piped_notebook, notebook, fmt)
 
     # Remove jupytext / text_representation entry
     piped_notebook.metadata.pop("jupytext")

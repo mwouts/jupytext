@@ -1,6 +1,8 @@
 """Combine source and outputs from two notebooks
 """
 import re
+from copy import copy
+from nbformat import NotebookNode
 from .cell_metadata import _IGNORE_CELL_METADATA
 from .header import _DEFAULT_NOTEBOOK_METADATA
 from .metadata_filter import restore_filtered_metadata
@@ -30,7 +32,8 @@ def same_content(ref, test, endswith=False):
 
 
 def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
-    """Copy outputs and metadata of the second notebook into the first one."""
+    """Return a notebook that combines the text and metadata from the first notebook,
+    with the outputs and metadata of the second notebook."""
     # nbformat version number taken from the notebook with outputs
     assert (
         nb_outputs.nbformat == nb_source.nbformat
@@ -44,7 +47,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     ext = fmt.get("extension") or text_repr.get("extension")
     format_name = fmt.get("format_name") or text_repr.get("format_name")
 
-    nb_source.metadata = restore_filtered_metadata(
+    nb_metadata = restore_filtered_metadata(
         nb_source.metadata,
         nb_outputs.metadata,
         nb_source.metadata.get("jupytext", {}).get("notebook_metadata_filter"),
@@ -54,56 +57,62 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     source_is_md_version_one = (
         ext in [".md", ".markdown", ".Rmd"] and text_repr.get("format_version") == "1.0"
     )
-    if nb_source.metadata.get("jupytext", {}).get("formats") or ext in [
+    if nb_metadata.get("jupytext", {}).get("formats") or ext in [
         ".md",
         ".markdown",
         ".Rmd",
     ]:
-        nb_source.metadata.get("jupytext", {}).pop("text_representation", None)
+        nb_metadata.get("jupytext", {}).pop("text_representation", None)
 
-    if not nb_source.metadata.get("jupytext", {}):
-        nb_source.metadata.pop("jupytext", {})
+    if not nb_metadata.get("jupytext", {}):
+        nb_metadata.pop("jupytext", {})
 
     if format_name in ["nomarker", "sphinx"] or source_is_md_version_one:
         cell_metadata_filter = "-all"
     else:
-        cell_metadata_filter = nb_source.metadata.get("jupytext", {}).get(
+        cell_metadata_filter = nb_metadata.get("jupytext", {}).get(
             "cell_metadata_filter"
         )
 
     outputs_map = map_outputs_to_inputs(nb_source.cells, nb_outputs.cells)
 
-    for cell, j in zip(nb_source.cells, outputs_map):
-        # Remove outputs to warranty that trust of returned notebook is that of second notebook
-        if cell.cell_type == "code":
-            cell.execution_count = None
-            cell.outputs = []
+    cells = []
+    for source_cell, j in zip(nb_source.cells, outputs_map):
+        if j is None:
+            cells.append(source_cell)
+            continue
 
-            if j is not None:
-                ocell = nb_outputs.cells[j]
-                cell.execution_count = ocell.execution_count
-                cell.outputs = ocell.outputs
+        output_cell = nb_outputs.cells[j]
 
-                # Restore the filtered output cell metadata
-                cell.metadata = restore_filtered_metadata(
-                    cell.metadata,
-                    ocell.metadata,
-                    cell_metadata_filter,
-                    _IGNORE_CELL_METADATA,
-                )
-        else:
-            if j is not None:
-                ocell = nb_outputs.cells[j]
+        # Outputs and optional attributes are taken from the notebook with outputs
+        cell = copy(output_cell)
 
-                # The 'spin' format does not allow metadata on non-code cells
-                cell.metadata = restore_filtered_metadata(
-                    cell.metadata,
-                    ocell.metadata,
-                    "-all" if format_name == "spin" else cell_metadata_filter,
-                    _IGNORE_CELL_METADATA,
-                )
+        # Cell text is taken from the source notebook
+        cell.source = source_cell.source
 
-    return nb_source
+        # We also restore the cell metadata that has been filtered
+        cell.metadata = restore_filtered_metadata(
+            source_cell.metadata,
+            output_cell.metadata,
+            # The 'spin' format does not allow metadata on non-code cells
+            "-all"
+            if format_name == "spin" and source_cell.cell_type != "code"
+            else cell_metadata_filter,
+            _IGNORE_CELL_METADATA,
+        )
+
+        cells.append(cell)
+
+    # We call NotebookNode rather than new_notebook as we don't want to validate
+    # the notebook (some of the notebook in the collection of test notebooks
+    # do have some invalid properties - probably inherited from an older version
+    # of the notebook format).
+    return NotebookNode(
+        cells=cells,
+        metadata=nb_metadata,
+        nbformat=nb_outputs.nbformat,
+        nbformat_minor=nb_outputs.nbformat_minor,
+    )
 
 
 def map_outputs_to_inputs(cells_inputs, cells_outputs):

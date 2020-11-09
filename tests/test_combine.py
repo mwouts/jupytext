@@ -2,7 +2,7 @@ import pytest
 from copy import deepcopy
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 from jupytext.combine import combine_inputs_with_outputs
-from jupytext.compare import compare_notebooks
+from jupytext.compare import compare_notebooks, compare
 import jupytext
 from .utils import list_notebooks
 
@@ -32,7 +32,7 @@ def test_combine():
     nb_outputs.cells[2].outputs = ["4"]
     nb_outputs.cells[3].outputs = ["5"]
 
-    combine_inputs_with_outputs(nb_source, nb_outputs)
+    nb_source = combine_inputs_with_outputs(nb_source, nb_outputs)
 
     assert nb_source.cells[2].outputs == ["4"]
     assert nb_source.cells[3].outputs == []
@@ -139,7 +139,7 @@ def test_combine_stable(nb_file):
     for cell in nb_source.cells:
         cell.outputs = []
 
-    combine_inputs_with_outputs(nb_source, nb_outputs)
+    nb_source = combine_inputs_with_outputs(nb_source, nb_outputs)
     compare_notebooks(nb_source, nb_org)
 
 
@@ -171,7 +171,7 @@ def test_combine_reorder():
     nb_outputs.cells[3].outputs = ["2"]
     nb_outputs.cells[4].outputs = ["6"]
 
-    combine_inputs_with_outputs(nb_source, nb_outputs)
+    nb_source = combine_inputs_with_outputs(nb_source, nb_outputs)
 
     assert nb_source.cells[1].outputs == ["2"]
     assert nb_source.cells[2].outputs == ["4"]
@@ -186,7 +186,7 @@ def test_combine_split():
 
     nb_outputs.cells[0].outputs = ["4"]
 
-    combine_inputs_with_outputs(nb_source, nb_outputs)
+    nb_source = combine_inputs_with_outputs(nb_source, nb_outputs)
 
     assert nb_source.cells[0].outputs == []
     assert nb_source.cells[1].outputs == ["4"]
@@ -204,8 +204,26 @@ def test_combine_refactor():
     nb_outputs.cells[1].outputs = ["2"]
     nb_outputs.cells[2].outputs = ["3"]
 
-    combine_inputs_with_outputs(nb_source, nb_outputs)
+    nb_source = combine_inputs_with_outputs(nb_source, nb_outputs)
 
     assert nb_source.cells[0].outputs == []
     assert nb_source.cells[1].outputs == ["2"]
     assert nb_source.cells[2].outputs == ["3"]
+
+
+def test_combine_attachments():
+    nb_source = new_notebook(
+        cells=[new_markdown_cell("![image.png](attachment:image.png)")]
+    )
+
+    nb_outputs = new_notebook(
+        cells=[
+            new_markdown_cell(
+                "![image.png](attachment:image.png)",
+                attachments={"image.png": {"image/png": "SOME_LONG_IMAGE_CODE...=="}},
+            )
+        ]
+    )
+
+    nb_source = combine_inputs_with_outputs(nb_source, nb_outputs)
+    compare(nb_source, nb_outputs)
