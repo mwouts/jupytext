@@ -186,7 +186,6 @@ jobs:
 
   publish:
     name: Publish to PyPi
-    needs: [pre-commit, analyse, test-pip, test-conda]
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
