@@ -1,4 +1,7 @@
-1.7.0-rc1 (2020-11-09)
+Jupytext ChangeLog
+==================
+
+1.7.0-rc1 (2020-11-10)
 ----------------------
 
 **Changed**
@@ -9,6 +12,8 @@
 - The `readf` and `writef` functions were dropped (they had been deprecated in favor of `read` and `write` in June 2019, v1.2.0)
 - The description & dependencies of the JupyterLab extension were updated (#654)
 - The `--set-kernel -` command, on a Python notebook, gives an explicit error when no kernel is not found that matches the current Python executable.
+- All the GitHub workflow files were concatenated into a unique file, and we have added an `pypi-publish` step to automatically publish the package on PyPi when new releases are created.
+- The `CHANGELOG.md` file was moved under `docs` to better expose the history of changes.
 
 **Added**
 - Configuration errors are reported in the console and/or in Jupyter (#613)
