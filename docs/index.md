@@ -114,4 +114,5 @@ using-library.md
 examples.md
 faq.md
 tutorials.md
+CHANGELOG.md
 ```
