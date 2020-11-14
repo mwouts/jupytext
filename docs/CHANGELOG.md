@@ -1,8 +1,8 @@
 Jupytext ChangeLog
 ==================
 
-1.7.0-rc1 (2020-11-10)
-----------------------
+1.7.0 (2020-11-14)
+------------------
 
 **Changed**
 - Jupytext's contents manager uses the parent CM's `get` and `save` methods to read and save text files, and explicitly calls `jupytext.reads` and `jupytext.writes` to do the conversion. We don't use `mock` nor internal parent methods any more. Thanks to Max Klein for helping making this work! ([#634](https://github.com/mwouts/jupytext/issues/634), [#635](https://github.com/mwouts/jupytext/issues/635))
