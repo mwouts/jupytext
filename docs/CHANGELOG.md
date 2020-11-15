@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.7.1 (2020-11-16)
+------------------
+
+**Fixed**
+- Text notebooks have the same format and mimetype as ipynb notebooks. This fixes the _File Load Error - content.indexOf is not a function_ error on text notebooks ([#659](https://github.com/mwouts/jupytext/issues/659))
+
+
 1.7.0 (2020-11-14)
 ------------------
 

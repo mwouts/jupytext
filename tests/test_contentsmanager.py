@@ -303,6 +303,32 @@ def test_load_save_py_freeze_metadata(script, tmpdir):
     compare(text_py2, text_py)
 
 
+def test_load_text_notebook(tmpdir):
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    nbpy = "text.py"
+    with open(str(tmpdir.join(nbpy)), "w") as fp:
+        fp.write("# %%\n1 + 1\n")
+
+    py_model = cm.get(nbpy, content=False)
+    assert py_model["type"] == "notebook"
+    assert py_model["content"] is None
+
+    py_model = cm.get(nbpy, content=True)
+    assert py_model["type"] == "notebook"
+    assert "cells" in py_model["content"]
+
+    # The model returned by the CM should match that of a classical ipynb notebook
+    nb_model = dict(
+        type="notebook", content=new_notebook(cells=[new_markdown_cell("A cell")])
+    )
+    cm.save(nb_model, "notebook.ipynb")
+    nb_model = cm.get("notebook.ipynb", content=True)
+    for key in ["format", "mimetype", "type"]:
+        assert nb_model[key] == py_model[key], key
+
+
 @skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
