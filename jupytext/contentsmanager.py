@@ -201,6 +201,10 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 model["type"] = "notebook"
                 config.set_default_format_options(fmt, read=True)
                 if content:
+                    # We may need to update these keys, inherited from text files formats
+                    # Cf. https://github.com/mwouts/jupytext/issues/659
+                    model["format"] = "json"
+                    model["mimetype"] = None
                     try:
                         model["content"] = jupytext.reads(model["content"], fmt=fmt)
                     except Exception as err:
