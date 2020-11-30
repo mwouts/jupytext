@@ -3,6 +3,8 @@ include *.md
 include *.txt
 include *.rst
 
+graft jupytext/labextension
+
 graft tests
 global-exclude *__pycache__
 global-exclude *.pyc
