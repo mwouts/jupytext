@@ -1,5 +1,5 @@
 comment:
-  after_n_builds: 11
+  after_n_builds: 8
 
 coverage:
   status:

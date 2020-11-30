@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.8.0-dev (2020-12-??)
+----------------------
+
+**Changed**
+- Python 2.7 is not explicitly supported any more
+
+
 1.7.1 (2020-11-16)
 ------------------
 
