@@ -25,10 +25,20 @@
     "url": "https://github.com/mwouts/jupytext.git"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rimraf lib",
-    "prepare": "npm run clean && npm run build",
-    "watch": "tsc -w"
+    "build": "jlpm run build:lib && jlpm run build:labextension:dev",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:lib": "tsc",
+    "build:prod": "jlpm run build:lib && jlpm run build:labextension",
+    "clean": "jlpm run clean:lib",
+    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
+    "clean:labextension": "rimraf jupyterlab-jupytext/labextension",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "install:extension": "jupyter labextension develop --overwrite .",
+    "prepare": "jlpm run clean && jlpm run build:prod",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:labextension": "jupyter labextension watch .",
+    "watch:src": "tsc -w"
   },
   "jupyterlab": {
     "discovery": {
@@ -43,16 +53,19 @@
       }
     },
     "extension": true,
-    "schemaDir": "schema"
+    "schemaDir": "schema",
+    "outputDir": "../../jupytext/labextension"
   },
   "dependencies": {
-    "@jupyterlab/application": "^2.0",
-    "@jupyterlab/apputils": "^2.0",
-    "@jupyterlab/notebook": "^2.0",
-    "@jupyterlab/nbformat": "^2.0"
+    "@jupyterlab/application": "^3.0.0",
+    "@jupyterlab/apputils": "^3.0.0",
+    "@jupyterlab/nbformat": "^3.0.0",
+    "@jupyterlab/notebook": "^3.0.0"
   },
   "devDependencies": {
-    "rimraf": "^3.0.0",
-    "typescript": "~3.7.3"
+    "@jupyterlab/builder": "^3.0.0",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "typescript": "~4.0.3"
   }
 }

@@ -16,6 +16,10 @@ except ImportError as err:
     TextFileContentsManager = reraise(err)
 
 
+def _jupyter_labextension_paths():  # pragma: no cover
+    return [{"src": "labextension", "dest": "jupyterlab-jupytext"}]
+
+
 def load_jupyter_server_extension(app):  # pragma: no cover
     """Use Jupytext's contents manager"""
     if hasattr(app.contents_manager_class, "default_jupytext_formats"):
