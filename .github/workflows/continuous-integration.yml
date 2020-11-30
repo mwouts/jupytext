@@ -64,7 +64,7 @@ jobs:
     if: ${{ needs.skip_duplicate.outputs.should_skip == 'false' }}
     strategy:
       matrix:
-        python-version: [ 2.7, 3.5, 3.6, 3.7, 3.8, 3.9 ]
+        python-version: [ 3.5, 3.6, 3.7, 3.8, 3.9 ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -108,11 +108,7 @@ jobs:
     strategy:
       matrix:
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
-        python-version: [ 2.7, 3.7 ]
-        exclude:
-          # This one fails, cf. https://github.com/mwouts/jupytext/runs/736344037
-          - os: windows-latest
-            python-version: 2.7
+        python-version: [ 3.7 ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -148,18 +144,11 @@ jobs:
       - name: Create kernel
         shell: pwsh
         run: |
-          if("${{ matrix.python-version }}" -eq "2.7"){
-            # Fix "ImportError: No module named functools_lru_cache" when running Jupyter commands
-            # Cf. https://github.com/mwouts/jupytext/runs/793874319
-            conda install backports.functools_lru_cache
-          }
           python -m ipykernel install --name jupytext-ci --user
       - name: Install optional dependencies
         shell: pwsh
         run: |
           $ErrorActionPreference='silentlycontinue'
-          # Install mock on Python 2.7
-          conda install mock --freeze-installed
           # install black, isort if available (Python 3.6 and above), and autopep8 for testing the pipe mode
           conda install black --freeze-installed
           conda install isort>=5.3.0 --freeze-installed
