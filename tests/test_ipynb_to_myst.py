@@ -1,7 +1,4 @@
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
+import unittest.mock as mock
 from textwrap import dedent
 import pytest
 from nbformat.v4.nbbase import new_notebook
