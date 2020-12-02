@@ -5,10 +5,7 @@ import sys
 import time
 from io import StringIO
 
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
+import unittest.mock as mock
 import pytest
 import nbformat
 import itertools

@@ -1,10 +1,7 @@
 import os
 import pytest
 
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
+import unittest.mock as mock
 from jupytext.compare import compare
 from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.paired_paths import InconsistentPath, paired_paths, base_path, full_path

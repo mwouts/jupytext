@@ -3,10 +3,7 @@
 import os
 import stat
 
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
+import unittest.mock as mock
 import pytest
 from jupytext.compare import compare
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
