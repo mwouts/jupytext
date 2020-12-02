@@ -9,11 +9,6 @@ from jupytext.pandoc import is_pandoc_available
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from jupytext.myst import is_myst_available
 
-skip_if_dict_is_not_ordered = pytest.mark.skipif(
-    sys.version_info < (3, 6),
-    reason="unordered dict result in changes in chunk options",
-)
-
 
 def tool_version(tool):
     try:

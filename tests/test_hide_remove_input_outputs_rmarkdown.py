@@ -1,10 +1,8 @@
 import pytest
 import jupytext
 from jupytext.compare import compare, compare_notebooks
-from .utils import skip_if_dict_is_not_ordered
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize(
     "md,rmd",
     [
@@ -46,7 +44,6 @@ def test_jupyter_book_options_to_rmarkdown(md, rmd):
     compare(rmd2, rmd)
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize(
     "md,rmd",
     [

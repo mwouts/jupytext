@@ -10,10 +10,8 @@ from nbformat.v4.nbbase import (
 from jupytext.compare import compare, compare_notebooks
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
-from .utils import skip_if_dict_is_not_ordered
 
 
-@skip_if_dict_is_not_ordered
 def test_read_mostly_py_rmd_file(
     rmd="""---
 title: Simple file
