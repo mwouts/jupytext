@@ -16,11 +16,6 @@ except ImportError:
 
 from .languages import _JUPYTER_LANGUAGES
 
-try:
-    unicode  # Python 2
-except NameError:
-    unicode = str  # Python 3
-
 # Map R Markdown's "echo", "results" and "include" to "hide_input" and "hide_output", that are understood by the
 # `runtools` extension for Jupyter notebook, and by nbconvert (use the `hide_input_output.tpl` template).
 # See http://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html
@@ -121,7 +116,7 @@ def metadata_to_rmd_options(language, metadata, use_runtools=False):
                 opt_name,
                 "c({})".format(", ".join(['"{}"'.format(str(v)) for v in opt_value])),
             )
-        elif isinstance(opt_value, (str, unicode)):
+        elif isinstance(opt_value, str):
             if opt_value.startswith("#R_CODE#"):
                 options += " {}={},".format(opt_name, opt_value[8:])
             elif '"' not in opt_value:
@@ -299,7 +294,7 @@ def rmd_options_to_metadata(options, use_runtools=False):
 def try_eval_metadata(metadata, name):
     """Evaluate the metadata to a python object, if possible"""
     value = metadata[name]
-    if not isinstance(value, (str, unicode)):
+    if not isinstance(value, str):
         return
     if (value.startswith('"') and value.endswith('"')) or (
         value.startswith("'") and value.endswith("'")
