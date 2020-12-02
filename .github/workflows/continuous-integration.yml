@@ -64,7 +64,7 @@ jobs:
     if: ${{ needs.skip_duplicate.outputs.should_skip == 'false' }}
     strategy:
       matrix:
-        python-version: [ 3.5, 3.6, 3.7, 3.8, 3.9 ]
+        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -78,10 +78,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-          # install black, isort if available (Python 3.6 and above), and autopep8 for testing the pipe mode
-          pip install black || true
-          pip install isort>=5.3.0 || true
-          pip install autopep8 || true
+          # install black, isort, and autopep8 for testing the pipe mode
+          pip install black
+          pip install isort>=5.3.0
+          pip install autopep8
           # install sphinx_gallery and matplotlib if available (may not work on pypy)
           pip install sphinx_gallery~=0.7.0 || true
           pip install jupyter-fs || true
@@ -149,7 +149,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference='silentlycontinue'
-          # install black, isort if available (Python 3.6 and above), and autopep8 for testing the pipe mode
+          # install black, isort, and autopep8 for testing the pipe mode
           conda install black --freeze-installed
           conda install isort>=5.3.0 --freeze-installed
           conda install autopep8 --freeze-installed
