@@ -1,9 +1,8 @@
 import pytest
 import jupytext
-from .utils import list_notebooks, skip_if_dict_is_not_ordered
+from .utils import list_notebooks
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("r_file", list_notebooks("R_spin"))
 def test_jupytext_same_as_knitr_spin(r_file, tmpdir):
     nb = jupytext.read(r_file)

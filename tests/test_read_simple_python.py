@@ -9,7 +9,7 @@ from nbformat.v4.nbbase import (
 from jupytext.compare import compare
 import jupytext
 from jupytext.compare import compare_notebooks
-from .utils import skip_if_dict_is_not_ordered
+
 import pytest
 
 
@@ -903,7 +903,6 @@ do not impede the correct identification of Markdown cells"""
     compare(script2, script)
 
 
-@skip_if_dict_is_not_ordered
 def test_read_explicit_markdown_cell_with_triple_quote_307(
     script="""# {{{ [md] {"special": "metadata"}
 # some text '''
@@ -981,7 +980,6 @@ Jupyter.utils.load_extensions('jupytext')"""
     compare_notebooks(notebook2, notebook)
 
 
-@skip_if_dict_is_not_ordered
 def test_raw_with_metadata(
     no_jupytext_version_number,
     text="""# + key="value" active=""

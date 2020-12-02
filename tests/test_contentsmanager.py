@@ -21,7 +21,6 @@ from .utils import (
     list_notebooks,
     requires_sphinx_gallery,
     requires_pandoc,
-    skip_if_dict_is_not_ordered,
     notebook_model,
 )
 
@@ -114,7 +113,6 @@ def test_pair_unpair_notebook(tmpdir):
     assert len(nb2.cells[0]["outputs"]) == 0
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb", skip="66"))
 def test_load_save_rename(nb_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
@@ -158,7 +156,6 @@ def test_load_save_rename(nb_file, tmpdir):
     assert not os.path.isfile(str(tmpdir.join("new.Rmd")))
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb", skip="magic"))
 def test_save_load_paired_md_notebook(nb_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
@@ -179,7 +176,6 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
 
 
 @requires_pandoc
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize(
     "nb_file",
     list_notebooks("ipynb", skip="(functional|Notebook with|flavors|invalid|305)"),
@@ -202,7 +198,6 @@ def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
     assert nb_md["content"].metadata["jupytext"]["formats"] == "ipynb,md:pandoc"
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("py_file", list_notebooks("percent"))
 def test_pair_plain_script(py_file, tmpdir, caplog):
     tmp_py = "notebook.py"
@@ -245,7 +240,6 @@ def test_pair_plain_script(py_file, tmpdir, caplog):
     assert "formats" not in nb2.metadata["jupytext"]
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
@@ -277,7 +271,6 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
         cm.rename_file(tmp_nbpy, "suffix_missing.py")
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("script", list_notebooks("python", skip="light"))
 def test_load_save_py_freeze_metadata(script, tmpdir):
     tmp_nbpy = "notebook.py"
@@ -329,7 +322,6 @@ def test_load_text_notebook(tmpdir):
         assert nb_model[key] == py_model[key], key
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
     tmp_ipynb = "1.notebook.ipynb"
@@ -357,7 +349,6 @@ def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
     assert os.path.isfile(str(tmpdir.join("2.new_notebook.py")))
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
@@ -507,7 +498,6 @@ def test_reload_notebook_after_jupytext_cli(nb_file, tmpdir):
     compare_notebooks(nb, nb2)
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("percent"))
 def test_load_save_percent_format(nb_file, tmpdir):
     tmp_py = "notebook.py"
@@ -538,7 +528,6 @@ def test_load_save_percent_format(nb_file, tmpdir):
     compare(text_py2, text_py)
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_julia"))
 def test_save_to_percent_format(nb_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
@@ -563,7 +552,6 @@ def test_save_to_percent_format(nb_file, tmpdir):
     assert metadata["jupytext"]["formats"] == "ipynb,jl:percent"
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
     nb = read(nb_file)
@@ -613,7 +601,6 @@ def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
     assert nb_py.metadata["jupytext"]["text_representation"]["format_name"] == "percent"
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
@@ -650,7 +637,6 @@ def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
     assert not os.path.isfile(str(tmpdir.join("other/notebook.ipynb")))
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py", skip="many hash"))
 def test_kernelspec_are_preserved(nb_file, tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
@@ -679,7 +665,6 @@ def test_kernelspec_are_preserved(nb_file, tmpdir):
     compare_notebooks(model2["content"], model["content"])
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
@@ -721,7 +706,6 @@ def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     compare_notebooks(model["content"], nb)
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 def test_pair_notebook_with_dot(nb_file, tmpdir):
     # Reproduce issue #138
@@ -1129,7 +1113,6 @@ def test_global_pairing_allows_to_save_other_file_types(nb_file, tmpdir):
     compare_notebooks(nb2, nb)
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("R"))
 def test_python_kernel_preserves_R_files(nb_file, tmpdir):
     """Opening a R file with a Jupyter server that has no R kernel should not modify the file"""
@@ -1697,7 +1680,6 @@ def test_multiple_pairing(tmpdir):
     assert model_py["last_modified"] <= model_md["last_modified"]
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 def test_filter_jupytext_version_information_416(nb_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))

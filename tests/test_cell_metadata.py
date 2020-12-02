@@ -13,7 +13,6 @@ from jupytext.cell_metadata import (
 )
 from jupytext.cell_metadata import text_to_metadata, metadata_to_text
 from jupytext.metadata_filter import filter_metadata
-from .utils import skip_if_dict_is_not_ordered
 
 SAMPLES = [
     ("r", ("R", {})),
@@ -60,7 +59,6 @@ def test_parse_rmd_options(options, language_and_metadata):
     compare(rmd_options_to_metadata(options), language_and_metadata)
 
 
-@skip_if_dict_is_not_ordered
 @pytest.mark.parametrize("options,language_and_metadata", SAMPLES)
 def test_build_options(options, language_and_metadata):
     compare(metadata_to_rmd_options(*language_and_metadata), options)
@@ -100,9 +98,6 @@ def test_try_eval_metadata():
     try_eval_metadata(metadata, "list")
     try_eval_metadata(metadata, "c")
     assert metadata == {"list": ["a", 5], "c": [1, 2, 3]}
-
-
-pytestmark = skip_if_dict_is_not_ordered
 
 
 def test_language_no_metadata(text="python", value=("python", {})):
