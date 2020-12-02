@@ -58,13 +58,7 @@ setup(
     ],
     entry_points={"console_scripts": ["jupytext = jupytext.cli:jupytext"]},
     tests_require=["pytest"],
-    install_requires=[
-        "markdown-it-py~=0.5.2; python_version >= '3.6'",
-        "nbformat>=4.0.0",
-        "pyyaml",
-        "toml",
-        'mock; python_version<"3"',
-    ],
+    install_requires=["markdown-it-py~=0.5.2", "nbformat>=4.0.0", "pyyaml", "toml"],
     extras_require={
         # left for back-compatibility
         "myst": [],
@@ -82,7 +76,6 @@ setup(
         "Topic :: Text Processing :: Markup",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
