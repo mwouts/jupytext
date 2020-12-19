@@ -12,9 +12,9 @@ import yaml
 
 try:
     from markdown_it import MarkdownIt
-    from markdown_it.extensions.front_matter import front_matter_plugin
-    from markdown_it.extensions.myst_blocks import myst_block_plugin
-    from markdown_it.extensions.myst_role import myst_role_plugin
+    from mdit_py_plugins.front_matter import front_matter_plugin
+    from mdit_py_plugins.myst_blocks import myst_block_plugin
+    from mdit_py_plugins.myst_role import myst_role_plugin
 except ImportError:
     MarkdownIt = None
 
@@ -32,7 +32,7 @@ def raise_if_myst_is_not_available():
     if not is_myst_available():
         raise ImportError(
             "The MyST Markdown format requires python >= 3.6 "
-            "and markdown-it-py~=0.5.2"
+            "and markdown-it-py~=0.6.0"
         )
 
 
