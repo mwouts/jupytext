@@ -1,11 +1,12 @@
 Jupytext ChangeLog
 ==================
 
-1.8.0-dev (2020-12-??)
-----------------------
+1.8.0 (2020-12-22)
+------------------
 
 **Changed**
-- Python 2.7 is not explicitly supported any more
+- Removed support for Python 2.7 and 3.5, a preliminary step towards a JupyterLab 3.0-compatible extension (#683)
+- The MyST Markdown format uses markdown-it-py~=0.6.0 (#692)
 
 
 1.7.1 (2020-11-16)
