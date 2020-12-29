@@ -7,17 +7,3 @@
   args:
     - --to
     - py:percent
-
-- id: unstage-notebooks
-  name: unstage-notebooks
-  description: Unstage any staged notebooks, changes will not be committed
-  language: python
-  files: .ipynb
-  entry: git reset HEAD --
-
-- id: remove-notebooks
-  name: remove-notebooks
-  description: Remove any committed notebooks, they will no longer be tracked
-  language: python
-  files: .ipynb
-  entry: git rm --cached --
