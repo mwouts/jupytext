@@ -4,7 +4,7 @@
   language: python
   entry: jupytext --pre-commit
   pass_filenames: false
-  types: [jupyter]
+  files: .ipynb
   args:
     - --to
     - py:percent
@@ -13,12 +13,12 @@
   name: unstage-notebooks
   description: Unstage any staged notebooks, changes will not be committed
   language: python
-  types: [jupyter]
+  files: .ipynb
   entry: git reset HEAD --
 
 - id: remove-notebooks
   name: remove-notebooks
   description: Remove any committed notebooks, they will no longer be tracked
   language: python
-  types: [jupyter]
+  files: .ipynb
   entry: git rm --cached --
