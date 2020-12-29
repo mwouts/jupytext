@@ -27,30 +27,39 @@ Note that these hooks do not update the `.ipynb` notebook when you pull. Make su
 
 ## Using Jupytext with the pre-commit package manager
 
-Using Jupytext with the [pre-commit package manager](https://pre-commit.com/) is another option. You could add the following to your `.pre-commit-config.yaml` file:
+Using Jupytext with the [pre-commit package manager](https://pre-commit.com/) is another option. You could add the following to your `.pre-commit-config.yaml` file to convert all staged notebooks to python scripts in `py:percent` format (the default):
 ```
 repos:
--   repo: local
+-   repo: https://github.com/mwouts/jupytext
+    rev: master
     hooks:
     - id: jupytext
-      name: jupytext
-      entry: jupytext --to md
-      files: .ipynb
-      language: python
 ```
 
-Here is another `.pre-commit-config.yaml` example that uses the --pre-commit mode of Jupytext to convert all `.ipynb` notebooks to `py:light` representation and unstage the `.ipynb` files before committing.
+You can also provide arguments to Jupytext in pre-commit, for example to produce several kinds of output files:
 ```
 repos:
+-   repo: https://github.com/mwouts/jupytext
+    rev: master
+    hooks:
+    - id: jupytext
+      args: [--from, ipynb, --to, py:light]
+    - id: jupytext
+      args: [--from, ipynb, --to, html]
+```
+
+Here is another `.pre-commit-config.yaml` example that converts all `.ipynb` notebooks to `py:light` representation and unstage the `.ipynb` files before committing.
+```
+repos:
+  - 
+    repo: https://github.com/mwouts/jupytext
+    rev: master
+    hooks:
+      - id: jupytext
+        args: [--from, ipynb, --to, py:light]
   -
     repo: local
     hooks:
-      -
-        id: jupytext
-        name: jupytext
-        entry: jupytext --from ipynb --to py:light --pre-commit
-        pass_filenames: false
-        language: python
       -
         id: unstage-ipynb
         name: unstage-ipynb
