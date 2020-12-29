@@ -1,10 +1,9 @@
-- id: convert-notebooks
-  name: convert-notebooks
+- id: jupytext
+  name: jupytext
   description: Convert all notebooks into another format, output will be tracked
   language: python
   entry: jupytext --pre-commit
   pass_filenames: false
-  files: .ipynb
   args:
     - --to
     - py:percent
