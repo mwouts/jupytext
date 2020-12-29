@@ -5,5 +5,7 @@
   entry: jupytext --pre-commit
   pass_filenames: false
   args:
+    - --from
+    - ipynb
     - --to
     - py:percent
