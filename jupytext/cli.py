@@ -91,7 +91,8 @@ def parse_jupytext_args(args=None):
         "--add-untracked",
         action="store_true",
         help="Add any newly created or untracked output files to the "
-        "git index."
+        "git index. In this case Jupytext will exit with a non-zero code "
+        "to alert that the index has been modified."
     )
     parser.add_argument(
         "--from",
