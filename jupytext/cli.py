@@ -88,6 +88,12 @@ def parse_jupytext_args(args=None):
         "extension that matches the (optional) --from argument.",
     )
     parser.add_argument(
+        "--add-untracked",
+        action="store_true",
+        help="Add any newly created or untracked output files to the "
+        "git index."
+    )
+    parser.add_argument(
         "--from",
         dest="input_format",
         help="Jupytext format for the input(s). Inferred from the "
@@ -679,7 +685,7 @@ def jupytext_single_file(nb_file, args, log):
             )
         )
         write(notebook, nb_dest, fmt=dest_fmt)
-        if args.pre_commit:
+        if args.pre_commit or (args.add_untracked and is_untracked(nb_dest)):
             system("git", "add", nb_dest)
 
     # c. Synchronize paired notebooks
@@ -729,6 +735,12 @@ def notebooks_in_git_index(fmt):
         except InconsistentPath:
             continue
     return files
+
+
+def is_untracked(filepath):
+    """Check whether a file is untracked by the git index"""
+    output = system("git", "ls-files", filepath)
+    return output != ""
 
 
 def print_paired_paths(nb_file, fmt):
