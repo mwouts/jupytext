@@ -740,7 +740,7 @@ def notebooks_in_git_index(fmt):
 def is_untracked(filepath):
     """Check whether a file is untracked by the git index"""
     output = system("git", "ls-files", filepath)
-    return output != ""
+    return output == ""
 
 
 def print_paired_paths(nb_file, fmt):
