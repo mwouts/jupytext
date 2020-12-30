@@ -655,6 +655,7 @@ def jupytext_single_file(nb_file, args, log):
         return 0
 
     # b. Output to the desired file or format
+    nb_dest_newly_added = False
     if nb_dest:
         if nb_dest == nb_file and not dest_fmt:
             dest_fmt = fmt
@@ -685,7 +686,10 @@ def jupytext_single_file(nb_file, args, log):
             )
         )
         write(notebook, nb_dest, fmt=dest_fmt)
-        if args.pre_commit or (args.add_untracked and is_untracked(nb_dest)):
+        if args.pre_commit:
+            system("git", "add", nb_dest)
+        elif args.add_untracked and is_untracked(nb_dest):
+            nb_dest_newly_added = True
             system("git", "add", nb_dest)
 
     # c. Synchronize paired notebooks
@@ -717,7 +721,8 @@ def jupytext_single_file(nb_file, args, log):
         log("[jupytext] Sync timestamp of '{}'".format(nb_file))
         os.utime(nb_file, None)
 
-    return 0
+    # return nonzero if the git index was modified by --add-untracked
+    return 0 if not nb_dest_newly_added else 1
 
 
 def notebooks_in_git_index(fmt):
