@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.8.2 (2021-01-04)
+------------------
+
+**Changed**
+- Jupytext 1.8.2 depends on `python>=3.6`. The last version of Jupytext explicitly tested with Python 2.7 and 3.5 was Jupytext 1.7.1, cf. [#697](https://github.com/mwouts/jupytext/issues/697).
+
+
 1.8.1 (2021-01-03)
 ------------------
 

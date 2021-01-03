@@ -58,12 +58,8 @@ setup(
     ],
     entry_points={"console_scripts": ["jupytext = jupytext.cli:jupytext"]},
     tests_require=["pytest"],
-    install_requires=[
-        "markdown-it-py~=0.6.0; python_version >= '3.6'",
-        "nbformat>=4.0.0",
-        "pyyaml",
-        "toml",
-    ],
+    install_requires=["nbformat>=4.0.0", "pyyaml", "toml", "markdown-it-py~=0.6.0"],
+    python_requires="~=3.6",
     extras_require={
         # left for back-compatibility
         "myst": [],
