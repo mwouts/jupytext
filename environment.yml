@@ -3,7 +3,7 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python
+  - python>=3.6
   - jupyter
   - jupyterlab
   - pyyaml
