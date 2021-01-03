@@ -8,6 +8,7 @@ dependencies:
   - jupyterlab
   - pyyaml
   - toml
+  - markdown-it-py~=0.6.0
   - nbconvert
   - ipykernel
   - jupyter_contrib_nbextensions
@@ -32,4 +33,3 @@ dependencies:
   - tox-conda
   - pip:
     - sphinx_copybutton
-    - myst_parser

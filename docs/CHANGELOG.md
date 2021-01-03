@@ -1,12 +1,19 @@
 Jupytext ChangeLog
 ==================
 
+1.8.1 (2021-01-03)
+------------------
+
+**Changed**
+- The dependency on `markdown-it-py` is conditional on `python>=3.6` ([#697](https://github.com/mwouts/jupytext/issues/697))
+
+
 1.8.0 (2020-12-22)
 ------------------
 
 **Changed**
 - Removed support for Python 2.7 and 3.5, a preliminary step towards a JupyterLab 3.0-compatible extension ([#683](https://github.com/mwouts/jupytext/issues/683))
-- The MyST Markdown format uses markdown-it-py~=0.6.0 ([#692](https://github.com/mwouts/jupytext/issues/692))
+- The MyST Markdown format uses `markdown-it-py~=0.6.0` ([#692](https://github.com/mwouts/jupytext/issues/692))
 
 
 1.7.1 (2020-11-16)
