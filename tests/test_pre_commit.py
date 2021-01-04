@@ -8,7 +8,7 @@ import pytest
 from jupytext.compare import compare
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from jupytext import read, write
-from jupytext.cli import jupytext, system
+from jupytext.cli import jupytext, system, is_untracked
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 from .utils import requires_black, requires_flake8, requires_pandoc
@@ -364,3 +364,69 @@ def test_wrap_markdown_cell(tmpdir):
     text = nb.cells[0].source
     assert len(text.splitlines()) >= 2
     assert text != long_text
+
+
+def test_is_untracked(tmpdir):
+    git = git_in_tmpdir(tmpdir)
+
+    # make a test file
+    file = tmpdir.join("test.txt")
+    file.write("test file\n")
+
+    with tmpdir.as_cwd():
+        # untracked
+        assert is_untracked(file)
+
+        # added, not committed
+        git("add", file)
+        assert not is_untracked(file)
+
+        # committed
+        git("commit", "-m", "'test'")
+        assert not is_untracked(file)
+
+
+def test_add_untracked_adds_new(tmpdir):
+    git = git_in_tmpdir(tmpdir)
+
+    # write test notebook
+    nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
+    nb_file = str(tmpdir.join("test.ipynb"))
+    write(nb, str(nb_file))
+
+    # Run jupytext
+    with tmpdir.as_cwd():
+        status = jupytext(
+            ["--from", "ipynb", "--to", "py:light", "--add-untracked", nb_file]
+        )
+
+    # File is now tracked
+    assert "test.py" in git("ls-files")
+    # New file added -> non-zero status code
+    assert status == 1
+
+
+def test_add_untracked_not_adds_existing(tmpdir):
+    git = git_in_tmpdir(tmpdir)
+
+    # write test notebook
+    nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
+    nb_file = str(tmpdir.join("test.ipynb"))
+    write(nb, str(nb_file))
+
+    # write and add previous existing output
+    py_file = tmpdir.join("test.py")
+    py_file.write("# hello world")
+    git("add", py_file)
+    git("commit", "-m", "testing")
+
+    # Run jupytext
+    with tmpdir.as_cwd():
+        status = jupytext(
+            ["--from", "ipynb", "--to", "py:light", "--add-untracked", nb_file]
+        )
+
+    # changes should not have been added -> file is marked as modified
+    assert "test.py" in git("ls-files", "--modified")
+    # Nothing added -> 0 status code
+    assert status == 0
