@@ -18,6 +18,3 @@ jupyter trust demo/World\ population.ipynb
 
 # Install the bash kernel
 python -m bash_kernel.install
-
-# Build jupyter lab to include the Jupytext extension, using low-memory settings
-jupyter lab build --dev-build=False --minimize=False
