@@ -50,16 +50,16 @@ jupyter nbextension enable --py jupytext [--user]
 
 ## Jupytext commands in JupyterLab
 
-In JupyterLab, Jupytext adds a set of commands to the command palette:
+In JupyterLab, Jupytext adds a set of commands to the command palette (View / Activate Command Palette, or Ctrl+Shift+C):
 
 ![](https://raw.githubusercontent.com/mwouts/jupytext/master/packages/labextension/jupytext_commands.png)
 
-The Jupytext extension for JupyterLab is bundled with Jupytext. Installing Jupytext will trigger a build of JupyterLab the next time you open it. If you prefer, you can trigger the build manually with
-```
-jupyter lab build
-```
+The Jupytext extension for JupyterLab is bundled with Jupytext. In most cases you don't need to install it explicitely.
 
-The version of the extension that is shipped with Jupytext requires JupyterLab 2.0. If you prefer to continue using JupyterLab in version 1.x, you should install the version 1.1.1 of the extension:
+From Jupytext 1.9.0 on, the version of the extension is compatible with JupyterLab 3.x only. If you wish to use Jupytext with JupyterLab 2.x or 1.x, please
+- install the `jupytext` package using `pip` or `conda`
+- and then, install the last version of the `jupyterlab-jupytext` extension that is compatible with your version of JupyterLab, i.e.
 ```
-jupyter labextension install jupyterlab-jupytext@1.1.1
+jupyter labextension install jupyterlab-jupytext@1.2.2  # for JupyterLab 2.x
+jupyter labextension install jupyterlab-jupytext@1.1.1  # for JupyterLab 1.x
 ```

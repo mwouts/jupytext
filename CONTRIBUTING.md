@@ -67,7 +67,7 @@ We also have a `tox.ini` file available if you wish to test your contribution on
 Build the `jupytext` package and install it with
 ```
 python setup.py sdist bdist_wheel
-pip install dist/jupytext-XXX.tar.gz
+pip install dist/jupytext-x.x.x-py3-none-any.whl
 ```
 
 ## Jupytext's extension for Jupyter Notebook
