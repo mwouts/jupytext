@@ -4,3 +4,4 @@ node_modules/
 *.egg-info/
 .ipynb_checkpoints
 yarn.lock
+*.tgz

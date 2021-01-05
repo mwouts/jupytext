@@ -1,3 +1,7 @@
+# 1.3.0 (2021-01-05)
+
+- The `jupyterlab-jupytext` extension is now distributed using `jupyter-packaging`, thanks to Martin Renou's awesome contribution (#683).
+
 # 1.2.3 (2020-10-14)
 
 - Remove duplicate `jupyterlab` entry in `package.json` (#654)
