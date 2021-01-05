@@ -63,6 +63,9 @@ requires_myst = pytest.mark.skipif(
     not is_myst_available(), reason="myst_parser not found"
 )
 requires_no_myst = pytest.mark.skipif(is_myst_available(), reason="myst is available")
+requires_pre_commit = pytest.mark.skipif(
+    not tool_version("pre-commit"), reason="pre-commit not found"
+)
 skip_on_windows = pytest.mark.skipif(sys.platform.startswith("win"), reason="Issue 489")
 
 
