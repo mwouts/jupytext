@@ -372,6 +372,7 @@ def test_is_untracked(tmpdir):
     # make a test file
     file = tmpdir.join("test.txt")
     file.write("test file\n")
+    file = str(file)
 
     with tmpdir.as_cwd():
         # untracked
@@ -392,7 +393,7 @@ def test_add_untracked_adds_new(tmpdir):
     # write test notebook
     nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
     nb_file = str(tmpdir.join("test.ipynb"))
-    write(nb, str(nb_file))
+    write(nb, nb_file)
 
     # Run jupytext
     with tmpdir.as_cwd():
@@ -412,11 +413,13 @@ def test_add_untracked_not_adds_existing(tmpdir):
     # write test notebook
     nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
     nb_file = str(tmpdir.join("test.ipynb"))
-    write(nb, str(nb_file))
+    write(nb, nb_file)
 
     # write and add previous existing output
     py_file = tmpdir.join("test.py")
     py_file.write("# hello world")
+    py_file = str(py_file)
+
     git("add", py_file)
     git("commit", "-m", "testing")
 
