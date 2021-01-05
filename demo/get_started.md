@@ -31,7 +31,7 @@ to it.
 If we want Jupytext to save files in multiple formats automatically,
 we can use the JupyterLab **command palette** to do so.
 
-* Click on the little 🎨 icon to the left
+* In the _View_ menu, click on _Activate Command Palette_
 * Then type **`Jupytext`**. You should see a number of commands come up. Each
   one tells Jupytext to save the notebook in a different
   file format automatically.
