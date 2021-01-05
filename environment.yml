@@ -5,7 +5,8 @@ channels:
 dependencies:
   - python>=3.6
   - jupyter
-  - jupyterlab
+  - jupyterlab>=3.0
+  - jupyter-packaging
   - pyyaml
   - toml
   - markdown-it-py~=0.6.0
@@ -22,8 +23,6 @@ dependencies:
   - isort
   - autopep8
   - sphinx-gallery<0.8
-  - nodejs
-  - yarn
   - pip
   - setuptools
   - twine

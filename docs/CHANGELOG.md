@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.9.0 (2021-01-05)
+------------------
+
+**Changed**
+- The Jupytext extension for JupyterLab is compatible with Jupyter Lab 3.0, thanks to Martin Renou's awesome contribution [#683](https://github.com/mwouts/jupytext/pull/683).
+
+
 1.8.2 (2021-01-04)
 ------------------
 
