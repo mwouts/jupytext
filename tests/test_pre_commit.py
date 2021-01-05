@@ -2,6 +2,8 @@
 
 import os
 import stat
+from pathlib import Path
+from textwrap import dedent
 
 import unittest.mock as mock
 import pytest
@@ -11,7 +13,7 @@ from jupytext import read, write
 from jupytext.cli import jupytext, system, is_untracked
 from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
-from .utils import requires_black, requires_flake8, requires_pandoc
+from .utils import requires_black, requires_flake8, requires_pandoc, requires_pre_commit
 from .utils import requires_jupytext_installed
 
 
@@ -29,6 +31,15 @@ def git_in_tmpdir(tmpdir):
     git("config", "user.email", "jupytext@tests.com")
 
     return git
+
+
+def system_in_tmpdir(tmpdir):
+    """Return a function that will execute system commands in the desired directory"""
+
+    def system_(*args):
+        return system(*args, cwd=str(tmpdir))
+
+    return system_
 
 
 @requires_jupytext_installed
@@ -252,13 +263,10 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
     nb = new_notebook(cells=[])
     os.chdir(str(tmpdir))
 
-    def system_in_tmpdir(*args):
-        return system(*args, cwd=str(tmpdir))
-
     git = git_in_tmpdir(tmpdir)
 
     def hook():
-        with mock.patch("jupytext.cli.system", system_in_tmpdir):
+        with mock.patch("jupytext.cli.system", system_in_tmpdir(tmpdir)):
             jupytext(["--to", "py", "--pre-commit"])
 
     write(nb, tmp_ipynb)
@@ -433,3 +441,102 @@ def test_add_untracked_not_adds_existing(tmpdir):
     assert "test.py" in git("ls-files", "--modified")
     # Nothing added -> 0 status code
     assert status == 0
+
+
+@requires_pre_commit
+def test_pre_commit_hook_for_new_file(tmpdir):
+    # get the path and revision of this repo, to use with pre-commit
+    repo_root = str(Path(__file__).parent.parent.resolve())
+    repo_rev = system("git", "rev-parse", "HEAD", cwd=repo_root).strip()
+
+    # set up the tmpdir repo with pre-commit
+    git = git_in_tmpdir(tmpdir)
+    sys = system_in_tmpdir(tmpdir)
+
+    pre_commit_config_yaml = dedent(
+        f"""
+        repos:
+        - repo: {repo_root}
+          rev: {repo_rev}
+          hooks:
+          - id: jupytext
+            args: [--from, ipynb, --to, py:light]
+        """
+    )
+    tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
+    git("add", ".pre-commit-config.yaml")
+    sys("pre-commit", "install", "--install-hooks")
+
+    # write test notebook
+    nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
+    nb_file = str(tmpdir.join("test.ipynb"))
+    write(nb, nb_file)
+
+    # try to commit it, should fail since the hook runs and makes changes
+    git("add", nb_file)
+    with pytest.raises(SystemExit):
+        git("commit", "-m", "failing")
+
+    # should have created and added a new py file, the next commit
+    # will succeed
+    git("commit", "-m", "passing")
+    assert "test.ipynb" in git("ls-files")
+    assert "test.py" in git("ls-files")
+
+
+@requires_pre_commit
+def test_pre_commit_hook_for_existing_changed_file(tmpdir):
+    # get the path and revision of this repo, to use with pre-commit
+    repo_root = str(Path(__file__).parent.parent.resolve())
+    repo_rev = system("git", "rev-parse", "HEAD", cwd=repo_root).strip()
+
+    git = git_in_tmpdir(tmpdir)
+    sys = system_in_tmpdir(tmpdir)
+
+    # set up the tmpdir repo with pre-commit
+    pre_commit_config_yaml = dedent(
+        f"""
+        repos:
+        - repo: {repo_root}
+          rev: {repo_rev}
+          hooks:
+          - id: jupytext
+            args: [--from, ipynb, --to, py:light]
+        """
+    )
+    tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
+    git("add", ".pre-commit-config.yaml")
+    sys("pre-commit", "install", "--install-hooks")
+
+    # write test notebook
+    nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
+    nb_file = str(tmpdir.join("test.ipynb"))
+    write(nb, nb_file)
+
+    git("add", nb_file)
+    with pytest.raises(SystemExit):
+        # Fails since the hook makes changes. Will succeed next try since
+        # new files are added automatically
+        git("commit", "-m", "fails")
+
+    git("commit", "-m", "succeeds")
+
+    # make a change to the notebook
+    nb = new_notebook(cells=[new_markdown_cell("Some other text")])
+    write(nb, nb_file)
+
+    git("add", nb_file)
+    # now a commit will fail, and keep failing until we add the new
+    # changes made to the existing output to the index outselves
+    with pytest.raises(SystemExit):
+        git("commit", "-m", "fails")
+
+    with pytest.raises(SystemExit):
+        git("commit", "-m", "fails again")
+
+    # once we add the changes, it will pass
+    git("add", "test.py")
+    git("commit", "-m", "succeeds")
+
+    assert "test.ipynb" in git("ls-files")
+    assert "test.py" in git("ls-files")
