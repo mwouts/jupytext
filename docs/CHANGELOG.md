@@ -1,18 +1,25 @@
 Jupytext ChangeLog
 ==================
 
+1.9.1 (2021-01-06)
+------------------
+
+**Fixed**
+- Include the lab extension that was missing in the conda package ([#703](https://github.com/mwouts/jupytext/pull/703)).
+
+
 1.9.0 (2021-01-05)
 ------------------
 
 **Changed**
-- The Jupytext extension for JupyterLab is compatible with Jupyter Lab 3.0, thanks to Martin Renou's awesome contribution [#683](https://github.com/mwouts/jupytext/pull/683).
+- The Jupytext extension for JupyterLab is compatible with Jupyter Lab 3.0, thanks to Martin Renou's awesome contribution ([#683](https://github.com/mwouts/jupytext/pull/683)).
 
 
 1.8.2 (2021-01-04)
 ------------------
 
 **Changed**
-- Jupytext 1.8.2 depends on `python>=3.6`. The last version of Jupytext explicitly tested with Python 2.7 and 3.5 was Jupytext 1.7.1, cf. [#697](https://github.com/mwouts/jupytext/issues/697).
+- Jupytext 1.8.2 depends on `python>=3.6`. The last version of Jupytext explicitly tested with Python 2.7 and 3.5 was Jupytext 1.7.1 ([#697](https://github.com/mwouts/jupytext/issues/697)).
 
 
 1.8.1 (2021-01-03)
