@@ -4,8 +4,10 @@ include *.txt
 include *.rst
 
 graft jupytext/labextension
-
+graft jupyter-config
+graft packages
 graft tests
+
 global-exclude *__pycache__
 global-exclude *.pyc
 global-exclude *population.ipynb
