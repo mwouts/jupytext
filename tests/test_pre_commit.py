@@ -517,18 +517,21 @@ def test_pre_commit_hook_for_existing_changed_file(tmpdir):
     git("add", ".pre-commit-config.yaml")
     sys("pre-commit", "install", "--install-hooks")
 
-    # write test notebook
+    # write test notebook and output file
     nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
     nb_file = str(tmpdir.join("test.ipynb"))
     write(nb, nb_file)
+    py_file = tmpdir.join("test.py")
+    py_file.write("# hello")
+    py_file = str(py_file)
 
-    git("add", nb_file)
+    git("add", ".")
+    # run the hook and commit the output
     with pytest.raises(SystemExit):
-        # Fails since the hook makes changes. Will succeed next try since
-        # new files are added automatically
-        git("commit", "-m", "fails")
-
-    git("commit", "-m", "succeeds")
+        # pre-commit will exit non-zero since it will make changed
+        sys("pre-commit", "run")
+    git("add", ".")
+    git("commit", "-m", "test")
 
     # make a change to the notebook
     nb = new_notebook(cells=[new_markdown_cell("Some other text")])
@@ -536,7 +539,7 @@ def test_pre_commit_hook_for_existing_changed_file(tmpdir):
 
     git("add", nb_file)
     # now a commit will fail, and keep failing until we add the new
-    # changes made to the existing output to the index outselves
+    # changes made to the existing output to the index ourselves
     with pytest.raises(SystemExit):
         git("commit", "-m", "fails")
 
