@@ -1,6 +1,6 @@
 - id: jupytext
   name: jupytext
-  description: Convert all notebooks into another format
+  description: Runs jupytext on all notebooks and paired files.
   language: python
   entry: jupytext --ignore-unmatched --alert-untracked
   pass_filenames: true
