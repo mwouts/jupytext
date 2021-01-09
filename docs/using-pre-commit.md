@@ -27,7 +27,7 @@ Note that these hooks do not update the `.ipynb` notebook when you pull. Make su
 
 ## Using Jupytext with the pre-commit package manager
 
-Using Jupytext with the [pre-commit package manager](https://pre-commit.com/) is another option. You could add the following to your `.pre-commit-config.yaml` file to convert all staged notebooks to python scripts in `py:percent` format (the default):
+Using Jupytext with the [pre-commit package manager](https://pre-commit.com/) is another option. You could add the following to your `.pre-commit-config.yaml` file to sync all staged notebooks:
 
 ```yaml
 repos:
@@ -35,9 +35,10 @@ repos:
     rev: master
     hooks:
     - id: jupytext
+      args: [--sync]
 ```
 
-You can also provide arguments to Jupytext in pre-commit, for example to produce several kinds of output files:
+You can provide almost all command line arguments to Jupytext in pre-commit, for example to produce several kinds of output files:
 
 ```yaml
 repos:
@@ -45,9 +46,7 @@ repos:
     rev: master
     hooks:
     - id: jupytext
-      args: [--to, py:light]
-    - id: jupytext
-      args: [--to, markdown]
+      args: [--from, ipynb, --to, py:light, --to, markdown]
 ```
 
 If you are combining Jupytext with other pre-commit hooks, you must ensure that all hooks will pass on any files you generate. For example, if you have a hook for using `black` to format all your python code, then you should use Jupytext's `--pipe` option to also format newly generated Python scripts before writing them:
@@ -56,9 +55,10 @@ If you are combining Jupytext with other pre-commit hooks, you must ensure that 
 repos:
 -   repo: https://github.com/mwouts/jupytext
     rev: master
+    additional_depenencies: [black]
     hooks:
     - id: jupytext
-      args: [--to, py:percent, --pipe, black]
+      args: [--sync, --pipe, black]
 -   repo: https://github.com/psf/black
     rev: 19.10b0
     hooks:
