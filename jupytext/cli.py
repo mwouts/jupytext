@@ -88,11 +88,16 @@ def parse_jupytext_args(args=None):
         "extension that matches the (optional) --from argument.",
     )
     parser.add_argument(
-        "--add-untracked",
+        "--ignore-unmatched",
         action="store_true",
-        help="Add any newly created or untracked output files to the "
-        "git index. In this case Jupytext will exit with a non-zero code "
-        "to alert that the index has been modified.",
+        help="Ignore passed filepaths that aren't in the source format "
+        "you are trying to convert from.",
+    )
+    parser.add_argument(
+        "--alert-untracked",
+        action="store_true",
+        help="Exit with a non-zero status if the output files are not "
+        "tracked in the git index",
     )
     parser.add_argument(
         "--from",
@@ -424,15 +429,24 @@ def jupytext_single_file(nb_file, args, log):
             msg += " Maybe you mean 'jupytext --sync {}' ?".format(args.set_formats)
         raise ValueError(msg)
 
-    nb_dest = args.output or (
-        None
-        if not args.output_format
-        else (
-            "-"
-            if nb_file == "-"
-            else full_path(base_path(nb_file, args.input_format), args.output_format)
-        )
-    )
+    nb_dest = None
+    if args.output:
+        nb_dest = args.output
+    elif args.output_format and nb_file == "-":
+        nb_dest = "-"
+    elif args.output_format:
+        try:
+            bp = base_path(nb_file, args.input_format)
+        except InconsistentPath:
+            if args.ignore_unmatched:
+                log(
+                    "[jupytext] Ignoring unmatched input "
+                    "path {} for format {}".format(nb_file, args.input_format)
+                )
+                return 0
+            else:
+                raise
+        nb_dest = full_path(bp, args.output_format)
 
     config = load_jupytext_config(os.path.abspath(nb_file))
 
@@ -656,7 +670,6 @@ def jupytext_single_file(nb_file, args, log):
         return 0
 
     # b. Output to the desired file or format
-    nb_dest_newly_added = False
     if nb_dest:
         if nb_dest == nb_file and not dest_fmt:
             dest_fmt = fmt
@@ -689,9 +702,6 @@ def jupytext_single_file(nb_file, args, log):
         write(notebook, nb_dest, fmt=dest_fmt)
         if args.pre_commit:
             system("git", "add", nb_dest)
-        elif args.add_untracked and is_untracked(nb_dest):
-            nb_dest_newly_added = True
-            system("git", "add", nb_dest)
 
     # c. Synchronize paired notebooks
     if args.sync:
@@ -722,8 +732,10 @@ def jupytext_single_file(nb_file, args, log):
         log("[jupytext] Sync timestamp of '{}'".format(nb_file))
         os.utime(nb_file, None)
 
-    # return nonzero if the git index was modified by --add-untracked
-    return 0 if not nb_dest_newly_added else 1
+    if args.alert_untracked and is_untracked(nb_dest):
+        return 1
+    else:
+        return 0
 
 
 def notebooks_in_git_index(fmt):

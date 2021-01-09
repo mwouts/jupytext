@@ -395,7 +395,37 @@ def test_is_untracked(tmpdir):
         assert not is_untracked(file)
 
 
-def test_add_untracked_adds_new(tmpdir):
+def test_ignore_unmatched_ignores(tmpdir):
+    # Unmatched file
+    file = tmpdir.join("test.txt")
+    file.write("Hello\n")
+
+    # Run jupytext
+    status = jupytext(
+        ["--from", "ipynb", "--to", "py:light", "--ignore-unmatched", str(file)]
+    )
+
+    assert status == 0
+    assert not tmpdir.join("test.py").exists()
+
+
+def test_alert_untracked_alerts(tmpdir):
+    git_in_tmpdir(tmpdir)
+
+    file = tmpdir.join("test.py")
+    file.write("print('hello')\n")
+
+    # Run jupytext
+    with tmpdir.as_cwd():
+        status = jupytext(
+            ["--from", ".py", "--to", "ipynb", "--alert-untracked", str(file)]
+        )
+
+    assert status != 0
+    assert tmpdir.join("test.ipynb").exists()
+
+
+def test_alert_untracked_not_alerts_for_tracked(tmpdir):
     git = git_in_tmpdir(tmpdir)
 
     # write test notebook
@@ -403,43 +433,18 @@ def test_add_untracked_adds_new(tmpdir):
     nb_file = str(tmpdir.join("test.ipynb"))
     write(nb, nb_file)
 
-    # Run jupytext
-    with tmpdir.as_cwd():
-        status = jupytext(
-            ["--from", "ipynb", "--to", "py:light", "--add-untracked", nb_file]
-        )
+    # write existing output
+    tmpdir.join("test.py").write("# Hello")
 
-    # File is now tracked
-    assert "test.py" in git("ls-files")
-    # New file added -> non-zero status code
-    assert status == 1
-
-
-def test_add_untracked_not_adds_existing(tmpdir):
-    git = git_in_tmpdir(tmpdir)
-
-    # write test notebook
-    nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
-    nb_file = str(tmpdir.join("test.ipynb"))
-    write(nb, nb_file)
-
-    # write and add previous existing output
-    py_file = tmpdir.join("test.py")
-    py_file.write("# hello world")
-    py_file = str(py_file)
-
-    git("add", py_file)
-    git("commit", "-m", "testing")
+    # track output file
+    git("add", str("test.py"))
 
     # Run jupytext
     with tmpdir.as_cwd():
         status = jupytext(
-            ["--from", "ipynb", "--to", "py:light", "--add-untracked", nb_file]
+            ["--from", "ipynb", "--to", "py:light", "--alert-untracked", str(nb_file)]
         )
 
-    # changes should not have been added -> file is marked as modified
-    assert "test.py" in git("ls-files", "--modified")
-    # Nothing added -> 0 status code
     assert status == 0
 
 
@@ -477,8 +482,12 @@ def test_pre_commit_hook_for_new_file(tmpdir):
     with pytest.raises(SystemExit):
         git("commit", "-m", "failing")
 
-    # should have created and added a new py file, the next commit
-    # will succeed
+    # try again, it will still fail because the output hasn't been added
+    with pytest.raises(SystemExit):
+        git("commit", "-m", "still failing")
+
+    # add the new file, now the commit will succeed
+    git("add", "test.py")
     git("commit", "-m", "passing")
     assert "test.ipynb" in git("ls-files")
     assert "test.py" in git("ls-files")
