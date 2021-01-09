@@ -2,9 +2,5 @@
   name: jupytext
   description: Convert all notebooks into another format
   language: python
-  entry: jupytext --add-untracked
+  entry: jupytext --ignore-unmatched --alert-untracked
   pass_filenames: true
-  files: ipynb
-  args:
-    - --to
-    - py:percent
