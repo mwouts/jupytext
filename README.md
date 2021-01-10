@@ -32,6 +32,11 @@ You can install Jupytext with
 - `pip install jupytext`
 - or `conda install jupytext -c conda-forge`.
 
+Please note that Jupytext includes an extension for Jupyter Lab. In the latest version of Jupytext, this extension is compatible with Jupyter Lab >= 3.0 only. If you use Jupyter Lab 2.x, please either stay with Jupytext 1.8.2, or install, on top of the latest pip or conda version of Jupytext, a version of the extension that is compatible with Jupyter Lab 2.x:
+```
+jupyter labextension install jupyterlab-jupytext@1.2.2  # For Jupyter Lab 2.x
+```
+
 Then, restart your Jupyter server (for more installation details, see the [install section](docs/install.md) in the documentation).
 
 When Jupytext is installed, `.py` and `.md` files have a notebook icon. And you can really open and run these files as notebooks
