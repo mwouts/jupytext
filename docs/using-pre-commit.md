@@ -32,7 +32,7 @@ Using Jupytext with the [pre-commit package manager](https://pre-commit.com/) is
 ```yaml
 repos:
 -   repo: https://github.com/mwouts/jupytext
-    rev: master
+    rev: #CURRENT_TAG/COMMIT_HASH
     hooks:
     - id: jupytext
       args: [--sync]
@@ -43,7 +43,7 @@ You can provide almost all command line arguments to Jupytext in pre-commit, for
 ```yaml
 repos:
 -   repo: https://github.com/mwouts/jupytext
-    rev: master
+    rev: #CURRENT_TAG/COMMIT_HASH
     hooks:
     - id: jupytext
       args: [--from, ipynb, --to, py:light, --to, markdown]
@@ -54,11 +54,13 @@ If you are combining Jupytext with other pre-commit hooks, you must ensure that 
 ```yaml
 repos:
 -   repo: https://github.com/mwouts/jupytext
-    rev: master
-    additional_depenencies: [black]
+    rev: #CURRENT_TAG/COMMIT_HASH
     hooks:
     - id: jupytext
       args: [--sync, --pipe, black]
+      additional_depenencies: 
+        - black==19.10b0 # Matches hook
+
 -   repo: https://github.com/psf/black
     rev: 19.10b0
     hooks:
