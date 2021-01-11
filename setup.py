@@ -2,7 +2,7 @@ from os import path, environ
 from io import open
 import re
 from setuptools import setup, find_packages
-import subprocess
+import shutil
 import warnings
 
 from jupyter_packaging import (
@@ -72,9 +72,7 @@ cmdclass["jsdeps"] = combine_commands(
 
 # We don't build the extensions if npm is not available
 # Cf. https://github.com/mwouts/jupytext/issues/706
-try:
-    proc = subprocess.Popen(["npm", "--version"])
-except FileNotFoundError:
+if not shutil.which("npm"):
     warnings.warn(
         "The jupyterlab-jupytext extension could not be build. "
         "Please install nodejs if you need the extensions. "
