@@ -58,7 +58,7 @@ repos:
     hooks:
     - id: jupytext
       args: [--sync, --pipe, black]
-      additional_depenencies:
+      additional_dependencies:
         - black==19.10b0 # Matches hook
 
 -   repo: https://github.com/psf/black
