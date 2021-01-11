@@ -1,6 +1,8 @@
 import pytest
+
 import jupytext
 from jupytext.header import header_to_metadata_and_cell
+
 from .utils import list_notebooks, requires_nbconvert
 
 

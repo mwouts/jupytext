@@ -1,23 +1,21 @@
 import pytest
-from jupytext.compare import compare
 from nbformat.v4.nbbase import new_notebook
+
 import jupytext
+from jupytext.compare import compare
 from jupytext.formats import (
-    guess_format,
+    JupytextFormatError,
     divine_format,
+    get_format_implementation,
+    guess_format,
+    long_form_multiple_formats,
     read_format_from_metadata,
     rearrange_jupytext_metadata,
-)
-from jupytext.formats import (
-    long_form_multiple_formats,
     short_form_multiple_formats,
     update_jupytext_formats_metadata,
-)
-from jupytext.formats import (
-    get_format_implementation,
     validate_one_format,
-    JupytextFormatError,
 )
+
 from .utils import list_notebooks, requires_myst, requires_pandoc
 
 

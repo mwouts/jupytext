@@ -1,10 +1,11 @@
 import pytest
 from nbformat.v4.nbbase import new_markdown_cell
+
 from jupytext.cell_reader import (
-    RMarkdownCellReader,
     LightScriptCellReader,
-    uncomment,
+    RMarkdownCellReader,
     paragraph_is_fully_commented,
+    uncomment,
 )
 from jupytext.cell_to_text import RMarkdownCellExporter
 

@@ -1,13 +1,16 @@
 import pytest
 from nbformat.v4.nbbase import new_code_cell, new_notebook
 
-from jupytext.compare import compare
 from jupytext import read, reads, writes
+from jupytext.compare import compare
 from jupytext.pep8 import (
-    next_instruction_is_function_or_class,
+    cell_ends_with_code,
     cell_ends_with_function_or_class,
+    cell_has_code,
+    next_instruction_is_function_or_class,
+    pep8_lines_between_cells,
 )
-from jupytext.pep8 import cell_ends_with_code, cell_has_code, pep8_lines_between_cells
+
 from .utils import list_notebooks
 
 

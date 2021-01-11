@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import pytest
-from jupytext.compare import compare
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell
-from jupytext.compare import compare_notebooks
-from jupytext.cli import jupytext as jupytext_cli
-from jupytext.pandoc import PandocError
+from nbformat.v4.nbbase import new_markdown_cell, new_notebook
+
 import jupytext
-from .utils import requires_pandoc, requires_no_pandoc
+from jupytext.cli import jupytext as jupytext_cli
+from jupytext.compare import compare, compare_notebooks
+from jupytext.pandoc import PandocError
+
+from .utils import requires_no_pandoc, requires_pandoc
 
 
 @requires_pandoc

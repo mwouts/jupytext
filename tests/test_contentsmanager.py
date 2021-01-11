@@ -1,27 +1,29 @@
 # coding: utf-8
 
-import os
-import re
-import time
-import pytest
 import itertools
 import logging
+import os
+import re
 import shutil
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
+import time
+
+import pytest
+from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 from tornado.web import HTTPError
-from jupytext.compare import compare
+
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
-from jupytext.jupytext import writes, write, read
-from jupytext.compare import compare_notebooks
+from jupytext.compare import compare, compare_notebooks
+from jupytext.formats import auto_ext_from_metadata, read_format_from_metadata
 from jupytext.header import header_to_metadata_and_cell
-from jupytext.formats import read_format_from_metadata, auto_ext_from_metadata
+from jupytext.jupytext import read, write, writes
 from jupytext.kernels import kernelspec_from_language
+
 from .utils import (
     list_notebooks,
-    requires_sphinx_gallery,
-    requires_pandoc,
     notebook_model,
+    requires_pandoc,
+    requires_sphinx_gallery,
 )
 
 

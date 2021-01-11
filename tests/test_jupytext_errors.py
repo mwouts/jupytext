@@ -1,5 +1,6 @@
 import pytest
 from nbformat.v4.nbbase import new_notebook
+
 import jupytext
 from jupytext.formats import JupytextFormatError
 

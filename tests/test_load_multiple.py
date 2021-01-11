@@ -1,6 +1,7 @@
 import pytest
-from tornado.web import HTTPError
 from nbformat.v4.nbbase import new_notebook
+from tornado.web import HTTPError
+
 import jupytext
 
 

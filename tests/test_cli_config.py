@@ -1,10 +1,11 @@
-import pytest
 import nbformat
-from nbformat.v4.nbbase import new_notebook, new_code_cell
+import pytest
+from nbformat.v4.nbbase import new_code_cell, new_notebook
+
 from jupytext.cli import jupytext
-from jupytext.jupytext import read, write
-from jupytext.header import header_to_metadata_and_cell
 from jupytext.compare import compare
+from jupytext.header import header_to_metadata_and_cell
+from jupytext.jupytext import read, write
 
 
 def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):

@@ -1,17 +1,17 @@
 import pytest
-from jupytext.compare import compare
-from jupytext.cell_metadata import (
-    rmd_options_to_metadata,
-    metadata_to_rmd_options,
-    parse_rmd_options,
-    parse_key_equal_value,
-)
+
 from jupytext.cell_metadata import (
     _IGNORE_CELL_METADATA,
     RMarkdownOptionParsingError,
+    metadata_to_rmd_options,
+    metadata_to_text,
+    parse_key_equal_value,
+    parse_rmd_options,
+    rmd_options_to_metadata,
+    text_to_metadata,
     try_eval_metadata,
 )
-from jupytext.cell_metadata import text_to_metadata, metadata_to_text
+from jupytext.compare import compare
 from jupytext.metadata_filter import filter_metadata
 
 SAMPLES = [

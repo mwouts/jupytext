@@ -1,4 +1,5 @@
 import pytest
+
 import jupytext
 from jupytext.compare import compare, compare_notebooks
 

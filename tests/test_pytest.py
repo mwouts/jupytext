@@ -1,4 +1,5 @@
 import pytest
+
 from jupytext.cli import jupytext
 
 

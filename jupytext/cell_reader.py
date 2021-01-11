@@ -2,9 +2,11 @@
 
 import re
 from copy import copy
-from nbformat.v4.nbbase import new_code_cell, new_raw_cell, new_markdown_cell
-from .languages import _SCRIPT_EXTENSIONS
+
+from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_raw_cell
+
 from .doxygen import doxygen_to_markdown
+from .languages import _SCRIPT_EXTENSIONS
 
 # Sphinx Gallery is an optional dependency. And we intercept the SyntaxError for #301
 try:
@@ -14,14 +16,14 @@ except (ImportError, SyntaxError):  # pragma: no cover
 
 from .cell_metadata import (
     is_active,
-    text_to_metadata,
     is_json_metadata,
     rmd_options_to_metadata,
+    text_to_metadata,
 )
 from .languages import _JUPYTER_LANGUAGES_LOWER_AND_UPPER
-from .stringparser import StringParser
-from .magics import uncomment_magic, is_magic, unescape_code_start, need_explicit_marker
+from .magics import is_magic, need_explicit_marker, uncomment_magic, unescape_code_start
 from .pep8 import pep8_lines_between_cells
+from .stringparser import StringParser
 
 _BLANK_LINE = re.compile(r"^\s*$")
 _PY_INDENTED = re.compile(r"^\s")

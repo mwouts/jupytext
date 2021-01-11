@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import pytest
 from nbformat.v4.nbbase import (
-    new_notebook,
     new_code_cell,
     new_markdown_cell,
+    new_notebook,
     new_raw_cell,
 )
-from jupytext.compare import compare, compare_notebooks
+
 import jupytext
+from jupytext.compare import compare, compare_notebooks
+
 from .utils import notebook_model
 
 

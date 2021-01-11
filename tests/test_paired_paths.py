@@ -1,15 +1,16 @@
 import os
+import unittest.mock as mock
+
 import pytest
 
-import unittest.mock as mock
 from jupytext.compare import compare
 from jupytext.contentsmanager import TextFileContentsManager
-from jupytext.paired_paths import InconsistentPath, paired_paths, base_path, full_path
 from jupytext.formats import (
-    long_form_one_format,
     long_form_multiple_formats,
+    long_form_one_format,
     short_form_multiple_formats,
 )
+from jupytext.paired_paths import InconsistentPath, base_path, full_path, paired_paths
 
 
 def test_simple_pair():

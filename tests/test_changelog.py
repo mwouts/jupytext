@@ -1,7 +1,8 @@
-from pathlib import Path
 import re
-import pytest
 import sys
+from pathlib import Path
+
+import pytest
 
 
 def replace_issue_number_with_links(text):

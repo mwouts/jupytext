@@ -1,13 +1,15 @@
-import os
-import sys
-import re
 import json
+import os
+import re
+import sys
+
 import pytest
-from jupytext.cli import system
-from jupytext.cell_reader import rst2md
-from jupytext.pandoc import is_pandoc_available
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
+
+from jupytext.cell_reader import rst2md
+from jupytext.cli import system
 from jupytext.myst import is_myst_available
+from jupytext.pandoc import is_pandoc_available
 
 
 def tool_version(tool):

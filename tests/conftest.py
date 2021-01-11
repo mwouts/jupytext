@@ -1,7 +1,8 @@
-import pytest
-import jupytext
-
 import unittest.mock as mock
+
+import pytest
+
+import jupytext
 
 
 @pytest.fixture

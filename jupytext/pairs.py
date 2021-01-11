@@ -1,13 +1,14 @@
 """Functions to read or write paired notebooks"""
 
 from collections import namedtuple
+
+from .combine import combine_inputs_with_outputs
 from .formats import (
-    long_form_one_format,
-    long_form_multiple_formats,
     check_file_version,
+    long_form_multiple_formats,
+    long_form_one_format,
 )
 from .paired_paths import find_base_path_and_format, full_path, paired_paths
-from .combine import combine_inputs_with_outputs
 
 NotebookFile = namedtuple("notebook_file", "path fmt timestamp")
 

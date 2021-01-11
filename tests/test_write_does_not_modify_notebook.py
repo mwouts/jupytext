@@ -1,9 +1,12 @@
-import pytest
 from copy import deepcopy
-from jupytext.compare import compare
 from itertools import product
+
+import pytest
+
 from jupytext import read, write, writes
+from jupytext.compare import compare
 from jupytext.formats import long_form_one_format
+
 from .utils import list_notebooks
 
 

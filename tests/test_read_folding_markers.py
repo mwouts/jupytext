@@ -1,5 +1,5 @@
-from jupytext.compare import compare
 import jupytext
+from jupytext.compare import compare
 
 
 # region Folding markers as cell boundaries

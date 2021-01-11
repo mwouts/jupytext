@@ -4,24 +4,25 @@ change on new releases.
 """
 
 import os
+
 import pytest
 from nbformat.v4.nbbase import new_notebook
-from jupytext.compare import compare
 
 import jupytext
-from jupytext.compare import compare_notebooks, combine_inputs_with_outputs
+from jupytext.compare import combine_inputs_with_outputs, compare, compare_notebooks
 from jupytext.formats import (
-    long_form_one_format,
-    check_auto_ext,
     auto_ext_from_metadata,
+    check_auto_ext,
+    long_form_one_format,
 )
 from jupytext.languages import _SCRIPT_EXTENSIONS
 from jupytext.paired_paths import full_path
+
 from .utils import (
     list_notebooks,
+    requires_myst,
     requires_pandoc,
     requires_sphinx_gallery,
-    requires_myst,
 )
 
 

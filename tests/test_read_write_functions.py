@@ -1,7 +1,9 @@
 from io import StringIO
 from pathlib import Path
+
 import nbformat
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell
+from nbformat.v4.nbbase import new_markdown_cell, new_notebook
+
 import jupytext
 from jupytext.compare import compare
 

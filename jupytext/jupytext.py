@@ -1,41 +1,42 @@
 """Read and write Jupyter notebooks as text files"""
 
-import os
 import io
-import sys
 import logging
+import os
+import sys
 from copy import copy, deepcopy
-from nbformat.v4.rwbase import NotebookReader, NotebookWriter
-from nbformat.v4.nbbase import new_notebook, new_code_cell, NotebookNode
+
 import nbformat
-from .formats import _VALID_FORMAT_OPTIONS
+from nbformat.v4.nbbase import NotebookNode, new_code_cell, new_notebook
+from nbformat.v4.rwbase import NotebookReader, NotebookWriter
+
+from .cell_metadata import _IGNORE_CELL_METADATA
 from .formats import (
-    read_format_from_metadata,
-    update_jupytext_formats_metadata,
-    rearrange_jupytext_metadata,
-)
-from .formats import (
-    format_name_for_ext,
-    guess_format,
+    _VALID_FORMAT_OPTIONS,
     divine_format,
+    format_name_for_ext,
     get_format_implementation,
+    guess_format,
     long_form_one_format,
+    read_format_from_metadata,
+    rearrange_jupytext_metadata,
+    update_jupytext_formats_metadata,
 )
 from .header import (
+    encoding_and_executable,
     header_to_metadata_and_cell,
-    metadata_and_cell_to_header,
     insert_jupytext_info_and_filter_metadata,
+    insert_or_test_version_number,
+    metadata_and_cell_to_header,
 )
-from .header import encoding_and_executable, insert_or_test_version_number
-from .metadata_filter import update_metadata_filters, filter_metadata
-from .cell_metadata import _IGNORE_CELL_METADATA
 from .languages import (
     default_language_from_metadata_and_ext,
     set_main_and_cell_language,
 )
-from .pep8 import pep8_lines_between_cells
+from .metadata_filter import filter_metadata, update_metadata_filters
+from .myst import MYST_FORMAT_NAME, myst_extensions, myst_to_notebook, notebook_to_myst
 from .pandoc import md_to_notebook, notebook_to_md
-from .myst import myst_extensions, myst_to_notebook, notebook_to_myst, MYST_FORMAT_NAME
+from .pep8 import pep8_lines_between_cells
 
 
 class TextNotebookConverter(NotebookReader, NotebookWriter):

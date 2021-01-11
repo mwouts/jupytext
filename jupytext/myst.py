@@ -3,8 +3,8 @@ This module contains round-trip conversion between
 myst formatted text documents and notebooks.
 """
 import json
-import warnings
 import re
+import warnings
 from textwrap import dedent
 
 import nbformat as nbf

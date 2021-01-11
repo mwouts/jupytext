@@ -1,9 +1,11 @@
 # coding: utf-8
 import pytest
+from nbformat.v4.nbbase import new_markdown_cell, new_notebook
+
 import jupytext
 from jupytext.compare import compare
+
 from .utils import list_notebooks
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell
 
 
 @pytest.mark.parametrize("nb_file", list_notebooks() + list_notebooks("Rmd"))

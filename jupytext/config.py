@@ -1,15 +1,17 @@
 """Find and read Jupytext configuration files"""
-import os
-import yaml
 import json
-from traitlets import Unicode, Float, Bool, Enum
+import os
+
+import yaml
+from traitlets import Bool, Enum, Float, Unicode
 from traitlets.config import Configurable
 from traitlets.config.loader import PyFileConfigLoader
 from traitlets.traitlets import TraitError
+
 from .formats import (
     NOTEBOOK_EXTENSIONS,
-    long_form_one_format,
     long_form_multiple_formats,
+    long_form_one_format,
     rearrange_jupytext_metadata,
 )
 
@@ -186,10 +188,7 @@ class JupytextConfiguration(Configurable):
 
     def default_formats(self, path):
         """Return the default formats, if they apply to the current path #157"""
-        from .paired_paths import (
-            base_path,
-            InconsistentPath,
-        )
+        from .paired_paths import InconsistentPath, base_path
 
         formats = long_form_multiple_formats(self.default_jupytext_formats)
         for fmt in formats:

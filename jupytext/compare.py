@@ -1,14 +1,15 @@
 """Compare two Jupyter notebooks"""
 
-import re
-import json
 import difflib
+import json
+import re
+
 from .cell_metadata import _IGNORE_CELL_METADATA
-from .header import _DEFAULT_NOTEBOOK_METADATA
-from .metadata_filter import filter_metadata
-from .jupytext import reads, writes
 from .combine import combine_inputs_with_outputs
 from .formats import long_form_one_format
+from .header import _DEFAULT_NOTEBOOK_METADATA
+from .jupytext import reads, writes
+from .metadata_filter import filter_metadata
 
 _BLANK_LINE = re.compile(r"^\s*$")
 

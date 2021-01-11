@@ -1,8 +1,9 @@
 """Escape Jupyter magics when converting to other formats"""
 
 import re
+
+from .languages import _COMMENT, _SCRIPT_EXTENSIONS, usual_language_name
 from .stringparser import StringParser
-from .languages import _SCRIPT_EXTENSIONS, _COMMENT, usual_language_name
 
 # A magic expression is a line or cell or metakernel magic (#94, #61) escaped zero, or multiple times
 _MAGIC_RE = {

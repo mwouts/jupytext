@@ -1,9 +1,12 @@
-import pytest
 from copy import deepcopy
+
+import pytest
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
-from jupytext.combine import combine_inputs_with_outputs
-from jupytext.compare import compare_notebooks, compare
+
 import jupytext
+from jupytext.combine import combine_inputs_with_outputs
+from jupytext.compare import compare, compare_notebooks
+
 from .utils import list_notebooks
 
 

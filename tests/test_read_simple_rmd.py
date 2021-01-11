@@ -1,15 +1,17 @@
 import re
-import pytest
+
 import nbformat
+import pytest
 from nbformat.v4.nbbase import (
-    new_notebook,
-    new_markdown_cell,
-    new_raw_cell,
     new_code_cell,
+    new_markdown_cell,
+    new_notebook,
+    new_raw_cell,
 )
-from jupytext.compare import compare, compare_notebooks
+
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
+from jupytext.compare import compare, compare_notebooks
 
 
 def test_read_mostly_py_rmd_file(

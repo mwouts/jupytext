@@ -1,5 +1,7 @@
 import pytest
+
 import jupytext
+
 from .utils import list_notebooks
 
 

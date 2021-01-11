@@ -1,9 +1,11 @@
 import os
+
 import pytest
+
 from jupytext.config import (
+    JupytextConfiguration,
     find_jupytext_configuration_file,
     load_jupytext_configuration_file,
-    JupytextConfiguration,
 )
 
 
