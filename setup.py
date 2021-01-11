@@ -1,7 +1,9 @@
-from os import path
+from os import path, environ
 from io import open
 import re
 from setuptools import setup, find_packages
+import subprocess
+import warnings
 
 from jupyter_packaging import (
     create_cmdclass,
@@ -59,7 +61,6 @@ cmdclass = create_cmdclass(
     package_data_spec={"jupytext": ["nbextension/**"]},
     data_files_spec=data_files_spec,
 )
-
 cmdclass["jsdeps"] = combine_commands(
     install_npm(
         path.join(this_directory, "packages", "labextension"),
@@ -68,6 +69,22 @@ cmdclass["jsdeps"] = combine_commands(
     ),
     ensure_targets(jstargets),
 )
+
+# We don't build the extensions if npm is not available
+# Cf. https://github.com/mwouts/jupytext/issues/706
+try:
+    proc = subprocess.Popen(["npm", "--version"])
+except FileNotFoundError:
+    warnings.warn(
+        "The jupyterlab-jupytext extension could not be build. "
+        "Please install nodejs if you need the extensions. "
+        "See also https://github.com/mwouts/jupytext/issues/706."
+    )
+    cmdclass = {}
+
+    # We can't allow this on the CI, as we publish the package with PyPi-publish
+    if environ.get("CI"):
+        raise RuntimeError("Please install npm.")
 
 setup(
     name="jupytext",
