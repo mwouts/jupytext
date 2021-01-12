@@ -465,17 +465,18 @@ def test_pre_commit_hook_for_new_file(tmpdir):
           rev: {repo_rev}
           hooks:
           - id: jupytext
-            args: [--from, ipynb, --to, py:light]
+            args: --sync
         """
     )
     tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
     git("add", ".pre-commit-config.yaml")
     sys("pre-commit", "install", "--install-hooks")
 
-    # write test notebook
+    # write test notebook and sync it to py:percent
     nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
     nb_file = str(tmpdir.join("test.ipynb"))
     write(nb, nb_file)
+    jupytext(["--set-formats", "ipynb,py:percent", nb_file])
 
     # try to commit it, should fail since the hook runs and makes changes
     git("add", nb_file)
