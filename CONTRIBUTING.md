@@ -66,9 +66,16 @@ We also have a `tox.ini` file available if you wish to test your contribution on
 
 Build the `jupytext` package and install it with
 ```
-python setup.py sdist bdist_wheel
+BUILD_JUPYTERLAB_EXTENSION=1 python setup.py sdist bdist_wheel
 pip install dist/jupytext-x.x.x-py3-none-any.whl
 ```
+
+or with
+```
+BUILD_JUPYTERLAB_EXTENSION=1 pip install .
+```
+
+Finally, note that you can remove `BUILD_JUPYTERLAB_EXTENSION=1` if you don't need the lab extension, and if you don't want to install `nodejs` or if you want a faster build.
 
 ## Jupytext's extension for Jupyter Notebook
 
