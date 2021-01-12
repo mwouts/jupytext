@@ -434,19 +434,24 @@ def jupytext_single_file(nb_file, args, log):
         nb_dest = args.output
     elif args.output_format and nb_file == "-":
         nb_dest = "-"
-    elif args.output_format:
+    else:
         try:
             bp = base_path(nb_file, args.input_format)
         except InconsistentPath:
             if args.ignore_unmatched:
                 log(
-                    "[jupytext] Ignoring unmatched input "
-                    "path {} for format {}".format(nb_file, args.input_format)
+                    "[jupytext] Ignoring unmatched input path {}{}".format(
+                        nb_file,
+                        " for format {}".format(args.input_format)
+                        if args.input_format
+                        else "",
+                    )
                 )
                 return 0
             else:
                 raise
-        nb_dest = full_path(bp, args.output_format)
+        if args.output_format:
+            nb_dest = full_path(bp, args.output_format)
 
     config = load_jupytext_config(os.path.abspath(nb_file))
 
