@@ -2,15 +2,7 @@ from os import path, environ
 from io import open
 import re
 from setuptools import setup, find_packages
-import shutil
 import warnings
-
-from jupyter_packaging import (
-    create_cmdclass,
-    install_npm,
-    ensure_targets,
-    combine_commands,
-)
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
@@ -26,65 +18,7 @@ with open(path.join(this_directory, "jupytext/version.py")) as f:
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
     version = version_match.group(1)
 
-lab_path = path.join(this_directory, "jupytext", "labextension")
-nb_path = path.join(this_directory, "jupytext", "nbextension")
-
-jupyter_config_path = path.join(this_directory, "jupyter-config")
-notebook_config_path = path.join(jupyter_config_path, "jupyter_notebook_config.d")
-jupyter_server_config_path = path.join(jupyter_config_path, "jupyter_server_config.d")
-nbconfig_path = path.join(jupyter_config_path, "nbconfig", "notebook.d")
-
-data_files_spec = [
-    # Install labextension
-    ("share/jupyter/labextensions/jupyterlab-jupytext", lab_path, "**"),
-    ("share/jupyter/labextensions/jupyterlab-jupytext", this_directory, "install.json"),
-    # Install nbextension
-    ("share/jupyter/nbextensions/jupytext", nb_path, "**"),
-    ("share/jupyter/nbextensions/jupytext", nbconfig_path, "jupytext.json"),
-    # Install config files
-    (
-        "etc/jupyter/jupyter_server_config.d",
-        jupyter_server_config_path,
-        "jupytext.json",
-    ),
-    ("etc/jupyter/jupyter_notebook_config.d", notebook_config_path, "jupytext.json"),
-    ("etc/jupyter/nbconfig/notebook.d", nbconfig_path, "jupytext.json"),
-]
-
-# Representative files that should exist after a successful build
-jstargets = [
-    path.join(lab_path, "package.json"),
-]
-
-cmdclass = create_cmdclass(
-    "jsdeps",
-    package_data_spec={"jupytext": ["nbextension/**"]},
-    data_files_spec=data_files_spec,
-)
-cmdclass["jsdeps"] = combine_commands(
-    install_npm(
-        path.join(this_directory, "packages", "labextension"),
-        build_cmd="build:prod",
-        npm=["jlpm"],
-    ),
-    ensure_targets(jstargets),
-)
-
-# We don't build the extensions if npm is not available
-# Cf. https://github.com/mwouts/jupytext/issues/706
-if not shutil.which("npm"):
-    warnings.warn(
-        "The jupyterlab-jupytext extension could not be build. "
-        "Please install nodejs if you need the extensions. "
-        "See also https://github.com/mwouts/jupytext/issues/706."
-    )
-    cmdclass = {}
-
-    # We can't allow this on the CI, as we publish the package with PyPi-publish
-    if environ.get("CI"):
-        raise RuntimeError("Please install npm.")
-
-setup(
+setup_args = dict(
     name="jupytext",
     version=version,
     author="Marc Wouts",
@@ -95,7 +29,6 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/mwouts/jupytext",
     packages=find_packages(exclude=["tests"]),
-    cmdclass=cmdclass,
     entry_points={"console_scripts": ["jupytext = jupytext.cli:jupytext"]},
     tests_require=["pytest"],
     install_requires=["nbformat>=4.0.0", "pyyaml", "toml", "markdown-it-py~=0.6.0"],
@@ -123,3 +56,107 @@ setup(
         "Programming Language :: Python :: 3.9",
     ],
 )
+
+build_labextension = environ.get("BUILD_JUPYTERLAB_EXTENSION") or environ.get("CI")
+if build_labextension in ["0", "False", "false", "No", "no", "N", "n"]:
+    build_labextension = False
+
+if not build_labextension:
+    # We skip the lab extension,
+    # cf. https://github.com/mwouts/jupytext/issues/706
+    warnings.warn(
+        "Jupytext is being built WITHOUT the lab extension. "
+        "Please set BUILD_JUPYTERLAB_EXTENSION=1 if you want it."
+    )
+
+    setup_args["package_data"] = {"jupytext": ["nbextension/*.*"]}
+    setup_args["data_files"] = [
+        (
+            "etc/jupyter/nbconfig/notebook.d",
+            ["jupyter-config/nbconfig/notebook.d/jupytext.json"],
+        ),
+        (
+            "etc/jupyter/jupyter_notebook_config.d",
+            ["jupyter-config/jupyter_notebook_config.d/jupytext.json"],
+        ),
+        (
+            "etc/jupyter/jupyter_server_config.d",
+            ["jupyter-config/jupyter_server_config.d/jupytext.json"],
+        ),
+        (
+            "share/jupyter/nbextensions/jupytext",
+            [
+                "jupytext/nbextension/index.js",
+                "jupytext/nbextension/README.md",
+                "jupytext/nbextension/jupytext_menu.png",
+                "jupytext/nbextension/jupytext.yml",
+            ],
+        ),
+    ]
+else:
+    # Install labextension using jupyter_packaging
+    from jupyter_packaging import (
+        create_cmdclass,
+        install_npm,
+        ensure_targets,
+        combine_commands,
+    )
+
+    lab_path = path.join(this_directory, "jupytext", "labextension")
+    nb_path = path.join(this_directory, "jupytext", "nbextension")
+
+    jupyter_config_path = path.join(this_directory, "jupyter-config")
+    notebook_config_path = path.join(jupyter_config_path, "jupyter_notebook_config.d")
+    jupyter_server_config_path = path.join(
+        jupyter_config_path, "jupyter_server_config.d"
+    )
+    nbconfig_path = path.join(jupyter_config_path, "nbconfig", "notebook.d")
+
+    data_files_spec = [
+        # Install nbextension
+        ("share/jupyter/nbextensions/jupytext", nb_path, "**"),
+        ("share/jupyter/nbextensions/jupytext", nbconfig_path, "jupytext.json"),
+        # Install config files
+        (
+            "etc/jupyter/jupyter_server_config.d",
+            jupyter_server_config_path,
+            "jupytext.json",
+        ),
+        (
+            "etc/jupyter/jupyter_notebook_config.d",
+            notebook_config_path,
+            "jupytext.json",
+        ),
+        ("etc/jupyter/nbconfig/notebook.d", nbconfig_path, "jupytext.json"),
+        ("share/jupyter/labextensions/jupyterlab-jupytext", lab_path, "**"),
+        (
+            "share/jupyter/labextensions/jupyterlab-jupytext",
+            this_directory,
+            "install.json",
+        ),
+    ]
+    package_data_spec = {"jupytext": ["nbextension/**"]}
+
+    # Representative files that should exist after a successful build
+    jstargets = [
+        path.join(lab_path, "package.json"),
+    ]
+
+    cmdclass = create_cmdclass(
+        "jsdeps",
+        package_data_spec=package_data_spec,
+        data_files_spec=data_files_spec,
+    )
+
+    cmdclass["jsdeps"] = combine_commands(
+        install_npm(
+            path.join(this_directory, "packages", "labextension"),
+            build_cmd="build:prod",
+            npm=["jlpm"],
+        ),
+        ensure_targets(jstargets),
+    )
+    setup_args["cmdclass"] = cmdclass
+
+# Call setup
+setup(**setup_args)
