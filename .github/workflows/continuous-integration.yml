@@ -214,7 +214,7 @@ jobs:
       - name: Build package
         run: |
           pip install wheel jupyter-packaging jupyterlab>=3
-          python setup.py sdist bdist_wheel
+          BUILD_JUPYTERLAB_EXTENSION=1 python setup.py sdist bdist_wheel
       - name: Publish
         uses: pypa/gh-action-pypi-publish@v1.1.0
         with:

@@ -57,7 +57,7 @@ setup_args = dict(
     ],
 )
 
-build_labextension = environ.get("BUILD_JUPYTERLAB_EXTENSION") or environ.get("CI")
+build_labextension = environ.get("BUILD_JUPYTERLAB_EXTENSION")
 if build_labextension in ["0", "False", "false", "No", "no", "N", "n"]:
     build_labextension = False
 
