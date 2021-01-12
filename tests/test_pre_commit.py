@@ -465,7 +465,7 @@ def test_pre_commit_hook_for_new_file(tmpdir):
           rev: {repo_rev}
           hooks:
           - id: jupytext
-            args: --sync
+            args: [--sync]
         """
     )
     tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
