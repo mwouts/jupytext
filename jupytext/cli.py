@@ -88,6 +88,18 @@ def parse_jupytext_args(args=None):
         "extension that matches the (optional) --from argument.",
     )
     parser.add_argument(
+        "--ignore-unmatched",
+        action="store_true",
+        help="Ignore passed filepaths that aren't in the source format "
+        "you are trying to convert from.",
+    )
+    parser.add_argument(
+        "--alert-untracked",
+        action="store_true",
+        help="Exit with a non-zero status if the output files are not "
+        "tracked in the git index",
+    )
+    parser.add_argument(
         "--from",
         dest="input_format",
         help="Jupytext format for the input(s). Inferred from the "
@@ -417,15 +429,24 @@ def jupytext_single_file(nb_file, args, log):
             msg += " Maybe you mean 'jupytext --sync {}' ?".format(args.set_formats)
         raise ValueError(msg)
 
-    nb_dest = args.output or (
-        None
-        if not args.output_format
-        else (
-            "-"
-            if nb_file == "-"
-            else full_path(base_path(nb_file, args.input_format), args.output_format)
-        )
-    )
+    nb_dest = None
+    if args.output:
+        nb_dest = args.output
+    elif args.output_format and nb_file == "-":
+        nb_dest = "-"
+    elif args.output_format:
+        try:
+            bp = base_path(nb_file, args.input_format)
+        except InconsistentPath:
+            if args.ignore_unmatched:
+                log(
+                    "[jupytext] Ignoring unmatched input "
+                    "path {} for format {}".format(nb_file, args.input_format)
+                )
+                return 0
+            else:
+                raise
+        nb_dest = full_path(bp, args.output_format)
 
     config = load_jupytext_config(os.path.abspath(nb_file))
 
@@ -711,7 +732,14 @@ def jupytext_single_file(nb_file, args, log):
         log("[jupytext] Sync timestamp of '{}'".format(nb_file))
         os.utime(nb_file, None)
 
-    return 0
+    if args.alert_untracked and is_untracked(nb_dest):
+        log(
+            "[jupytext] Output file {nb_dest} is not tracked in the git index, "
+            "add it to the index using 'git add' to fix this.".format(nb_dest=nb_dest)
+        )
+        return 1
+    else:
+        return 0
 
 
 def notebooks_in_git_index(fmt):
@@ -729,6 +757,12 @@ def notebooks_in_git_index(fmt):
         except InconsistentPath:
             continue
     return files
+
+
+def is_untracked(filepath):
+    """Check whether a file is untracked by the git index"""
+    output = system("git", "ls-files", filepath).strip()
+    return output == ""
 
 
 def print_paired_paths(nb_file, fmt):

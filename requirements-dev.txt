@@ -10,6 +10,7 @@ setuptools
 toml
 jupyterlab==3.0.0
 jupyter-packaging
+pre-commit
 
 # Python 2
 pathlib
