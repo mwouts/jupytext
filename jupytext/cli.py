@@ -733,7 +733,10 @@ def jupytext_single_file(nb_file, args, log):
         os.utime(nb_file, None)
 
     if args.alert_untracked and is_untracked(nb_dest):
-        log("[jupytext] Output file {} is not tracked in the git index".format(nb_dest))
+        log(
+            "[jupytext] Output file {nb_dest} is not tracked in the git index, "
+            "add it to the index using 'git add' to fix this.".format(nb_dest=nb_dest)
+        )
         return 1
     else:
         return 0
