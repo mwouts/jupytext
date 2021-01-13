@@ -425,6 +425,22 @@ def test_alert_untracked_alerts(tmpdir):
     assert tmpdir.join("test.ipynb").exists()
 
 
+def test_alert_untracked_alerts_when_using_sync(tmpdir):
+    git_in_tmpdir(tmpdir)
+
+    file = tmpdir.join("test.py")
+    file.write("print('hello')\n")
+
+    tmpdir.join(".jupytext.toml").write('default_jupytext_formats = "ipynb,py"')
+
+    # Run jupytext
+    with tmpdir.as_cwd():
+        status = jupytext(["--sync", "--alert-untracked", str(file)])
+
+    assert status != 0
+    assert tmpdir.join("test.ipynb").exists()
+
+
 def test_alert_untracked_not_alerts_for_tracked(tmpdir):
     git = git_in_tmpdir(tmpdir)
 

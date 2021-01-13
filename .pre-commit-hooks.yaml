@@ -3,5 +3,6 @@
   description: Runs jupytext on all notebooks and paired files.
   language: python
   entry: jupytext --ignore-unmatched --alert-untracked
+  types: [jupyter, markdown, myst, python, r]
   pass_filenames: true
   require_serial: true

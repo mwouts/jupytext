@@ -434,19 +434,24 @@ def jupytext_single_file(nb_file, args, log):
         nb_dest = args.output
     elif args.output_format and nb_file == "-":
         nb_dest = "-"
-    elif args.output_format:
+    else:
         try:
             bp = base_path(nb_file, args.input_format)
         except InconsistentPath:
             if args.ignore_unmatched:
                 log(
-                    "[jupytext] Ignoring unmatched input "
-                    "path {} for format {}".format(nb_file, args.input_format)
+                    "[jupytext] Ignoring unmatched input path {}{}".format(
+                        nb_file,
+                        " for format {}".format(args.input_format)
+                        if args.input_format
+                        else "",
+                    )
                 )
                 return 0
             else:
                 raise
-        nb_dest = full_path(bp, args.output_format)
+        if args.output_format:
+            nb_dest = full_path(bp, args.output_format)
 
     config = load_jupytext_config(os.path.abspath(nb_file))
 
@@ -709,6 +714,8 @@ def jupytext_single_file(nb_file, args, log):
         if modified:
             inputs_nb_file = outputs_nb_file = None
 
+        untracked_paths = []
+
         def write_function(path, fmt):
             # Do not write the ipynb file if it was not modified
             # But, always write text representations to make sure they are the most recent
@@ -718,9 +725,21 @@ def jupytext_single_file(nb_file, args, log):
             write(notebook, path, fmt=fmt)
             if args.pre_commit:
                 system("git", "add", path)
+            if args.alert_untracked and is_untracked(path):
+                nonlocal untracked_paths
+                untracked_paths.append(path)
 
         formats = prepare_notebook_for_save(notebook, config, nb_file)
         write_pair(nb_file, formats, write_function)
+        if untracked_paths:
+            log(
+                "[jupytext] Output file {nb_dest} is not tracked in the git index, "
+                "add it to the index using 'git add' to fix this.".format(
+                    nb_dest=", ".join(untracked_paths)
+                )
+            )
+            return 1
+
     elif (
         os.path.isfile(nb_file)
         and nb_dest.endswith(".ipynb")
