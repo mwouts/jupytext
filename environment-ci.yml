@@ -9,6 +9,7 @@ dependencies:
   - jupyter
   - ipykernel
   - nbconvert
+  - nbformat<=5.0.8
   - pyyaml
   - toml
   - pip
