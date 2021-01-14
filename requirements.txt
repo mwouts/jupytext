@@ -1,4 +1,4 @@
-nbformat>=4.0.0
+nbformat>=4.0.0,<=5.0.8
 pyyaml
 toml
 markdown-it-py~=0.6.0
