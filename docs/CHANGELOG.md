@@ -10,6 +10,9 @@ Jupytext ChangeLog
 **Fixed**
 - Indented magic commands are supported (#694)
 
+**Added**
+- Added a test that ensures that `py:percent` scripts end with exactly one blank line (#682)
+
 
 1.9.1 (2021-01-06)
 ------------------
