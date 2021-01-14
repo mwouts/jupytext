@@ -25,6 +25,12 @@ repos:
     - id: end-of-file-fixer
     - id: trailing-whitespace
 
+  - repo: https://github.com/myint/autoflake
+    rev: v1.4
+    hooks:
+    - id: autoflake
+      args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
+
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.4
     hooks:
