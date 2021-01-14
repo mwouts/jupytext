@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.9.2-dev (???)
+---------------
+
+**Changed**
+- Jupytext does not work properly with the new cell ids of the version 4.5 of `nbformat>=5.1.0` yet, so we added the requirement `nbformat<=5.0.8` (#715)
+
+
 1.9.1 (2021-01-06)
 ------------------
 
