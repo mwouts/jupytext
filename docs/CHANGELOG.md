@@ -12,7 +12,8 @@ Jupytext ChangeLog
 - Indented magic commands are supported ([#694](https://github.com/mwouts/jupytext/issues/694))
 
 **Added**
-- Added a test that ensures that `py:percent` scripts end with exactly one blank line ([#682](https://github.com/mwouts/jupytext/issues/682))
+- We made sure that `py:percent` scripts end with exactly one blank line ([#682](https://github.com/mwouts/jupytext/issues/682))
+- We checked that Jupytext works well with symbolic links to folders (not files!) ([#696](https://github.com/mwouts/jupytext/issues/696))
 - We have added `isort` and `autoflake8` to the `pre-commit` configuration file used for developing the Jupytext project ([#709](https://github.com/mwouts/jupytext/issues/709))
 
 
