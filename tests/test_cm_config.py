@@ -1,4 +1,6 @@
 import os
+import sys
+
 import unittest.mock as mock
 
 import pytest
@@ -123,3 +125,50 @@ def test_global_config_file(tmpdir):
             "notebook.ipynb",
             "notebook.Rmd",
         }
+
+
+@pytest.mark.skipif(
+    sys.platform.startswith("win"),
+    reason="AttributeError: 'LocalPath' object has no attribute 'mksymlinkto'",
+)
+def test_paired_files_and_symbolic_links(tmpdir):
+    """We test that we don't get issues when pairing files into folders
+    that are symbolic links"""
+
+    actual = tmpdir.mkdir("actual_files")
+    actual_notebooks = actual.mkdir("notebooks")
+    actual_scripts = actual.mkdir("scripts")
+
+    # Open the contents manager in another dir
+    jupyter_dir = tmpdir.mkdir("jupyter_dir")
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(jupyter_dir)
+
+    # Create sym links to the notebook/script folders
+    jupyter_dir.join("link_to_notebooks").mksymlinkto(actual_notebooks)
+    jupyter_dir.join("link_to_scripts").mksymlinkto(actual_scripts)
+
+    # Pair the notebooks in the linked folders
+    jupyter_dir.join("jupytext.toml").write(
+        'default_jupytext_formats = "link_to_notebooks///ipynb,link_to_scripts///py:percent"'
+    )
+
+    # Save a notebook
+    cm.save(notebook_model(SAMPLE_NOTEBOOK), "link_to_notebooks/notebook.ipynb")
+
+    # This creates two files in the destinations folders
+    assert actual_notebooks.join("notebook.ipynb").isfile()
+    assert actual_scripts.join("notebook.py").isfile()
+
+    # Re-open the notebook (here, the text version)
+    cm.get("link_to_scripts/notebook.py")
+
+    # Update the text version
+    jupyter_dir.join("link_to_scripts").join("notebook.py").write_text(
+        "# %%\n3 + 3\n", encoding="utf-8"
+    )
+
+    # Reload and make sure that we get the updated notebook
+    model = cm.get("link_to_notebooks/notebook.ipynb")
+    nb = model["content"]
+    assert nb.cells == [new_code_cell("3 + 3")]
