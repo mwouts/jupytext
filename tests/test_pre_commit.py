@@ -7,6 +7,7 @@ from textwrap import dedent
 
 import unittest.mock as mock
 import pytest
+from pre_commit.main import main as pre_commit
 from jupytext.compare import compare
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from jupytext import read, write
@@ -472,7 +473,6 @@ def test_pre_commit_hook_for_new_file(tmpdir):
 
     # set up the tmpdir repo with pre-commit
     git = git_in_tmpdir(tmpdir)
-    sys = system_in_tmpdir(tmpdir)
 
     pre_commit_config_yaml = dedent(
         f"""
@@ -486,13 +486,16 @@ def test_pre_commit_hook_for_new_file(tmpdir):
     )
     tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
     git("add", ".pre-commit-config.yaml")
-    sys("pre-commit", "install", "--install-hooks")
+    with tmpdir.as_cwd():
+        pre_commit(["install", "--install-hooks", "-f"])
 
     # write test notebook and sync it to py:percent
     nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
     nb_file = str(tmpdir.join("test.ipynb"))
     write(nb, nb_file)
-    jupytext(["--set-formats", "ipynb,py:percent", nb_file])
+
+    with tmpdir.as_cwd():
+        jupytext(["--set-formats", "ipynb,py:percent", nb_file])
 
     # try to commit it, should fail since the hook runs and makes changes
     git("add", nb_file)
@@ -527,12 +530,13 @@ def test_pre_commit_hook_for_existing_changed_file(tmpdir):
           rev: {repo_rev}
           hooks:
           - id: jupytext
-            args: [--from, ipynb, --to, py:light]
+            args: [--from, ipynb, --to, "py:light"]
         """
     )
     tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
     git("add", ".pre-commit-config.yaml")
-    sys("pre-commit", "install", "--install-hooks")
+    with tmpdir.as_cwd():
+        pre_commit(["install", "--install-hooks"])
 
     # write test notebook and output file
     nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
@@ -546,7 +550,8 @@ def test_pre_commit_hook_for_existing_changed_file(tmpdir):
     # run the hook and commit the output
     with pytest.raises(SystemExit):
         # pre-commit will exit non-zero since it will make changed
-        sys("pre-commit", "run")
+        sys("pre-commit", "try-repo", repo_root, "jupytext")
+
     git("add", ".")
     git("commit", "-m", "test")
 
