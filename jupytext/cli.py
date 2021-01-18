@@ -780,6 +780,8 @@ def notebooks_in_git_index(fmt):
 
 def is_untracked(filepath):
     """Check whether a file is untracked by the git index"""
+    if not filepath:
+        return False
     output = system("git", "ls-files", filepath).strip()
     return output == ""
 
