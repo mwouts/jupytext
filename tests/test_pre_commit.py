@@ -492,6 +492,7 @@ def test_pre_commit_hook_for_new_file(tmpdir):
     # write test notebook and sync it to py:percent
     nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
     nb_file = str(tmpdir.join("test.ipynb"))
+    py_file = str(tmpdir.join("test.py"))
     write(nb, nb_file)
 
     with tmpdir.as_cwd():
@@ -507,7 +508,7 @@ def test_pre_commit_hook_for_new_file(tmpdir):
         git("commit", "-m", "still failing")
 
     # add the new file, now the commit will succeed
-    git("add", "test.py")
+    git("add", py_file)
     git("commit", "-m", "passing")
     assert "test.ipynb" in git("ls-files")
     assert "test.py" in git("ls-files")
@@ -520,7 +521,6 @@ def test_pre_commit_hook_for_existing_changed_file(tmpdir):
     repo_rev = system("git", "rev-parse", "HEAD", cwd=repo_root).strip()
 
     git = git_in_tmpdir(tmpdir)
-    sys = system_in_tmpdir(tmpdir)
 
     # set up the tmpdir repo with pre-commit
     pre_commit_config_yaml = dedent(
@@ -542,15 +542,8 @@ def test_pre_commit_hook_for_existing_changed_file(tmpdir):
     nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
     nb_file = str(tmpdir.join("test.ipynb"))
     write(nb, nb_file)
-    py_file = tmpdir.join("test.py")
-    py_file.write("# hello")
-    py_file = str(py_file)
-
-    git("add", ".")
-    # run the hook and commit the output
-    with pytest.raises(SystemExit):
-        # pre-commit will exit non-zero since it will make changed
-        sys("pre-commit", "try-repo", repo_root, "jupytext")
+    py_file = str(tmpdir.join("test.py"))
+    jupytext(["--from", "ipynb", "--to", "py:light", str(nb_file)])
 
     git("add", ".")
     git("commit", "-m", "test")
@@ -569,7 +562,7 @@ def test_pre_commit_hook_for_existing_changed_file(tmpdir):
         git("commit", "-m", "fails again")
 
     # once we add the changes, it will pass
-    git("add", "test.py")
+    git("add", py_file)
     git("commit", "-m", "succeeds")
 
     assert "test.ipynb" in git("ls-files")
