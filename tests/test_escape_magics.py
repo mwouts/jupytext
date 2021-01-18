@@ -270,5 +270,8 @@ def test_configure_magic(no_jupytext_version_number):
 def test_indented_magic():
     assert is_magic("    !rm file", "python")
     assert is_magic("    # !rm file", "python")
+    assert is_magic("    %cd", "python")
     assert comment_magic(["    !rm file"]) == ["    # !rm file"]
     assert uncomment_magic(["    # !rm file"]) == ["    !rm file"]
+    assert comment_magic(["    %cd"]) == ["    # %cd"]
+    assert uncomment_magic(["    # %cd"]) == ["    %cd"]
