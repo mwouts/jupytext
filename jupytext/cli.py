@@ -717,10 +717,15 @@ def jupytext_single_file(nb_file, args, log):
         untracked_paths = []
 
         def write_function(path, fmt):
-            # Do not write the ipynb file if it was not modified
-            # But, always write text representations to make sure they are the most recent
-            if path == inputs_nb_file and path == outputs_nb_file:
+            if path == inputs_nb_file:
+                # We update the timestamp of the text file to make sure it remains more recent than the ipynb
+                if path != outputs_nb_file:
+                    log("[jupytext] Sync timestamp of '{}'".format(nb_file))
+                    os.utime(nb_file, None)
+
+                # We don't write the ipynb file if it was not modified
                 return
+
             log("[jupytext] Updating '{}'".format(path))
             write(notebook, path, fmt=fmt)
             if args.pre_commit:

@@ -5,13 +5,14 @@ Jupytext ChangeLog
 ---------------
 
 **Changed**
-- Jupytext does not work properly with the new cell ids of the version 4.5 of `nbformat>=5.1.0` yet, so we added the requirement `nbformat<=5.0.8` (#715)
+- Jupytext does not work properly with the new cell ids of the version 4.5 of `nbformat>=5.1.0` yet, so we added the requirement `nbformat<=5.0.8` ([#715](https://github.com/mwouts/jupytext/issues/715))
+- `jupytext --sync` only updates the timestamp of the text file (not the file itself) when that file is the most recent ([#698](https://github.com/mwouts/jupytext/issues/698))
 
 **Fixed**
-- Indented magic commands are supported (#694)
+- Indented magic commands are supported ([#694](https://github.com/mwouts/jupytext/issues/694))
 
 **Added**
-- Added a test that ensures that `py:percent` scripts end with exactly one blank line (#682)
+- Added a test that ensures that `py:percent` scripts end with exactly one blank line ([#682](https://github.com/mwouts/jupytext/issues/682))
 
 
 1.9.1 (2021-01-06)
