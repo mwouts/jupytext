@@ -5,3 +5,5 @@
   entry: jupytext --ignore-unmatched --alert-untracked
   pass_filenames: true
   require_serial: true
+  types: jupyter
+  additional_dependencies: identify
