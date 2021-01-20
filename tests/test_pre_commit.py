@@ -7,7 +7,6 @@ from textwrap import dedent
 
 import unittest.mock as mock
 import pytest
-from pre_commit.main import main as pre_commit
 from jupytext.compare import compare
 from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
 from jupytext import read, write
@@ -16,6 +15,11 @@ from jupytext.compare import compare_notebooks
 from .utils import list_notebooks
 from .utils import requires_black, requires_flake8, requires_pandoc, requires_pre_commit
 from .utils import requires_jupytext_installed
+
+try:
+    from pre_commit.main import main as pre_commit
+except ImportError:
+    pre_commit = None
 
 
 def git_in_tmpdir(tmpdir):
