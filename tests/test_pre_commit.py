@@ -540,7 +540,7 @@ def test_pre_commit_hook_for_existing_changed_file(tmpdir):
           rev: {repo_rev}
           hooks:
           - id: jupytext
-            args: [--from, ipynb, --to, "py:light"]
+            args: [--from, ipynb, --to, "py:percent"]
         """
     )
     tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
@@ -553,7 +553,7 @@ def test_pre_commit_hook_for_existing_changed_file(tmpdir):
     nb_file = str(tmpdir.join("test.ipynb"))
     write(nb, nb_file)
     py_file = str(tmpdir.join("test.py"))
-    jupytext(["--from", "ipynb", "--to", "py:light", str(nb_file)])
+    jupytext(["--from", "ipynb", "--to", "py:percent", str(nb_file)])
 
     git("add", ".")
     git("commit", "-m", "test")

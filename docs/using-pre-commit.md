@@ -46,7 +46,7 @@ repos:
     rev: #CURRENT_TAG/COMMIT_HASH
     hooks:
     - id: jupytext
-      args: [--from, ipynb, --to, py:light, --to, markdown]
+      args: [--from, ipynb, --to, "py:percent"]
 ```
 
 If you are combining Jupytext with other pre-commit hooks, you must ensure that all hooks will pass on any files you generate. For example, if you have a hook for using `black` to format all your python code, then you should use Jupytext's `--pipe` option to also format newly generated Python scripts before writing them:
