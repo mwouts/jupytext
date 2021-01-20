@@ -18,7 +18,7 @@ from .utils import requires_jupytext_installed
 
 try:
     from pre_commit.main import main as pre_commit
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     pre_commit = None
 
 
