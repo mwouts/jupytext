@@ -145,19 +145,6 @@ jobs:
         shell: pwsh
         run: |
           python -m ipykernel install --name jupytext-ci --user
-      - name: Install optional dependencies
-        shell: pwsh
-        run: |
-          $ErrorActionPreference='silentlycontinue'
-          # install black, isort, and autopep8 for testing the pipe mode
-          conda install black --freeze-installed
-          conda install isort>=5.3.0 --freeze-installed
-          conda install autopep8 --freeze-installed
-          # install sphinx_gallery and matplotlib if available
-          conda install 'sphinx-gallery>=0.7' 'sphinx-gallery<0.8' --freeze-installed
-          # myst-parser
-          conda install 'markdown-it-py>=0.5' 'markdown-it-py<0.6' --freeze-installed
-          exit 0
       - name: Conda list
         shell: pwsh
         run: conda list

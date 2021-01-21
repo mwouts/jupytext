@@ -1,6 +1,5 @@
 # This environment is smaller than the dev environment.
-# In particular it does not include JupyterLab, community notebook extensions,
-# nor the libraries that are not available for Python 2.7
+# In particular it does not include JupyterLab nor the community notebook extensions
 name: jupytext-ci
 channels:
   - defaults
@@ -12,11 +11,16 @@ dependencies:
   - nbformat<=5.0.8
   - pyyaml
   - toml
+  - markdown-it-py~=0.6.0
   - pip
   - pytest
   - pytest-cov
   - coverage
   - flake8
+  - autopep8
+  - black
+  - isort>=5.3.0
   - pandoc>=2.11
-  # pathlib is required on Python 2
-  - pathlib
+  - sphinx-gallery<0.8
+  - pre-commit
+  - gitpython
