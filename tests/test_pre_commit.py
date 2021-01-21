@@ -52,7 +52,8 @@ def test_pre_commit_hook_for_new_file(
 
     # try again, it will still fail because the output hasn't been added
     with pytest.raises(
-        HookExecutionError, match="Output file test.py is not tracked in the git index"
+        HookExecutionError,
+        match="Please run 'git add test.py'",
     ):
         tmp_repo.index.commit("still failing")
 
@@ -99,8 +100,10 @@ def test_pre_commit_hook_for_existing_changed_file(
     with pytest.raises(HookExecutionError, match="files were modified by this hook"):
         tmp_repo.index.commit("fails")
 
-    # TODO: Not sure this is the expected message?
-    with pytest.raises(HookExecutionError, match="files were modified by this hook"):
+    with pytest.raises(
+        HookExecutionError,
+        match="Please run 'git add test.py'",
+    ):
         tmp_repo.index.commit("fails again")
 
     # once we add the changes, it will pass

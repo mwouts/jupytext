@@ -20,6 +20,14 @@ def test_is_untracked(tmpdir, cwd_tmpdir, tmp_repo):
     tmp_repo.index.commit("test")
     assert not is_untracked(file)
 
+    # changed
+    tmpdir.join(file).write("modified file\n")
+    assert is_untracked(file)
+
+    # added, not committed
+    tmp_repo.git.add(file)
+    assert not is_untracked(file)
+
 
 def test_ignore_unmatched_ignores(tmpdir, cwd_tmpdir):
     # Unmatched file
@@ -46,7 +54,7 @@ def test_alert_untracked_alerts(tmpdir, cwd_tmpdir, tmp_repo, capsys):
     assert tmpdir.join("test.ipynb").exists()
 
     out = capsys.readouterr()
-    assert "Output file test.ipynb is not tracked in the git index" in out.out
+    assert "Please run 'git add test.ipynb'" in out.out
 
 
 def test_alert_untracked_alerts_when_using_sync(tmpdir, cwd_tmpdir, tmp_repo, capsys):
@@ -62,10 +70,10 @@ def test_alert_untracked_alerts_when_using_sync(tmpdir, cwd_tmpdir, tmp_repo, ca
     assert tmpdir.join("test.ipynb").exists()
 
     out = capsys.readouterr()
-    assert "Output file test.ipynb is not tracked in the git index" in out.out
+    assert "Please run 'git add test.ipynb'" in out.out
 
 
-def test_alert_untracked_not_alerts_for_tracked(tmpdir, cwd_tmpdir, tmp_repo):
+def test_alert_untracked_alerts_for_modified(tmpdir, cwd_tmpdir, tmp_repo, capsys):
     # write test notebook
     nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
     write(nb, "test.ipynb")
@@ -81,4 +89,6 @@ def test_alert_untracked_not_alerts_for_tracked(tmpdir, cwd_tmpdir, tmp_repo):
         ["--from", "ipynb", "--to", "py:light", "--alert-untracked", "test.ipynb"]
     )
 
-    assert status == 0
+    assert status == 1
+    out = capsys.readouterr()
+    assert "Please run 'git add test.py'" in out.out

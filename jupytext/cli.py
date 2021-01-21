@@ -741,18 +741,17 @@ def jupytext_single_file(nb_file, args, log):
             if args.pre_commit:
                 system("git", "add", path)
             if args.alert_untracked and is_untracked(path):
+                log(
+                    "[jupytext] Output file {nb_dest} is not up-to-date in the git index. "
+                    "Please run 'git add {nb_dest}' to fix this".format(nb_dest=path)
+                )
+
                 nonlocal untracked_paths
                 untracked_paths.append(path)
 
         formats = prepare_notebook_for_save(notebook, config, nb_file)
         write_pair(nb_file, formats, write_function)
         if untracked_paths:
-            log(
-                "[jupytext] Output file {nb_dest} is not tracked in the git index, "
-                "add it to the index using 'git add' to fix this.".format(
-                    nb_dest=", ".join(untracked_paths)
-                )
-            )
             return 1
 
     elif (
@@ -768,8 +767,8 @@ def jupytext_single_file(nb_file, args, log):
 
     if args.alert_untracked and is_untracked(nb_dest):
         log(
-            "[jupytext] Output file {nb_dest} is not tracked in the git index, "
-            "add it to the index using 'git add' to fix this.".format(nb_dest=nb_dest)
+            "[jupytext] Output file {nb_dest} is not up-to-date in the git index. "
+            "Please run 'git add {nb_dest}' to fix this".format(nb_dest=nb_dest)
         )
         return 1
     else:
@@ -794,11 +793,19 @@ def notebooks_in_git_index(fmt):
 
 
 def is_untracked(filepath):
-    """Check whether a file is untracked by the git index"""
+    """Check whether a file was created or modified and needs to be added to the git index"""
     if not filepath:
         return False
+
     output = system("git", "ls-files", filepath).strip()
-    return output == ""
+    if output == "":
+        return True
+
+    output = system("git", "diff", filepath).strip()
+    if output != "":
+        return True
+
+    return False
 
 
 def print_paired_paths(nb_file, fmt):
