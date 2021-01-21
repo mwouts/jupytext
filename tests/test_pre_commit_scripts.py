@@ -8,10 +8,9 @@ import pytest
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 
 from jupytext import read, write
-from jupytext.cli import jupytext
+from jupytext.cli import jupytext, system
 from jupytext.compare import compare, compare_notebooks
 
-from .test_pre_commit import git_in_tmpdir, system_in_tmpdir
 from .utils import (
     list_notebooks,
     requires_black,
@@ -19,6 +18,31 @@ from .utils import (
     requires_jupytext_installed,
     requires_pandoc,
 )
+
+
+def git_in_tmpdir(tmpdir):
+    """Return a function that will execute git instruction in the desired directory"""
+
+    def git(*args):
+        out = system("git", *args, cwd=str(tmpdir))
+        print(out)
+        return out
+
+    git("init")
+    git("status")
+    git("config", "user.name", "jupytext-test-cli")
+    git("config", "user.email", "jupytext@tests.com")
+
+    return git
+
+
+def system_in_tmpdir(tmpdir):
+    """Return a function that will execute system commands in the desired directory"""
+
+    def system_(*args):
+        return system(*args, cwd=str(tmpdir))
+
+    return system_
 
 
 @requires_jupytext_installed
