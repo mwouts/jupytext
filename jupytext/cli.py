@@ -319,6 +319,13 @@ def jupytext(args=None):
         return 0
 
     if args.pre_commit:
+        warnings.warn(
+            "The --pre-commit argument is deprecated. "
+            "Please consider switching to the pre-commit.com framework "
+            "(let us know at https://github.com/mwouts/jupytext/issues "
+            "if that is an issue for you)",
+            DeprecationWarning,
+        )
         if args.notebooks:
             raise ValueError(
                 "--pre-commit takes notebooks from the git index. Do not pass any notebook here."
