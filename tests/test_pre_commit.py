@@ -1,3 +1,4 @@
+import sys
 from textwrap import dedent
 
 import pytest
@@ -11,6 +12,13 @@ try:
     from pre_commit.main import main as pre_commit
 except (ImportError, ModuleNotFoundError) as err:
     pytestmark = pytest.mark.skip(str(err))
+
+if sys.platform.startswith("win"):
+    # The tests below fail in the Windows plan
+    # https://github.com/mwouts/jupytext/runs/1745075455
+    pytestmark = pytest.mark.skip(
+        "OSError: [WinError 193] %1 is not a valid Win32 application"
+    )
 
 
 def test_pre_commit_hook_for_new_file(
