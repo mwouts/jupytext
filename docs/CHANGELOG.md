@@ -4,19 +4,20 @@ Jupytext ChangeLog
 1.10.0-dev (???)
 ----------------
 
+**Added**
+- Jupytext has a pre-commit hook! Many thanks to John Paton and Aaron Gokaslan for making this happen ([#698](https://github.com/mwouts/jupytext/issues/698))
+- We have added `isort` and `autoflake8` to the `pre-commit` configuration file used for developing the Jupytext project ([#709](https://github.com/mwouts/jupytext/issues/709))
+- We made sure that `py:percent` scripts end with exactly one blank line ([#682](https://github.com/mwouts/jupytext/issues/682))
+- We checked that Jupytext works well with symbolic links to folders (not files!) ([#696](https://github.com/mwouts/jupytext/issues/696))
+
 **Changed**
-- Jupytext does not work properly with the new cell ids of the version 4.5 of `nbformat>=5.1.0` yet, so we added the requirement `nbformat<=5.0.8` ([#715](https://github.com/mwouts/jupytext/issues/715))
 - `jupytext --sync` only updates the timestamp of the text file (not the file itself) when that file is the most recent ([#698](https://github.com/mwouts/jupytext/issues/698))
+- Jupytext does not work properly with the new cell ids of the version 4.5 of `nbformat>=5.1.0` yet, so we added the requirement `nbformat<=5.0.8` ([#715](https://github.com/mwouts/jupytext/issues/715))
 
 **Fixed**
 - Code cells that contain triple backticks (or more) are now encapsulated with four backticks (or more) in the Markdown and MyST Markdown formats. The version number for the Markdown format was increased to 1.3, and the version number for the MyST Markdown format was increased to 0.13 ([#712](https://github.com/mwouts/jupytext/issues/712))
 - Indented magic commands are supported ([#694](https://github.com/mwouts/jupytext/issues/694))
 - Jupytext will issue an informative error or warning on notebooks in a version of nbformat that is not known to be supported ([#681](https://github.com/mwouts/jupytext/issues/681), [#715](https://github.com/mwouts/jupytext/issues/715))
-
-**Added**
-- We made sure that `py:percent` scripts end with exactly one blank line ([#682](https://github.com/mwouts/jupytext/issues/682))
-- We checked that Jupytext works well with symbolic links to folders (not files!) ([#696](https://github.com/mwouts/jupytext/issues/696))
-- We have added `isort` and `autoflake8` to the `pre-commit` configuration file used for developing the Jupytext project ([#709](https://github.com/mwouts/jupytext/issues/709))
 
 
 1.9.1 (2021-01-06)
