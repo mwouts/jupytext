@@ -156,12 +156,11 @@ def test_default_config_has_priority_over_current_metadata(
 
     cfg_file = tmpdir.join("jupytext.toml")
     cfg_file.write(
-        """default_jupytext_formats = "ipynb,py:percent"
-default_cell_metadata_filter = "-some_metadata_key"
+        """default_cell_metadata_filter = "-some_metadata_key"
 """
     )
 
-    jupytext_cli([str(py_file), "--sync"])
+    jupytext_cli([str(py_file), "--to", "py"])
     assert (
         py_file.read()
         == """# %%
