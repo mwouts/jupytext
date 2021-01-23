@@ -4,6 +4,7 @@ import argparse
 import glob
 import json
 import os
+import io
 import re
 import shlex
 import subprocess
@@ -26,7 +27,7 @@ from .formats import (
     short_form_one_format,
 )
 from .header import recursive_update
-from .jupytext import read, reads, write, writes
+from .jupytext import create_prefix_dir, read, reads, write, writes
 from .kernels import find_kernel_specs, get_kernel_spec, kernelspec_from_language
 from .languages import _SCRIPT_EXTENSIONS
 from .paired_paths import (
@@ -685,6 +686,68 @@ def jupytext_single_file(nb_file, args, log):
         return 0
 
     # b. Output to the desired file or format
+    untracked_files = 0
+
+    def lazy_write(path, fmt=None, action=None, update_timestamp_only=False):
+        """Write the notebook only if it has changed"""
+        if path == "-":
+            write(notebook, "-", fmt=fmt)
+            return
+
+        nonlocal untracked_files
+        if update_timestamp_only:
+            modified = False
+        else:
+            _, ext = os.path.splitext(path)
+            fmt = copy(fmt or {})
+            fmt = long_form_one_format(fmt, update={"extension": ext})
+            new_content = writes(notebook, fmt=fmt)
+            if not new_content.endswith("\n"):
+                new_content += "\n"
+            if not os.path.isfile(path):
+                modified = True
+            else:
+                with open(path) as fp:
+                    current_content = fp.read()
+                modified = new_content != current_content
+
+        if modified:
+            # The text representation of the notebook has changed, we write it on disk
+            if action is None:
+                log("[jupytext] Updating '{}'".format(path))
+            else:
+                log(
+                    "[jupytext] Writing {path}{format}{action}".format(
+                        path=path,
+                        format=" in format " + short_form_one_format(fmt)
+                        if fmt and "format_name" in fmt
+                        else "",
+                        action=action,
+                    )
+                )
+            create_prefix_dir(path, fmt)
+            with io.open(path, "w", encoding="utf-8") as fp:
+                fp.write(new_content)
+
+        # Otherwise, we only update the timestamp of the text file to make sure
+        # they remain more recent than the ipynb file, for compatibility with the
+        # Jupytext contents manager for Jupyter
+        if not modified and not path.endswith(".ipynb"):
+            log("[jupytext] Updating the timestamp of '{}'".format(path))
+            os.utime(path, None)
+
+        if args.pre_commit:
+            system("git", "add", path)
+
+        if args.alert_untracked and is_untracked(path):
+            log(
+                "[jupytext] Outdated git index! "
+                "Please run 'git add {path}'".format(path=path)
+            )
+            untracked_files += 1
+
+        return untracked_files
+
     if nb_dest:
         if nb_dest == nb_file and not dest_fmt:
             dest_fmt = fmt
@@ -705,56 +768,26 @@ def jupytext_single_file(nb_file, args, log):
         else:
             action = ""
 
-        log(
-            "[jupytext] Writing {nb_dest}{format}{action}".format(
-                nb_dest=nb_dest,
-                format=" in format " + short_form_one_format(dest_fmt)
-                if dest_fmt and "format_name" in dest_fmt
-                else "",
-                action=action,
-            )
-        )
-        write(notebook, nb_dest, fmt=dest_fmt)
-        if args.pre_commit:
-            system("git", "add", nb_dest)
+        lazy_write(nb_dest, fmt=dest_fmt, action=action)
 
     # c. Synchronize paired notebooks
     if args.sync:
         # Also update the original notebook if the notebook was modified
         if modified:
-            inputs_nb_file = outputs_nb_file = None
-
-        untracked_paths = []
+            inputs_nb_file = None
 
         def write_function(path, fmt):
-            if path == inputs_nb_file:
-                # We update the timestamp of the text file to make sure it remains more recent than the ipynb
-                if path != outputs_nb_file:
-                    log("[jupytext] Sync timestamp of '{}'".format(nb_file))
-                    os.utime(nb_file, None)
-
-                # We don't write the ipynb file if it was not modified
-                return
-
-            log("[jupytext] Updating '{}'".format(path))
-            write(notebook, path, fmt=fmt)
-            if args.pre_commit:
-                system("git", "add", path)
-            if args.alert_untracked and is_untracked(path):
-                log(
-                    "[jupytext] Output file {nb_dest} is not up-to-date in the git index. "
-                    "Please run 'git add {nb_dest}' to fix this".format(nb_dest=path)
-                )
-
-                nonlocal untracked_paths
-                untracked_paths.append(path)
+            lazy_write(
+                path,
+                fmt,
+                update_timestamp_only=(path == inputs_nb_file),
+            )
 
         formats = prepare_notebook_for_save(notebook, config, nb_file)
         write_pair(nb_file, formats, write_function)
-        if untracked_paths:
-            return 1
+        return untracked_files
 
-    elif (
+    if (
         os.path.isfile(nb_file)
         and nb_dest.endswith(".ipynb")
         and not nb_file.endswith(".ipynb")
@@ -762,17 +795,9 @@ def jupytext_single_file(nb_file, args, log):
     ):
         # Update the original text file timestamp, as required by our Content Manager
         # Otherwise Jupyter will refuse to open the paired notebook #335
-        log("[jupytext] Sync timestamp of '{}'".format(nb_file))
-        os.utime(nb_file, None)
+        lazy_write(nb_file, update_timestamp_only=True)
 
-    if args.alert_untracked and is_untracked(nb_dest):
-        log(
-            "[jupytext] Output file {nb_dest} is not up-to-date in the git index. "
-            "Please run 'git add {nb_dest}' to fix this".format(nb_dest=nb_dest)
-        )
-        return 1
-    else:
-        return 0
+    return untracked_files
 
 
 def notebooks_in_git_index(fmt):
