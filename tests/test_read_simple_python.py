@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from nbformat.v4.nbbase import (
-    new_markdown_cell,
-    new_code_cell,
-    new_raw_cell,
-    new_notebook,
-)
-from jupytext.compare import compare
-import jupytext
-from jupytext.compare import compare_notebooks
-
 import pytest
+from nbformat.v4.nbbase import (
+    new_code_cell,
+    new_markdown_cell,
+    new_notebook,
+    new_raw_cell,
+)
+
+import jupytext
+from jupytext.compare import compare, compare_notebooks
 
 
 def test_read_simple_file(

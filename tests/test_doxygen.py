@@ -1,9 +1,10 @@
-import pytest
 import nbformat
+import pytest
+
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
-from jupytext.doxygen import doxygen_to_markdown, markdown_to_doxygen
 from jupytext.compare import compare, compare_notebooks
+from jupytext.doxygen import doxygen_to_markdown, markdown_to_doxygen
 
 SAMPLE_MARKDOWN = """A latex formula $$1+1$$, another one $$2+2
 $$

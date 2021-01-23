@@ -1,8 +1,8 @@
 import pytest
-from jupytext.compare import compare
-from nbformat.v4.nbbase import new_notebook, new_code_cell, new_markdown_cell
+from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
+
 import jupytext
-from jupytext.compare import compare_notebooks
+from jupytext.compare import compare, compare_notebooks
 
 
 @pytest.mark.parametrize("blank_lines", range(1, 6))

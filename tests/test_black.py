@@ -1,14 +1,16 @@
 import os
-import pytest
 from shutil import copyfile
-from jupytext.compare import compare
-from nbformat.v4.nbbase import new_notebook, new_code_cell
-from .utils import list_notebooks, requires_black, requires_flake8, requires_autopep8
+
+import pytest
+from nbformat.v4.nbbase import new_code_cell, new_notebook
 
 from jupytext import read, write
-from jupytext.cli import system, jupytext, pipe_notebook
+from jupytext.cli import jupytext, pipe_notebook, system
 from jupytext.combine import black_invariant
+from jupytext.compare import compare
 from jupytext.header import _DEFAULT_NOTEBOOK_METADATA
+
+from .utils import list_notebooks, requires_autopep8, requires_black, requires_flake8
 
 
 @requires_black

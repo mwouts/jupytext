@@ -1,16 +1,13 @@
 import pytest
 from nbformat.v4.nbbase import (
-    new_notebook,
-    new_markdown_cell,
     new_code_cell,
+    new_markdown_cell,
+    new_notebook,
     new_raw_cell,
 )
-from jupytext.compare import compare
-from jupytext.compare import (
-    compare_notebooks,
-    NotebookDifference,
-    test_round_trip_conversion as round_trip_conversion,
-)
+
+from jupytext.compare import NotebookDifference, compare, compare_notebooks
+from jupytext.compare import test_round_trip_conversion as round_trip_conversion
 
 
 def notebook_metadata():

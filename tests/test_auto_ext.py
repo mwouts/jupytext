@@ -1,6 +1,8 @@
 import pytest
+
 from jupytext import read, reads, writes
 from jupytext.formats import JupytextFormatError, auto_ext_from_metadata
+
 from .utils import list_notebooks
 
 

@@ -1,8 +1,9 @@
 import nbformat
-from nbformat.v4.nbbase import new_notebook, new_code_cell
+from nbformat.v4.nbbase import new_code_cell, new_notebook
+
 from jupytext.cli import jupytext as jupytext_cli
-from jupytext.languages import _JUPYTER_LANGUAGES_LOWER_AND_UPPER
 from jupytext.compare import compare_notebooks
+from jupytext.languages import _JUPYTER_LANGUAGES_LOWER_AND_UPPER
 
 
 def test_custom_cell_magics(

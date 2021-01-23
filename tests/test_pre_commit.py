@@ -2,19 +2,25 @@
 
 import os
 import stat
+import unittest.mock as mock
 from pathlib import Path
 from textwrap import dedent
 
-import unittest.mock as mock
 import pytest
-from jupytext.compare import compare
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
+from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
+
 from jupytext import read, write
-from jupytext.cli import jupytext, system, is_untracked
-from jupytext.compare import compare_notebooks
-from .utils import list_notebooks
-from .utils import requires_black, requires_flake8, requires_pandoc, requires_pre_commit
-from .utils import requires_jupytext_installed
+from jupytext.cli import is_untracked, jupytext, system
+from jupytext.compare import compare, compare_notebooks
+
+from .utils import (
+    list_notebooks,
+    requires_black,
+    requires_flake8,
+    requires_jupytext_installed,
+    requires_pandoc,
+    requires_pre_commit,
+)
 
 try:
     from pre_commit.main import main as pre_commit

@@ -1,4 +1,5 @@
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
+from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
+
 import jupytext
 from jupytext.compare import compare, compare_notebooks
 

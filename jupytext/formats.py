@@ -6,40 +6,42 @@ new formats here!
 import os
 import re
 import warnings
-import yaml
+
 import nbformat
-from .header import header_to_metadata_and_cell, insert_or_test_version_number
+import yaml
+
 from .cell_reader import (
-    MarkdownCellReader,
-    RMarkdownCellReader,
-    LightScriptCellReader,
-    RScriptCellReader,
     DoublePercentScriptCellReader,
     HydrogenCellReader,
+    LightScriptCellReader,
+    MarkdownCellReader,
+    RMarkdownCellReader,
+    RScriptCellReader,
     SphinxGalleryScriptCellReader,
 )
 from .cell_to_text import (
-    MarkdownCellExporter,
-    RMarkdownCellExporter,
-    LightScriptCellExporter,
     BareScriptCellExporter,
-    RScriptCellExporter,
     DoublePercentCellExporter,
     HydrogenCellExporter,
+    LightScriptCellExporter,
+    MarkdownCellExporter,
+    RMarkdownCellExporter,
+    RScriptCellExporter,
     SphinxGalleryCellExporter,
 )
-from .metadata_filter import metadata_filter_as_string
-from .stringparser import StringParser
-from .languages import _SCRIPT_EXTENSIONS, _COMMENT_CHARS, same_language
-from .pandoc import pandoc_version
+from .header import header_to_metadata_and_cell, insert_or_test_version_number
+from .languages import _COMMENT_CHARS, _SCRIPT_EXTENSIONS, same_language
 from .magics import is_magic
+from .metadata_filter import metadata_filter_as_string
 from .myst import (
     MYST_FORMAT_NAME,
     is_myst_available,
-    myst_version,
-    myst_extensions,
     matches_mystnb,
+    myst_extensions,
+    myst_version,
 )
+from .pandoc import pandoc_version
+from .stringparser import StringParser
 from .version import __version__
 
 

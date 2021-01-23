@@ -1,30 +1,31 @@
 # -*- coding: utf-8 -*-
 
+import itertools
 import os
 import sys
 import time
-from io import StringIO
-
 import unittest.mock as mock
-import pytest
-import nbformat
-import itertools
-from shutil import copyfile
-from jupytext.compare import compare
 from argparse import ArgumentTypeError
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
+from io import StringIO
+from shutil import copyfile
+
+import nbformat
+import pytest
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
-from jupytext import __version__
-from jupytext import read, reads, write, writes
-from jupytext.cli import parse_jupytext_args, jupytext, system, str2bool
-from jupytext.compare import compare_notebooks
-from jupytext.paired_paths import paired_paths, InconsistentPath
-from jupytext.formats import long_form_one_format, JupytextFormatError
-from .utils import list_notebooks, requires_sphinx_gallery
+from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
+
+from jupytext import __version__, read, reads, write, writes
+from jupytext.cli import jupytext, parse_jupytext_args, str2bool, system
+from jupytext.compare import compare, compare_notebooks
+from jupytext.formats import JupytextFormatError, long_form_one_format
+from jupytext.paired_paths import InconsistentPath, paired_paths
+
 from .utils import (
+    list_notebooks,
     requires_jupytext_installed,
-    requires_pandoc,
     requires_myst,
+    requires_pandoc,
+    requires_sphinx_gallery,
     skip_on_windows,
 )
 

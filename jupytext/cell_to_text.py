@@ -3,19 +3,20 @@
 import re
 import warnings
 from copy import copy
-from .languages import cell_language, comment_lines, same_language
-from .cell_metadata import is_active, _IGNORE_CELL_METADATA
+
 from .cell_metadata import (
-    metadata_to_text,
-    metadata_to_rmd_options,
+    _IGNORE_CELL_METADATA,
+    is_active,
     metadata_to_double_percent_options,
+    metadata_to_rmd_options,
+    metadata_to_text,
 )
-from .metadata_filter import filter_metadata
-from .magics import comment_magic, escape_code_start, need_explicit_marker
 from .cell_reader import LightScriptCellReader, MarkdownCellReader, RMarkdownCellReader
-from .languages import _SCRIPT_EXTENSIONS
-from .pep8 import pep8_lines_between_cells
 from .doxygen import markdown_to_doxygen
+from .languages import _SCRIPT_EXTENSIONS, cell_language, comment_lines, same_language
+from .magics import comment_magic, escape_code_start, need_explicit_marker
+from .metadata_filter import filter_metadata
+from .pep8 import pep8_lines_between_cells
 
 
 def cell_source(cell):

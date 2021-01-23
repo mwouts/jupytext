@@ -1,10 +1,12 @@
 import os
+
 import pytest
-from nbformat.v4.nbbase import new_notebook, new_code_cell, new_markdown_cell
-from jupytext.compare import compare
-from jupytext import reads, writes, write
-from jupytext.combine import combine_inputs_with_outputs
+from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
+
+from jupytext import reads, write, writes
 from jupytext.cli import jupytext as jupytext_cli
+from jupytext.combine import combine_inputs_with_outputs
+from jupytext.compare import compare
 
 
 def test_write_reload_simple_notebook():

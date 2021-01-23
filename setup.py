@@ -1,8 +1,9 @@
-from os import path, environ
-from io import open
 import re
-from setuptools import setup, find_packages
 import warnings
+from io import open
+from os import environ, path
+
+from setuptools import find_packages, setup
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
@@ -96,10 +97,10 @@ if not build_labextension:
 else:
     # Install labextension using jupyter_packaging
     from jupyter_packaging import (
-        create_cmdclass,
-        install_npm,
-        ensure_targets,
         combine_commands,
+        create_cmdclass,
+        ensure_targets,
+        install_npm,
     )
 
     lab_path = path.join(this_directory, "jupytext", "labextension")

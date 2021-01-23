@@ -1,8 +1,11 @@
 import os
 import shutil
+
 import pytest
-from jupytext.contentsmanager import TextFileContentsManager
+
 from jupytext.compare import compare_notebooks
+from jupytext.contentsmanager import TextFileContentsManager
+
 from .utils import list_notebooks
 
 

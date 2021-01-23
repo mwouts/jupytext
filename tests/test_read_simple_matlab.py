@@ -1,6 +1,7 @@
-from nbformat.v4.nbbase import new_notebook, new_code_cell
-from jupytext.compare import compare, compare_notebooks
+from nbformat.v4.nbbase import new_code_cell, new_notebook
+
 import jupytext
+from jupytext.compare import compare, compare_notebooks
 
 
 def test_hide_code_tag(

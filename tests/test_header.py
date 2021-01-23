@@ -1,12 +1,13 @@
-from nbformat.v4.nbbase import new_notebook, new_raw_cell, new_markdown_cell
-from jupytext.compare import compare
+from nbformat.v4.nbbase import new_markdown_cell, new_notebook, new_raw_cell
+
 import jupytext
+from jupytext.compare import compare
+from jupytext.formats import get_format_implementation
 from jupytext.header import (
-    uncomment_line,
     header_to_metadata_and_cell,
     metadata_and_cell_to_header,
+    uncomment_line,
 )
-from jupytext.formats import get_format_implementation
 
 
 def test_uncomment():

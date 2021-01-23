@@ -1,10 +1,15 @@
 """List all the paths associated to a given notebook"""
 
 import os
-from .formats import long_form_one_format, long_form_multiple_formats
-from .formats import short_form_one_format, short_form_multiple_formats
-from .formats import NOTEBOOK_EXTENSIONS
+
 from .config import find_jupytext_configuration_file
+from .formats import (
+    NOTEBOOK_EXTENSIONS,
+    long_form_multiple_formats,
+    long_form_one_format,
+    short_form_multiple_formats,
+    short_form_one_format,
+)
 
 
 class InconsistentPath(ValueError):

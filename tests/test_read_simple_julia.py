@@ -1,5 +1,5 @@
-from jupytext.compare import compare
 import jupytext
+from jupytext.compare import compare
 
 
 def test_read_simple_file(

@@ -1,11 +1,13 @@
 import os
-
 import unittest.mock as mock
-from nbformat.v4.nbbase import new_notebook, new_markdown_cell, new_code_cell
-from nbformat import read
+
 import pytest
+from nbformat import read
+from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 from tornado.web import HTTPError
+
 import jupytext
+
 from .utils import notebook_model
 
 SAMPLE_NOTEBOOK = new_notebook(

@@ -1,9 +1,10 @@
 import pytest
 from nbformat.v4.nbbase import new_code_cell, new_notebook
-from jupytext.compare import compare
-from jupytext.magics import comment_magic, uncomment_magic, unesc, is_magic
-from jupytext.compare import compare_notebooks
+
 import jupytext
+from jupytext.compare import compare, compare_notebooks
+from jupytext.magics import comment_magic, is_magic, uncomment_magic, unesc
+
 from .utils import notebook_model
 
 

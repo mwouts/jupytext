@@ -1,7 +1,9 @@
 import nbformat
 import pytest
+
 import jupytext
 from jupytext.compare import compare_notebooks
+
 from .utils import list_notebooks
 
 

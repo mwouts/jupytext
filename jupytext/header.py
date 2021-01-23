@@ -2,14 +2,16 @@
 """
 
 import re
-import yaml
-from yaml.representer import SafeRepresenter
+
 import nbformat
+import yaml
 from nbformat.v4.nbbase import new_raw_cell
-from .version import __version__
+from yaml.representer import SafeRepresenter
+
 from .languages import _SCRIPT_EXTENSIONS, comment_lines
-from .metadata_filter import filter_metadata, _DEFAULT_NOTEBOOK_METADATA
+from .metadata_filter import _DEFAULT_NOTEBOOK_METADATA, filter_metadata
 from .pep8 import pep8_lines_between_cells
+from .version import __version__
 
 SafeRepresenter.add_representer(nbformat.NotebookNode, SafeRepresenter.represent_dict)
 

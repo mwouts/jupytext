@@ -2,11 +2,13 @@
 """
 import re
 from copy import copy
+
 from nbformat import NotebookNode
+
 from .cell_metadata import _IGNORE_CELL_METADATA
+from .formats import long_form_one_format
 from .header import _DEFAULT_NOTEBOOK_METADATA
 from .metadata_filter import restore_filtered_metadata
-from .formats import long_form_one_format
 
 _BLANK_LINE = re.compile(r"^\s*$")
 

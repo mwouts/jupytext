@@ -2,8 +2,9 @@
 
 import os
 import sys
-from .reraise import reraise
+
 from .languages import same_language
+from .reraise import reraise
 
 try:
     # I prefer not to take a dependency on jupyter_client

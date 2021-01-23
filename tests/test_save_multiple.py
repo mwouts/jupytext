@@ -1,11 +1,14 @@
 import os
+
 import pytest
 from nbformat.v4.nbbase import new_notebook
 from nbformat.validator import NotebookValidationError
 from tornado.web import HTTPError
+
 import jupytext
-from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.compare import compare_notebooks
+from jupytext.contentsmanager import TextFileContentsManager
+
 from .utils import list_notebooks, notebook_model
 
 

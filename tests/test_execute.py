@@ -1,8 +1,11 @@
 import shutil
+
 import pytest
+
 from jupytext import read
 from jupytext.cli import jupytext
-from .utils import requires_nbconvert, requires_ir_kernel, skip_on_windows
+
+from .utils import requires_ir_kernel, requires_nbconvert, skip_on_windows
 
 
 @requires_nbconvert

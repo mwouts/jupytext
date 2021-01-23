@@ -1,6 +1,8 @@
 import pytest
-from jupytext.compare import compare
+
 import jupytext
+from jupytext.compare import compare
+
 from .utils import list_notebooks
 
 

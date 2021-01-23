@@ -1,22 +1,25 @@
 import unittest.mock as mock
 from textwrap import dedent
+
 import pytest
 from nbformat.v4.nbbase import new_notebook
 from tornado.web import HTTPError
+
+import jupytext
+from jupytext.cli import jupytext as jupytext_cli
 from jupytext.formats import (
-    get_format_implementation,
     JupytextFormatError,
+    get_format_implementation,
     guess_format,
 )
 from jupytext.myst import (
-    myst_to_notebook,
     CODE_DIRECTIVE,
     MystMetadataParsingError,
     matches_mystnb,
     myst_extensions,
+    myst_to_notebook,
 )
-from jupytext.cli import jupytext as jupytext_cli
-import jupytext
+
 from .utils import requires_myst, requires_no_myst
 
 

@@ -1,9 +1,10 @@
 """ContentsManager that allows to open Rmd, py, R and ipynb files as notebooks
 """
-import os
 import itertools
-from datetime import timedelta, datetime
+import os
 from collections import namedtuple
+from datetime import datetime, timedelta
+
 import nbformat
 from tornado.web import HTTPError
 
@@ -14,27 +15,31 @@ except ImportError:
     pass
 
 import jupytext
-from .formats import long_form_multiple_formats
-from .formats import short_form_one_format, short_form_multiple_formats
-from .paired_paths import (
-    paired_paths,
-    find_base_path_and_format,
-    base_path,
-    full_path,
-    InconsistentPath,
-)
-from .pairs import write_pair, read_pair, latest_inputs_and_outputs
-from .kernels import set_kernelspec_from_language
+
 from .config import (
+    JUPYTEXT_CONFIG_FILES,
     JupytextConfiguration,
     JupytextConfigurationError,
-    JUPYTEXT_CONFIG_FILES,
     find_global_jupytext_configuration_file,
     load_jupytext_configuration_file,
-    validate_jupytext_configuration_file,
     preferred_format,
     prepare_notebook_for_save,
+    validate_jupytext_configuration_file,
 )
+from .formats import (
+    long_form_multiple_formats,
+    short_form_multiple_formats,
+    short_form_one_format,
+)
+from .kernels import set_kernelspec_from_language
+from .paired_paths import (
+    InconsistentPath,
+    base_path,
+    find_base_path_and_format,
+    full_path,
+    paired_paths,
+)
+from .pairs import latest_inputs_and_outputs, read_pair, write_pair
 
 
 def build_jupytext_contents_manager_class(base_contents_manager_class):

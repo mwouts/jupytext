@@ -1,6 +1,7 @@
 """Notebook and cell metadata filtering"""
 
 from copy import copy
+
 from .cell_metadata import _JUPYTEXT_CELL_METADATA
 
 _DEFAULT_NOTEBOOK_METADATA = ",".join(

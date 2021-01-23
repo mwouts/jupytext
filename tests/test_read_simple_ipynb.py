@@ -1,7 +1,8 @@
 import nbformat
 from nbformat.v4.nbbase import new_notebook
-from jupytext.compare import compare
+
 import jupytext
+from jupytext.compare import compare
 
 
 def test_save_ipynb_with_jupytext_has_final_newline(tmpdir):

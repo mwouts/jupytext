@@ -1,9 +1,12 @@
 import os
 import shlex
+
 import pytest
+from nbformat.v4.nbbase import new_code_cell, new_notebook
+
 import jupytext
-from nbformat.v4.nbbase import new_notebook, new_code_cell
 from jupytext.cli import jupytext as jupytext_cli
+
 from .utils import requires_black, requires_myst
 
 doc_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "docs")

@@ -1,26 +1,48 @@
-# Install pre-commit hooks via
-# pre-commit install
+# Install the pre-commit hooks below with
+# 'pre-commit install'
 
+# Auto-update the version of the hooks with
+# 'pre-commit autoupdate'
+
+# Run the hooks on all files with
+# 'pre-commit run --all'
+
+# NB: In this config we exclude the example and tests notebooks
+# from the code hooks (black, flake8, etc) as we want to keep
+# the text representation of the test notebooks unchanged
 exclude: >
     (?x)^(
-      \.vscode/settings\.json|
       demo/.*|
       tests/notebooks/.*|
     )$
 repos:
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.1.0
+    rev: v3.4.0
     hooks:
     - id: check-json
     - id: check-yaml
     - id: end-of-file-fixer
     - id: trailing-whitespace
 
+  - repo: https://github.com/myint/autoflake
+    rev: v1.4
+    hooks:
+    - id: autoflake
+      args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
+
   - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.2
+    rev: 3.8.4
     hooks:
     - id: flake8
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.7.0
+    hooks:
+      # isort needs the 'black' profile when used in combination with black
+      # See https://github.com/PyCQA/isort/issues/1518
+    - id: isort
+      args: ["--profile", "black"]
 
   - repo: https://github.com/psf/black
     rev: 20.8b1

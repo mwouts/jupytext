@@ -7,7 +7,7 @@ See also https://ipython.org/ipython-doc/3/notebook/nbformat.html#cell-metadata
 
 import ast
 import re
-from json import loads, dumps
+from json import dumps, loads
 
 try:
     from json import JSONDecodeError

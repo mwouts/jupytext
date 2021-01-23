@@ -13,6 +13,7 @@ Jupytext ChangeLog
 
 **Added**
 - Added a test that ensures that `py:percent` scripts end with exactly one blank line ([#682](https://github.com/mwouts/jupytext/issues/682))
+- We have added `isort` and `autoflake8` to the `pre-commit` configuration file used for developing the Jupytext project ([#709](https://github.com/mwouts/jupytext/issues/709))
 
 
 1.9.1 (2021-01-06)
