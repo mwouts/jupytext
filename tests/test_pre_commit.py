@@ -4,14 +4,10 @@ from textwrap import dedent
 import pytest
 from git.exc import HookExecutionError
 from nbformat.v4.nbbase import new_markdown_cell, new_notebook
+from pre_commit.main import main as pre_commit
 
 from jupytext import write
 from jupytext.cli import jupytext
-
-try:
-    from pre_commit.main import main as pre_commit
-except (ImportError, ModuleNotFoundError) as err:
-    pytestmark = pytest.mark.skip(str(err))
 
 if sys.platform.startswith("win"):
     # The tests below fail in the Windows plan
