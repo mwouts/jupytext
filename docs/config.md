@@ -68,14 +68,10 @@ You can pair notebooks in trees with a `root_prefix` separated with three slashe
 default_jupytext_formats = "notebooks///ipynb,scripts///py:percent"
 ```
 The `root_prefix` is matched with the top-most parent folder of the matching name, not above the Jupytext configuration file.
-A document is not considered a paired notebook when its path does not match the paired path specifications.
 
+For instance, with the pairing above, a notebook with path `/home/user/jupyter/notebooks/project1/example.ipynb` will be paired with the Python file `/home/user/jupyter/scripts/project1/example.py`.
 
-With only two slashes, notebooks are paired in directories but not in subfolders:
-```
-# Pair notebooks in folders named 'notebooks' to folders named 'scripts'
-default_jupytext_formats = "notebooks//ipynb,scripts//py:percent"
-```
+In addition to the `root_prefix`, you can use symbolic links if you wish to distribute your notebook folders at different places. Be sure to use symbolic links on folders, not files ([#696](https://github.com/mwouts/jupytext/issues/696)).
 
 To disable the default pairing for an individual notebook, set formats to a single format, with e.g.:
 ```bash
