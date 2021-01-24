@@ -309,7 +309,7 @@ class MarkdownCellReader(BaseCellReader):
 
     comment = ""
     start_code_re = re.compile(
-        r"^```(\s*)({})($|\s.*$)".format(
+        r"^```(`*)(\s*)({})($|\s.*$)".format(
             "|".join(_JUPYTER_LANGUAGES_LOWER_AND_UPPER).replace("+", "\\+")
         )
     )
@@ -362,7 +362,10 @@ class MarkdownCellReader(BaseCellReader):
 
     def options_to_metadata(self, options):
         if isinstance(options, tuple):
-            options = " ".join(options)
+            self.end_code_re = re.compile("```" + options[0])
+            options = " ".join(options[1:])
+        else:
+            self.end_code_re = re.compile(r"^```\s*$")
         self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(options)
         return text_to_metadata(options)
 
@@ -441,17 +444,11 @@ class MarkdownCellReader(BaseCellReader):
                     prev_blank = 0
         else:
             self.cell_type = "code"
-            parser = StringParser(self.language or self.default_language)
             for i, line in enumerate(lines):
                 # skip cell header
                 if i == 0:
                     continue
 
-                if parser.is_quoted():
-                    parser.read_line(line)
-                    continue
-
-                parser.read_line(line)
                 if self.end_code_re.match(line):
                     return i, i + 1, True
 

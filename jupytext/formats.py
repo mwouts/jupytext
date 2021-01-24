@@ -83,7 +83,8 @@ JUPYTEXT_FORMATS = (
             # Version 1.1 on 2019-03-24 - jupytext v1.1.0 : Markdown regions and cell metadata
             # Version 1.2 on 2019-09-21 - jupytext v1.3.0 : Raw regions are now encoded with HTML comments (#321)
             # and by default, cell metadata use the key=value representation (#347)
-            current_version_number="1.2",
+            # Version 1.3 on 2021-01-24 - jupytext v1.9.2 : Code cells may start with more than three backticks (#712)
+            current_version_number="1.3",
             min_readable_version_number="1.0",
         ),
         NotebookFormatDescription(

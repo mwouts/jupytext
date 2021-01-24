@@ -222,7 +222,14 @@ class MarkdownCellExporter(BaseCellExporter):
             return self.html_comment(self.metadata, "raw")
 
         options = metadata_to_text(self.language, self.metadata)
-        return ["```" + options] + source + ["```"]
+
+        # We may need more than three backquotes, cf. https://github.com/mwouts/jupytext/issues/712
+        code_cell_delimiter = "```"
+        for line in self.source:
+            while line.startswith(code_cell_delimiter):
+                code_cell_delimiter += "`"
+
+        return [code_cell_delimiter + options] + source + [code_cell_delimiter]
 
 
 class RMarkdownCellExporter(MarkdownCellExporter):

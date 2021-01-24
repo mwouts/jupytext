@@ -766,7 +766,7 @@ def test_two_markdown_cell_with_no_language_code_works(
 
 
 def test_markdown_cell_with_code_inside_multiline_string_419(
-    text='''```python
+    text='''````python
 readme = """
 above
 
@@ -776,7 +776,7 @@ x = 2
 
 below
 """
-```
+````
 ''',
 ):
     nb = jupytext.reads(text, "md")
