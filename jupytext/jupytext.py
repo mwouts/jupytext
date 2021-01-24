@@ -4,6 +4,7 @@ import io
 import logging
 import os
 import sys
+import warnings
 from copy import copy, deepcopy
 
 import nbformat
@@ -37,6 +38,11 @@ from .metadata_filter import filter_metadata, update_metadata_filters
 from .myst import MYST_FORMAT_NAME, myst_extensions, myst_to_notebook, notebook_to_myst
 from .pandoc import md_to_notebook, notebook_to_md
 from .pep8 import pep8_lines_between_cells
+from .version import __version__
+
+
+class NotSupportedNBFormatVersion(NotImplementedError):
+    pass
 
 
 class TextNotebookConverter(NotebookReader, NotebookWriter):
@@ -343,7 +349,15 @@ def reads(text, fmt, as_version=nbformat.NO_CONVERT, **kwargs):
     ext = fmt["extension"]
 
     if ext == ".ipynb":
-        return nbformat.reads(text, as_version, **kwargs)
+        nb = nbformat.reads(text, as_version, **kwargs)
+        (version, version_minor) = nbformat.reader.get_version(nb)
+        if version != 4:
+            warnings.warn(
+                f"Notebooks in nbformat version {version} are not supported by Jupytext. "
+                f"Please consider converting them to nbformat version 4 with "
+                f"'jupyter nbconvert --to notebook --inplace'"
+            )
+        return nb
 
     format_name = read_format_from_metadata(text, ext) or fmt.get("format_name")
 
@@ -408,7 +422,7 @@ def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, **kwargs):
 
 
 def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
-    """Return text representation of the notebook
+    """Return the text representation of the notebook
 
     :param notebook: the notebook
     :param fmt: the jupytext format like `md`, `py:percent`, ...
@@ -416,6 +430,20 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     :param kwargs: (not used) additional parameters for nbformat.writes
     :return: the text representation of the notebook
     """
+    if version is not nbformat.NO_CONVERT:
+        notebook = nbformat.convert(notebook, version)
+    (version, version_minor) = nbformat.reader.get_version(notebook)
+    if version < 4:
+        raise NotSupportedNBFormatVersion(
+            f"Notebooks in nbformat version {version}.{version_minor} are not supported by Jupytext. "
+            f"Please convert your notebooks to nbformat version 4, or call this function with 'version=4'."
+        )
+    if version > 4 or (version == 4 and version_minor > 4):
+        warnings.warn(
+            f"Notebooks in nbformat version {version}.{version_minor} "
+            f"have not been tested with Jupytext version {__version__}."
+        )
+
     metadata = deepcopy(notebook.metadata)
     rearrange_jupytext_metadata(metadata)
     fmt = copy(fmt)
@@ -438,7 +466,7 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
                 cells=notebook.cells,
             ),
             version,
-            **kwargs
+            **kwargs,
         )
 
     if not format_name:
@@ -491,8 +519,8 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
     if isinstance(content, bytes):
         content = content.decode("utf8")
     fp.write(content)
-    if not content.endswith(u"\n"):
-        fp.write(u"\n")
+    if not content.endswith("\n"):
+        fp.write("\n")
 
 
 def create_prefix_dir(nb_file, fmt):
