@@ -431,6 +431,10 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     :return: the text representation of the notebook
     """
     if version is not nbformat.NO_CONVERT:
+        if not isinstance(version, int):
+            raise TypeError(
+                "The argument 'version' should be either nbformat.NO_CONVERT, or an integer."
+            )
         notebook = nbformat.convert(notebook, version)
     (version, version_minor) = nbformat.reader.get_version(notebook)
     if version < 4:

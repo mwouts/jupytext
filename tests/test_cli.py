@@ -509,13 +509,13 @@ def test_sync(nb_file, tmpdir, capsys):
     assert os.path.isfile(tmp_rmd)
     compare_notebooks(read(tmp_rmd), nb, "Rmd")
 
-    write(nb, tmp_rmd, "Rmd")
+    write(nb, tmp_rmd, fmt="Rmd")
     jupytext(["--sync", tmp_ipynb])
 
     nb2 = read(tmp_ipynb)
     compare_notebooks(nb2, nb, "Rmd", compare_outputs=True)
 
-    write(nb, tmp_py, "py")
+    write(nb, tmp_py, fmt="py")
     jupytext(["--sync", tmp_ipynb])
 
     nb2 = read(tmp_ipynb)
@@ -581,7 +581,7 @@ def test_cli_can_infer_jupytext_format(nb_file, ext, tmpdir):
     compare_notebooks(nb2, nb)
 
     # Percent format to Jupyter notebook
-    write(nb, tmp_text, ext + ":percent")
+    write(nb, tmp_text, fmt=ext + ":percent")
     jupytext(["--to", "notebook", tmp_text])
     nb2 = read(tmp_ipynb)
     compare_notebooks(nb2, nb)
@@ -758,7 +758,7 @@ def test_cli_sync_file_with_suffix(tmpdir):
         metadata={"jupytext": {"formats": "ipynb,.pct.py:percent,.lgt.py:light,Rmd"}},
     )
 
-    write(nb, tmp_pct_py, ".pct.py:percent")
+    write(nb, tmp_pct_py, fmt=".pct.py:percent")
     jupytext(["--sync", tmp_pct_py])
     assert os.path.isfile(tmp_lgt_py)
     assert os.path.isfile(tmp_rmd)
