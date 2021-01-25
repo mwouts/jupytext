@@ -766,7 +766,7 @@ def test_two_markdown_cell_with_no_language_code_works(
 
 
 def test_markdown_cell_with_code_inside_multiline_string_419(
-    text='''````python
+    text='''```python
 readme = """
 above
 
@@ -776,11 +776,12 @@ x = 2
 
 below
 """
-````
+```
 ''',
 ):
+    """A code cell containing triple backticks is converted to a code cell encapsulated with four backticks"""
     nb = jupytext.reads(text, "md")
-    compare(jupytext.writes(nb, "md"), text)
+    compare(jupytext.writes(nb, "md"), "`" + text[:-1] + "`\n")
     assert len(nb.cells) == 1
 
 
