@@ -440,7 +440,8 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
     if version < 4:
         raise NotSupportedNBFormatVersion(
             f"Notebooks in nbformat version {version}.{version_minor} are not supported by Jupytext. "
-            f"Please convert your notebooks to nbformat version 4, or call this function with 'version=4'."
+            f"Please convert your notebooks to nbformat version 4 with "
+            f"'jupyter nbconvert --to notebook --inplace', or call this function with 'version=4'."
         )
     if version > 4 or (version == 4 and version_minor > 4):
         warnings.warn(
