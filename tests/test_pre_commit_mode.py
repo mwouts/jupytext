@@ -36,7 +36,7 @@ def test_ignore_unmatched_ignores(tmpdir, cwd_tmpdir):
 
     # Run jupytext
     status = jupytext(
-        ["--from", "ipynb", "--to", "py:light", "--ignore-unmatched", file]
+        ["--from", "ipynb", "--to", "py:light", "--pre-commit-mode", file]
     )
 
     assert status == 0
@@ -48,7 +48,7 @@ def test_alert_untracked_alerts(tmpdir, cwd_tmpdir, tmp_repo, capsys):
     tmpdir.join(file).write("print('hello')\n")
 
     # Run jupytext
-    status = jupytext(["--from", ".py", "--to", "ipynb", "--alert-untracked", file])
+    status = jupytext(["--from", ".py", "--to", "ipynb", "--pre-commit-mode", file])
 
     assert status != 0
     assert tmpdir.join("test.ipynb").exists()
@@ -58,13 +58,13 @@ def test_alert_untracked_alerts(tmpdir, cwd_tmpdir, tmp_repo, capsys):
 
 
 def test_alert_untracked_alerts_when_using_sync(tmpdir, cwd_tmpdir, tmp_repo, capsys):
-    file = "test.py"
-    tmpdir.join(file).write("print('hello')\n")
+    tmpdir.join("test.py").write("print('hello')\n")
+    tmp_repo.git.add("test.py")
 
     tmpdir.join(".jupytext.toml").write('default_jupytext_formats = "ipynb,py"')
 
     # Run jupytext
-    status = jupytext(["--sync", "--alert-untracked", str(file)])
+    status = jupytext(["--sync", "--pre-commit-mode", "test.py"])
 
     assert status != 0
     assert tmpdir.join("test.ipynb").exists()
@@ -86,9 +86,56 @@ def test_alert_untracked_alerts_for_modified(tmpdir, cwd_tmpdir, tmp_repo, capsy
 
     # Run jupytext
     status = jupytext(
-        ["--from", "ipynb", "--to", "py:light", "--alert-untracked", "test.ipynb"]
+        ["--from", "ipynb", "--to", "py:light", "--pre-commit-mode", "test.ipynb"]
     )
 
     assert status == 1
     out = capsys.readouterr()
     assert "Please run 'git add test.py'" in out.out
+
+
+def test_alert_file_not_in_index(tmpdir, cwd_tmpdir, tmp_repo, capsys):
+    tmpdir.join("test.py").write("print('hello')\n")
+    tmpdir.join(".jupytext.toml").write('default_jupytext_formats = "ipynb,py"')
+
+    # Run jupytext
+    status = jupytext(["--sync", "--pre-commit-mode", "test.py"])
+
+    assert status != 0
+    assert not tmpdir.join("test.ipynb").exists()
+
+    out = capsys.readouterr()
+    assert "Please run 'git add test.py'" in out.err
+
+
+def test_alert_inconsistent_versions(tmpdir, cwd_tmpdir, tmp_repo, capsys):
+    """Jupytext refuses to sync two inconsistent notebooks"""
+    write(new_notebook(cells=[new_markdown_cell("A short py notebook")]), "test.py")
+    write(
+        new_notebook(
+            cells=[new_markdown_cell("Another ipynb notebook")],
+            metadata={"jupytext": {"formats": "ipynb,py"}},
+        ),
+        "test.ipynb",
+    )
+
+    # Add them both
+    tmp_repo.git.add("test.py")
+    tmp_repo.git.add("test.ipynb")
+
+    # Run jupytext
+    status = jupytext(["--sync", "--pre-commit-mode", "test.ipynb"])
+
+    # The diff should be visible
+    assert status == 1
+    out = capsys.readouterr()
+    assert (
+        """--- test.py
++++ test.ipynb"""
+        in out.out
+    )
+    assert """-# A short py notebook
++# Another ipynb notebook
+"""
+    assert "Error: 'test.ipynb' and 'test.py' are inconsistent" in out.err
+    assert "'git reset <file>'" in out.err

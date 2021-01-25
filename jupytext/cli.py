@@ -92,16 +92,15 @@ def parse_jupytext_args(args=None):
         "extension that matches the (optional) --from argument.",
     )
     parser.add_argument(
-        "--ignore-unmatched",
+        "--pre-commit-mode",
         action="store_true",
-        help="Ignore passed filepaths that aren't in the source format "
-        "you are trying to convert from.",
-    )
-    parser.add_argument(
-        "--alert-untracked",
-        action="store_true",
-        help="Exit with a non-zero status if the output files are not "
-        "tracked in the git index",
+        help="This is a mode that is compatible with the pre-commit framework. "
+        "In this mode, --sync won't use timestamp but instead will "
+        "determines the source notebook as the element of the pair "
+        "that is added to the git index. An alert is raised if multiple inconsistent representations are "
+        "in the index. It also raises an alert after updating the paired files or outputs if those "
+        "files need to be added to the index. Finally, filepaths that aren't in the source format "
+        "you are trying to convert from are ignored.",
     )
     parser.add_argument(
         "--from",
@@ -449,7 +448,7 @@ def jupytext_single_file(nb_file, args, log):
         try:
             bp = base_path(nb_file, args.input_format)
         except InconsistentPath:
-            if args.ignore_unmatched:
+            if args.pre_commit_mode:
                 log(
                     "[jupytext] Ignoring unmatched input path {}{}".format(
                         nb_file,
@@ -585,11 +584,14 @@ def jupytext_single_file(nb_file, args, log):
         if args.set_formats is None:
             try:
                 notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(
-                    notebook, fmt, nb_file, log
+                    notebook, fmt, nb_file, log, args.pre_commit_mode
                 )
             except NotAPairedNotebook as err:
                 sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
                 return 0
+            except (InconsistentVersions, InputNotInIndex) as err:
+                sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
+                return 1
 
     # II. ### Apply commands onto the notebook ###
     # Pipe the notebook into the desired commands
@@ -710,6 +712,8 @@ def jupytext_single_file(nb_file, args, log):
                 with open(path) as fp:
                     current_content = fp.read()
                 modified = new_content != current_content
+                # if modified:
+                #    log(compare(new_content, current_content, "new", "current", return_diff=True))
 
         if modified:
             # The text representation of the notebook has changed, we write it on disk
@@ -739,7 +743,7 @@ def jupytext_single_file(nb_file, args, log):
         if args.pre_commit:
             system("git", "add", path)
 
-        if args.alert_untracked and is_untracked(path):
+        if args.pre_commit_mode and is_untracked(path):
             log(
                 "[jupytext] Outdated git index! "
                 "Please run 'git add {path}'".format(path=path)
@@ -891,7 +895,15 @@ class NotAPairedNotebook(ValueError):
     """An error raised when a notebook is not a paired notebook"""
 
 
-def load_paired_notebook(notebook, fmt, nb_file, log):
+class InconsistentVersions(ValueError):
+    """An error raised when two paired files contain inconsistent representations"""
+
+
+class InputNotInIndex(ValueError):
+    """In the pre-commit-mode mode, input files should be in the git index."""
+
+
+def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
     """Update the notebook with the inputs and outputs of the most recent paired files"""
     formats = notebook.metadata.get("jupytext", {}).get("formats")
 
@@ -905,6 +917,9 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
     def get_timestamp(path):
         if not os.path.isfile(path):
             return None
+        if pre_commit_mode:
+            # Files that are in the git index are considered more recent
+            return system("git", "status", "--porcelain", path).startswith(("M", "A"))
         return os.lstat(path).st_mtime
 
     def read_one_file(path, fmt):
@@ -913,6 +928,37 @@ def load_paired_notebook(notebook, fmt, nb_file, log):
 
         log("[jupytext] Loading '{}'".format(path))
         return read(path, fmt=fmt)
+
+    if pre_commit_mode:
+        if not get_timestamp(nb_file):
+            raise InputNotInIndex(
+                f"The input file '{nb_file}' is not in the git index. Please run 'git add {nb_file}'."
+            )
+
+        # We raise an error if two representations of this notebook in the git index are inconsistent
+        nb_files_in_git_index = sorted(
+            (
+                (alt_path, alt_fmt)
+                for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats)
+                if get_timestamp(alt_path)
+            ),
+            key=lambda x: 0 if x[1]["extension"] != ".ipynb" else 1,
+        )
+
+        if len(nb_files_in_git_index) > 1:
+            path0, fmt0 = nb_files_in_git_index[0]
+            with open(path0) as fp:
+                text0 = fp.read()
+            for alt_path, alt_fmt in nb_files_in_git_index[1:]:
+                nb = read(alt_path, fmt=alt_fmt)
+                alt_text = writes(nb, fmt=fmt0)
+                if alt_text != text0:
+                    diff = compare(alt_text, text0, alt_path, path0, return_diff=True)
+                    log(diff)
+                    raise InconsistentVersions(
+                        f"'{alt_path}' and '{path0}' are inconsistent. "
+                        f"Please remove the outdated version from the git index with 'git reset <file>'."
+                    )
 
     inputs, outputs = latest_inputs_and_outputs(nb_file, fmt, formats, get_timestamp)
     notebook = read_pair(inputs, outputs, read_one_file)
@@ -930,7 +976,7 @@ def exec_command(command, input=None, capture=False):
             dict(stdout=subprocess.PIPE, stdin=subprocess.PIPE)
             if input is not None
             else {}
-        )
+        ),
     )
     out, err = process.communicate(input=input)
     if out and not capture:

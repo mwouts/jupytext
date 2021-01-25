@@ -2,6 +2,6 @@
   name: jupytext
   description: Runs jupytext on all notebooks and paired files.
   language: python
-  entry: jupytext --ignore-unmatched --alert-untracked
+  entry: jupytext --pre-commit-mode
   require_serial: true
   types: [jupyter]
