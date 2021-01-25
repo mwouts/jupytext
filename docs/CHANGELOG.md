@@ -1,15 +1,15 @@
 Jupytext ChangeLog
 ==================
 
-1.9.2-dev (???)
----------------
+1.10.0-dev (???)
+----------------
 
 **Changed**
 - Jupytext does not work properly with the new cell ids of the version 4.5 of `nbformat>=5.1.0` yet, so we added the requirement `nbformat<=5.0.8` ([#715](https://github.com/mwouts/jupytext/issues/715))
 - `jupytext --sync` only updates the timestamp of the text file (not the file itself) when that file is the most recent ([#698](https://github.com/mwouts/jupytext/issues/698))
 
 **Fixed**
-- Code cells that contain triple backticks (or more) are now encapsulated with four backticks (or more) in the Markdown format. The version number for that format was increased to 1.3 ([#712](https://github.com/mwouts/jupytext/issues/712))
+- Code cells that contain triple backticks (or more) are now encapsulated with four backticks (or more) in the Markdown and MyST Markdown formats. The version number for the Markdown format was increased to 1.3, and the version number for the MyST Markdown format was increased to 0.13 ([#712](https://github.com/mwouts/jupytext/issues/712))
 - Indented magic commands are supported ([#694](https://github.com/mwouts/jupytext/issues/694))
 - Jupytext will issue an informative error or warning on notebooks in a version of nbformat that is not known to be supported ([#681](https://github.com/mwouts/jupytext/issues/681), [#715](https://github.com/mwouts/jupytext/issues/715))
 

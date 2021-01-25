@@ -40,7 +40,7 @@ def raise_if_myst_is_not_available():
 
 def myst_version():
     """The version of myst."""
-    return 0.12
+    return 0.13
 
 
 def myst_extensions(no_md=False):
