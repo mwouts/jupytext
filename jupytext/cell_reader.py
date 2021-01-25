@@ -444,11 +444,20 @@ class MarkdownCellReader(BaseCellReader):
                     prev_blank = 0
         else:
             self.cell_type = "code"
+            # At some point we could remove the below, in which we make sure not to break language strings
+            # into multiple cells (#419). Indeed, now that the markdown cell uses one extra backtick (#712)
+            # we should not have the issue any more
+            parser = StringParser(self.language or self.default_language)
             for i, line in enumerate(lines):
                 # skip cell header
                 if i == 0:
                     continue
 
+                if parser.is_quoted():
+                    parser.read_line(line)
+                    continue
+
+                parser.read_line(line)
                 if self.end_code_re.match(line):
                     return i, i + 1, True
 
