@@ -2,9 +2,19 @@
 from nbformat.v4.nbbase import new_code_cell, new_notebook
 
 from jupytext import reads, writes
+from jupytext.cell_to_text import three_backticks_or_more
 from jupytext.compare import compare, compare_notebooks
 
 from .utils import requires_myst
+
+
+def test_three_backticks_or_more():
+    assert three_backticks_or_more([""]) == "```"
+    assert three_backticks_or_more(["``"]) == "```"
+    assert three_backticks_or_more(["```python"]) == "````"
+    assert three_backticks_or_more(["```"]) == "````"
+    assert three_backticks_or_more(["`````python"]) == "``````"
+    assert three_backticks_or_more(["`````"]) == "``````"
 
 
 def test_triple_backticks_in_code_cell(
