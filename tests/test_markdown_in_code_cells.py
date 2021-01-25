@@ -4,6 +4,8 @@ from nbformat.v4.nbbase import new_code_cell, new_notebook
 from jupytext import reads, writes
 from jupytext.compare import compare, compare_notebooks
 
+from .utils import requires_myst
+
 
 def test_triple_backticks_in_code_cell(
     no_jupytext_version_number,
@@ -38,6 +40,42 @@ foo
     compare(actual_text, text)
 
     actual_nb = reads(text, fmt="md")
+    compare_notebooks(actual_nb, nb)
+
+
+@requires_myst
+def test_triple_backticks_in_code_cell_myst(
+    no_jupytext_version_number,
+    nb=new_notebook(
+        metadata={"main_language": "python"},
+        cells=[
+            new_code_cell(
+                '''a = """
+```
+foo
+```
+"""'''
+            )
+        ],
+    ),
+    text='''---
+jupytext:
+  main_language: python
+---
+
+````{code-cell}
+a = """
+```
+foo
+```
+"""
+````
+''',
+):
+    actual_text = writes(nb, fmt="md:myst")
+    compare(actual_text, text)
+
+    actual_nb = reads(text, fmt="md:myst")
     compare_notebooks(actual_nb, nb)
 
 

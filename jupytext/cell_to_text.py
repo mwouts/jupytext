@@ -29,6 +29,16 @@ def cell_source(cell):
     return source.splitlines()
 
 
+def three_backticks_or_more(lines):
+    """Return a string with enough backticks to encapsulate the given code cell in Markdown
+    cf. https://github.com/mwouts/jupytext/issues/712"""
+    code_cell_delimiter = "```"
+    for line in lines:
+        while line.startswith(code_cell_delimiter):
+            code_cell_delimiter += "`"
+    return code_cell_delimiter
+
+
 class BaseCellExporter(object):
     """A class that represent a notebook cell as text"""
 
@@ -222,13 +232,7 @@ class MarkdownCellExporter(BaseCellExporter):
             return self.html_comment(self.metadata, "raw")
 
         options = metadata_to_text(self.language, self.metadata)
-
-        # We may need more than three backquotes, cf. https://github.com/mwouts/jupytext/issues/712
-        code_cell_delimiter = "```"
-        for line in self.source:
-            while line.startswith(code_cell_delimiter):
-                code_cell_delimiter += "`"
-
+        code_cell_delimiter = three_backticks_or_more(self.source)
         return [code_cell_delimiter + options] + source + [code_cell_delimiter]
 
 
