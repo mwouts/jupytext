@@ -61,6 +61,10 @@ requires_ir_kernel = pytest.mark.skipif(
     not any(get_kernel_spec(name).language == "R" for name in find_kernel_specs()),
     reason="irkernel is not installed",
 )
+requires_user_kernel_python3 = pytest.mark.skipif(
+    "python_kernel" not in find_kernel_specs(),
+    reason="Please run 'python -m ipykernel install --name python_kernel --user'",
+)
 requires_myst = pytest.mark.skipif(
     not is_myst_available(), reason="myst_parser not found"
 )

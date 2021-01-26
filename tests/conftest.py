@@ -60,7 +60,7 @@ def python_notebook():
             "kernelspec": {
                 "display_name": "Python 3",
                 "language": "python",
-                "name": "python3",
+                "name": "python_kernel",
             }
         },
     )
@@ -86,7 +86,7 @@ def notebook_with_outputs():
             "kernelspec": {
                 "display_name": "Python 3",
                 "language": "python",
-                "name": "python3",
+                "name": "python_kernel",
             }
         },
     )
