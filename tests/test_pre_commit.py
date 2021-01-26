@@ -6,7 +6,7 @@ from git.exc import HookExecutionError
 from nbformat.v4.nbbase import new_markdown_cell, new_notebook
 from pre_commit.main import main as pre_commit
 
-from jupytext import write
+from jupytext import read, write
 from jupytext.cli import jupytext
 
 if sys.platform.startswith("win"):
@@ -17,7 +17,7 @@ if sys.platform.startswith("win"):
     )  # pragma: nocover
 
 
-def test_pre_commit_hook_for_new_file(
+def test_pre_commit_hook_sync(
     tmpdir, cwd_tmpdir, tmp_repo, capsys, jupytext_repo_root, jupytext_repo_rev
 ):
     pre_commit_config_yaml = dedent(
@@ -35,32 +35,68 @@ def test_pre_commit_hook_for_new_file(
     tmp_repo.git.add(".pre-commit-config.yaml")
     pre_commit(["install", "--install-hooks", "-f"])
 
-    # write test notebook and sync it to py:percent
-    nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
+    # write a test notebook and sync it to py:percent
+    nb = new_notebook(
+        cells=[new_markdown_cell("A short notebook")],
+        # We need a Python kernel here otherwise Jupytext is going to add
+        # the information that this is a Python notebook when we sync the
+        # .py and .ipynb files for the second time
+        metadata={
+            "kernelspec": {
+                "display_name": "Python 3",
+                "language": "python",
+                "name": "python3",
+            }
+        },
+    )
     write(nb, "test.ipynb")
 
     jupytext(["--set-formats", "ipynb,py:percent", "test.ipynb"])
 
-    # try to commit it, should fail since the hook runs and makes changes
+    # try to commit it, should fail because the py version hasn't been added
     tmp_repo.git.add("test.ipynb")
-    with pytest.raises(HookExecutionError, match="files were modified by this hook"):
-        tmp_repo.index.commit("failing")
-
-    # try again, it will still fail because the output hasn't been added
     with pytest.raises(
         HookExecutionError,
         match="Please run 'git add test.py'",
     ):
-        tmp_repo.index.commit("still failing")
+        tmp_repo.index.commit("failing")
 
-    # add the new file, now the commit will succeed
+    # add the py file, now the commit will succeed
     tmp_repo.git.add("test.py")
     tmp_repo.index.commit("passing")
     assert "test.ipynb" in tmp_repo.tree()
     assert "test.py" in tmp_repo.tree()
 
+    # modify the ipynb file
+    nb = read("test.ipynb")
+    nb.cells.append(new_markdown_cell("A new cell"))
+    write(nb, "test.ipynb")
 
-def test_pre_commit_hook_for_existing_changed_file(
+    tmp_repo.git.add("test.ipynb")
+
+    # We try to commit one more time, this updates the py file
+    with pytest.raises(
+        HookExecutionError,
+        match="files were modified by this hook",
+    ):
+        tmp_repo.index.commit("failing")
+
+    # the text file has been updated
+    assert "A new cell" in tmpdir.join("test.py").read()
+
+    # trying to commit should fail again because we forgot to add the .py version
+    with pytest.raises(HookExecutionError, match="Please run 'git add test.py'"):
+        tmp_repo.index.commit("still failing")
+
+    nb = read("test.ipynb")
+    assert len(nb.cells) == 2
+
+    # add the text file, now the commit will succeed
+    tmp_repo.git.add("test.py")
+    tmp_repo.index.commit("passing")
+
+
+def test_pre_commit_hook_to(
     tmpdir, cwd_tmpdir, tmp_repo, capsys, jupytext_repo_root, jupytext_repo_rev
 ):
     # set up the tmpdir repo with pre-commit
