@@ -66,6 +66,10 @@ requires_myst = pytest.mark.skipif(
 )
 requires_no_myst = pytest.mark.skipif(is_myst_available(), reason="myst is available")
 skip_on_windows = pytest.mark.skipif(sys.platform.startswith("win"), reason="Issue 489")
+skip_pre_commit_tests_on_windows = pytest.mark.skipif(
+    sys.platform.startswith("win"),
+    reason="OSError: [WinError 193] %1 is not a valid Win32 application",
+)
 
 
 def list_notebooks(path="ipynb", skip="World"):

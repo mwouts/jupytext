@@ -3,6 +3,12 @@ from pathlib import Path
 
 import pytest
 from git import Repo
+from nbformat.v4.nbbase import (
+    new_code_cell,
+    new_markdown_cell,
+    new_notebook,
+    new_output,
+)
 
 import jupytext
 from jupytext.cli import system
@@ -41,3 +47,46 @@ def jupytext_repo_root():
 def jupytext_repo_rev(jupytext_repo_root):
     """The local revision of this repo, to use in .pre-commit-config.yaml in tests"""
     return system("git", "rev-parse", "HEAD", cwd=jupytext_repo_root).strip()
+
+
+@pytest.fixture()
+def python_notebook():
+    return new_notebook(
+        cells=[new_markdown_cell("A short notebook")],
+        # We need a Python kernel here otherwise Jupytext is going to add
+        # the information that this is a Python notebook when we sync the
+        # .py and .ipynb files
+        metadata={
+            "kernelspec": {
+                "display_name": "Python 3",
+                "language": "python",
+                "name": "python3",
+            }
+        },
+    )
+
+
+@pytest.fixture()
+def notebook_with_outputs():
+    return new_notebook(
+        cells=[
+            new_code_cell(
+                "1 + 1",
+                execution_count=1,
+                outputs=[
+                    new_output(
+                        data={"text/plain": ["2"]},
+                        execution_count=1,
+                        output_type="execute_result",
+                    )
+                ],
+            )
+        ],
+        metadata={
+            "kernelspec": {
+                "display_name": "Python 3",
+                "language": "python",
+                "name": "python3",
+            }
+        },
+    )
