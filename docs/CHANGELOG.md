@@ -10,7 +10,7 @@ Jupytext ChangeLog
 
 **Fixed**
 - Indented magic commands are supported ([#694](https://github.com/mwouts/jupytext/issues/694))
-- Jupytext will issue an informative error or warning on notebooks in a version of nbformat that is not known to be supported ([#681](https://github.com/mwouts/jupytext/issues/681))
+- Jupytext will issue an informative error or warning on notebooks in a version of nbformat that is not known to be supported ([#681](https://github.com/mwouts/jupytext/issues/681), [#715](https://github.com/mwouts/jupytext/issues/715))
 
 **Added**
 - We made sure that `py:percent` scripts end with exactly one blank line ([#682](https://github.com/mwouts/jupytext/issues/682))
