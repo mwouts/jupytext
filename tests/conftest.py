@@ -71,7 +71,7 @@ def notebook_with_outputs():
     return new_notebook(
         cells=[
             new_code_cell(
-                "1 + 1",
+                "1+1",
                 execution_count=1,
                 outputs=[
                     new_output(
