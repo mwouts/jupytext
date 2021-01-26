@@ -2,9 +2,9 @@
 
 import argparse
 import glob
+import io
 import json
 import os
-import io
 import re
 import shlex
 import subprocess
@@ -83,24 +83,6 @@ def parse_jupytext_args(args=None):
         help="One or more notebook(s). "
         "Notebook is read from stdin when this argument is empty.",
         nargs="*",
-    )
-    parser.add_argument(
-        "--pre-commit",
-        action="store_true",
-        help="Ignore the notebook argument, and instead apply Jupytext "
-        "on the notebooks found in the git index, which have an "
-        "extension that matches the (optional) --from argument.",
-    )
-    parser.add_argument(
-        "--pre-commit-mode",
-        action="store_true",
-        help="This is a mode that is compatible with the pre-commit framework. "
-        "In this mode, --sync won't use timestamp but instead will "
-        "determines the source notebook as the element of the pair "
-        "that is added to the git index. An alert is raised if multiple inconsistent representations are "
-        "in the index. It also raises an alert after updating the paired files or outputs if those "
-        "files need to be added to the index. Finally, filepaths that aren't in the source format "
-        "you are trying to convert from are ignored.",
     )
     parser.add_argument(
         "--from",
@@ -292,8 +274,13 @@ def parse_jupytext_args(args=None):
         "--quiet",
         "-q",
         action="store_true",
-        default=False,
         help="Quiet mode: do not comment about files being updated or created",
+    )
+    parser.add_argument(
+        "--diff",
+        "-d",
+        action="store_true",
+        help="Display the diff for each output file",
     )
 
     action.add_argument(
@@ -301,6 +288,25 @@ def parse_jupytext_args(args=None):
         "-v",
         action="store_true",
         help="Show jupytext's version number and exit",
+    )
+
+    parser.add_argument(
+        "--pre-commit",
+        action="store_true",
+        help="Ignore the notebook argument, and instead apply Jupytext "
+        "on the notebooks found in the git index, which have an "
+        "extension that matches the (optional) --from argument.",
+    )
+    parser.add_argument(
+        "--pre-commit-mode",
+        action="store_true",
+        help="This is a mode that is compatible with the pre-commit framework. "
+        "In this mode, --sync won't use timestamp but instead will "
+        "determines the source notebook as the element of the pair "
+        "that is added to the git index. An alert is raised if multiple inconsistent representations are "
+        "in the index. It also raises an alert after updating the paired files or outputs if those "
+        "files need to be added to the index. Finally, filepaths that aren't in the source format "
+        "you are trying to convert from are ignored.",
     )
 
     return parser.parse_args(args)
@@ -704,6 +710,7 @@ def jupytext_single_file(nb_file, args, log):
             fmt = copy(fmt or {})
             fmt = long_form_one_format(fmt, update={"extension": ext})
             new_content = writes(notebook, fmt=fmt)
+            diff = None
             if not new_content.endswith("\n"):
                 new_content += "\n"
             if not os.path.isfile(path):
@@ -712,23 +719,31 @@ def jupytext_single_file(nb_file, args, log):
                 with open(path) as fp:
                     current_content = fp.read()
                 modified = new_content != current_content
-                # if modified:
-                #    log(compare(new_content, current_content, "new", "current", return_diff=True))
+                if modified and args.diff:
+                    diff = compare(
+                        new_content,
+                        current_content,
+                        "",
+                        "",
+                        return_diff=True,
+                    )
 
         if modified:
             # The text representation of the notebook has changed, we write it on disk
             if action is None:
-                log("[jupytext] Updating '{}'".format(path))
+                message = "[jupytext] Updating '{}'".format(path)
             else:
-                log(
-                    "[jupytext] Writing {path}{format}{action}".format(
-                        path=path,
-                        format=" in format " + short_form_one_format(fmt)
-                        if fmt and "format_name" in fmt
-                        else "",
-                        action=action,
-                    )
+                message = "[jupytext] Writing {path}{format}{action}".format(
+                    path=path,
+                    format=" in format " + short_form_one_format(fmt)
+                    if fmt and "format_name" in fmt
+                    else "",
+                    action=action,
                 )
+            if diff is not None:
+                message += " with this change:\n" + diff
+
+            log(message)
             create_prefix_dir(path, fmt)
             with io.open(path, "w", encoding="utf-8") as fp:
                 fp.write(new_content)
