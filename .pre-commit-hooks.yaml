@@ -5,3 +5,5 @@
   entry: jupytext --pre-commit-mode
   require_serial: true
   types: [jupyter]
+  additional_dependencies:
+    - 'nbformat<=5.0.8'
