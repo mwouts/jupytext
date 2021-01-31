@@ -26,6 +26,7 @@ from .utils import (
     requires_myst,
     requires_pandoc,
     requires_sphinx_gallery,
+    requires_user_kernel_python3,
     skip_on_windows,
 )
 
@@ -1139,14 +1140,12 @@ def test_jupytext_to_file_emits_a_warning(tmpdir):
         jupytext(["notebook.ipynb", "--to", "script.py"])
 
 
-def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir):
+def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir, cwd_tmpdir):
     """The user may type
         jupytext --set-formats notebook.md
     meaning
-        jupytext --syn notebook.md
+        jupytext --sync notebook.md
     """
-    os.chdir(str(tmpdir))
-
     cfg_file = tmpdir.join("jupytext.toml")
     cfg_file.write('default_jupytext_formats = "md,ipynb,py:percent"')
 
@@ -1167,3 +1166,32 @@ def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir):
 
     # Remove the config file, otherwise test_jupytext_jupyter_fs_metamanager fails later on!
     cfg_file.remove()
+
+
+def test_diff(tmpdir, cwd_tmpdir, capsys):
+    write(new_notebook(cells=[new_code_cell("1 + 1")]), "test.ipynb")
+    write(new_notebook(cells=[new_code_cell("2 + 2")]), "test.py", fmt="py:percent")
+
+    jupytext(["--to", "py:percent", "test.ipynb", "--diff"])
+    captured = capsys.readouterr()
+    assert "-2 + 2\n+1 + 1" in captured.out
+
+
+@requires_user_kernel_python3
+def test_skip_execution(tmpdir, cwd_tmpdir, tmp_repo, python_notebook, capsys):
+    write(
+        new_notebook(cells=[new_code_cell("1 + 1")], metadata=python_notebook.metadata),
+        "test.ipynb",
+    )
+    tmp_repo.index.add("test.ipynb")
+
+    jupytext(["--execute", "--pre-commit-mode", "test.ipynb"])
+    captured = capsys.readouterr()
+    assert "Executing notebook" in captured.out
+
+    nb = read("test.ipynb")
+    assert nb.cells[0].execution_count == 1
+
+    jupytext(["--execute", "--pre-commit-mode", "test.ipynb"])
+    captured = capsys.readouterr()
+    assert "skipped" in captured.out
