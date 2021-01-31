@@ -13,7 +13,6 @@ def test_pre_commit_hook_sync_nbstripout(
     tmpdir,
     cwd_tmpdir,
     tmp_repo,
-    capsys,
     jupytext_repo_root,
     jupytext_repo_rev,
     notebook_with_outputs,

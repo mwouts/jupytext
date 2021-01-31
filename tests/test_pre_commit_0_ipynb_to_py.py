@@ -11,7 +11,7 @@ from .utils import skip_pre_commit_tests_on_windows
 
 @skip_pre_commit_tests_on_windows
 def test_pre_commit_hook_ipynb_to_py(
-    tmpdir, cwd_tmpdir, tmp_repo, capsys, jupytext_repo_root, jupytext_repo_rev
+    tmpdir, cwd_tmpdir, tmp_repo, jupytext_repo_root, jupytext_repo_rev
 ):
     """Here we document and test the expected behavior of the pre-commit hook in the
     directional (--to) mode. Note that here, the ipynb file is always the source for
