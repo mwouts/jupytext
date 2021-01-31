@@ -3,7 +3,6 @@ from git.exc import HookExecutionError
 from pre_commit.main import main as pre_commit
 
 from jupytext import read, write
-from jupytext.cli import jupytext
 
 from .utils import skip_pre_commit_tests_on_windows
 
@@ -44,16 +43,12 @@ repos:
     tmp_repo.git.add(".pre-commit-config.yaml")
     pre_commit(["install", "--install-hooks", "-f"])
 
-    # TODO: We pair all notebooks to py:percent files
-    # tmpdir.join(".jupytext.toml").write('default_jupytext_formats = "ipynb,py:percent"')
-    # tmp_repo.git.add(".jupytext.toml")
-    # tmp_repo.index.commit("pair notebooks")
+    tmpdir.join(".jupytext.toml").write('default_jupytext_formats = "ipynb,py:percent"')
+    tmp_repo.git.add(".jupytext.toml")
+    tmp_repo.index.commit("pair notebooks")
 
     # write a test notebook
     write(notebook_with_outputs, "test.ipynb")
-
-    # TODO: remove this and instead test the global pairing
-    jupytext(["--set-formats", "ipynb,py:percent", "test.ipynb"])
 
     # try to commit it, should fail because
     # 1. the py version hasn't been added
