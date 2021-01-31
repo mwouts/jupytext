@@ -374,12 +374,16 @@ def prepare_notebook_for_save(nbk, config, path):
         formats, metadata, auto_ext_requires_language_info=False
     )
 
-    # Set preferred formats if not format name is given yet
+    # Set preferred formats if no format name has been given yet
     if config:
         formats = [
             preferred_format(f, config.preferred_jupytext_formats_save) for f in formats
         ]
         config.set_default_format_options(jupytext_metadata)
+
+    # Don't keep the formats if they are equal to the default
+    if config and jupytext_metadata.get("formats") == config.default_formats(path):
+        jupytext_metadata.pop("formats", None)
 
     if not jupytext_metadata:
         metadata.pop("jupytext")
