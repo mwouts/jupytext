@@ -262,7 +262,10 @@ def parse_jupytext_args(args=None):
     parser.add_argument(
         "--execute",
         action="store_true",
-        help="Execute the notebook with the given kernel",
+        help="Execute the notebook with the given kernel. In the "
+        "--pre-commit-mode, the notebook is executed only if a code "
+        "cell changed, or if some execution outputs are missing "
+        "or not ordered.",
     )
     parser.add_argument(
         "--run-path",
@@ -585,6 +588,7 @@ def jupytext_single_file(nb_file, args, log):
         recursive_update(notebook.metadata, args.update_metadata)
 
     # Read paired notebooks, except if the pair is being created
+    nb_files = [nb_file, nb_dest]
     if args.sync:
         set_prefix_and_suffix(fmt, notebook, nb_file)
         if args.set_formats is None:
@@ -592,12 +596,15 @@ def jupytext_single_file(nb_file, args, log):
                 notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(
                     notebook, fmt, nb_file, log, args.pre_commit_mode
                 )
+                nb_files = [inputs_nb_file, outputs_nb_file]
             except NotAPairedNotebook as err:
                 sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
                 return 0
             except (InconsistentVersions, InputNotInIndex) as err:
                 sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
                 return 1
+        else:
+            nb_files = [nb_file]
 
     # II. ### Apply commands onto the notebook ###
     # Pipe the notebook into the desired commands
@@ -608,6 +615,17 @@ def jupytext_single_file(nb_file, args, log):
     # and/or test the desired commands onto the notebook
     for cmd in args.check or []:
         pipe_notebook(notebook, cmd, args.pipe_fmt, update=False, prefix=prefix)
+
+    if (
+        args.execute
+        and args.pre_commit_mode
+        and execution_counts_are_in_order(notebook)
+        and not code_cells_have_changed(notebook, nb_files)
+    ):
+        log(
+            f"[jupytext] Execution of '{nb_file}' skipped as code cells have not changed and outputs are present."
+        )
+        args.execute = False
 
     # Execute the notebook
     if args.execute:
@@ -1080,3 +1098,32 @@ def pipe_notebook(notebook, command, fmt="py:percent", update=True, prefix=None)
         piped_notebook.metadata["jupytext"] = notebook.metadata["jupytext"]
 
     return piped_notebook
+
+
+def execution_counts_are_in_order(notebook):
+    """Returns True if all the code cells have an execution count, ordered from 1 to N with no missing number"""
+    expected_execution_count = 1
+    for cell in notebook.cells:
+        if cell.cell_type == "code":
+            if cell.execution_count != expected_execution_count:
+                return False
+            expected_execution_count += 1
+    return True
+
+
+def code_cells_have_changed(notebook, nb_files):
+    """The source for the code cells has not changed"""
+    for nb_file in nb_files:
+        if not os.path.exists(nb_file):
+            return True
+
+        nb_ref = read(nb_file)
+
+        # Are the new code cells equals to those in the file?
+        ref = [cell.source for cell in nb_ref.cells if cell.cell_type == "code"]
+        new = [cell.source for cell in notebook.cells if cell.cell_type == "code"]
+
+        if ref != new:
+            return True
+
+    return False

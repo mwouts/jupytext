@@ -14,7 +14,6 @@ def test_pre_commit_hook_sync_execute(
     tmpdir,
     cwd_tmpdir,
     tmp_repo,
-    capsys,
     jupytext_repo_root,
     jupytext_repo_rev,
     notebook_with_outputs,
@@ -65,4 +64,4 @@ repos:
 
     # the first cell has the expected output
     nb = read("test.ipynb")
-    assert nb.cells[0].outputs[0]["test/plain"] == "7"
+    assert nb.cells[0].outputs[0]["data"]["text/plain"] == "7"
