@@ -5,7 +5,7 @@ Jupytext works well with the [pre-commit](https://pre-commit.com/) framework. Yo
 ```yaml
 repos:
 -   repo: https://github.com/mwouts/jupytext
-    rev: #CURRENT_TAG/COMMIT_HASH
+    rev: v1.10.0  # CURRENT_TAG/COMMIT_HASH
     hooks:
     - id: jupytext
       args: [--sync]
@@ -16,7 +16,7 @@ You can provide almost all command line arguments to Jupytext in pre-commit, for
 ```yaml
 repos:
 -   repo: https://github.com/mwouts/jupytext
-    rev: #CURRENT_TAG/COMMIT_HASH
+    rev: v1.10.0  # CURRENT_TAG/COMMIT_HASH
     hooks:
     - id: jupytext
       args: [--from, ipynb, --to, "py:percent"]
@@ -27,7 +27,7 @@ If you are combining Jupytext with other pre-commit hooks, you must ensure that 
 ```yaml
 repos:
 -   repo: https://github.com/mwouts/jupytext
-    rev: #CURRENT_TAG/COMMIT_HASH
+    rev: v1.10.0  # CURRENT_TAG/COMMIT_HASH
     hooks:
     - id: jupytext
       args: [--sync, --pipe, black]
