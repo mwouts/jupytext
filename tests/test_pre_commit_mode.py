@@ -138,4 +138,4 @@ def test_alert_inconsistent_versions(tmpdir, cwd_tmpdir, tmp_repo, capsys):
 +# Another ipynb notebook
 """
     assert "Error: 'test.ipynb' and 'test.py' are inconsistent" in out.err
-    assert "'git reset <file>'" in out.err
+    assert "'git reset <file> && git checkout -- <file>'" in out.err

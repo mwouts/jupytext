@@ -990,7 +990,7 @@ def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
                     log(diff)
                     raise InconsistentVersions(
                         f"'{alt_path}' and '{path0}' are inconsistent. "
-                        f"Please remove the outdated version from the git index with 'git reset <file>'."
+                        f"Please revert the outdated file with 'git reset <file> && git checkout -- <file>'."
                     )
 
     inputs, outputs = latest_inputs_and_outputs(nb_file, fmt, formats, get_timestamp)
