@@ -78,3 +78,18 @@ repos:
     # add the text file, now the commit will succeed
     tmp_repo.git.add("test.py")
     tmp_repo.index.commit("passing")
+
+    # modify the .py file
+    nb.cells.append(new_markdown_cell("A third cell"))
+    write(nb, "test.py", fmt="py:percent")
+    tmp_repo.git.add("test.py")
+
+    # the pre-commit hook will update the .ipynb file
+    with pytest.raises(HookExecutionError, match="Please run 'git add test.ipynb'"):
+        tmp_repo.index.commit("failing")
+
+    tmp_repo.git.add("test.ipynb")
+    tmp_repo.index.commit("passing")
+
+    nb = read("test.ipynb")
+    assert len(nb.cells) == 3
