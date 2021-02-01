@@ -1093,9 +1093,10 @@ def pipe_notebook(notebook, command, fmt="py:percent", update=True, prefix=None)
         piped_notebook = combine_inputs_with_outputs(piped_notebook, notebook, fmt)
 
     # Remove jupytext / text_representation entry
-    piped_notebook.metadata.pop("jupytext")
     if "jupytext" in notebook.metadata:
         piped_notebook.metadata["jupytext"] = notebook.metadata["jupytext"]
+    else:
+        piped_notebook.metadata.pop("jupytext", None)
 
     return piped_notebook
 
