@@ -21,6 +21,7 @@ Jupytext works with notebooks in any of the following languages:
 - R
 - Robot Framework
 - Rust/Evxcr
+- Sage
 - Scala
 - Scheme
 - Script of Script
