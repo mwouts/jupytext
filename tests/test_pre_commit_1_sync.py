@@ -1,4 +1,4 @@
-import os
+import shutil
 
 import pytest
 from git.exc import HookExecutionError
@@ -98,8 +98,10 @@ repos:
 
     # finally we move the paired notebook to a subfolder
     tmpdir.mkdir("subfolder")
-    os.rename("test.py", "subfolder/test.py")
-    os.rename("test.ipynb", "subfolder/test.ipynb")
-    tmp_repo.git.add("test.ipynb")
-    tmp_repo.git.add("test.py")
+    shutil.move("test.py", "subfolder")
+    shutil.move("test.ipynb", "subfolder")
+
+    # adding both files works on the first commit as notebooks are in sync
+    tmp_repo.git.add("subfolder/test.ipynb")
+    tmp_repo.git.add("subfolder/test.py")
     tmp_repo.index.commit("passing")
