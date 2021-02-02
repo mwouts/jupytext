@@ -54,7 +54,7 @@ def test_alert_untracked_alerts(tmpdir, cwd_tmpdir, tmp_repo, capsys):
     assert tmpdir.join("test.ipynb").exists()
 
     out = capsys.readouterr()
-    assert "Please run 'git add test.ipynb'" in out.out
+    assert "git add test.ipynb" in out.out
 
 
 def test_alert_untracked_alerts_when_using_sync(tmpdir, cwd_tmpdir, tmp_repo, capsys):
@@ -70,7 +70,7 @@ def test_alert_untracked_alerts_when_using_sync(tmpdir, cwd_tmpdir, tmp_repo, ca
     assert tmpdir.join("test.ipynb").exists()
 
     out = capsys.readouterr()
-    assert "Please run 'git add test.ipynb'" in out.out
+    assert "git add test.ipynb" in out.out
 
 
 def test_alert_untracked_alerts_for_modified(tmpdir, cwd_tmpdir, tmp_repo, capsys):
@@ -91,7 +91,7 @@ def test_alert_untracked_alerts_for_modified(tmpdir, cwd_tmpdir, tmp_repo, capsy
 
     assert status == 1
     out = capsys.readouterr()
-    assert "Please run 'git add test.py'" in out.out
+    assert "git add test.py" in out.out
 
 
 def test_alert_inconsistent_versions(tmpdir, cwd_tmpdir, tmp_repo, capsys):
@@ -118,10 +118,11 @@ def test_alert_inconsistent_versions(tmpdir, cwd_tmpdir, tmp_repo, capsys):
     assert (
         """--- test.py
 +++ test.ipynb"""
-        in out.out
+        in out.err
     )
     assert """-# A short py notebook
 +# Another ipynb notebook
 """
-    assert "Error: 'test.ipynb' and 'test.py' are inconsistent" in out.err
-    assert "'git reset <file> && git checkout -- <file>'" in out.err
+    assert "Error: test.ipynb and test.py are inconsistent" in out.err
+    assert "git reset test.py && git checkout -- test.py" in out.err
+    assert "git reset test.ipynb && git checkout -- test.ipynb" in out.err

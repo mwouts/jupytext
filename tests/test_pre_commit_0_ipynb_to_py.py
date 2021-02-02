@@ -49,10 +49,7 @@ repos:
     with pytest.raises(HookExecutionError, match="files were modified by this hook"):
         tmp_repo.index.commit("fails")
 
-    with pytest.raises(
-        HookExecutionError,
-        match="Please run 'git add test.py'",
-    ):
+    with pytest.raises(HookExecutionError, match="git add test.py"):
         tmp_repo.index.commit("fails again")
 
     # once we add the changes, it will pass

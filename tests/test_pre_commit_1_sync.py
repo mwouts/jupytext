@@ -43,7 +43,7 @@ repos:
     tmp_repo.git.add("test.ipynb")
     with pytest.raises(
         HookExecutionError,
-        match="Please run 'git add test.py'",
+        match="git add test.py",
     ):
         tmp_repo.index.commit("failing")
 
@@ -71,7 +71,7 @@ repos:
     assert "A new cell" in tmpdir.join("test.py").read()
 
     # trying to commit should fail again because we forgot to add the .py version
-    with pytest.raises(HookExecutionError, match="Please run 'git add test.py'"):
+    with pytest.raises(HookExecutionError, match="git add test.py"):
         tmp_repo.index.commit("still failing")
 
     nb = read("test.ipynb")
@@ -87,7 +87,7 @@ repos:
     tmp_repo.git.add("test.py")
 
     # the pre-commit hook will update the .ipynb file
-    with pytest.raises(HookExecutionError, match="Please run 'git add test.ipynb'"):
+    with pytest.raises(HookExecutionError, match="git add test.ipynb"):
         tmp_repo.index.commit("failing")
 
     tmp_repo.git.add("test.ipynb")

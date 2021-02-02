@@ -594,7 +594,7 @@ def jupytext_single_file(nb_file, args, log):
             except NotAPairedNotebook as err:
                 sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
                 return 0
-            except (InconsistentVersions) as err:
+            except InconsistentVersions as err:
                 sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
                 return 1
         else:
@@ -617,7 +617,8 @@ def jupytext_single_file(nb_file, args, log):
         and not code_cells_have_changed(notebook, nb_files)
     ):
         log(
-            f"[jupytext] Execution of '{nb_file}' skipped as code cells have not changed and outputs are present."
+            f"[jupytext] Execution of {shlex.quote(nb_file)} "
+            f"skipped as code cells have not changed and outputs are present."
         )
         args.execute = False
 
@@ -758,10 +759,10 @@ def jupytext_single_file(nb_file, args, log):
         if modified:
             # The text representation of the notebook has changed, we write it on disk
             if action is None:
-                message = "[jupytext] Updating '{}'".format(path)
+                message = "[jupytext] Updating {}".format(shlex.quote(path))
             else:
                 message = "[jupytext] Writing {path}{format}{action}".format(
-                    path=path,
+                    path=shlex.quote(path),
                     format=" in format " + short_form_one_format(fmt)
                     if fmt and "format_name" in fmt
                     else "",
@@ -779,7 +780,7 @@ def jupytext_single_file(nb_file, args, log):
         # they remain more recent than the ipynb file, for compatibility with the
         # Jupytext contents manager for Jupyter
         if not modified and not path.endswith(".ipynb"):
-            log("[jupytext] Updating the timestamp of '{}'".format(path))
+            log(f"[jupytext] Updating the timestamp of {shlex.quote(path)}")
             os.utime(path, None)
 
         if args.pre_commit:
@@ -787,8 +788,9 @@ def jupytext_single_file(nb_file, args, log):
 
         if args.pre_commit_mode and is_untracked(path):
             log(
-                "[jupytext] Outdated git index! "
-                "Please run 'git add {path}'".format(path=path)
+                f"[jupytext] Error: the git index is outdated.\n"
+                f"Please add the paired notebook with:\n"
+                f"    git add {shlex.quote(path)}"
             )
             untracked_files += 1
 
@@ -946,7 +948,7 @@ def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
     formats = notebook.metadata.get("jupytext", {}).get("formats")
 
     if not formats:
-        raise NotAPairedNotebook("'{}' is not a paired notebook".format(nb_file))
+        raise NotAPairedNotebook(f"{shlex.quote(nb_file)} is not a paired notebook")
 
     formats = long_form_multiple_formats(formats)
     _, fmt_with_prefix_suffix = find_base_path_and_format(nb_file, formats)
@@ -969,7 +971,7 @@ def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
         if path == nb_file:
             return notebook
 
-        log("[jupytext] Loading '{}'".format(path))
+        log(f"[jupytext] Loading {shlex.quote(path)}")
         return read(path, fmt=fmt)
 
     if use_git_index_rather_than_timestamp:
@@ -992,10 +994,12 @@ def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
                 alt_text = writes(nb, fmt=fmt0)
                 if alt_text != text0:
                     diff = compare(alt_text, text0, alt_path, path0, return_diff=True)
-                    log(diff)
                     raise InconsistentVersions(
-                        f"'{alt_path}' and '{path0}' are inconsistent. "
-                        f"Please revert the outdated file with 'git reset <file> && git checkout -- <file>'."
+                        f"{shlex.quote(alt_path)} and {shlex.quote(path0)} are inconsistent.\n"
+                        + diff
+                        + f"\nPlease revert JUST ONE of the files with EITHER\n"
+                        f"    git reset {shlex.quote(alt_path)} && git checkout -- {shlex.quote(alt_path)}\nOR\n"
+                        f"    git reset {shlex.quote(path0)} && git checkout -- {shlex.quote(path0)}\n"
                     )
 
     inputs, outputs = latest_inputs_and_outputs(nb_file, fmt, formats, get_timestamp)
