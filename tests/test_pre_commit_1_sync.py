@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from git.exc import HookExecutionError
 from nbformat.v4.nbbase import new_markdown_cell
@@ -93,3 +95,11 @@ repos:
 
     nb = read("test.ipynb")
     assert len(nb.cells) == 3
+
+    # finally we move the paired notebook to a subfolder
+    tmpdir.mkdir("subfolder")
+    os.rename("test.py", "subfolder/test.py")
+    os.rename("test.ipynb", "subfolder/test.ipynb")
+    tmp_repo.git.add("test.ipynb")
+    tmp_repo.git.add("test.py")
+    tmp_repo.index.commit("passing")
