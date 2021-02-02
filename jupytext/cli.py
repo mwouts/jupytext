@@ -38,13 +38,7 @@ from .paired_paths import (
     paired_paths,
 )
 from .pairs import latest_inputs_and_outputs, read_pair, write_pair
-from .reraise import reraise
 from .version import __version__
-
-try:
-    from nbconvert.preprocessors import ExecutePreprocessor
-except ImportError as ep_err:
-    ExecutePreprocessor = reraise(ep_err)
 
 
 def system(*args, **kwargs):
@@ -631,7 +625,6 @@ def jupytext_single_file(nb_file, args, log):
     if args.execute:
         kernel_name = notebook.metadata.get("kernelspec", {}).get("name")
         log("[jupytext] Executing notebook with kernel {}".format(kernel_name))
-        exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
 
         if nb_dest is not None and nb_dest != "-":
             nb_path = os.path.dirname(nb_dest)
@@ -657,7 +650,23 @@ def jupytext_single_file(nb_file, args, log):
             resources = {"metadata": {"path": run_path}}
         else:
             resources = {}
-        exec_proc.preprocess(notebook, resources=resources)
+
+        try:
+            from nbconvert.preprocessors import ExecutePreprocessor
+
+            exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
+            exec_proc.preprocess(notebook, resources=resources)
+        except (ImportError, RuntimeError) as err:
+            if args.pre_commit_mode:
+                raise RuntimeError(
+                    "An error occured while executing the notebook. Please "
+                    "make sure that you have listed 'nbconvert' and 'ipykernel' "
+                    "under 'additional_dependencies' in the jupytext hook."
+                ) from err
+            raise RuntimeError(
+                "An error occured while executing the notebook. Please "
+                "make sure that 'nbconvert' and 'ipykernel' are installed."
+            ) from err
 
     # III. ### Possible actions ###
     modified = args.update_metadata or args.pipe or args.execute
@@ -783,8 +792,7 @@ def jupytext_single_file(nb_file, args, log):
             )
             untracked_files += 1
 
-        # end of lazy_write
-        return
+        return untracked_files
 
     if nb_dest:
         if nb_dest == nb_file and not dest_fmt:
