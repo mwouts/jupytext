@@ -105,3 +105,7 @@ repos:
     tmp_repo.git.add("subfolder/test.ipynb")
     tmp_repo.git.add("subfolder/test.py")
     tmp_repo.index.commit("passing")
+
+    # and we don't get any error or message when we run 'pre-commit run --all'
+    status = pre_commit(["run", "--all"])
+    assert status == 0

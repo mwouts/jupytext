@@ -94,20 +94,6 @@ def test_alert_untracked_alerts_for_modified(tmpdir, cwd_tmpdir, tmp_repo, capsy
     assert "Please run 'git add test.py'" in out.out
 
 
-def test_alert_file_not_in_index(tmpdir, cwd_tmpdir, tmp_repo, capsys):
-    tmpdir.join("test.py").write("print('hello')\n")
-    tmpdir.join(".jupytext.toml").write('default_jupytext_formats = "ipynb,py"')
-
-    # Run jupytext
-    status = jupytext(["--sync", "--pre-commit-mode", "test.py"])
-
-    assert status != 0
-    assert not tmpdir.join("test.ipynb").exists()
-
-    out = capsys.readouterr()
-    assert "Please run 'git add test.py'" in out.err
-
-
 def test_alert_inconsistent_versions(tmpdir, cwd_tmpdir, tmp_repo, capsys):
     """Jupytext refuses to sync two inconsistent notebooks"""
     write(new_notebook(cells=[new_markdown_cell("A short py notebook")]), "test.py")

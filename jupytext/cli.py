@@ -594,7 +594,7 @@ def jupytext_single_file(nb_file, args, log):
             except NotAPairedNotebook as err:
                 sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
                 return 0
-            except (InconsistentVersions, InputNotInIndex) as err:
+            except (InconsistentVersions) as err:
                 sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
                 return 1
         else:
@@ -938,11 +938,7 @@ class NotAPairedNotebook(ValueError):
 
 
 class InconsistentVersions(ValueError):
-    """An error raised when two paired files contain inconsistent representations"""
-
-
-class InputNotInIndex(ValueError):
-    """In the pre-commit-mode mode, input files should be in the git index."""
+    """An error raised when two paired files in the git index contain inconsistent representations"""
 
 
 def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
@@ -956,12 +952,17 @@ def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
     _, fmt_with_prefix_suffix = find_base_path_and_format(nb_file, formats)
     fmt.update(fmt_with_prefix_suffix)
 
+    def file_in_git_index(path):
+        return system("git", "status", "--porcelain", path).startswith(("M", "A"))
+
+    use_git_index_rather_than_timestamp = pre_commit_mode and file_in_git_index(nb_file)
+
     def get_timestamp(path):
         if not os.path.isfile(path):
             return None
-        if pre_commit_mode:
+        if use_git_index_rather_than_timestamp:
             # Files that are in the git index are considered more recent
-            return system("git", "status", "--porcelain", path).startswith(("M", "A"))
+            return file_in_git_index(path)
         return os.lstat(path).st_mtime
 
     def read_one_file(path, fmt):
@@ -971,12 +972,7 @@ def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
         log("[jupytext] Loading '{}'".format(path))
         return read(path, fmt=fmt)
 
-    if pre_commit_mode:
-        if not get_timestamp(nb_file):
-            raise InputNotInIndex(
-                f"The input file '{nb_file}' is not in the git index. Please run 'git add {nb_file}'."
-            )
-
+    if use_git_index_rather_than_timestamp:
         # We raise an error if two representations of this notebook in the git index are inconsistent
         nb_files_in_git_index = sorted(
             (
