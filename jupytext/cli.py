@@ -783,7 +783,8 @@ def jupytext_single_file(nb_file, args, log):
             )
             untracked_files += 1
 
-        return untracked_files
+        # end of lazy_write
+        return
 
     if nb_dest:
         if nb_dest == nb_file and not dest_fmt:
