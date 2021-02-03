@@ -461,8 +461,7 @@ def jupytext_single_file(nb_file, args, log):
                     )
                 )
                 return 0
-            else:
-                raise
+            raise
         if args.output_format:
             nb_dest = full_path(bp, args.output_format)
 
@@ -541,12 +540,12 @@ def jupytext_single_file(nb_file, args, log):
         else:
             try:
                 kernelspec = get_kernel_spec(set_kernel)
-            except KeyError:
+            except KeyError as err:
                 raise KeyError(
                     "Please choose a kernel name among {}".format(
                         find_kernel_specs().keys()
                     )
-                )
+                ) from err
 
             kernelspec = {
                 "name": args.set_kernel,
@@ -794,7 +793,7 @@ def jupytext_single_file(nb_file, args, log):
             )
             untracked_files += 1
 
-        return untracked_files
+        return
 
     if nb_dest:
         if nb_dest == nb_file and not dest_fmt:
@@ -899,12 +898,12 @@ def set_format_options(fmt, format_options):
     for opt in format_options:
         try:
             key, value = opt.split("=")
-        except ValueError:
+        except ValueError as err:
             raise ValueError(
                 "Format options are expected to be of the form key=value, not '{}'".format(
                     opt
                 )
-            )
+            ) from err
 
         if key not in _VALID_FORMAT_OPTIONS:
             raise ValueError(

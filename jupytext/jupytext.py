@@ -42,7 +42,7 @@ from .version import __version__
 
 
 class NotSupportedNBFormatVersion(NotImplementedError):
-    pass
+    """An error issued when the current notebook format is not supported by this version of Jupytext"""
 
 
 class TextNotebookConverter(NotebookReader, NotebookWriter):
@@ -353,8 +353,8 @@ def reads(text, fmt, as_version=nbformat.NO_CONVERT, **kwargs):
         (version, version_minor) = nbformat.reader.get_version(nb)
         if version != 4:
             warnings.warn(
-                f"Notebooks in nbformat version {version} are not supported by Jupytext. "
-                f"Please consider converting them to nbformat version 4 with "
+                f"Notebooks in nbformat version {version}.{version_minor} are not supported by Jupytext. "
+                f"Please consider converting them to nbformat version 4.x with "
                 f"'jupyter nbconvert --to notebook --inplace'"
             )
         return nb
