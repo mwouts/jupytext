@@ -1183,3 +1183,12 @@ def test_skip_execution(tmpdir, cwd_tmpdir, tmp_repo, python_notebook, capsys):
     jupytext(["--execute", "--pre-commit-mode", "test.ipynb"])
     captured = capsys.readouterr()
     assert "skipped" in captured.out
+
+
+def test_glob_recursive(tmpdir, cwd_tmpdir):
+    tmpdir.mkdir("subfolder").join("test.py").write("1 + 1\n")
+    tmpdir.join("test.py").write("2 + 2\n")
+    jupytext(["--to", "ipynb", "**/*.py"])
+
+    assert tmpdir.join("test.ipynb").isfile()
+    assert tmpdir.join("subfolder").join("test.ipynb").isfile()
