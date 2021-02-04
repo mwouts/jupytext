@@ -1,8 +1,8 @@
 Jupytext ChangeLog
 ==================
 
-1.10.0-dev (???)
-----------------
+1.10.0 (2021-01-04)
+-------------------
 
 **Added**
 - Jupytext has a pre-commit hook! Many thanks to John Paton and Aaron Gokaslan for making this happen ([#698](https://github.com/mwouts/jupytext/issues/698))
