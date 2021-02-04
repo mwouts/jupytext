@@ -159,3 +159,18 @@ default_notebook_metadata_filter: "jupytext"
     jupytext(["--sync", str(tmpdir.join("scripts").join("*.py"))])
 
     assert tmpdir.join("notebooks").join("test.ipynb").exists()
+
+
+def test_sync_config_does_not_create_formats_metadata(
+    tmpdir, cwd_tmpdir, python_notebook
+):
+    tmpdir.join("jupytext.yml").write(
+        """default_jupytext_formats: "ipynb,py:percent"
+"""
+    )
+
+    write(python_notebook, "test.ipynb")
+    jupytext(["--sync", "test.ipynb"])
+
+    nb = read("test.py")
+    assert "formats" not in nb.metadata["jupytext"]

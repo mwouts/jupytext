@@ -2,7 +2,9 @@
   name: jupytext
   description: Runs jupytext on all notebooks and paired files.
   language: python
-  entry: jupytext --ignore-unmatched --alert-untracked
-  pass_filenames: true
+  entry: jupytext --pre-commit-mode
   require_serial: true
-  types: [jupyter]
+  # We have only added the most frequent text notebook types, but
+  # many more types are actually supported (r, matlab, js, bash, powershell, robot, ...)
+  # If you need support for one of these other extensions, please override this default value
+  types_or: [jupyter, markdown, python]

@@ -27,18 +27,21 @@ def _multilines(obj):
         ]
 
 
-def compare(actual, expected, return_diff=False):
+def compare(
+    actual, expected, actual_name="actual", expected_name="expected", return_diff=False
+):
     """Compare two strings, lists or dict-like objects"""
     if actual != expected:
-        diff = "\n".join(
-            difflib.unified_diff(
-                _multilines(expected),
-                _multilines(actual),
-                "expected",
-                "actual",
-                lineterm="",
-            )
+        diff = difflib.unified_diff(
+            _multilines(expected),
+            _multilines(actual),
+            expected_name,
+            actual_name,
+            lineterm="",
         )
+        if expected_name == "" and actual_name == "":
+            diff = list(diff)[2:]
+        diff = "\n".join(diff)
         if return_diff:
             return diff
         raise AssertionError("\n" + diff)

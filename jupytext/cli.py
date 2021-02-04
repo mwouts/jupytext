@@ -2,6 +2,7 @@
 
 import argparse
 import glob
+import io
 import json
 import os
 import re
@@ -26,7 +27,7 @@ from .formats import (
     short_form_one_format,
 )
 from .header import recursive_update
-from .jupytext import read, reads, write, writes
+from .jupytext import create_prefix_dir, read, reads, write, writes
 from .kernels import find_kernel_specs, get_kernel_spec, kernelspec_from_language
 from .languages import _SCRIPT_EXTENSIONS
 from .paired_paths import (
@@ -37,13 +38,7 @@ from .paired_paths import (
     paired_paths,
 )
 from .pairs import latest_inputs_and_outputs, read_pair, write_pair
-from .reraise import reraise
 from .version import __version__
-
-try:
-    from nbconvert.preprocessors import ExecutePreprocessor
-except ImportError as ep_err:
-    ExecutePreprocessor = reraise(ep_err)
 
 
 def system(*args, **kwargs):
@@ -82,25 +77,6 @@ def parse_jupytext_args(args=None):
         help="One or more notebook(s). "
         "Notebook is read from stdin when this argument is empty.",
         nargs="*",
-    )
-    parser.add_argument(
-        "--pre-commit",
-        action="store_true",
-        help="Ignore the notebook argument, and instead apply Jupytext "
-        "on the notebooks found in the git index, which have an "
-        "extension that matches the (optional) --from argument.",
-    )
-    parser.add_argument(
-        "--ignore-unmatched",
-        action="store_true",
-        help="Ignore passed filepaths that aren't in the source format "
-        "you are trying to convert from.",
-    )
-    parser.add_argument(
-        "--alert-untracked",
-        action="store_true",
-        help="Exit with a non-zero status if the output files are not "
-        "tracked in the git index",
     )
     parser.add_argument(
         "--from",
@@ -280,7 +256,10 @@ def parse_jupytext_args(args=None):
     parser.add_argument(
         "--execute",
         action="store_true",
-        help="Execute the notebook with the given kernel",
+        help="Execute the notebook with the given kernel. In the "
+        "--pre-commit-mode, the notebook is executed only if a code "
+        "cell changed, or if some execution outputs are missing "
+        "or not ordered.",
     )
     parser.add_argument(
         "--run-path",
@@ -292,8 +271,13 @@ def parse_jupytext_args(args=None):
         "--quiet",
         "-q",
         action="store_true",
-        default=False,
         help="Quiet mode: do not comment about files being updated or created",
+    )
+    parser.add_argument(
+        "--diff",
+        "-d",
+        action="store_true",
+        help="Display the diff for each output file",
     )
 
     action.add_argument(
@@ -301,6 +285,25 @@ def parse_jupytext_args(args=None):
         "-v",
         action="store_true",
         help="Show jupytext's version number and exit",
+    )
+
+    parser.add_argument(
+        "--pre-commit",
+        action="store_true",
+        help="Ignore the notebook argument, and instead apply Jupytext "
+        "on the notebooks found in the git index, which have an "
+        "extension that matches the (optional) --from argument.",
+    )
+    parser.add_argument(
+        "--pre-commit-mode",
+        action="store_true",
+        help="This is a mode that is compatible with the pre-commit framework. "
+        "In this mode, --sync won't use timestamp but instead will "
+        "determines the source notebook as the element of the pair "
+        "that is added to the git index. An alert is raised if multiple inconsistent representations are "
+        "in the index. It also raises an alert after updating the paired files or outputs if those "
+        "files need to be added to the index. Finally, filepaths that aren't in the source format "
+        "you are trying to convert from are ignored.",
     )
 
     return parser.parse_args(args)
@@ -319,6 +322,13 @@ def jupytext(args=None):
         return 0
 
     if args.pre_commit:
+        warnings.warn(
+            "The --pre-commit argument is deprecated. "
+            "Please consider switching to the pre-commit.com framework "
+            "(let us know at https://github.com/mwouts/jupytext/issues "
+            "if that is an issue for you)",
+            DeprecationWarning,
+        )
         if args.notebooks:
             raise ValueError(
                 "--pre-commit takes notebooks from the git index. Do not pass any notebook here."
@@ -441,7 +451,7 @@ def jupytext_single_file(nb_file, args, log):
         try:
             bp = base_path(nb_file, args.input_format)
         except InconsistentPath:
-            if args.ignore_unmatched:
+            if args.pre_commit_mode:
                 log(
                     "[jupytext] Ignoring unmatched input path {}{}".format(
                         nb_file,
@@ -451,8 +461,7 @@ def jupytext_single_file(nb_file, args, log):
                     )
                 )
                 return 0
-            else:
-                raise
+            raise
         if args.output_format:
             nb_dest = full_path(bp, args.output_format)
 
@@ -531,12 +540,12 @@ def jupytext_single_file(nb_file, args, log):
         else:
             try:
                 kernelspec = get_kernel_spec(set_kernel)
-            except KeyError:
+            except KeyError as err:
                 raise KeyError(
                     "Please choose a kernel name among {}".format(
                         find_kernel_specs().keys()
                     )
-                )
+                ) from err
 
             kernelspec = {
                 "name": args.set_kernel,
@@ -572,16 +581,23 @@ def jupytext_single_file(nb_file, args, log):
         recursive_update(notebook.metadata, args.update_metadata)
 
     # Read paired notebooks, except if the pair is being created
+    nb_files = [nb_file, nb_dest]
     if args.sync:
         set_prefix_and_suffix(fmt, notebook, nb_file)
         if args.set_formats is None:
             try:
                 notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(
-                    notebook, fmt, nb_file, log
+                    notebook, fmt, nb_file, log, args.pre_commit_mode
                 )
+                nb_files = [inputs_nb_file, outputs_nb_file]
             except NotAPairedNotebook as err:
                 sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
                 return 0
+            except InconsistentVersions as err:
+                sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
+                return 1
+        else:
+            nb_files = [nb_file]
 
     # II. ### Apply commands onto the notebook ###
     # Pipe the notebook into the desired commands
@@ -593,11 +609,22 @@ def jupytext_single_file(nb_file, args, log):
     for cmd in args.check or []:
         pipe_notebook(notebook, cmd, args.pipe_fmt, update=False, prefix=prefix)
 
+    if (
+        args.execute
+        and args.pre_commit_mode
+        and execution_counts_are_in_order(notebook)
+        and not code_cells_have_changed(notebook, nb_files)
+    ):
+        log(
+            f"[jupytext] Execution of {shlex.quote(nb_file)} "
+            f"skipped as code cells have not changed and outputs are present."
+        )
+        args.execute = False
+
     # Execute the notebook
     if args.execute:
         kernel_name = notebook.metadata.get("kernelspec", {}).get("name")
         log("[jupytext] Executing notebook with kernel {}".format(kernel_name))
-        exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
 
         if nb_dest is not None and nb_dest != "-":
             nb_path = os.path.dirname(nb_dest)
@@ -623,7 +650,23 @@ def jupytext_single_file(nb_file, args, log):
             resources = {"metadata": {"path": run_path}}
         else:
             resources = {}
-        exec_proc.preprocess(notebook, resources=resources)
+
+        try:
+            from nbconvert.preprocessors import ExecutePreprocessor
+
+            exec_proc = ExecutePreprocessor(timeout=None, kernel_name=kernel_name)
+            exec_proc.preprocess(notebook, resources=resources)
+        except (ImportError, RuntimeError) as err:
+            if args.pre_commit_mode:
+                raise RuntimeError(
+                    "An error occured while executing the notebook. Please "
+                    "make sure that you have listed 'nbconvert' and 'ipykernel' "
+                    "under 'additional_dependencies' in the jupytext hook."
+                ) from err
+            raise RuntimeError(
+                "An error occured while executing the notebook. Please "
+                "make sure that 'nbconvert' and 'ipykernel' are installed."
+            ) from err
 
     # III. ### Possible actions ###
     modified = args.update_metadata or args.pipe or args.execute
@@ -678,6 +721,80 @@ def jupytext_single_file(nb_file, args, log):
         return 0
 
     # b. Output to the desired file or format
+    untracked_files = 0
+
+    def lazy_write(path, fmt=None, action=None, update_timestamp_only=False):
+        """Write the notebook only if it has changed"""
+        if path == "-":
+            write(notebook, "-", fmt=fmt)
+            return
+
+        nonlocal untracked_files
+        if update_timestamp_only:
+            modified = False
+        else:
+            _, ext = os.path.splitext(path)
+            fmt = copy(fmt or {})
+            fmt = long_form_one_format(fmt, update={"extension": ext})
+            new_content = writes(notebook, fmt=fmt)
+            diff = None
+            if not new_content.endswith("\n"):
+                new_content += "\n"
+            if not os.path.isfile(path):
+                modified = True
+            else:
+                with open(path) as fp:
+                    current_content = fp.read()
+                modified = new_content != current_content
+                if modified and args.diff:
+                    diff = compare(
+                        new_content,
+                        current_content,
+                        "",
+                        "",
+                        return_diff=True,
+                    )
+
+        if modified:
+            # The text representation of the notebook has changed, we write it on disk
+            if action is None:
+                message = "[jupytext] Updating {}".format(shlex.quote(path))
+            else:
+                message = "[jupytext] Writing {path}{format}{action}".format(
+                    path=shlex.quote(path),
+                    format=" in format " + short_form_one_format(fmt)
+                    if fmt and "format_name" in fmt
+                    else "",
+                    action=action,
+                )
+            if diff is not None:
+                message += " with this change:\n" + diff
+
+            log(message)
+            create_prefix_dir(path, fmt)
+            with io.open(path, "w", encoding="utf-8") as fp:
+                fp.write(new_content)
+
+        # Otherwise, we only update the timestamp of the text file to make sure
+        # they remain more recent than the ipynb file, for compatibility with the
+        # Jupytext contents manager for Jupyter
+        if not modified and not path.endswith(".ipynb"):
+            log(f"[jupytext] Updating the timestamp of {shlex.quote(path)}")
+            os.utime(path, None)
+
+        if args.pre_commit:
+            system("git", "add", path)
+
+        if args.pre_commit_mode and is_untracked(path):
+            log(
+                f"[jupytext] Error: the git index is outdated.\n"
+                f"Please add the paired notebook with:\n"
+                f"    git add {shlex.quote(path)}"
+            )
+            untracked_files += 1
+
+        return
+
     if nb_dest:
         if nb_dest == nb_file and not dest_fmt:
             dest_fmt = fmt
@@ -698,57 +815,26 @@ def jupytext_single_file(nb_file, args, log):
         else:
             action = ""
 
-        log(
-            "[jupytext] Writing {nb_dest}{format}{action}".format(
-                nb_dest=nb_dest,
-                format=" in format " + short_form_one_format(dest_fmt)
-                if dest_fmt and "format_name" in dest_fmt
-                else "",
-                action=action,
-            )
-        )
-        write(notebook, nb_dest, fmt=dest_fmt)
-        if args.pre_commit:
-            system("git", "add", nb_dest)
+        lazy_write(nb_dest, fmt=dest_fmt, action=action)
 
     # c. Synchronize paired notebooks
     if args.sync:
         # Also update the original notebook if the notebook was modified
         if modified:
-            inputs_nb_file = outputs_nb_file = None
-
-        untracked_paths = []
+            inputs_nb_file = None
 
         def write_function(path, fmt):
-            if path == inputs_nb_file:
-                # We update the timestamp of the text file to make sure it remains more recent than the ipynb
-                if path != outputs_nb_file:
-                    log("[jupytext] Sync timestamp of '{}'".format(nb_file))
-                    os.utime(nb_file, None)
-
-                # We don't write the ipynb file if it was not modified
-                return
-
-            log("[jupytext] Updating '{}'".format(path))
-            write(notebook, path, fmt=fmt)
-            if args.pre_commit:
-                system("git", "add", path)
-            if args.alert_untracked and is_untracked(path):
-                nonlocal untracked_paths
-                untracked_paths.append(path)
+            lazy_write(
+                path,
+                fmt,
+                update_timestamp_only=(path == inputs_nb_file),
+            )
 
         formats = prepare_notebook_for_save(notebook, config, nb_file)
         write_pair(nb_file, formats, write_function)
-        if untracked_paths:
-            log(
-                "[jupytext] Output file {nb_dest} is not tracked in the git index, "
-                "add it to the index using 'git add' to fix this.".format(
-                    nb_dest=", ".join(untracked_paths)
-                )
-            )
-            return 1
+        return untracked_files
 
-    elif (
+    if (
         os.path.isfile(nb_file)
         and nb_dest.endswith(".ipynb")
         and not nb_file.endswith(".ipynb")
@@ -756,17 +842,9 @@ def jupytext_single_file(nb_file, args, log):
     ):
         # Update the original text file timestamp, as required by our Content Manager
         # Otherwise Jupyter will refuse to open the paired notebook #335
-        log("[jupytext] Sync timestamp of '{}'".format(nb_file))
-        os.utime(nb_file, None)
+        lazy_write(nb_file, update_timestamp_only=True)
 
-    if args.alert_untracked and is_untracked(nb_dest):
-        log(
-            "[jupytext] Output file {nb_dest} is not tracked in the git index, "
-            "add it to the index using 'git add' to fix this.".format(nb_dest=nb_dest)
-        )
-        return 1
-    else:
-        return 0
+    return untracked_files
 
 
 def notebooks_in_git_index(fmt):
@@ -787,11 +865,19 @@ def notebooks_in_git_index(fmt):
 
 
 def is_untracked(filepath):
-    """Check whether a file is untracked by the git index"""
+    """Check whether a file was created or modified and needs to be added to the git index"""
     if not filepath:
         return False
+
     output = system("git", "ls-files", filepath).strip()
-    return output == ""
+    if output == "":
+        return True
+
+    output = system("git", "diff", filepath).strip()
+    if output != "":
+        return True
+
+    return False
 
 
 def print_paired_paths(nb_file, fmt):
@@ -812,12 +898,12 @@ def set_format_options(fmt, format_options):
     for opt in format_options:
         try:
             key, value = opt.split("=")
-        except ValueError:
+        except ValueError as err:
             raise ValueError(
                 "Format options are expected to be of the form key=value, not '{}'".format(
                     opt
                 )
-            )
+            ) from err
 
         if key not in _VALID_FORMAT_OPTIONS:
             raise ValueError(
@@ -852,28 +938,68 @@ class NotAPairedNotebook(ValueError):
     """An error raised when a notebook is not a paired notebook"""
 
 
-def load_paired_notebook(notebook, fmt, nb_file, log):
+class InconsistentVersions(ValueError):
+    """An error raised when two paired files in the git index contain inconsistent representations"""
+
+
+def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
     """Update the notebook with the inputs and outputs of the most recent paired files"""
     formats = notebook.metadata.get("jupytext", {}).get("formats")
 
     if not formats:
-        raise NotAPairedNotebook("'{}' is not a paired notebook".format(nb_file))
+        raise NotAPairedNotebook(f"{shlex.quote(nb_file)} is not a paired notebook")
 
     formats = long_form_multiple_formats(formats)
     _, fmt_with_prefix_suffix = find_base_path_and_format(nb_file, formats)
     fmt.update(fmt_with_prefix_suffix)
 
+    def file_in_git_index(path):
+        return system("git", "status", "--porcelain", path).startswith(("M", "A"))
+
+    use_git_index_rather_than_timestamp = pre_commit_mode and file_in_git_index(nb_file)
+
     def get_timestamp(path):
         if not os.path.isfile(path):
             return None
+        if use_git_index_rather_than_timestamp:
+            # Files that are in the git index are considered more recent
+            return file_in_git_index(path)
         return os.lstat(path).st_mtime
 
     def read_one_file(path, fmt):
         if path == nb_file:
             return notebook
 
-        log("[jupytext] Loading '{}'".format(path))
+        log(f"[jupytext] Loading {shlex.quote(path)}")
         return read(path, fmt=fmt)
+
+    if use_git_index_rather_than_timestamp:
+        # We raise an error if two representations of this notebook in the git index are inconsistent
+        nb_files_in_git_index = sorted(
+            (
+                (alt_path, alt_fmt)
+                for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats)
+                if get_timestamp(alt_path)
+            ),
+            key=lambda x: 0 if x[1]["extension"] != ".ipynb" else 1,
+        )
+
+        if len(nb_files_in_git_index) > 1:
+            path0, fmt0 = nb_files_in_git_index[0]
+            with open(path0) as fp:
+                text0 = fp.read()
+            for alt_path, alt_fmt in nb_files_in_git_index[1:]:
+                nb = read(alt_path, fmt=alt_fmt)
+                alt_text = writes(nb, fmt=fmt0)
+                if alt_text != text0:
+                    diff = compare(alt_text, text0, alt_path, path0, return_diff=True)
+                    raise InconsistentVersions(
+                        f"{shlex.quote(alt_path)} and {shlex.quote(path0)} are inconsistent.\n"
+                        + diff
+                        + f"\nPlease revert JUST ONE of the files with EITHER\n"
+                        f"    git reset {shlex.quote(alt_path)} && git checkout -- {shlex.quote(alt_path)}\nOR\n"
+                        f"    git reset {shlex.quote(path0)} && git checkout -- {shlex.quote(path0)}\n"
+                    )
 
     inputs, outputs = latest_inputs_and_outputs(nb_file, fmt, formats, get_timestamp)
     notebook = read_pair(inputs, outputs, read_one_file)
@@ -891,7 +1017,7 @@ def exec_command(command, input=None, capture=False):
             dict(stdout=subprocess.PIPE, stdin=subprocess.PIPE)
             if input is not None
             else {}
-        )
+        ),
     )
     out, err = process.communicate(input=input)
     if out and not capture:
@@ -975,8 +1101,38 @@ def pipe_notebook(notebook, command, fmt="py:percent", update=True, prefix=None)
         piped_notebook = combine_inputs_with_outputs(piped_notebook, notebook, fmt)
 
     # Remove jupytext / text_representation entry
-    piped_notebook.metadata.pop("jupytext")
     if "jupytext" in notebook.metadata:
         piped_notebook.metadata["jupytext"] = notebook.metadata["jupytext"]
+    else:
+        piped_notebook.metadata.pop("jupytext", None)
 
     return piped_notebook
+
+
+def execution_counts_are_in_order(notebook):
+    """Returns True if all the code cells have an execution count, ordered from 1 to N with no missing number"""
+    expected_execution_count = 1
+    for cell in notebook.cells:
+        if cell.cell_type == "code":
+            if cell.execution_count != expected_execution_count:
+                return False
+            expected_execution_count += 1
+    return True
+
+
+def code_cells_have_changed(notebook, nb_files):
+    """The source for the code cells has not changed"""
+    for nb_file in nb_files:
+        if not os.path.exists(nb_file):
+            return True
+
+        nb_ref = read(nb_file)
+
+        # Are the new code cells equals to those in the file?
+        ref = [cell.source for cell in nb_ref.cells if cell.cell_type == "code"]
+        new = [cell.source for cell in notebook.cells if cell.cell_type == "code"]
+
+        if ref != new:
+            return True
+
+    return False

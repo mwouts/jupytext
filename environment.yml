@@ -17,6 +17,7 @@ dependencies:
   - pytest-xdist
   - pytest-cov
   - pre-commit
+  - gitpython
   - pylint
   - flake8
   - black
