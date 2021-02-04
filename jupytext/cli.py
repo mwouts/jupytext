@@ -416,7 +416,7 @@ def jupytext(args=None):
     for pattern in args.notebooks:
         if "*" in pattern or "?" in pattern:
             # Exclude the .jupytext.py configuration file
-            notebooks.extend(glob.glob(pattern))
+            notebooks.extend(glob.glob(pattern, recursive=True))
         else:
             notebooks.append(pattern)
 
