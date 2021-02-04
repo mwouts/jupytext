@@ -39,6 +39,10 @@ def test_auto_from_kernelspecs_works(nb_file):
     elif expected_ext == ".fs":
         expected_ext = ".fsx"
     auto_ext = auto_ext_from_metadata(nb.metadata)
+    if auto_ext == ".sage":
+        pytest.xfail(
+            "Sage notebooks have Python in their language_info metadata, see #727"
+        )
     assert auto_ext == expected_ext
 
 
