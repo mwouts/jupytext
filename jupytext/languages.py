@@ -57,6 +57,7 @@ _SCRIPT_EXTENSIONS = {
     ".sos": {"language": "sos", "comment": "#"},
     ".java": {"language": "java", "comment": "//"},
     ".groovy": {"language": "groovy", "comment": "//"},
+    ".sage": {"language": "sage", "comment": "#"},
 }
 
 _COMMENT_CHARS = [

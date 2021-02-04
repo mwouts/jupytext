@@ -4,6 +4,9 @@ Jupytext ChangeLog
 1.10.1 (2021-02-??)
 -------------------
 
+**Added**
+- Sage notebooks are supported. They can be converted to `.sage` and `.md` files and back. Thanks to Lars Franke for suggesting this! ([#727](https://github.com/mwouts/jupytext/issues/727))
+
 
 1.10.0 (2021-02-04)
 -------------------
