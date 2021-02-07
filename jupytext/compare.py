@@ -110,25 +110,12 @@ def compare_notebooks(
     allow_expected_differences=True,
     raise_on_first_difference=True,
     compare_outputs=False,
+    compare_ids=False,
 ):
     """Compare the two notebooks, and raise with a meaningful message
     that explains the differences, if any"""
     fmt = long_form_one_format(fmt)
     format_name = fmt.get("format_name")
-
-    # Expected differences
-    allow_filtered_cell_metadata = allow_expected_differences
-    allow_missing_code_cell_metadata = (
-        allow_expected_differences and format_name == "sphinx"
-    )
-    allow_missing_markdown_cell_metadata = (
-        allow_expected_differences and format_name in ["sphinx", "spin"]
-    )
-    allow_removed_final_blank_line = allow_expected_differences
-
-    cell_metadata_filter = notebook_actual.get("jupytext", {}).get(
-        "cell_metadata_filter"
-    )
 
     if (
         format_name == "sphinx"
@@ -137,11 +124,77 @@ def compare_notebooks(
     ):
         notebook_actual.cells = notebook_actual.cells[1:]
 
-    # Compare cells type and content
-    test_cell_iter = iter(notebook_actual.cells)
+    modified_cells, modified_cell_metadata = compare_cells(
+        notebook_actual.cells,
+        notebook_expected.cells,
+        raise_on_first_difference,
+        compare_outputs=compare_outputs,
+        compare_ids=compare_ids,
+        cell_metadata_filter=notebook_actual.get("jupytext", {}).get(
+            "cell_metadata_filter"
+        ),
+        allow_missing_code_cell_metadata=(
+            allow_expected_differences and format_name == "sphinx"
+        ),
+        allow_missing_markdown_cell_metadata=(
+            allow_expected_differences and format_name in ["sphinx", "spin"]
+        ),
+        allow_filtered_cell_metadata=allow_expected_differences,
+        allow_removed_final_blank_line=allow_expected_differences,
+    )
+
+    # Compare notebook metadata
+    modified_metadata = False
+    try:
+        compare(
+            filtered_notebook_metadata(notebook_actual),
+            filtered_notebook_metadata(notebook_expected),
+        )
+    except AssertionError as error:
+        if raise_on_first_difference:
+            raise NotebookDifference("Notebook metadata differ: {}".format(str(error)))
+        modified_metadata = True
+
+    error = []
+    if modified_cells:
+        error.append(
+            "Cells {} differ ({}/{})".format(
+                ",".join([str(i) for i in modified_cells]),
+                len(modified_cells),
+                len(notebook_expected.cells),
+            )
+        )
+    if modified_cell_metadata:
+        error.append(
+            "Cell metadata '{}' differ".format(
+                "', '".join([str(i) for i in modified_cell_metadata])
+            )
+        )
+    if modified_metadata:
+        error.append("Notebook metadata differ")
+
+    if error:
+        raise NotebookDifference(" | ".join(error))
+
+
+def compare_cells(
+    actual_cells,
+    expected_cells,
+    raise_on_first_difference=True,
+    compare_outputs=True,
+    compare_ids=True,
+    cell_metadata_filter=None,
+    allow_missing_code_cell_metadata=False,
+    allow_missing_markdown_cell_metadata=False,
+    allow_filtered_cell_metadata=False,
+    allow_removed_final_blank_line=False,
+):
+    """Compare two collection of notebook cells"""
+    test_cell_iter = iter(actual_cells)
     modified_cells = set()
     modified_cell_metadata = set()
-    for i, ref_cell in enumerate(notebook_expected.cells, 1):
+
+    for i, ref_cell in enumerate(expected_cells, 1):
         try:
             test_cell = next(test_cell_iter)
         except StopIteration:
@@ -151,7 +204,7 @@ def compare_notebooks(
                         ref_cell.cell_type, i, ref_cell.source
                     )
                 )
-            modified_cells.update(range(i, len(notebook_expected.cells) + 1))
+            modified_cells.update(range(i, len(expected_cells) + 1))
             break
 
         ref_lines = [
@@ -166,6 +219,15 @@ def compare_notebooks(
                     "Unexpected cell type '{}' for {} cell #{}:\n{}".format(
                         test_cell.cell_type, ref_cell.cell_type, i, ref_cell.source
                     )
+                )
+            modified_cells.add(i)
+
+        # Compare cell ids (introduced in nbformat 5.1.0)
+        if compare_ids and test_cell.get("id") != ref_cell.get("id"):
+            if raise_on_first_difference:
+                raise NotebookDifference(
+                    f"Cell ids differ on {test_cell['cell_type']} cell #{i}: "
+                    f"'{test_cell.get('id')}' != '{ref_cell.get('id')}'"
                 )
             modified_cells.add(i)
 
@@ -291,43 +353,12 @@ def compare_notebooks(
     if remaining_cell_count and not raise_on_first_difference:
         modified_cells.update(
             range(
-                len(notebook_expected.cells) + 1,
-                len(notebook_expected.cells) + 1 + remaining_cell_count,
+                len(expected_cells) + 1,
+                len(expected_cells) + 1 + remaining_cell_count,
             )
         )
 
-    # Compare notebook metadata
-    modified_metadata = False
-    try:
-        compare(
-            filtered_notebook_metadata(notebook_actual),
-            filtered_notebook_metadata(notebook_expected),
-        )
-    except AssertionError as error:
-        if raise_on_first_difference:
-            raise NotebookDifference("Notebook metadata differ: {}".format(str(error)))
-        modified_metadata = True
-
-    error = []
-    if modified_cells:
-        error.append(
-            "Cells {} differ ({}/{})".format(
-                ",".join([str(i) for i in modified_cells]),
-                len(modified_cells),
-                len(notebook_expected.cells),
-            )
-        )
-    if modified_cell_metadata:
-        error.append(
-            "Cell metadata '{}' differ".format(
-                "', '".join([str(i) for i in modified_cell_metadata])
-            )
-        )
-    if modified_metadata:
-        error.append("Notebook metadata differ")
-
-    if error:
-        raise NotebookDifference(" | ".join(error))
+    return modified_cells, modified_cell_metadata
 
 
 def test_round_trip_conversion(
