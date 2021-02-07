@@ -443,7 +443,7 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
             f"Please convert your notebooks to nbformat version 4 with "
             f"'jupyter nbconvert --to notebook --inplace', or call this function with 'version=4'."
         )
-    if version > 4 or (version == 4 and version_minor > 4):
+    if version > 4 or (version == 4 and version_minor > 5):
         warnings.warn(
             f"Notebooks in nbformat version {version}.{version_minor} "
             f"have not been tested with Jupytext version {__version__}."
