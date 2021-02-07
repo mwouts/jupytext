@@ -11,7 +11,7 @@ from nbformat.v4.nbbase import (
 
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
-from jupytext.compare import compare, compare_notebooks
+from jupytext.compare import compare, compare_cells, compare_notebooks
 
 
 def test_read_mostly_py_rmd_file(
@@ -39,43 +39,24 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 """,
 ):
     nb = jupytext.reads(rmd, "Rmd")
-    compare(
+    compare_cells(
         nb.cells,
         [
-            {
-                "cell_type": "raw",
-                "source": "---\ntitle: Simple file\n---",
-                "metadata": {},
-            },
-            {
-                "cell_type": "code",
-                "metadata": {"echo": True},
-                "execution_count": None,
-                "source": "import numpy as np\n" "x = np.arange(0, 2*math.pi, eps)",
-                "outputs": [],
-            },
-            {
-                "cell_type": "code",
-                "metadata": {"echo": True},
-                "execution_count": None,
-                "source": "x = np.arange(0,1,eps)\ny = np.abs(x)-.5",
-                "outputs": [],
-            },
-            {
-                "cell_type": "code",
-                "metadata": {},
-                "execution_count": None,
-                "source": "%%R\nls()",
-                "outputs": [],
-            },
-            {
-                "cell_type": "code",
-                "metadata": {"results": "asis"},
-                "execution_count": None,
-                "source": "%%R -i x\ncat(stringi::" "stri_rand_lipsum(3), sep='\n\n')",
-                "outputs": [],
-            },
+            new_raw_cell("---\ntitle: Simple file\n---"),
+            new_code_cell(
+                "import numpy as np\n" "x = np.arange(0, 2*math.pi, eps)",
+                metadata={"echo": True},
+            ),
+            new_code_cell(
+                "x = np.arange(0,1,eps)\ny = np.abs(x)-.5", metadata={"echo": True}
+            ),
+            new_code_cell("%%R\nls()"),
+            new_code_cell(
+                "%%R -i x\ncat(stringi::" "stri_rand_lipsum(3), sep='\n\n')",
+                metadata={"results": "asis"},
+            ),
         ],
+        compare_ids=False,
     )
 
     rmd2 = jupytext.writes(nb, "Rmd")
@@ -194,20 +175,21 @@ title: R Markdown notebook title
     nb = nbformat.read(str(nb_file), as_version=4)
 
     if root_level_metadata_as_raw_cell:
-        assert len(nb.cells) == 2
-        compare(
-            nb.cells[0],
-            new_raw_cell(
-                """---
+        compare_cells(
+            nb.cells,
+            [
+                new_raw_cell(
+                    """---
 author: R Markdown document author
 title: R Markdown notebook title
 ---"""
-            ),
+                ),
+                new_code_cell("1 + 1"),
+            ],
+            compare_ids=False,
         )
-        compare(nb.cells[1], new_code_cell("1 + 1"))
     else:
-        assert len(nb.cells) == 1
-        compare(nb.cells[0], new_code_cell("1 + 1"))
+        compare_cells(nb.cells, [new_code_cell("1 + 1")], compare_ids=False)
         assert nb.metadata["jupytext"]["root_level_metadata"] == {
             "title": "R Markdown notebook title",
             "author": "R Markdown document author",

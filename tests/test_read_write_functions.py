@@ -5,7 +5,7 @@ import nbformat
 from nbformat.v4.nbbase import new_markdown_cell, new_notebook
 
 import jupytext
-from jupytext.compare import compare
+from jupytext.compare import compare, compare_notebooks
 
 
 def test_simple_hook(tmpdir):
@@ -81,4 +81,4 @@ def test_read_py_percent_from_stream():
 
     nb = jupytext.read(stream())
     nb2 = jupytext.read(stream(), fmt="py:percent")
-    compare(nb2, nb)
+    compare_notebooks(nb2, nb)

@@ -9,7 +9,7 @@ from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 
 from jupytext import read, write
 from jupytext.cli import jupytext, system
-from jupytext.compare import compare, compare_notebooks
+from jupytext.compare import compare_cells, compare_notebooks
 
 from .utils import (
     list_notebooks,
@@ -139,7 +139,9 @@ def test_sync_with_pre_commit_hook(tmpdir):
     assert "notebook.md" in git("ls-tree", "-r", "master", "--name-only")
 
     nb = read(tmp_ipynb)
-    compare(nb.cells, [new_markdown_cell("Notebook was edited")])
+    compare_cells(
+        nb.cells, [new_markdown_cell("Notebook was edited")], compare_ids=False
+    )
 
     # create and commit a jpg file
     tmp_jpg = str(tmpdir.join("image.jpg"))

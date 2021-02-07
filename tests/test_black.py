@@ -7,7 +7,7 @@ from nbformat.v4.nbbase import new_code_cell, new_notebook
 from jupytext import read, write
 from jupytext.cli import jupytext, pipe_notebook, system
 from jupytext.combine import black_invariant
-from jupytext.compare import compare
+from jupytext.compare import compare, compare_cells, compare_notebooks
 from jupytext.header import _DEFAULT_NOTEBOOK_METADATA
 
 from .utils import list_notebooks, requires_autopep8, requires_black, requires_flake8
@@ -61,7 +61,9 @@ def test_pipe_into_black():
     nb_dest = new_notebook(cells=[new_code_cell("1 + 1")])
 
     nb_pipe = pipe_notebook(nb_org, "black")
-    compare(nb_pipe, nb_dest)
+    compare_notebooks(
+        nb_pipe, nb_dest, allow_expected_differences=False, compare_ids=False
+    )
 
 
 @requires_autopep8
@@ -70,7 +72,9 @@ def test_pipe_into_autopep8():
     nb_dest = new_notebook(cells=[new_code_cell("1 + 1")])
 
     nb_pipe = pipe_notebook(nb_org, "autopep8 -")
-    compare(nb_pipe, nb_dest)
+    compare_notebooks(
+        nb_pipe, nb_dest, allow_expected_differences=False, compare_ids=False
+    )
 
 
 @requires_flake8
@@ -104,7 +108,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     write(nb_org, tmp_ipynb)
     jupytext([tmp_ipynb, "--pipe", "black"])
     nb_now = read(tmp_ipynb)
-    compare(nb_now, nb_black)
+    compare_notebooks(nb_now, nb_black)
 
     # Write to another folder using dots
     script_fmt = os.path.join("..", "script_folder//py:percent")
@@ -113,7 +117,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     assert os.path.isfile(tmp_py)
     nb_now = read(tmp_py)
     nb_now.metadata = metadata
-    compare(nb_now, nb_black)
+    compare_notebooks(nb_now, nb_black)
     os.remove(tmp_py)
 
     # Map to another folder based on file name
@@ -134,7 +138,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     assert os.path.isfile(tmp_py)
     nb_now = read(tmp_py)
     nb_now.metadata = metadata
-    compare(nb_now, nb_black)
+    compare_notebooks(nb_now, nb_black)
 
 
 @requires_black
@@ -156,7 +160,7 @@ def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
     jupytext([tmp_ipynb, "--pipe", "black", "--sync"])
 
     nb_now = read(tmp_ipynb)
-    compare(nb_now, nb_black)
+    compare_notebooks(nb_now, nb_black)
     assert "language_info" in nb_now.metadata
 
     nb_now = read(tmp_py)
@@ -166,7 +170,7 @@ def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
         for key in nb_black.metadata
         if key in _DEFAULT_NOTEBOOK_METADATA.split(",")
     }
-    compare(nb_now, nb_black)
+    compare_notebooks(nb_now, nb_black)
 
 
 @requires_black
@@ -202,7 +206,7 @@ jupyter:
     jupytext([tmp_md, "--pipe", "black"])
 
     nb = read(tmp_md)
-    compare(nb.cells, [new_code_cell("1 + 2 + 3 + 4")])
+    compare_cells(nb.cells, [new_code_cell("1 + 2 + 3 + 4")], compare_ids=False)
 
 
 @requires_black

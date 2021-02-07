@@ -13,7 +13,7 @@ from tornado.web import HTTPError
 
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
-from jupytext.compare import compare, compare_notebooks
+from jupytext.compare import compare, compare_cells, compare_notebooks
 from jupytext.formats import auto_ext_from_metadata, read_format_from_metadata
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.jupytext import read, write, writes
@@ -1792,7 +1792,9 @@ def test_jupytext_jupyter_fs_metamanager(tmpdir):
     model = cm.get(osfs + ":text.md", type="notebook")
     assert model["type"] == "notebook"
     # We only compare the cells, as kernelspecs are added to the notebook metadata
-    compare(model["content"].cells, [new_markdown_cell(text.strip())])
+    compare_cells(
+        model["content"].cells, [new_markdown_cell(text.strip())], compare_ids=False
+    )
 
     for nb_file in ["notebook.ipynb", "text_notebook.md"]:
         model = cm.get(osfs + ":" + nb_file)
@@ -1802,7 +1804,7 @@ def test_jupytext_jupyter_fs_metamanager(tmpdir):
         # saving adds 'trusted=True' to the code cell metadata
         for cell in actual_cells:
             cell.metadata = {}
-        compare(actual_cells, nb.cells)
+        compare_cells(actual_cells, nb.cells, compare_ids=False)
 
 
 def test_config_jupytext_jupyter_fs_meta_manager(tmpdir):

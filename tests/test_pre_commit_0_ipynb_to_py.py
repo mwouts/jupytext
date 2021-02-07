@@ -5,6 +5,7 @@ from pre_commit.main import main as pre_commit
 
 from jupytext import read, write
 from jupytext.cli import jupytext
+from jupytext.compare import compare_cells
 
 from .utils import skip_pre_commit_tests_on_windows
 
@@ -66,4 +67,4 @@ repos:
 
     # But it won't change the ipynb file (if you want that, use the --sync mode)
     nb = read("test.ipynb")
-    assert nb.cells == [new_markdown_cell("Some other text")]
+    compare_cells(nb.cells, [new_markdown_cell("Some other text")], compare_ids=False)
