@@ -8,6 +8,9 @@ Jupytext ChangeLog
 - The recursive glob pattern `**/*.ipynb` is now supported by Jupytext - Thanks to Banst for this contribution ([#731](https://github.com/mwouts/jupytext/issues/731))
 - Sage notebooks are supported. They can be converted to `.sage` and `.md` files and back. Thanks to Lars Franke for suggesting this! ([#727](https://github.com/mwouts/jupytext/issues/727))
 
+**Changed**
+- We have tested Jupytext the new cell ids introduced in `nbformat>=5.1.0`. Cell ids are preserved by the `--sync` and `--update` command. So we removed the constraint on the version of `nbformat` ([#735](https://github.com/mwouts/jupytext/issues/735)).
+
 **Fixed**
 - We filtered out the `node_modules` folder from the `.tar.gz` package for Jupytext ([#730](https://github.com/mwouts/jupytext/issues/730))
 
