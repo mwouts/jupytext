@@ -1,14 +1,15 @@
 include LICENSE
 include *.md
 include *.txt
-include *.rst
 
-graft jupytext/labextension
 graft jupyter-config
-graft packages
 graft tests
 
-global-exclude *__pycache__
+exclude packages/labextension/node_modules/
+exclude packages/labextension/yarn.lock
+exclude packages/labextension/.gitignore
+
 global-exclude *.pyc
 global-exclude *population.ipynb
 global-exclude plotly_graphs.ipynb
+global-exclude Notebook_with_R_magic.ipynb
