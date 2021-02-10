@@ -8,7 +8,7 @@ dependencies:
   - jupyter
   - ipykernel
   - nbconvert
-  - nbformat<=5.0.8
+  - nbformat>=5.1.1
   - pyyaml
   - toml
   - markdown-it-py~=0.6.0

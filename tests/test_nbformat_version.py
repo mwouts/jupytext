@@ -25,10 +25,9 @@ def sample_notebook_v3_json(sample_notebook_v3):
 
 
 @pytest.fixture()
-def sample_notebook_v4_5():
+def sample_notebook_v4_99():
     nb = new_notebook_v4(cells=[new_markdown_cell("Hi")])
-    nb["nbformat_minor"] = 5
-    nb["cells"][0]["id"] = "unique-id"
+    nb["nbformat_minor"] = 99
     return nb
 
 
@@ -57,11 +56,11 @@ def test_jupytext_gives_a_meaningful_error_when_writing_nbformat_3(
 
 
 @pytest.mark.parametrize("fmt", ["py:light", "py:percent", "md"])
-def test_jupytext_gives_a_meaningful_error_when_writing_nbformat_4_5(
-    sample_notebook_v4_5, fmt
+def test_jupytext_gives_a_meaningful_error_when_writing_nbformat_4_99(
+    sample_notebook_v4_99, fmt
 ):
     with pytest.warns(
         Warning,
-        match="Notebooks in nbformat version 4.5 have not been tested",
+        match="Notebooks in nbformat version 4.99 have not been tested",
     ):
-        writes(sample_notebook_v4_5, fmt=fmt)
+        writes(sample_notebook_v4_99, fmt=fmt)

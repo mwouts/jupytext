@@ -61,7 +61,7 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
         # Read and convert the mirror file to the latest nbformat version if necessary
         nb_mirror = jupytext.read(mirror_file, as_version=notebook.nbformat)
         nb_mirror.nbformat_minor = notebook.nbformat_minor
-        compare(nb_mirror, notebook)
+        compare_notebooks(nb_mirror, notebook)
         return
     elif ext == ".ipynb":
         notebook = jupytext.read(mirror_file)

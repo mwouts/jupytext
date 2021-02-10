@@ -6,7 +6,12 @@ from nbformat.v4.nbbase import (
     new_raw_cell,
 )
 
-from jupytext.compare import NotebookDifference, compare, compare_notebooks
+from jupytext.compare import (
+    NotebookDifference,
+    compare,
+    compare_cells,
+    compare_notebooks,
+)
 from jupytext.compare import test_round_trip_conversion as round_trip_conversion
 
 
@@ -47,9 +52,9 @@ def notebook_expected():
     return new_notebook(
         metadata=notebook_metadata(),
         cells=[
-            new_markdown_cell("First markdown cell"),
-            new_code_cell("1 + 1"),
-            new_markdown_cell("Second markdown cell"),
+            new_markdown_cell("First markdown cell", id="markdown-cell-one"),
+            new_code_cell("1 + 1", id="code-cell-one"),
+            new_markdown_cell("Second markdown cell", id="markdown-cell-two"),
         ],
     )
 
@@ -61,9 +66,9 @@ def notebook_actual():
     return new_notebook(
         metadata=metadata,
         cells=[
-            new_markdown_cell("First markdown cell"),
-            new_code_cell("1 + 1"),
-            new_markdown_cell("Modified markdown cell"),
+            new_markdown_cell("First markdown cell", id="markdown-cell-one"),
+            new_code_cell("1 + 1", id="code-cell-one"),
+            new_markdown_cell("Modified markdown cell", id="markdown-cell-two"),
         ],
     )
 
@@ -77,16 +82,16 @@ def test_compare_on_notebooks(notebook_actual, notebook_expected):
         == """
 --- expected
 +++ actual
-@@ -15,7 +15,7 @@
-   {
+@@ -18,7 +18,7 @@
     "cell_type": "markdown",
+    "id": "markdown-cell-two",
     "metadata": {},
 -   "source": "Second markdown cell"
 +   "source": "Modified markdown cell"
    }
   ],
   "metadata": {
-@@ -34,7 +34,7 @@
+@@ -37,7 +37,7 @@
     "name": "python",
     "nbconvert_exporter": "python",
     "pygments_lexer": "ipython3",
@@ -300,3 +305,10 @@ def test_notebook_metadata_differ():
     with pytest.raises(NotebookDifference) as exception_info:
         compare_notebooks(nb2, nb1, raise_on_first_difference=False)
     assert "Notebook metadata differ" in exception_info.value.args[0]
+
+
+def test_cell_ids_differ():
+    with pytest.raises(NotebookDifference, match="'id-one' != 'id-two'"):
+        compare_cells(
+            [new_code_cell("1", id="id-one")], [new_code_cell("1", id="id-two")]
+        )

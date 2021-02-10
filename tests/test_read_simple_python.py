@@ -858,7 +858,7 @@ def test_notebook_no_line_to_next_cell(
     nb2 = jupytext.reads(script, "py")
     nb2.metadata.pop("jupytext")
 
-    compare(nb2, nb)
+    compare_notebooks(nb2, nb)
 
 
 def test_notebook_one_blank_line_before_first_markdown_cell(

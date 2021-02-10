@@ -8,6 +8,7 @@ from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 from tornado.web import HTTPError
 
 import jupytext
+from jupytext.compare import compare_cells
 
 from .utils import notebook_model
 
@@ -170,4 +171,4 @@ def test_paired_files_and_symbolic_links(tmpdir):
     # Reload and make sure that we get the updated notebook
     model = cm.get("link_to_notebooks/notebook.ipynb")
     nb = model["content"]
-    assert nb.cells == [new_code_cell("3 + 3")]
+    compare_cells(nb.cells, [new_code_cell("3 + 3")], compare_ids=False)

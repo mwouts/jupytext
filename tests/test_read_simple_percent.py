@@ -227,7 +227,7 @@ def test_multiple_empty_cells():
     compare(text, expected)
     nb2 = jupytext.reads(text, "py:percent")
     nb2.metadata = nb.metadata
-    compare(nb2, nb)
+    compare_notebooks(nb2, nb)
 
 
 def test_first_cell_markdown_191():

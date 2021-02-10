@@ -7,7 +7,7 @@ from nbformat.v4.nbbase import (
 
 import jupytext
 from jupytext.combine import combine_inputs_with_outputs
-from jupytext.compare import compare, compare_notebooks
+from jupytext.compare import compare, compare_cells, compare_notebooks
 
 
 def test_read_mostly_py_markdown_file(
@@ -56,32 +56,14 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 ):
     nb = jupytext.reads(markdown, "md")
     assert nb.metadata["jupytext"]["main_language"] == "python"
-    compare(
+    compare_cells(
         nb.cells,
         [
-            {
-                "cell_type": "raw",
-                "source": "---\ntitle: Simple file\n---",
-                "metadata": {},
-            },
-            {
-                "cell_type": "code",
-                "metadata": {},
-                "execution_count": None,
-                "source": "import numpy as np\n" "x = np.arange(0, 2*math.pi, eps)",
-                "outputs": [],
-            },
-            {
-                "cell_type": "code",
-                "metadata": {},
-                "execution_count": None,
-                "source": "x = np.arange(0,1,eps)\ny = np.abs(x)-.5",
-                "outputs": [],
-            },
-            {
-                "cell_type": "markdown",
-                "metadata": {},
-                "source": """This is
+            new_raw_cell("---\ntitle: Simple file\n---"),
+            new_code_cell("import numpy as np\n" "x = np.arange(0, 2*math.pi, eps)"),
+            new_code_cell("x = np.arange(0,1,eps)\ny = np.abs(x)-.5"),
+            new_markdown_cell(
+                """This is
 a Markdown cell
 
 ```
@@ -95,24 +77,13 @@ a Markdown cell
 # with two blank lines
 ```
 
-And the same markdown cell continues""",
-            },
-            {"cell_type": "raw", "metadata": {}, "source": "this is a raw cell"},
-            {
-                "cell_type": "code",
-                "metadata": {},
-                "execution_count": None,
-                "source": "%%R\nls()",
-                "outputs": [],
-            },
-            {
-                "cell_type": "code",
-                "metadata": {},
-                "execution_count": None,
-                "source": "%%R\ncat(stringi::" "stri_rand_lipsum(3), sep='\n\n')",
-                "outputs": [],
-            },
+And the same markdown cell continues"""
+            ),
+            new_raw_cell("this is a raw cell"),
+            new_code_cell("%%R\nls()"),
+            new_code_cell("%%R\ncat(stringi::" "stri_rand_lipsum(3), sep='\n\n')"),
         ],
+        compare_ids=False,
     )
 
     markdown2 = jupytext.writes(nb, "md")
@@ -141,7 +112,7 @@ cell
 ):
     nb = jupytext.reads(markdown, "md")
     assert nb.metadata["jupytext"]["main_language"] == "python"
-    compare(
+    compare_cells(
         nb.cells,
         [
             new_markdown_cell("Some text"),
@@ -162,6 +133,7 @@ cell""",
                 metadata={"region_name": "markdown"},
             ),
         ],
+        compare_ids=False,
     )
 
     markdown2 = jupytext.writes(nb, "md")
@@ -180,24 +152,13 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
 ):
     nb = jupytext.reads(markdown, "md")
     assert nb.metadata["jupytext"]["main_language"] == "R"
-    compare(
+    compare_cells(
         nb.cells,
         [
-            {
-                "cell_type": "code",
-                "metadata": {},
-                "execution_count": None,
-                "source": "ls()",
-                "outputs": [],
-            },
-            {
-                "cell_type": "code",
-                "metadata": {},
-                "execution_count": None,
-                "source": "cat(stringi::stri_rand_lipsum(3), sep='\n\n')",
-                "outputs": [],
-            },
+            new_code_cell("ls()"),
+            new_code_cell("cat(stringi::stri_rand_lipsum(3), sep='\n\n')"),
         ],
+        compare_ids=False,
     )
 
     markdown2 = jupytext.writes(nb, "md")
@@ -293,9 +254,10 @@ b = 2
 """,
 ):
     nb = jupytext.reads(markdown, "md")
-    compare(
-        nb.cells[0],
-        new_code_cell(source="a = 1\nb = 2", metadata={"tags": ["parameters"]}),
+    compare_cells(
+        nb.cells,
+        [new_code_cell(source="a = 1\nb = 2", metadata={"tags": ["parameters"]})],
+        compare_ids=False,
     )
     markdown2 = jupytext.writes(nb, "md")
     compare(markdown2, markdown)
@@ -308,7 +270,11 @@ raw content
 """,
 ):
     nb = jupytext.reads(markdown, "md")
-    compare(nb.cells[0], new_raw_cell(source="raw content", metadata={"key": "value"}))
+    compare_cells(
+        nb.cells,
+        [new_raw_cell(source="raw content", metadata={"key": "value"})],
+        compare_ids=False,
+    )
     markdown2 = jupytext.writes(nb, "md")
     compare(markdown2, markdown)
 
@@ -320,7 +286,11 @@ raw content
 """,
 ):
     nb = jupytext.reads(markdown, "md")
-    compare(nb.cells[0], new_raw_cell(source="raw content", metadata={"key": "value"}))
+    compare_cells(
+        nb.cells,
+        [new_raw_cell(source="raw content", metadata={"key": "value"})],
+        compare_ids=False,
+    )
     markdown2 = jupytext.writes(nb, "md")
     compare(markdown2, markdown)
 
@@ -342,7 +312,11 @@ raw content
 """,
 ):
     nb = jupytext.reads(markdown, "md")
-    compare(nb.cells[0], new_raw_cell(source="raw content", metadata={"key": "value"}))
+    compare_cells(
+        nb.cells,
+        [new_raw_cell(source="raw content", metadata={"key": "value"})],
+        compare_ids=False,
+    )
     md2 = jupytext.writes(nb, "md")
     assert "format_version: '1.1'" not in md2
 
@@ -376,14 +350,17 @@ jupyter:
 """,
 ):
     nb = jupytext.reads(header + "\n" + markdown_11, "md")
-    compare(
-        nb.cells[0],
-        new_raw_cell(
-            source=""".. meta::
+    compare_cells(
+        nb.cells,
+        [
+            new_raw_cell(
+                source=""".. meta::
    :description: Topic: Integrated Development Environments, Difficulty: Easy, Category: Tools
    :keywords: python, introduction, IDE, PyCharm, VSCode, Jupyter, recommendation, tools""",
-            metadata={"raw_mimetype": "text/restructuredtext"},
-        ),
+                metadata={"raw_mimetype": "text/restructuredtext"},
+            )
+        ],
+        compare_ids=False,
     )
     md2 = jupytext.writes(nb, "md")
     assert "format_version: '1.1'" not in md2
@@ -402,11 +379,14 @@ markdown cell
 """,
 ):
     nb = jupytext.reads(markdown, "md")
-    compare(
-        nb.cells[0],
-        new_markdown_cell(
-            source="A long\n\n\nmarkdown cell", metadata={"key": "value"}
-        ),
+    compare_cells(
+        nb.cells,
+        [
+            new_markdown_cell(
+                source="A long\n\n\nmarkdown cell", metadata={"key": "value"}
+            )
+        ],
+        compare_ids=False,
     )
     markdown2 = jupytext.writes(nb, "md")
     compare(markdown2, markdown)
@@ -422,11 +402,14 @@ markdown cell
 """,
 ):
     nb = jupytext.reads(markdown, "md")
-    compare(
-        nb.cells[0],
-        new_markdown_cell(
-            source="A long\n\n\nmarkdown cell", metadata={"key": "value"}
-        ),
+    compare_cells(
+        nb.cells,
+        [
+            new_markdown_cell(
+                source="A long\n\n\nmarkdown cell", metadata={"key": "value"}
+            )
+        ],
+        compare_ids=False,
     )
     markdown2 = jupytext.writes(nb, "md")
     compare(markdown2, markdown)
@@ -444,8 +427,14 @@ markdown cell
 """,
 ):
     nb = jupytext.reads(markdown, "md")
-    compare(nb.cells[0], new_markdown_cell(source="# A header"))
-    compare(nb.cells[1], new_markdown_cell(source="A long\n\n\nmarkdown cell"))
+    compare_cells(
+        nb.cells,
+        [
+            new_markdown_cell(source="# A header"),
+            new_markdown_cell(source="A long\n\n\nmarkdown cell"),
+        ],
+        compare_ids=False,
+    )
     markdown2 = jupytext.writes(nb, "md")
     compare(markdown2, markdown)
 

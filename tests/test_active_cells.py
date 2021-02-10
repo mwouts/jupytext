@@ -1,7 +1,8 @@
 import pytest
+from nbformat import NotebookNode
 
 import jupytext
-from jupytext.compare import compare
+from jupytext.compare import compare, compare_cells
 
 HEADER = {
     ".py": """# ---
@@ -64,7 +65,8 @@ def check_active_cell(ext, active_dict):
     nb = jupytext.reads(text, ext)
     assert len(nb.cells) == 1
     compare(jupytext.writes(nb, ext), text)
-    compare(nb.cells[0], active_dict[".ipynb"])
+    cell = NotebookNode(active_dict[".ipynb"])
+    compare_cells(nb.cells, [cell], compare_ids=False)
 
 
 @pytest.mark.parametrize("ext", [".Rmd", ".md", ".py", ".R"])
@@ -159,7 +161,8 @@ def test_active_ipynb_rspin(no_jupytext_version_number):
     nb = jupytext.reads(ACTIVE_IPYNB_RSPIN[".R"], "R:spin")
     assert len(nb.cells) == 1
     compare(jupytext.writes(nb, "R:spin"), ACTIVE_IPYNB_RSPIN[".R"])
-    compare(nb.cells[0], ACTIVE_IPYNB_RSPIN[".ipynb"])
+    cell = NotebookNode(ACTIVE_IPYNB_RSPIN[".ipynb"])
+    compare_cells(nb.cells, [cell], compare_ids=False)
 
 
 ACTIVE_PY_IPYNB = {

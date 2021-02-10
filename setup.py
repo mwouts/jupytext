@@ -32,7 +32,7 @@ setup_args = dict(
     packages=find_packages(exclude=["tests"]),
     entry_points={"console_scripts": ["jupytext = jupytext.cli:jupytext"]},
     tests_require=["pytest"],
-    install_requires=["nbformat<=5.0.8", "pyyaml", "toml", "markdown-it-py~=0.6.0"],
+    install_requires=["nbformat", "pyyaml", "toml", "markdown-it-py~=0.6.0"],
     python_requires="~=3.6",
     extras_require={
         # left for back-compatibility

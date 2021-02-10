@@ -1161,10 +1161,23 @@ def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir, cwd_tmpdir
     nb_file = tmpdir.join("notebook.ipynb")
     md_file.write("Some text")
 
-    with pytest.warns(None) as record:
+    with pytest.warns(None) as warnings:
         jupytext(["--sync", "notebook.md"])
 
-    assert len(record) == 0
+    # TODO: remove this filter when the fix for
+    #  https://github.com/jupyter/nbformat/issues/212
+    #  is released
+    warnings = [
+        w
+        for w in warnings
+        if not (
+            "Sampling from a set deprecated" in str(w.message)
+            and "nbformat" in w.filename
+        )
+    ]
+
+    assert not warnings
+
     assert py_file.exists()
     assert nb_file.exists()
 
@@ -1211,3 +1224,55 @@ def test_glob_recursive(tmpdir, cwd_tmpdir):
 
     assert tmpdir.join("test.ipynb").isfile()
     assert tmpdir.join("subfolder").join("test.ipynb").isfile()
+
+
+def test_jupytext_sync_preserves_cell_ids(tmpdir, cwd_tmpdir, notebook_with_outputs):
+    write(notebook_with_outputs, "test.ipynb")
+
+    # Sync with a py file, this should not change the cell id
+    jupytext(["--set-formats", "ipynb,py:percent", "test.ipynb"])
+    nb = read("test.ipynb")
+    assert nb.cells[0].source == "1+1"
+    assert nb.cells[0].id == notebook_with_outputs.cells[0].id
+
+    # Change the py file and sync. This should not change the cell id neither
+    py_nb = tmpdir.join("test.py")
+    py = py_nb.read()
+    py_nb.write(py.replace("1+1", "2+2"))
+
+    jupytext(["--sync", "test.ipynb"])
+    nb = read("test.ipynb")
+    assert nb.cells[0].source == "2+2"
+    assert nb.cells[0].id == notebook_with_outputs.cells[0].id
+
+
+def test_jupytext_update_preserves_cell_ids(tmpdir, cwd_tmpdir, notebook_with_outputs):
+    write(notebook_with_outputs, "test.ipynb")
+
+    # Sync with a py file, this should not change the cell id
+    jupytext(["--to", "py:percent", "test.ipynb"])
+    nb = read("test.ipynb")
+    assert nb.cells[0].source == "1+1"
+    assert nb.cells[0].id == notebook_with_outputs.cells[0].id
+
+    # Change the py file and update the ipynb file.
+    # This should not change the cell id neither
+    py_nb = tmpdir.join("test.py")
+    py = py_nb.read()
+    py_nb.write(py.replace("1+1", "2+2"))
+
+    jupytext(["--to", "notebook", "--update", "test.py"])
+    nb = read("test.ipynb")
+    assert nb.cells[0].source == "2+2"
+    assert nb.cells[0].id == notebook_with_outputs.cells[0].id
+
+
+def test_jupytext_to_ipynb_suggests_update(tmpdir, cwd_tmpdir, capsys):
+    tmpdir.join("test.py").write("1 + 1\n")
+    jupytext(["--to", "ipynb", "test.py"])
+    capture = capsys.readouterr()
+    assert "update" not in capture.out
+
+    jupytext(["--to", "ipynb", "test.py"])
+    capture = capsys.readouterr()
+    assert "update" in capture.out
