@@ -7,6 +7,7 @@ Jupytext ChangeLog
 **Added**
 - The recursive glob pattern `**/*.ipynb` is now supported by Jupytext - Thanks to Banst for this contribution ([#731](https://github.com/mwouts/jupytext/issues/731))
 - Sage notebooks are supported. They can be converted to `.sage` and `.md` files and back. Thanks to Lars Franke for suggesting this! ([#727](https://github.com/mwouts/jupytext/issues/727))
+- Jupytext is also accessible with `python -m jupytext`. Thanks to Matthew Brett for his PR! ([#739](https://github.com/mwouts/jupytext/issues/739))
 
 **Fixed**
 - We filtered out the `node_modules` folder from the `.tar.gz` package for Jupytext ([#730](https://github.com/mwouts/jupytext/issues/730))
