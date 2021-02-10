@@ -27,7 +27,7 @@ dependencies:
   - pip
   - setuptools
   - twine
-  - pandoc>=2.11
+  - pandoc>=2.11.4
   # make html in docs folder
   - sphinx
   - tox-conda
