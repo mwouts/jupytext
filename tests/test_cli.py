@@ -8,6 +8,7 @@ import unittest.mock as mock
 from argparse import ArgumentTypeError
 from io import StringIO
 from shutil import copyfile
+from subprocess import check_call
 
 import nbformat
 import pytest
@@ -63,6 +64,24 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     nb2 = read(nb_other)
 
     compare_notebooks(nb2, nb1)
+
+
+def test_convert_single_file_in_place_m(tmpdir):
+    nb_file = list_notebooks("ipynb_py")[0]
+    nb_org = str(tmpdir.join(os.path.basename(nb_file)))
+    copyfile(nb_file, nb_org)
+
+    base, ext = os.path.splitext(nb_org)
+
+    for fmt_ext in ("py", "Rmd"):
+        nb_other = base + "." + fmt_ext
+
+        check_call([sys.executable, "-m", "jupytext", nb_org, "--to", fmt_ext])
+
+        nb1 = read(nb_org)
+        nb2 = read(nb_other)
+
+        compare_notebooks(nb2, nb1)
 
 
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb") + list_notebooks("Rmd"))
