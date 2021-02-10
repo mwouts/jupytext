@@ -110,7 +110,7 @@ def compare_notebooks(
     allow_expected_differences=True,
     raise_on_first_difference=True,
     compare_outputs=False,
-    compare_ids=False,
+    compare_ids=None,
 ):
     """Compare the two notebooks, and raise with a meaningful message
     that explains the differences, if any"""
@@ -123,6 +123,9 @@ def compare_notebooks(
         and notebook_actual.cells[0].source == "%matplotlib inline"
     ):
         notebook_actual.cells = notebook_actual.cells[1:]
+
+    if compare_ids is None:
+        compare_ids = compare_outputs
 
     modified_cells, modified_cell_metadata = compare_cells(
         notebook_actual.cells,

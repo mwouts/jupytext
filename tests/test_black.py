@@ -14,19 +14,17 @@ from .utils import list_notebooks, requires_autopep8, requires_black, requires_f
 
 
 @requires_black
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_apply_black_on_python_notebooks(nb_file, tmpdir):
-    tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
-    tmp_py = str(tmpdir.join("notebook.py"))
-    copyfile(nb_file, tmp_ipynb)
+@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
+def test_apply_black_on_python_notebooks(tmpdir, cwd_tmpdir, nb_file):
+    copyfile(nb_file, "notebook.ipynb")
 
-    jupytext(args=[tmp_ipynb, "--to", "py:percent"])
-    system("black", tmp_py)
-    jupytext(args=[tmp_py, "--to", "ipynb", "--update"])
+    jupytext(args=["notebook.ipynb", "--to", "py:percent"])
+    system("black", "notebook.py")
+    jupytext(args=["notebook.py", "--to", "ipynb", "--update"])
 
     nb1 = read(nb_file)
-    nb2 = read(tmp_ipynb)
-    nb3 = read(tmp_py)
+    nb2 = read("notebook.ipynb")
+    nb3 = read("notebook.py")
 
     assert len(nb1.cells) == len(nb2.cells)
     assert len(nb1.cells) == len(nb3.cells)
@@ -57,23 +55,23 @@ def test_black_invariant():
 
 @requires_black
 def test_pipe_into_black():
-    nb_org = new_notebook(cells=[new_code_cell("1        +1")])
-    nb_dest = new_notebook(cells=[new_code_cell("1 + 1")])
+    nb_org = new_notebook(cells=[new_code_cell("1        +1", id="cell-id")])
+    nb_dest = new_notebook(cells=[new_code_cell("1 + 1", id="cell-id")])
 
     nb_pipe = pipe_notebook(nb_org, "black")
     compare_notebooks(
-        nb_pipe, nb_dest, allow_expected_differences=False, compare_ids=False
+        nb_pipe, nb_dest, allow_expected_differences=False, compare_ids=True
     )
 
 
 @requires_autopep8
 def test_pipe_into_autopep8():
-    nb_org = new_notebook(cells=[new_code_cell("1        +1")])
-    nb_dest = new_notebook(cells=[new_code_cell("1 + 1")])
+    nb_org = new_notebook(cells=[new_code_cell("1        +1", id="cell-id")])
+    nb_dest = new_notebook(cells=[new_code_cell("1 + 1", id="cell-id")])
 
     nb_pipe = pipe_notebook(nb_org, "autopep8 -")
     compare_notebooks(
-        nb_pipe, nb_dest, allow_expected_differences=False, compare_ids=False
+        nb_pipe, nb_dest, allow_expected_differences=False, compare_ids=True
     )
 
 
@@ -95,20 +93,21 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
     metadata = read(nb_file).metadata
 
-    nb_org = new_notebook(cells=[new_code_cell("1        +1")], metadata=metadata)
-    nb_black = new_notebook(cells=[new_code_cell("1 + 1")], metadata=metadata)
+    nb_org = new_notebook(
+        cells=[new_code_cell("1        +1", id="cell-id")], metadata=metadata
+    )
+    nb_black = new_notebook(
+        cells=[new_code_cell("1 + 1", id="cell-id")], metadata=metadata
+    )
 
-    os.makedirs(str(tmpdir.join("notebook_folder")))
-    os.makedirs(str(tmpdir.join("script_folder")))
-
-    tmp_ipynb = str(tmpdir.join("notebook_folder").join("notebook.ipynb"))
-    tmp_py = str(tmpdir.join("script_folder").join("notebook.py"))
+    tmp_ipynb = str(tmpdir.mkdir("notebook_folder").join("notebook.ipynb"))
+    tmp_py = str(tmpdir.mkdir("script_folder").join("notebook.py"))
 
     # Black in place
     write(nb_org, tmp_ipynb)
     jupytext([tmp_ipynb, "--pipe", "black"])
     nb_now = read(tmp_ipynb)
-    compare_notebooks(nb_now, nb_black)
+    compare_notebooks(nb_now, nb_black, compare_ids=True)
 
     # Write to another folder using dots
     script_fmt = os.path.join("..", "script_folder//py:percent")
@@ -142,28 +141,29 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
 
 
 @requires_black
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_apply_black_and_sync_on_paired_notebook(tmpdir, nb_file):
+@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
+def test_apply_black_and_sync_on_paired_notebook(tmpdir, cwd_tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
     metadata = read(nb_file).metadata
     metadata["jupytext"] = {"formats": "ipynb,py"}
     assert "language_info" in metadata
 
-    nb_org = new_notebook(cells=[new_code_cell("1        +1")], metadata=metadata)
-    nb_black = new_notebook(cells=[new_code_cell("1 + 1")], metadata=metadata)
-
-    tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
-    tmp_py = str(tmpdir.join("notebook.py"))
+    nb_org = new_notebook(
+        cells=[new_code_cell("1        +1", id="cell-id")], metadata=metadata
+    )
+    nb_black = new_notebook(
+        cells=[new_code_cell("1 + 1", id="cell-id")], metadata=metadata
+    )
 
     # Black in place
-    write(nb_org, tmp_ipynb)
-    jupytext([tmp_ipynb, "--pipe", "black", "--sync"])
+    write(nb_org, "notebook.ipynb")
+    jupytext(["notebook.ipynb", "--pipe", "black", "--sync"])
 
-    nb_now = read(tmp_ipynb)
-    compare_notebooks(nb_now, nb_black)
+    nb_now = read("notebook.ipynb")
+    compare_notebooks(nb_now, nb_black, compare_ids=True)
     assert "language_info" in nb_now.metadata
 
-    nb_now = read(tmp_py)
+    nb_now = read("notebook.py")
     nb_now.metadata["jupytext"].pop("text_representation")
     nb_black.metadata = {
         key: nb_black.metadata[key]
