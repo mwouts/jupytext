@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.10.2 (2021-02-17)
+-------------------
+
+**Fixed**
+- We have adjusted the `MANIFEST.in` file to exclude the `node_modules` but still include the JupyterLab extension that was missing in the `.tar.gz` (and conda) package in v1.10.1. Many thanks to Martin Renou for providing the fix at ([#741](https://github.com/mwouts/jupytext/issues/741))
+
+
 1.10.1 (2021-02-11)
 -------------------
 
