@@ -2,12 +2,16 @@ include LICENSE
 include *.md
 include *.txt
 
+exclude packages/labextension/node_modules
+graft packages/labextension/src
+include packages/labextension/LICENSE
+include packages/labextension/package.json
+include packages/labextension/tsconfig.json
+include packages/labextension/yarn.lock
+include packages/labextension/README.md
+
 graft jupyter-config
 graft tests
-
-exclude packages/labextension/node_modules/
-exclude packages/labextension/yarn.lock
-exclude packages/labextension/.gitignore
 
 global-exclude *.pyc
 global-exclude *population.ipynb
