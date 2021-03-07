@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 from git import Repo
+from nbformat.v4 import nbbase
 from nbformat.v4.nbbase import (
     new_code_cell,
     new_markdown_cell,
@@ -90,3 +91,17 @@ def notebook_with_outputs():
             }
         },
     )
+
+
+"""To make sure that cell ids are distinct we use a global counter.
+    This solves https://github.com/mwouts/jupytext/issues/747"""
+global_cell_count = 0
+
+
+def generate_corpus_id():
+    global global_cell_count
+    global_cell_count += 1
+    return f"cell-{global_cell_count}"
+
+
+nbbase.random_cell_id = generate_corpus_id
