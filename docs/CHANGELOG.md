@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.10.3 (2021-03-07)
+-------------------
+
+**Fixed**
+- We have updated `marked`, an indirect dependency of the `jupyterlab-jupytext` extension, to fix a moderate vulnerability (#750).
+
+
 1.10.2 (2021-02-17)
 -------------------
 
