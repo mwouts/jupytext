@@ -1,3 +1,7 @@
+# 1.3.1 (2021-03-07)
+
+- We have updated `yarn.lock` to upgrade `marked` to `2.0` and fix a moderate vulnerability in the extension dependencies (#750)
+
 # 1.3.0 (2021-01-05)
 
 - The `jupyterlab-jupytext` extension is now distributed using `jupyter-packaging`, thanks to Martin Renou's awesome contribution (#683).
