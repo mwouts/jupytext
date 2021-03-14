@@ -15,7 +15,7 @@ from tempfile import NamedTemporaryFile
 
 from .combine import combine_inputs_with_outputs
 from .compare import NotebookDifference, compare, test_round_trip_conversion
-from .config import load_jupytext_config, prepare_notebook_for_save
+from .config import load_jupytext_config, notebook_formats
 from .formats import (
     _BINARY_FORMAT_OPTIONS,
     _VALID_FORMAT_OPTIONS,
@@ -481,8 +481,6 @@ def jupytext_single_file(nb_file, args, log):
         if ext:
             fmt = {"extension": ext}
     if fmt:
-        if config:
-            config.set_default_format_options(fmt)
         set_format_options(fmt, args.format_options)
     log(
         "[jupytext] Reading {}{}".format(
@@ -493,7 +491,7 @@ def jupytext_single_file(nb_file, args, log):
         )
     )
 
-    notebook = read(nb_file, fmt=fmt)
+    notebook = read(nb_file, fmt=fmt, config=config)
     if "extension" in fmt and "format_name" not in fmt:
         text_representation = notebook.metadata.get("jupytext", {}).get(
             "text_representation", {}
@@ -501,15 +499,8 @@ def jupytext_single_file(nb_file, args, log):
         if text_representation.get("extension") == fmt["extension"]:
             fmt["format_name"] = text_representation["format_name"]
 
-    if config and "formats" not in notebook.metadata.get("jupytext", {}):
-        default_formats = config.default_formats(nb_file)
-        if default_formats:
-            notebook.metadata.setdefault("jupytext", {})["formats"] = default_formats
-
     # Compute actual extension when using script/auto, and update nb_dest if necessary
     dest_fmt = args.output_format
-    if dest_fmt and config:
-        config.set_default_format_options(dest_fmt)
     if dest_fmt and dest_fmt["extension"] == ".auto":
         dest_fmt = check_auto_ext(dest_fmt, notebook.metadata, "--to")
         if not args.output and nb_file != "-":
@@ -583,11 +574,14 @@ def jupytext_single_file(nb_file, args, log):
     # Read paired notebooks, except if the pair is being created
     nb_files = [nb_file, nb_dest]
     if args.sync:
-        set_prefix_and_suffix(fmt, notebook, nb_file)
+        formats = notebook_formats(
+            notebook, config, nb_file, fallback_on_current_fmt=False
+        )
+        set_prefix_and_suffix(fmt, formats, nb_file)
         if args.set_formats is None:
             try:
                 notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(
-                    notebook, fmt, nb_file, log, args.pre_commit_mode
+                    notebook, fmt, config, formats, nb_file, log, args.pre_commit_mode
                 )
                 nb_files = [inputs_nb_file, outputs_nb_file]
             except NotAPairedNotebook as err:
@@ -693,7 +687,7 @@ def jupytext_single_file(nb_file, args, log):
                     dest_text = writes(notebook, fmt=dest_fmt)
                     notebook = reads(dest_text, fmt=dest_fmt)
 
-                text = writes(notebook, fmt=fmt)
+                text = writes(notebook, fmt=fmt, config=config)
 
                 if args.test_strict:
                     compare(text, org_text)
@@ -736,7 +730,7 @@ def jupytext_single_file(nb_file, args, log):
             _, ext = os.path.splitext(path)
             fmt = copy(fmt or {})
             fmt = long_form_one_format(fmt, update={"extension": ext})
-            new_content = writes(notebook, fmt=fmt)
+            new_content = writes(notebook, fmt=fmt, config=config)
             diff = None
             if not new_content.endswith("\n"):
                 new_content += "\n"
@@ -830,7 +824,7 @@ def jupytext_single_file(nb_file, args, log):
                 update_timestamp_only=(path == inputs_nb_file),
             )
 
-        formats = prepare_notebook_for_save(notebook, config, nb_file)
+        formats = notebook_formats(notebook, config, nb_file)
         write_pair(nb_file, formats, write_function)
         return untracked_files
 
@@ -918,11 +912,9 @@ def set_format_options(fmt, format_options):
         fmt[key] = value
 
 
-def set_prefix_and_suffix(fmt, notebook, nb_file):
+def set_prefix_and_suffix(fmt, formats, nb_file):
     """Add prefix and suffix information from jupytext.formats if format and path matches"""
-    for alt_fmt in long_form_multiple_formats(
-        notebook.metadata.get("jupytext", {}).get("formats")
-    ):
+    for alt_fmt in long_form_multiple_formats(formats):
         if alt_fmt["extension"] == fmt["extension"] and fmt.get(
             "format_name"
         ) == alt_fmt.get("format_name"):
@@ -942,10 +934,8 @@ class InconsistentVersions(ValueError):
     """An error raised when two paired files in the git index contain inconsistent representations"""
 
 
-def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
+def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commit_mode):
     """Update the notebook with the inputs and outputs of the most recent paired files"""
-    formats = notebook.metadata.get("jupytext", {}).get("formats")
-
     if not formats:
         raise NotAPairedNotebook(f"{shlex.quote(nb_file)} is not a paired notebook")
 
@@ -971,7 +961,7 @@ def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
             return notebook
 
         log(f"[jupytext] Loading {shlex.quote(path)}")
-        return read(path, fmt=fmt)
+        return read(path, fmt=fmt, config=config)
 
     if use_git_index_rather_than_timestamp:
         # We raise an error if two representations of this notebook in the git index are inconsistent
@@ -989,8 +979,8 @@ def load_paired_notebook(notebook, fmt, nb_file, log, pre_commit_mode):
             with open(path0) as fp:
                 text0 = fp.read()
             for alt_path, alt_fmt in nb_files_in_git_index[1:]:
-                nb = read(alt_path, fmt=alt_fmt)
-                alt_text = writes(nb, fmt=fmt0)
+                nb = read(alt_path, fmt=alt_fmt, config=config)
+                alt_text = writes(nb, fmt=fmt0, config=config)
                 if alt_text != text0:
                     diff = compare(alt_text, text0, alt_path, path0, return_diff=True)
                     raise InconsistentVersions(

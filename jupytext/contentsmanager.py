@@ -22,8 +22,8 @@ from .config import (
     JupytextConfigurationError,
     find_global_jupytext_configuration_file,
     load_jupytext_configuration_file,
+    notebook_formats,
     preferred_format,
-    prepare_notebook_for_save,
     validate_jupytext_configuration_file,
 )
 from .formats import (
@@ -122,7 +122,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             nbk = model["content"]
             try:
                 config = self.get_config(path)
-                jupytext_formats = prepare_notebook_for_save(nbk, config, path)
+                jupytext_formats = notebook_formats(nbk, config, path)
                 self.update_paired_notebooks(path, jupytext_formats)
 
                 def save_one_file(path, fmt):
@@ -161,7 +161,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                         type="file",
                         format="text",
                         content=jupytext.writes(
-                            nbformat.from_dict(model["content"]), fmt=fmt
+                            nbformat.from_dict(model["content"]), fmt=fmt, config=config
                         ),
                     )
 
@@ -204,14 +204,15 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             else:
                 model = self.super.get(path, content, type="file", format=format)
                 model["type"] = "notebook"
-                config.set_default_format_options(fmt, read=True)
                 if content:
                     # We may need to update these keys, inherited from text files formats
                     # Cf. https://github.com/mwouts/jupytext/issues/659
                     model["format"] = "json"
                     model["mimetype"] = None
                     try:
-                        model["content"] = jupytext.reads(model["content"], fmt=fmt)
+                        model["content"] = jupytext.reads(
+                            model["content"], fmt=fmt, config=config
+                        )
                     except Exception as err:
                         self.log.error(
                             u"Error while reading file: %s %s", path, err, exc_info=True
@@ -289,11 +290,10 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     )["content"]
 
                 self.log.info(u"Reading SOURCE from {}".format(alt_path))
-                config.set_default_format_options(alt_fmt, read=True)
                 text = self.super.get(
                     alt_path, content=True, type="file", format=format
                 )["content"]
-                return jupytext.reads(text, fmt=alt_fmt)
+                return jupytext.reads(text, fmt=alt_fmt, config=config)
 
             inputs, outputs = latest_inputs_and_outputs(
                 path, fmt, formats, get_timestamp, contents_manager_mode=True

@@ -48,21 +48,49 @@ class NotSupportedNBFormatVersion(NotImplementedError):
 class TextNotebookConverter(NotebookReader, NotebookWriter):
     """A class that can read or write a Jupyter notebook as text"""
 
-    def __init__(self, fmt):
+    def __init__(self, fmt, config):
         self.fmt = copy(long_form_one_format(fmt))
+        self.config = config
         self.ext = self.fmt["extension"]
         self.implementation = get_format_implementation(
             self.ext, self.fmt.get("format_name")
         )
 
-    def update_fmt_with_notebook_options(self, metadata):
+    def update_fmt_with_notebook_options(self, metadata, read=False):
         """Update format options with the values in the notebook metadata, and record those
         options in the notebook metadata"""
-        # format options in notebook have precedence over that in fmt
+        # format options in notebook have precedence over that in fmt, and precedence over the config
         for opt in _VALID_FORMAT_OPTIONS:
+            if self.config is not None:
+                # We use the config filters if provided
+                if (
+                    opt == "notebook_metadata_filter"
+                    and self.config.default_notebook_metadata_filter
+                ):
+                    continue
+                if (
+                    opt == "cell_metadata_filter"
+                    and self.config.default_cell_metadata_filter
+                ):
+                    continue
+
             if opt in metadata.get("jupytext", {}):
                 self.fmt.setdefault(opt, metadata["jupytext"][opt])
+
+        # we save the format options in the notebook metadata
+        for opt in _VALID_FORMAT_OPTIONS:
             if opt in self.fmt:
+                metadata.setdefault("jupytext", {}).setdefault(opt, self.fmt[opt])
+
+        if self.config is not None:
+            self.config.set_default_format_options(self.fmt, read=read)
+
+        # We don't want default metadata filters in the notebook itself
+        for opt in _VALID_FORMAT_OPTIONS:
+            if opt in self.fmt and opt not in [
+                "notebook_metadata_filter",
+                "cell_metadata_filter",
+            ]:
                 metadata.setdefault("jupytext", {}).setdefault(opt, self.fmt[opt])
 
         # Is this format the same as that documented in the YAML header? If so, we want to know the format version
@@ -91,12 +119,17 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             lines,
             self.implementation.header_prefix,
             self.implementation.extension,
-            self.fmt.get("root_level_metadata_as_raw_cell", True),
+            self.fmt.get(
+                "root_level_metadata_as_raw_cell",
+                self.config.root_level_metadata_as_raw_cell
+                if self.config is not None
+                else True,
+            ),
         )
         default_language = default_language_from_metadata_and_ext(
             metadata, self.implementation.extension
         )
-        self.update_fmt_with_notebook_options(metadata)
+        self.update_fmt_with_notebook_options(metadata, read=True)
 
         if header_cell:
             cells.append(header_cell)
@@ -157,7 +190,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         """Return the text representation of the notebook"""
         if self.fmt.get("format_name") == "pandoc":
             metadata = insert_jupytext_info_and_filter_metadata(
-                metadata, self.ext, self.implementation
+                metadata, self.fmt, self.implementation
             )
 
             cells = []
@@ -196,7 +229,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 "pygments_lexer", None
             )
             metadata = insert_jupytext_info_and_filter_metadata(
-                metadata, self.ext, self.implementation
+                metadata, self.fmt, self.implementation
             )
 
             cells = []
@@ -257,8 +290,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             nb,
             metadata,
             self.implementation,
-            self.ext,
-            self.fmt.get("root_level_metadata_as_raw_cell", True),
+            self.fmt,
         )
         header.extend(header_content)
 
@@ -334,13 +366,14 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         return "\n".join(header + lines)
 
 
-def reads(text, fmt, as_version=nbformat.NO_CONVERT, **kwargs):
+def reads(text, fmt, as_version=nbformat.NO_CONVERT, config=None, **kwargs):
     """
     Read a notebook from a string
 
     :param text: the text representation of the notebook
     :param fmt: (optional) the jupytext format like `md`, `py:percent`, ...
     :param as_version: see nbformat.reads
+    :param config: (optional) a Jupytext configuration object
     :param kwargs: (not used) additional parameters for nbformat.reads
     :return: the notebook
     """
@@ -370,7 +403,7 @@ def reads(text, fmt, as_version=nbformat.NO_CONVERT, **kwargs):
         fmt["format_name"] = format_name
 
     fmt.update(format_options)
-    reader = TextNotebookConverter(fmt)
+    reader = TextNotebookConverter(fmt, config)
     notebook = reader.reads(text, **kwargs)
     rearrange_jupytext_metadata(notebook.metadata)
 
@@ -382,12 +415,13 @@ def reads(text, fmt, as_version=nbformat.NO_CONVERT, **kwargs):
     return notebook
 
 
-def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, **kwargs):
+def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, config=None, **kwargs):
     """Read a notebook from a file name or a file object
 
     :param fp: a file name or a file object
     :param as_version: see nbformat.read
     :param fmt: (optional) the jupytext format like `md`, `py:percent`, ...
+    :param config: (optional) a Jupytext configuration object
     :param kwargs: (not used) additional parameters for nbformat.read
     :return: the notebook
     """
@@ -409,7 +443,7 @@ def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, **kwargs):
             fmt = long_form_one_format(fmt)
         fmt.update({"extension": ext})
         with io.open(fp, encoding="utf-8") as stream:
-            return read(stream, as_version=as_version, fmt=fmt, **kwargs)
+            return read(stream, as_version=as_version, fmt=fmt, config=config, **kwargs)
 
     if fmt is not None:
         fmt = long_form_one_format(fmt)
@@ -418,15 +452,16 @@ def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, **kwargs):
             rearrange_jupytext_metadata(notebook.metadata)
             return notebook
 
-    return reads(fp.read(), fmt, **kwargs)
+    return reads(fp.read(), fmt, config=config, **kwargs)
 
 
-def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
+def writes(notebook, fmt, version=nbformat.NO_CONVERT, config=None, **kwargs):
     """Return the text representation of the notebook
 
     :param notebook: the notebook
     :param fmt: the jupytext format like `md`, `py:percent`, ...
     :param version: see nbformat.writes
+    :param config: (optional) a Jupytext configuration object
     :param kwargs: (not used) additional parameters for nbformat.writes
     :return: the text representation of the notebook
     """
@@ -481,22 +516,23 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, **kwargs):
         fmt["format_name"] = format_name
         update_jupytext_formats_metadata(metadata, fmt)
 
-    writer = TextNotebookConverter(fmt)
+    writer = TextNotebookConverter(fmt, config)
     return writer.writes(notebook, metadata)
 
 
-def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
+def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, config=None, **kwargs):
     """Write a notebook to a file name or a file object
 
     :param nb: the notebook
     :param fp: a file name or a file object
     :param version: see nbformat.write
     :param fmt: (optional if fp is a file name) the jupytext format like `md`, `py:percent`, ...
+    :param config: (optional) a Jupytext configuration object
     :param kwargs: (not used) additional parameters for nbformat.write
     """
     if fp == "-":
         # Use sys.stdout.buffer when possible, and explicit utf-8 encoding, cf. #331
-        content = writes(nb, version=version, fmt=fmt, **kwargs)
+        content = writes(nb, version=version, fmt=fmt, config=config, **kwargs)
         try:
             # Python 3
             sys.stdout.buffer.write(content.encode("utf-8"))
@@ -513,14 +549,14 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, **kwargs):
         create_prefix_dir(fp, fmt)
 
         with io.open(fp, "w", encoding="utf-8") as stream:
-            write(nb, stream, version=version, fmt=fmt, **kwargs)
+            write(nb, stream, version=version, fmt=fmt, config=config, **kwargs)
             return
     else:
         assert (
             fmt is not None
         ), "'fmt' argument in jupytext.write is mandatory unless fp is a file name"
 
-    content = writes(nb, version=version, fmt=fmt, **kwargs)
+    content = writes(nb, version=version, fmt=fmt, config=config, **kwargs)
     if isinstance(content, bytes):
         content = content.decode("utf8")
     fp.write(content)

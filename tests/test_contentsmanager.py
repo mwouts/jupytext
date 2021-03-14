@@ -1682,10 +1682,7 @@ def test_multiple_pairing(tmpdir):
     assert model_py["last_modified"] <= model_md["last_modified"]
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_filter_jupytext_version_information_416(nb_file, tmpdir):
-    tmp_py = str(tmpdir.join("notebook.py"))
-
+def test_filter_jupytext_version_information_416(python_notebook, tmpdir, cwd_tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     cm.default_notebook_metadata_filter = (
@@ -1693,17 +1690,17 @@ def test_filter_jupytext_version_information_416(nb_file, tmpdir):
     )
 
     # load notebook
-    notebook = jupytext.read(nb_file)
+    notebook = python_notebook
     notebook.metadata["jupytext_formats"] = "ipynb,py"
     model = notebook_model(notebook)
 
     # save to ipynb and py
     cm.save(model=model, path="notebook.ipynb")
 
-    assert os.path.isfile(tmp_py)
+    assert os.path.isfile("notebook.py")
 
     # read py file
-    with open(tmp_py) as fp:
+    with open("notebook.py") as fp:
         text = fp.read()
 
     assert "---" in text
