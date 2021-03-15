@@ -1,6 +1,16 @@
 Jupytext ChangeLog
 ==================
 
+1.11.0 (2021-03-??)
+-------------------
+
+**Fixed**
+- The `jupytext.toml` can now be used together with the `jupytext` pre-commit hook ([#752](https://github.com/mwouts/jupytext/issues/752))
+
+**Changed**
+- The options in `jupytext.toml` where renamed to match the `jupytext` metadata in the text notebooks. One should now use `formats` rather than `default_jupytext_formats` and `notebook_metadata_filter` rather than `default_notebook_metadata_filter` ([#753](https://github.com/mwouts/jupytext/issues/753))
+
+
 1.10.3 (2021-03-07)
 -------------------
 
