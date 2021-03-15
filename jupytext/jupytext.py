@@ -75,7 +75,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             if opt in self.fmt:
                 metadata.setdefault("jupytext", {}).setdefault(opt, self.fmt[opt])
 
-        if self.config is not None:
+        # when we read the notebook we use the values of the config as default, as again the text representation
+        # of the notebook might not store the format options when notebook_metadata_filter="-all"
+        if read and self.config is not None:
             self.config.set_default_format_options(self.fmt, read=read)
 
         # We don't want default metadata filters in the notebook itself
