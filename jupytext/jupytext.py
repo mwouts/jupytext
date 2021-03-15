@@ -67,19 +67,6 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         # format options in notebook have precedence over that in fmt, and precedence over the config
         for opt in _VALID_FORMAT_OPTIONS:
-            if self.config is not None:
-                # We use the config filters if provided
-                if (
-                    opt == "notebook_metadata_filter"
-                    and self.config.default_notebook_metadata_filter
-                ):
-                    continue
-                if (
-                    opt == "cell_metadata_filter"
-                    and self.config.default_cell_metadata_filter
-                ):
-                    continue
-
             if opt in metadata.get("jupytext", {}):
                 self.fmt.setdefault(opt, metadata["jupytext"][opt])
 
