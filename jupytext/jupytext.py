@@ -59,21 +59,14 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
     def update_fmt_with_notebook_options(self, metadata, read=False):
         """Update format options with the values in the notebook metadata, and record those
         options in the notebook metadata"""
+        # The settings in the Jupytext configuration file have precedence over the metadata in the notebook
+        # when the notebook is saved. This is because the metadata in the notebook might not be visible
+        # in the text representation when e.g. notebook_metadata_filter="-all", which makes them hard to edit.
+        if not read and self.config is not None:
+            self.config.set_default_format_options(self.fmt, read)
+
         # format options in notebook have precedence over that in fmt, and precedence over the config
         for opt in _VALID_FORMAT_OPTIONS:
-            if self.config is not None:
-                # We use the config filters if provided
-                if (
-                    opt == "notebook_metadata_filter"
-                    and self.config.default_notebook_metadata_filter
-                ):
-                    continue
-                if (
-                    opt == "cell_metadata_filter"
-                    and self.config.default_cell_metadata_filter
-                ):
-                    continue
-
             if opt in metadata.get("jupytext", {}):
                 self.fmt.setdefault(opt, metadata["jupytext"][opt])
 
