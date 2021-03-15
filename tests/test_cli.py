@@ -1164,18 +1164,6 @@ def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir, cwd_tmpdir
     with pytest.warns(None) as warnings:
         jupytext(["--sync", "notebook.md"])
 
-    # TODO: remove this filter when the fix for
-    #  https://github.com/jupyter/nbformat/issues/212
-    #  is released
-    warnings = [
-        w
-        for w in warnings
-        if not (
-            "Sampling from a set deprecated" in str(w.message)
-            and "nbformat" in w.filename
-        )
-    ]
-
     assert not warnings
 
     assert py_file.exists()
