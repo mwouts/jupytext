@@ -89,7 +89,7 @@ def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(
     shutil.copy(nb_file, tmp_ipynb)
 
     cm.formats = "ipynb,py"
-    cm.default_notebook_metadata_filter = "all"
+    cm.notebook_metadata_filter = "all"
     cm.default_cell_metadata_filter = "-all"
     cm.root_dir = str(tmpdir)
     model = cm.get(file)

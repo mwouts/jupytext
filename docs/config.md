@@ -82,23 +82,23 @@ Please note that, while Jupytext is Jupyter acts accordingly to both local or gl
 
 ### Metadata filtering
 
-You can specify which metadata to include or exclude in the text files created by Jupytext by setting `default_notebook_metadata_filter` (notebook metadata) and `default_cell_metadata_filter` (cell metadata) in the configuration file. They accept a string of comma separated keywords. A minus sign `-` in front of a keyword means exclusion.
+You can specify which metadata to include or exclude in the text files created by Jupytext by setting `notebook_metadata_filter` (notebook metadata) and `default_cell_metadata_filter` (cell metadata) in the configuration file. They accept a string of comma separated keywords. A minus sign `-` in front of a keyword means exclusion.
 
 Suppose you want to keep all the notebook metadata but `widgets` and `varInspector` in the YAML header. For cell metadata, you want to allow `ExecuteTime` and `autoscroll`, but not `hide_output`. You can set
 ```python
-default_notebook_metadata_filter = "all,-widgets,-varInspector"
+notebook_metadata_filter = "all,-widgets,-varInspector"
 default_cell_metadata_filter = "ExecuteTime,autoscroll,-hide_output"
 ```
 
 If you want that the text files created by Jupytext have no metadata, you may use the global metadata filters below. Please note that with this setting, the metadata is only preserved in the `.ipynb` file.
 ```python
-default_notebook_metadata_filter = "-all"
+notebook_metadata_filter = "-all"
 default_cell_metadata_filter = "-all"
 ```
 
 It is possible to filter nested metadata. For example, if you want to preserve the Jupytext metadata, but not the Jupytext version number, you can use:
 ```python
-default_notebook_metadata_filter = "-jupytext.text_representation.jupytext_version"
+notebook_metadata_filter = "-jupytext.text_representation.jupytext_version"
 ```
 
 Finally, to hide the notebook metadata in an HTML comment in Markdown files, use the option `hide_notebook_metadata`.

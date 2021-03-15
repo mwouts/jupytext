@@ -58,21 +58,21 @@ def test_load_jupytext_configuration_file(tmpdir, config_file):
     if config_file.endswith(("jupytext", ".toml")):
         full_config_path.write(
             """formats = "ipynb,py:percent"
-default_notebook_metadata_filter = "all"
+notebook_metadata_filter = "all"
 default_cell_metadata_filter = "all"
 """
         )
     elif config_file.endswith(".yml"):
         full_config_path.write(
             """formats: ipynb,py:percent
-default_notebook_metadata_filter: all
+notebook_metadata_filter: all
 default_cell_metadata_filter: all
 """
         )
     elif config_file.endswith(".json"):
         full_config_path.write(
             """{"formats": "ipynb,py:percent",
-"default_notebook_metadata_filter": "all",
+"notebook_metadata_filter": "all",
 "default_cell_metadata_filter": "all"
 }
 """
@@ -80,7 +80,7 @@ default_cell_metadata_filter: all
     elif config_file.endswith(".py"):
         full_config_path.write(
             """c.formats = "ipynb,py:percent"
-c.default_notebook_metadata_filter = "all"
+c.notebook_metadata_filter = "all"
 c.default_cell_metadata_filter = "all"
 """
         )
@@ -88,5 +88,5 @@ c.default_cell_metadata_filter = "all"
     config = load_jupytext_configuration_file(str(full_config_path))
     config = JupytextConfiguration(**config)
     assert config.formats == "ipynb,py:percent"
-    assert config.default_notebook_metadata_filter == "all"
+    assert config.notebook_metadata_filter == "all"
     assert config.default_cell_metadata_filter == "all"

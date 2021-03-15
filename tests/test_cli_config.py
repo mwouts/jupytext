@@ -150,7 +150,7 @@ def test_cli_config_on_windows_issue_629(tmpdir):
     cfg_file = tmpdir.join("jupytext.yml")
     cfg_file.write(
         """formats: "notebooks///ipynb,scripts///py:percent"
-default_notebook_metadata_filter: "jupytext"
+notebook_metadata_filter: "jupytext"
 """
     )
 

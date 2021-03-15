@@ -614,7 +614,7 @@ def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     cm.formats = "ipynb,python//py:percent"
-    cm.default_notebook_metadata_filter = "all"
+    cm.notebook_metadata_filter = "all"
     cm.default_cell_metadata_filter = "all"
 
     # load notebook
@@ -648,7 +648,7 @@ def test_kernelspec_are_preserved(nb_file, tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     cm.formats = "ipynb,py"
-    cm.default_notebook_metadata_filter = "-all"
+    cm.notebook_metadata_filter = "-all"
 
     # load notebook
     model = cm.get("notebook.ipynb")
@@ -991,7 +991,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
 
     # set config
     cm.formats = "ipynb,py"
-    cm.default_notebook_metadata_filter = "jupytext,-all"
+    cm.notebook_metadata_filter = "jupytext,-all"
     cm.default_cell_metadata_filter = "-all"
 
     # load notebook
@@ -1038,7 +1038,7 @@ print('hello2')
 
     # Andre's config #139
     cm.freeze_metadata = True
-    cm.default_notebook_metadata_filter = "-all"
+    cm.notebook_metadata_filter = "-all"
     cm.default_cell_metadata_filter = "-lines_to_next_cell"
 
     # load notebook
@@ -1347,7 +1347,7 @@ def test_share_py_recreate_ipynb(tmpdir, nb_file):
     cm.formats = "ipynb,py"
 
     # the text files don't need a YAML header
-    cm.default_notebook_metadata_filter = "-all"
+    cm.notebook_metadata_filter = "-all"
     cm.default_cell_metadata_filter = "-all"
 
     nb = read(nb_file)
@@ -1689,9 +1689,7 @@ def test_multiple_pairing(tmpdir):
 def test_filter_jupytext_version_information_416(python_notebook, tmpdir, cwd_tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_notebook_metadata_filter = (
-        "-jupytext.text_representation.jupytext_version"
-    )
+    cm.notebook_metadata_filter = "-jupytext.text_representation.jupytext_version"
 
     # load notebook
     notebook = python_notebook
