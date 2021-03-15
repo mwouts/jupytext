@@ -1,6 +1,7 @@
 """Find and read Jupytext configuration files"""
 import json
 import os
+import warnings
 
 import yaml
 from traitlets import Bool, Enum, Float, Unicode
@@ -40,7 +41,7 @@ JUPYTEXT_CEILING_DIRECTORIES = [
 class JupytextConfiguration(Configurable):
     """Jupytext Configuration's options"""
 
-    default_jupytext_formats = Unicode(
+    formats = Unicode(
         u"",
         help="Save notebooks to these file extensions. "
         "Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R "
@@ -49,6 +50,9 @@ class JupytextConfiguration(Configurable):
         "e.g. ipynb,py:percent to save the notebook to "
         "hydrogen/spyder/vscode compatible scripts",
         config=True,
+    )
+    default_jupytext_formats = Unicode(
+        "", help="Deprecated. Use 'formats' instead", config=True
     )
 
     preferred_jupytext_formats_save = Unicode(
@@ -68,11 +72,15 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
-    default_notebook_metadata_filter = Unicode(
+    notebook_metadata_filter = Unicode(
         u"",
         help="Notebook metadata that should be save in the text representations. "
         "Examples: 'all', '-all', 'widgets,nteract', 'kernelspec,jupytext-all'",
         config=True,
+    )
+
+    default_notebook_metadata_filter = Unicode(
+        "", help="Deprecated. Use 'notebook_metadata_filter' instead", config=True
     )
 
     hide_notebook_metadata = Enum(
@@ -90,11 +98,15 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
-    default_cell_metadata_filter = Unicode(
+    cell_metadata_filter = Unicode(
         u"",
         help="Cell metadata that should be saved in the text representations. "
         "Examples: 'all', 'hide_input,hide_output'",
         config=True,
+    )
+
+    default_cell_metadata_filter = Unicode(
+        "", help="Deprecated. Use 'cell_metadata_filter' instead", config=True
     )
 
     comment_magics = Enum(
@@ -131,11 +143,15 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
-    default_cell_markers = Unicode(
+    cell_markers = Unicode(
         u"",
         help='Start and end cell markers for the light format, comma separated. Use "{{{,}}}" to mark cells'
         'as foldable regions in Vim, and "region,endregion" to mark cells as Vscode/PyCharm regions',
         config=True,
+    )
+
+    default_cell_markers = Unicode(
+        "", help="Deprecated. Use 'cell_markers' instead", config=True
     )
 
     notebook_extensions = Unicode(
@@ -155,13 +171,29 @@ class JupytextConfiguration(Configurable):
     def set_default_format_options(self, format_options, read=False):
         """Set default format option"""
         if self.default_notebook_metadata_filter:
+            warnings.warn(
+                "The option 'default_notebook_metadata_filter' is deprecated. "
+                "Please use 'notebook_metadata_filter' instead.",
+                DeprecationWarning,
+            )
             format_options.setdefault(
                 "notebook_metadata_filter", self.default_notebook_metadata_filter
             )
+        if self.notebook_metadata_filter:
+            format_options.setdefault(
+                "notebook_metadata_filter", self.notebook_metadata_filter
+            )
         if self.default_cell_metadata_filter:
+            warnings.warn(
+                "The option 'default_cell_metadata_filter' is deprecated. "
+                "Please use 'cell_metadata_filter' instead.",
+                DeprecationWarning,
+            )
             format_options.setdefault(
                 "cell_metadata_filter", self.default_cell_metadata_filter
             )
+        if self.cell_metadata_filter:
+            format_options.setdefault("cell_metadata_filter", self.cell_metadata_filter)
         if self.hide_notebook_metadata is not None:
             format_options.setdefault(
                 "hide_notebook_metadata", self.hide_notebook_metadata
@@ -178,8 +210,16 @@ class JupytextConfiguration(Configurable):
             format_options.setdefault(
                 "doxygen_equation_markers", self.doxygen_equation_markers
             )
-        if not read and self.default_cell_markers:
-            format_options.setdefault("cell_markers", self.default_cell_markers)
+        if not read:
+            if self.default_cell_markers:
+                warnings.warn(
+                    "The option 'default_cell_markers' is deprecated. "
+                    "Please use 'cell_markers' instead.",
+                    DeprecationWarning,
+                )
+                format_options.setdefault("cell_markers", self.default_cell_markers)
+            if self.cell_markers:
+                format_options.setdefault("cell_markers", self.cell_markers)
         if read and self.sphinx_convert_rst2md:
             format_options.setdefault("rst2md", self.sphinx_convert_rst2md)
         if self.custom_cell_magics:
@@ -189,11 +229,18 @@ class JupytextConfiguration(Configurable):
         """Return the default formats, if they apply to the current path #157"""
         from .paired_paths import InconsistentPath, base_path
 
-        formats = long_form_multiple_formats(self.default_jupytext_formats)
-        for fmt in formats:
+        if self.default_jupytext_formats:
+            warnings.warn(
+                "The option 'default_jupytext_formats' is deprecated. "
+                "Please use 'formats' instead.",
+                DeprecationWarning,
+            )
+
+        formats = self.formats or self.default_jupytext_formats
+        for fmt in long_form_multiple_formats(formats):
             try:
                 base_path(path, fmt)
-                return self.default_jupytext_formats
+                return formats
             except InconsistentPath:
                 continue
 

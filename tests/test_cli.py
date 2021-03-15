@@ -1154,7 +1154,7 @@ def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir, cwd_tmpdir
         jupytext --sync notebook.md
     """
     cfg_file = tmpdir.join("jupytext.toml")
-    cfg_file.write('default_jupytext_formats = "md,ipynb,py:percent"')
+    cfg_file.write('formats = "md,ipynb,py:percent"')
 
     md_file = tmpdir.join("notebook.md")
     py_file = tmpdir.join("notebook.py")
