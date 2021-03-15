@@ -88,7 +88,7 @@ see the [documentation](docs/config.md#per-notebook-configuration).
 
 with e.g. the following content:
 ```
-default_jupytext_formats = "ipynb,py:percent"
+formats = "ipynb,py:percent"
 ```
 see the [documentation](docs/config.md#configuring-paired-notebooks-globally).
 </details>

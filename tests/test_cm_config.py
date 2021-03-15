@@ -20,11 +20,11 @@ SAMPLE_NOTEBOOK = new_notebook(
 def test_local_config_overrides_cm_config(tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
 
     nested = tmpdir.mkdir("nested")
     with open(str(nested.join(".jupytext.yml")), "w") as fp:
-        fp.write("default_jupytext_formats: ''\n")
+        fp.write("formats: ''\n")
 
     cm.save(notebook_model(SAMPLE_NOTEBOOK), "notebook.ipynb")
     assert os.path.isfile(str(tmpdir.join("notebook.ipynb")))
@@ -64,7 +64,7 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
     nb_file = tmpdir.join("notebook.ipynb")
     py_file = tmpdir.join("notebook.py")
 
-    cfg_file.write("default_jupytext_formats: 'ipynb,py'\n")
+    cfg_file.write("formats: 'ipynb,py'\n")
 
     cm.save(notebook_model(SAMPLE_NOTEBOOK), "notebook.ipynb")
     assert nb_file.isfile()
@@ -109,7 +109,7 @@ def test_global_config_file(tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(cm_dir)
 
-    tmpdir.join("jupytext.toml").write('default_jupytext_formats = "ipynb,Rmd"')
+    tmpdir.join("jupytext.toml").write('formats = "ipynb,Rmd"')
 
     def fake_global_config_directory():
         return [str(tmpdir)]
@@ -150,7 +150,7 @@ def test_paired_files_and_symbolic_links(tmpdir):
 
     # Pair the notebooks in the linked folders
     jupyter_dir.join("jupytext.toml").write(
-        'default_jupytext_formats = "link_to_notebooks///ipynb,link_to_scripts///py:percent"'
+        'formats = "link_to_notebooks///ipynb,link_to_scripts///py:percent"'
     )
 
     # Save a notebook

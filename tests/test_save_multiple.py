@@ -38,7 +38,7 @@ def test_ipynb_is_ok(nb_file, tmpdir):
 
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_jupytext_formats = "ipynb,Rmd"
+    cm.formats = "ipynb,Rmd"
 
     cm.save(model=notebook_model(nb), path=tmp_rmd)
 
@@ -73,7 +73,7 @@ def test_no_files_created_on_no_format(tmpdir):
 
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_jupytext_formats = ""
+    cm.formats = ""
 
     cm.save(
         model=notebook_model(new_notebook(nbformat=4, metadata=dict())),
@@ -108,7 +108,7 @@ def test_no_rmd_on_not_notebook(tmpdir):
 
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_jupytext_formats = "ipynb,Rmd"
+    cm.formats = "ipynb,Rmd"
 
     with pytest.raises(HTTPError):
         cm.save(model=dict(type="not notebook", content=new_notebook()), path=tmp_ipynb)
@@ -121,7 +121,7 @@ def test_no_rmd_on_not_v4(tmpdir):
 
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_jupytext_formats = "ipynb,Rmd"
+    cm.formats = "ipynb,Rmd"
 
     with pytest.raises(NotebookValidationError):
         cm.save(model=notebook_model(new_notebook(nbformat=3)), path=tmp_rmd)

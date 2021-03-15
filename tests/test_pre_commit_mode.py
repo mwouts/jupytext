@@ -61,7 +61,7 @@ def test_alert_untracked_alerts_when_using_sync(tmpdir, cwd_tmpdir, tmp_repo, ca
     tmpdir.join("test.py").write("print('hello')\n")
     tmp_repo.git.add("test.py")
 
-    tmpdir.join(".jupytext.toml").write('default_jupytext_formats = "ipynb,py"')
+    tmpdir.join(".jupytext.toml").write('formats = "ipynb,py"')
 
     # Run jupytext
     status = jupytext(["--sync", "--pre-commit-mode", "test.py"])
@@ -132,7 +132,7 @@ def test_pre_commit_local_config(tmpdir, cwd_tmpdir, tmp_repo, python_notebook, 
     tmpdir.join(".jupytext.toml").write_text(
         """default_notebook_metadata_filter = "-all"
 default_cell_metadata_filter = "-all"
-default_jupytext_formats = "ipynb,py:percent"
+formats = "ipynb,py:percent"
 """,
         encoding="utf-8",
     )

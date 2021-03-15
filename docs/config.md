@@ -53,19 +53,19 @@ The examples below assume that you use a `.jupytext`, `jupytext.toml` or `.jupyt
 Say you want to always associate every `.ipynb` notebook with a `.md` file  (and reciprocally). This is done by adding the following to your `jupytext.toml` or `.jupytext.toml` Jupyter configuration file:
 ```
 # Always pair ipynb notebooks to md files
-default_jupytext_formats = "ipynb,md"
+formats = "ipynb,md"
 ```
 
 If you prefer to use a default `ipynb` - `py:percent` pairing, then that would be:
 ```
 # Always pair ipynb notebooks to py:percent files
-default_jupytext_formats = "ipynb,py:percent"
+formats = "ipynb,py:percent"
 ```
 
 You can pair notebooks in trees with a `root_prefix` separated with three slashes, e.g.
 ```
 # Pair notebooks in subfolders of 'notebooks' to scripts in subfolders of 'scripts'
-default_jupytext_formats = "notebooks///ipynb,scripts///py:percent"
+formats = "notebooks///ipynb,scripts///py:percent"
 ```
 The `root_prefix` is matched with the top-most parent folder of the matching name, not above the Jupytext configuration file.
 

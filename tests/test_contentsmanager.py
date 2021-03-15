@@ -121,7 +121,7 @@ def test_load_save_rename(nb_file, tmpdir):
     tmp_rmd = "notebook.Rmd"
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,Rmd"
+    cm.formats = "ipynb,Rmd"
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save Rmd, reopen
@@ -248,7 +248,7 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
     tmp_nbpy = "notebook.nb.py"
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,.nb.py"
+    cm.formats = "ipynb,.nb.py"
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
@@ -330,7 +330,7 @@ def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
     tmp_nbpy = "1.notebook.py"
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
@@ -357,7 +357,7 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     tmp_nbpy = "notebook.nb.py"
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,.nb.py"
+    cm.formats = "ipynb,.nb.py"
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
@@ -397,7 +397,7 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     tmp_nbpy = u"notebôk.nb.py"
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,.nb.py"
+    cm.formats = "ipynb,.nb.py"
     tmpdir = u"" + str(tmpdir)
     cm.root_dir = tmpdir
 
@@ -439,7 +439,7 @@ def test_outdated_text_notebook(nb_file, tmpdir):
     tmp_nbpy = u"notebook.py"
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "py,ipynb"
+    cm.formats = "py,ipynb"
     cm.outdated_text_notebook_margin = 0
     cm.root_dir = str(tmpdir)
 
@@ -558,13 +558,13 @@ def test_save_to_percent_format(nb_file, tmpdir):
 def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
     nb = read(nb_file)
 
-    # Way 0: preferred_jupytext_formats_save, no prefix + default_jupytext_formats
+    # Way 0: preferred_jupytext_formats_save, no prefix + formats
     tmp_py = str(tmpdir.join("python/notebook.py"))
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     cm.preferred_jupytext_formats_save = "py:percent"
-    cm.default_jupytext_formats = "ipynb,python//py"
+    cm.formats = "ipynb,python//py"
 
     # save to ipynb and py
     cm.save(model=notebook_model(nb), path="notebook.ipynb")
@@ -573,13 +573,13 @@ def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
     nb_py = read(tmp_py)
     assert nb_py.metadata["jupytext"]["text_representation"]["format_name"] == "percent"
 
-    # Way 1: preferred_jupytext_formats_save + default_jupytext_formats
+    # Way 1: preferred_jupytext_formats_save + formats
     tmp_py = str(tmpdir.join("python/notebook.py"))
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     cm.preferred_jupytext_formats_save = "python//py:percent"
-    cm.default_jupytext_formats = "ipynb,python//py"
+    cm.formats = "ipynb,python//py"
 
     # save to ipynb and py
     cm.save(model=notebook_model(nb), path="notebook.ipynb")
@@ -588,12 +588,12 @@ def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
     nb_py = read(tmp_py)
     assert nb_py.metadata["jupytext"]["text_representation"]["format_name"] == "percent"
 
-    # Way 2: default_jupytext_formats
+    # Way 2: formats
     tmp_py = str(tmpdir.join("python/notebook.py"))
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_jupytext_formats = "ipynb,python//py:percent"
+    cm.formats = "ipynb,python//py:percent"
 
     # save to ipynb and py
     cm.save(model=notebook_model(nb), path="notebook.ipynb")
@@ -613,7 +613,7 @@ def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_jupytext_formats = "ipynb,python//py:percent"
+    cm.formats = "ipynb,python//py:percent"
     cm.default_notebook_metadata_filter = "all"
     cm.default_cell_metadata_filter = "all"
 
@@ -647,7 +647,7 @@ def test_kernelspec_are_preserved(nb_file, tmpdir):
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
     cm.default_notebook_metadata_filter = "-all"
 
     # load notebook
@@ -818,7 +818,7 @@ def test_save_in_auto_extension_global(nb_file, tmpdir):
 
     # create contents manager with default load format as percent
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,auto"
+    cm.formats = "ipynb,auto"
     cm.preferred_jupytext_formats_save = "auto:percent"
     cm.root_dir = str(tmpdir)
 
@@ -846,7 +846,7 @@ def test_global_auto_pairing_works_with_empty_notebook(tmpdir):
 
     # create contents manager with default load format as percent
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,auto"
+    cm.formats = "ipynb,auto"
     cm.preferred_jupytext_formats_save = "auto:percent"
     cm.root_dir = str(tmpdir)
 
@@ -902,7 +902,7 @@ def test_save_in_auto_extension_global_with_format(nb_file, tmpdir):
 
     # create contents manager with default load format as percent
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,auto:percent"
+    cm.formats = "ipynb,auto:percent"
     cm.root_dir = str(tmpdir)
 
     # save notebook
@@ -960,7 +960,7 @@ def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
 
     # create contents manager with default load format as percent
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,.pct.auto,.lgt.auto"
+    cm.formats = "ipynb,.pct.auto,.lgt.auto"
     cm.preferred_jupytext_formats_save = ".pct.auto:percent,.lgt.auto:light"
     cm.root_dir = str(tmpdir)
 
@@ -990,7 +990,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     cm.save(model=notebook_model(nb), path=tmp_ipynb)
 
     # set config
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
     cm.default_notebook_metadata_filter = "jupytext,-all"
     cm.default_cell_metadata_filter = "-all"
 
@@ -1072,7 +1072,7 @@ def test_local_format_can_deactivate_pairing(nb_file, ext, tmpdir):
 
     # create contents manager with default pairing
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
     cm.root_dir = str(tmpdir)
 
     # save notebook
@@ -1100,7 +1100,7 @@ def test_global_pairing_allows_to_save_other_file_types(nb_file, tmpdir):
 
     # create contents manager with default pairing
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
     cm.root_dir = str(tmpdir)
 
     # save notebook
@@ -1344,7 +1344,7 @@ def test_share_py_recreate_ipynb(tmpdir, nb_file):
     cm.preferred_jupytext_formats_save = "py:percent"
 
     # every new file is paired
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
 
     # the text files don't need a YAML header
     cm.default_notebook_metadata_filter = "-all"
@@ -1378,7 +1378,7 @@ def test_vim_folding_markers(tmpdir):
 
     # Default Vim folding markers
     cm.default_cell_markers = "{{{,}}}"
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
 
     nb = new_notebook(
         cells=[
@@ -1434,7 +1434,7 @@ def test_vscode_pycharm_folding_markers(tmpdir):
 
     # Default VScode/PyCharm folding markers
     cm.default_cell_markers = "region,endregion"
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
 
     nb = new_notebook(
         cells=[
@@ -1810,7 +1810,7 @@ def test_jupytext_jupyter_fs_metamanager(tmpdir):
 
 def test_config_jupytext_jupyter_fs_meta_manager(tmpdir):
     """Test the configuration of Jupytext with a fs manager"""
-    tmpdir.join("jupytext.toml").write('default_jupytext_formats = "ipynb,py"')
+    tmpdir.join("jupytext.toml").write('formats = "ipynb,py"')
     cm = fs_meta_manager(tmpdir)
     # the hash that corresponds to the osfs
     osfs = [h for h in cm._managers if h != ""][0]

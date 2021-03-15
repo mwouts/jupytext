@@ -38,7 +38,7 @@ def test_ipynb_notebooks_can_be_trusted(nb_file, tmpdir, no_jupytext_version_num
     tmp_py = str(tmpdir.join(py_file))
     shutil.copy(nb_file, tmp_ipynb)
 
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
     cm.root_dir = str(tmpdir)
     model = cm.get(file)
     cm.save(model, py_file)
@@ -88,7 +88,7 @@ def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(
     tmp_py = str(tmpdir.join(py_file))
     shutil.copy(nb_file, tmp_ipynb)
 
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
     cm.default_notebook_metadata_filter = "all"
     cm.default_cell_metadata_filter = "-all"
     cm.root_dir = str(tmpdir)
