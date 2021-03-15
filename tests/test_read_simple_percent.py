@@ -382,13 +382,13 @@ cell
     compare_notebooks(nb, nb2)
 
 
-def test_default_cell_markers_in_contents_manager(tmpdir):
+def test_cell_markers_in_contents_manager(tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_cell_markers = "'''"
+    cm.cell_markers = "'''"
 
     nb = new_notebook(
         cells=[new_code_cell("1 + 1"), new_markdown_cell("a\nlong\ncell")],
@@ -425,13 +425,13 @@ cell
     compare_notebooks(nb, nb2)
 
 
-def test_default_cell_markers_in_contents_manager_does_not_impact_light_format(tmpdir):
+def test_cell_markers_in_contents_manager_does_not_impact_light_format(tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.default_cell_markers = "'''"
+    cm.cell_markers = "'''"
 
     nb = new_notebook(
         cells=[new_code_cell("1 + 1"), new_markdown_cell("a\nlong\ncell")],

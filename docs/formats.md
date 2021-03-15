@@ -205,11 +205,11 @@ Metadata can be associated to a given cell using a key/value representation:
 
 The `light` format can use custom cell markers instead of `# +` or `# -`. If you prefer to mark cells with VS Code/PyCharm (resp. Vim) folding markers, set `"cell_markers": "region,endregion"` (resp. `"{{{,}}}"`) in the jupytext section of the notebook metadata. If you want to configure this as a global default, add either
 ```python
-c.ContentsManager.default_cell_markers = "region,endregion"  # Use VS Code/PyCharm region folding delimiters
+c.ContentsManager.cell_markers = "region,endregion"  # Use VS Code/PyCharm region folding delimiters
 ```
 or
 ```python
-c.ContentsManager.default_cell_markers = "{{{,}}}"           # Use Vim region folding delimiters
+c.ContentsManager.cell_markers = "{{{,}}}"           # Use Vim region folding delimiters
 ```
 to your `.jupyter/jupyter_notebook_config.py` file.
 
@@ -277,7 +277,7 @@ jupytext --update-metadata '{"jupytext": {"cell_markers": "\"\"\""}}' notebook.i
 
 If you want to use multiline comments for all your paired notebooks, you could also add
 ```python
-c.ContentsManager.default_cell_markers = '"""'
+c.ContentsManager.cell_markers = '"""'
 ```
 to your `.jupyter/jupyter_notebook_config.py` file.
 

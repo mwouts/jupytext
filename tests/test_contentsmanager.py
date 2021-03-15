@@ -1377,7 +1377,7 @@ def test_vim_folding_markers(tmpdir):
     cm.root_dir = str(tmpdir)
 
     # Default Vim folding markers
-    cm.default_cell_markers = "{{{,}}}"
+    cm.cell_markers = "{{{,}}}"
     cm.formats = "ipynb,py"
 
     nb = new_notebook(
@@ -1433,7 +1433,7 @@ def test_vscode_pycharm_folding_markers(tmpdir):
     cm.root_dir = str(tmpdir)
 
     # Default VScode/PyCharm folding markers
-    cm.default_cell_markers = "region,endregion"
+    cm.cell_markers = "region,endregion"
     cm.formats = "ipynb,py"
 
     nb = new_notebook(
@@ -1481,14 +1481,14 @@ b = 1
     )
 
 
-def test_open_file_with_default_cell_markers(tmpdir):
+def test_open_file_with_cell_markers(tmpdir):
     tmp_py = str(tmpdir.join("nb.py"))
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
     # Default VScode/PyCharm folding markers
-    cm.default_cell_markers = "region,endregion"
+    cm.cell_markers = "region,endregion"
 
     text = """# +
 # this is a unique code cell
@@ -1519,14 +1519,14 @@ def test_open_file_with_default_cell_markers(tmpdir):
     compare(text2, expected)
 
 
-def test_save_file_with_default_cell_markers(tmpdir):
+def test_save_file_with_cell_markers(tmpdir):
     tmp_py = str(tmpdir.join("nb.py"))
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
     # Default VScode/PyCharm folding markers
-    cm.default_cell_markers = "region,endregion"
+    cm.cell_markers = "region,endregion"
 
     text = """# +
 # this is a unique code cell
