@@ -615,7 +615,7 @@ def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
     cm.formats = "ipynb,python//py:percent"
     cm.notebook_metadata_filter = "all"
-    cm.default_cell_metadata_filter = "all"
+    cm.cell_metadata_filter = "all"
 
     # load notebook
     model = cm.get("notebook.ipynb")
@@ -992,7 +992,7 @@ def test_metadata_filter_is_effective(nb_file, tmpdir):
     # set config
     cm.formats = "ipynb,py"
     cm.notebook_metadata_filter = "jupytext,-all"
-    cm.default_cell_metadata_filter = "-all"
+    cm.cell_metadata_filter = "-all"
 
     # load notebook
     nb = cm.get(tmp_ipynb)["content"]
@@ -1039,7 +1039,7 @@ print('hello2')
     # Andre's config #139
     cm.freeze_metadata = True
     cm.notebook_metadata_filter = "-all"
-    cm.default_cell_metadata_filter = "-lines_to_next_cell"
+    cm.cell_metadata_filter = "-lines_to_next_cell"
 
     # load notebook
     model = cm.get("script.py")
@@ -1348,7 +1348,7 @@ def test_share_py_recreate_ipynb(tmpdir, nb_file):
 
     # the text files don't need a YAML header
     cm.notebook_metadata_filter = "-all"
-    cm.default_cell_metadata_filter = "-all"
+    cm.cell_metadata_filter = "-all"
 
     nb = read(nb_file)
     model_ipynb = cm.save(model=notebook_model(nb), path="nb.ipynb")

@@ -90,7 +90,7 @@ def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(
 
     cm.formats = "ipynb,py"
     cm.notebook_metadata_filter = "all"
-    cm.default_cell_metadata_filter = "-all"
+    cm.cell_metadata_filter = "-all"
     cm.root_dir = str(tmpdir)
     model = cm.get(file)
     cm.save(model, py_file)

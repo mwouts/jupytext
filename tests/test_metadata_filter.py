@@ -157,7 +157,7 @@ def test_default_config_has_priority_over_current_metadata(
 
     cfg_file = tmpdir.join("jupytext.toml")
     cfg_file.write(
-        """default_cell_metadata_filter = "-some_metadata_key"
+        """cell_metadata_filter = "-some_metadata_key"
 """
     )
 
