@@ -172,3 +172,18 @@ def test_paired_files_and_symbolic_links(tmpdir):
     model = cm.get("link_to_notebooks/notebook.ipynb")
     nb = model["content"]
     compare_cells(nb.cells, [new_code_cell("3 + 3")], compare_ids=False)
+
+
+def test_metadata_filter_from_config_has_precedence_over_notebook_metadata(
+    tmpdir, cwd_tmpdir, python_notebook
+):
+    python_notebook.metadata["jupytext"] = {"notebook_metadata_filter": "-all"}
+    tmpdir.join("jupytext.toml").write('notebook_metadata_filter = "all"')
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    cm.save(notebook_model(python_notebook), "test.py")
+
+    py = tmpdir.join("test.py").read()
+    assert "notebook_metadata_filter: all" in py
