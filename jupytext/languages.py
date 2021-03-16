@@ -29,7 +29,7 @@ _JUPYTER_LANGUAGES = [
 ]
 
 # Supported file extensions (and languages)
-# Please add more languages here (and add a few tests) - see CONTRIBUTING.md
+# Please add more languages here (and add a few tests) - see contributing.md
 _SCRIPT_EXTENSIONS = {
     ".py": {"language": "python", "comment": "#"},
     ".coco": {"language": "coconut", "comment": "#"},
