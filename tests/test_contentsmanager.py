@@ -1562,20 +1562,36 @@ def test_save_file_with_cell_markers(tmpdir):
     assert nb2.metadata["jupytext"]["cell_markers"] == "region,endregion"
 
 
-def test_notebook_extensions(tmpdir):
-    tmp_py = str(tmpdir.join("script.py"))
-    tmp_rmd = str(tmpdir.join("notebook.Rmd"))
-    tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
-
+def test_notebook_extensions(tmpdir, cwd_tmpdir):
     nb = new_notebook()
-    write(nb, tmp_py)
-    write(nb, tmp_rmd)
-    write(nb, tmp_ipynb)
+    write(nb, "script.py")
+    write(nb, "notebook.Rmd")
+    write(nb, "notebook.ipynb")
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.notebook_extensions = "ipynb,Rmd"
+
+    model = cm.get("notebook.ipynb")
+    assert model["type"] == "notebook"
+
+    model = cm.get("notebook.Rmd")
+    assert model["type"] == "notebook"
+
+    model = cm.get("script.py")
+    assert model["type"] == "file"
+
+
+def test_notebook_extensions_in_config(tmpdir, cwd_tmpdir):
+    nb = new_notebook()
+    write(nb, "script.py")
+    write(nb, "notebook.Rmd")
+    write(nb, "notebook.ipynb")
+    tmpdir.join("jupytext.toml").write("""notebook_extensions = ["ipynb", "Rmd"]""")
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    cm.notebook_extensions = "ipynb,Rmd"
     model = cm.get("notebook.ipynb")
     assert model["type"] == "notebook"
 

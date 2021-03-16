@@ -53,11 +53,10 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
     default_jupytext_formats = Unicode(
-        "", help="Deprecated. Use 'formats' instead", config=True
+        help="Deprecated. Use 'formats' instead", config=True
     )
 
     preferred_jupytext_formats_save = Unicode(
-        u"",
         help="Preferred format when saving notebooks as text, per extension. "
         'Use "jl:percent,py:percent,R:percent" if you want to save '
         "Julia, Python and R scripts in the double percent format and "
@@ -66,7 +65,6 @@ class JupytextConfiguration(Configurable):
     )
 
     preferred_jupytext_formats_read = Unicode(
-        u"",
         help="Preferred format when reading notebooks from text, per "
         'extension. Use "py:sphinx" if you want to read all python '
         "scripts as Sphinx gallery scripts.",
@@ -74,7 +72,6 @@ class JupytextConfiguration(Configurable):
     )
 
     notebook_metadata_filter = Unicode(
-        u"",
         help="Notebook metadata that should be save in the text representations. "
         "Examples: 'all', '-all', 'widgets,nteract', 'kernelspec,jupytext-all'",
         config=True,
@@ -100,7 +97,6 @@ class JupytextConfiguration(Configurable):
     )
 
     cell_metadata_filter = Unicode(
-        u"",
         help="Cell metadata that should be saved in the text representations. "
         "Examples: 'all', 'hide_input,hide_output'",
         config=True,
@@ -145,24 +141,22 @@ class JupytextConfiguration(Configurable):
     )
 
     cell_markers = Unicode(
-        u"",
         help='Start and end cell markers for the light format, comma separated. Use "{{{,}}}" to mark cells'
         'as foldable regions in Vim, and "region,endregion" to mark cells as Vscode/PyCharm regions',
         config=True,
     )
 
     default_cell_markers = Unicode(
-        "", help="Deprecated. Use 'cell_markers' instead", config=True
+        help="Deprecated. Use 'cell_markers' instead", config=True
     )
 
-    notebook_extensions = Unicode(
-        u",".join(NOTEBOOK_EXTENSIONS),
-        help="A comma separated list of notebook extensions",
+    notebook_extensions = Union(
+        [List(Unicode(), NOTEBOOK_EXTENSIONS), Unicode()],
+        help="A list of notebook extensions",
         config=True,
     )
 
     custom_cell_magics = Unicode(
-        "",
         help='A comma separated list of cell magics. Use e.g. custom_cell_magics = "configure,local" '
         'if you want code cells starting with the Spark magic cell commands "configure" and "local" '
         "to be commented out when converted to scripts.",
@@ -377,6 +371,8 @@ def load_jupytext_configuration_file(config_file, stream=None):
             for prefix, fmt in config.formats.items()
         ]
     config.formats = short_form_multiple_formats(config.formats)
+    if isinstance(config.notebook_extensions, str):
+        config.notebook_extensions = config.notebook_extensions.split(",")
     return config
 
 
