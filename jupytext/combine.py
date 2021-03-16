@@ -49,12 +49,19 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     ext = fmt.get("extension") or text_repr.get("extension")
     format_name = fmt.get("format_name") or text_repr.get("format_name")
 
-    nb_metadata = restore_filtered_metadata(
-        nb_source.metadata,
-        nb_outputs.metadata,
-        nb_source.metadata.get("jupytext", {}).get("notebook_metadata_filter"),
-        _DEFAULT_NOTEBOOK_METADATA,
+    notebook_metadata_filter = nb_source.metadata.get("jupytext", {}).get(
+        "notebook_metadata_filter"
     )
+    if notebook_metadata_filter == "-all":
+        nb_metadata = nb_outputs.metadata
+
+    else:
+        nb_metadata = restore_filtered_metadata(
+            nb_source.metadata,
+            nb_outputs.metadata,
+            notebook_metadata_filter,
+            _DEFAULT_NOTEBOOK_METADATA,
+        )
 
     source_is_md_version_one = (
         ext in [".md", ".markdown", ".Rmd"] and text_repr.get("format_version") == "1.0"

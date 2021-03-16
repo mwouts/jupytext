@@ -12,7 +12,6 @@ from .formats import (
     NOTEBOOK_EXTENSIONS,
     long_form_multiple_formats,
     long_form_one_format,
-    rearrange_jupytext_metadata,
 )
 
 
@@ -351,16 +350,19 @@ def validate_jupytext_configuration_file(config_file, config_dict):
     return config
 
 
-def prepare_notebook_for_save(nbk, config, path):
-    """Apply the given configuration to the notebook before saving it"""
+def notebook_formats(nbk, config, path, fallback_on_current_fmt=True):
+    """Return the list of formats for the current notebook"""
     metadata = nbk.get("metadata")
-    rearrange_jupytext_metadata(metadata)
-    jupytext_metadata = metadata.setdefault("jupytext", {})
-    formats = jupytext_metadata.get("formats") or (
-        config.default_formats(path) if config else None
+    jupytext_metadata = metadata.get("jupytext", {})
+    formats = (
+        jupytext_metadata.get("formats")
+        or metadata.get("jupytext_formats")
+        or (config.default_formats(path) if config else None)
     )
 
     if not formats:
+        if not fallback_on_current_fmt:
+            return None
         text_repr = jupytext_metadata.get("text_representation", {})
         ext = os.path.splitext(path)[1]
         fmt = {"extension": ext}
@@ -379,13 +381,5 @@ def prepare_notebook_for_save(nbk, config, path):
         formats = [
             preferred_format(f, config.preferred_jupytext_formats_save) for f in formats
         ]
-        config.set_default_format_options(jupytext_metadata)
-
-    # Don't keep the formats if they are equal to the default
-    if config and jupytext_metadata.get("formats") == config.default_formats(path):
-        jupytext_metadata.pop("formats", None)
-
-    if not jupytext_metadata:
-        metadata.pop("jupytext")
 
     return formats

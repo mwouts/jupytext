@@ -65,12 +65,12 @@ def encoding_and_executable(notebook, metadata, ext):
     return lines
 
 
-def insert_jupytext_info_and_filter_metadata(metadata, ext, text_format):
+def insert_jupytext_info_and_filter_metadata(metadata, fmt, text_format):
     """Update the notebook metadata to include Jupytext information, and filter
     the notebook metadata according to the default or user filter"""
     if insert_or_test_version_number():
         metadata.setdefault("jupytext", {})["text_representation"] = {
-            "extension": ext,
+            "extension": fmt["extension"],
             "format_name": text_format.format_name,
             "format_version": text_format.current_version_number,
             "jupytext_version": __version__,
@@ -79,17 +79,13 @@ def insert_jupytext_info_and_filter_metadata(metadata, ext, text_format):
     if "jupytext" in metadata and not metadata["jupytext"]:
         del metadata["jupytext"]
 
-    notebook_metadata_filter = metadata.get("jupytext", {}).get(
-        "notebook_metadata_filter"
-    )
+    notebook_metadata_filter = fmt.get("notebook_metadata_filter")
     return filter_metadata(
         metadata, notebook_metadata_filter, _DEFAULT_NOTEBOOK_METADATA
     )
 
 
-def metadata_and_cell_to_header(
-    notebook, metadata, text_format, ext, root_level_metadata_as_raw_cell=True
-):
+def metadata_and_cell_to_header(notebook, metadata, text_format, fmt):
     """
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
@@ -99,6 +95,7 @@ def metadata_and_cell_to_header(
 
     lines_to_next_cell = None
     root_level_metadata = {}
+    root_level_metadata_as_raw_cell = fmt.get("root_level_metadata_as_raw_cell", True)
 
     if not root_level_metadata_as_raw_cell:
         root_level_metadata = metadata.get("jupytext", {}).pop(
@@ -117,7 +114,7 @@ def metadata_and_cell_to_header(
                 lines_to_next_cell = cell.metadata.get("lines_to_next_cell")
                 notebook.cells = notebook.cells[1:]
 
-    metadata = insert_jupytext_info_and_filter_metadata(metadata, ext, text_format)
+    metadata = insert_jupytext_info_and_filter_metadata(metadata, fmt, text_format)
 
     if metadata:
         root_level_metadata["jupyter"] = metadata
@@ -131,7 +128,7 @@ def metadata_and_cell_to_header(
         header = ["---"] + header + ["---"]
 
         if (
-            metadata.get("jupytext", {}).get("hide_notebook_metadata", False)
+            fmt.get("hide_notebook_metadata", False)
             and text_format.format_name == "markdown"
         ):
             header = ["<!--", ""] + header + ["", "-->"]

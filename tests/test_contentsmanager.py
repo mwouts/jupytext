@@ -1541,21 +1541,25 @@ def test_save_file_with_default_cell_markers(tmpdir):
     nb = cm.get("nb.py")["content"]
     assert len(nb.cells) == 1
 
-    nb.metadata["jupytext"]["cell_markers"] = "+,-"
-    del nb.metadata["jupytext"]["notebook_metadata_filter"]
     cm.save(model=notebook_model(nb), path="nb.py")
 
     with open(tmp_py) as fp:
         text2 = fp.read()
 
     compare(
-        "\n".join(text2.splitlines()[-len(text.splitlines()) :]),
-        "\n".join(text.splitlines()),
+        text2,
+        """# region
+# this is a unique code cell
+1 + 1
+
+2 + 2
+# endregion
+""",
     )
 
     nb2 = cm.get("nb.py")["content"]
     compare_notebooks(nb2, nb)
-    assert nb2.metadata["jupytext"]["cell_markers"] == "+,-"
+    assert nb2.metadata["jupytext"]["cell_markers"] == "region,endregion"
 
 
 def test_notebook_extensions(tmpdir):
@@ -1682,10 +1686,7 @@ def test_multiple_pairing(tmpdir):
     assert model_py["last_modified"] <= model_md["last_modified"]
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_filter_jupytext_version_information_416(nb_file, tmpdir):
-    tmp_py = str(tmpdir.join("notebook.py"))
-
+def test_filter_jupytext_version_information_416(python_notebook, tmpdir, cwd_tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     cm.default_notebook_metadata_filter = (
@@ -1693,17 +1694,17 @@ def test_filter_jupytext_version_information_416(nb_file, tmpdir):
     )
 
     # load notebook
-    notebook = jupytext.read(nb_file)
+    notebook = python_notebook
     notebook.metadata["jupytext_formats"] = "ipynb,py"
     model = notebook_model(notebook)
 
     # save to ipynb and py
     cm.save(model=model, path="notebook.ipynb")
 
-    assert os.path.isfile(tmp_py)
+    assert os.path.isfile("notebook.py")
 
     # read py file
-    with open(tmp_py) as fp:
+    with open("notebook.py") as fp:
         text = fp.read()
 
     assert "---" in text

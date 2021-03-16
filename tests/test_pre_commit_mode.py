@@ -126,3 +126,33 @@ def test_alert_inconsistent_versions(tmpdir, cwd_tmpdir, tmp_repo, capsys):
     assert "Error: test.ipynb and test.py are inconsistent" in out.err
     assert "git reset test.py && git checkout -- test.py" in out.err
     assert "git reset test.ipynb && git checkout -- test.ipynb" in out.err
+
+
+def test_pre_commit_local_config(tmpdir, cwd_tmpdir, tmp_repo, python_notebook, capsys):
+    tmpdir.join(".jupytext.toml").write_text(
+        """default_notebook_metadata_filter = "-all"
+default_cell_metadata_filter = "-all"
+default_jupytext_formats = "ipynb,py:percent"
+""",
+        encoding="utf-8",
+    )
+
+    write(python_notebook, str(tmpdir.join("test.ipynb")))
+
+    # create the paired file
+    jupytext(["--sync", "test.ipynb"])
+
+    print("--------- test.ipynb ---------")
+    print(tmpdir.join("test.ipynb").read_text("utf-8"))
+    print("--------- test.py ---------")
+    print(tmpdir.join("test.py").read_text("utf-8"))
+
+    tmp_repo.git.add(".")
+
+    capsys.readouterr()
+    exit_code = jupytext(["--pre-commit-mode", "--sync", "test.ipynb", "--diff"])
+
+    out, err = capsys.readouterr()
+    assert not err, err
+    assert "updating test" not in out.lower(), out
+    assert exit_code == 0, out

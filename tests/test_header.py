@@ -87,7 +87,7 @@ def test_metadata_and_cell_to_header(no_jupytext_version_number):
         metadata=metadata, cells=[new_raw_cell(source="---\ntitle: Sample header\n---")]
     )
     header, lines_to_next_cell = metadata_and_cell_to_header(
-        nb, metadata, get_format_implementation(".md"), ".md"
+        nb, metadata, get_format_implementation(".md"), {"extension": ".md"}
     )
     assert (
         "\n".join(header)
@@ -105,7 +105,7 @@ jupyter:
 def test_metadata_and_cell_to_header2(no_jupytext_version_number):
     nb = new_notebook(cells=[new_markdown_cell(source="Some markdown\ntext")])
     header, lines_to_next_cell = metadata_and_cell_to_header(
-        nb, {}, get_format_implementation(".md"), ".md"
+        nb, {}, get_format_implementation(".md"), {"extension": ".md"}
     )
     assert header == []
     assert len(nb.cells) == 1
@@ -169,10 +169,13 @@ jupyter:
 
 
 def test_header_to_html_comment(no_jupytext_version_number):
-    metadata = {"jupytext": {"mainlanguage": "python", "hide_notebook_metadata": True}}
+    metadata = {"jupytext": {"mainlanguage": "python"}}
     nb = new_notebook(metadata=metadata, cells=[])
     header, lines_to_next_cell = metadata_and_cell_to_header(
-        nb, metadata, get_format_implementation(".md"), ".md"
+        nb,
+        metadata,
+        get_format_implementation(".md"),
+        {"extension": ".md", "hide_notebook_metadata": True},
     )
     compare(
         "\n".join(header),
@@ -181,7 +184,6 @@ def test_header_to_html_comment(no_jupytext_version_number):
 ---
 jupyter:
   jupytext:
-    hide_notebook_metadata: true
     mainlanguage: python
 ---
 

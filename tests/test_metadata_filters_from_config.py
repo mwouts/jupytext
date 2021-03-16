@@ -44,6 +44,4 @@ default_cell_metadata_filter = "-all"
 
     jupytext_cli([str(md_file), "--to", "notebook", "--update"])
     nb2 = nbformat.read(str(nb_file), as_version=4)
-
-    del nb2.metadata["jupytext"]
     compare_notebooks(nb2, nb)
