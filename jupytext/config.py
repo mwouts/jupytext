@@ -175,7 +175,7 @@ class JupytextConfiguration(Configurable):
             warnings.warn(
                 "The option 'default_notebook_metadata_filter' is deprecated. "
                 "Please use 'notebook_metadata_filter' instead.",
-                DeprecationWarning,
+                FutureWarning,
             )
             format_options.setdefault(
                 "notebook_metadata_filter", self.default_notebook_metadata_filter
@@ -188,7 +188,7 @@ class JupytextConfiguration(Configurable):
             warnings.warn(
                 "The option 'default_cell_metadata_filter' is deprecated. "
                 "Please use 'cell_metadata_filter' instead.",
-                DeprecationWarning,
+                FutureWarning,
             )
             format_options.setdefault(
                 "cell_metadata_filter", self.default_cell_metadata_filter
@@ -216,7 +216,7 @@ class JupytextConfiguration(Configurable):
                 warnings.warn(
                     "The option 'default_cell_markers' is deprecated. "
                     "Please use 'cell_markers' instead.",
-                    DeprecationWarning,
+                    FutureWarning,
                 )
                 format_options.setdefault("cell_markers", self.default_cell_markers)
             if self.cell_markers:
@@ -234,7 +234,7 @@ class JupytextConfiguration(Configurable):
             warnings.warn(
                 "The option 'default_jupytext_formats' is deprecated. "
                 "Please use 'formats' instead.",
-                DeprecationWarning,
+                FutureWarning,
             )
 
         formats = self.formats or self.default_jupytext_formats
