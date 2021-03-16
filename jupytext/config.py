@@ -4,7 +4,7 @@ import os
 import warnings
 
 import yaml
-from traitlets import Bool, Enum, Float, Unicode
+from traitlets import Bool, Dict, Enum, Float, List, Unicode, Union
 from traitlets.config import Configurable
 from traitlets.config.loader import PyFileConfigLoader
 from traitlets.traitlets import TraitError
@@ -13,6 +13,7 @@ from .formats import (
     NOTEBOOK_EXTENSIONS,
     long_form_multiple_formats,
     long_form_one_format,
+    short_form_multiple_formats,
 )
 
 
@@ -41,8 +42,8 @@ JUPYTEXT_CEILING_DIRECTORIES = [
 class JupytextConfiguration(Configurable):
     """Jupytext Configuration's options"""
 
-    formats = Unicode(
-        u"",
+    formats = Union(
+        [Unicode(), List(Unicode()), Dict(Unicode)],
         help="Save notebooks to these file extensions. "
         "Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R "
         "comma separated. If you want another format than the "
@@ -336,11 +337,13 @@ def find_jupytext_configuration_file(path, search_parent_dirs=True):
     return find_jupytext_configuration_file(parent_dir)
 
 
-def load_jupytext_configuration_file(jupytext_config_file, stream=None):
+def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
     """Read a Jupytext config file, and return a dict"""
     if not jupytext_config_file.endswith(".py") and stream is None:
         with open(jupytext_config_file) as stream:
-            return load_jupytext_configuration_file(jupytext_config_file, stream.read())
+            return parse_jupytext_configuration_file(
+                jupytext_config_file, stream.read()
+            )
 
     try:
         if jupytext_config_file.endswith((".toml", "jupytext")):
@@ -363,6 +366,20 @@ def load_jupytext_configuration_file(jupytext_config_file, stream=None):
         )
 
 
+def load_jupytext_configuration_file(config_file, stream=None):
+    """Read and validate a Jupytext configuration file, and return a JupytextConfiguration object"""
+    config_dict = parse_jupytext_configuration_file(config_file, stream)
+    config = validate_jupytext_configuration_file(config_file, config_dict)
+    # formats can be a dict prefix => format
+    if isinstance(config.formats, dict):
+        config.formats = [
+            (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt
+            for prefix, fmt in config.formats.items()
+        ]
+    config.formats = short_form_multiple_formats(config.formats)
+    return config
+
+
 def load_jupytext_config(nb_file):
     """Return the jupytext configuration file in the same folder, or in a parent folder, of the current file, if any"""
     config_file = find_jupytext_configuration_file(nb_file)
@@ -371,8 +388,7 @@ def load_jupytext_config(nb_file):
     if os.path.isfile(nb_file) and os.path.samefile(config_file, nb_file):
         return None
     config_file = find_jupytext_configuration_file(nb_file)
-    config_dict = load_jupytext_configuration_file(config_file)
-    return validate_jupytext_configuration_file(config_file, config_dict)
+    return load_jupytext_configuration_file(config_file)
 
 
 def validate_jupytext_configuration_file(config_file, config_dict):

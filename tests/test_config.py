@@ -3,7 +3,6 @@ import os
 import pytest
 
 from jupytext.config import (
-    JupytextConfiguration,
     find_jupytext_configuration_file,
     load_jupytext_configuration_file,
 )
@@ -86,7 +85,59 @@ c.cell_metadata_filter = "all"
         )
 
     config = load_jupytext_configuration_file(str(full_config_path))
-    config = JupytextConfiguration(**config)
     assert config.formats == "ipynb,py:percent"
     assert config.notebook_metadata_filter == "all"
     assert config.cell_metadata_filter == "all"
+
+
+@pytest.mark.parametrize(
+    "content_toml,formats_short_form",
+    [
+        (
+            """# always pair ipynb notebooks to py:percent files
+formats = "ipynb,py:percent"
+""",
+            "ipynb,py:percent",
+        ),
+        (
+            """# always pair ipynb notebooks to py:percent files
+formats = ['ipynb', 'py:percent']
+""",
+            "ipynb,py:percent",
+        ),
+        (
+            """# always pair ipynb notebooks to py:percent files
+formats = ["ipynb", "py:percent"]
+""",
+            "ipynb,py:percent",
+        ),
+        (
+            """# always pair ipynb notebooks to py:percent files
+formats = "ipynb,py:percent"
+""",
+            "ipynb,py:percent",
+        ),
+        (
+            """# Pair notebooks in subfolders of 'notebooks' to scripts in subfolders of 'scripts'
+[formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+""",
+            "notebooks///ipynb,scripts///py:percent",
+        ),
+        (
+            """# Pair notebooks in subfolders of 'notebooks' to scripts in subfolders of 'scripts'
+[formats]
+"notebooks" = "ipynb"
+"scripts" = "py:percent"
+""",
+            "notebooks///ipynb,scripts///py:percent",
+        ),
+    ],
+)
+def test_jupytext_formats(tmpdir, content_toml, formats_short_form):
+    jupytext_toml = tmpdir.join("jupytext.toml")
+    jupytext_toml.write(content_toml)
+
+    config = load_jupytext_configuration_file(str(jupytext_toml))
+    assert config.formats == formats_short_form

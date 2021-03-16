@@ -24,7 +24,6 @@ from .config import (
     load_jupytext_configuration_file,
     notebook_formats,
     preferred_format,
-    validate_jupytext_configuration_file,
 )
 from .formats import (
     long_form_multiple_formats,
@@ -489,13 +488,9 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 config_file = self._get_os_path(config_file)
                 is_os_path = True
             if is_os_path:
-                config_dict = load_jupytext_configuration_file(config_file)
-            else:
-                model = self.super.get(config_file, content=True, type="file")
-                config_dict = load_jupytext_configuration_file(
-                    config_file, model["content"]
-                )
-            return validate_jupytext_configuration_file(config_file, config_dict)
+                return load_jupytext_configuration_file(config_file)
+            model = self.super.get(config_file, content=True, type="file")
+            return load_jupytext_configuration_file(config_file, model["content"])
 
         def get_config(self, path, use_cache=False):
             """Return the Jupytext configuration for the given path"""

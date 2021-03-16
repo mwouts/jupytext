@@ -61,11 +61,23 @@ If you prefer to use a default `ipynb` - `py:percent` pairing, then that would b
 # Always pair ipynb notebooks to py:percent files
 formats = "ipynb,py:percent"
 ```
+or alternatively, using an explicit format list:
+```
+# Always pair ipynb notebooks to py:percent files
+formats = ["ipynb", "py:percent"]
+```
 
 You can pair notebooks in trees with a `root_prefix` separated with three slashes, e.g.
 ```
 # Pair notebooks in subfolders of 'notebooks' to scripts in subfolders of 'scripts'
 formats = "notebooks///ipynb,scripts///py:percent"
+```
+or alternatively, using a dict to map the prefix path to the format name:
+```
+# Pair notebooks in subfolders of 'notebooks' to scripts in subfolders of 'scripts'
+[formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
 ```
 The `root_prefix` is matched with the top-most parent folder of the matching name, not above the Jupytext configuration file.
 
