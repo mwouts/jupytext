@@ -141,3 +141,28 @@ def test_jupytext_formats(tmpdir, content_toml, formats_short_form):
 
     config = load_jupytext_configuration_file(str(jupytext_toml))
     assert config.formats == formats_short_form
+
+
+def test_deprecated_formats_cause_warning(
+    tmpdir, content_toml="default_jupytext_formats = 'ipynb,md'"
+):
+    jupytext_toml = tmpdir.join("jupytext.toml")
+    jupytext_toml.write(content_toml)
+
+    config = load_jupytext_configuration_file(str(jupytext_toml))
+    with pytest.warns(FutureWarning, match="use 'formats'"):
+        assert config.default_formats(str(tmpdir.join("test.md"))) == "ipynb,md"
+
+
+@pytest.mark.parametrize(
+    "option_name",
+    ["notebook_metadata_filter", "cell_metadata_filter", "cell_markers"],
+)
+def test_deprecated_options_cause_warning(tmpdir, option_name):
+    jupytext_toml = tmpdir.join("jupytext.toml")
+    jupytext_toml.write(f"default_{option_name} = 'value'")
+    config = load_jupytext_configuration_file(str(jupytext_toml))
+    fmt = {}
+    with pytest.warns(FutureWarning, match=f"use '{option_name}'"):
+        config.set_default_format_options(fmt)
+        assert fmt[option_name] == "value"
