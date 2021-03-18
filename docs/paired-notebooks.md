@@ -44,12 +44,6 @@ In JupyterLab this is slightly different. Scripts and Markdown document also hav
 ![](https://github.com/mwouts/jupytext-screenshots/raw/master/JupytextDocumentation/ContextMenuLab.png)
 
 If do not want to classify scripts or Markdown documents as notebooks, please use the `notebook_extension` option. For instance, if you want to get the notebook icon only for `.ipynb` and `.Rmd` files, set
-
-```python
-c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
-c.ContentsManager.notebook_extensions = "ipynb,Rmd"
-```
-in your `.jupyter/jupyter_notebook_config.py`, or
 ```
 notebook_extensions = "ipynb,Rmd"
 ```

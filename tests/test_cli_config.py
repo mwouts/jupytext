@@ -13,7 +13,7 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
     nb_file = tmpdir.join("notebook.ipynb")
     py_file = tmpdir.join("notebook.py")
 
-    cfg_file.write("default_jupytext_formats: 'ipynb,py'\n")
+    cfg_file.write("formats: 'ipynb,py'\n")
     nbformat.write(new_notebook(), str(nb_file))
 
     jupytext([str(nb_file), "--sync"])
@@ -25,10 +25,10 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
     assert "jupytext" not in nb.metadata
 
 
-def test_default_jupytext_formats(tmpdir):
+def test_formats(tmpdir):
     tmpdir.join(".jupytext").write(
         '''# Default pairing
-default_jupytext_formats = "ipynb,py"'''
+formats = "ipynb,py"'''
     )
     test = tmpdir.join("test.py")
     test.write("1 + 1\n")
@@ -38,8 +38,8 @@ default_jupytext_formats = "ipynb,py"'''
     assert tmpdir.join("test.ipynb").isfile()
 
 
-def test_default_jupytext_formats_with_suffix(tmpdir):
-    tmpdir.join(".jupytext").write('default_jupytext_formats = "ipynb,.nb.py"')
+def test_formats_with_suffix(tmpdir):
+    tmpdir.join(".jupytext").write('formats = "ipynb,.nb.py"')
     test = tmpdir.join("test.py")
     test.write("1 + 1\n")
 
@@ -53,9 +53,9 @@ def test_default_jupytext_formats_with_suffix(tmpdir):
     assert tmpdir.join("test.ipynb").isfile()
 
 
-def test_default_jupytext_formats_does_not_apply_to_config_file(tmpdir):
+def test_formats_does_not_apply_to_config_file(tmpdir):
     config = tmpdir.join(".jupytext.py")
-    config.write('c.default_jupytext_formats = "ipynb,py"')
+    config.write('c.formats = "ipynb,py"')
     test = tmpdir.join("test.py")
     test.write("1 + 1\n")
 
@@ -88,12 +88,12 @@ def test_preferred_jupytext_formats_save(tmpdir):
 @pytest.mark.parametrize(
     "config",
     [
-        # Way 1: preferred_jupytext_formats_save + default_jupytext_formats
+        # Way 1: preferred_jupytext_formats_save + formats
         """preferred_jupytext_formats_save: "python//py:percent"
-default_jupytext_formats: "ipynb,python//py"
+formats: "ipynb,python//py"
 """,
-        # Way 2: default_jupytext_formats
-        "default_jupytext_formats: ipynb,python//py:percent",
+        # Way 2: formats
+        "formats: ipynb,python//py:percent",
     ],
 )
 def test_save_using_preferred_and_default_format(config, tmpdir):
@@ -149,8 +149,8 @@ jupyter:
 def test_cli_config_on_windows_issue_629(tmpdir):
     cfg_file = tmpdir.join("jupytext.yml")
     cfg_file.write(
-        """default_jupytext_formats: "notebooks///ipynb,scripts///py:percent"
-default_notebook_metadata_filter: "jupytext"
+        """formats: "notebooks///ipynb,scripts///py:percent"
+notebook_metadata_filter: "jupytext"
 """
     )
 
@@ -165,7 +165,7 @@ def test_sync_config_does_not_create_formats_metadata(
     tmpdir, cwd_tmpdir, python_notebook
 ):
     tmpdir.join("jupytext.yml").write(
-        """default_jupytext_formats: "ipynb,py:percent"
+        """formats: "ipynb,py:percent"
 """
     )
 

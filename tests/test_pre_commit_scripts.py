@@ -341,7 +341,7 @@ def test_wrap_markdown_cell(tmpdir):
     tmpdir.join("jupytext.toml").write(
         """# By default, the notebooks in this repository are in the notebooks subfolder
     # and they are paired to scripts in the script subfolder.
-    default_jupytext_formats = "notebooks///ipynb,scripts///py:percent"
+    formats = "notebooks///ipynb,scripts///py:percent"
     """
     )
 

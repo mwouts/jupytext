@@ -25,7 +25,7 @@ def test_combine_same_version_ok(tmpdir):
     jupytext.write(nb, str(tmpdir.join(tmp_ipynb)))
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
     cm.root_dir = str(tmpdir)
 
     nb = cm.get(tmp_ipynb)
@@ -55,7 +55,7 @@ def test_combine_lower_version_raises(tmpdir):
     jupytext.write(nb, str(tmpdir.join(tmp_ipynb)))
 
     cm = jupytext.TextFileContentsManager()
-    cm.default_jupytext_formats = "ipynb,py"
+    cm.formats = "ipynb,py"
     cm.root_dir = str(tmpdir)
 
     with pytest.raises(HTTPError):

@@ -42,7 +42,7 @@ repos:
     tmp_repo.git.add(".pre-commit-config.yaml")
     pre_commit(["install", "--install-hooks", "-f"])
 
-    tmpdir.join(".jupytext.toml").write('default_jupytext_formats = "ipynb,py:percent"')
+    tmpdir.join(".jupytext.toml").write('formats = "ipynb,py:percent"')
     tmp_repo.git.add(".jupytext.toml")
     tmp_repo.index.commit("pair notebooks")
 

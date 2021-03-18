@@ -1,4 +1,4 @@
-nbformat>=5.1.1
+nbformat>=5.1.2
 flake8
 isort
 black

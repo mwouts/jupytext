@@ -1,9 +1,10 @@
 """Find and read Jupytext configuration files"""
 import json
 import os
+import warnings
 
 import yaml
-from traitlets import Bool, Enum, Float, Unicode
+from traitlets import Bool, Dict, Enum, Float, List, Unicode, Union
 from traitlets.config import Configurable
 from traitlets.config.loader import PyFileConfigLoader
 from traitlets.traitlets import TraitError
@@ -12,6 +13,7 @@ from .formats import (
     NOTEBOOK_EXTENSIONS,
     long_form_multiple_formats,
     long_form_one_format,
+    short_form_multiple_formats,
 )
 
 
@@ -40,8 +42,8 @@ JUPYTEXT_CEILING_DIRECTORIES = [
 class JupytextConfiguration(Configurable):
     """Jupytext Configuration's options"""
 
-    default_jupytext_formats = Unicode(
-        u"",
+    formats = Union(
+        [Unicode(), List(Unicode()), Dict(Unicode)],
         help="Save notebooks to these file extensions. "
         "Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R "
         "comma separated. If you want another format than the "
@@ -50,9 +52,11 @@ class JupytextConfiguration(Configurable):
         "hydrogen/spyder/vscode compatible scripts",
         config=True,
     )
+    default_jupytext_formats = Unicode(
+        help="Deprecated. Use 'formats' instead", config=True
+    )
 
     preferred_jupytext_formats_save = Unicode(
-        u"",
         help="Preferred format when saving notebooks as text, per extension. "
         'Use "jl:percent,py:percent,R:percent" if you want to save '
         "Julia, Python and R scripts in the double percent format and "
@@ -61,18 +65,20 @@ class JupytextConfiguration(Configurable):
     )
 
     preferred_jupytext_formats_read = Unicode(
-        u"",
         help="Preferred format when reading notebooks from text, per "
         'extension. Use "py:sphinx" if you want to read all python '
         "scripts as Sphinx gallery scripts.",
         config=True,
     )
 
-    default_notebook_metadata_filter = Unicode(
-        u"",
+    notebook_metadata_filter = Unicode(
         help="Notebook metadata that should be save in the text representations. "
         "Examples: 'all', '-all', 'widgets,nteract', 'kernelspec,jupytext-all'",
         config=True,
+    )
+
+    default_notebook_metadata_filter = Unicode(
+        "", help="Deprecated. Use 'notebook_metadata_filter' instead", config=True
     )
 
     hide_notebook_metadata = Enum(
@@ -90,11 +96,14 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
-    default_cell_metadata_filter = Unicode(
-        u"",
+    cell_metadata_filter = Unicode(
         help="Cell metadata that should be saved in the text representations. "
         "Examples: 'all', 'hide_input,hide_output'",
         config=True,
+    )
+
+    default_cell_metadata_filter = Unicode(
+        "", help="Deprecated. Use 'cell_metadata_filter' instead", config=True
     )
 
     comment_magics = Enum(
@@ -131,21 +140,23 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
-    default_cell_markers = Unicode(
-        u"",
+    cell_markers = Unicode(
         help='Start and end cell markers for the light format, comma separated. Use "{{{,}}}" to mark cells'
         'as foldable regions in Vim, and "region,endregion" to mark cells as Vscode/PyCharm regions',
         config=True,
     )
 
-    notebook_extensions = Unicode(
-        u",".join(NOTEBOOK_EXTENSIONS),
-        help="A comma separated list of notebook extensions",
+    default_cell_markers = Unicode(
+        help="Deprecated. Use 'cell_markers' instead", config=True
+    )
+
+    notebook_extensions = Union(
+        [List(Unicode(), NOTEBOOK_EXTENSIONS), Unicode()],
+        help="A list of notebook extensions",
         config=True,
     )
 
     custom_cell_magics = Unicode(
-        "",
         help='A comma separated list of cell magics. Use e.g. custom_cell_magics = "configure,local" '
         'if you want code cells starting with the Spark magic cell commands "configure" and "local" '
         "to be commented out when converted to scripts.",
@@ -155,13 +166,29 @@ class JupytextConfiguration(Configurable):
     def set_default_format_options(self, format_options, read=False):
         """Set default format option"""
         if self.default_notebook_metadata_filter:
+            warnings.warn(
+                "The option 'default_notebook_metadata_filter' is deprecated. "
+                "Please use 'notebook_metadata_filter' instead.",
+                FutureWarning,
+            )
             format_options.setdefault(
                 "notebook_metadata_filter", self.default_notebook_metadata_filter
             )
+        if self.notebook_metadata_filter:
+            format_options.setdefault(
+                "notebook_metadata_filter", self.notebook_metadata_filter
+            )
         if self.default_cell_metadata_filter:
+            warnings.warn(
+                "The option 'default_cell_metadata_filter' is deprecated. "
+                "Please use 'cell_metadata_filter' instead.",
+                FutureWarning,
+            )
             format_options.setdefault(
                 "cell_metadata_filter", self.default_cell_metadata_filter
             )
+        if self.cell_metadata_filter:
+            format_options.setdefault("cell_metadata_filter", self.cell_metadata_filter)
         if self.hide_notebook_metadata is not None:
             format_options.setdefault(
                 "hide_notebook_metadata", self.hide_notebook_metadata
@@ -178,8 +205,16 @@ class JupytextConfiguration(Configurable):
             format_options.setdefault(
                 "doxygen_equation_markers", self.doxygen_equation_markers
             )
-        if not read and self.default_cell_markers:
-            format_options.setdefault("cell_markers", self.default_cell_markers)
+        if not read:
+            if self.default_cell_markers:
+                warnings.warn(
+                    "The option 'default_cell_markers' is deprecated. "
+                    "Please use 'cell_markers' instead.",
+                    FutureWarning,
+                )
+                format_options.setdefault("cell_markers", self.default_cell_markers)
+            if self.cell_markers:
+                format_options.setdefault("cell_markers", self.cell_markers)
         if read and self.sphinx_convert_rst2md:
             format_options.setdefault("rst2md", self.sphinx_convert_rst2md)
         if self.custom_cell_magics:
@@ -189,11 +224,18 @@ class JupytextConfiguration(Configurable):
         """Return the default formats, if they apply to the current path #157"""
         from .paired_paths import InconsistentPath, base_path
 
-        formats = long_form_multiple_formats(self.default_jupytext_formats)
-        for fmt in formats:
+        if self.default_jupytext_formats:
+            warnings.warn(
+                "The option 'default_jupytext_formats' is deprecated. "
+                "Please use 'formats' instead.",
+                FutureWarning,
+            )
+
+        formats = self.formats or self.default_jupytext_formats
+        for fmt in long_form_multiple_formats(formats):
             try:
                 base_path(path, fmt)
-                return self.default_jupytext_formats
+                return formats
             except InconsistentPath:
                 continue
 
@@ -289,11 +331,13 @@ def find_jupytext_configuration_file(path, search_parent_dirs=True):
     return find_jupytext_configuration_file(parent_dir)
 
 
-def load_jupytext_configuration_file(jupytext_config_file, stream=None):
+def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
     """Read a Jupytext config file, and return a dict"""
     if not jupytext_config_file.endswith(".py") and stream is None:
         with open(jupytext_config_file) as stream:
-            return load_jupytext_configuration_file(jupytext_config_file, stream.read())
+            return parse_jupytext_configuration_file(
+                jupytext_config_file, stream.read()
+            )
 
     try:
         if jupytext_config_file.endswith((".toml", "jupytext")):
@@ -316,6 +360,22 @@ def load_jupytext_configuration_file(jupytext_config_file, stream=None):
         )
 
 
+def load_jupytext_configuration_file(config_file, stream=None):
+    """Read and validate a Jupytext configuration file, and return a JupytextConfiguration object"""
+    config_dict = parse_jupytext_configuration_file(config_file, stream)
+    config = validate_jupytext_configuration_file(config_file, config_dict)
+    # formats can be a dict prefix => format
+    if isinstance(config.formats, dict):
+        config.formats = [
+            (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt
+            for prefix, fmt in config.formats.items()
+        ]
+    config.formats = short_form_multiple_formats(config.formats)
+    if isinstance(config.notebook_extensions, str):
+        config.notebook_extensions = config.notebook_extensions.split(",")
+    return config
+
+
 def load_jupytext_config(nb_file):
     """Return the jupytext configuration file in the same folder, or in a parent folder, of the current file, if any"""
     config_file = find_jupytext_configuration_file(nb_file)
@@ -324,8 +384,7 @@ def load_jupytext_config(nb_file):
     if os.path.isfile(nb_file) and os.path.samefile(config_file, nb_file):
         return None
     config_file = find_jupytext_configuration_file(nb_file)
-    config_dict = load_jupytext_configuration_file(config_file)
-    return validate_jupytext_configuration_file(config_file, config_dict)
+    return load_jupytext_configuration_file(config_file)
 
 
 def validate_jupytext_configuration_file(config_file, config_dict):

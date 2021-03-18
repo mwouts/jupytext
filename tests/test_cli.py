@@ -1079,7 +1079,7 @@ def test_sync_pipe_config(tmpdir):
     tmpdir.join("jupytext.toml").write(
         """# By default, the notebooks in this repository are in the notebooks subfolder
 # and they are paired to scripts in the script subfolder.
-default_jupytext_formats = "notebooks///ipynb,scripts///py:percent"
+formats = "notebooks///ipynb,scripts///py:percent"
 """
     )
 
@@ -1154,7 +1154,7 @@ def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir, cwd_tmpdir
         jupytext --sync notebook.md
     """
     cfg_file = tmpdir.join("jupytext.toml")
-    cfg_file.write('default_jupytext_formats = "md,ipynb,py:percent"')
+    cfg_file.write('formats = "md,ipynb,py:percent"')
 
     md_file = tmpdir.join("notebook.md")
     py_file = tmpdir.join("notebook.py")
@@ -1163,18 +1163,6 @@ def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir, cwd_tmpdir
 
     with pytest.warns(None) as warnings:
         jupytext(["--sync", "notebook.md"])
-
-    # TODO: remove this filter when the fix for
-    #  https://github.com/jupyter/nbformat/issues/212
-    #  is released
-    warnings = [
-        w
-        for w in warnings
-        if not (
-            "Sampling from a set deprecated" in str(w.message)
-            and "nbformat" in w.filename
-        )
-    ]
 
     assert not warnings
 

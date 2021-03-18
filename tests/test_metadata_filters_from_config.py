@@ -11,8 +11,8 @@ def test_metadata_filters_from_config(tmpdir):
     md_file = tmpdir.join("notebook.md")
 
     cfg_file.write(
-        """default_notebook_metadata_filter = "-all"
-default_cell_metadata_filter = "-all"
+        """notebook_metadata_filter = "-all"
+cell_metadata_filter = "-all"
 """
     )
     nb = new_notebook(

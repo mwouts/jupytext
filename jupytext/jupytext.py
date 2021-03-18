@@ -65,26 +65,20 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         if not read and self.config is not None:
             self.config.set_default_format_options(self.fmt, read)
 
-        # format options in notebook have precedence over that in fmt, and precedence over the config
+        # Use format options from the notebook if not already set by the config
         for opt in _VALID_FORMAT_OPTIONS:
             if opt in metadata.get("jupytext", {}):
                 self.fmt.setdefault(opt, metadata["jupytext"][opt])
 
-        # we save the format options in the notebook metadata
-        for opt in _VALID_FORMAT_OPTIONS:
-            if opt in self.fmt:
-                metadata.setdefault("jupytext", {}).setdefault(opt, self.fmt[opt])
-
-        if self.config is not None:
+        # When we read the notebook we use the values of the config as defaults, as again the text representation
+        # of the notebook might not store the format options when notebook_metadata_filter="-all"
+        if read and self.config is not None:
             self.config.set_default_format_options(self.fmt, read=read)
 
-        # We don't want default metadata filters in the notebook itself
+        # We save the format options in the notebook metadata
         for opt in _VALID_FORMAT_OPTIONS:
-            if opt in self.fmt and opt not in [
-                "notebook_metadata_filter",
-                "cell_metadata_filter",
-            ]:
-                metadata.setdefault("jupytext", {}).setdefault(opt, self.fmt[opt])
+            if opt in self.fmt:
+                metadata.setdefault("jupytext", {})[opt] = self.fmt[opt]
 
         # Is this format the same as that documented in the YAML header? If so, we want to know the format version
         file_fmt = metadata.get("jupytext", {}).get("text_representation", {})

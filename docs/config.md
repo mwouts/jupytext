@@ -50,22 +50,36 @@ If `JUPYTEXT_CEILING_DIRECTORIES` is defined, Jupytext will stop searching for c
 
 The examples below assume that you use a `.jupytext`, `jupytext.toml` or `.jupytext.toml` Jupyter configuration file in TOML format. If you use another extension, please adapt the examples. For instance, if you want to use `jupytext.yml` in YAML format, replace the `=` sign with `:` and remove the double quotes. See also [`test_config.py`](https://github.com/mwouts/jupytext/blob/master/tests/test_config.py) for short examples in all the supported formats.
 
+Also, the examples are for Jupytext 1.11.0 or later. If you are using an older version, you should consult the [previous version](https://github.com/mwouts/jupytext/blob/v1.10.3/docs/config.md#configuring-paired-notebooks-globally) of this documentation.
+
 Say you want to always associate every `.ipynb` notebook with a `.md` file  (and reciprocally). This is done by adding the following to your `jupytext.toml` or `.jupytext.toml` Jupyter configuration file:
 ```
 # Always pair ipynb notebooks to md files
-default_jupytext_formats = "ipynb,md"
+formats = "ipynb,md"
 ```
 
 If you prefer to use a default `ipynb` - `py:percent` pairing, then that would be:
 ```
 # Always pair ipynb notebooks to py:percent files
-default_jupytext_formats = "ipynb,py:percent"
+formats = "ipynb,py:percent"
+```
+or alternatively, using an explicit format list:
+```
+# Always pair ipynb notebooks to py:percent files
+formats = ["ipynb", "py:percent"]
 ```
 
 You can pair notebooks in trees with a `root_prefix` separated with three slashes, e.g.
 ```
 # Pair notebooks in subfolders of 'notebooks' to scripts in subfolders of 'scripts'
-default_jupytext_formats = "notebooks///ipynb,scripts///py:percent"
+formats = "notebooks///ipynb,scripts///py:percent"
+```
+or alternatively, using a dict to map the prefix path to the format name:
+```
+# Pair notebooks in subfolders of 'notebooks' to scripts in subfolders of 'scripts'
+[formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
 ```
 The `root_prefix` is matched with the top-most parent folder of the matching name, not above the Jupytext configuration file.
 
@@ -82,23 +96,23 @@ Please note that, while Jupytext is Jupyter acts accordingly to both local or gl
 
 ### Metadata filtering
 
-You can specify which metadata to include or exclude in the text files created by Jupytext by setting `default_notebook_metadata_filter` (notebook metadata) and `default_cell_metadata_filter` (cell metadata) in the configuration file. They accept a string of comma separated keywords. A minus sign `-` in front of a keyword means exclusion.
+You can specify which metadata to include or exclude in the text files created by Jupytext by setting `notebook_metadata_filter` (notebook metadata) and `cell_metadata_filter` (cell metadata) in the configuration file. They accept a string of comma separated keywords. A minus sign `-` in front of a keyword means exclusion.
 
 Suppose you want to keep all the notebook metadata but `widgets` and `varInspector` in the YAML header. For cell metadata, you want to allow `ExecuteTime` and `autoscroll`, but not `hide_output`. You can set
 ```python
-default_notebook_metadata_filter = "all,-widgets,-varInspector"
-default_cell_metadata_filter = "ExecuteTime,autoscroll,-hide_output"
+notebook_metadata_filter = "all,-widgets,-varInspector"
+cell_metadata_filter = "ExecuteTime,autoscroll,-hide_output"
 ```
 
 If you want that the text files created by Jupytext have no metadata, you may use the global metadata filters below. Please note that with this setting, the metadata is only preserved in the `.ipynb` file.
 ```python
-default_notebook_metadata_filter = "-all"
-default_cell_metadata_filter = "-all"
+notebook_metadata_filter = "-all"
+cell_metadata_filter = "-all"
 ```
 
 It is possible to filter nested metadata. For example, if you want to preserve the Jupytext metadata, but not the Jupytext version number, you can use:
 ```python
-default_notebook_metadata_filter = "-jupytext.text_representation.jupytext_version"
+notebook_metadata_filter = "-jupytext.text_representation.jupytext_version"
 ```
 
 Finally, to hide the notebook metadata in an HTML comment in Markdown files, use the option `hide_notebook_metadata`.
