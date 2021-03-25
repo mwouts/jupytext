@@ -176,6 +176,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
     def writes(self, nb, metadata=None, **kwargs):
         """Return the text representation of the notebook"""
         if self.fmt.get("format_name") == "pandoc":
+            self.update_fmt_with_notebook_options(nb.metadata)
             metadata = insert_jupytext_info_and_filter_metadata(
                 metadata, self.fmt, self.implementation
             )
@@ -215,6 +216,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             pygments_lexer = metadata.get("language_info", {}).get(
                 "pygments_lexer", None
             )
+            self.update_fmt_with_notebook_options(nb.metadata)
             metadata = insert_jupytext_info_and_filter_metadata(
                 metadata, self.fmt, self.implementation
             )
