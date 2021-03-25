@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.11.1 (2021-03-26)
+-------------------
+
+**Fixed**
+- Format options stored in the notebook itself are now taken into account (Fixes [#757](https://github.com/mwouts/jupytext/issues/757))
+
+
 1.11.0 (2021-03-18)
 -------------------
 

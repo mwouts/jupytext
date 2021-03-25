@@ -1,9 +1,14 @@
+from copy import deepcopy
+
 import pytest
 from nbformat.v4.nbbase import new_code_cell, new_notebook
 
 from jupytext import reads, writes
 from jupytext.cli import jupytext as jupytext_cli
+from jupytext.compare import compare, compare_notebooks
 from jupytext.metadata_filter import filter_metadata, metadata_filter_as_dict
+
+from .utils import requires_myst
 
 
 def to_dict(keys):
@@ -168,3 +173,47 @@ def test_default_config_has_priority_over_current_metadata(
 1 + 1
 """
     )
+
+
+@requires_myst
+def test_metadata_filter_in_notebook_757():
+    md = """---
+jupytext:
+  cell_metadata_filter: all,-hidden,-heading_collapsed
+  notebook_metadata_filter: all,-language_info,-toc,-jupytext.text_representation.jupytext_version,-jupytext.text_representation.format_version
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+nbhosting:
+  title: 'Exercice: Taylor'
+---
+
+```python
+1 + 1
+```
+"""  # noqa
+    nb = reads(md, fmt="md:myst")
+    assert nb.metadata["jupytext"]["notebook_metadata_filter"] == ",".join(
+        [
+            "all",
+            "-language_info",
+            "-toc",
+            "-jupytext.text_representation.jupytext_version",
+            "-jupytext.text_representation.format_version",
+        ]
+    )
+    md2 = writes(nb, fmt="md:myst")
+    compare(md2, md)
+
+    for fmt in ["py:light", "py:percent", "md"]:
+        text = writes(nb, fmt=fmt)
+        nb2 = reads(text, fmt=fmt)
+        compare_notebooks(nb2, nb, fmt=fmt)
+        ref_metadata = deepcopy(nb.metadata)
+        del ref_metadata["jupytext"]["text_representation"]
+        del nb2.metadata["jupytext"]["text_representation"]
+        compare(nb2.metadata, ref_metadata)
