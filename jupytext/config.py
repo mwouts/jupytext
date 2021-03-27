@@ -43,7 +43,7 @@ class JupytextConfiguration(Configurable):
     """Jupytext Configuration's options"""
 
     formats = Union(
-        [Unicode(), List(Unicode()), Dict(Unicode)],
+        [Unicode(), List(Unicode()), Dict(Unicode())],
         help="Save notebooks to these file extensions. "
         "Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R "
         "comma separated. If you want another format than the "
