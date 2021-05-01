@@ -5,6 +5,7 @@ Jupytext ChangeLog
 -------------------
 
 **Changed**
+- Jupytext's dependency markdown-it-py is now in v1 ([#769](https://github.com/mwouts/jupytext/issues/769))
 - The optional argument `fmt` in `jupytext.reads` now has the default value `None` - thanks to Yuvi Panda ([#763](https://github.com/mwouts/jupytext/issues/763))
 
 **Fixed**

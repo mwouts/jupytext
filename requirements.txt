@@ -1,4 +1,4 @@
 nbformat
 pyyaml
 toml
-markdown-it-py~=0.6.0
+markdown-it-py[plugins]>=1.0.0b3,<2.0.0
