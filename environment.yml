@@ -19,9 +19,9 @@ dependencies:
   - pre-commit
   - gitpython
   - pylint
-  - flake8
-  - black
-  - isort
+  - flake8==3.9.1
+  - black==21.4b2
+  - isort==5.8.0
   - autopep8
   - sphinx-gallery<0.8
   - pip

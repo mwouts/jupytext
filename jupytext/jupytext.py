@@ -355,7 +355,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         return "\n".join(header + lines)
 
 
-def reads(text, fmt, as_version=nbformat.NO_CONVERT, config=None, **kwargs):
+def reads(text, fmt=None, as_version=nbformat.NO_CONVERT, config=None, **kwargs):
     """
     Read a notebook from a string
 
