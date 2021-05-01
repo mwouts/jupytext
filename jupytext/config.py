@@ -334,7 +334,7 @@ def find_jupytext_configuration_file(path, search_parent_dirs=True):
 def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
     """Read a Jupytext config file, and return a dict"""
     if not jupytext_config_file.endswith(".py") and stream is None:
-        with open(jupytext_config_file) as stream:
+        with open(jupytext_config_file, encoding="utf-8") as stream:
             return parse_jupytext_configuration_file(
                 jupytext_config_file, stream.read()
             )

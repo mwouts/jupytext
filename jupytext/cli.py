@@ -679,7 +679,7 @@ def jupytext_single_file(nb_file, args, log):
 
             # Round trip from a text file
             else:
-                with open(nb_file) as fp:
+                with open(nb_file, encoding="utf-8") as fp:
                     org_text = fp.read()
 
                 # If the destination is not ipynb, we convert to/back that format
@@ -737,7 +737,7 @@ def jupytext_single_file(nb_file, args, log):
             if not os.path.isfile(path):
                 modified = True
             else:
-                with open(path) as fp:
+                with open(path, encoding="utf-8") as fp:
                     current_content = fp.read()
                 modified = new_content != current_content
                 if modified and args.diff:
@@ -976,7 +976,7 @@ def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commi
 
         if len(nb_files_in_git_index) > 1:
             path0, fmt0 = nb_files_in_git_index[0]
-            with open(path0) as fp:
+            with open(path0, encoding="utf-8") as fp:
                 text0 = fp.read()
             for alt_path, alt_fmt in nb_files_in_git_index[1:]:
                 nb = read(alt_path, fmt=alt_fmt, config=config)
