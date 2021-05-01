@@ -215,6 +215,8 @@ def restore_filtered_metadata(
     metadata = copy(filtered_metadata)
     for key in unfiltered_metadata:
         if key not in filtered_unfiltered_metadata:
-            metadata[key] = unfiltered_metadata[key]
+            # We don't want to restore the line_to_next_cell metadata from the ipynb file, see #761
+            if key not in _JUPYTEXT_CELL_METADATA:
+                metadata[key] = unfiltered_metadata[key]
 
     return metadata

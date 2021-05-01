@@ -867,7 +867,7 @@ def test_remove_jupytext_metadata(tmpdir, cwd_tmpdir):
 )
 def test_convert_and_update_preserves_notebook(nb_file, fmt, tmpdir, cwd_tmpdir):
     # cannot encode magic parameters in markdown yet
-    if "magic" in nb_file and fmt == "md":
+    if ("magic" in nb_file or "LateX" in nb_file) and fmt == "md":
         return
 
     tmp_ipynb = "notebook.ipynb"

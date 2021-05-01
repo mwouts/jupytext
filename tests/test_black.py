@@ -228,3 +228,27 @@ def test_black_through_tempfile(
     jupytext([tmp_md, "--pipe", "black {}"])
     with open(tmp_md) as fp:
         compare(fp.read(), black)
+
+
+@requires_black
+def test_pipe_black_removes_lines_to_next_cell_metadata(
+    tmpdir,
+    cwd_tmpdir,
+    text="""# %%
+def func():
+    return 42
+# %%
+func()""",
+):
+    tmpdir.join("notebook.py").write(text)
+    jupytext(["--set-formats", "ipynb,py:percent", "notebook.py"])
+
+    nb = read(tmpdir.join("notebook.ipynb"))
+    assert nb.cells[0].metadata["lines_to_next_cell"] == 0
+
+    jupytext(["--sync", "notebook.py", "--pipe", "black"])
+    nb = read(tmpdir.join("notebook.ipynb"))
+    assert "lines_to_next_cell" not in nb.cells[0].metadata
+
+    new_text = tmpdir.join("notebook.py").read()
+    assert "\n\n# %%\nfunc()" in new_text
