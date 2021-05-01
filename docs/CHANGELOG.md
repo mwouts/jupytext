@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.11.2 (2021-05-??)
+-------------------
+
+**Changed**
+- Jupytext's dependency markdown-it-py is now in v1 ([#769](https://github.com/mwouts/jupytext/issues/769))
+
+
 1.11.1 (2021-03-26)
 -------------------
 

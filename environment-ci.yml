@@ -11,7 +11,7 @@ dependencies:
   - nbformat>=5.1.2
   - pyyaml
   - toml
-  - markdown-it-py~=0.6.0
+  # - markdown-it-py~=1.0.0
   - pip
   - pytest
   - pytest-cov
@@ -24,3 +24,5 @@ dependencies:
   - sphinx-gallery<0.8
   - pre-commit
   - gitpython
+  - pip:
+    - markdown-it-py[plugins]>=1.0.0b3,<2.0.0
