@@ -184,7 +184,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             format=None,
             load_alternative_format=True,
         ):
-            """ Takes a path for an entity and returns its model"""
+            """Takes a path for an entity and returns its model"""
             path = path.strip("/")
             ext = os.path.splitext(path)[1]
 
