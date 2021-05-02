@@ -174,3 +174,24 @@ def test_sync_config_does_not_create_formats_metadata(
 
     nb = read("test.py")
     assert "formats" not in nb.metadata["jupytext"]
+
+
+def test_multiple_formats_771(tmpdir, cwd_tmpdir, python_notebook):
+    tmpdir.join("jupytext.toml").write(
+        """formats = "notebooks///ipynb,notebooks///py,scripts///py:percent"
+"""
+    )
+    notebooks_dir = tmpdir.mkdir("notebooks")
+    scripts_dir = tmpdir.join("scripts")
+
+    write(python_notebook, str(notebooks_dir.join("notebook.ipynb")))
+    jupytext(["--sync", "notebooks/notebook.ipynb"])
+
+    assert notebooks_dir.join("notebook.py").isfile()
+    assert scripts_dir.join("notebook.py").isfile()
+
+    notebooks_dir.join("module.py").write("1 + 1\n")
+    jupytext(["--sync", "notebooks/module.py"])
+
+    assert notebooks_dir.join("module.ipynb").isfile()
+    assert scripts_dir.join("module.py").isfile()
