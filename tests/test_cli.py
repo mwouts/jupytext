@@ -1264,3 +1264,50 @@ def test_jupytext_to_ipynb_suggests_update(tmpdir, cwd_tmpdir, capsys):
     jupytext(["--to", "ipynb", "test.py"])
     capture = capsys.readouterr()
     assert "update" in capture.out
+
+
+@pytest.mark.parametrize("formats", ["", "py:percent", "py", "py:percent,ipynb"])
+def test_jupytext_to_ipynb_does_not_update_timestamp_if_output_not_in_pair(
+    tmpdir, cwd_tmpdir, python_notebook, capsys, formats
+):
+    # Write a text notebook
+    nb = python_notebook
+    if formats:
+        nb.metadata["jupytext"] = {"formats": formats}
+
+    test_py = tmpdir.join("test.py")
+    write(nb, str(test_py))
+
+    # make it read-only
+    test_py.chmod(0o444)
+
+    # py -> ipynb
+    if "ipynb" not in formats:
+        jupytext(["--to", "ipynb", "test.py"])
+    else:
+        jupytext(["--to", "ipynb", "test.py", "-o", "another.ipynb"])
+
+    capture = capsys.readouterr()
+    assert "Updating the timestamp" not in capture.out
+
+
+@pytest.mark.parametrize("formats", ["py:percent", "py", None])
+def test_jupytext_to_ipynb_does_not_update_timestamp_if_not_paired(
+    tmpdir, cwd_tmpdir, python_notebook, capsys, formats
+):
+    # Write a text notebook
+    nb = python_notebook
+    if formats:
+        nb.metadata["jupytext"] = {"formats": formats}
+
+    test_py = tmpdir.join("test.py")
+    write(nb, str(test_py))
+
+    # make it read-only
+    test_py.chmod(0o444)
+
+    # py -> ipynb
+    jupytext(["--to", "ipynb", "test.py"])
+
+    capture = capsys.readouterr()
+    assert "Updating the timestamp" not in capture.out

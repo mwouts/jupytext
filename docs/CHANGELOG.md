@@ -12,6 +12,7 @@ Jupytext ChangeLog
 - All text files are opened with an explicit `utf-8` encoding ([#770](https://github.com/mwouts/jupytext/issues/770))
 - Previously `--pipe black` was not always putting two blank lines between functions. To fix that we load the internal Jupytext
   cell metadata like `lines_to_next_cell` from the text file rather than ipynb ([#761](https://github.com/mwouts/jupytext/issues/761))
+- The timestamp of the source file is not updated any more when the destination file is not in the pair ([#765](https://github.com/mwouts/jupytext/issues/765), [#767](https://github.com/mwouts/jupytext/issues/767))
 
 
 1.11.1 (2021-03-26)
