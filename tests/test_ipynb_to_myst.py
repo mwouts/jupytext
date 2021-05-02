@@ -1,3 +1,4 @@
+import json
 import unittest.mock as mock
 from textwrap import dedent
 
@@ -7,6 +8,7 @@ from tornado.web import HTTPError
 
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
+from jupytext.compare import compare
 from jupytext.formats import (
     JupytextFormatError,
     get_format_implementation,
@@ -193,3 +195,58 @@ kernelspec:
 
     with pytest.raises(HTTPError, match=PLEASE_INSTALL_MYST):
         cm.get("notebook.md")
+
+
+@requires_myst
+@pytest.mark.parametrize("language_info", ["none", "std", "no_pygments_lexer"])
+def test_myst_representation_same_cli_or_contents_manager(
+    tmpdir, cwd_tmpdir, notebook_with_outputs, language_info
+):
+    """This test gives some information on #759. As of Jupytext 1.11.1, in the MyST Markdown format,
+    the code cells have an ipython3 lexer when the notebook "language_info" metadata has "ipython3"
+    as the pygments_lexer. This information comes from the kernel and ATM it is not clear how the user
+    can choose to include it or not in the md file."""
+
+    nb = notebook_with_outputs
+    if language_info != "none":
+        nb["metadata"]["language_info"] = {
+            "codemirror_mode": {"name": "ipython", "version": 3},
+            "file_extension": ".py",
+            "mimetype": "text/x-python",
+            "name": "python",
+            "nbconvert_exporter": "python",
+            "pygments_lexer": "ipython3",
+            "version": "3.7.3",
+        }
+    if language_info == "no_pygments_lexer":
+        del nb["metadata"]["language_info"]["pygments_lexer"]
+
+    # Writing the notebook with the Python API
+    text_api = jupytext.writes(nb, fmt="md:myst")
+
+    # How do code cells look like?
+    code_cells = set(
+        line for line in text_api.splitlines() if line.startswith("```{code-cell")
+    )
+
+    if language_info == "std":
+        assert code_cells == {"```{code-cell} ipython3"}
+    else:
+        assert code_cells == {"```{code-cell}"}
+
+    # We get the same file with the command line jupytext
+    tmpdir.mkdir("cli").join("notebook.ipynb").write(json.dumps(nb))
+    jupytext_cli(["--to", "md:myst", "cli/notebook.ipynb"])
+    text_cli = tmpdir.join("cli").join("notebook.md").read()
+
+    compare(text_cli, text_api)
+
+    # Or with the contents manager
+    cm = jupytext.TextFileContentsManager()
+    cm.formats = "ipynb,md:myst"
+    cm.root_dir = str(tmpdir.mkdir("contents_manager"))
+
+    cm.save(model=dict(content=nb, type="notebook"), path="notebook.ipynb")
+    text_cm = tmpdir.join("contents_manager").join("notebook.md").read()
+
+    compare(text_cm, text_api)
