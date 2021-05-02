@@ -9,7 +9,8 @@ dependencies:
   - jupyter-packaging
   - pyyaml
   - toml
-  # - markdown-it-py~=1.0.0
+  - markdown-it-py~=1.0
+  - mdit-py-plugins
   - nbconvert
   - ipykernel
   - jupyter_contrib_nbextensions
@@ -33,4 +34,3 @@ dependencies:
   - tox-conda
   - pip:
     - sphinx_copybutton
-    - markdown-it-py[plugins]>=1.0.0b3,<2.0.0
