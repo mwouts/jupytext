@@ -663,7 +663,6 @@ def jupytext_single_file(nb_file, args, log):
             ) from err
 
     # III. ### Possible actions ###
-    modified = args.update_metadata or args.pipe or args.execute
     # a. Test round trip conversion
     if args.test or args.test_strict:
         try:
@@ -813,30 +812,22 @@ def jupytext_single_file(nb_file, args, log):
 
     # c. Synchronize paired notebooks
     if args.sync:
-        # Also update the original notebook if the notebook was modified
-        if modified:
-            inputs_nb_file = None
+        write_pair(nb_file, formats, lazy_write)
 
-        def write_function(path, fmt):
-            lazy_write(
-                path,
-                fmt,
-                update_timestamp_only=(path == inputs_nb_file),
-            )
-
-        formats = notebook_formats(notebook, config, nb_file)
-        write_pair(nb_file, formats, write_function)
-        return untracked_files
-
-    if (
+    elif (
         os.path.isfile(nb_file)
-        and nb_dest.endswith(".ipynb")
         and not nb_file.endswith(".ipynb")
-        and notebook.metadata.get("jupytext", {}).get("formats") is not None
+        and os.path.isfile(nb_dest)
+        and nb_dest.endswith(".ipynb")
     ):
-        # Update the original text file timestamp, as required by our Content Manager
-        # Otherwise Jupyter will refuse to open the paired notebook #335
-        lazy_write(nb_file, update_timestamp_only=True)
+        formats = notebook.metadata.get("jupytext", {}).get("formats")
+        if formats is not None and any(
+            os.path.isfile(alt_path) and os.path.samefile(nb_dest, alt_path)
+            for alt_path, _ in paired_paths(nb_file, fmt, formats)
+        ):
+            # Update the original text file timestamp, as required by our Content Manager
+            # Otherwise Jupyter will refuse to open the paired notebook #335
+            lazy_write(nb_file, update_timestamp_only=True)
 
     return untracked_files
 
