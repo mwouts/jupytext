@@ -1,3 +1,7 @@
+# 1.3.2 (2021-05-21)
+
+- We have upgraded the extension dependencies and especially `hosted-git-info` to fix a security vulnerability (#783)
+
 # 1.3.1 (2021-03-07)
 
 - We have updated `yarn.lock` to upgrade `marked` to `2.0` and fix a moderate vulnerability in the extension dependencies (#750)

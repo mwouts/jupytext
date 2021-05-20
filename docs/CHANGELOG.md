@@ -1,6 +1,12 @@
 Jupytext ChangeLog
 ==================
 
+1.11.3 (2021-05-??)
+-------------------
+
+**Fixed**
+- Dependencies of the JupyterLab extension have been upgraded to fix a security vulnerability ([#783](https://github.com/mwouts/jupytext/issues/783))
+
 1.11.2 (2021-05-02)
 -------------------
 
