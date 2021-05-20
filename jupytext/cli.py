@@ -832,17 +832,24 @@ def jupytext_single_file(nb_file, args, log):
 
         lazy_write(nb_dest, fmt=dest_fmt, action=action)
 
-        nb_dest_in_pair = formats and any(
+        formats = notebook.metadata.get("jupytext", {}).get("formats")
+        nb_dest_in_pair = formats is not None and any(
             os.path.exists(alt_path) and os.path.samefile(nb_dest, alt_path)
             for alt_path, _ in paired_paths(nb_file, fmt, formats)
         )
 
+        if formats is not None and not nb_dest_in_pair:
+            # We remove the formats if the destination is not in the pair (and rewrite,
+            # this is not great, but samefile above requires that the file exists)
+            notebook.metadata.get("jupytext", {}).pop("formats")
+            lazy_write(nb_dest, fmt=dest_fmt, action=action)
+
         if (
-            nb_dest_in_pair
-            and os.path.isfile(nb_file)
+            os.path.isfile(nb_file)
             and not nb_file.endswith(".ipynb")
             and os.path.isfile(nb_dest)
             and nb_dest.endswith(".ipynb")
+            and nb_dest_in_pair
         ):
             # If the destination is an ipynb file and is in the pair, then we
             # update the original text file timestamp, as required by our Content Manager
