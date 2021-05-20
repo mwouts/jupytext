@@ -181,6 +181,13 @@ def parse_jupytext_args(args=None):
         "to operate on the Jupytext metadata.",
     )
     action.add_argument(
+        "--use-source-timestamp",
+        help="Set the modification timestamp of the output file(s) equal"
+        "to that of the source file, and keep the source file and "
+        "its timestamp unchanged.",
+        action="store_true",
+    )
+    action.add_argument(
         "--warn-only",
         "-w",
         action="store_true",
@@ -771,7 +778,12 @@ def jupytext_single_file(nb_file, args, log):
         # Otherwise, we only update the timestamp of the text file to make sure
         # they remain more recent than the ipynb file, for compatibility with the
         # Jupytext contents manager for Jupyter
-        if not modified and not path.endswith(".ipynb"):
+        if args.use_source_timestamp:
+            log(
+                f"[jupytext] Setting the timestamp of {shlex.quote(path)} equal to that of {shlex.quote(nb_file)}"
+            )
+            os.utime(path, (os.stat(path).st_atime, os.stat(nb_file).st_mtime))
+        elif not modified and not path.endswith(".ipynb"):
             log(f"[jupytext] Updating the timestamp of {shlex.quote(path)}")
             os.utime(path, None)
 
@@ -810,24 +822,34 @@ def jupytext_single_file(nb_file, args, log):
 
         lazy_write(nb_dest, fmt=dest_fmt, action=action)
 
-    # c. Synchronize paired notebooks
-    if args.sync:
-        write_pair(nb_file, formats, lazy_write)
-
-    elif (
-        os.path.isfile(nb_file)
-        and not nb_file.endswith(".ipynb")
-        and os.path.isfile(nb_dest)
-        and nb_dest.endswith(".ipynb")
-    ):
         formats = notebook.metadata.get("jupytext", {}).get("formats")
-        if formats is not None and any(
-            os.path.isfile(alt_path) and os.path.samefile(nb_dest, alt_path)
+        nb_dest_in_pair = formats is not None and any(
+            os.path.exists(alt_path) and os.path.samefile(nb_dest, alt_path)
             for alt_path, _ in paired_paths(nb_file, fmt, formats)
+        )
+
+        if formats is not None and not nb_dest_in_pair:
+            # We remove the formats if the destination is not in the pair (and rewrite,
+            # this is not great, but samefile above requires that the file exists)
+            notebook.metadata.get("jupytext", {}).pop("formats")
+            lazy_write(nb_dest, fmt=dest_fmt, action=action)
+
+        if (
+            os.path.isfile(nb_file)
+            and not nb_file.endswith(".ipynb")
+            and os.path.isfile(nb_dest)
+            and nb_dest.endswith(".ipynb")
+            and nb_dest_in_pair
         ):
-            # Update the original text file timestamp, as required by our Content Manager
+            # If the destination is an ipynb file and is in the pair, then we
+            # update the original text file timestamp, as required by our Content Manager
             # Otherwise Jupyter will refuse to open the paired notebook #335
+            # NB: An alternative is --use-source-timestamp
             lazy_write(nb_file, update_timestamp_only=True)
+
+    # c. Synchronize paired notebooks
+    elif args.sync:
+        write_pair(nb_file, formats, lazy_write)
 
     return untracked_files
 

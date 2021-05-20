@@ -1311,3 +1311,51 @@ def test_jupytext_to_ipynb_does_not_update_timestamp_if_not_paired(
 
     capture = capsys.readouterr()
     assert "Updating the timestamp" not in capture.out
+
+
+@pytest.mark.parametrize("formats", ["ipynb,py", "py:percent", "py", None])
+def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, formats):
+    # Write a text notebook
+    nb = python_notebook
+    if formats:
+        nb.metadata["jupytext"] = {"formats": formats}
+
+    test_py = tmpdir.join("test.py")
+    test_ipynb = tmpdir.join("test.ipynb")
+    write(nb, str(test_py))
+    src_timestamp = test_py.stat().mtime
+
+    # Wait...
+    time.sleep(0.1)
+
+    # py -> ipynb
+    jupytext(["--to", "ipynb", "test.py", "--use-source-timestamp"])
+
+    capture = capsys.readouterr()
+    assert "Updating the timestamp" not in capture.out
+
+    dest_timestamp = test_ipynb.stat().mtime
+    assert src_timestamp == dest_timestamp
+
+    # Make sure that we can open the file in Jupyter
+    from jupytext.contentsmanager import TextFileContentsManager
+
+    cm = TextFileContentsManager()
+    cm.outdated_text_notebook_margin = 0.001
+    cm.root_dir = str(tmpdir)
+
+    # No error here
+    cm.get("test.ipynb")
+
+    # But now if we don't use --use-source-timestamp
+    jupytext(["--to", "ipynb", "test.py"])
+    os.utime(test_py, (src_timestamp, src_timestamp))
+
+    # Then we can't open paired notebooks
+    if formats == "ipynb,py":
+        from tornado.web import HTTPError
+
+        with pytest.raises(HTTPError, match="seems more recent than test.py"):
+            cm.get("test.ipynb")
+    else:
+        cm.get("test.ipynb")
