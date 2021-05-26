@@ -2,7 +2,7 @@
 
 ## What is Jupytext?
 
-Jupytext is a Python package that provides _two-way_ conversion between Jupyter Notebooks and several other text-based formats like Markdown documents or scripts.
+Jupytext is a Python package that provides _two-way_ conversion between Jupyter notebooks and several other text-based formats like Markdown documents or scripts.
 
 ## Why would I want to convert my notebooks to text?
 
@@ -42,11 +42,10 @@ The `.ipynb` file contains the full notebook. The paired text file only contains
 
 ## How do I remove pairing?
 
-Paired Jupyter Notebooks contains specific `jupytext` metadata that you may want to remove. You may want to keep the pairing only while editing the files, and when it comes the time to distribute them, it may make sense to remove the pairing. To do so, you can update the metadata in the `.ipynb` files as follows:
-
-~~~
+Paired Jupyter notebooks contains specific `jupytext` metadata that you may want to remove. You may want to keep the pairing only while editing the files, and when it comes the time to distribute them, it may make sense to remove the pairing. To do so, you can update the metadata in the `.ipynb` files as follows:
+```shell
 jupytext --update-metadata '{"jupytext": null}' path/to/notebooks/*.ipynb
-~~~
+```
 
 ## Can I create a notebook from a text file?
 
@@ -59,7 +58,7 @@ Output cells appear in the browser when you execute the notebook, but they are n
 The output cells are lost when you reload the notebook - if you want to avoid this, just _pair_ the text file to an `.ipynb` file.
 
 If you want to convert text formats to notebooks programmatically, use one of
-```bash
+```shell
 jupytext --to ipynb *.md                        # convert all .md files to notebooks with no outputs
 jupytext --to ipynb --execute *.md              # convert all .md files to notebooks and execute them
 jupytext --set-formats ipynb,md --execute *.md  # convert all .md files to paired notebooks and execute them
@@ -77,16 +76,17 @@ Note that if you version both the `.md` and `.ipynb` files, you can configure `g
 
 ## I have modified a text file, but git reports no diff for the paired `.ipynb` file
 
-The synchronization between the two files happens when you reload and *save* the notebook in Jupyter, or when you explicitly run `jupytext --sync`. If you want to force the synchronization on every commit, create a file `.git\hooks\pre-commit` with the following content:
-
-```bash
+The synchronization between the two files happens when you reload and *save* the notebook in Jupyter, or when you explicitly run `jupytext --sync`. If you want to force the synchronization on every commit, create a file `.git/hooks/pre-commit` with the following content:
+```sh
 #!/bin/sh
 jupytext --sync --pre-commit
 ```
+and make it executable:
+```shell
+chmod u+x .git/hooks/pre-commit
+```
 
-and make it executable: `chmod u+x .git\hooks\pre-commit`.
-
-Alternatively, VIM users can give a try to the [jupytext.vim](https://github.com/goerz/jupytext.vim) plugin.
+Alternatively, Vim users can give a try to the [jupytext.vim](https://github.com/goerz/jupytext.vim) plugin.
 
 ## Jupyter warns me that the file has changed on disk
 
@@ -95,8 +95,7 @@ By default, Jupyter saves your notebook every 2 minutes. Fortunately, it is also
 You should simply click on _Reload_.
 
 Note you can deactivate Jupyter's autosave function with the Jupytext Menu in Jupyter Notebook, and with the _Autosave Document_ setting in JupyterLab. If you want to permanently deactivate autosave in Jupyter Notebook, use a [`custom.js` file](https://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/JavaScript%20Notebook%20Extensions.ipynb):
-
-```sh
+```shell
 mkdir -p ~/.jupyter/custom
 echo "Jupyter.notebook.set_autosave_interval(0);" >> ~/.jupyter/custom/custom.js
 ```
@@ -112,17 +111,16 @@ If your IDE has the ability to compare the changes in memory versus on disk (lik
 This happens if you have edited the `.ipynb` file outside of Jupyter. It is a safeguard to avoid overwriting the input cells of the notebook with an outdated text file.
 
 Manual action is requested as the paired text representation may be outdated. Please edit (`touch`) the paired `.md` or `.py` file if it is not outdated, or if it is, delete it, or update it with
-```bash
+```shell
 jupytext --sync notebook.ipynb
 ```
 
-## Can I use Jupytext with Jupyter Hub, Binder, Nteract, Colab, Saturn or Azure?
+## Can I use Jupytext with JupyterHub, Binder, Nteract, Colab, Saturn or Azure?
 
-Jupytext is compatible with Jupyter Hub (execute `pip install jupytext --user` to install it in user mode) and with Binder (add `jupytext` to the project requirements and `jupyter lab build` to `postBuild`).
+Jupytext is compatible with JupyterHub (execute `pip install jupytext --user` to install it in user mode) and with Binder (add `jupytext` to the project requirements and `jupyter lab build` to `postBuild`).
 
 If you use another editor than Jupyter Notebook, Lab or Hub, you probably can't get Jupytext there. However you can still use Jupytext at the command line to manually sync the two representations of the notebook:
-
-```bash
+```shell
 jupytext --set-formats ipynb,py:light notebook.ipynb   # Pair a notebook to a light script
 jupytext --sync notebook.ipynb                         # Sync the two representations
 ```
@@ -132,7 +130,7 @@ jupytext --sync notebook.ipynb                         # Sync the two representa
 Indeed, you could substitute every `.ipynb` file in the project history with its Jupytext Markdown representation.
 
 Technically this is available in just one command, which results in a complete rewrite of the history. Please experiment that in a branch, and think twice before pushing the result...
-```bash
+```shell
 git filter-branch --tree-filter 'jupytext --to md */*.ipynb && rm -f */*.ipynb' HEAD
 ```
 
