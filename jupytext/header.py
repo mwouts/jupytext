@@ -143,7 +143,7 @@ def recursive_update(target, update):
     for key in update:
         value = update[key]
         if value is None:
-            del target[key]
+            target.pop(key, None)
         elif isinstance(value, dict):
             target[key] = recursive_update(target.get(key, {}), value)
         else:
