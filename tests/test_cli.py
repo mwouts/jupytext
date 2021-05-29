@@ -1335,7 +1335,8 @@ def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, forma
     assert "Updating the timestamp" not in capture.out
 
     dest_timestamp = test_ipynb.stat().mtime
-    assert src_timestamp == dest_timestamp
+    # on Mac OS the dest_timestamp is truncated at the microsecond (#790)
+    assert src_timestamp - 1e-6 <= dest_timestamp <= src_timestamp
 
     # Make sure that we can open the file in Jupyter
     from jupytext.contentsmanager import TextFileContentsManager
