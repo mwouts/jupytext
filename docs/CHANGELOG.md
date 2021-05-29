@@ -4,6 +4,9 @@ Jupytext ChangeLog
 1.11.3 (2021-05-??)
 -------------------
 
+**Changed**
+- Jupytext CLI has a new option `--use-source-timestamp` that sets the last modification time of the output file equal to that of the source file (this avoids having to change the timestamp of the source file) ([#784](https://github.com/mwouts/jupytext/issues/784))
+
 **Fixed**
 - Dependencies of the JupyterLab extension have been upgraded to fix a security vulnerability ([#783](https://github.com/mwouts/jupytext/issues/783))
 
