@@ -9,7 +9,6 @@ import re
 import shlex
 import subprocess
 import sys
-import time
 import warnings
 from copy import copy
 from tempfile import NamedTemporaryFile
@@ -976,21 +975,19 @@ def git_timestamp(path):
 
     # Return the commit timestamp
     try:
-        git_ts_iso = system("git", "log", "-1", "--pretty=%cI", path).strip()
+        git_ts_str = system("git", "log", "-1", "--pretty=%ct", path).strip()
     except SystemExit as err:
         if err.code == 128:
             # git not initialized
-            git_ts_iso = ""
+            git_ts_str = ""
         else:
             raise
 
-    if not git_ts_iso:
-        # Unless the file is not in the git index
-        return get_timestamp(path)
+    if git_ts_str:
+        return float(git_ts_str)
 
-    git_ts_struct = time.strptime(git_ts_iso, "%Y-%m-%dT%H:%M:%S%z")
-    git_ts = time.mktime(git_ts_struct)
-    return git_ts
+    # The file is not in the git index
+    return get_timestamp(path)
 
 
 def get_timestamp(path):
