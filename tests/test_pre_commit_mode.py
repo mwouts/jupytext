@@ -1,8 +1,10 @@
+import os
 import time
 
-from nbformat.v4.nbbase import new_markdown_cell, new_notebook
+import pytest
+from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 
-from jupytext import write
+from jupytext import read, write
 from jupytext.cli import get_timestamp, git_timestamp, is_untracked, jupytext
 
 
@@ -206,3 +208,47 @@ def test_git_timestamp(tmpdir, cwd_tmpdir, tmp_repo):
     # If a file is not in the git repo then we return its timestamp
     tmpdir.join("file_3").write("")
     assert git_timestamp("file_3") == get_timestamp("file_3")
+
+
+@pytest.mark.parametrize(
+    "commit_order", [["test.py", "test.ipynb"], ["test.ipynb", "test.py"]]
+)
+@pytest.mark.parametrize("sync_file", ["test.py", "test.ipynb"])
+def test_sync_pre_commit_mode_respects_commit_order_780(
+    tmpdir,
+    cwd_tmpdir,
+    tmp_repo,
+    python_notebook,
+    commit_order,
+    sync_file,
+):
+    file_1, file_2 = commit_order
+
+    nb = python_notebook
+    nb.metadata["jupytext"] = {"formats": "ipynb,py:percent"}
+    nb.cells = [new_code_cell("1 + 1")]
+    write(nb, file_1)
+
+    tmp_repo.git.add(file_1)
+    tmp_repo.index.commit(file_1)
+
+    # This needs to >1 sec because commit timestamps have a one-second resolution
+    time.sleep(1.2)
+
+    nb.cells = [new_code_cell("2 + 2")]
+    write(nb, file_2)
+
+    tmp_repo.git.add(file_2)
+    tmp_repo.index.commit(file_2)
+
+    # Invert file timestamps
+    ts_1 = os.stat(file_1).st_mtime
+    ts_2 = os.stat(file_2).st_mtime
+    os.utime(file_1, (ts_2, ts_2))
+    os.utime(file_2, (ts_1, ts_1))
+
+    jupytext(["--sync", "--pre-commit-mode", sync_file])
+
+    for file in commit_order:
+        nb = read(file)
+        assert nb.cells[0].source == "2 + 2", file
