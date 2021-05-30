@@ -9,6 +9,7 @@ import re
 import shlex
 import subprocess
 import sys
+import time
 import warnings
 from copy import copy
 from tempfile import NamedTemporaryFile
@@ -959,6 +960,45 @@ class InconsistentVersions(ValueError):
     """An error raised when two paired files in the git index contain inconsistent representations"""
 
 
+def file_in_git_index(path):
+    if not os.path.isfile(path):
+        return False
+    return system("git", "status", "--porcelain", path).strip().startswith(("M", "A"))
+
+
+def git_timestamp(path):
+    if not os.path.isfile(path):
+        return None
+
+    # Files that are in the git index are considered most recent
+    if file_in_git_index(path):
+        return float("inf")
+
+    # Return the commit timestamp
+    try:
+        git_ts_iso = system("git", "log", "-1", "--pretty=%cI", path).strip()
+    except SystemExit as err:
+        if err.code == 128:
+            # git not initialized
+            git_ts_iso = ""
+        else:
+            raise
+
+    if not git_ts_iso:
+        # Unless the file is not in the git index
+        return get_timestamp(path)
+
+    git_ts_struct = time.strptime(git_ts_iso, "%Y-%m-%dT%H:%M:%S%z")
+    git_ts = time.mktime(git_ts_struct)
+    return git_ts
+
+
+def get_timestamp(path):
+    if not os.path.isfile(path):
+        return None
+    return os.lstat(path).st_mtime
+
+
 def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commit_mode):
     """Update the notebook with the inputs and outputs of the most recent paired files"""
     if not formats:
@@ -968,19 +1008,6 @@ def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commi
     _, fmt_with_prefix_suffix = find_base_path_and_format(nb_file, formats)
     fmt.update(fmt_with_prefix_suffix)
 
-    def file_in_git_index(path):
-        return system("git", "status", "--porcelain", path).startswith(("M", "A"))
-
-    use_git_index_rather_than_timestamp = pre_commit_mode and file_in_git_index(nb_file)
-
-    def get_timestamp(path):
-        if not os.path.isfile(path):
-            return None
-        if use_git_index_rather_than_timestamp:
-            # Files that are in the git index are considered more recent
-            return file_in_git_index(path)
-        return os.lstat(path).st_mtime
-
     def read_one_file(path, fmt):
         if path == nb_file:
             return notebook
@@ -988,13 +1015,13 @@ def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commi
         log(f"[jupytext] Loading {shlex.quote(path)}")
         return read(path, fmt=fmt, config=config)
 
-    if use_git_index_rather_than_timestamp:
+    if pre_commit_mode and file_in_git_index(nb_file):
         # We raise an error if two representations of this notebook in the git index are inconsistent
         nb_files_in_git_index = sorted(
             (
                 (alt_path, alt_fmt)
                 for alt_path, alt_fmt in paired_paths(nb_file, fmt, formats)
-                if get_timestamp(alt_path)
+                if file_in_git_index(alt_path)
             ),
             key=lambda x: 0 if x[1]["extension"] != ".ipynb" else 1,
         )
@@ -1016,7 +1043,9 @@ def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commi
                         f"    git reset {shlex.quote(path0)} && git checkout -- {shlex.quote(path0)}\n"
                     )
 
-    inputs, outputs = latest_inputs_and_outputs(nb_file, fmt, formats, get_timestamp)
+    inputs, outputs = latest_inputs_and_outputs(
+        nb_file, fmt, formats, git_timestamp if pre_commit_mode else get_timestamp
+    )
     notebook = read_pair(inputs, outputs, read_one_file)
 
     return notebook, inputs.path, outputs.path

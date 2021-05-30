@@ -1,7 +1,9 @@
+import time
+
 from nbformat.v4.nbbase import new_markdown_cell, new_notebook
 
 from jupytext import write
-from jupytext.cli import is_untracked, jupytext
+from jupytext.cli import get_timestamp, git_timestamp, is_untracked, jupytext
 
 
 def test_is_untracked(tmpdir, cwd_tmpdir, tmp_repo):
@@ -156,3 +158,51 @@ formats = "ipynb,py:percent"
     assert not err, err
     assert "updating test" not in out.lower(), out
     assert exit_code == 0, out
+
+
+def test_git_timestamp(tmpdir, cwd_tmpdir, tmp_repo):
+    # No commit yet => return the file timestamp
+    tmpdir.join("file_1").write("")
+    assert git_timestamp("file_1") == get_timestamp("file_1")
+
+    # Staged files are always considered more recent than committed files, i.e timestamp==inf
+    time.sleep(0.1)
+    tmpdir.join("file_2").write("")
+    tmp_repo.git.add(".")
+
+    assert get_timestamp("file_1") < get_timestamp("file_2")
+    assert git_timestamp("file_1") == git_timestamp("file_2") == float("inf")
+
+    tmp_repo.index.commit("Add file_1 and file_2")
+    assert get_timestamp("file_1") < get_timestamp("file_2")
+    assert git_timestamp("file_1") == git_timestamp("file_2") < float("inf")
+    assert (
+        git_timestamp("file_1")
+        < get_timestamp("file_1") + 1
+        < git_timestamp("file_1") + 2
+    )
+
+    # Git timestamps have a resolution of 1 sec, so if we want to see
+    # different git timestamps between file_1 and file_2 we need this:
+    time.sleep(1.2)
+
+    # Here we just touch the file (content unchanged). The git timestamp is not modified
+    tmpdir.join("file_1").write("")
+    assert get_timestamp("file_1") > get_timestamp("file_2")
+    assert git_timestamp("file_1") == git_timestamp("file_2") < float("inf")
+
+    # When we modify the file then its "git_timestamp" becomes inf again
+    tmpdir.join("file_1").write("modified")
+    assert get_timestamp("file_1") > get_timestamp("file_2")
+    assert float("inf") == git_timestamp("file_1") > git_timestamp("file_2")
+
+    tmp_repo.git.add(".")
+    assert float("inf") == git_timestamp("file_1") > git_timestamp("file_2")
+
+    # When the file is committed its timestamp is the commit timestamp
+    tmp_repo.index.commit("Update file_1")
+    assert float("inf") > git_timestamp("file_1") > git_timestamp("file_2")
+
+    # If a file is not in the git repo then we return its timestamp
+    tmpdir.join("file_3").write("")
+    assert git_timestamp("file_3") == get_timestamp("file_3")
