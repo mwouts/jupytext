@@ -3,7 +3,13 @@ from nbformat.v4.nbbase import new_code_cell, new_notebook
 
 import jupytext
 from jupytext.compare import compare, compare_notebooks
-from jupytext.magics import comment_magic, is_magic, uncomment_magic, unesc
+from jupytext.magics import (
+    _PYTHON_MAGIC_ASSIGN,
+    comment_magic,
+    is_magic,
+    uncomment_magic,
+    unesc,
+)
 
 from .utils import notebook_model
 
@@ -276,3 +282,11 @@ def test_indented_magic():
     assert uncomment_magic(["    # !rm file"]) == ["    !rm file"]
     assert comment_magic(["    %cd"]) == ["    # %cd"]
     assert uncomment_magic(["    # %cd"]) == ["    %cd"]
+
+
+def test_magic_assign_781():
+    assert _PYTHON_MAGIC_ASSIGN.match("name = %magic")
+    assert _PYTHON_MAGIC_ASSIGN.match("# name = %magic")
+    assert not _PYTHON_MAGIC_ASSIGN.match("# not a name = %magic")
+    assert not _PYTHON_MAGIC_ASSIGN.match("# 0name = %magic")
+    assert is_magic("result = %sql SELECT * FROM quickdemo WHERE value > 25", "python")
