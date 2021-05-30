@@ -1360,3 +1360,19 @@ def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, forma
             cm.get("test.ipynb")
     else:
         cm.get("test.ipynb")
+
+
+def test_round_trip_with_null_metadata_792(tmpdir, cwd_tmpdir, python_notebook):
+    nb = python_notebook
+    nb.metadata.kernelspec = {
+        "argv": ["python", "-m", "ipykernel_launcher", "-f", "{connection_file}"],
+        "display_name": "Python 3",
+        "env": None,
+        "interrupt_mode": "signal",
+        "language": "python",
+        "metadata": None,
+        "name": "python3",
+    }
+    write(nb, "test.ipynb")
+    jupytext(["--to", "py:percent", "test.ipynb"])
+    jupytext(["--to", "ipynb", "test.py"])

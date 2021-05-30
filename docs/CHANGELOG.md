@@ -1,7 +1,7 @@
 Jupytext ChangeLog
 ==================
 
-1.11.3 (2021-05-??)
+1.11.3 (2021-06-??)
 -------------------
 
 **Changed**
@@ -10,6 +10,7 @@ Jupytext ChangeLog
 **Fixed**
 - Dependencies of the JupyterLab extension have been upgraded to fix a security vulnerability ([#783](https://github.com/mwouts/jupytext/issues/783))
 - Variables assigned from a magic command are commented out in `py` scripts ([#781](https://github.com/mwouts/jupytext/issues/781))
+- Fixed a round-trip issue on notebooks that have None/null in their metadata ([#792](https://github.com/mwouts/jupytext/issues/792))
 
 
 1.11.2 (2021-05-02)
