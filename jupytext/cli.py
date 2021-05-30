@@ -180,14 +180,14 @@ def parse_jupytext_args(args=None):
         "See also the --opt and --set-formats options for other ways "
         "to operate on the Jupytext metadata.",
     )
-    action.add_argument(
+    parser.add_argument(
         "--use-source-timestamp",
         help="Set the modification timestamp of the output file(s) equal"
         "to that of the source file, and keep the source file and "
         "its timestamp unchanged.",
         action="store_true",
     )
-    action.add_argument(
+    parser.add_argument(
         "--warn-only",
         "-w",
         action="store_true",
@@ -604,11 +604,20 @@ def jupytext_single_file(nb_file, args, log):
     # Pipe the notebook into the desired commands
     prefix = None if nb_file == "-" else os.path.splitext(os.path.basename(nb_file))[0]
     for cmd in args.pipe or []:
-        notebook = pipe_notebook(notebook, cmd, args.pipe_fmt, prefix=prefix)
+        notebook = pipe_notebook(
+            notebook, cmd, args.pipe_fmt, prefix=prefix, warn_only=args.warn_only
+        )
 
     # and/or test the desired commands onto the notebook
     for cmd in args.check or []:
-        pipe_notebook(notebook, cmd, args.pipe_fmt, update=False, prefix=prefix)
+        pipe_notebook(
+            notebook,
+            cmd,
+            args.pipe_fmt,
+            update=False,
+            prefix=prefix,
+            warn_only=args.warn_only,
+        )
 
     if (
         args.execute
@@ -1013,7 +1022,7 @@ def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commi
     return notebook, inputs.path, outputs.path
 
 
-def exec_command(command, input=None, capture=False):
+def exec_command(command, input=None, capture=False, warn_only=False):
     """Execute the desired command, and pipe the given input into it"""
     assert isinstance(command, list)
     sys.stdout.write("[jupytext] Executing {}\n".format(" ".join(command)))
@@ -1032,17 +1041,22 @@ def exec_command(command, input=None, capture=False):
         sys.stderr.write(err.decode("utf-8"))
 
     if process.returncode:
-        sys.stderr.write(
-            "[jupytext] Error: The command '{}' exited with code {}\n".format(
-                " ".join(command), process.returncode
-            )
+        msg = f"The command '{' '.join(command)}' exited with code {process.returncode}"
+        hint = (
+            "" if warn_only else " (use --warn-only to turn this error into a warning)"
         )
-        raise SystemExit(process.returncode)
+        sys.stderr.write(
+            f"[jupytext] {'Warning' if warn_only else 'Error'}: {msg}{hint}\n"
+        )
+        if not warn_only:
+            raise SystemExit(process.returncode)
 
     return out
 
 
-def pipe_notebook(notebook, command, fmt="py:percent", update=True, prefix=None):
+def pipe_notebook(
+    notebook, command, fmt="py:percent", update=True, prefix=None, warn_only=False
+):
     """Pipe the notebook, in the desired representation, to the given command. Update the notebook
     with the returned content if desired."""
     if command in ["black", "flake8", "autopep8"]:
@@ -1078,7 +1092,9 @@ def pipe_notebook(notebook, command, fmt="py:percent", update=True, prefix=None)
             tmp.close()
 
             exec_command(
-                [cmd if cmd != "{}" else tmp.name for cmd in command], capture=update
+                [cmd if cmd != "{}" else tmp.name for cmd in command],
+                capture=update,
+                warn_only=warn_only,
             )
 
             if not update:
@@ -1088,7 +1104,9 @@ def pipe_notebook(notebook, command, fmt="py:percent", update=True, prefix=None)
         finally:
             os.remove(tmp.name)
     else:
-        cmd_output = exec_command(command, text.encode("utf-8"), capture=update)
+        cmd_output = exec_command(
+            command, text.encode("utf-8"), capture=update, warn_only=warn_only
+        )
 
         if not update:
             return notebook

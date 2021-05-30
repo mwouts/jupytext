@@ -252,3 +252,36 @@ func()""",
 
     new_text = tmpdir.join("notebook.py").read()
     assert "\n\n# %%\nfunc()" in new_text
+
+
+@requires_black
+@pytest.mark.parametrize(
+    "code,black_should_fail",
+    [("myvar = %dont_format_me", False), ("incomplete_instruction = (...", True)],
+)
+def test_pipe_black_uses_warn_only_781(
+    tmpdir, cwd_tmpdir, code, black_should_fail, python_notebook, capsys
+):
+    nb = python_notebook
+    nb.cells.append(new_code_cell(code))
+    write(nb, "notebook.ipynb")
+
+    if not black_should_fail:
+        jupytext(["--pipe", "black", "notebook.ipynb"])
+        return
+
+    with pytest.raises(SystemExit):
+        jupytext(["--pipe", "black", "notebook.ipynb"])
+
+    out, err = capsys.readouterr()
+    assert "Error: The command 'black -' exited with code" in err
+    assert "--warn-only" in err
+
+    # With warn-only we just get a warning
+    jupytext(["--pipe", "black", "notebook.ipynb", "--warn-only"])
+    out, err = capsys.readouterr()
+    assert "Warning: The command 'black -' exited with code" in err
+
+    # If black fails the notebook should be left unchanged
+    actual = read("notebook.ipynb")
+    compare_notebooks(actual, nb)
