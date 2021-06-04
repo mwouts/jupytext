@@ -6,6 +6,8 @@ Jupytext ChangeLog
 
 **Changed**
 - Jupytext CLI has a new option `--use-source-timestamp` that sets the last modification time of the output file equal to that of the source file (this avoids having to change the timestamp of the source file) ([#784](https://github.com/mwouts/jupytext/issues/784))
+- In the pre-commit mode, Jupytext now uses the commit timestamp to determine which file in the pair is the most recent ([#780](https://github.com/mwouts/jupytext/issues/780))
+
 
 **Fixed**
 - Dependencies of the JupyterLab extension have been upgraded to fix a security vulnerability ([#783](https://github.com/mwouts/jupytext/issues/783))
