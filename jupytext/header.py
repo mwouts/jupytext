@@ -143,7 +143,7 @@ def recursive_update(target, update):
     for key in update:
         value = update[key]
         if value is None:
-            target.pop(key, None)
+            del target[key]
         elif isinstance(value, dict):
             target[key] = recursive_update(target.get(key, {}), value)
         else:
@@ -225,7 +225,9 @@ def header_to_metadata_and_cell(
 
     if ended:
         if jupyter:
-            recursive_update(metadata, yaml.safe_load("\n".join(jupyter))["jupyter"])
+            extra_metadata = metadata
+            metadata = yaml.safe_load("\n".join(jupyter))["jupyter"]
+            recursive_update(metadata, extra_metadata)
 
         lines_to_next_cell = 1
         if len(lines) > i + 1:
