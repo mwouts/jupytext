@@ -1376,3 +1376,5 @@ def test_round_trip_with_null_metadata_792(tmpdir, cwd_tmpdir, python_notebook):
     write(nb, "test.ipynb")
     jupytext(["--to", "py:percent", "test.ipynb"])
     jupytext(["--to", "ipynb", "test.py"])
+    nb = read("test.ipynb")
+    assert nb.metadata.kernelspec.env is None
