@@ -1,3 +1,7 @@
+# 1.3.3 (2021-06-10)
+
+- We have upgraded the extension dependencies and especially `ws` to fix a security vulnerability (#798)
+
 # 1.3.2 (2021-05-21)
 
 - We have upgraded the extension dependencies and especially `hosted-git-info` to fix a security vulnerability (#783)
