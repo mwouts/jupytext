@@ -30,10 +30,10 @@ And if you wish to export more metadata from the notebook, have a look at the pa
 
 In the Markdown format, markdown cells are inserted verbatim and separated with two blank lines.
 
-If you'd like that cell breaks also occurs on Markdown headers, add a `split_at_heading: true` entry in the `jupytext` section in the YAML header, or if you want that option to be the default for all Markdown documents in Jupyter, activate the option on Jupytext's content manager:
+If you'd like that cell breaks also occurs on Markdown headers, add a `split_at_heading: true` entry in the `jupytext` section in the YAML header, or if you want that option to be the default for all Markdown documents in Jupyter, activate the option in the [`jupytext.toml` configuration file](config.md#jupytext-configuration-file):
 
-```python
-c.ContentsManager.split_at_heading = True
+```
+split_at_heading = true
 ```
 
 Code cells are encoded using the classical triple backticks, followed by the notebook language. Cell metadata are appended after the language information, with a `key=value` syntax, where `value` is encoded in JSON format. For instance, in a Python notebook, a simple code cell with a `parameters` tag is represented as:
@@ -291,15 +291,14 @@ By default, [Jupyter magics](#magic-commands) are commented in the `percent` rep
 
 Another popular notebook-like format for Python scripts is the Sphinx-gallery [format](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-Gallery notebooks by Jupytext.
 
-Comments in Sphinx-Gallery scripts are formatted using reStructuredText rather than markdown. They can be converted to markdown for a nicer display in Jupyter by adding a `c.ContentsManager.sphinx_convert_rst2md = True` line to your Jupyter configuration file. Please note that this is a non-reversible transformation—use this only with Binder. Revert to the default value `sphinx_convert_rst2md = False` when you edit Sphinx-Gallery files with Jupytext.
+Comments in Sphinx-Gallery scripts are formatted using reStructuredText rather than markdown. They can be converted to markdown for a nicer display in Jupyter by adding a `sphinx_convert_rst2md = True` line to your Jupytext configuration file. Please note that this is a non-reversible transformation—use this only with Binder. Revert to the default value `sphinx_convert_rst2md = False` when you edit Sphinx-Gallery files with Jupytext.
 
 Turn a GitHub repository containing Sphinx-Gallery scripts into a live notebook repository with [Binder](https://mybinder.org/) and Jupytext by adding only two files to the repo:
 - `binder/requirements.txt`, a list of the required packages (including `jupytext`)
-- `.jupyter/jupyter_notebook_config.py` with the following contents:
-```python
-c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
-c.ContentsManager.preferred_jupytext_formats_read = "py:sphinx"
-c.ContentsManager.sphinx_convert_rst2md = True
+- a [`jupytext.toml` configuration file](config.md#jupytext-configuration-file) with the following contents:
+```
+preferred_jupytext_formats_read = "py:sphinx"
+sphinx_convert_rst2md = true
 ```
 
 Our sample notebook is also represented in `sphinx` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.spx.py).
