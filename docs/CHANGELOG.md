@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.11.4 (2021-07-??)
+-------------------
+
+**Changed**
+- (Documentation) the `cell_markers` option (and the other ones) can be set directly in the `jupytext.toml` config file ([#809](https://github.com/mwouts/jupytext/issues/809)).
+
+
 1.11.3 (2021-06-10)
 -------------------
 
