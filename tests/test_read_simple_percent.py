@@ -340,8 +340,8 @@ some text, and a fake cell marker
 
 
 def test_cell_markers_option_in_contents_manager(tmpdir):
-    tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
-    tmp_py = str(tmpdir.join("notebook.py"))
+    tmp_ipynb = tmpdir / "notebook.ipynb"
+    tmp_py = tmpdir / "notebook.py"
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -382,9 +382,33 @@ cell
     compare_notebooks(nb, nb2)
 
 
+def test_cell_markers_in_config(tmpdir, python_notebook):
+    (tmpdir / "jupytext.toml").write('''cell_markers = '"""'\n''')
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    nb = python_notebook
+    nb.metadata["jupytext"] = {"formats": "ipynb,py:percent"}
+
+    cm.save(model=notebook_model(nb), path="notebook.ipynb")
+
+    text = (tmpdir / "notebook.py").read()
+    assert (
+        '''# %% [markdown]
+"""
+A short notebook
+"""
+'''
+        in text
+    )
+
+    nb2 = jupytext.read(tmpdir / "notebook.py")
+    compare_notebooks(nb, nb2)
+
+
 def test_cell_markers_in_contents_manager(tmpdir):
-    tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
-    tmp_py = str(tmpdir.join("notebook.py"))
+    tmp_ipynb = tmpdir / "notebook.ipynb"
+    tmp_py = tmpdir / "notebook.py"
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -426,8 +450,8 @@ cell
 
 
 def test_cell_markers_in_contents_manager_does_not_impact_light_format(tmpdir):
-    tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
-    tmp_py = str(tmpdir.join("notebook.py"))
+    tmp_ipynb = tmpdir / "notebook.ipynb"
+    tmp_py = tmpdir / "notebook.py"
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
