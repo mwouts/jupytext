@@ -727,7 +727,7 @@ def test_format_prefix_suffix(tmpdir, cwd_tmpdir):
     tmp_py = "scripts/notebook_name.py"
     write(new_notebook(), tmp_ipynb)
 
-    jupytext([tmp_ipynb, "--to", os.path.join("..", "scripts//py")])
+    jupytext([tmp_ipynb, "--to", "../scripts//py"])
     assert os.path.isfile(tmp_py)
     os.remove(tmp_py)
 

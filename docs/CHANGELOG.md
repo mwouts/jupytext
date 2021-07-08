@@ -8,6 +8,8 @@ Jupytext ChangeLog
 - (Documentation) the `cell_markers` option (and the other ones) can be set directly in the `jupytext.toml` config file ([#809](https://github.com/mwouts/jupytext/issues/809)).
 
 **Fixed**
+- The prefix in the Jupytext formats always use /, while paths might use either / or \ ([#806](https://github.com/mwouts/jupytext/issues/806))
+- Fixed an `InconsistentPath` issue with notebooks paired with scripts in a folder ([#806](https://github.com/mwouts/jupytext/issues/806))
 - The pre-commit tests are skipped when the Jupytext folder is not a git repository ([#814](https://github.com/mwouts/jupytext/issues/814))
 
 

@@ -17,15 +17,17 @@ class InconsistentPath(ValueError):
     information it contains"""
 
 
-def split(path):
-    """Split the current path in parent path / current directory or file, using either / or the local path separator"""
-    if "/" not in path and os.path.sep not in path:
+def split(path, sep):
+    if sep not in path:
         return "", path
 
-    if path.rfind("/") < path.rfind(os.path.sep):
-        return path.rsplit(os.path.sep, 1)
+    return path.rsplit(sep, 1)
 
-    return path.rsplit("/", 1)
+
+def join(left, right, sep):
+    if left:
+        return left + sep + right
+    return right
 
 
 def separator(path):
@@ -35,30 +37,46 @@ def separator(path):
     return "/"
 
 
-def base_path(main_path, fmt):
+def base_path(main_path, fmt, formats=None):
     """Given a path and options for a format (ext, suffix, prefix), return the corresponding base path"""
-    if not fmt or (isinstance(fmt, dict) and "extension" not in fmt):
-        base, ext = os.path.splitext(main_path)
+    fmt = long_form_one_format(fmt)
+
+    base, ext = os.path.splitext(main_path)
+    if "extension" not in fmt:
+        fmt["extension"] = ext
         if ext not in NOTEBOOK_EXTENSIONS:
             raise InconsistentPath(
                 "'{}' is not a notebook. Supported extensions are '{}'.".format(
                     main_path, "', '".join(NOTEBOOK_EXTENSIONS)
                 )
             )
-        return base
 
-    fmt = long_form_one_format(fmt)
-    fmt_ext = fmt["extension"]
-    suffix = fmt.get("suffix")
-    prefix = fmt.get("prefix")
-
-    base, ext = os.path.splitext(main_path)
-    if ext != fmt_ext:
+    if ext != fmt["extension"]:
         raise InconsistentPath(
             u"Notebook path '{}' was expected to have extension '{}'".format(
-                main_path, fmt_ext
+                main_path, fmt["extension"]
             )
         )
+
+    # Is there a format that matches the main path?
+    if formats is None:
+        formats = [fmt]
+
+    for f in formats:
+        if f["extension"] != fmt["extension"]:
+            continue
+        if (
+            "format_name" in fmt
+            and "format_name" in f
+            and f["format_name"] != fmt["format_name"]
+        ):
+            continue
+        # extend 'fmt' with the format information (prefix, suffix) from f
+        fmt = {key: fmt.get(key, value) for key, value in f.items()}
+        break
+
+    suffix = fmt.get("suffix")
+    prefix = fmt.get("prefix")
 
     if suffix:
         if not base.endswith(suffix):
@@ -76,9 +94,9 @@ def base_path(main_path, fmt):
         prefix_root, prefix = prefix.rsplit("//", 1)
     else:
         prefix_root = ""
-    prefix_dir, prefix_file_name = split(prefix)
-    notebook_dir, notebook_file_name = split(base)
     sep = separator(base)
+    notebook_dir, notebook_file_name = split(base, sep)
+    prefix_dir, prefix_file_name = split(prefix, "/")
 
     base_dir = None
     config_file = find_jupytext_configuration_file(notebook_dir)
@@ -102,7 +120,7 @@ def base_path(main_path, fmt):
         parent_prefix_dir = prefix_dir
         actual_folders = list()
         while parent_prefix_dir:
-            parent_prefix_dir, expected_folder = os.path.split(parent_prefix_dir)
+            parent_prefix_dir, expected_folder = split(parent_prefix_dir, "/")
             if expected_folder == "..":
                 if not actual_folders:
                     raise InconsistentPath(
@@ -110,11 +128,11 @@ def base_path(main_path, fmt):
                             notebook_dir, prefix_dir
                         )
                     )
-                parent_notebook_dir = os.path.join(
-                    parent_notebook_dir, actual_folders.pop()
+                parent_notebook_dir = join(
+                    parent_notebook_dir, actual_folders.pop(), sep
                 )
             else:
-                parent_notebook_dir, actual_folder = os.path.split(parent_notebook_dir)
+                parent_notebook_dir, actual_folder = split(parent_notebook_dir, sep)
                 actual_folders.append(actual_folder)
 
                 if actual_folder != expected_folder:
@@ -164,7 +182,7 @@ def full_path(base, fmt):
             prefix_root, prefix = prefix.rsplit("//", 1)
         else:
             prefix_root = ""
-        prefix_dir, prefix_file_name = split(prefix)
+        prefix_dir, prefix_file_name = split(prefix, "/")
 
         # Local path separator (\\ on windows)
         sep = separator(base)
@@ -179,10 +197,10 @@ def full_path(base, fmt):
             )
         if prefix_root:
             left, right = base.rsplit("//", 1)
-            right_dir, notebook_file_name = split(right)
+            right_dir, notebook_file_name = split(right, sep)
             notebook_dir = left + prefix_root + sep + right_dir
         else:
-            notebook_dir, notebook_file_name = split(base)
+            notebook_dir, notebook_file_name = split(base, sep)
 
         if prefix_file_name:
             notebook_file_name = prefix_file_name + notebook_file_name
@@ -191,7 +209,7 @@ def full_path(base, fmt):
             dotdot = ".." + sep
             while prefix_dir.startswith(dotdot):
                 prefix_dir = prefix_dir[len(dotdot) :]
-                notebook_dir = os.path.dirname(notebook_dir)
+                notebook_dir = split(notebook_dir, sep)[0]
 
             # Do not add a path separator when notebook_dir is '/'
             if notebook_dir and not notebook_dir.endswith(sep):
@@ -235,7 +253,7 @@ def paired_paths(main_path, fmt, formats):
     formats = long_form_multiple_formats(formats)
 
     # Is there a format that matches the main path?
-    base = base_path(main_path, fmt)
+    base = base_path(main_path, fmt, formats)
     paths = [full_path(base, f) for f in formats]
 
     if main_path not in paths:
