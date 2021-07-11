@@ -7,6 +7,9 @@ Jupytext ChangeLog
 **Changed**
 - (Documentation) the `cell_markers` option (and the other ones) can be set directly in the `jupytext.toml` config file ([#809](https://github.com/mwouts/jupytext/issues/809)).
 
+**Fixed**
+- The pre-commit tests are skipped when the Jupytext folder is not a git repository ([#814](https://github.com/mwouts/jupytext/issues/814))
+
 
 1.11.3 (2021-06-10)
 -------------------
