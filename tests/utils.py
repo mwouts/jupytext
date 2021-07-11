@@ -2,6 +2,7 @@ import json
 import os
 import re
 import sys
+from pathlib import Path
 
 import pytest
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
@@ -73,6 +74,10 @@ skip_on_windows = pytest.mark.skipif(sys.platform.startswith("win"), reason="Iss
 skip_pre_commit_tests_on_windows = pytest.mark.skipif(
     sys.platform.startswith("win"),
     reason="OSError: [WinError 193] %1 is not a valid Win32 application",
+)
+skip_pre_commit_tests_when_jupytext_folder_is_not_a_git_repo = pytest.mark.skipif(
+    not (Path(__file__).parent.parent / ".git").is_dir(),
+    reason="Jupytext folder is not a git repository #814",
 )
 
 

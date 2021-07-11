@@ -5,11 +5,16 @@ from pre_commit.main import main as pre_commit
 
 from jupytext import read, write
 
-from .utils import requires_pandoc, skip_pre_commit_tests_on_windows
+from .utils import (
+    requires_pandoc,
+    skip_pre_commit_tests_on_windows,
+    skip_pre_commit_tests_when_jupytext_folder_is_not_a_git_repo,
+)
 
 
 @requires_pandoc
 @skip_pre_commit_tests_on_windows
+@skip_pre_commit_tests_when_jupytext_folder_is_not_a_git_repo
 def test_pre_commit_hook_sync_reformat_code_and_markdown(
     tmpdir,
     cwd_tmpdir,
