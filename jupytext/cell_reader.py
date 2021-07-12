@@ -1,6 +1,7 @@
 """Read notebook cells from their text representation"""
 
 import re
+import warnings
 from copy import copy
 
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_raw_cell
@@ -10,7 +11,21 @@ from .languages import _SCRIPT_EXTENSIONS
 
 # Sphinx Gallery is an optional dependency. And we intercept the SyntaxError for #301
 try:
-    from sphinx_gallery.notebook import rst2md
+    from pkg_resources import parse_version
+    from sphinx_gallery import __version__ as sg_version
+
+    if parse_version(sg_version) <= parse_version("0.7.0"):
+        from sphinx_gallery.notebook import rst2md
+    else:
+        warnings.warn(
+            f"Sphinx Gallery in version {sg_version} is not supported by Jupytext. "
+            f"Please use sphinx-gallery<=0.7.0 instead. "
+            f"If that is an issue, feel free to report it "
+            f"at https://github.com/mwouts/jupytext/issues, or even better, "
+            f"prepare a PR to handle the new signature of "
+            f"sphinx_gallery.notebook.rst2md."
+        )
+        rst2md = None
 except (ImportError, SyntaxError):  # pragma: no cover
     rst2md = None
 
