@@ -52,8 +52,10 @@ requires_sphinx_gallery = pytest.mark.skipif(
     not rst2md, reason="sphinx_gallery is not available"
 )
 requires_pandoc = pytest.mark.skipif(
-    not is_pandoc_available() or sys.version_info < (3,),
-    reason="pandoc>=2.7.2 is not available",
+    # The mirror files changed slightly when Pandoc 2.11 was introduced
+    # https://github.com/mwouts/jupytext/commit/c07d919702999056ce47f92b74f63a15c8361c5d
+    not is_pandoc_available(min_version="2.11") or sys.version_info < (3,),
+    reason="pandoc>=2.11 is not available",
 )
 requires_no_pandoc = pytest.mark.skipif(
     is_pandoc_available(), reason="Pandoc is installed"
