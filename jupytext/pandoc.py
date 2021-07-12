@@ -15,7 +15,7 @@ class PandocError(OSError):
 
 def pandoc(args, filein=None, fileout=None):
     """Execute pandoc with the given arguments"""
-    cmd = [u"pandoc"]
+    cmd = ["pandoc"]
 
     if filein:
         cmd.append(filein)
@@ -35,16 +35,16 @@ def pandoc(args, filein=None, fileout=None):
     return out.decode("utf-8")
 
 
-def is_pandoc_available():
+def is_pandoc_available(min_version="2.7.2"):
     """Is Pandoc>=2.7.2 available?"""
     try:
-        raise_if_pandoc_is_not_available()
+        raise_if_pandoc_is_not_available(min_version=min_version)
         return True
     except PandocError:
         return False
 
 
-def raise_if_pandoc_is_not_available():
+def raise_if_pandoc_is_not_available(min_version="2.7.2"):
     """Raise with an informative error message if pandoc is not available"""
     try:
         from pkg_resources import parse_version
@@ -54,14 +54,14 @@ def raise_if_pandoc_is_not_available():
     version = pandoc_version()
     if version == "N/A":
         raise PandocError(
-            "The Pandoc Markdown format requires 'pandoc>=2.7.2', "
+            f"The Pandoc Markdown format requires 'pandoc>={min_version}', "
             "but pandoc was not found"
         )
 
-    if parse_version(version) < parse_version("2.7.2"):
+    if parse_version(version) < parse_version(min_version):
         raise PandocError(
-            "The Pandoc Markdown format requires 'pandoc>=2.7.2', "
-            "but pandoc version {} was not found".format(version)
+            f"The Pandoc Markdown format requires 'pandoc>={min_version}', "
+            f"but pandoc version {version} was not found"
         )
 
     return version
@@ -70,7 +70,7 @@ def raise_if_pandoc_is_not_available():
 def pandoc_version():
     """Pandoc's version number"""
     try:
-        return pandoc(u"--version").splitlines()[0].split()[1]
+        return pandoc("--version").splitlines()[0].split()[1]
     except (IOError, OSError):
         return "N/A"
 
@@ -83,7 +83,7 @@ def md_to_notebook(text):
     tmp_file.close()
 
     pandoc(
-        u"--from markdown --to ipynb -s --atx-headers --wrap=preserve --preserve-tabs",
+        "--from markdown --to ipynb -s --atx-headers --wrap=preserve --preserve-tabs",
         tmp_file.name,
         tmp_file.name,
     )
@@ -103,7 +103,7 @@ def notebook_to_md(notebook):
     tmp_file.close()
 
     pandoc(
-        u"--from ipynb --to markdown -s --atx-headers --wrap=preserve --preserve-tabs",
+        "--from ipynb --to markdown -s --atx-headers --wrap=preserve --preserve-tabs",
         tmp_file.name,
         tmp_file.name,
     )
