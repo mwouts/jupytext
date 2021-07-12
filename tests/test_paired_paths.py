@@ -3,6 +3,8 @@ import unittest.mock as mock
 
 import pytest
 
+import jupytext
+from jupytext.cli import jupytext as jupytext_cli
 from jupytext.compare import compare
 from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.formats import (
@@ -103,10 +105,19 @@ def test_paired_paths_windows_no_subfolder():
         paired_paths(nb_file, "notebooks///ipynb", formats)
 
 
-def test_paired_path_dotdot_564():
-    main_path = "examples/tutorials/colabs/rigid_object_tutorial.ipynb"
+@pytest.mark.parametrize("os_path_sep", ["\\", "/"])
+def test_paired_path_dotdot_564(os_path_sep):
+    main_path = os_path_sep.join(
+        ["examples", "tutorials", "colabs", "rigid_object_tutorial.ipynb"]
+    )
     formats = "../nb_python//py:percent,../colabs//ipynb"
-    paired_paths(main_path, "ipynb", formats)
+    with mock.patch("os.path.sep", os_path_sep):
+        assert base_path(
+            main_path, None, long_form_multiple_formats(formats)
+        ) == os_path_sep.join(
+            ["examples", "tutorials", "colabs", "rigid_object_tutorial"]
+        )
+        paired_paths(main_path, "ipynb", formats)
 
 
 def test_path_in_tree_limited_to_config_dir(tmpdir):
@@ -247,3 +258,57 @@ def test_cm_paired_paths():
     zero = ""
     cm.update_paired_notebooks("nb.ipynb", zero)
     assert cm.paired_notebooks == {}
+
+
+def test_paired_path_with_prefix(
+    nb_file="scripts/test.py",
+    fmt={"extension": ".py", "format_name": "percent"},
+    formats=[
+        {"extension": ".ipynb"},
+        {"prefix": "scripts/", "format_name": "percent", "extension": ".py"},
+    ],
+):
+    assert paired_paths(nb_file, fmt, formats) == [
+        ("test.ipynb", {"extension": ".ipynb"}),
+        (
+            "scripts/test.py",
+            {"prefix": "scripts/", "format_name": "percent", "extension": ".py"},
+        ),
+    ]
+
+
+def test_paired_notebook_ipynb_root_scripts_in_folder_806(
+    tmpdir, cwd_tmpdir, python_notebook
+):
+    """In this test we pair a notebook with a script in a subfolder, and then do some
+    natural operations like delete/recreate one of the paired files"""
+    # Save sample notebook
+    test_ipynb = tmpdir / "test.ipynb"
+    jupytext.write(python_notebook, str(test_ipynb))
+
+    # Pair the notebook to a script in a subfolder
+    jupytext_cli(["--set-formats", "ipynb,scripts//py:percent", "test.ipynb"])
+    assert (tmpdir / "scripts" / "test.py").exists()
+
+    # Delete and then recreate the ipynb notebook using --to notebook
+    test_ipynb.remove()
+    jupytext_cli(
+        [
+            "--to",
+            "notebook",
+            "--output",
+            "test.ipynb",
+            "scripts/test.py",
+        ]
+    )
+    assert test_ipynb.exists()
+
+    # Delete and then recreate the ipynb notebook using --sync
+    test_ipynb.remove()
+    jupytext_cli(
+        [
+            "--sync",
+            "scripts/test.py",
+        ]
+    )
+    assert test_ipynb.exists()

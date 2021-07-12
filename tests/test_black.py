@@ -110,9 +110,8 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     compare_notebooks(nb_now, nb_black, compare_ids=True)
 
     # Write to another folder using dots
-    script_fmt = os.path.join("..", "script_folder//py:percent")
     write(nb_org, tmp_ipynb)
-    jupytext([tmp_ipynb, "--to", script_fmt, "--pipe", "black"])
+    jupytext([tmp_ipynb, "--to", "../script_folder//py:percent", "--pipe", "black"])
     assert os.path.isfile(tmp_py)
     nb_now = read(tmp_py)
     nb_now.metadata = metadata
