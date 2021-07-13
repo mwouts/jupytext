@@ -290,3 +290,10 @@ def test_magic_assign_781():
     assert not _PYTHON_MAGIC_ASSIGN.match("# not a name = %magic")
     assert not _PYTHON_MAGIC_ASSIGN.match("# 0name = %magic")
     assert is_magic("result = %sql SELECT * FROM quickdemo WHERE value > 25", "python")
+
+
+def test_magic_assign_816():
+    assert _PYTHON_MAGIC_ASSIGN.match("flake8_version = !flake8 --version")
+    assert _PYTHON_MAGIC_ASSIGN.match("# flake8_version = !flake8 --version")
+    assert _PYTHON_MAGIC_ASSIGN.match("name = %time 2+2")
+    assert _PYTHON_MAGIC_ASSIGN.match("# name = %time 2+2")

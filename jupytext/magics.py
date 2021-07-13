@@ -59,7 +59,7 @@ _PYTHON_MAGIC_CMD = re.compile(
 _IPYTHON_MAGIC_HELP = re.compile(r"^\s*(# )*[^\s]*\?\s*$")
 
 _PYTHON_MAGIC_ASSIGN = re.compile(
-    r"^(# |#)*\s*([a-zA-Z_][a-zA-Z_$0-9]*)\s*=\s*(%|%%|%%%)[a-zA-Z](.*)"
+    r"^(# |#)*\s*([a-zA-Z_][a-zA-Z_$0-9]*)\s*=\s*(%|%%|%%%|!)[a-zA-Z](.*)"
 )
 
 _SCRIPT_LANGUAGES = [_SCRIPT_EXTENSIONS[ext]["language"] for ext in _SCRIPT_EXTENSIONS]
