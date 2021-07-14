@@ -12,6 +12,7 @@ Jupytext ChangeLog
 - The prefix in the Jupytext formats always use /, while paths might use either / or \ ([#806](https://github.com/mwouts/jupytext/issues/806))
 - Fixed an `InconsistentPath` issue with notebooks paired with scripts in a folder ([#806](https://github.com/mwouts/jupytext/issues/806))
 - The pre-commit tests are skipped when the Jupytext folder is not a git repository ([#814](https://github.com/mwouts/jupytext/issues/814))
+- Remove the mention of '--update' in 'jupytext --pipe' since outputs are preserved already
 
 
 1.11.3 (2021-06-10)

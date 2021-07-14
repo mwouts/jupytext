@@ -475,7 +475,8 @@ def jupytext_single_file(nb_file, args, log):
     config = load_jupytext_config(os.path.abspath(nb_file))
 
     # Just acting on metadata / pipe => save in place
-    if not nb_dest and not args.sync:
+    save_in_place = not nb_dest and not args.sync
+    if save_in_place:
         nb_dest = nb_file
 
     if nb_dest == "-":
@@ -818,7 +819,9 @@ def jupytext_single_file(nb_file, args, log):
             base_path(nb_dest, dest_fmt)
 
         # Describe what jupytext is doing
-        if os.path.isfile(nb_dest) and args.update:
+        if save_in_place:
+            action = ""
+        elif os.path.isfile(nb_dest) and args.update:
             if not nb_dest.endswith(".ipynb"):
                 raise ValueError("--update is only for ipynb files")
             action = " (destination file updated)"
