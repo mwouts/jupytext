@@ -3,6 +3,7 @@
 import itertools
 import os
 from collections import namedtuple
+from copy import deepcopy
 from datetime import datetime, timedelta
 
 import nbformat
@@ -118,7 +119,17 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 return self.super.save(model, path)
 
             path = path.strip("/")
-            nbk = model["content"]
+
+            # TODO: this hack should go to notebook.services.contents.filemanager.FileContentsManager.save
+            # nbformat.write calls nbformat.validator.validate which has the effect of adding the missing cell ids.
+            # This changes the signature of the notebook.
+            # So if we want to trust the notebook we need to add these new fields before saving.
+            nbk = model["content"] = deepcopy(model["content"])
+            try:
+                nbformat.validator.validate(nbk)
+            except nbformat.validator.ValidationError as err:
+                self.log.error("Notebook JSON is invalid: %s", err)
+
             try:
                 config = self.get_config(path)
                 jupytext_formats = notebook_formats(nbk, config, path)
@@ -169,11 +180,9 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 return write_pair(path, jupytext_formats, save_one_file)
 
             except Exception as e:
-                self.log.error(
-                    u"Error while saving file: %s %s", path, e, exc_info=True
-                )
+                self.log.error("Error while saving file: %s %s", path, e, exc_info=True)
                 raise HTTPError(
-                    500, u"Unexpected error while saving file: %s %s" % (path, e)
+                    500, "Unexpected error while saving file: %s %s" % (path, e)
                 )
 
         def get(
@@ -217,7 +226,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                         )
                     except Exception as err:
                         self.log.error(
-                            u"Error while reading file: %s %s", path, err, exc_info=True
+                            "Error while reading file: %s %s", path, err, exc_info=True
                         )
                         raise HTTPError(500, str(err))
 
@@ -257,7 +266,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     self.update_paired_notebooks(path, formats)
                 except InconsistentPath as err:
                     self.log.error(
-                        u"Unable to read paired notebook: %s %s",
+                        "Unable to read paired notebook: %s %s",
                         path,
                         err,
                         exc_info=True,
@@ -286,12 +295,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 if alt_path == path:
                     return model["content"]
                 if alt_path.endswith(".ipynb"):
-                    self.log.info(u"Reading OUTPUTS from {}".format(alt_path))
+                    self.log.info("Reading OUTPUTS from {}".format(alt_path))
                     return self.super.get(
                         alt_path, content=True, type="notebook", format=format
                     )["content"]
 
-                self.log.info(u"Reading SOURCE from {}".format(alt_path))
+                self.log.info("Reading SOURCE from {}".format(alt_path))
                 text = self.super.get(
                     alt_path, content=True, type="file", format=format
                 )["content"]
@@ -336,21 +345,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 raise
             except Exception as err:
                 self.log.error(
-                    u"Error while reading file: %s %s", path, err, exc_info=True
+                    "Error while reading file: %s %s", path, err, exc_info=True
                 )
                 raise HTTPError(500, str(err))
 
             if not outputs.timestamp:
                 set_kernelspec_from_language(model["content"])
-
-            # Trust code cells when they have no output
-            for cell in model["content"].cells:
-                if (
-                    cell.cell_type == "code"
-                    and not cell.outputs
-                    and cell.metadata.get("trusted") is False
-                ):
-                    cell.metadata["trusted"] = True
 
             return model
 
@@ -376,7 +376,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             untitled = self.untitled_notebook
             config = self.get_config(path)
             name = self.increment_notebook_filename(config, untitled + ext, path)
-            path = u"{0}/{1}".format(path, name)
+            path = "{0}/{1}".format(path, name)
 
             model = {"type": "notebook"}
             if format_name:
@@ -402,7 +402,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 basename_i = basename + insert_i
                 name = basename_i + ext
                 if not any(
-                    self.exists(u"{}/{}{}".format(path, basename_i, nb_ext))
+                    self.exists("{}/{}{}".format(path, basename_i, nb_ext))
                     for nb_ext in config.notebook_extensions
                 ):
                     break
@@ -443,7 +443,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 raise
             except Exception as err:
                 self.log.error(
-                    u"Error while renaming file from %s to %s: %s",
+                    "Error while renaming file from %s to %s: %s",
                     old_path,
                     new_path,
                     err,
@@ -523,7 +523,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     self.cached_config.timestamp = datetime.now()
                 except JupytextConfigurationError as err:
                     self.log.error(
-                        u"Error while reading config file: %s %s",
+                        "Error while reading config file: %s %s",
                         config_file,
                         err,
                         exc_info=True,
