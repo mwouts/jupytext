@@ -1,19 +1,18 @@
 Jupytext ChangeLog
 ==================
 
-1.11.4 (2021-07-??)
+1.11.4 (2021-07-14)
 -------------------
 
 **Changed**
-- (Documentation) the `cell_markers` option (and the other ones) can be set directly in the `jupytext.toml` config file ([#809](https://github.com/mwouts/jupytext/issues/809)).
+- The documentation illustrates how the `cell_markers` option (and the other ones) can be set directly in the `jupytext.toml` config file ([#809](https://github.com/mwouts/jupytext/issues/809)).
 - The dependency on `mdit-py-plugins` through `markdown-it-py[plugins]` was made explicit ([#814](https://github.com/mwouts/jupytext/issues/814))
 
 **Fixed**
 - System assigns of the form `var = !cmd` are commented out ([#816](https://github.com/mwouts/jupytext/issues/816))
-- The prefix in the Jupytext formats always use /, while paths might use either / or \ ([#806](https://github.com/mwouts/jupytext/issues/806))
-- Fixed an `InconsistentPath` issue with notebooks paired with scripts in a folder ([#806](https://github.com/mwouts/jupytext/issues/806))
-- The pre-commit tests are skipped when the Jupytext folder is not a git repository ([#814](https://github.com/mwouts/jupytext/issues/814))
-- Remove the mention of '--update' in 'jupytext --pipe' since outputs are preserved already
+- Fixed an `InconsistentPath` issue with notebooks paired with scripts in a folder. The prefix in the Jupytext formats always use /, while paths might use either / or \ ([#806](https://github.com/mwouts/jupytext/issues/806))
+- Tests that cannot succeed are skipped when either the Jupytext folder is not a git repository, when `sphinx-gallery` is too recent, or when `pandoc` is not up-to-date ([#814](https://github.com/mwouts/jupytext/issues/814))
+- Removed the mention of '--update' in 'jupytext --pipe' since outputs are preserved already
 
 
 1.11.3 (2021-06-10)
