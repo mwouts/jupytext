@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 from shutil import copyfile
 
 import pytest
@@ -284,3 +285,20 @@ def test_pipe_black_uses_warn_only_781(
     # If black fails the notebook should be left unchanged
     actual = read("notebook.ipynb")
     compare_notebooks(actual, nb)
+
+
+def test_pipe_black_preserve_outputs(notebook_with_outputs, tmpdir, cwd_tmpdir, capsys):
+    write(notebook_with_outputs, "test.ipynb")
+    jupytext(["--pipe", "black", "test.ipynb"])
+
+    # Outputs are preserved
+    nb = read("test.ipynb")
+    expected = deepcopy(notebook_with_outputs)
+    expected.cells[0].source = "1 + 1"
+    compare_notebooks(nb, expected)
+
+    # No mention of --update
+    out, err = capsys.readouterr()
+    assert not err
+    assert "replaced" not in out
+    assert "--update" not in out
