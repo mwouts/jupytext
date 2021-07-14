@@ -6,6 +6,7 @@ Jupytext ChangeLog
 
 **Changed**
 - (Documentation) the `cell_markers` option (and the other ones) can be set directly in the `jupytext.toml` config file ([#809](https://github.com/mwouts/jupytext/issues/809)).
+- The dependency on `mdit-py-plugins` through `markdown-it-py[plugins]` was made explicit ([#814](https://github.com/mwouts/jupytext/issues/814))
 
 **Fixed**
 - System assigns of the form `var = !cmd` are commented out ([#816](https://github.com/mwouts/jupytext/issues/816))
