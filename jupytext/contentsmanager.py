@@ -343,15 +343,6 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             if not outputs.timestamp:
                 set_kernelspec_from_language(model["content"])
 
-            # Trust code cells when they have no output
-            for cell in model["content"].cells:
-                if (
-                    cell.cell_type == "code"
-                    and not cell.outputs
-                    and cell.metadata.get("trusted") is False
-                ):
-                    cell.metadata["trusted"] = True
-
             return model
 
         def new_untitled(self, path="", type="", ext=""):
