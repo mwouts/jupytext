@@ -58,6 +58,7 @@ _SCRIPT_EXTENSIONS = {
     ".java": {"language": "java", "comment": "//"},
     ".groovy": {"language": "groovy", "comment": "//"},
     ".sage": {"language": "sage", "comment": "#"},
+    ".ml": {"language": "ocaml"},  # no line comment for OCaml
 }
 
 _COMMENT_CHARS = [
