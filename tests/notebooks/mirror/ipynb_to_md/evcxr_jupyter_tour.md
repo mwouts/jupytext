@@ -46,7 +46,7 @@ pub fn fib(x: i32) -> i32 {
 (1..13).map(fib).collect::<Vec<i32>>()
 ```
 
-Hmm, that doesn't look right. Lets redefine the function. In practice, we'd go back and edit the function above and reevalute it, but here, lets redefine it in a separate cell.
+Hmm, that doesn't look right. Lets redefine the function. In practice, we'd go back and edit the function above and reevaluate it, but here, lets redefine it in a separate cell.
 
 ```rust
 pub fn fib(x: i32) -> i32 {

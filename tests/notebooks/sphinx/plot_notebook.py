@@ -46,7 +46,7 @@ import matplotlib.pyplot as plt
 # continues to start with a **comment hash and space** (respecting code style)
 # is text that has to be rendered in
 # html format. Keep in mind to always keep your comments always together by
-# comment hashes. That means to break a paragraph you still need to commend
+# comment hashes. That means to break a paragraph you still need to comment
 # that line break.
 #
 # In this example the next block of code produces some plotable data. Code is
@@ -64,7 +64,7 @@ plt.xlabel('$x$')
 plt.ylabel('$y$')
 
 ###########################################################################
-# Again it is possble to continue the discussion with a new Python string. This
+# Again it is possible to continue the discussion with a new Python string. This
 # time to introduce the next code block generates 2 separate figures.
 
 plt.figure()

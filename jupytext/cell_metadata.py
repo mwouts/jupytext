@@ -447,7 +447,7 @@ def text_to_metadata(text, allow_title=False):
 
     if first_curly_bracket < 0 or (0 <= first_equal_sign < first_curly_bracket):
         # this is a key=value metadata line
-        # case one = the options may be preceeded with a language
+        # case one = the options may be preceded with a language
         if not allow_title:
             if is_jupyter_language(text):
                 return text, {}

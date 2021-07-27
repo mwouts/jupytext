@@ -221,7 +221,7 @@ The `nomarker` format is a variation of the `light` format with no cell marker a
 
 ### The `percent` format
 
-The `percent` format is a representation of Jupyter notebooks as scripts, in which all cells are explicitely delimited with a commented double percent sign `# %%`. The `percent` format is currently available for these [languages](https://github.com/mwouts/jupytext/blob/master/jupytext/languages.py).
+The `percent` format is a representation of Jupyter notebooks as scripts, in which all cells are explicitly delimited with a commented double percent sign `# %%`. The `percent` format is currently available for these [languages](https://github.com/mwouts/jupytext/blob/master/jupytext/languages.py).
 
 The format was introduced by Spyder in 2013, and is now supported by many editors, including
 - [Spyder IDE](https://docs.spyder-ide.org/editor.html#defining-code-cells),

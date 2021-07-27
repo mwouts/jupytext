@@ -442,7 +442,7 @@ def jupytext(args=None):
 
 
 def jupytext_single_file(nb_file, args, log):
-    """Apply the jupytext commmand, with given arguments, to a single file"""
+    """Apply the jupytext command, with given arguments, to a single file"""
     if nb_file == "-" and args.sync:
         msg = "Missing notebook path."
         if args.set_formats is not None and os.path.isfile(args.set_formats):
@@ -670,12 +670,12 @@ def jupytext_single_file(nb_file, args, log):
         except (ImportError, RuntimeError) as err:
             if args.pre_commit_mode:
                 raise RuntimeError(
-                    "An error occured while executing the notebook. Please "
+                    "An error occurred while executing the notebook. Please "
                     "make sure that you have listed 'nbconvert' and 'ipykernel' "
                     "under 'additional_dependencies' in the jupytext hook."
                 ) from err
             raise RuntimeError(
-                "An error occured while executing the notebook. Please "
+                "An error occurred while executing the notebook. Please "
                 "make sure that 'nbconvert' and 'ipykernel' are installed."
             ) from err
 
