@@ -116,7 +116,7 @@ We described Escher's *Square Limit* from the description of its smaller parts, 
 
 This seemed simple because we chose to talk in terms of an *algebra* to describe pictures. The primitives `rot`, `flip`, `fliprot45`, `above`, `beside` and `over` fit the job perfectly.
 
-We were able to describe these primitves in terms of `compose` `contexts`, which the Compose library knows how to render.
+We were able to describe these primitives in terms of `compose` `contexts`, which the Compose library knows how to render.
 
 Denotation can be an easy way to describe a system as well as a practical implementation method.
 

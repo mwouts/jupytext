@@ -40,7 +40,7 @@ We can also use this to render SVG:
 
 ## Adding External Clojure Dependencies 
 
-You can fetch external Clojure dependcies using the `clojupyter.misc.helper` namespace. 
+You can fetch external Clojure dependencies using the `clojupyter.misc.helper` namespace. 
 
 ```clojure
 (require '[clojupyter.misc.helper :as helper])

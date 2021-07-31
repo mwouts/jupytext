@@ -15,7 +15,7 @@ SoS consists of a ployglot notebook that allows the use of multiple kernels in o
 
 - SoS Polyglot Notebook is a Jupyter Notebook with a SoS kernel.
 - SoS Notebook serves as a super kernel to all other Jupyter kernels and allows the use of multiple kernels in one Jupyter notebook.
-- SoS Workflow System is a Python based workflow system that is designed to be readable, sharable, and suitable for daily data analysis.
+- SoS Workflow System is a Python based workflow system that is designed to be readable, shareable, and suitable for daily data analysis.
 - SoS Workflow System can be used from command line or use SoS Notebook as its IDE.
 
 ![](https://vatlab.github.io/sos-docs/doc/media/SoS_Notebook_and_Workflow.png)

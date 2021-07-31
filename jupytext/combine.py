@@ -24,7 +24,7 @@ def black_invariant(text, chars=None):
 
 
 def same_content(ref, test, endswith=False):
-    """Is the content of two cells the same, up to reformating by black"""
+    """Is the content of two cells the same, up to reformatting by black"""
     ref = black_invariant(ref)
     test = black_invariant(test)
 
