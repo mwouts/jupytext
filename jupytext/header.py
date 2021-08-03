@@ -133,7 +133,7 @@ def metadata_and_cell_to_header(notebook, metadata, text_format, fmt):
         ):
             header = ["<!--", ""] + header + ["", "-->"]
 
-    return comment_lines(header, text_format.header_prefix), lines_to_next_cell
+    return comment_lines(header, text_format.header_prefix, text_format.header_suffix), lines_to_next_cell
 
 
 def recursive_update(target, update):
@@ -173,7 +173,7 @@ def header_to_metadata_and_cell(
     comment = "#" if header_prefix == "#'" else header_prefix
 
     encoding_re = re.compile(
-        r"^[ \t\f]*{}.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)".format(comment)
+        r"^[ \t\f]*{}.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)".format(re.escape(comment))
     )
 
     for i, line in enumerate(lines):

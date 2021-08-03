@@ -620,6 +620,7 @@ class LightScriptCellReader(ScriptCellReader):
         script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = default_language or script["language"]
         self.comment = script["comment"]
+        self.comment_suffix = script.get("comment_suffix", "")
         self.ignore_end_marker = True
         self.explicit_end_marker_required = False
         if (
@@ -705,7 +706,7 @@ class LightScriptCellReader(ScriptCellReader):
         elif not self.cell_marker_end:
             end_of_cell = self.metadata.get("endofcell", "-")
             self.end_code_re = re.compile(
-                "^" + self.comment + " " + end_of_cell + r"\s*$"
+                "^" + re.escape(self.comment) + " " + end_of_cell + r"\s*$"
             )
 
         return self.find_region_end(lines)
@@ -774,9 +775,10 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
         script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = default_language or script["language"]
         self.comment = script["comment"]
-        self.start_code_re = re.compile(r"^\s*{}\s*%%(%*)\s(.*)$".format(self.comment))
+        self.comment_suffix = script.get("comment_suffix", "")
+        self.start_code_re = re.compile(r"^\s*{}\s*%%(%*)\s(.*)$".format(re.escape(self.comment)))
         self.alternative_start_code_re = re.compile(
-            r"^\s*{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(self.comment)
+            r"^\s*{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(re.escape(self.comment))
         )
         self.explicit_soc = True
 

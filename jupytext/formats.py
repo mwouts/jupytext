@@ -60,11 +60,13 @@ class NotebookFormatDescription:
         cell_reader_class,
         cell_exporter_class,
         current_version_number,
+        header_suffix="",
         min_readable_version_number=None,
     ):
         self.format_name = format_name
         self.extension = extension
         self.header_prefix = header_prefix
+        self.header_suffix = header_suffix
         self.cell_reader_class = cell_reader_class
         self.cell_exporter_class = cell_exporter_class
         self.current_version_number = current_version_number
@@ -115,6 +117,7 @@ JUPYTEXT_FORMATS = (
             format_name="light",
             extension=ext,
             header_prefix=_SCRIPT_EXTENSIONS[ext]["comment"],
+            header_suffix=_SCRIPT_EXTENSIONS[ext].get("comment_suffix", ""),
             cell_reader_class=LightScriptCellReader,
             cell_exporter_class=LightScriptCellExporter,
             # Version 1.5 on 2019-10-19 - jupytext v1.3.0 - Cell metadata represented as key=value by default
@@ -136,6 +139,7 @@ JUPYTEXT_FORMATS = (
             format_name="nomarker",
             extension=ext,
             header_prefix=_SCRIPT_EXTENSIONS[ext]["comment"],
+            header_suffix=_SCRIPT_EXTENSIONS[ext].get("comment_suffix", ""),
             cell_reader_class=LightScriptCellReader,
             cell_exporter_class=BareScriptCellExporter,
             current_version_number="1.0",
@@ -148,6 +152,7 @@ JUPYTEXT_FORMATS = (
             format_name="percent",
             extension=ext,
             header_prefix=_SCRIPT_EXTENSIONS[ext]["comment"],
+            header_suffix=_SCRIPT_EXTENSIONS[ext].get("comment_suffix", ""),
             cell_reader_class=DoublePercentScriptCellReader,
             cell_exporter_class=DoublePercentCellExporter,
             # Version 1.3 on 2019-09-21 - jupytext v1.3.0: Markdown cells can be quoted using triple quotes #305
@@ -166,6 +171,7 @@ JUPYTEXT_FORMATS = (
             format_name="hydrogen",
             extension=ext,
             header_prefix=_SCRIPT_EXTENSIONS[ext]["comment"],
+            header_suffix=_SCRIPT_EXTENSIONS[ext].get("comment_suffix", ""),
             cell_reader_class=HydrogenCellReader,
             cell_exporter_class=HydrogenCellExporter,
             # Version 1.2 on 2018-12-14 - jupytext v0.9.0: same as percent - only magics are not commented by default
@@ -297,7 +303,7 @@ def guess_format(text, ext):
     # Is this a Hydrogen-like script?
     # Or a Sphinx-gallery script?
     if ext in _SCRIPT_EXTENSIONS:
-        comment = _SCRIPT_EXTENSIONS[ext]["comment"]
+        comment = re.escape(_SCRIPT_EXTENSIONS[ext]["comment"])
         language = _SCRIPT_EXTENSIONS[ext]["language"]
         twenty_hash_re = re.compile(r"^#( |)#{19,}\s*$")
         double_percent_re = re.compile(r"^{}( %%|%%)$".format(comment))
