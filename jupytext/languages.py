@@ -58,7 +58,7 @@ _SCRIPT_EXTENSIONS = {
     ".java": {"language": "java", "comment": "//"},
     ".groovy": {"language": "groovy", "comment": "//"},
     ".sage": {"language": "sage", "comment": "#"},
-    ".ml": {"language": "ocaml"},  # no line comment for OCaml
+    ".ml": {"language": "ocaml", "comment": "(*", "comment_suffix": " *)"},  # no line comment for OCaml
 }
 
 _COMMENT_CHARS = [
@@ -193,8 +193,8 @@ def cell_language(source, default_language, custom_cell_magics):
     return None, None
 
 
-def comment_lines(lines, prefix):
+def comment_lines(lines, prefix, suffix=""):
     """Return commented lines"""
     if not prefix:
         return lines
-    return [prefix + " " + line if line else prefix for line in lines]
+    return [prefix + " " + line + suffix if line else prefix + suffix for line in lines]
