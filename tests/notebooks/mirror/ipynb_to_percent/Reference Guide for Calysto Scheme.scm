@@ -167,7 +167,7 @@ def mypyfunc(a, b):
 (mypyfunc 4 5)
 
 ;; %% [markdown]
-;; You can use `func` to turn a Scheme procedure into a Python function, and `define!` to put it into the shared enviornment with Python:
+;; You can use `func` to turn a Scheme procedure into a Python function, and `define!` to put it into the shared environment with Python:
 
 ;; %%
 (define! mypyfunc2 (func (lambda (n) n)))
@@ -185,7 +185,7 @@ def mypyfunc(a, b):
 ;; 1. In Scheme, everything is an expression and has a return value
 ;; 1. Python does not support macros (e.g., extending syntax)
 ;; 1. In Python, "if X" is false if X is None, False, [], (,) or 0. In Scheme, "if X" is only false if X is #f or 0
-;; 1. Calysto Scheme uses continuations, not the call stack. However, for debugging there is a pseudo-stack when an error is raised. You can trun that off with (use-stack-trace #f)
+;; 1. Calysto Scheme uses continuations, not the call stack. However, for debugging there is a pseudo-stack when an error is raised. You can turn that off with (use-stack-trace #f)
 ;; 1. Scheme procedures are not Python functions, but there are means to use one as the other.
 ;;
 ;; ## Major Differences Between Calysto Scheme and other Schemes
@@ -194,7 +194,7 @@ def mypyfunc(a, b):
 ;; 1. In Calysto Scheme, #(...) is short for '#(...)
 ;; 1. Calysto Scheme is missing many standard functions (see list at bottom)
 ;; 1. Calysto Scheme has a built-in amb operator called `choose`
-;; 1. For debugging there is a pseudo-stack when errors are raised in Calysto Scheme. You can trun that off with (use-stack-trace #f)
+;; 1. For debugging there is a pseudo-stack when errors are raised in Calysto Scheme. You can turn that off with (use-stack-trace #f)
 ;;
 ;; ### Stack Trace
 ;;

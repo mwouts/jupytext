@@ -5,7 +5,7 @@ kernelspec:
   name: coconut
 ---
 
-Taken fron [coconut-lang.org](coconut-lang.org)
+Taken from [coconut-lang.org](coconut-lang.org)
 
 +++
 
