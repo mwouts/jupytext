@@ -288,19 +288,24 @@ class BaseCellReader(object):
             content = "\n".join(lines).strip()
             for triple_quote in ['"""', "'''"]:
                 if (
-                    content.startswith(triple_quote)
+                    content.startswith((triple_quote, 'r'+triple_quote, 'R'+triple_quote))
                     and content.endswith(triple_quote)
                     and len(content) >= 6
                 ):
-                    left = right = triple_quote
-                    content = content[3:-3]
+                    if content.startswith(('r'+triple_quote, 'R'+triple_quote)):
+                        left = content[:4]
+                        right = triple_quote
+                        content = content[4:-3]
+                    else:
+                        left = right = triple_quote
+                        content = content[3:-3]
                     # Trim first/last line return
                     if content.startswith("\n"):
                         content = content[1:]
-                        left = triple_quote + "\n"
+                        left = left + "\n"
                     if content.endswith("\n"):
                         content = content[:-1]
-                        right = "\n" + triple_quote
+                        right = "\n" + right
                     if len(left) == len(right) == 4:
                         self.metadata["cell_marker"] = left[:3]
                     else:
