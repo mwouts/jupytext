@@ -288,11 +288,13 @@ class BaseCellReader(object):
             content = "\n".join(lines).strip()
             for triple_quote in ['"""', "'''"]:
                 if (
-                    content.startswith((triple_quote, 'r'+triple_quote, 'R'+triple_quote))
+                    content.startswith(
+                        (triple_quote, "r" + triple_quote, "R" + triple_quote)
+                    )
                     and content.endswith(triple_quote)
                     and len(content) >= 6
                 ):
-                    if content.startswith(('r'+triple_quote, 'R'+triple_quote)):
+                    if content.startswith(("r" + triple_quote, "R" + triple_quote)):
                         left = content[:4]
                         right = triple_quote
                         content = content[4:-3]
