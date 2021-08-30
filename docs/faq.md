@@ -64,6 +64,11 @@ jupytext --to ipynb --execute *.md              # convert all .md files to noteb
 jupytext --set-formats ipynb,md --execute *.md  # convert all .md files to paired notebooks and execute them
 ```
 
+Conversions the other way use a similar format
+```shell
+jupytext --to md *.ipynb                         # convert all .ipynb files to .md files
+```
+
 ## I want a specific cell to be commented out in the paired script
 
 That's possible! See how to [activate or deactivate cells](formats.md#active-and-inactive-cells).
