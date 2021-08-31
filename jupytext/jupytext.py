@@ -38,6 +38,7 @@ from .metadata_filter import filter_metadata, update_metadata_filters
 from .myst import MYST_FORMAT_NAME, myst_extensions, myst_to_notebook, notebook_to_myst
 from .pandoc import md_to_notebook, notebook_to_md
 from .pep8 import pep8_lines_between_cells
+from .quarto import notebook_to_qmd, qmd_to_notebook
 from .version import __version__
 
 
@@ -95,6 +96,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         """Read a notebook represented as text"""
         if self.fmt.get("format_name") == "pandoc":
             return md_to_notebook(s)
+
+        if self.fmt.get("format_name") == "quarto":
+            return qmd_to_notebook(s)
 
         if self.fmt.get("format_name") == MYST_FORMAT_NAME:
             return myst_to_notebook(s)
@@ -173,80 +177,50 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         return new_notebook(cells=cells, metadata=metadata)
 
+    def filter_notebook(self, nb, metadata):
+        self.update_fmt_with_notebook_options(nb.metadata)
+        metadata = insert_jupytext_info_and_filter_metadata(
+            metadata, self.fmt, self.implementation
+        )
+
+        cells = []
+        for cell in nb.cells:
+            cell_metadata = filter_metadata(
+                cell.metadata,
+                self.fmt.get("cell_metadata_filter"),
+                _IGNORE_CELL_METADATA,
+            )
+            if cell.cell_type == "code":
+                cells.append(new_code_cell(source=cell.source, metadata=cell_metadata))
+            else:
+                cells.append(
+                    NotebookNode(
+                        source=cell.source,
+                        metadata=cell_metadata,
+                        cell_type=cell.cell_type,
+                    )
+                )
+        return NotebookNode(
+            nbformat=nb.nbformat,
+            nbformat_minor=nb.nbformat_minor,
+            metadata=metadata,
+            cells=cells,
+        )
+
     def writes(self, nb, metadata=None, **kwargs):
         """Return the text representation of the notebook"""
         if self.fmt.get("format_name") == "pandoc":
-            self.update_fmt_with_notebook_options(nb.metadata)
-            metadata = insert_jupytext_info_and_filter_metadata(
-                metadata, self.fmt, self.implementation
-            )
-
-            cells = []
-            for cell in nb.cells:
-                cell_metadata = filter_metadata(
-                    cell.metadata,
-                    self.fmt.get("cell_metadata_filter"),
-                    _IGNORE_CELL_METADATA,
-                )
-                if cell.cell_type == "code":
-                    cells.append(
-                        new_code_cell(source=cell.source, metadata=cell_metadata)
-                    )
-                else:
-                    cells.append(
-                        NotebookNode(
-                            source=cell.source,
-                            metadata=cell_metadata,
-                            cell_type=cell.cell_type,
-                        )
-                    )
-
-            return notebook_to_md(
-                NotebookNode(
-                    nbformat=nb.nbformat,
-                    nbformat_minor=nb.nbformat_minor,
-                    metadata=metadata,
-                    cells=cells,
-                )
-            )
-
+            return notebook_to_md(self.filter_notebook(nb, metadata))
+        if self.fmt.get("format_name") == "quarto" or self.ext == ".qmd":
+            return notebook_to_qmd(self.filter_notebook(nb, metadata))
         if self.fmt.get(
             "format_name"
         ) == MYST_FORMAT_NAME or self.ext in myst_extensions(no_md=True):
             pygments_lexer = metadata.get("language_info", {}).get(
                 "pygments_lexer", None
             )
-            self.update_fmt_with_notebook_options(nb.metadata)
-            metadata = insert_jupytext_info_and_filter_metadata(
-                metadata, self.fmt, self.implementation
-            )
-
-            cells = []
-            for cell in nb.cells:
-                cell_metadata = filter_metadata(
-                    cell.metadata,
-                    self.fmt.get("cell_metadata_filter"),
-                    _IGNORE_CELL_METADATA,
-                )
-                if cell.cell_type == "code":
-                    cells.append(
-                        new_code_cell(source=cell.source, metadata=cell_metadata)
-                    )
-                else:
-                    cells.append(
-                        NotebookNode(
-                            source=cell.source,
-                            metadata=cell_metadata,
-                            cell_type=cell.cell_type,
-                        )
-                    )
             return notebook_to_myst(
-                NotebookNode(
-                    nbformat=nb.nbformat,
-                    nbformat_minor=nb.nbformat_minor,
-                    metadata=metadata,
-                    cells=cells,
-                ),
+                self.filter_notebook(nb, metadata),
                 default_lexer=pygments_lexer,
             )
 
