@@ -473,10 +473,10 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             if self.file_exists(pyproject_path):
                 import toml
 
-                with open(pyproject_path, "r") as stream:
-                    doc = toml.loads(stream.read())
-                    if doc.get("tool", {}).get("jupytext") is not None:
-                        return pyproject_path
+                model = self.get(pyproject_path, type="file")
+                doc = toml.loads(model["content"])
+                if doc.get("tool", {}).get("jupytext") is not None:
+                    return pyproject_path
 
             if not directory:
                 return None
