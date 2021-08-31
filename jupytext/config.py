@@ -356,7 +356,6 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
             import toml
 
             doc = toml.loads(stream)
-            print(jupytext_config_file)
             if jupytext_config_file.endswith(PYPROJECT_FILE):
                 return doc["tool"]["jupytext"]
             else:

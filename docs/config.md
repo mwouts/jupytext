@@ -72,6 +72,13 @@ or alternatively, using an explicit format list:
 formats = ["ipynb", "py:percent"]
 ```
 
+If you wish to use the `pyproject.toml` config file rather than `jupytext.toml`, you just need to
+create a `[tool.jupytext]` section in the `pyproject.toml` file, like here:
+```
+[tool.jupytext]
+formats = "ipynb,py:percent"
+```
+
 You can pair notebooks in trees with a `root_prefix` separated with three slashes, e.g.
 ```
 # Pair notebooks in subfolders of 'notebooks' to scripts in subfolders of 'scripts'
@@ -84,7 +91,7 @@ or alternatively, using a dict to map the prefix path to the format name:
 "notebooks/" = "ipynb"
 "scripts/" = "py:percent"
 ```
-Note that if you are using a `pyproject.toml` file with this dict format, you should make sure the table header is instead `[tool.jupytext.formats]`
+Note that if you are using a `pyproject.toml` file with this dict format, you should make sure the table header is instead `[tool.jupytext.formats]`.
 
 The `root_prefix` is matched with the top-most parent folder of the matching name, not above the Jupytext configuration file.
 
