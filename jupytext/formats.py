@@ -41,6 +41,7 @@ from .myst import (
     myst_version,
 )
 from .pandoc import pandoc_version
+from .quarto import quarto_version
 from .stringparser import StringParser
 from .version import __version__
 
@@ -209,6 +210,14 @@ JUPYTEXT_FORMATS = (
             cell_reader_class=None,
             cell_exporter_class=None,
             current_version_number=pandoc_version(),
+        ),
+        NotebookFormatDescription(
+            format_name="quarto",
+            extension=".qmd",
+            header_prefix="",
+            cell_reader_class=None,
+            cell_exporter_class=None,
+            current_version_number=quarto_version(),
         ),
     ]
     + [
@@ -578,6 +587,7 @@ def long_form_one_format(
     common_name_to_ext = {
         "notebook": "ipynb",
         "rmarkdown": "Rmd",
+        "quarto": "qmd",
         "markdown": "md",
         "script": "auto",
         "c++": "cpp",
