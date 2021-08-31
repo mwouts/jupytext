@@ -1,3 +1,7 @@
+# 1.3.4 (2021-08-31)
+
+- We have upgraded the extension dependencies and especially `tar` and `url-parse` to fix two security vulnerabilities (#842) (#843)
+
 # 1.3.3 (2021-06-10)
 
 - We have upgraded the extension dependencies and especially `ws` to fix a security vulnerability (#798)
