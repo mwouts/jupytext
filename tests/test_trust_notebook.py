@@ -143,3 +143,23 @@ def test_text_notebooks_can_be_trusted(nb_file, tmpdir, no_jupytext_version_numb
     model = cm.get(file)
     for cell in model["content"].cells:
         assert cell.metadata.get("trusted", True)
+
+
+def test_simple_notebook_is_trusted(tmpdir, python_notebook):
+    cm = TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    nb = python_notebook
+    cm.notary.unsign(nb)
+
+    # All cells are trusted in this notebook
+    assert cm.notary.check_cells(nb)
+    # Yet the notebook is not in the database of trusted notebooks
+    assert not cm.notary.check_signature(nb)
+
+    # Save the notebook using the CM
+    cm.save(dict(type="notebook", content=nb), "test.ipynb")
+
+    # The notebook is safe so it should have been trusted before getting saved to disk
+    nb = cm.get("test.ipynb")["content"]
+    assert cm.notary.check_signature(nb)
