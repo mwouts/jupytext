@@ -81,6 +81,7 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
         ("jupytext.toml", "hide_notebook_metadata = False"),
         ("jupytext.toml", 'hide_notebook_metadata = "False"'),
         ("jupytext.toml", "not_a_jupytext_option = true"),
+        ("pyproject.toml", "[tool.jupytext]\nnot_a_jupytext_option = true"),
         ("jupytext.json", '{"notebook_metadata_filter":"-all",}'),
         (".jupytext.py", "c.not_a_jupytext_option = True"),
         (".jupytext.py", "c.hide_notebook_metadata = true"),

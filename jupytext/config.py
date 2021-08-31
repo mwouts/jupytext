@@ -32,6 +32,9 @@ JUPYTEXT_CONFIG_FILES = [
 JUPYTEXT_CONFIG_FILES.extend(
     ["." + filename for filename in JUPYTEXT_CONFIG_FILES] + [".jupytext.py"]
 )
+
+PYPROJECT_FILE = "pyproject.toml"
+
 JUPYTEXT_CEILING_DIRECTORIES = [
     path
     for path in os.environ.get("JUPYTEXT_CEILING_DIRECTORIES", "").split(":")
@@ -316,6 +319,15 @@ def find_jupytext_configuration_file(path, search_parent_dirs=True):
             if os.path.isfile(full_path):
                 return full_path
 
+    pyproject_path = os.path.join(path, PYPROJECT_FILE)
+    if os.path.isfile(pyproject_path):
+        import toml
+
+        with open(pyproject_path, "r") as stream:
+            doc = toml.loads(stream.read())
+            if doc.get("tool", {}).get("jupytext") is not None:
+                return pyproject_path
+
     if not search_parent_dirs:
         return None
 
@@ -343,7 +355,12 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
         if jupytext_config_file.endswith((".toml", "jupytext")):
             import toml
 
-            return toml.loads(stream)
+            doc = toml.loads(stream)
+            print(jupytext_config_file)
+            if jupytext_config_file.endswith(PYPROJECT_FILE):
+                return doc["tool"]["jupytext"]
+            else:
+                return doc
 
         if jupytext_config_file.endswith((".yml", ".yaml")):
             return yaml.safe_load(stream)

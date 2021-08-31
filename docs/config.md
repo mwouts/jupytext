@@ -34,7 +34,10 @@ list(global_jupytext_configuration_directories())
 ```
 which include `XDG_CONFIG_HOME` (defaults to `$HOME/.config`) and `XDG_CONFIG_DIR`.
 
-The name for the configuration file can be any of `jupytext.config.JUPYTEXT_CONFIG_FILES`, i.e. `.jupytext` (in TOML), `jupytext.toml`, `jupytext.yml`, `jupytext.yaml`, `jupytext.json` or `jupytext.py`, and their dot-file versions.
+The name for the configuration file can be any of `jupytext.config.JUPYTEXT_CONFIG_FILES`, i.e. `.jupytext` (in TOML),
+`jupytext.toml`, `jupytext.yml`, `jupytext.yaml`, `jupytext.json` or `jupytext.py`, and their dot-file versions.
+Alternatively, if you are using it, you can also use your Python project's `pyproject.toml` file by adding
+configuration to a `[tool.jupytext]` table within it.
 
 If you want to know, for a given directory, which configuration file Jupytext is using, please execute:
 ```python
@@ -81,6 +84,8 @@ or alternatively, using a dict to map the prefix path to the format name:
 "notebooks/" = "ipynb"
 "scripts/" = "py:percent"
 ```
+Note that if you are using a `pyproject.toml` file with this dict format, you should make sure the table header is instead `[tool.jupytext.formats]`
+
 The `root_prefix` is matched with the top-most parent folder of the matching name, not above the Jupytext configuration file.
 
 For instance, with the pairing above, a notebook with path `/home/user/jupyter/notebooks/project1/example.ipynb` will be paired with the Python file `/home/user/jupyter/scripts/project1/example.py`.

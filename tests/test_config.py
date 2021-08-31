@@ -24,6 +24,16 @@ def test_find_jupytext_configuration_file(tmpdir):
         find_jupytext_configuration_file(str(nested)), str(root_config)
     )
 
+    # Local pyproject file
+    pyproject_config = nested.join("pyproject.toml")
+    pyproject_config.write("[tool.jupytext]\n")
+    assert os.path.samefile(
+        find_jupytext_configuration_file(str(tmpdir)), str(root_config)
+    )
+    assert os.path.samefile(
+        find_jupytext_configuration_file(str(nested)), str(pyproject_config)
+    )
+
     # Local configuration file
     local_config = nested.join(".jupytext")
     local_config.write("\n")
@@ -49,12 +59,27 @@ def test_jupytext_py_is_not_a_configuration_file(tmpdir):
 
 @pytest.mark.parametrize(
     "config_file",
-    ["jupytext", "jupytext.toml", "jupytext.yml", "jupytext.json", "jupytext.py"],
+    [
+        "pyproject.toml",
+        "jupytext",
+        "jupytext.toml",
+        "jupytext.yml",
+        "jupytext.json",
+        "jupytext.py",
+    ],
 )
 def test_load_jupytext_configuration_file(tmpdir, config_file):
     full_config_path = tmpdir.join(config_file)
 
-    if config_file.endswith(("jupytext", ".toml")):
+    if config_file == "pyproject.toml":
+        full_config_path.write(
+            """[tool.jupytext]
+formats = "ipynb,py:percent"
+notebook_metadata_filter = "all"
+cell_metadata_filter = "all"
+"""
+        )
+    elif config_file.endswith(("jupytext", ".toml")):
         full_config_path.write(
             """formats = "ipynb,py:percent"
 notebook_metadata_filter = "all"

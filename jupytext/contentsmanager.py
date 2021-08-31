@@ -18,6 +18,7 @@ import jupytext
 
 from .config import (
     JUPYTEXT_CONFIG_FILES,
+    PYPROJECT_FILE,
     JupytextConfiguration,
     JupytextConfigurationError,
     find_global_jupytext_configuration_file,
@@ -467,6 +468,10 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 path = directory + "/" + jupytext_config_file
                 if self.file_exists(path):
                     return path
+
+            pyproject_path = directory + "/" + PYPROJECT_FILE
+            if self.file_exists(pyproject_path):
+                return pyproject_path
 
             if not directory:
                 return None
