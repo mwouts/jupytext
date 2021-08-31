@@ -1,0 +1,12 @@
+---
+jupyter: python3
+---
+
+```{python}
+%%time
+
+print('asdf')
+```
+
+Thanks for jupytext!
+

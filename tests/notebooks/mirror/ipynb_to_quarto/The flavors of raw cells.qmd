@@ -1,0 +1,21 @@
+---
+jupyter: python3
+---
+
+```{=tex}
+$1+1$
+```
+
+```{=rst}
+:math:`1+1`
+```
+
+```{=html}
+<b>Bold text<b>
+```
+
+**Bold text**
+
+1 + 1
+
+Not formatted

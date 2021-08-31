@@ -1,0 +1,12 @@
+---
+jupyter: python3
+---
+
+A markdown cell
+
+```{python}
+#| slideshow: {slide_type: ''}
+1+1
+```
+
+Markdown cell two
