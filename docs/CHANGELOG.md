@@ -1,6 +1,15 @@
 Jupytext ChangeLog
 ==================
 
+1.11.5 (2021-08-31)
+-------------------
+
+**Fixed**
+- Fixed typos revealed by `codespell` - thanks to @hectormz for this contribution ([#829](https://github.com/mwouts/jupytext/issues/829))
+- We updated the dependencies of the `jupyterlab-jupytext` extension to address several security issues ([#842](https://github.com/mwouts/jupytext/issues/842)) ([#843](https://github.com/mwouts/jupytext/issues/843))
+- The Jupytext dev environment (`requirements-dev.txt`) now uses `jupyterlab==3.0.17` rather than `3.0.0` because of another security issue ([#839](https://github.com/mwouts/jupytext/issues/839))
+
+
 1.11.4 (2021-07-14)
 -------------------
 
