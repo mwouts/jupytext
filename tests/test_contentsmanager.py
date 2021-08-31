@@ -23,6 +23,7 @@ from .utils import (
     list_notebooks,
     notebook_model,
     requires_pandoc,
+    requires_quarto,
     requires_sphinx_gallery,
 )
 
@@ -198,6 +199,29 @@ def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
 
     compare_notebooks(nb_md["content"], nb, "md:pandoc")
     assert nb_md["content"].metadata["jupytext"]["formats"] == "ipynb,md:pandoc"
+
+
+@requires_quarto
+@pytest.mark.parametrize(
+    "nb_file",
+    list_notebooks("ipynb"),
+)
+def test_save_load_paired_qmd_notebook(nb_file, tmpdir):
+    tmp_ipynb = "notebook.ipynb"
+    tmp_qmd = "notebook.qmd"
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # open ipynb, save with cm, reopen
+    nb = jupytext.read(nb_file)
+    nb.metadata["jupytext"] = {"formats": "ipynb,qmd"}
+
+    cm.save(model=notebook_model(nb), path=tmp_ipynb)
+    nb_md = cm.get(tmp_qmd)
+
+    compare_notebooks(nb_md["content"], nb, "qmd")
+    assert nb_md["content"].metadata["jupytext"]["formats"] == "ipynb,qmd"
 
 
 @pytest.mark.parametrize("py_file", list_notebooks("percent"))

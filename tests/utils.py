@@ -11,6 +11,7 @@ from jupytext.cell_reader import rst2md
 from jupytext.cli import system
 from jupytext.myst import is_myst_available
 from jupytext.pandoc import is_pandoc_available
+from jupytext.quarto import is_quarto_available
 
 
 def tool_version(tool):
@@ -54,8 +55,11 @@ requires_sphinx_gallery = pytest.mark.skipif(
 requires_pandoc = pytest.mark.skipif(
     # The mirror files changed slightly when Pandoc 2.11 was introduced
     # https://github.com/mwouts/jupytext/commit/c07d919702999056ce47f92b74f63a15c8361c5d
-    not is_pandoc_available(min_version="2.11") or sys.version_info < (3,),
+    not is_pandoc_available(min_version="2.11"),
     reason="pandoc>=2.11 is not available",
+)
+requires_quarto = pytest.mark.skipif(
+    not is_quarto_available(min_version="0.2.0"), reason="quarto>=0.2 is not available"
 )
 requires_no_pandoc = pytest.mark.skipif(
     is_pandoc_available(), reason="Pandoc is installed"
