@@ -204,7 +204,11 @@ def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
 @requires_quarto
 @pytest.mark.parametrize(
     "nb_file",
-    list_notebooks("ipynb"),
+    list_notebooks(
+        "ipynb",
+        skip="(World|functional|Notebook with|plotly_graphs|flavors|complex_metadata|"
+        "update83|raw_cell|_66|nteract|LaTeX|invalid|305|text_outputs|ir_notebook)",
+    ),
 )
 def test_save_load_paired_qmd_notebook(nb_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
