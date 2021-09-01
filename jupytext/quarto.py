@@ -8,6 +8,8 @@ import tempfile
 from nbformat import reads as ipynb_reads
 from nbformat import writes as ipynb_writes
 
+QUARTO_MIN_VERSION = "0.2.116"
+
 
 class QuartoError(OSError):
     """An error related to Quarto"""
@@ -29,8 +31,8 @@ def quarto(args, filein=None):
     return out.decode("utf-8")
 
 
-def is_quarto_available(min_version="2.7.2"):
-    """Is Quarto>=2.7.2 available?"""
+def is_quarto_available(min_version=QUARTO_MIN_VERSION):
+    """Is Quarto available?"""
     try:
         raise_if_quarto_is_not_available(min_version=min_version)
         return True
@@ -38,7 +40,7 @@ def is_quarto_available(min_version="2.7.2"):
         return False
 
 
-def raise_if_quarto_is_not_available(min_version="0.2.0"):
+def raise_if_quarto_is_not_available(min_version=QUARTO_MIN_VERSION):
     """Raise with an informative error message if quarto is not available"""
     try:
         from pkg_resources import parse_version
