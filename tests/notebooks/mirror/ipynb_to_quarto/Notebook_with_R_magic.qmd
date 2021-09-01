@@ -1,5 +1,9 @@
 ---
-jupyter: python2
+jupyter:
+  kernelspec:
+    display_name: Python 2
+    language: python
+    name: python2
 ---
 
 # A notebook with R cells
