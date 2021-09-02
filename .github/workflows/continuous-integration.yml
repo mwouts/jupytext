@@ -100,6 +100,7 @@ jobs:
       - name: Install Quarto
         run: |
           # download the latest release
+          gh auth login
           gh release download --repo quarto-dev/quarto-cli --pattern '*.deb'
           # install it
           sudo apt install ./*.deb
