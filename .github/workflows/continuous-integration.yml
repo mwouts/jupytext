@@ -97,6 +97,14 @@ jobs:
         run: pip install .
       - name: Install a Jupyter Kernel
         run: python -m ipykernel install --name python_kernel --user
+      - name: Install Quarto
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          # download the latest release
+          gh release download --repo quarto-dev/quarto-cli --pattern '*.deb'
+          # install it
+          sudo apt install ./*.deb
       - name: Test with pytest
         run: pytest --cov=./ --cov-report=xml
       - name: Upload coverage
