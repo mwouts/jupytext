@@ -36,6 +36,3 @@ def test_qmd_to_ipynb(
     qmd2 = jupytext.writes(nb, "qmd")
     qmd2_without_header = qmd2.rsplit("---\n\n", 1)[1]
     compare(qmd2_without_header, qmd)
-
-
-# TODO: add an example with cell metadata
