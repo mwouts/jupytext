@@ -52,6 +52,10 @@ const JUPYTEXT_FORMATS = [
     label: "Pair Notebook with R Markdown"
   },
   {
+    format: "qmd",
+    label: "Pair Notebook with Quarto (qmd)"
+  },
+  {
     format: "custom",
     label: "Custom pairing"
   },
@@ -97,7 +101,7 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
   if (!notebook_extension)
     return formats;
 
-  notebook_extension = ['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
+  notebook_extension = ['ipynb', 'md', 'Rmd', 'qmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
   for (const i in formats) {
     const ext = formats[i].split(':')[0];
     if (ext == notebook_extension)
@@ -105,7 +109,7 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
   }
 
   // the notebook extension was not found among the formats
-  if (['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) != -1)
+  if (['ipynb', 'md', 'Rmd', 'qmd'].indexOf(notebook_extension) != -1)
     formats.push(notebook_extension);
   else {
     let format_name = 'light';
@@ -149,7 +153,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           if (format == "custom"){
               for (const i in jupytext_formats) {
                   const fmt = jupytext_formats[i];
-                  if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'auto:nomarker', 'md', 'Rmd', 'md:myst'].indexOf(fmt)==-1)
+                  if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'auto:nomarker', 'md', 'Rmd', 'qmd', 'md:myst'].indexOf(fmt)==-1)
                       return true;
               }
               return false;
@@ -187,7 +191,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           }
             // Toggle the selected format
             let notebook_extension: string = notebook_tracker.currentWidget.context.path.split('.').pop();
-            notebook_extension = ['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
+            notebook_extension = ['ipynb', 'md', 'Rmd', 'qmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
 
             // Toggle the selected format
             const index = formats.indexOf(format);
