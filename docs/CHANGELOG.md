@@ -5,10 +5,12 @@ Jupytext ChangeLog
 -----------------------
 
 **Added**
-- Jupytext can be configured through the `pyproject.toml` file. Thanks to Robin Brown for this contribution! (#828)
+- Jupytext can be configured through the `pyproject.toml` file. Thanks to Robin Brown for this contribution! ([#828](https://github.com/mwouts/jupytext/issues/828))
+- Jupytext supports Quarto notebooks (with `.qmd` extension) ([#837](https://github.com/mwouts/jupytext/issues/837))
+
 
 **Fixed**
-- Added more test to make sure that notebooks can be trusted. In practice, notebooks could not be trusted in JupyterLab<3.0.13 because of the absence of cell ids (#826)
+- Added more test to make sure that notebooks can be trusted. In practice, notebooks could not be trusted in JupyterLab<3.0.13 because of the absence of cell ids ([#826](https://github.com/mwouts/jupytext/issues/826))
 
 
 1.11.5 (2021-08-31)
