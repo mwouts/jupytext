@@ -141,9 +141,16 @@ def test_ipynb_to_pandoc(nb_file, no_jupytext_version_number):
 @requires_quarto
 @pytest.mark.parametrize(
     "nb_file",
-    list_notebooks("ipynb"),
+    list_notebooks(
+        "ipynb",
+        skip="(World|functional|Notebook with|plotly_graphs|flavors|complex_metadata|"
+        "update83|raw_cell|_66|nteract|LaTeX|invalid|305|text_outputs|ir_notebook)",
+    ),
 )
-def test_ipynb_to_quarto(nb_file, no_jupytext_version_number):
+def test_ipynb_to_quarto(
+    nb_file,
+    no_jupytext_version_number,
+):
     assert_conversion_same_as_mirror(nb_file, "qmd", "ipynb_to_quarto")
 
 
