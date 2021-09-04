@@ -76,16 +76,6 @@ Python and R notebooks represented in the R Markdown format can run both in Jupy
 
 See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
 
-### Pandoc Markdown
-
-Pandoc, the _Universal document converter_,  can read and write Jupyter notebooks - see [Pandoc's documentation](https://pandoc.org/MANUAL.html#creating-jupyter-notebooks-with-pandoc).
-
-In Pandoc Markdown, all cells are marked with pandoc divs (`:::`). The format is therefore slightly more verbose than the Jupytext Markdown format.
-
-See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pandoc.md#) in the `md:pandoc` format.
-
-If you wish to use that format, please install `pandoc` in version 2.7.2 or above, with e.g. `conda install pandoc -c conda-forge`.
-
 ### MyST Markdown
 
 [MyST (Markedly Structured Text)][myst-parser] is a markdown flavor that "implements the best parts of reStructuredText". It provides a way to call Sphinx directives and roles from within Markdown,
@@ -156,6 +146,26 @@ See for instance how our `World population.ipynb` notebook is [represented](http
 [jupyter-book]: https://jupyterbook.org
 [block break]: https://myst-parser.readthedocs.io/en/latest/using/syntax.html#block-breaks
 [myst-highlight]: https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight
+
+### Pandoc Markdown
+
+Pandoc, the _Universal document converter_,  can read and write Jupyter notebooks - see [Pandoc's documentation](https://pandoc.org/MANUAL.html#creating-jupyter-notebooks-with-pandoc).
+
+In Pandoc Markdown, all cells are marked with pandoc divs (`:::`). The format is therefore slightly more verbose than the Jupytext Markdown format.
+
+See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pandoc.md#) in the `md:pandoc` format.
+
+If you wish to use that format, please install `pandoc` in version 2.7.2 or above, with e.g. `conda install pandoc -c conda-forge`.
+
+### Quarto
+
+[Quarto](https://quarto.org/) is a scientific and publishing system build on Pandoc. If you have `quarto` installed, Jupytext lets you edit `.qmd` documents as notebooks in Jupyter, and pair `.ipynb` notebooks with `.qmd` notebooks.
+
+The conversion from `.ipynb` to `.qmd` and back directly calls `quarto convert`.
+
+Note that `quarto` is evolving fast. At the time of writing (`quarto` in v0.2.116),
+- The conversion takes about 2 secs per document, causing lags in Jupyter
+- The round trip `.ipynb` to `.qmd` to `.ipynb` has the effect to concatenate consecutive Markdown cells and to turn raw cells into Markdown cells - please make sure this is not a problem for you.
 
 ## Notebooks as scripts
 
