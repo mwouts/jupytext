@@ -98,9 +98,10 @@ jobs:
       - name: Install a Jupyter Kernel
         run: python -m ipykernel install --name python_kernel --user
       - name: Install Quarto
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # download the latest release
-          gh auth login
           gh release download --repo quarto-dev/quarto-cli --pattern '*.deb'
           # install it
           sudo apt install ./*.deb
