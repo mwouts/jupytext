@@ -1,11 +1,7 @@
 ---
 jupyter:
   jupytext:
-    text_representation:
-      extension: .Rmd
-      format_name: rmarkdown
-      format_version: '1.2'
-      jupytext_version: 1.11.4
+    formats: ipynb:markdown,md
   kernelspec:
     display_name: OCaml default
     language: OCaml
