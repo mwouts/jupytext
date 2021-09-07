@@ -8,7 +8,7 @@ import tempfile
 from nbformat import reads as ipynb_reads
 from nbformat import writes as ipynb_writes
 
-QUARTO_MIN_VERSION = "0.2.116"
+QUARTO_MIN_VERSION = "0.2.134"
 
 
 class QuartoError(OSError):

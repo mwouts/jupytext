@@ -41,7 +41,6 @@ from .myst import (
     myst_version,
 )
 from .pandoc import pandoc_version
-from .quarto import quarto_version
 from .stringparser import StringParser
 from .version import __version__
 
@@ -217,7 +216,9 @@ JUPYTEXT_FORMATS = (
             header_prefix="",
             cell_reader_class=None,
             cell_exporter_class=None,
-            current_version_number=quarto_version(),
+            # Version 1.0 on 2021-09-07 = quarto --version >= 0.2.134,
+            # cf. https://github.com/mwouts/jupytext/issues/837
+            current_version_number="1.0",
         ),
     ]
     + [
