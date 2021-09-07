@@ -31,14 +31,18 @@ def insert_or_test_version_number():
     return INSERT_AND_CHECK_VERSION_NUMBER
 
 
-def uncomment_line(line, prefix):
+def uncomment_line(line, prefix, suffix=""):
     """Remove prefix (and space) from line"""
-    if not prefix:
-        return line
-    if line.startswith(prefix + " "):
-        return line[len(prefix) + 1 :]
-    if line.startswith(prefix):
-        return line[len(prefix) :]
+    if prefix:
+        if line.startswith(prefix + " "):
+            line = line[len(prefix) + 1 :]
+        elif line.startswith(prefix):
+            line = line[len(prefix) :]
+    if suffix:
+        if line.endswith(suffix + " "):
+            line = line[: -(1 + len(suffix))]
+        elif line.endswith(suffix):
+            line = line[: -len(suffix)]
     return line
 
 
@@ -133,7 +137,10 @@ def metadata_and_cell_to_header(notebook, metadata, text_format, fmt):
         ):
             header = ["<!--", ""] + header + ["", "-->"]
 
-    return comment_lines(header, text_format.header_prefix, text_format.header_suffix), lines_to_next_cell
+    return (
+        comment_lines(header, text_format.header_prefix, text_format.header_suffix),
+        lines_to_next_cell,
+    )
 
 
 def recursive_update(target, update):
@@ -203,7 +210,13 @@ def header_to_metadata_and_cell(
             if not started and not line.strip():
                 continue
 
-        line = uncomment_line(line, header_prefix)
+        # OCAML
+        if header_prefix == "(*":
+            header_suffix = "*)"
+        else:
+            header_suffix = ""
+
+        line = uncomment_line(line, header_prefix, header_suffix)
         if _HEADER_RE.match(line):
             if not started:
                 started = True

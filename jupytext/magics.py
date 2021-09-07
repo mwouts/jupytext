@@ -6,7 +6,7 @@ from .languages import _COMMENT, _SCRIPT_EXTENSIONS, usual_language_name
 from .stringparser import StringParser
 
 
-def get_comment(ext): 
+def get_comment(ext):
     return re.escape(_SCRIPT_EXTENSIONS[ext]["comment"])
 
 
@@ -19,17 +19,13 @@ _MAGIC_RE = {
 }
 _MAGIC_FORCE_ESC_RE = {
     _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
-        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*escape".format(
-            get_comment(ext)
-        )
+        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*escape".format(get_comment(ext))
     )
     for ext in _SCRIPT_EXTENSIONS
 }
 _MAGIC_NOT_ESC_RE = {
     _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
-        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*noescape".format(
-            get_comment(ext)
-        )
+        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*noescape".format(get_comment(ext))
     )
     for ext in _SCRIPT_EXTENSIONS
 }
@@ -171,9 +167,7 @@ _ESCAPED_CODE_START = {
 }
 _ESCAPED_CODE_START.update(
     {
-        ext: re.compile(
-            r"^({0} |{0})*({0}|{0} )\+".format(get_comment(ext))
-        )
+        ext: re.compile(r"^({0} |{0})*({0}|{0} )\+".format(get_comment(ext)))
         for ext in _SCRIPT_EXTENSIONS
     }
 )

@@ -77,7 +77,9 @@ class BaseCellExporter(object):
         self.language = self.language or cell.metadata.get("language", default_language)
         self.default_language = default_language
         self.comment = _SCRIPT_EXTENSIONS.get(self.ext, {}).get("comment", "#")
-        self.comment_suffix = _SCRIPT_EXTENSIONS.get(self.ext, {}).get("comment_suffix", "")
+        self.comment_suffix = _SCRIPT_EXTENSIONS.get(self.ext, {}).get(
+            "comment_suffix", ""
+        )
         self.comment_magics = self.fmt.get(
             "comment_magics", self.default_comment_magics
         )
@@ -279,7 +281,9 @@ def endofcell_marker(source, comment):
     we add an end-of-cell marker"""
     endofcell = "-"
     while True:
-        endofcell_re = re.compile(r"^{}( )".format(re.escape(comment)) + endofcell + r"\s*$")
+        endofcell_re = re.compile(
+            r"^{}( )".format(re.escape(comment)) + endofcell + r"\s*$"
+        )
         if list(filter(endofcell_re.match, source)):
             endofcell = endofcell + "-"
         else:
@@ -493,9 +497,13 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
                     indent = left_space.groups()[0]
 
         if options.startswith("%") or not options:
-            lines = [indent + self.comment + " %%" + options + self.comment_suffix]
+            lines = comment_lines(
+                ["%%" + options], indent + self.comment, self.comment_suffix
+            )
         else:
-            lines = [indent + self.comment + " %% " + options + self.comment_suffix]
+            lines = comment_lines(
+                ["%% " + options], indent + self.comment, self.comment_suffix
+            )
 
         if self.is_code() and active:
             source = copy(self.source)
