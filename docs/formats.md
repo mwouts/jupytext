@@ -159,11 +159,11 @@ If you wish to use that format, please install `pandoc` in version 2.7.2 or abov
 
 ### Quarto
 
-[Quarto](https://quarto.org/) is a scientific and publishing system build on Pandoc. If you have `quarto` installed, Jupytext lets you edit `.qmd` documents as notebooks in Jupyter, and pair `.ipynb` notebooks with `.qmd` notebooks.
+[Quarto](https://quarto.org/) is a scientific and technical publishing system built on Pandoc. If you have `quarto` installed, Jupytext lets you edit `.qmd` documents as notebooks in Jupyter, and pair `.ipynb` notebooks with `.qmd` notebooks.
 
-The conversion from `.ipynb` to `.qmd` and back directly calls `quarto convert` , and requires an installation of Quarto v0.2.134 or higher.
+The conversion from `.ipynb` to `.qmd` and back directly calls `quarto convert`, and consequently requires an installation of Quarto v0.2.134 or higher.
 
-Note that the round trip `.ipynb` to `.qmd` to `.ipynb` has the effect of concatenating consecutive Markdown cells and turning raw cells into Markdown cells - please make sure this is not a problem for you.
+Note that the round trip of `.ipynb` to `.qmd` to `.ipynb` has the effect of concatenating consecutive Markdown cells and turning raw cells into Markdown cells (since `.qmd` files represent all content as either Markdown or code cells).
 
 ## Notebooks as scripts
 
