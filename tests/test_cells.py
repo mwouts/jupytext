@@ -186,3 +186,8 @@ def test_code_to_cell():
     assert cell.source == """def f(x):\n    return x+1"""
     assert cell.metadata == {}
     assert pos == 2
+
+
+def test_uncomment_ocaml():
+    assert uncomment(["(* ## *)"], "(*", "*)") == ["##"]
+    assert uncomment(["(*##*)"], "(*", "*)") == ["##"]
