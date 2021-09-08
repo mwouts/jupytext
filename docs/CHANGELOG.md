@@ -1,8 +1,8 @@
 Jupytext ChangeLog
 ==================
 
-1.11.5+dev (2021-09-??)
------------------------
+1.12.0 (2021-09-09)
+-------------------
 
 **Added**
 - Jupytext supports Quarto notebooks (with `.qmd` extension) ([#837](https://github.com/mwouts/jupytext/issues/837))
