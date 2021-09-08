@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import itertools
 import os
 import sys
 import time
@@ -861,10 +860,8 @@ def test_remove_jupytext_metadata(tmpdir, cwd_tmpdir):
     }
 
 
-@pytest.mark.parametrize(
-    "nb_file,fmt",
-    itertools.product(list_notebooks("ipynb_py"), ["py:light", "py:percent", "md"]),
-)
+@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
+@pytest.mark.parametrize("fmt", ["py:light", "py:percent", "md"])
 def test_convert_and_update_preserves_notebook(nb_file, fmt, tmpdir, cwd_tmpdir):
     # cannot encode magic parameters in markdown yet
     if ("magic" in nb_file or "LateX" in nb_file) and fmt == "md":
@@ -880,6 +877,12 @@ def test_convert_and_update_preserves_notebook(nb_file, fmt, tmpdir, cwd_tmpdir)
 
     nb_org = read(nb_file)
     nb_now = read(tmp_ipynb)
+
+    # The cell marker changes from """ to r""" on the LateX notebook #836
+    if "LateX" in nb_file and fmt == "py:percent":
+        last_cell = nb_now.cells[-1]
+        last_cell.metadata["cell_marker"] = last_cell.metadata["cell_marker"][1:]
+
     compare(nb_now, nb_org)
 
 

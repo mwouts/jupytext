@@ -298,33 +298,32 @@ class BaseCellReader(object):
             self.ext, self.metadata, self.cell_type == "code"
         ):
             content = "\n".join(lines).strip()
-            for triple_quote in ['"""', "'''"]:
-                if (
-                    content.startswith(
-                        (triple_quote, "r" + triple_quote, "R" + triple_quote)
-                    )
-                    and content.endswith(triple_quote)
-                    and len(content) >= 6
-                ):
-                    if content.startswith(("r" + triple_quote, "R" + triple_quote)):
-                        left = content[:4]
-                        right = triple_quote
-                        content = content[4:-3]
-                    else:
-                        left = right = triple_quote
-                        content = content[3:-3]
-                    # Trim first/last line return
-                    if content.startswith("\n"):
-                        content = content[1:]
-                        left = left + "\n"
-                    if content.endswith("\n"):
-                        content = content[:-1]
-                        right = "\n" + right
-                    if len(left) == len(right) == 4:
-                        self.metadata["cell_marker"] = left[:3]
-                    else:
-                        self.metadata["cell_marker"] = left + "," + right
-                    return content.splitlines()
+            for prefix in [""] if self.ext != ".py" else ["", "r", "R"]:
+                for triple_quote in ['"""', "'''"]:
+                    left = prefix + triple_quote
+                    right = triple_quote
+                    if (
+                        content.startswith(left)
+                        and content.endswith(right)
+                        and len(content) >= len(left + right)
+                    ):
+                        content = content[len(left) : -len(right)]
+                        # Trim first/last line return
+                        if content.startswith("\n"):
+                            content = content[1:]
+                            left = left + "\n"
+                        if content.endswith("\n"):
+                            content = content[:-1]
+                            right = "\n" + right
+
+                        if not prefix:
+                            if len(left) == len(right) == 4:
+                                self.metadata["cell_marker"] = left[:3]
+                        elif len(left[1:]) == len(right) == 4:
+                            self.metadata["cell_marker"] = left[:4]
+                        else:
+                            self.metadata["cell_marker"] = left + "," + right
+                        return content.splitlines()
 
         if not is_active(self.ext, self.metadata) or (
             "active" not in self.metadata

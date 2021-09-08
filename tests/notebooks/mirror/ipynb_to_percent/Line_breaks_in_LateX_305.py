@@ -29,7 +29,7 @@
 # $$
 
 # %% [markdown]
-'''
+r'''
 This cell uses the triple quote cell markers introduced at https://github.com/mwouts/jupytext/issues/305
 
 $$

@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.12.0+dev (2021-09-??)
+-----------------------
+
+**Added**
+- The `py:percent` format can encode Markdown cells as raw strings (#836)
+
+
 1.12.0 (2021-09-09)
 -------------------
 
