@@ -1,3 +1,7 @@
+# 1.3.5 (2021-09-05)
+
+- The extension can pair notebooks with `.qmd` files (Quarto format) (#837)
+
 # 1.3.4 (2021-08-31)
 
 - We have upgraded the extension dependencies and especially `tar` and `url-parse` to fix two security vulnerabilities (#842) (#843)

@@ -5,6 +5,7 @@ Jupytext ChangeLog
 -----------------------
 
 **Added**
+- Jupytext supports Quarto notebooks (with `.qmd` extension) ([#837](https://github.com/mwouts/jupytext/issues/837))
 - Jupytext can be configured through the `pyproject.toml` file. Thanks to Robin Brown for this contribution! ([#828](https://github.com/mwouts/jupytext/issues/828))
 - Jupytext now supports OCaml files with `.ml` extension. Thanks to Quentin Fortier for getting this started ([#832](https://github.com/mwouts/jupytext/issues/832))
 

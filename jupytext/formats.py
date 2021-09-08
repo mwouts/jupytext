@@ -210,6 +210,16 @@ JUPYTEXT_FORMATS = (
             cell_exporter_class=None,
             current_version_number=pandoc_version(),
         ),
+        NotebookFormatDescription(
+            format_name="quarto",
+            extension=".qmd",
+            header_prefix="",
+            cell_reader_class=None,
+            cell_exporter_class=None,
+            # Version 1.0 on 2021-09-07 = quarto --version >= 0.2.134,
+            # cf. https://github.com/mwouts/jupytext/issues/837
+            current_version_number="1.0",
+        ),
     ]
     + [
         NotebookFormatDescription(
@@ -578,6 +588,7 @@ def long_form_one_format(
     common_name_to_ext = {
         "notebook": "ipynb",
         "rmarkdown": "Rmd",
+        "quarto": "qmd",
         "markdown": "md",
         "script": "auto",
         "c++": "cpp",

@@ -1,0 +1,7 @@
+---
+jupyter: python3
+---
+
+```{python}
+cat = 42
+```

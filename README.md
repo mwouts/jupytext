@@ -16,7 +16,7 @@
 Have you always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningful diffs when doing version control? Then... Jupytext may well be the tool you're looking for!
 
 Jupytext is a plugin for Jupyter that can save Jupyter notebooks as either
-- Markdown files (or [MyST Markdown](docs/formats.md#myst-markdown) files, or [R Markdown](docs/formats.md#r-markdown) documents)
+- Markdown files (or [MyST Markdown](docs/formats.md#myst-markdown) files, or [R Markdown](docs/formats.md#r-markdown) or [Quarto](docs/formats.md#quarto) text notebooks)
 - Scripts in [many languages](docs/languages.md).
 
 ## Use cases
@@ -111,7 +111,7 @@ Jupytext implements many text [formats](docs/formats.md) for Jupyter Notebooks. 
 If your notebook contains more text than code, if you are writing a documentation or a book, you probably want to save your notebook as a Markdown document
 - Use the [Jupytext Markdown format](docs/formats.md#jupytext-markdown) if you wish to render your notebook as a `.md` file (without its outputs) on GitHub
 - Use the [MyST Markdown format](docs/formats.md#myst-markdown), a markdown flavor that “implements the best parts of reStructuredText”, if you wish to render your notebooks using Sphinx or [Jupyter Book](https://jupyterbook.org).
-- Use the [R Markdown format](docs/formats.md#r-markdown) if you want to open your Jupyter Notebooks in RStudio.
+- Use the [R Markdown format](docs/formats.md#r-markdown) or the [Quarto format](docs/formats.md#quarto) if you want to open your Jupyter Notebooks in RStudio.
 
 ## More resources?
 

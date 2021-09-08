@@ -40,7 +40,7 @@ define([
         }
 
         var notebook_extension = Jupyter.notebook.notebook_path.split('.').pop();
-        notebook_extension = ['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
+        notebook_extension = ['ipynb', 'md', 'Rmd', 'qmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
         for (var i in formats) {
             var ext = formats[i].split(':')[0];
             if (ext == notebook_extension)
@@ -48,7 +48,7 @@ define([
         }
 
         // the notebook extension was not found among the formats
-        if (['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) != -1)
+        if (['ipynb', 'md', 'Rmd', 'qmd'].indexOf(notebook_extension) != -1)
             formats.push(notebook_extension);
         else {
             var format_name = Jupyter.notebook.metadata.jupytext && Jupyter.notebook.metadata.jupytext.text_representation
@@ -70,7 +70,7 @@ define([
             $('#jupytext_pair_' + fmt.replace(':', '_') + ' > .fa').toggleClass('fa-check', true);
 
             // any custom format?
-            if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'auto:nomarker', 'md', 'Rmd', 'md:myst'].indexOf(fmt) == -1)
+            if (['ipynb', 'auto:light', 'auto:percent', 'auto:hydrogen', 'auto:nomarker', 'md', 'Rmd', 'qmd', 'md:myst'].indexOf(fmt) == -1)
                 $('#jupytext_pair_custom' + ' > .fa').toggleClass('fa-check', true);
         }
 
@@ -112,7 +112,7 @@ define([
         }
         var formats = getSelectedJupytextFormats();
         var notebook_extension = Jupyter.notebook.notebook_path.split('.').pop();
-        notebook_extension = ['ipynb', 'md', 'Rmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
+        notebook_extension = ['ipynb', 'md', 'Rmd', 'qmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
 
         // Toggle the selected format
         var index = formats.indexOf(format);
@@ -380,6 +380,7 @@ define([
             TextNotebooks.append(text_notebook_entry('MyST Markdown', '.md:myst'));
             TextNotebooks.append($('<li/>').addClass('divider'));
             TextNotebooks.append(text_notebook_entry('R Markdown', '.Rmd'));
+            TextNotebooks.append(text_notebook_entry('Quarto', '.qmd'));
 
             // Jupytext menu
             $('#open_notebook').before('<li id="jupytext_sub_menu"/>');
@@ -400,6 +401,7 @@ define([
             JupytextActions.append(jupytext_pair('md', 'Pair Notebook with Markdown'));
             JupytextActions.append(jupytext_pair('md:myst', 'Pair Notebook with MyST Markdown'));
             JupytextActions.append(jupytext_pair('Rmd', 'Pair Notebook with R Markdown', notebook_extension !== 'Rmd'));
+            JupytextActions.append(jupytext_pair('qmd', 'Pair Notebook with Quarto (qmd)', notebook_extension !== 'qmd'));
             JupytextActions.append(jupytext_pair('custom', 'Custom pairing'));
             JupytextActions.append($('<li/>').addClass('divider'));
             JupytextActions.append(toggle_metadata);
