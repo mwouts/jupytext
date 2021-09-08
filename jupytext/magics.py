@@ -5,26 +5,27 @@ import re
 from .languages import _COMMENT, _SCRIPT_EXTENSIONS, usual_language_name
 from .stringparser import StringParser
 
+
+def get_comment(ext):
+    return re.escape(_SCRIPT_EXTENSIONS[ext]["comment"])
+
+
 # A magic expression is a line or cell or metakernel magic (#94, #61) escaped zero, or multiple times
 _MAGIC_RE = {
     _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
-        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z]".format(_SCRIPT_EXTENSIONS[ext]["comment"])
+        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z]".format(get_comment(ext))
     )
     for ext in _SCRIPT_EXTENSIONS
 }
 _MAGIC_FORCE_ESC_RE = {
     _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
-        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*escape".format(
-            _SCRIPT_EXTENSIONS[ext]["comment"]
-        )
+        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*escape".format(get_comment(ext))
     )
     for ext in _SCRIPT_EXTENSIONS
 }
 _MAGIC_NOT_ESC_RE = {
     _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
-        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*noescape".format(
-            _SCRIPT_EXTENSIONS[ext]["comment"]
-        )
+        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*noescape".format(get_comment(ext))
     )
     for ext in _SCRIPT_EXTENSIONS
 }
@@ -166,9 +167,7 @@ _ESCAPED_CODE_START = {
 }
 _ESCAPED_CODE_START.update(
     {
-        ext: re.compile(
-            r"^({0} |{0})*({0}|{0} )\+".format(_SCRIPT_EXTENSIONS[ext]["comment"])
-        )
+        ext: re.compile(r"^({0} |{0})*({0}|{0} )\+".format(get_comment(ext)))
         for ext in _SCRIPT_EXTENSIONS
     }
 )

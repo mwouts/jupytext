@@ -77,6 +77,9 @@ class BaseCellExporter(object):
         self.language = self.language or cell.metadata.get("language", default_language)
         self.default_language = default_language
         self.comment = _SCRIPT_EXTENSIONS.get(self.ext, {}).get("comment", "#")
+        self.comment_suffix = _SCRIPT_EXTENSIONS.get(self.ext, {}).get(
+            "comment_suffix", ""
+        )
         self.comment_magics = self.fmt.get(
             "comment_magics", self.default_comment_magics
         )
@@ -168,7 +171,7 @@ class BaseCellExporter(object):
                 explicitly_code=self.cell_type == "code",
             )
 
-        return comment_lines(source, self.comment)
+        return comment_lines(source, self.comment, self.comment_suffix)
 
     def code_to_text(self):
         """Return the text representation of this cell as a code cell"""
@@ -278,7 +281,9 @@ def endofcell_marker(source, comment):
     we add an end-of-cell marker"""
     endofcell = "-"
     while True:
-        endofcell_re = re.compile(r"^{}( )".format(comment) + endofcell + r"\s*$")
+        endofcell_re = re.compile(
+            r"^{}( )".format(re.escape(comment)) + endofcell + r"\s*$"
+        )
         if list(filter(endofcell_re.match, source)):
             endofcell = endofcell + "-"
         else:
@@ -492,9 +497,13 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
                     indent = left_space.groups()[0]
 
         if options.startswith("%") or not options:
-            lines = [indent + self.comment + " %%" + options]
+            lines = comment_lines(
+                ["%%" + options], indent + self.comment, self.comment_suffix
+            )
         else:
-            lines = [indent + self.comment + " %% " + options]
+            lines = comment_lines(
+                ["%% " + options], indent + self.comment, self.comment_suffix
+            )
 
         if self.is_code() and active:
             source = copy(self.source)
@@ -555,4 +564,4 @@ class SphinxGalleryCellExporter(BaseCellExporter):  # pylint: disable=W0223
             cell_marker
             if cell_marker.startswith("#" * 20)
             else self.default_cell_marker
-        ] + comment_lines(self.source, self.comment)
+        ] + comment_lines(self.source, self.comment, self.comment_suffix)

@@ -44,19 +44,31 @@ _BLANK_LINE = re.compile(r"^\s*$")
 _PY_INDENTED = re.compile(r"^\s")
 
 
-def uncomment(lines, prefix="#"):
+def uncomment(lines, prefix="#", suffix=""):
     """Remove prefix and space, or only prefix, when possible"""
-    if not prefix:
-        return lines
-    prefix_and_space = prefix + " "
-    length_prefix = len(prefix)
-    length_prefix_and_space = len(prefix_and_space)
-    return [
-        line[length_prefix_and_space:]
-        if line.startswith(prefix_and_space)
-        else (line[length_prefix:] if line.startswith(prefix) else line)
-        for line in lines
-    ]
+    if prefix:
+        prefix_and_space = prefix + " "
+        length_prefix = len(prefix)
+        length_prefix_and_space = len(prefix_and_space)
+        lines = [
+            line[length_prefix_and_space:]
+            if line.startswith(prefix_and_space)
+            else (line[length_prefix:] if line.startswith(prefix) else line)
+            for line in lines
+        ]
+
+    if suffix:
+        space_and_suffix = " " + suffix
+        length_suffix = len(suffix)
+        length_space_and_suffix = len(space_and_suffix)
+        lines = [
+            line[:-length_space_and_suffix]
+            if line.endswith(space_and_suffix)
+            else (line[:-length_suffix] if line.endswith(suffix) else line)
+            for line in lines
+        ]
+
+    return lines
 
 
 def paragraph_is_fully_commented(lines, comment, main_language):
@@ -539,7 +551,9 @@ class ScriptCellReader(BaseCellReader):  # pylint: disable=W0223
                 lines, self.ext, self.language or self.default_language
             )
 
-        return uncomment(lines, self.markdown_prefix or self.comment)
+        return uncomment(
+            lines, self.markdown_prefix or self.comment, self.comment_suffix
+        )
 
 
 class RScriptCellReader(ScriptCellReader):
@@ -547,6 +561,7 @@ class RScriptCellReader(ScriptCellReader):
     to the knitr-spin syntax"""
 
     comment = "#'"
+    comment_suffix = ""
     markdown_prefix = "#'"
     default_language = "R"
     start_code_re = re.compile(r"^#\+(.*)\s*$")
@@ -620,6 +635,7 @@ class LightScriptCellReader(ScriptCellReader):
         script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = default_language or script["language"]
         self.comment = script["comment"]
+        self.comment_suffix = script.get("comment_suffix", "")
         self.ignore_end_marker = True
         self.explicit_end_marker_required = False
         if (
@@ -632,16 +648,29 @@ class LightScriptCellReader(ScriptCellReader):
                 ",", 1
             )
             self.start_code_re = re.compile(
-                "^" + self.comment + r"\s*" + self.cell_marker_start + r"(.*)$"
+                "^"
+                + re.escape(self.comment)
+                + r"\s*"
+                + self.cell_marker_start
+                + r"(.*)$"
             )
             self.end_code_re = re.compile(
-                "^" + self.comment + r"\s*" + self.cell_marker_end + r"\s*$"
+                "^" + re.escape(self.comment) + r"\s*" + self.cell_marker_end + r"\s*$"
             )
         else:
-            self.start_code_re = re.compile("^" + self.comment + r"\s*\+(.*)$")
+            self.start_code_re = re.compile(
+                "^" + re.escape(self.comment) + r"\s*\+(.*)$"
+            )
 
     def metadata_and_language_from_option_line(self, line):
         if self.start_code_re.match(line):
+            # Remove the OCAML suffix
+            if self.comment_suffix:
+                if line.endswith(" " + self.comment_suffix):
+                    line = line[: -len(" " + self.comment_suffix)]
+                elif line.endswith(self.comment_suffix):
+                    line = line[: -len(self.comment_suffix)]
+
             # We want to parse inner most regions as cells.
             # Thus, if we find another region start before the end for this region,
             # we will have ignore the metadata that we found here, and move on to the next cell.
@@ -705,7 +734,7 @@ class LightScriptCellReader(ScriptCellReader):
         elif not self.cell_marker_end:
             end_of_cell = self.metadata.get("endofcell", "-")
             self.end_code_re = re.compile(
-                "^" + self.comment + " " + end_of_cell + r"\s*$"
+                "^" + re.escape(self.comment) + " " + end_of_cell + r"\s*$"
             )
 
         return self.find_region_end(lines)
@@ -774,9 +803,14 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
         script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = default_language or script["language"]
         self.comment = script["comment"]
-        self.start_code_re = re.compile(r"^\s*{}\s*%%(%*)\s(.*)$".format(self.comment))
+        self.comment_suffix = script.get("comment_suffix", "")
+        self.start_code_re = re.compile(
+            r"^\s*{}\s*%%(%*)\s(.*)$".format(re.escape(self.comment))
+        )
         self.alternative_start_code_re = re.compile(
-            r"^\s*{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(self.comment)
+            r"^\s*{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(
+                re.escape(self.comment)
+            )
         )
         self.explicit_soc = True
 
@@ -784,6 +818,7 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
         """Parse code options on the given line. When a start of a code cell
         is found, self.metadata is set to a dictionary."""
         if self.start_code_re.match(line):
+            line = uncomment([line], self.comment, self.comment_suffix)[0]
             self.language, self.metadata = self.options_to_metadata(
                 line[line.find("%%") + 2 :]
             )
