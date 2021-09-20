@@ -150,8 +150,22 @@ class BaseCellExporter(object):
                 left, right = cell_markers.split(",", 1)
             else:
                 left = cell_markers + "\n"
+                if cell_markers.startswith(("r", "R")):
+                    cell_markers = cell_markers[1:]
                 right = "\n" + cell_markers
-            if left[:3] == right[-3:] and left[:3] in ['"""', "'''"]:
+
+            if (
+                left[:3] == right[-3:]
+                or (left[:1] in ["r", "R"] and left[1:4] == right[-3:])
+            ) and right[-3:] in ['"""', "'''"]:
+                # Markdown cells that contain a backslash should be encoded as raw strings
+                if (
+                    left[:1] not in ["r", "R"]
+                    and "\\" in "\n".join(source)
+                    and self.fmt.get("format_name") == "percent"
+                ):
+                    left = "r" + left
+
                 source = copy(source)
                 source[0] = left + source[0]
                 source[-1] = source[-1] + right
