@@ -287,6 +287,7 @@ def test_pipe_black_uses_warn_only_781(
     compare_notebooks(actual, nb)
 
 
+@requires_black
 def test_pipe_black_preserve_outputs(notebook_with_outputs, tmpdir, cwd_tmpdir, capsys):
     write(notebook_with_outputs, "test.ipynb")
     jupytext(["--pipe", "black", "test.ipynb"])
