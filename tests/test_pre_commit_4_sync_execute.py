@@ -31,7 +31,7 @@ repos:
   rev: {jupytext_repo_rev}
   hooks:
   - id: jupytext
-    args: [--sync, --execute, --diff]
+    args: [--sync, --execute, --show-changes]
     additional_dependencies:
     - nbconvert
 """

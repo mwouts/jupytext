@@ -154,7 +154,9 @@ formats = "ipynb,py:percent"
     tmp_repo.git.add(".")
 
     capsys.readouterr()
-    exit_code = jupytext(["--pre-commit-mode", "--sync", "test.ipynb", "--diff"])
+    exit_code = jupytext(
+        ["--pre-commit-mode", "--sync", "test.ipynb", "--show-changes"]
+    )
 
     out, err = capsys.readouterr()
     assert not err, err
