@@ -1,3 +1,7 @@
+# 1.3.4 (2021-09-23)
+
+- We have upgraded the extension dependencies and especially `ansi-regex` to fix a security vulnerability (#857)
+
 # 1.3.5 (2021-09-05)
 
 - The extension can pair notebooks with `.qmd` files (Quarto format) (#837)
