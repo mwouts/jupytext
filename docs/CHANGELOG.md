@@ -5,7 +5,12 @@ Jupytext ChangeLog
 -----------------------
 
 **Added**
-- The `py:percent` format can encode Markdown cells as raw strings (#836)
+- The Jupytext CLI has a new `--diff` command to show the differences between two notebooks (and if you want to see the changes in a file being updated by Jupytext, use `--show-changes`) ([#799](https://github.com/mwouts/jupytext/issues/799))
+- Jupyter will show the diff between text and `ipynb` paired notebooks when it cannot open a paired notebook because the `ipynb` version is more recent. Also, if the inputs in the two files are identical then the notebook will open with no error ([#799](https://github.com/mwouts/jupytext/issues/799))
+- The `py:percent` format will use raw strings when encoding Markdown cells as string, if they contain backslash characters ([#836](https://github.com/mwouts/jupytext/issues/836))
+
+**Fixed**
+- We have upgraded the jupyterlab extension dependencies and especially `ansi-regex` to fix a security vulnerability ([#857](https://github.com/mwouts/jupytext/issues/857))
 
 
 1.12.0 (2021-09-09)
