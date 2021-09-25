@@ -1,8 +1,8 @@
 Jupytext ChangeLog
 ==================
 
-1.12.0+dev (2021-09-??)
------------------------
+1.13.0 (2021-09-25)
+-------------------
 
 **Added**
 - The Jupytext CLI has a new `--diff` command to show the differences between two notebooks (and if you want to see the changes in a file being updated by Jupytext, use `--show-changes`) ([#799](https://github.com/mwouts/jupytext/issues/799))
