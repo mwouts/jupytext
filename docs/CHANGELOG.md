@@ -5,7 +5,10 @@ Jupytext ChangeLog
 -----------------------
 
 **Added**
-- The `py:percent` format can encode Markdown cells as raw strings (#836)
+- The `py:percent` format can encode Markdown cells as raw strings ([#836](https://github.com/mwouts/jupytext/issues/836))
+
+**Changed**
+- The Jupytext configuration file is reloaded only when a notebook is opened, saved, or when a different folder is explored ([#797](https://github.com/mwouts/jupytext/issues/797))
 
 
 1.12.0 (2021-09-09)

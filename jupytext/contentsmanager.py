@@ -3,7 +3,7 @@
 import itertools
 import os
 from collections import namedtuple
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import nbformat
 from tornado.web import HTTPError
@@ -58,9 +58,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             self.paired_notebooks = dict()
 
             # Configuration cache, useful when notebooks are listed in a given directory
-            self.cached_config = namedtuple(
-                "cached_config", "path timestamp config_file config"
-            )
+            self.cached_config = namedtuple("cached_config", "path config_file config")
             self.super = super(JupytextContentsManager, self)
             self.super.__init__(*args, **kwargs)
 
@@ -501,15 +499,10 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             """Return the Jupytext configuration for the given path"""
             parent_dir = self.get_parent_dir(path)
 
-            # When listing the notebooks for the tree view, we use a one-second
-            # cache for the configuration file
-            if (
-                not use_cache
-                or parent_dir != self.cached_config.path
-                or (
-                    self.cached_config.timestamp + timedelta(seconds=1) < datetime.now()
-                )
-            ):
+            # When listing the notebooks for the tree view, we use a cache for the configuration file
+            # The cache will be refreshed when a notebook is opened or saved, or when we go
+            # to a different directory.
+            if not use_cache or parent_dir != self.cached_config.path:
                 try:
                     config_file = self.get_config_file(parent_dir)
                     if config_file:
@@ -521,7 +514,6 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                         )
                     self.cached_config.config_file = config_file
                     self.cached_config.path = parent_dir
-                    self.cached_config.timestamp = datetime.now()
                 except JupytextConfigurationError as err:
                     self.log.error(
                         u"Error while reading config file: %s %s",
