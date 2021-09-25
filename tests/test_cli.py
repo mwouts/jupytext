@@ -1183,7 +1183,16 @@ def test_diff(tmpdir, cwd_tmpdir, capsys):
     write(new_notebook(cells=[new_code_cell("1 + 1")]), "test.ipynb")
     write(new_notebook(cells=[new_code_cell("2 + 2")]), "test.py", fmt="py:percent")
 
-    jupytext(["--to", "py:percent", "test.ipynb", "--diff"])
+    jupytext(["--diff", "test.py", "test.ipynb"])
+    captured = capsys.readouterr()
+    assert "-2 + 2\n+1 + 1" in captured.out
+
+
+def test_show_changes(tmpdir, cwd_tmpdir, capsys):
+    write(new_notebook(cells=[new_code_cell("1 + 1")]), "test.ipynb")
+    write(new_notebook(cells=[new_code_cell("2 + 2")]), "test.py", fmt="py:percent")
+
+    jupytext(["--to", "py:percent", "test.ipynb", "--show-changes"])
     captured = capsys.readouterr()
     assert "-2 + 2\n+1 + 1" in captured.out
 
@@ -1359,7 +1368,7 @@ def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, forma
     if formats == "ipynb,py":
         from tornado.web import HTTPError
 
-        with pytest.raises(HTTPError, match="seems more recent than test.py"):
+        with pytest.raises(HTTPError, match="is more recent than test.py"):
             cm.get("test.ipynb")
     else:
         cm.get("test.ipynb")

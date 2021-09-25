@@ -2,7 +2,10 @@
 
 from collections import namedtuple
 
+import jupytext
+
 from .combine import combine_inputs_with_outputs
+from .compare import compare
 from .formats import (
     check_file_version,
     long_form_multiple_formats,
@@ -11,6 +14,10 @@ from .formats import (
 from .paired_paths import find_base_path_and_format, full_path, paired_paths
 
 NotebookFile = namedtuple("notebook_file", "path fmt timestamp")
+
+
+class PairedFilesDiffer(ValueError):
+    """An error when the two representations of a paired notebook differ"""
 
 
 def write_pair(path, formats, write_one_file):
@@ -106,7 +113,7 @@ def latest_inputs_and_outputs(
     )
 
 
-def read_pair(inputs, outputs, read_one_file):
+def read_pair(inputs, outputs, read_one_file, must_match=False):
     """Read a notebook given its inputs and outputs path and formats"""
     if not outputs.path or outputs.path == inputs.path:
         return read_one_file(inputs.path, inputs.fmt)
@@ -114,7 +121,17 @@ def read_pair(inputs, outputs, read_one_file):
     notebook = read_one_file(inputs.path, inputs.fmt)
     check_file_version(notebook, inputs.path, outputs.path)
 
-    outputs = read_one_file(outputs.path, outputs.fmt)
-    notebook = combine_inputs_with_outputs(notebook, outputs, fmt=inputs.fmt)
+    notebook_with_outputs = read_one_file(outputs.path, outputs.fmt)
+
+    if must_match:
+        in_text = jupytext.writes(notebook, inputs.fmt)
+        out_text = jupytext.writes(notebook_with_outputs, inputs.fmt)
+        diff = compare(out_text, in_text, outputs.path, inputs.path, return_diff=True)
+        if diff:
+            raise PairedFilesDiffer(diff)
+
+    notebook = combine_inputs_with_outputs(
+        notebook, notebook_with_outputs, fmt=inputs.fmt
+    )
 
     return notebook

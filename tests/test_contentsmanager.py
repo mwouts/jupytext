@@ -463,9 +463,6 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
 def test_outdated_text_notebook(nb_file, tmpdir):
     # 1. write py ipynb
-    tmp_ipynb = u"notebook.ipynb"
-    tmp_nbpy = u"notebook.py"
-
     cm = jupytext.TextFileContentsManager()
     cm.formats = "py,ipynb"
     cm.outdated_text_notebook_margin = 0
@@ -473,9 +470,45 @@ def test_outdated_text_notebook(nb_file, tmpdir):
 
     # open ipynb, save py, reopen
     nb = jupytext.read(nb_file)
-    cm.save(model=notebook_model(nb), path=tmp_nbpy)
-    model_py = cm.get(tmp_nbpy, load_alternative_format=False)
-    model_ipynb = cm.get(tmp_ipynb, load_alternative_format=False)
+    cm.save(model=notebook_model(nb), path="notebook.py")
+    model_py = cm.get("notebook.py", load_alternative_format=False)
+    model_ipynb = cm.get("notebook.ipynb", load_alternative_format=False)
+
+    # 2. check that time of ipynb <= py
+    assert model_ipynb["last_modified"] <= model_py["last_modified"]
+
+    # 3. wait some time
+    time.sleep(0.5)
+
+    # 4. modify ipynb
+    nb.cells.append(new_markdown_cell("New cell"))
+    write(nb, str(tmpdir.join("notebook.ipynb")))
+
+    # 5. test error
+    with pytest.raises(HTTPError):
+        cm.get("notebook.py")
+
+    # 6. test OK with
+    cm.outdated_text_notebook_margin = 1.0
+    cm.get("notebook.py")
+
+    # 7. test OK with
+    cm.outdated_text_notebook_margin = float("inf")
+    cm.get("notebook.py")
+
+
+def test_outdated_text_notebook_no_diff_ok(tmpdir, python_notebook):
+    # 1. write py ipynb
+    cm = jupytext.TextFileContentsManager()
+    cm.formats = "py,ipynb"
+    cm.outdated_text_notebook_margin = 0
+    cm.root_dir = str(tmpdir)
+
+    # open ipynb, save py, reopen
+    nb = python_notebook
+    cm.save(model=notebook_model(nb), path="notebook.py")
+    model_py = cm.get("notebook.py", load_alternative_format=False)
+    model_ipynb = cm.get("notebook.ipynb", load_alternative_format=False)
 
     # 2. check that time of ipynb <= py
     assert model_ipynb["last_modified"] <= model_py["last_modified"]
@@ -484,20 +517,61 @@ def test_outdated_text_notebook(nb_file, tmpdir):
     time.sleep(0.5)
 
     # 4. touch ipynb
-    with open(str(tmpdir.join(tmp_ipynb)), "a"):
-        os.utime(str(tmpdir.join(tmp_ipynb)), None)
+    with open(tmpdir / "notebook.ipynb", "a"):
+        os.utime(tmpdir / "notebook.ipynb", None)
 
-    # 5. test error
-    with pytest.raises(HTTPError):
-        cm.get(tmp_nbpy)
+    # 5. No error since both files correspond to the same notebook #799
+    cm.get("notebook.py")
 
-    # 6. test OK with
-    cm.outdated_text_notebook_margin = 1.0
-    cm.get(tmp_nbpy)
 
-    # 7. test OK with
-    cm.outdated_text_notebook_margin = float("inf")
-    cm.get(tmp_nbpy)
+def test_outdated_text_notebook_diff_is_shown(tmpdir, python_notebook):
+    # 1. write py ipynb
+    cm = jupytext.TextFileContentsManager()
+    cm.formats = "py,ipynb"
+    cm.outdated_text_notebook_margin = 0
+    cm.root_dir = str(tmpdir)
+
+    # open ipynb, save py, reopen
+    nb = python_notebook
+    nb.cells = [new_markdown_cell("Text version 1.0")]
+    cm.save(model=notebook_model(nb), path="notebook.py")
+    model_py = cm.get("notebook.py", load_alternative_format=False)
+    model_ipynb = cm.get("notebook.ipynb", load_alternative_format=False)
+
+    # 2. check that time of ipynb <= py
+    assert model_ipynb["last_modified"] <= model_py["last_modified"]
+
+    # 3. wait some time
+    time.sleep(0.5)
+
+    # 4. modify ipynb
+    nb.cells = [new_markdown_cell("Text version 2.0")]
+    jupytext.write(nb, str(tmpdir / "notebook.ipynb"))
+
+    # 5. The diff is shown in the error
+    with pytest.raises(HTTPError) as excinfo:
+        cm.get("notebook.py")
+
+    diff = excinfo.value.log_message
+
+    diff = diff[diff.find("Differences") : diff.rfind("Please")]
+
+    compare(
+        # In the reference below, lines with a single space
+        # have been stripped by the pre-commit hook
+        diff.replace("\n \n", "\n\n"),
+        """Differences (jupytext --diff notebook.py notebook.ipynb) are:
+--- notebook.py
++++ notebook.ipynb
+@@ -12,5 +12,5 @@
+ #     name: python_kernel
+ # ---
+
+-# Text version 1.0
++# Text version 2.0
+
+""",
+    )
 
 
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
