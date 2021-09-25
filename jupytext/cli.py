@@ -229,6 +229,16 @@ def parse_jupytext_args(args=None):
         "jupytext notebook.ipynb --pipe 'black {}'",
     )
     parser.add_argument(
+        "--diff",
+        "-d",
+        action="store_true",
+        help="Show the differences between (the inputs) of two notebooks",
+    )
+    parser.add_argument(
+        "--diff-format",
+        help="The text format used to show differences in --diff",
+    )
+    parser.add_argument(
         "--check",
         action="append",
         help="Pipe the text representation (in format --pipe-fmt) of the notebook into "
@@ -281,8 +291,7 @@ def parse_jupytext_args(args=None):
         help="Quiet mode: do not comment about files being updated or created",
     )
     parser.add_argument(
-        "--diff",
-        "-d",
+        "--show-changes",
         action="store_true",
         help="Display the diff for each output file",
     )
@@ -379,6 +388,7 @@ def jupytext(args=None):
         and not args.output
         and not args.sync
         and not args.pipe
+        and not args.diff
         and not args.check
         and not args.update_metadata
         and not args.format_options
@@ -386,9 +396,53 @@ def jupytext(args=None):
         and not args.execute
     ):
         raise ValueError(
-            "Please provide one of --to, --output, --set-formats, --sync, --pipe, "
+            "Please provide one of --to, --output, --set-formats, --sync, --pipe, --diff, "
             "--check, --update-metadata, --format-options, --set-kernel or --execute"
         )
+
+    if args.diff:
+        if (
+            len(args.notebooks) != 2
+            or args.output_format
+            or args.output
+            or args.sync
+            or args.pipe
+            or args.check
+            or args.update_metadata
+            or args.format_options
+            or args.set_kernel
+            or args.execute
+        ):
+            raise ValueError(
+                "Please provide two notebooks after 'jupytext --diff'.\n"
+                "NB: Use --show-changes if you wish to see the changes in "
+                "a notebook being updated by Jupytext."
+            )
+
+        nb_file1, nb_file2 = args.notebooks
+        nb1 = read(nb_file1)
+        nb2 = read(nb_file2)
+
+        def fmt_if_not_ipynb(nb):
+            fmt = nb.metadata["jupytext"]["text_representation"]
+            if fmt["extension"] == ".ipynb":
+                return None
+            return short_form_one_format(fmt)
+
+        diff_fmt = (
+            args.diff_format or fmt_if_not_ipynb(nb1) or fmt_if_not_ipynb(nb2) or "md"
+        )
+
+        diff = compare(
+            writes(nb2, diff_fmt),
+            writes(nb1, diff_fmt),
+            nb_file2,
+            nb_file1,
+            return_diff=True,
+        )
+        sys.stdout.write(diff)
+
+        return
 
     if args.output and len(args.notebooks) != 1:
         raise ValueError("Please input a single notebook when using --output")
@@ -756,7 +810,7 @@ def jupytext_single_file(nb_file, args, log):
                 with open(path, encoding="utf-8") as fp:
                     current_content = fp.read()
                 modified = new_content != current_content
-                if modified and args.diff:
+                if modified and args.show_changes:
                     diff = compare(
                         new_content,
                         current_content,

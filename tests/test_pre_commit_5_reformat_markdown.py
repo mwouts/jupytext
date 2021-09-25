@@ -36,11 +36,11 @@ repos:
   rev: {jupytext_repo_rev}
   hooks:
   - id: jupytext
-    args: [--sync, --pipe-fmt, ipynb, --pipe, 'pandoc --from ipynb --to ipynb --markdown-headings=atx', --diff]
+    args: [--sync, --pipe-fmt, ipynb, --pipe, 'pandoc --from ipynb --to ipynb --markdown-headings=atx', --show-changes]
     additional_dependencies:
     - nbformat==5.0.8  # because pandoc 2.11.4 does not preserve yet the new cell ids
   - id: jupytext
-    args: [--sync, --pipe, black, --diff]
+    args: [--sync, --pipe, black, --show-changes]
     additional_dependencies:
     - black==20.8b1  # Matches black hook below
     - nbformat==5.0.8  # for compatibility with the pandoc hook above

@@ -39,7 +39,7 @@ from .paired_paths import (
     full_path,
     paired_paths,
 )
-from .pairs import latest_inputs_and_outputs, read_pair, write_pair
+from .pairs import PairedFilesDiffer, latest_inputs_and_outputs, read_pair, write_pair
 
 
 def build_jupytext_contents_manager_class(base_contents_manager_class):
@@ -302,6 +302,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             # Before we combine the two files, we make sure we're not overwriting ipynb cells
             # with an outdated text file
+            content = None
             try:
                 if (
                     outputs.timestamp
@@ -309,35 +310,64 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     > inputs.timestamp
                     + timedelta(seconds=config.outdated_text_notebook_margin)
                 ):
-                    raise HTTPError(
-                        400,
-                        """{out} (last modified {out_last})
-                        seems more recent than {src} (last modified {src_last})
-                        Please either:
-                        - open {src} in a text editor, make sure it is up to date, and save it,
-                        - or delete {src} if not up to date,
-                        - or increase check margin by adding, say,
-                            outdated_text_notebook_margin = 5  # default is 1 (second)
-                        to your jupytext.toml file
-                        """.format(
+                    ts_mismatch = (
+                        "{out} (last modified {out_last}) is more recent than "
+                        "{src} (last modified {src_last})".format(
                             src=inputs.path,
                             src_last=inputs.timestamp,
                             out=outputs.path,
                             out_last=outputs.timestamp,
-                        ),
+                        )
                     )
+                    self.log.warning(ts_mismatch)
+
+                    try:
+                        content = read_pair(
+                            inputs, outputs, read_one_file, must_match=True
+                        )
+                        self.log.warning(
+                            "The inputs in {src} and {out} are identical, "
+                            "so the mismatch in timestamps was ignored".format(
+                                src=inputs.path, out=outputs.path
+                            )
+                        )
+                    except HTTPError:
+                        raise
+                    except PairedFilesDiffer as diff:
+                        raise HTTPError(
+                            400,
+                            """{ts_mismatch}
+
+Differences (jupytext --diff {src} {out}) are:
+{diff}
+Please either:
+- open {src} in a text editor, make sure it is up to date, and save it,
+- or delete {src} if not up to date,
+- or increase check margin by adding, say,
+outdated_text_notebook_margin = 5  # default is 1 (second)
+to your jupytext.toml file
+                        """.format(
+                                ts_mismatch=ts_mismatch,
+                                src=inputs.path,
+                                out=outputs.path,
+                                diff=diff,
+                            ),
+                        )
             except OverflowError:
                 pass
 
-            try:
-                model["content"] = read_pair(inputs, outputs, read_one_file)
-            except HTTPError:
-                raise
-            except Exception as err:
-                self.log.error(
-                    u"Error while reading file: %s %s", path, err, exc_info=True
-                )
-                raise HTTPError(500, str(err))
+            if content is not None:
+                model["content"] = content
+            else:
+                try:
+                    model["content"] = read_pair(inputs, outputs, read_one_file)
+                except HTTPError:
+                    raise
+                except Exception as err:
+                    self.log.error(
+                        u"Error while reading file: %s %s", path, err, exc_info=True
+                    )
+                    raise HTTPError(500, str(err))
 
             if not outputs.timestamp:
                 set_kernelspec_from_language(model["content"])
