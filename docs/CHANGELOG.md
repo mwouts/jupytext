@@ -12,6 +12,9 @@ Jupytext ChangeLog
 **Fixed**
 - We have upgraded the jupyterlab extension dependencies and especially `ansi-regex` to fix a security vulnerability ([#857](https://github.com/mwouts/jupytext/issues/857))
 
+**Changed**
+- The Jupytext configuration file is reloaded only when a notebook is opened, saved, or when a different folder is explored ([#797](https://github.com/mwouts/jupytext/issues/797))
+
 
 1.12.0 (2021-09-09)
 -------------------
