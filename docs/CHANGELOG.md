@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.13.1 (2021-10-06)
+-------------------
+
+**Fixed**
+- Fixed the `guess_format` function to classify `py:percent` scripts with magic commands as such ([#848](https://github.com/mwouts/jupytext/issues/848))
+
+
 1.13.0 (2021-09-25)
 -------------------
 

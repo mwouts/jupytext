@@ -313,7 +313,8 @@ def guess_format(text, ext):
     # Is this a Hydrogen-like script?
     # Or a Sphinx-gallery script?
     if ext in _SCRIPT_EXTENSIONS:
-        comment = re.escape(_SCRIPT_EXTENSIONS[ext]["comment"])
+        unescaped_comment = _SCRIPT_EXTENSIONS[ext]["comment"]
+        comment = re.escape(unescaped_comment)
         language = _SCRIPT_EXTENSIONS[ext]["language"]
         twenty_hash_re = re.compile(r"^#( |)#{19,}\s*$")
         double_percent_re = re.compile(r"^{}( %%|%%)$".format(comment))
@@ -345,7 +346,7 @@ def guess_format(text, ext):
             ):
                 double_percent_count += 1
 
-            if not line.startswith(comment) and is_magic(line, language):
+            if not line.startswith(unescaped_comment) and is_magic(line, language):
                 magic_command_count += 1
 
             if twenty_hash_re.match(line) and ext == ".py":
