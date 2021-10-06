@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import unittest.mock as mock
+import warnings
 from argparse import ArgumentTypeError
 from contextlib import contextmanager
 from io import StringIO
@@ -1133,11 +1134,11 @@ def test_sync_script_dotdot_folder_564(tmpdir):
 
 @contextmanager
 def no_warning():
-    with pytest.warns(None) as warnings:
+    with pytest.warns(None) as records:
         yield
 
     # There should be no warning
-    for record in warnings:
+    for record in records:
         # Temporary exception for for this one, see #865
         if (
             "Passing a schema to Validator.iter_errors is deprecated "
@@ -1145,6 +1146,12 @@ def no_warning():
         ):
             continue
         raise RuntimeError(record)
+
+
+def test_no_warning():
+    with pytest.raises(RuntimeError, match="a sample warning"):
+        with no_warning():
+            warnings.warn("a sample warning")
 
 
 def test_jupytext_to_file_emits_a_warning(tmpdir):
