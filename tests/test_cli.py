@@ -1141,10 +1141,12 @@ def test_jupytext_to_file_emits_a_warning(tmpdir):
     nb_file = tmpdir.join("notebook.ipynb")
     write(new_notebook(), str(nb_file))
 
-    with pytest.warns(None) as record:
+    with pytest.warns(None) as warnings:
         jupytext(["notebook.ipynb", "-o", "script.py"])
 
-    assert len(record) == 0
+    # There should be no warning
+    for record in warnings:
+        raise RuntimeError(record)
 
     with pytest.warns(UserWarning, match="Maybe you want to use the '-o' option"):
         jupytext(["notebook.ipynb", "--to", "script.py"])
@@ -1167,7 +1169,9 @@ def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir, cwd_tmpdir
     with pytest.warns(None) as warnings:
         jupytext(["--sync", "notebook.md"])
 
-    assert not warnings
+    # There should be no warning
+    for record in warnings:
+        raise RuntimeError(record)
 
     assert py_file.exists()
     assert nb_file.exists()
