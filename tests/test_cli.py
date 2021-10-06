@@ -5,7 +5,6 @@ import sys
 import time
 import unittest.mock as mock
 from argparse import ArgumentTypeError
-from contextlib import contextmanager
 from io import StringIO
 from shutil import copyfile
 from subprocess import check_call
@@ -1131,22 +1130,6 @@ def test_sync_script_dotdot_folder_564(tmpdir):
     jupytext(["--sync", str(nb_file)])
 
 
-@contextmanager
-def no_warning():
-    with pytest.warns(None) as warnings:
-        yield
-
-    # There should be no warning
-    for record in warnings:
-        # Temporary exception for for this one, see #865
-        if (
-            "Passing a schema to Validator.iter_errors is deprecated "
-            "and will be removed in a future release" in str(record.message)
-        ):
-            continue
-        raise RuntimeError(record)
-
-
 def test_jupytext_to_file_emits_a_warning(tmpdir):
     """The user may type
         jupytext notebook.ipynb --to script.py
@@ -1158,8 +1141,12 @@ def test_jupytext_to_file_emits_a_warning(tmpdir):
     nb_file = tmpdir.join("notebook.ipynb")
     write(new_notebook(), str(nb_file))
 
-    with no_warning():
+    with pytest.warns(None) as warnings:
         jupytext(["notebook.ipynb", "-o", "script.py"])
+
+    # There should be no warning
+    for record in warnings:
+        raise RuntimeError(record)
 
     with pytest.warns(UserWarning, match="Maybe you want to use the '-o' option"):
         jupytext(["notebook.ipynb", "--to", "script.py"])
@@ -1179,8 +1166,12 @@ def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir, cwd_tmpdir
     nb_file = tmpdir.join("notebook.ipynb")
     md_file.write("Some text")
 
-    with no_warning():
+    with pytest.warns(None) as warnings:
         jupytext(["--sync", "notebook.md"])
+
+    # There should be no warning
+    for record in warnings:
+        raise RuntimeError(record)
 
     assert py_file.exists()
     assert nb_file.exists()
