@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.13.1 (2021-10-07)
+-------------------
+
+**Fixed**
+- The magic commands in `py:percent` scripts with no explicit format information remain commented over a round trip ([#848](https://github.com/mwouts/jupytext/issues/848))
+
+
 1.13.0 (2021-09-25)
 -------------------
 

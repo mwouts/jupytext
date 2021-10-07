@@ -31,6 +31,32 @@ def test_guess_format_percent(nb_file):
         assert guess_format(stream.read(), ext=".py")[0] == "percent"
 
 
+def test_guess_format_simple_percent(
+    nb="""# %%
+print("hello world!")
+""",
+):
+    assert guess_format(nb, ext=".py")[0] == "percent"
+
+
+def test_guess_format_simple_percent_with_magic(
+    nb="""# %%
+# %time
+print("hello world!")
+""",
+):
+    assert guess_format(nb, ext=".py")[0] == "percent"
+
+
+def test_guess_format_simple_hydrogen_with_magic(
+    nb="""# %%
+%time
+print("hello world!")
+""",
+):
+    assert guess_format(nb, ext=".py")[0] == "hydrogen"
+
+
 @pytest.mark.parametrize("nb_file", list_notebooks("sphinx"))
 def test_guess_format_sphinx(nb_file):
     with open(nb_file) as stream:
