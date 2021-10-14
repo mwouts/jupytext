@@ -1,4 +1,5 @@
 import re
+from time import sleep
 
 import nbformat
 import pytest
@@ -198,3 +199,36 @@ title: R Markdown notebook title
     # Writing back to Rmd should preserve the original document
     jupytext_cli([str(nb_file), "--to", "Rmd"])
     compare(rmd_file.read(), rmd)
+
+
+def test_pair_rmd_file_with_cell_tags_and_options(
+    tmpdir, cwd_tmpdir, no_jupytext_version_number
+):
+    rmd = """```{r plot_1, dpi=72}
+plot(3:30)
+```
+"""
+    rmd_file = tmpdir.join("test.Rmd")
+    rmd_file.write(rmd)
+
+    # Pair Rmd with ipynb
+    jupytext_cli(["--set-formats", "ipynb,Rmd", "test.Rmd"])
+
+    # Wait so that ipynb will be more recent
+    sleep(0.2)
+
+    # Modify the ipynb file
+    nb_file = tmpdir.join("test.ipynb")
+    nb = nbformat.read(nb_file, as_version=4)
+    nb.cells[0].source = "plot(4:40)"
+    nb_file.write(nbformat.writes(nb))
+
+    # Sync the two files
+    jupytext_cli(["--sync", "test.Rmd"])
+
+    # Remove the header
+    rmd2 = rmd_file.read()
+    rmd2 = rmd2.rsplit("---\n\n")[1]
+
+    # The new code chunk has the new code, and options are still there
+    compare(rmd2, rmd.replace("3", "4"))
