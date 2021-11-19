@@ -1,69 +1,110 @@
-import { JupyterFrontEnd, JupyterFrontEndPlugin } from "@jupyterlab/application";
+import {
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin,
+} from "@jupyterlab/application";
 
-import { ICommandPalette } from "@jupyterlab/apputils";
+import { ICommandPalette, ISessionContextDialogs, showErrorMessage } from "@jupyterlab/apputils";
 
-import { INotebookTracker } from "@jupyterlab/notebook";
+import { IEditorServices } from "@jupyterlab/codeeditor";
+
+import { IEditorTracker } from "@jupyterlab/fileeditor";
+
+import { IMarkdownViewerTracker } from "@jupyterlab/markdownviewer";
 
 import * as nbformat from "@jupyterlab/nbformat";
+
+import {
+  INotebookTracker,
+  INotebookWidgetFactory,
+  NotebookPanel,
+  NotebookWidgetFactory,
+} from "@jupyterlab/notebook";
+import { IRenderMimeRegistry } from "@jupyterlab/rendermime";
+
+import {
+  ITranslator,
+  nullTranslator,
+  TranslationBundle,
+} from "@jupyterlab/translation";
+
+import { markdownIcon } from "@jupyterlab/ui-components";
+
+interface IJupytextFormat {
+  /**
+   * Conversion format
+   */
+  format: string;
+  /**
+   * Command label
+   */
+  label: string;
+}
 
 interface JupytextRepresentation {
   format_name: string;
   extension: string;
-};
+}
 
 interface JupytextSection {
   formats?: string;
   notebook_metadata_filter?: string;
   cell_metadata_filter?: string;
-  text_representation?: JupytextRepresentation
-};
+  text_representation?: JupytextRepresentation;
+}
 
-const JUPYTEXT_FORMATS = [
-  {
-    format: "ipynb",
-    label: "Pair Notebook with ipynb document"
-  },
+function getJupytextFormats(trans: TranslationBundle): IJupytextFormat[] {
+  return [
     {
-    format: "auto:light",
-    label: "Pair Notebook with light Script"
-  },
-  {
-    format: "auto:percent",
-    label: "Pair Notebook with percent Script"
-  },
-  {
-    format: "auto:hydrogen",
-    label: "Pair Notebook with Hydrogen Script"
-  },
-  {
-    format: "auto:nomarker",
-    label: "Pair Notebook with nomarker Script"
-  },
-  {
-    format: "md",
-    label: "Pair Notebook with Markdown"
-  },
-  {
-    format: "md:myst",
-    label: "Pair Notebook with MyST Markdown"
-  },
-  {
-    format: "Rmd",
-    label: "Pair Notebook with R Markdown"
-  },
-  {
-    format: "qmd",
-    label: "Pair Notebook with Quarto (qmd)"
-  },
-  {
-    format: "custom",
-    label: "Custom pairing"
-  },
-  {
-    format: "none",
-    label: "Unpair Notebook"
-  }
-];
+      format: "ipynb",
+      label: trans.__("Pair Notebook with ipynb document"),
+    },
+    {
+      format: "auto:light",
+      label: trans.__("Pair Notebook with light Script"),
+    },
+    {
+      format: "auto:percent",
+      label: trans.__("Pair Notebook with percent Script"),
+    },
+    {
+      format: "auto:hydrogen",
+      label: trans.__("Pair Notebook with Hydrogen Script"),
+    },
+    {
+      format: "auto:nomarker",
+      label: trans.__("Pair Notebook with nomarker Script"),
+    },
+    {
+      format: "md",
+      label: trans.__("Pair Notebook with Markdown"),
+    },
+    {
+      format: "md:myst",
+      label: trans.__("Pair Notebook with MyST Markdown"),
+    },
+    {
+      format: "Rmd",
+      label: trans.__("Pair Notebook with R Markdown"),
+    },
+    {
+      format: "qmd",
+      label: trans.__("Pair Notebook with Quarto (qmd)"),
+    },
+    {
+      format: "custom",
+      label: trans.__("Custom pairing"),
+    },
+    {
+      format: "none",
+      label: trans.__("Unpair Notebook"),
+    },
+  ];
+}
+
+/**
+ * Supported file format.
+ */
+const SUPPORTED_EXTENSION = ["ipynb", "md", "Rmd", "qmd"];
 
 function get_jupytext_formats(notebook_tracker: INotebookTracker): Array<string> {
   if (!notebook_tracker.currentWidget) return [];
@@ -101,7 +142,8 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
   if (!notebook_extension)
     return formats;
 
-  notebook_extension = ['ipynb', 'md', 'Rmd', 'qmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
+  notebook_extension =
+    SUPPORTED_EXTENSION.indexOf(notebook_extension) == -1 ? "auto" : notebook_extension;
   for (const i in formats) {
     const ext = formats[i].split(':')[0];
     if (ext == notebook_extension)
@@ -109,7 +151,7 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
   }
 
   // the notebook extension was not found among the formats
-  if (['ipynb', 'md', 'Rmd', 'qmd'].indexOf(notebook_extension) != -1)
+  if (SUPPORTED_EXTENSION.indexOf(notebook_extension) != -1)
     formats.push(notebook_extension);
   else {
     let format_name = 'light';
@@ -132,15 +174,41 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
 const extension: JupyterFrontEndPlugin<void> = {
   id: "jupyterlab-jupytext",
   autoStart: true,
-  requires: [ICommandPalette, INotebookTracker],
+  // IEditorTracker and IMarkdownViewerTracker are optionally requested only
+  // to ensure this is called after they are activated and we properly overwrite
+  // the default factory for non-notebook file format
+  optional: [
+    ITranslator,
+    ICommandPalette,
+    IEditorTracker,
+    IMarkdownViewerTracker,
+  ],
+  requires: [
+    NotebookPanel.IContentFactory,
+    IEditorServices,
+    IRenderMimeRegistry,
+    ISessionContextDialogs,
+    INotebookWidgetFactory,
+    INotebookTracker,
+  ],
   activate: (
     app: JupyterFrontEnd,
-    palette: ICommandPalette,
-    notebook_tracker: INotebookTracker
+    contentFactory: NotebookPanel.IContentFactory,
+    editorServices: IEditorServices,
+    rendermime: IRenderMimeRegistry,
+    sessionContextDialogs: ISessionContextDialogs,
+    notebookFactory: NotebookWidgetFactory.IFactory,
+    notebook_tracker: INotebookTracker,
+    translator: ITranslator | null,
+    palette: ICommandPalette | null,
+    editorTracker: IEditorTracker | null,
+    markdownTracker: IMarkdownViewerTracker | null
   ) => {
     console.log("JupyterLab extension jupyterlab-jupytext is activated");
+    const trans = (translator ?? nullTranslator).load("jupytext");
 
     // Jupytext formats
+    const JUPYTEXT_FORMATS = getJupytextFormats(trans);
     JUPYTEXT_FORMATS.forEach((args, rank) => {
       const format: string = args["format"];
       const command: string = "jupytext:" + format;
@@ -184,14 +252,17 @@ const extension: JupyterFrontEndPlugin<void> = {
           // Toggle the selected format
           console.log("Jupytext: executing command=" + command);
           if (format == "custom") {
-            alert(
-              "Please edit the notebook metadata directly if you wish a custom configuration."
+            showErrorMessage(
+              trans.__("Error"),
+              trans.__(
+                "Please edit the notebook metadata directly if you wish a custom configuration."
+              )
             );
             return;
           }
             // Toggle the selected format
             let notebook_extension: string = notebook_tracker.currentWidget.context.path.split('.').pop();
-            notebook_extension = ['ipynb', 'md', 'Rmd', 'qmd'].indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
+            notebook_extension = SUPPORTED_EXTENSION.indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
 
             // Toggle the selected format
             const index = formats.indexOf(format);
@@ -272,13 +343,13 @@ const extension: JupyterFrontEndPlugin<void> = {
       });
 
       console.log("Jupytext: adding command=" + command + " with rank=" + (rank + 1));
-      palette.addItem({ command, rank: rank + 2, category: "Jupytext" });
+      palette?.addItem({ command, rank: rank + 2, category: "Jupytext" });
     });
 
     // Jupytext's documentation
-    palette.addItem({
+    palette?.addItem({
       args: {
-        text: "Jupytext Reference",
+        text: trans.__("Jupytext Reference"),
         url: "https://jupytext.readthedocs.io/en/latest/"
       },
       command: "help:open",
@@ -286,9 +357,9 @@ const extension: JupyterFrontEndPlugin<void> = {
       rank: 0
     });
 
-    palette.addItem({
+    palette?.addItem({
       args: {
-        text: "Jupytext FAQ",
+        text: trans.__("Jupytext FAQ"),
         url: "https://jupytext.readthedocs.io/en/latest/faq.html"
       },
       command: "help:open",
@@ -298,7 +369,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     // Metadata in text representation
     app.commands.addCommand("jupytext_metadata", {
-      label: "Include Metadata",
+      label: trans.__("Include Metadata"),
       isToggled: () => {
         if (!notebook_tracker.currentWidget)
           return false;
@@ -353,8 +424,43 @@ const extension: JupyterFrontEndPlugin<void> = {
       }
     });
 
-    palette.addItem({ command: "jupytext_metadata", rank: JUPYTEXT_FORMATS.length + 3, category: "Jupytext" });
-  }
+    palette?.addItem({
+      command: "jupytext_metadata",
+      rank: JUPYTEXT_FORMATS.length + 3,
+      category: "Jupytext",
+    });
+
+    // Define file types
+    app.docRegistry.addFileType({
+      name: "jupytext-md",
+      displayName: trans.__("Markdown File"),
+      // Extension file are transformed to lower case...
+      extensions: [".rmd", ".qmd"],
+      icon: markdownIcon
+    });
+
+    // Duplicate notebook factory to apply it on markdown file
+    //   Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
+    const factory = new NotebookWidgetFactory({
+      name: "Jupytext Notebook",
+      // label: trans.__("Jupytext Notebook"), // will be needed in JupyterLab 4
+      fileTypes: ["jupytext-md", "markdown", "python"],
+      modelName: notebookFactory.modelName ?? "notebook",
+      // Override the default to open directly using notebook view
+      defaultFor: ["jupytext-md", "markdown"],
+      preferKernel: notebookFactory.preferKernel ?? true,
+      canStartKernel: notebookFactory.canStartKernel ?? true,
+      rendermime,
+      contentFactory,
+      editorConfig: notebookFactory.editorConfig,
+      notebookConfig: notebookFactory.notebookConfig,
+      mimeTypeService: editorServices.mimeTypeService,
+      sessionDialogs: sessionContextDialogs,
+      toolbarFactory: notebookFactory.toolbarFactory,
+      translator
+    });
+    app.docRegistry.addWidgetFactory(factory);
+  },
 };
 
 export default extension;
