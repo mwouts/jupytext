@@ -102,9 +102,9 @@ function getJupytextFormats(trans: TranslationBundle): IJupytextFormat[] {
 }
 
 /**
- * Supported file format.
+ * Supported file formats.
  */
-const SUPPORTED_EXTENSION = ["ipynb", "md", "Rmd", "qmd"];
+const LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS = ["ipynb", "md", "Rmd", "qmd"];
 
 function get_jupytext_formats(notebook_tracker: INotebookTracker): Array<string> {
   if (!notebook_tracker.currentWidget) return [];
@@ -143,7 +143,7 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
     return formats;
 
   notebook_extension =
-    SUPPORTED_EXTENSION.indexOf(notebook_extension) == -1 ? "auto" : notebook_extension;
+    LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS.indexOf(notebook_extension) == -1 ? "auto" : notebook_extension;
   for (const i in formats) {
     const ext = formats[i].split(':')[0];
     if (ext == notebook_extension)
@@ -151,7 +151,7 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
   }
 
   // the notebook extension was not found among the formats
-  if (SUPPORTED_EXTENSION.indexOf(notebook_extension) != -1)
+  if (LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS.indexOf(notebook_extension) != -1)
     formats.push(notebook_extension);
   else {
     let format_name = 'light';
@@ -262,7 +262,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           }
             // Toggle the selected format
             let notebook_extension: string = notebook_tracker.currentWidget.context.path.split('.').pop();
-            notebook_extension = SUPPORTED_EXTENSION.indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
+            notebook_extension = LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS.indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
 
             // Toggle the selected format
             const index = formats.indexOf(format);
