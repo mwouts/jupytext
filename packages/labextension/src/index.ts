@@ -3,13 +3,13 @@ import {
   JupyterFrontEndPlugin,
 } from "@jupyterlab/application";
 
-import { ICommandPalette, ISessionContextDialogs, showErrorMessage } from "@jupyterlab/apputils";
+import {
+  ICommandPalette,
+  ISessionContextDialogs,
+  showErrorMessage,
+} from "@jupyterlab/apputils";
 
 import { IEditorServices } from "@jupyterlab/codeeditor";
-
-import { IEditorTracker } from "@jupyterlab/fileeditor";
-
-import { IMarkdownViewerTracker } from "@jupyterlab/markdownviewer";
 
 import * as nbformat from "@jupyterlab/nbformat";
 
@@ -177,12 +177,7 @@ const extension: JupyterFrontEndPlugin<void> = {
   // IEditorTracker and IMarkdownViewerTracker are optionally requested only
   // to ensure this is called after they are activated and we properly overwrite
   // the default factory for non-notebook file format
-  optional: [
-    ITranslator,
-    ICommandPalette,
-    IEditorTracker,
-    IMarkdownViewerTracker,
-  ],
+  optional: [ITranslator, ICommandPalette],
   requires: [
     NotebookPanel.IContentFactory,
     IEditorServices,
@@ -198,11 +193,9 @@ const extension: JupyterFrontEndPlugin<void> = {
     rendermime: IRenderMimeRegistry,
     sessionContextDialogs: ISessionContextDialogs,
     notebookFactory: NotebookWidgetFactory.IFactory,
-    notebook_tracker: INotebookTracker,
+    notebookTracker: INotebookTracker,
     translator: ITranslator | null,
-    palette: ICommandPalette | null,
-    editorTracker: IEditorTracker | null,
-    markdownTracker: IMarkdownViewerTracker | null
+    palette: ICommandPalette | null
   ) => {
     console.log("JupyterLab extension jupyterlab-jupytext is activated");
     const trans = (translator ?? nullTranslator).load("jupytext");
@@ -215,8 +208,8 @@ const extension: JupyterFrontEndPlugin<void> = {
       app.commands.addCommand(command, {
         label: args["label"],
         isToggled: () => {
-          if (!notebook_tracker.currentWidget) return false;
-          const jupytext_formats = get_selected_formats(notebook_tracker);
+          if (!notebookTracker.currentWidget) return false;
+          const jupytext_formats = get_selected_formats(notebookTracker);
 
           if (format == "custom"){
               for (const i in jupytext_formats) {
@@ -229,25 +222,25 @@ const extension: JupyterFrontEndPlugin<void> = {
           return jupytext_formats.indexOf(format)!=-1;
         },
         isEnabled: () => {
-            if (!notebook_tracker.currentWidget)
+            if (!notebookTracker.currentWidget)
                 return false;
 
-            const notebook_extension: string | undefined = notebook_tracker.currentWidget.context.path.split('.').pop();
+            const notebook_extension: string | undefined = notebookTracker.currentWidget.context.path.split('.').pop();
             if (format === notebook_extension)
                 return false;
 
             if (format === 'none') {
-                const formats = get_selected_formats(notebook_tracker);
+                const formats = get_selected_formats(notebookTracker);
                 return formats.length > 1;
             }
 
             return true;
         },
         execute: () => {
-            const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
+            const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.metadata.get(
             "jupytext"
           ) as unknown) as JupytextSection;
-          let formats: Array<string> = get_selected_formats(notebook_tracker);
+          let formats: Array<string> = get_selected_formats(notebookTracker);
 
           // Toggle the selected format
           console.log("Jupytext: executing command=" + command);
@@ -261,7 +254,7 @@ const extension: JupyterFrontEndPlugin<void> = {
             return;
           }
             // Toggle the selected format
-            let notebook_extension: string = notebook_tracker.currentWidget.context.path.split('.').pop();
+            let notebook_extension: string = notebookTracker.currentWidget.context.path.split('.').pop();
             notebook_extension = LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS.indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
 
             // Toggle the selected format
@@ -316,7 +309,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
           if (formats.length === 0) {
             if (
-              !notebook_tracker.currentWidget.context.model.metadata.has(
+              !notebookTracker.currentWidget.context.model.metadata.has(
                 "jupytext"
               )
             )
@@ -327,7 +320,7 @@ const extension: JupyterFrontEndPlugin<void> = {
             }
 
             if (Object.keys(jupytext).length == 0)
-              notebook_tracker.currentWidget.context.model.metadata.delete(
+              notebookTracker.currentWidget.context.model.metadata.delete(
                 "jupytext"
               );
             return;
@@ -336,7 +329,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           // set the desired format
           if (jupytext) jupytext.formats = formats.join();
           else
-            notebook_tracker.currentWidget.context.model.metadata.set(
+            notebookTracker.currentWidget.context.model.metadata.set(
               "jupytext",
               { formats: formats.join() });
       }
@@ -371,13 +364,13 @@ const extension: JupyterFrontEndPlugin<void> = {
     app.commands.addCommand("jupytext_metadata", {
       label: trans.__("Include Metadata"),
       isToggled: () => {
-        if (!notebook_tracker.currentWidget)
+        if (!notebookTracker.currentWidget)
           return false;
 
-        if (!notebook_tracker.currentWidget.context.model.metadata.has("jupytext"))
+        if (!notebookTracker.currentWidget.context.model.metadata.has("jupytext"))
           return false;
 
-        const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
+        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
 
         if (jupytext.notebook_metadata_filter === '-all')
           return false;
@@ -385,13 +378,13 @@ const extension: JupyterFrontEndPlugin<void> = {
         return true;
       },
       isEnabled: () => {
-        if (!notebook_tracker.currentWidget)
+        if (!notebookTracker.currentWidget)
           return false;
 
-        if (!notebook_tracker.currentWidget.context.model.metadata.has("jupytext"))
+        if (!notebookTracker.currentWidget.context.model.metadata.has("jupytext"))
           return false;
 
-        const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
+        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
 
         if (jupytext.notebook_metadata_filter === undefined)
           return true;
@@ -403,13 +396,13 @@ const extension: JupyterFrontEndPlugin<void> = {
       },
       execute: () => {
         console.log("Jupytext: toggling YAML header");
-        if (!notebook_tracker.currentWidget)
+        if (!notebookTracker.currentWidget)
           return;
 
-        if (!notebook_tracker.currentWidget.context.model.metadata.has("jupytext"))
+        if (!notebookTracker.currentWidget.context.model.metadata.has("jupytext"))
           return;
 
-        const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
+        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
 
         if (jupytext.notebook_metadata_filter) {
           delete jupytext.notebook_metadata_filter;
@@ -446,8 +439,6 @@ const extension: JupyterFrontEndPlugin<void> = {
       // label: trans.__("Jupytext Notebook"), // will be needed in JupyterLab 4
       fileTypes: ["jupytext-md", "markdown", "python"],
       modelName: notebookFactory.modelName ?? "notebook",
-      // Override the default to open directly using notebook view
-      defaultFor: ["jupytext-md", "markdown"],
       preferKernel: notebookFactory.preferKernel ?? true,
       canStartKernel: notebookFactory.canStartKernel ?? true,
       rendermime,
@@ -457,9 +448,35 @@ const extension: JupyterFrontEndPlugin<void> = {
       mimeTypeService: editorServices.mimeTypeService,
       sessionDialogs: sessionContextDialogs,
       toolbarFactory: notebookFactory.toolbarFactory,
-      translator
+      translator,
     });
     app.docRegistry.addWidgetFactory(factory);
+
+    // Register widget created with the new factory in the notebook tracker
+    //   This is required to activate notebook commands (and therefore shortcuts)
+    let id = 0; // The ID counter for notebook panels.
+    const ft = app.docRegistry.getFileType("notebook");
+
+    factory.widgetCreated.connect((sender, widget) => {
+      // If the notebook panel does not have an ID, assign it one.
+      widget.id = widget.id || `notebook-jupytext-${++id}`;
+
+      // Set up the title icon
+      widget.title.icon = ft?.icon;
+      widget.title.iconClass = ft?.iconClass ?? "";
+      widget.title.iconLabel = ft?.iconLabel ?? "";
+
+      // Notify the widget tracker if restore data needs to update.
+      widget.context.pathChanged.connect(() => {
+        // Trick using private API
+        // @ts-ignore
+        void notebookTracker.save(widget);
+      });
+      // Add the notebook panel to the tracker.
+      //   Trick using private API
+      //   @ts-ignore
+      void notebookTracker.add(widget);
+    });
   },
 };
 

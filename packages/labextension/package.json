@@ -61,8 +61,6 @@
     "@jupyterlab/apputils": "^3.0.0",
     "@jupyterlab/codeeditor": "^3.0.0",
     "@jupyterlab/docregistry": "^3.0.0",
-    "@jupyterlab/fileeditor": "^3.0.0",
-    "@jupyterlab/markdownviewer": "^3.0.0",
     "@jupyterlab/nbformat": "^3.0.0",
     "@jupyterlab/notebook": "^3.0.0",
     "@jupyterlab/rendermime": "^3.0.0",
