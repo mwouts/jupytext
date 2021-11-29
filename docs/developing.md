@@ -2,7 +2,7 @@
 
 ## How to test development versions from GitHub
 
-If you want to test a feature that has been integrated in `master` but not delivered yet to `pip` or `conda`, use
+If you want to test a feature that has been integrated in `main` but not delivered yet to `pip` or `conda`, use
 ```
 pip install git+https://github.com/mwouts/jupytext.git
 ```

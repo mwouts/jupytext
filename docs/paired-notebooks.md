@@ -6,11 +6,11 @@ Jupytext can write a given notebook to multiple files. In addition to the origin
 
 In Jupyter Notebook, pair your notebook to one or more text formats with the [Jupytext menu](install.md#jupytext-menu-in-jupyter-notebook):
 
-![](https://raw.githubusercontent.com/mwouts/jupytext_nbextension/master/jupytext_menu.png)
+![](https://raw.githubusercontent.com/mwouts/jupytext/main/jupytext/nbextension/jupytext_menu.png)
 
 In JupyterLab, use the [Jupytext commands](install.md#jupytext-commands-in-jupyterlab):
 
-![](https://raw.githubusercontent.com/mwouts/jupyterlab-jupytext/master/jupytext_commands.png)
+![](https://raw.githubusercontent.com/mwouts/jupytext/main/packages/labextension/jupytext_commands.png)
 
 These command simply add a `"jupytext": {"formats": "ipynb,md"}`-like entry in the notebook metadata.
 
@@ -21,7 +21,7 @@ You can also configure the notebook pairing on the command line, and set a defau
 When saving a paired notebook using Jupytext's contents manager, Jupyter updates both the `.ipynb` and its text representation. The text representation can be edited outside of Jupyter. When the notebook is refreshed in Jupyter, the input cells are read from the text file, and the output cells from the `.ipynb` file.
 
 It is possible (and convenient) to leave the notebook open in Jupyter while you edit its text representation. However, you don't want the two editors to save the notebook simultaneously. To avoid this:
-- deactivate Jupyter's autosave, by either toggling the `"Autosave notebook"` menu entry or run `%autosave 0` in a cell of the notebook (see in the [faq](https://github.com/mwouts/jupytext/blob/master/docs/faq.md#jupyter-warns-me-that-the-file-has-changed-on-disk) how to deactivate autosave permanently)
+- deactivate Jupyter's autosave, by either toggling the `"Autosave notebook"` menu entry or run `%autosave 0` in a cell of the notebook (see in the [faq](https://github.com/mwouts/jupytext/blob/main/docs/faq.md#jupyter-warns-me-that-the-file-has-changed-on-disk) how to deactivate autosave permanently)
 - and refresh the notebook when you switch back from the editor to Jupyter.
 
 In case you forgot to refresh, and saved the Jupyter notebook while the text representation had changed, no worries: Jupyter will ask you which version you want to keep:

@@ -8,7 +8,7 @@
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://github.com/mwouts/jupytext/tree/master/packages/labextension",
+  "homepage": "https://github.com/mwouts/jupytext/tree/main/packages/labextension",
   "bugs": {
     "url": "https://github.com/mwouts/jupytext/issues"
   },

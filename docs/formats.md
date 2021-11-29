@@ -60,7 +60,7 @@ Raw cells are delimited with HTML comments, and accept cell metadata in the same
 
 Markdown cells can also have explicit markers: use one of `<!-- #md -->` or `<!-- #markdown -->` or `<!-- #region -->` and the corresponding `<!-- #end... -->` counterpart. Note that the `<!-- #region -->` and `<!-- #endregion -->` cells markers are [foldable](https://code.visualstudio.com/docs/editor/codebasics#_folding) in VS Code, and that you can also insert a title there, e.g. `<!-- #region This is a title for my protected cell -->`. Cell metadata are accepted in the format `key="value"` (`"value"` being encoded in JSON) as for the other cell types.
 
-For a concrete example, see how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.md#).
+For a concrete example, see how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/main/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.md#).
 
 ### R Markdown
 
@@ -74,7 +74,7 @@ Jupytext's implementation of R Markdown is very similar to that of the Markdown 
 
 Python and R notebooks represented in the R Markdown format can run both in Jupyter and RStudio. Note that you can change the default Python environment in RStudio with `RETICULATE_PYTHON` in a `.Renviron` file, see [here](https://github.com/mwouts/jupytext/issues/267#issuecomment-506994930).
 
-See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/master/demo) is represented in [R Markdown](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.Rmd).
+See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/main/demo) is represented in [R Markdown](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.Rmd).
 
 ### MyST Markdown
 
@@ -135,7 +135,7 @@ This is a markdown cell with metadata
 This is a new markdown cell with no metadata
 ```
 
-See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.myst.md#) in the `myst` format.
+See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.myst.md#) in the `myst` format.
 
 **Note**: The `myst` format requires Python >= 3.6
 
@@ -153,7 +153,7 @@ Pandoc, the _Universal document converter_,  can read and write Jupyter notebook
 
 In Pandoc Markdown, all cells are marked with pandoc divs (`:::`). The format is therefore slightly more verbose than the Jupytext Markdown format.
 
-See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pandoc.md#) in the `md:pandoc` format.
+See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.pandoc.md#) in the `md:pandoc` format.
 
 If you wish to use that format, please install `pandoc` in version 2.7.2 or above, with e.g. `conda install pandoc -c conda-forge`.
 
@@ -169,7 +169,7 @@ Note that the round trip of `.ipynb` to `.qmd` to `.ipynb` has the effect of con
 
 ### The `light` format
 
-The `light` format was created for this project. That format can read any script in one of these [languages](https://github.com/mwouts/jupytext/blob/master/jupytext/languages.py) as a Jupyter notebook, even scripts which were never prepared to become a notebook.
+The `light` format was created for this project. That format can read any script in one of these [languages](https://github.com/mwouts/jupytext/blob/main/jupytext/languages.py) as a Jupyter notebook, even scripts which were never prepared to become a notebook.
 
 When a script in the `light` format is converted to a notebook, Jupytext code paragraphs are turned into code cells, and comments that are not adjacent to code are converted to Markdown cells. Cell breaks occurs on blank lines outside of functions, classes or multiline comments.
 
@@ -221,7 +221,7 @@ cell_markers = "{{{,}}}"           # Use Vim region folding delimiters
 ```
 to your [`jupytext.toml` configuration file](config.md#jupytext-configuration-file).
 
-See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.lgt.py) in that format.
+See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.lgt.py) in that format.
 
 ### The `nomarker` format
 
@@ -229,7 +229,7 @@ The `nomarker` format is a variation of the `light` format with no cell marker a
 
 ### The `percent` format
 
-The `percent` format is a representation of Jupyter notebooks as scripts, in which all cells are explicitly delimited with a commented double percent sign `# %%`. The `percent` format is currently available for these [languages](https://github.com/mwouts/jupytext/blob/master/jupytext/languages.py).
+The `percent` format is a representation of Jupyter notebooks as scripts, in which all cells are explicitly delimited with a commented double percent sign `# %%`. The `percent` format is currently available for these [languages](https://github.com/mwouts/jupytext/blob/main/jupytext/languages.py).
 
 The format was introduced by Spyder in 2013, and is now supported by many editors, including
 - [Spyder IDE](https://docs.spyder-ide.org/editor.html#defining-code-cells),
@@ -289,7 +289,7 @@ cell_markers = '"""'
 ```
 to your [`jupytext.toml` configuration file](config.md#jupytext-configuration-file).
 
-See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.pct.py) in the `percent` format.
+See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.pct.py) in the `percent` format.
 
 ### The `hydrogen` format
 
@@ -309,7 +309,7 @@ preferred_jupytext_formats_read = "py:sphinx"
 sphinx_convert_rst2md = true
 ```
 
-Our sample notebook is also represented in `sphinx` format [here](https://github.com/mwouts/jupytext/blob/master/demo/World%20population.spx.py).
+Our sample notebook is also represented in `sphinx` format [here](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.spx.py).
 
 ## Jupytext format options
 

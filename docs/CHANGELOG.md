@@ -292,7 +292,7 @@ error will occur if the required dependencies, resp. `markdown-it-py` and `pando
 ------------------
 
 **Added**
-- Jupytext can use a local or global [configuration file](https://github.com/mwouts/jupytext/blob/master/docs/config.md) ([#508](https://github.com/mwouts/jupytext/issues/508))
+- Jupytext can use a local or global [configuration file](https://github.com/mwouts/jupytext/blob/main/docs/config.md) ([#508](https://github.com/mwouts/jupytext/issues/508))
 - Jupytext can pair notebooks in trees. Use e.g. `notebooks///ipynb,scripts///py:percent` if you want to replicate the tree of notebooks under `notebooks` in a folder named `scripts` ([#424](https://github.com/mwouts/jupytext/issues/424))
 - The extension for Jupyter Notebook has a _New Text Notebook_ menu that creates text-only notebooks ([#443](https://github.com/mwouts/jupytext/issues/443))
 - Groovy and Java are now supported, thanks to Przemek Wesołek ([#500](https://github.com/mwouts/jupytext/issues/500))
