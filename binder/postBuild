@@ -5,6 +5,7 @@ set -e
 # NB: If you want to use Jupytext on your binder, don't install it from source,
 # just add "jupytext" to your "binder/requirements.txt" instead.
 BUILD_JUPYTERLAB_EXTENSION=1 pip install .[myst]
+export JUPYTER_CONFIG_PATH=${PWD}/binder:${JUPYTER_CONFIG_PATH}
 
 # Create the notebook for our jupytext demo
 jupytext demo/get_started.md --to ipynb --update-metadata '{"jupytext":null}'
