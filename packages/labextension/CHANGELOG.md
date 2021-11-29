@@ -1,4 +1,13 @@
-# 1.3.4 (2021-09-23)
+# 1.3.7 (2021-11-30)
+
+The extension for Jupyter Lab benefited from a series of improvements contributed by [Frédéric Collonval](https://github.com/fcollonval):
+- A new "Jupytext Notebook" factory offers the option to open text notebooks directly with the notebook view (#803). To use it, follow the instructions in the [documentation](https://github.com/mwouts/jupytext/blob/main/docs/index.md#install).
+- The ICommandPalette is optional, for compatibility with RISE within JupyterLab [RISE#605](https://github.com/damianavila/RISE/pull/605)
+- Added support for translation.
+
+We also upgraded the extension dependency and especially `json-schema` to address a security vulnerability.
+
+# 1.3.6 (2021-09-23)
 
 - We have upgraded the extension dependencies and especially `ansi-regex` to fix a security vulnerability (#857)
 
