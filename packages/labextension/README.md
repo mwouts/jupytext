@@ -23,12 +23,12 @@ jupyter labextension install jupyterlab-jupytext@1.1.1  # for JupyterLab 1.x
 
 We assume that you have activated the conda environment described in [CONTRIBUTING.md](https://github.com/mwouts/jupytext/blob/master/CONTRIBUTING.md).
 
-Then you can rebuild the Jupytext python package (with `python setup.py sdist bdist_wheel`) and reinstall it (`pip install dist/jupytext-x.x.x-py3-none-any.whl`).
+Then you can rebuild the Jupytext python package (with `BUILD_JUPYTERLAB_EXTENSION=1 python setup.py sdist bdist_wheel`) and reinstall it (`pip install dist/jupytext-x.x.x-py3-none-any.whl`).
 
 Alternatively, if you prefer to develop iteratively, you could install a development version of the extension with
 
 ```bash
-jupyter labextension develop . --overwrite
+BUILD_JUPYTERLAB_EXTENSION=1 jupyter labextension develop . --overwrite
 ```
 
 Read more on this on the [JupyterLab documentation](https://jupyterlab.readthedocs.io/en/latest/extension/extension_dev.html#developing-a-prebuilt-extension).
