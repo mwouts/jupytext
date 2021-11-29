@@ -30,6 +30,25 @@ When Jupytext is installed, `.py` and `.md` files have a notebook icon. And you 
 (click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo))
 </details>
 <details>
+<summary>With a click on the text file in JupyterLab</summary>
+To do that, you will need to change the default viewer for text files supported by Jupytext by copy-pasting the following settings in `Document Manager` section:
+
+```json
+{
+  "defaultViewers": {
+    "markdown": "Jupytext Notebook",
+    "jupytext-md": "Jupytext Notebook"
+  }
+}
+```
+
+
+Here is a screencast of the steps to follow:
+
+[![](https://raw.githubusercontent.com/mwouts/jupytext/main/docs/jupyterlab_default_viewer.gif)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb)
+(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb))
+</details>
+<details>
   <summary>With a right click and <i>open with notebook</i> in Jupyter Lab</summary>
 
 [![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/ContextMenuLab.png)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb)

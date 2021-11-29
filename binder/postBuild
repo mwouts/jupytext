@@ -6,6 +6,9 @@ set -e
 # just add "jupytext" to your "binder/requirements.txt" instead.
 BUILD_JUPYTERLAB_EXTENSION=1 pip install .[myst]
 
+mkdir -p ${HOME}/.jupyter/labconfig
+cp binder/labconfig/* ${HOME}/.jupyter/labconfig
+
 # Create the notebook for our jupytext demo
 jupytext demo/get_started.md --to ipynb --update-metadata '{"jupytext":null}'
 
