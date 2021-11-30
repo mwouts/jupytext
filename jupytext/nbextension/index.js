@@ -1,6 +1,6 @@
 // A Jupyter notebook extension for Jupytext
 // Refer to the documentation at
-// https://github.com/mwouts/jupytext/blob/master/jupytext/nbextension/README.md
+// https://github.com/mwouts/jupytext/blob/main/jupytext/nbextension/README.md
 
 // The most convenient way to edit this file is to edit the version installed by pip at
 // share/jupyter/nbextensions/jupytext

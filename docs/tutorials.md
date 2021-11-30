@@ -5,7 +5,7 @@
 [![](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48)
 [![](https://img.shields.io/badge/CFM%20insights-Jupytext%20&%20Papermill-00ab6c.svg)](https://medium.com/capital-fund-management/automated-reports-with-jupyter-notebooks-using-jupytext-and-papermill-619e60c37330)
 [![](https://img.shields.io/badge/TDS-VS%20Code%20vs%20PyCharm-00ab6c.svg)](https://towardsdatascience.com/jupyter-notebooks-in-the-ide-visual-studio-code-versus-pycharm-5e72218eb3e8)
-[![](https://img.shields.io/badge/Binder-Try%20it!-blue.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb)
+[![](https://img.shields.io/badge/Binder-Try%20it!-blue.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
 
 Looking for a demo?
 - Read the original [announcement](https://towardsdatascience.com/introducing-jupytext-9234fdff6c57) in _Towards Data Science_ (Sept. 2018),
@@ -13,4 +13,4 @@ Looking for a demo?
 - Read our article on [Jupytext and Papermill](https://medium.com/capital-fund-management/automated-reports-with-jupyter-notebooks-using-jupytext-and-papermill-619e60c37330) in _CFM Insights_ (Sept. 2019)
 - See how you can edit [Jupyter Notebooks in VS Code or PyCharm](https://towardsdatascience.com/jupyter-notebooks-in-the-ide-visual-studio-code-versus-pycharm-5e72218eb3e8) with (or without!) Jupytext (Jan. 2020)
 - Watch the [JupyterCon 2020 talk](https://github.com/mwouts/jupytext_jupytercon2020/blob/master/README.md) on Jupytext (Oct. 2020),
-- or, try Jupytext online with [binder](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb)!
+- or, try Jupytext online with [binder](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)!

@@ -1,6 +1,17 @@
 Jupytext ChangeLog
 ==================
 
+1.13.2 (2021-11-30)
+-------------------
+
+**Changed**
+- The extension for Jupyter Lab benefited from a series of improvements contributed by [Frédéric Collonval](https://github.com/fcollonval):
+  - A new "Jupytext Notebook" factory offers the option to open text notebooks directly with the notebook view (#803). To use it, follow the instructions in the [documentation](https://github.com/mwouts/jupytext/blob/main/docs/index.md#install).
+  - The ICommandPalette is optional, for compatibility with RISE within JupyterLab [RISE#605](https://github.com/damianavila/RISE/pull/605)
+  - Added support for translation
+- Branch `master` was renamed to `main` (links update)
+
+
 1.13.1 (2021-10-07)
 -------------------
 
@@ -292,7 +303,7 @@ error will occur if the required dependencies, resp. `markdown-it-py` and `pando
 ------------------
 
 **Added**
-- Jupytext can use a local or global [configuration file](https://github.com/mwouts/jupytext/blob/master/docs/config.md) ([#508](https://github.com/mwouts/jupytext/issues/508))
+- Jupytext can use a local or global [configuration file](https://github.com/mwouts/jupytext/blob/main/docs/config.md) ([#508](https://github.com/mwouts/jupytext/issues/508))
 - Jupytext can pair notebooks in trees. Use e.g. `notebooks///ipynb,scripts///py:percent` if you want to replicate the tree of notebooks under `notebooks` in a folder named `scripts` ([#424](https://github.com/mwouts/jupytext/issues/424))
 - The extension for Jupyter Notebook has a _New Text Notebook_ menu that creates text-only notebooks ([#443](https://github.com/mwouts/jupytext/issues/443))
 - Groovy and Java are now supported, thanks to Przemek Wesołek ([#500](https://github.com/mwouts/jupytext/issues/500))

@@ -51,7 +51,7 @@ If `JUPYTEXT_CEILING_DIRECTORIES` is defined, Jupytext will stop searching for c
 
 ### Configuring paired notebooks globally
 
-The examples below assume that you use a `.jupytext`, `jupytext.toml` or `.jupytext.toml` Jupyter configuration file in TOML format. If you use another extension, please adapt the examples. For instance, if you want to use `jupytext.yml` in YAML format, replace the `=` sign with `:` and remove the double quotes. See also [`test_config.py`](https://github.com/mwouts/jupytext/blob/master/tests/test_config.py) for short examples in all the supported formats.
+The examples below assume that you use a `.jupytext`, `jupytext.toml` or `.jupytext.toml` Jupyter configuration file in TOML format. If you use another extension, please adapt the examples. For instance, if you want to use `jupytext.yml` in YAML format, replace the `=` sign with `:` and remove the double quotes. See also [`test_config.py`](https://github.com/mwouts/jupytext/blob/main/tests/test_config.py) for short examples in all the supported formats.
 
 Also, the examples are for Jupytext 1.11.0 or later. If you are using an older version, you should consult the [previous version](https://github.com/mwouts/jupytext/blob/v1.10.3/docs/config.md#configuring-paired-notebooks-globally) of this documentation.
 
@@ -131,4 +131,4 @@ Finally, to hide the notebook metadata in an HTML comment in Markdown files, use
 
 ### More options
 
-There are a couple more options available - please have a look at the `JupytextConfiguration` class in [config.py](https://github.com/mwouts/jupytext/blob/master/jupytext/config.py).
+There are a couple more options available - please have a look at the `JupytextConfiguration` class in [config.py](https://github.com/mwouts/jupytext/blob/main/jupytext/config.py).

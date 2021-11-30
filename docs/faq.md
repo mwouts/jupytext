@@ -24,7 +24,7 @@ Saving notebooks as scripts is an appropriate choice when you want to act on the
 
 ## Can I see a sample of each format?
 
-Go to [our demo folder](https://github.com/mwouts/jupytext/tree/master/demo) and see how our sample `World population` notebook is represented in each format.
+Go to [our demo folder](https://github.com/mwouts/jupytext/tree/main/demo) and see how our sample `World population` notebook is represented in each format.
 
 ## Can I edit the paired text file?
 

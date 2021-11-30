@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/mwouts/jupytext/master/docs/logo_large.png)
+![](https://raw.githubusercontent.com/mwouts/jupytext/main/docs/logo_large.png)
 
 ![CI](https://github.com/mwouts/jupytext/workflows/CI/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/jupytext/badge/?version=latest)](https://jupytext.readthedocs.io/en/latest/?badge=latest)
@@ -9,8 +9,8 @@
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/jupytext.svg)](https://anaconda.org/conda-forge/jupytext)
 [![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
-[![Binder:notebook](https://img.shields.io/badge/binder-notebook-0172B2.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)
-[![Binder:lab](https://img.shields.io/badge/binder-jupyterlab-0172B2.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb)
+[![Binder:notebook](https://img.shields.io/badge/binder-notebook-0172B2.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo)
+[![Binder:lab](https://img.shields.io/badge/binder-jupyterlab-0172B2.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
 [![](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48)
 
 Have you always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningful diffs when doing version control? Then... Jupytext may well be the tool you're looking for!
@@ -44,14 +44,32 @@ When Jupytext is installed, `.py` and `.md` files have a notebook icon. And you 
 <details>
   <summary>With a click on the text file in Jupyter Notebook</summary>
 
-[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/TextNotebooks.png)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo)
-(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?filepath=demo))
+[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/TextNotebooks.png)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo)
+(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo))
 </details>
 <details>
+<summary>With a click on the text file in JupyterLab</summary>
+To do that, you will need to change the default viewer for text files supported by Jupytext by copy-pasting the following settings in `Document Manager` section:
+
+```json
+{
+  "defaultViewers": {
+    "markdown": "Jupytext Notebook",
+    "jupytext-md": "Jupytext Notebook"
+  }
+}
+```
+
+
+Here is a screencast of the steps to follow:
+
+[![](https://raw.githubusercontent.com/mwouts/jupytext/main/docs/jupyterlab_default_viewer.gif)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb)
+(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb))
+</details><details>
   <summary>With a right click and <i>open with notebook</i> in Jupyter Lab</summary>
 
-[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/ContextMenuLab.png)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb)
-(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb))
+[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/ContextMenuLab.png)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
+(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb))
 </details>
 </ul>
 
@@ -64,13 +82,13 @@ To pair a given `.ipynb` or text notebook to an additional notebook format, use 
 <details>
   <summary>the <i>"pair notebook with..."</i> commands in Jupyter Lab</summary>
 
-[![](https://raw.githubusercontent.com/mwouts/jupytext/master/packages/labextension/jupytext_commands.png)](docs/install.md#jupytext-commands-in-jupyterlab)
+[![](https://raw.githubusercontent.com/mwouts/jupytext/main/packages/labextension/jupytext_commands.png)](docs/install.md#jupytext-commands-in-jupyterlab)
 </details>
 
 <details>
   <summary>the <i>"pair notebook with..."</i> menu entries in Jupyter Notebook</summary>
 
-[![](https://raw.githubusercontent.com/mwouts/jupytext/master/jupytext/nbextension/jupytext_menu.png)](docs/install.md#jupytext-menu-in-jupyter-notebook)
+[![](https://raw.githubusercontent.com/mwouts/jupytext/main/jupytext/nbextension/jupytext_menu.png)](docs/install.md#jupytext-menu-in-jupyter-notebook)
 </details>
 
 <details>

@@ -7,11 +7,11 @@ The latest version for this extension is [![npm version](https://badge.fury.io/j
 Most users do not need to install this extension, since it is already included in the latest [jupytext](https://github.com/mwouts/jupytext/), both on [![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext) and
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/jupytext.svg)](https://anaconda.org/conda-forge/jupytext).
 
-![](https://github.com/mwouts/jupytext/raw/master/packages/labextension/jupytext_commands.png)
+![](https://raw.githubusercontent.com/mwouts/jupytext/main/packages/labextension/jupytext_commands.png)
 
 ## Installation
 
-Please install [Jupytext](https://github.com/mwouts/jupytext/blob/master/README.md#installation) first. As mentioned above, both the `pip` and `conda` packages do include the latest version of the JupyterLab extension, so in most cases you don't need to specifically install this `npm` package.
+Please install [Jupytext](https://github.com/mwouts/jupytext/blob/main/README.md#installation) first. As mentioned above, both the `pip` and `conda` packages do include the latest version of the JupyterLab extension, so in most cases you don't need to specifically install this `npm` package.
 
 In case you're not using JupyterLab 3.x, you will have to install an older version of the extension that is compatible with your version. Please first install `jupytext` using `pip` or `conda`, and then downgrade the extension to a version compatible with your version of Jupyter Lab with:
 ```bash
@@ -21,14 +21,14 @@ jupyter labextension install jupyterlab-jupytext@1.1.1  # for JupyterLab 1.x
 
 # How to develop this extension
 
-We assume that you have activated the conda environment described in [CONTRIBUTING.md](https://github.com/mwouts/jupytext/blob/master/CONTRIBUTING.md).
+We assume that you have activated the conda environment described in [CONTRIBUTING.md](https://github.com/mwouts/jupytext/blob/main/CONTRIBUTING.md).
 
-Then you can rebuild the Jupytext python package (with `python setup.py sdist bdist_wheel`) and reinstall it (`pip install dist/jupytext-x.x.x-py3-none-any.whl`).
+Then you can rebuild the Jupytext python package (with `BUILD_JUPYTERLAB_EXTENSION=1 python setup.py sdist bdist_wheel`) and reinstall it (`pip install dist/jupytext-x.x.x-py3-none-any.whl`).
 
 Alternatively, if you prefer to develop iteratively, you could install a development version of the extension with
 
 ```bash
-jupyter labextension develop . --overwrite
+BUILD_JUPYTERLAB_EXTENSION=1 jupyter labextension develop . --overwrite
 ```
 
 Read more on this on the [JupyterLab documentation](https://jupyterlab.readthedocs.io/en/latest/extension/extension_dev.html#developing-a-prebuilt-extension).
