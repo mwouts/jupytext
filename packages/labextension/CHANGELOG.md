@@ -1,3 +1,7 @@
+# 1.3.8 (2021-12-03)
+
+- The "Jupytext Notebook" factory that lets the user configure the Notebook viewer as the default for text notebooks accepts more filetypes: "myst", "r-markdown" and "quarto" ([#803](https://github.com/mwouts/jupytext/issues/803))
+
 # 1.3.7 (2021-11-30)
 
 The extension for Jupyter Lab benefited from a series of improvements contributed by [Frédéric Collonval](https://github.com/fcollonval):

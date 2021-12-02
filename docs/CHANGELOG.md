@@ -1,15 +1,22 @@
 Jupytext ChangeLog
 ==================
 
+1.13.3-dev (2021-12-03)
+-------------------
+
+**Changed**
+- The "Jupytext Notebook" factory that lets the user configure the Notebook viewer as the default for text notebooks accepts more filetypes: "myst", "r-markdown" and "quarto" ([#803](https://github.com/mwouts/jupytext/issues/803))
+
+
 1.13.2 (2021-11-30)
 -------------------
 
 **Changed**
 - The extension for Jupyter Lab benefited from a series of improvements contributed by [Frédéric Collonval](https://github.com/fcollonval):
-  - A new "Jupytext Notebook" factory offers the option to open text notebooks directly with the notebook view (#803). To use it, follow the instructions in the [documentation](https://github.com/mwouts/jupytext/blob/main/docs/index.md#install).
-  - The ICommandPalette is optional, for compatibility with RISE within JupyterLab [RISE#605](https://github.com/damianavila/RISE/pull/605)
+  - A new "Jupytext Notebook" factory offers the option to open text notebooks directly with the notebook view ([#803](https://github.com/mwouts/jupytext/issues/803)). To use it, follow the instructions in the [documentation](https://github.com/mwouts/jupytext/blob/main/docs/index.md#install).
+  - The ICommandPalette is optional, for compatibility with RISE within JupyterLab [RISE[#605](https://github.com/mwouts/jupytext/issues/605)](https://github.com/damianavila/RISE/pull/605)
   - Added support for translation
-- Branch `master` was renamed to `main` (links update)
+- Branch `master` was renamed to `main` (links in the documentation were updated)
 
 
 1.13.1 (2021-10-07)
