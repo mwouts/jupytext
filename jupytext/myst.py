@@ -283,7 +283,7 @@ def myst_to_notebook(
 
     # get the document metadata
     metadata_nb = {}
-    if tokens[0].type == "front_matter":
+    if tokens and tokens[0].type == "front_matter":
         metadata = tokens.pop(0)
         md_start_line = metadata.map[1]
         try:
