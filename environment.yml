@@ -9,7 +9,7 @@ dependencies:
   - jupyter-packaging
   - pyyaml
   - toml
-  - markdown-it-py~=1.0
+  - markdown-it-py>=1.0.0,<3.0.0
   - mdit-py-plugins
   - nbconvert
   - ipykernel
