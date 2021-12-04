@@ -49,13 +49,18 @@ When Jupytext is installed, `.py` and `.md` files have a notebook icon. And you 
 </details>
 <details>
 <summary>With a click on the text file in JupyterLab</summary>
-To do that, you will need to change the default viewer for text files supported by Jupytext by copy-pasting the following settings in `Document Manager` section:
+To do that, you will need to change the default viewer for text notebooks by copy-pasting the following settings (or the subset that matches your use case) in the `Document Manager` section:
 
 ```json
 {
   "defaultViewers": {
     "markdown": "Jupytext Notebook",
-    "jupytext-md": "Jupytext Notebook"
+    "myst": "Jupytext Notebook",
+    "r-markdown": "Jupytext Notebook",
+    "quarto": "Jupytext Notebook",
+    "julia": "Jupytext Notebook",
+    "python": "Jupytext Notebook",
+    "r": "Jupytext Notebook"
   }
 }
 ```

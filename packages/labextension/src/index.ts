@@ -425,19 +425,33 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     // Define file types
     app.docRegistry.addFileType({
-      name: "jupytext-md",
-      displayName: trans.__("Markdown File"),
-      // Extension file are transformed to lower case...
-      extensions: [".rmd", ".qmd"],
+      name: "myst",
+      displayName: trans.__("MyST Markdown Notebook"),
+      extensions: [".myst", ".mystnb", ".mnb"],
       icon: markdownIcon
     });
 
-    // Duplicate notebook factory to apply it on markdown file
+    app.docRegistry.addFileType({
+      name: "r-markdown",
+      displayName: trans.__("R Markdown Notebook"),
+      // Extension file are transformed to lower case...
+      extensions: [".rmd"],
+      icon: markdownIcon
+    });
+
+    app.docRegistry.addFileType({
+      name: "quarto",
+      displayName: trans.__("Quarto Notebook"),
+      extensions: [".qmd"],
+      icon: markdownIcon
+    });
+
+    // Duplicate notebook factory to apply it on Jupytext notebooks
     //   Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
     const factory = new NotebookWidgetFactory({
       name: "Jupytext Notebook",
       // label: trans.__("Jupytext Notebook"), // will be needed in JupyterLab 4
-      fileTypes: ["jupytext-md", "markdown", "python"],
+      fileTypes: ["markdown", "myst", "r-markdown", "quarto", "julia", "python", "r"],
       modelName: notebookFactory.modelName ?? "notebook",
       preferKernel: notebookFactory.preferKernel ?? true,
       canStartKernel: notebookFactory.canStartKernel ?? true,
