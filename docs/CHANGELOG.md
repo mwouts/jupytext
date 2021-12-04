@@ -1,11 +1,13 @@
 Jupytext ChangeLog
 ==================
 
-1.13.3-dev (2021-12-03)
+1.13.3 (2021-12-04)
 -------------------
 
 **Changed**
 - The "Jupytext Notebook" factory that lets the user configure the Notebook viewer as the default for text notebooks accepts more filetypes: "myst", "r-markdown" and "quarto" ([#803](https://github.com/mwouts/jupytext/issues/803))
+- Empty MyST Markdown files are valid notebooks ([#883](https://github.com/mwouts/jupytext/issues/883))
+- Jupytext also works with `markdown-it-py` v2.0 ([#885](https://github.com/mwouts/jupytext/issues/885))
 
 
 1.13.2 (2021-11-30)
