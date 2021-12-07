@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/mwouts/jupytext/workflows/CI/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/jupytext/badge/?version=latest)](https://jupytext.readthedocs.io/en/latest/?badge=latest)
-[![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=master)](https://codecov.io/gh/mwouts/jupytext/branch/master)
+[![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=main)](https://codecov.io/gh/mwouts/jupytext/branch/main)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/mwouts/jupytext.svg)](https://lgtm.com/projects/g/mwouts/jupytext/context:python)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![GitHub language count](https://img.shields.io/github/languages/count/mwouts/jupytext)](docs/languages.md)
@@ -44,7 +44,7 @@ When Jupytext is installed, `.py` and `.md` files have a notebook icon. And you 
 <details>
   <summary>With a click on the text file in Jupyter Notebook</summary>
 
-[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/TextNotebooks.png)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo)
+[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/main/JupytextDocumentation/TextNotebooks.png)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo)
 (click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo))
 </details>
 <details>
@@ -68,12 +68,12 @@ To do that, you will need to change the default viewer for text notebooks by cop
 
 Here is a screencast of the steps to follow:
 
-[![](https://raw.githubusercontent.com/mwouts/jupytext/main/docs/jupyterlab_default_viewer.gif)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb)
-(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/master?urlpath=lab/tree/demo/get_started.ipynb))
+[![](https://raw.githubusercontent.com/mwouts/jupytext/main/docs/jupyterlab_default_viewer.gif)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
+(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb))
 </details><details>
   <summary>With a right click and <i>open with notebook</i> in Jupyter Lab</summary>
 
-[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/ContextMenuLab.png)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
+[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/main/JupytextDocumentation/ContextMenuLab.png)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
 (click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb))
 </details>
 </ul>
