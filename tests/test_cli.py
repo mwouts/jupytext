@@ -794,9 +794,12 @@ def test_cli_sync_file_with_suffix(tmpdir, cwd_tmpdir):
     jupytext(["--sync", tmp_lgt_py])
     jupytext(["--sync", tmp_ipynb])
 
-    assert open(tmp_lgt_py).read().splitlines()[-2:] == ["", "1+1"]
-    assert open(tmp_pct_py).read().splitlines()[-3:] == ["", "# %%", "1+1"]
-    assert open(tmp_rmd).read().splitlines()[-4:] == ["", "```{python}", "1+1", "```"]
+    with open(tmp_lgt_py) as fp:
+        assert fp.read().splitlines()[-2:] == ["", "1+1"]
+    with open(tmp_pct_py) as fp:
+        fp.read().splitlines()[-3:] == ["", "# %%", "1+1"]
+    with open(tmp_rmd) as fp:
+        fp.read().splitlines()[-4:] == ["", "```{python}", "1+1", "```"]
 
 
 @requires_sphinx_gallery
