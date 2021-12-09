@@ -26,11 +26,11 @@ jupyter:
 ```
 
 You can add custom notebook metadata like `author` or `title` under the `jupyter:` section, it will be synchronized with the notebook metadata.
-And if you wish to export more metadata from the notebook, have a look at the paragraph on [metadata filtering](#metadata-filtering).
+And if you wish to export more metadata from the notebook, have a look at the paragraph on [metadata filtering](config.md#Metadata-filtering).
 
 In the Markdown format, markdown cells are inserted verbatim and separated with two blank lines.
 
-If you'd like that cell breaks also occurs on Markdown headers, add a `split_at_heading: true` entry in the `jupytext` section in the YAML header, or if you want that option to be the default for all Markdown documents in Jupyter, activate the option in the [`jupytext.toml` configuration file](config.md#jupytext-configuration-file):
+If you'd like that cell breaks also occurs on Markdown headers, add a `split_at_heading: true` entry in the `jupytext` section in the YAML header, or if you want that option to be the default for all Markdown documents in Jupyter, activate the option in the [`jupytext.toml` configuration file](config.md#Jupytext-configuration-file):
 
 ```
 split_at_heading = true
@@ -219,7 +219,7 @@ or
 ```python
 cell_markers = "{{{,}}}"           # Use Vim region folding delimiters
 ```
-to your [`jupytext.toml` configuration file](config.md#jupytext-configuration-file).
+to your [`jupytext.toml` configuration file](config.md#Jupytext-configuration-file).
 
 See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.lgt.py) in that format.
 
@@ -287,7 +287,7 @@ If you want to use multiline comments for all your paired notebooks, you could a
 ```python
 cell_markers = '"""'
 ```
-to your [`jupytext.toml` configuration file](config.md#jupytext-configuration-file).
+to your [`jupytext.toml` configuration file](config.md#Jupytext-configuration-file).
 
 See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.pct.py) in the `percent` format.
 
@@ -303,7 +303,7 @@ Comments in Sphinx-Gallery scripts are formatted using reStructuredText rather t
 
 Turn a GitHub repository containing Sphinx-Gallery scripts into a live notebook repository with [Binder](https://mybinder.org/) and Jupytext by adding only two files to the repo:
 - `binder/requirements.txt`, a list of the required packages (including `jupytext`)
-- a [`jupytext.toml` configuration file](config.md#jupytext-configuration-file) with the following contents:
+- a [`jupytext.toml` configuration file](config.md#Jupytext-configuration-file) with the following contents:
 ```
 preferred_jupytext_formats_read = "py:sphinx"
 sphinx_convert_rst2md = true

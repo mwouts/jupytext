@@ -11,7 +11,7 @@ Most users do not need to install this extension, since it is already included i
 
 ## Installation
 
-Please install [Jupytext](https://github.com/mwouts/jupytext/blob/main/README.md#installation) first. As mentioned above, both the `pip` and `conda` packages do include the latest version of the JupyterLab extension, so in most cases you don't need to specifically install this `npm` package.
+Please install [Jupytext](https://github.com/mwouts/jupytext/blob/main/README.md#Install) first. As mentioned above, both the `pip` and `conda` packages do include the latest version of the JupyterLab extension, so in most cases you don't need to specifically install this `npm` package.
 
 In case you're not using JupyterLab 3.x, you will have to install an older version of the extension that is compatible with your version. Please first install `jupytext` using `pip` or `conda`, and then downgrade the extension to a version compatible with your version of Jupyter Lab with:
 ```bash
