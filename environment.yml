@@ -16,6 +16,7 @@ dependencies:
   - jupyter_contrib_nbextensions
   - pytest
   - pytest-xdist
+  - pytest-randomly
   - pytest-cov
   - pre-commit
   - gitpython

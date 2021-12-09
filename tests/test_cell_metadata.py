@@ -14,25 +14,29 @@ from jupytext.cell_metadata import (
 from jupytext.compare import compare
 from jupytext.metadata_filter import filter_metadata
 
-SAMPLES = [
-    ("r", ("R", {})),
-    (
-        'r plot_1, dpi=72, fig.path="fig_path/"',
-        ("R", {"name": "plot_1", "dpi": 72, "fig.path": "fig_path/"}),
-    ),
-    (
-        'r plot_1, bool=TRUE, fig.path="fig_path/"',
-        ("R", {"name": "plot_1", "bool": True, "fig.path": "fig_path/"}),
-    ),
-    ("r echo=FALSE", ("R", {"tags": ["remove_input"]})),
-    ("r plot_1, echo=TRUE", ("R", {"name": "plot_1", "echo": True})),
-    (
-        "python echo=if a==5 then TRUE else FALSE",
-        ("python", {"echo": "#R_CODE#if a==5 then TRUE else FALSE"}),
-    ),
-    (
-        'python noname, tags=c("a", "b", "c"), echo={sum(a+c(1,2))>1}',
+
+def r_options_language_metadata():
+    for r_options, language, metadata in [
+        ("r", "R", {}),
         (
+            'r plot_1, dpi=72, fig.path="fig_path/"',
+            "R",
+            {"name": "plot_1", "dpi": 72, "fig.path": "fig_path/"},
+        ),
+        (
+            'r plot_1, bool=TRUE, fig.path="fig_path/"',
+            "R",
+            {"name": "plot_1", "bool": True, "fig.path": "fig_path/"},
+        ),
+        ("r echo=FALSE", "R", {"tags": ["remove_input"]}),
+        ("r plot_1, echo=TRUE", "R", {"name": "plot_1", "echo": True}),
+        (
+            "python echo=if a==5 then TRUE else FALSE",
+            "python",
+            {"echo": "#R_CODE#if a==5 then TRUE else FALSE"},
+        ),
+        (
+            'python noname, tags=c("a", "b", "c"), echo={sum(a+c(1,2))>1}',
             "python",
             {
                 "name": "noname",
@@ -40,32 +44,34 @@ SAMPLES = [
                 "echo": "#R_CODE#{sum(a+c(1,2))>1}",
             },
         ),
-    ),
-    ('python active="ipynb,py"', ("python", {"active": "ipynb,py"})),
-    (
-        'python include=FALSE, active="Rmd"',
-        ("python", {"active": "Rmd", "tags": ["remove_cell"]}),
-    ),
-    (
-        'r chunk_name, include=FALSE, active="Rmd"',
-        ("R", {"name": "chunk_name", "active": "Rmd", "tags": ["remove_cell"]}),
-    ),
-    ('python tags=c("parameters")', ("python", {"tags": ["parameters"]})),
-]
+        ('python active="ipynb,py"', "python", {"active": "ipynb,py"}),
+        (
+            'python include=FALSE, active="Rmd"',
+            "python",
+            {"active": "Rmd", "tags": ["remove_cell"]},
+        ),
+        (
+            'r chunk_name, include=FALSE, active="Rmd"',
+            "R",
+            {"name": "chunk_name", "active": "Rmd", "tags": ["remove_cell"]},
+        ),
+        ('python tags=c("parameters")', "python", {"tags": ["parameters"]}),
+    ]:
+        yield r_options, language, metadata
 
 
-@pytest.mark.parametrize("options,language_and_metadata", SAMPLES)
-def test_parse_rmd_options(options, language_and_metadata):
-    compare(rmd_options_to_metadata(options), language_and_metadata)
+@pytest.mark.parametrize("options,language, metadata", r_options_language_metadata())
+def test_parse_rmd_options(options, language, metadata):
+    compare(rmd_options_to_metadata(options), (language, metadata))
 
 
-@pytest.mark.parametrize("options,language_and_metadata", SAMPLES)
-def test_build_options(options, language_and_metadata):
-    compare(metadata_to_rmd_options(*language_and_metadata), options)
+@pytest.mark.parametrize("options,language, metadata", r_options_language_metadata())
+def test_build_options(options, language, metadata):
+    compare(metadata_to_rmd_options(*(language, metadata)), options)
 
 
-@pytest.mark.parametrize("options,language_and_metadata", SAMPLES)
-def test_build_options_random_order(options, language_and_metadata):
+@pytest.mark.parametrize("options,language, metadata", r_options_language_metadata())
+def test_build_options_random_order(options, language, metadata):
     # Older python has no respect for order...
     # assert to_chunk_options(metadata) == options
 
@@ -73,7 +79,7 @@ def test_build_options_random_order(options, language_and_metadata):
         set([o.strip() for o in opt.split(",")])
 
     assert split_and_strip(
-        metadata_to_rmd_options(*language_and_metadata)
+        metadata_to_rmd_options(*(language, metadata))
     ) == split_and_strip(options)
 
 
