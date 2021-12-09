@@ -262,6 +262,7 @@ def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
         git("commit", "-m", "created")
 
 
+@pytest.mark.filterwarnings("ignore:The --pre-commit argument is deprecated")
 def test_manual_call_of_pre_commit_hook(tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))

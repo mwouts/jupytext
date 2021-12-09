@@ -703,6 +703,7 @@ def test_utf8_out_331(capsys, caplog):
 
 
 @requires_jupytext_installed
+@pytest.mark.filterwarnings("ignore:The --pre-commit argument is deprecated")
 def test_cli_expect_errors(tmp_ipynb):
     with pytest.raises(ValueError):
         jupytext([])
@@ -722,6 +723,11 @@ def test_cli_expect_errors(tmp_ipynb):
         system("jupytext", ["notebook.ipynb", "--from", "py:percent", "--to", "md"])
 
 
+@pytest.mark.filterwarnings(
+    "ignore:You have passed a file name to the '--to' option, "
+    "when a format description was expected. "
+    "Maybe you want to use the '-o' option instead?"
+)
 def test_format_prefix_suffix(tmpdir, cwd_tmpdir):
     os.makedirs("notebooks")
     tmp_ipynb = "notebooks/notebook_name.ipynb"
