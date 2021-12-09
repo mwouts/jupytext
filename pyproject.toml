@@ -10,6 +10,9 @@ filterwarnings = [
     "ignore:Passing a schema to Validator.iter_errors is deprecated and will be removed in a future release:DeprecationWarning",
     # in test_utf8_out_331 and two others
     'ignore:Exception ignored in. <function Context.__del__:pytest.PytestUnraisableExceptionWarning',
+    'ignore:contextfilter. is renamed to .pass_context:DeprecationWarning',
     # in test_cli_expect_errors and two others
-    'ignore:Exception ignored in. <socket.socket:pytest.PytestUnraisableExceptionWarning'
+    'ignore:Exception ignored in. <socket.socket:pytest.PytestUnraisableExceptionWarning',
+    # test_config_jupytext_jupyter_fs_meta_manager
+    'ignore:The alias `_\(\)` will be deprecated. Use `_i18n\(\)` instead.:FutureWarning'
 ]
