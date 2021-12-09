@@ -163,7 +163,8 @@ def header_to_metadata_and_cell(
 ):
     """
     Return the metadata, a boolean to indicate if a jupyter section was found,
-     the first cell of notebook if some metadata is found outside of the jupyter section, and next loc in text
+    the first cell of notebook if some metadata is found outside
+    the jupyter section, and next loc in text
     """
 
     header = []
@@ -224,6 +225,10 @@ def header_to_metadata_and_cell(
             ended = True
             if in_html_div:
                 continue
+            break
+
+        # Stop if there is something else than a YAML header
+        if not started and line.strip():
             break
 
         if _JUPYTER_RE.match(line):
