@@ -6,6 +6,7 @@ Jupytext ChangeLog
 
 **Fixed**
 - The parsing of notebooks that don't have a YAML header (like `docs/formats.md`) was improved.
+- The test suite works with `pytest-randomly` ([#838](https://github.com/mwouts/jupytext/issues/838))
 
 
 1.13.3 (2021-12-04)
