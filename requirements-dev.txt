@@ -3,6 +3,7 @@ flake8
 isort
 black
 pytest>=3.6
+pytest-randomly
 pytest-cov
 notebook
 jupyter_client

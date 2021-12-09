@@ -15,6 +15,7 @@ dependencies:
   - mdit-py-plugins
   - pip
   - pytest
+  - pytest-randomly
   - pytest-cov
   - coverage
   - flake8
