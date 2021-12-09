@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.13.4-dev (2021-12-??)
+-----------------------
+
+**Fixed**
+- The parsing of notebooks that don't have a YAML header (like `docs/formats.md`) was improved.
+
+
 1.13.3 (2021-12-04)
 -------------------
 
