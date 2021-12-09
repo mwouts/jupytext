@@ -4,6 +4,9 @@ Jupytext ChangeLog
 1.13.4-dev (2021-12-??)
 -----------------------
 
+**Changed**
+- The test suite turns warnings into errors, after filtering the warnings that don't belong to Jupytext ([#823](https://github.com/mwouts/jupytext/issues/823))
+
 **Fixed**
 - The parsing of notebooks that don't have a YAML header (like `docs/formats.md`) was improved.
 - The test suite works with `pytest-randomly` ([#838](https://github.com/mwouts/jupytext/issues/838))
