@@ -47,11 +47,17 @@ To do that, you will need to change the default viewer for text notebooks by cop
 }
 ```
 
-
 Here is a screencast of the steps to follow:
 
 [![](https://raw.githubusercontent.com/mwouts/jupytext/main/docs/jupyterlab_default_viewer.gif)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
 (click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb))
+
+Another possibility is to activate this with a [default_setting_overrides.json](https://github.com/mwouts/jupytext/blob/main/binder/labconfig/default_setting_overrides.json) file in the `.jupyter/labconfig` folder with e.g.
+```
+wget https://raw.githubusercontent.com/mwouts/jupytext/main/binder/labconfig/default_setting_overrides.json -P  ~/.jupyter/labconfig/
+```
+
+Note: to open links to `.md` files in notebooks with the Notebook editor, use `jupyterlab>=4.0.0a16`.
 </details>
 <details>
   <summary>With a right click and <i>open with notebook</i> in Jupyter Lab</summary>
