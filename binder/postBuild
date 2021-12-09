@@ -1,6 +1,9 @@
 # Stop everything if one command fails
 set -e
 
+# Install JupyterLab 4.O (pre)
+pip install 'jupyterlab>=4.0.0a16'
+
 # Install from sources
 # NB: If you want to use Jupytext on your binder, don't install it from source,
 # just add "jupytext" to your "binder/requirements.txt" instead.
