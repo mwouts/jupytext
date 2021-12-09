@@ -8,7 +8,7 @@ from jupytext.myst import myst_extensions
 from .utils import is_myst_available, is_quarto_available
 
 
-@pytest.mark.parametrize("ext", set(NOTEBOOK_EXTENSIONS) - {".ipynb"})
+@pytest.mark.parametrize("ext", sorted(set(NOTEBOOK_EXTENSIONS) - {".ipynb"}))
 def test_read_empty_text_notebook(ext, tmp_path):
     if ext == ".qmd" and not is_quarto_available(min_version="0.2.0"):
         pytest.skip("quarto is not available")
