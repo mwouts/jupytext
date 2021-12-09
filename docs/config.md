@@ -13,7 +13,7 @@ You can pair a notebook to as many text representations as you want (see our _Wo
 where
 - `ext` is one of `ipynb`, `md`, `Rmd`, `jl`, `py`, `R`, `sh`, `cpp`, `q`. Use the `auto` extension to have the script extension chosen according to the Jupyter kernel.
 - `format_name` (optional) is either `light` (default for scripts), `nomarker`, `percent`, `hydrogen`, `sphinx` (Python only), `spin` (R only) &mdash; see the [format specifications](formats.md).
-- `root_folder`, `path`, `prefix` and `suffix` allow to save the text representation to files with different names, or in different folders (see the [configuration files examples](config.md#configuring-paired-notebooks-globally)).
+- `root_folder`, `path`, `prefix` and `suffix` allow to save the text representation to files with different names, or in different folders (see the [configuration files examples](config.md#Configuring-paired-notebooks-globally)).
 
 Jupytext accepts a few additional options. These options should be added to the `"jupytext"` section in the metadata &mdash; use either the metadata editor or the `--opt/--format-options` argument on the command line.
 - `comment_magics`: By default, Jupyter magics are commented when notebooks are exported to any other format than markdown. If you prefer otherwise, use this boolean option, or its global counterpart (see below).
@@ -53,7 +53,7 @@ If `JUPYTEXT_CEILING_DIRECTORIES` is defined, Jupytext will stop searching for c
 
 The examples below assume that you use a `.jupytext`, `jupytext.toml` or `.jupytext.toml` Jupyter configuration file in TOML format. If you use another extension, please adapt the examples. For instance, if you want to use `jupytext.yml` in YAML format, replace the `=` sign with `:` and remove the double quotes. See also [`test_config.py`](https://github.com/mwouts/jupytext/blob/main/tests/test_config.py) for short examples in all the supported formats.
 
-Also, the examples are for Jupytext 1.11.0 or later. If you are using an older version, you should consult the [previous version](https://github.com/mwouts/jupytext/blob/v1.10.3/docs/config.md#configuring-paired-notebooks-globally) of this documentation.
+Also, the examples are for Jupytext 1.11.0 or later. If you are using an older version, you should consult the [previous version](https://github.com/mwouts/jupytext/blob/v1.10.3/docs/config.md#Configuring-paired-notebooks-globally) of this documentation.
 
 Say you want to always associate every `.ipynb` notebook with a `.md` file  (and reciprocally). This is done by adding the following to your `jupytext.toml` or `.jupytext.toml` Jupyter configuration file:
 ```
