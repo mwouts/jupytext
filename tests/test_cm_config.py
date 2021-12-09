@@ -88,7 +88,7 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
     ],
 )
 @pytest.mark.filterwarnings(
-    r"ignore:Passing unrecognized arguments "
+    r"ignore:Passing unrecog(i)nized arguments "
     r"to super\(JupytextConfiguration\).__init__"
 )
 def test_incorrect_config_message(tmpdir, cfg_file, cfg_text):
