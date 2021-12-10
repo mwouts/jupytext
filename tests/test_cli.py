@@ -67,6 +67,7 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     compare_notebooks(nb2, nb1)
 
 
+@requires_jupytext_installed
 def test_convert_single_file_in_place_m(tmpdir):
     nb_file = list_notebooks("ipynb_py")[0]
     nb_org = str(tmpdir.join(os.path.basename(nb_file)))
