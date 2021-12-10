@@ -687,6 +687,10 @@ def test_set_kernel_works_with_pipes_326(capsys):
 
 
 @skip_on_windows
+@pytest.mark.filterwarnings(
+    "ignore:unclosed context <zmq.asyncio.Context"
+    ":pytest.PytestUnraisableExceptionWarning"
+)
 def test_utf8_out_331(capsys, caplog):
     py = u"from IPython.core.display import HTML; HTML(u'\xd7')"
 
