@@ -87,6 +87,10 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
         (".jupytext.py", "c.hide_notebook_metadata = true"),
     ],
 )
+@pytest.mark.filterwarnings(
+    r"ignore:Passing (unrecognized|unrecoginized) arguments "
+    r"to super\(JupytextConfiguration\).__init__"
+)
 def test_incorrect_config_message(tmpdir, cfg_file, cfg_text):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)

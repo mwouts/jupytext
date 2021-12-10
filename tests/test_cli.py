@@ -67,6 +67,7 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     compare_notebooks(nb2, nb1)
 
 
+@requires_jupytext_installed
 def test_convert_single_file_in_place_m(tmpdir):
     nb_file = list_notebooks("ipynb_py")[0]
     nb_org = str(tmpdir.join(os.path.basename(nb_file)))
@@ -687,6 +688,7 @@ def test_set_kernel_works_with_pipes_326(capsys):
 
 
 @skip_on_windows
+@pytest.mark.filterwarnings("ignore")
 def test_utf8_out_331(capsys, caplog):
     py = u"from IPython.core.display import HTML; HTML(u'\xd7')"
 
@@ -703,6 +705,7 @@ def test_utf8_out_331(capsys, caplog):
 
 
 @requires_jupytext_installed
+@pytest.mark.filterwarnings("ignore:The --pre-commit argument is deprecated")
 def test_cli_expect_errors(tmp_ipynb):
     with pytest.raises(ValueError):
         jupytext([])
@@ -722,6 +725,11 @@ def test_cli_expect_errors(tmp_ipynb):
         system("jupytext", ["notebook.ipynb", "--from", "py:percent", "--to", "md"])
 
 
+@pytest.mark.filterwarnings(
+    "ignore:You have passed a file name to the '--to' option, "
+    "when a format description was expected. "
+    "Maybe you want to use the '-o' option instead?"
+)
 def test_format_prefix_suffix(tmpdir, cwd_tmpdir):
     os.makedirs("notebooks")
     tmp_ipynb = "notebooks/notebook_name.ipynb"
@@ -788,9 +796,12 @@ def test_cli_sync_file_with_suffix(tmpdir, cwd_tmpdir):
     jupytext(["--sync", tmp_lgt_py])
     jupytext(["--sync", tmp_ipynb])
 
-    assert open(tmp_lgt_py).read().splitlines()[-2:] == ["", "1+1"]
-    assert open(tmp_pct_py).read().splitlines()[-3:] == ["", "# %%", "1+1"]
-    assert open(tmp_rmd).read().splitlines()[-4:] == ["", "```{python}", "1+1", "```"]
+    with open(tmp_lgt_py) as fp:
+        assert fp.read().splitlines()[-2:] == ["", "1+1"]
+    with open(tmp_pct_py) as fp:
+        fp.read().splitlines()[-3:] == ["", "# %%", "1+1"]
+    with open(tmp_rmd) as fp:
+        fp.read().splitlines()[-4:] == ["", "```{python}", "1+1", "```"]
 
 
 @requires_sphinx_gallery
