@@ -48,7 +48,7 @@ When Jupytext is installed, `.py` and `.md` files have a notebook icon. And you 
 (click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo))
 </details>
 <details>
-<summary>With a click on the text file in JupyterLab <b>(New!)</b></summary>
+<summary>With a click on the text file in JupyterLab (<b>⭐New⭐</b>)</summary>
 To do that, you will need to change the default viewer for text notebooks by copy-pasting the following settings (or the subset that matches your use case) in the `Document Manager` section:
 
 ```json
