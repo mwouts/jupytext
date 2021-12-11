@@ -17,6 +17,8 @@ filterwarnings = [
     'ignore:.*contextfilter.* renamed to .*pass_context:DeprecationWarning',
     # in test_cli_expect_errors and two others
     'ignore:Exception ignored in. <socket.socket:pytest.PytestUnraisableExceptionWarning',
+    # in test_paired_paths / Python 3.6
+    'ignore:Exception ignored in. <bound method Context.__del__:pytest.PytestUnraisableExceptionWarning',
     # test_config_jupytext_jupyter_fs_meta_manager
     'ignore:The alias `_\(\)` will be deprecated. Use `_i18n\(\)` instead.:FutureWarning',
     # Conda/Python 3.7/Windows - ImportError while loading conftest
