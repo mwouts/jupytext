@@ -1,11 +1,11 @@
 Jupytext ChangeLog
 ==================
 
-1.13.4-dev (2021-12-??)
------------------------
+1.13.4 (2021-12-12)
+-------------------
 
 **Changed**
-- The test suite turns warnings into errors, after filtering the warnings that don't belong to Jupytext ([#823](https://github.com/mwouts/jupytext/issues/823))
+- The test suite filters the warnings that don't belong to Jupytext ([#823](https://github.com/mwouts/jupytext/issues/823))
 
 **Fixed**
 - The parsing of notebooks that don't have a YAML header (like `docs/formats.md`) was improved.

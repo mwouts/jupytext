@@ -4,16 +4,21 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 filterwarnings = [
     # Uncomment this "error" to turn all unfiltered warnings into errors
-    "error",
+    # "error",
     # use single quote to denote raw strings in toml
+    # (10 warnings)
     'ignore:Passing unrecognized arguments to super\(KernelSpec\).__init__:DeprecationWarning',
-    # In many tests
+    # Not seen any more with latest Python + libs
     "ignore:Passing a schema to Validator.iter_errors is deprecated and will be removed in a future release:DeprecationWarning",
     # in test_utf8_out_331 and two others
+    # Not seen any more with latest Python + libs
     'ignore:Exception ignored in. <function Context.__del__:pytest.PytestUnraisableExceptionWarning',
+    # In test_markdown_jupytext_nbconvert_is_identity
     'ignore:.*contextfilter.* renamed to .*pass_context:DeprecationWarning',
     # in test_cli_expect_errors and two others
     'ignore:Exception ignored in. <socket.socket:pytest.PytestUnraisableExceptionWarning',
+    # in test_paired_paths / Python 3.6
+    'ignore:Exception ignored in. <bound method Context.__del__:pytest.PytestUnraisableExceptionWarning',
     # test_config_jupytext_jupyter_fs_meta_manager
     'ignore:The alias `_\(\)` will be deprecated. Use `_i18n\(\)` instead.:FutureWarning',
     # Conda/Python 3.7/Windows - ImportError while loading conftest
