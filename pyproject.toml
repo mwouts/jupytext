@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 filterwarnings = [
     # Uncomment this "error" to turn all unfiltered warnings into errors
-    "error",
+    # "error",
     # use single quote to denote raw strings in toml
     # (10 warnings)
     'ignore:Passing unrecognized arguments to super\(KernelSpec\).__init__:DeprecationWarning',

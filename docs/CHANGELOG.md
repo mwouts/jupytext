@@ -5,7 +5,7 @@ Jupytext ChangeLog
 -------------------
 
 **Changed**
-- The test suite turns warnings into errors, after filtering the warnings that don't belong to Jupytext ([#823](https://github.com/mwouts/jupytext/issues/823))
+- The test suite filters the warnings that don't belong to Jupytext ([#823](https://github.com/mwouts/jupytext/issues/823))
 
 **Fixed**
 - The parsing of notebooks that don't have a YAML header (like `docs/formats.md`) was improved.
