@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.13.5 (2021-12-27)
+-------------------
+
+**Fixed**
+- Jupytext refuses to open a text notebook that is not UTF-8 ([#896](https://github.com/mwouts/jupytext/issues/896))
+
+
 1.13.4 (2021-12-12)
 -------------------
 
