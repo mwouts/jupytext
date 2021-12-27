@@ -5,7 +5,7 @@ Jupytext ChangeLog
 -------------------
 
 **Fixed**
-- Jupytext refuses to open a text notebook that is not UTF-8 ([#896](https://github.com/mwouts/jupytext/issues/896))
+- Jupytext will not open a text notebook that is not UTF-8 ([#896](https://github.com/mwouts/jupytext/issues/896))
 
 
 1.13.4 (2021-12-12)
