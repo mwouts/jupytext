@@ -203,7 +203,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             if ext == ".ipynb":
                 model = self.super.get(path, content, type="notebook", format=format)
             else:
-                model = self.super.get(path, content, type="file", format=format)
+                model = self.super.get(path, content, type="file", format="text")
                 model["type"] = "notebook"
                 if content:
                     # We may need to update these keys, inherited from text files formats
