@@ -3,7 +3,7 @@ from git.exc import HookExecutionError
 from nbformat.v4.nbbase import new_markdown_cell
 from pre_commit.main import main as pre_commit
 
-from jupytext import TextFileContentsManager, read, write
+from jupytext import TextFileContentsManager, read
 
 from .utils import (
     skip_pre_commit_tests_on_windows,
@@ -66,45 +66,23 @@ repos:
     # But not in the ipynb notebook
     assert "text_representation" not in tmpdir.join("test.ipynb").read()
 
-    # modify the ipynb file in another editor
-    nb = read("test.ipynb")
+    # modify the ipynb file in Jupyter
+    # Reload the notebook
+    nb = cm.get("test.ipynb")["content"]
     nb.cells.append(new_markdown_cell("A new cell"))
-    write(nb, "test.ipynb")
+    cm.save(dict(type="notebook", content=nb), "test.ipynb")
 
-    tmp_repo.git.add("test.ipynb")
+    # The text representation metadata is in the py file
+    assert "text_representation" in tmpdir.join("test.py").read()
+    # But not in the ipynb notebook
+    assert "text_representation" not in tmpdir.join("test.ipynb").read()
 
-    # We try to commit one more time, this updates the py file
-    with pytest.raises(
-        HookExecutionError,
-        match="files were modified by this hook",
-    ):
-        tmp_repo.index.commit("failing")
-
-    # the text file has been updated
+    # the text file has been updated (and the ipynb file as well)
     assert "A new cell" in tmpdir.join("test.py").read()
-
-    # trying to commit should fail again because we forgot to add the .py version
-    with pytest.raises(HookExecutionError, match="git add test.py"):
-        tmp_repo.index.commit("still failing")
-
     nb = read("test.ipynb")
     assert len(nb.cells) == 2
 
-    # add the text file, now the commit will succeed
-    tmp_repo.git.add("test.py")
-    tmp_repo.index.commit("passing")
-
-    # modify the .py file
-    nb.cells.append(new_markdown_cell("A third cell"))
-    write(nb, "test.py", fmt="py:percent")
-    tmp_repo.git.add("test.py")
-
-    # the pre-commit hook will update the .ipynb file
-    with pytest.raises(HookExecutionError, match="git add test.ipynb"):
-        tmp_repo.index.commit("failing")
-
+    # add both files, the commit will succeed
     tmp_repo.git.add("test.ipynb")
+    tmp_repo.git.add("test.py")
     tmp_repo.index.commit("passing")
-
-    nb = read("test.ipynb")
-    assert len(nb.cells) == 3
