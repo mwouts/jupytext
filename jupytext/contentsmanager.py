@@ -14,8 +14,6 @@ try:
 except ImportError:
     pass
 
-import jupytext
-
 from .config import (
     JUPYTEXT_CONFIG_FILES,
     PYPROJECT_FILE,
@@ -31,7 +29,7 @@ from .formats import (
     short_form_multiple_formats,
     short_form_one_format,
 )
-from .jupytext import drop_text_representation_metadata
+from .jupytext import drop_text_representation_metadata, reads, writes
 from .kernels import set_kernelspec_from_language
 from .paired_paths import (
     InconsistentPath,
@@ -167,7 +165,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     text_model = dict(
                         type="file",
                         format="text",
-                        content=jupytext.writes(
+                        content=writes(
                             nbformat.from_dict(model["content"]), fmt=fmt, config=config
                         ),
                     )
@@ -220,7 +218,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     model["format"] = "json"
                     model["mimetype"] = None
                     try:
-                        model["content"] = jupytext.reads(
+                        model["content"] = reads(
                             model["content"], fmt=fmt, config=config
                         )
                     except Exception as err:
@@ -303,7 +301,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 text = self.super.get(
                     alt_path, content=True, type="file", format=format
                 )["content"]
-                return jupytext.reads(text, fmt=alt_fmt, config=config)
+                return reads(text, fmt=alt_fmt, config=config)
 
             inputs, outputs = latest_inputs_and_outputs(
                 path, fmt, formats, get_timestamp, contents_manager_mode=True
