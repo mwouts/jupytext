@@ -8,6 +8,7 @@ from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 from tornado.web import HTTPError
 
 import jupytext
+from jupytext import TextFileContentsManager
 from jupytext.compare import compare_cells
 
 from .utils import notebook_model
@@ -192,3 +193,32 @@ def test_metadata_filter_from_config_has_precedence_over_notebook_metadata(
 
     py = tmpdir.join("test.py").read()
     assert "notebook_metadata_filter: all" in py
+
+
+def test_test_no_text_representation_metadata_in_ipynb_900(
+    tmpdir,
+    python_notebook,
+):
+    tmpdir.join(".jupytext.toml").write('formats = "ipynb,py:percent"\n')
+
+    # create a test notebook and save it in Jupyter
+    nb = python_notebook
+    cm = TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+    cm.save(dict(type="notebook", content=nb), "test.ipynb")
+
+    # Assert that "text_representation" is in the Jupytext metadata #900
+    assert "text_representation" in tmpdir.join("test.py").read()
+    # But not in the ipynb notebook
+    assert "text_representation" not in tmpdir.join("test.ipynb").read()
+
+    # modify the ipynb file in Jupyter
+    # Reload the notebook
+    nb = cm.get("test.ipynb")["content"]
+    nb.cells.append(new_markdown_cell("A new cell"))
+    cm.save(dict(type="notebook", content=nb), "test.ipynb")
+
+    # The text representation metadata is in the py file
+    assert "text_representation" in tmpdir.join("test.py").read()
+    # But not in the ipynb notebook
+    assert "text_representation" not in tmpdir.join("test.ipynb").read()
