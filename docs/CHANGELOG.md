@@ -5,6 +5,13 @@ Jupytext ChangeLog
 -------------------
 
 **Fixed**
+- The `text_representation` metadata of text notebooks is filtered from `.ipynb` files both in `jupytext.write` and in the contents manager for Jupyter ([#900](https://github.com/mwouts/jupytext/issues/900))
+
+
+1.13.5 (2021-12-27)
+-------------------
+
+**Fixed**
 - Jupytext will not open a text notebook that is not UTF-8 ([#896](https://github.com/mwouts/jupytext/issues/896))
 
 
