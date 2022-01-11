@@ -452,7 +452,8 @@ def jupytext(args=None):
         not args.output
         and args.output_format
         and "." in args.output_format
-        and not args.output_format.startswith(".")
+        # a suffix is expected to start with one of these characters #901
+        and not args.output_format.startswith((".", "-", "_"))
         and "//" not in args.output_format
     ):
 
@@ -461,7 +462,7 @@ def jupytext(args=None):
 
         warnings.formatwarning = single_line
         warnings.warn(
-            "You have passed a file name to the '--to' option, "
+            "You might have passed a file name to the '--to' option, "
             "when a format description was expected. Maybe you want to use the '-o' option instead?"
         )
 

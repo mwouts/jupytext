@@ -1,11 +1,14 @@
 Jupytext ChangeLog
 ==================
 
-1.13.5 (2021-12-27)
+1.13.6 (2022-01-11)
 -------------------
 
 **Fixed**
 - The `text_representation` metadata of text notebooks is filtered from `.ipynb` files both in `jupytext.write` and in the contents manager for Jupyter ([#900](https://github.com/mwouts/jupytext/issues/900))
+
+**Changed**
+- Jupytext will not issue a warning when a format suffix starting with '.', '-' or '_' is passed to the `--to` option ([#901](https://github.com/mwouts/jupytext/issues/901))
 
 
 1.13.5 (2021-12-27)
