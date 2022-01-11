@@ -454,20 +454,9 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, config=None, **kwargs):
     ext = fmt["extension"]
     format_name = fmt.get("format_name")
 
-    jupytext_metadata = metadata.get("jupytext", {})
-
     if ext == ".ipynb":
-        # Remove jupytext section if empty
-        jupytext_metadata.pop("text_representation", {})
-        if not jupytext_metadata:
-            metadata.pop("jupytext", {})
         return nbformat.writes(
-            NotebookNode(
-                nbformat=notebook.nbformat,
-                nbformat_minor=notebook.nbformat_minor,
-                metadata=metadata,
-                cells=notebook.cells,
-            ),
+            drop_text_representation_metadata(notebook, metadata),
             version,
             **kwargs,
         )
@@ -481,6 +470,27 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, config=None, **kwargs):
 
     writer = TextNotebookConverter(fmt, config)
     return writer.writes(notebook, metadata)
+
+
+def drop_text_representation_metadata(notebook, metadata=None):
+    """When the notebook is saved to an ipynb file, we drop the text_representation metadata"""
+    if metadata is None:
+        # Make a copy to avoid modification by reference
+        metadata = deepcopy(notebook["metadata"])
+
+    jupytext_metadata = metadata.get("jupytext", {})
+    jupytext_metadata.pop("text_representation", {})
+
+    # Remove the jupytext section if empty
+    if not jupytext_metadata:
+        metadata.pop("jupytext", {})
+
+    return NotebookNode(
+        nbformat=notebook["nbformat"],
+        nbformat_minor=notebook["nbformat_minor"],
+        metadata=metadata,
+        cells=notebook["cells"],
+    )
 
 
 def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, config=None, **kwargs):
