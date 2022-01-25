@@ -883,7 +883,8 @@ def jupytext_single_file(nb_file, args, log):
             check_file_version(notebook, nb_file, nb_dest)
             notebook = combine_inputs_with_outputs(notebook, read(nb_dest), fmt=fmt)
         elif os.path.isfile(nb_dest):
-            action = " (destination file replaced [use --update to preserve cell outputs and ids])"
+            suggest_update = " [use --update to preserve cell outputs and ids]" if nb_dest.endswith(".ipynb") else ""
+            action = f" (destination file replaced{suggest_update})"
         else:
             action = ""
 
