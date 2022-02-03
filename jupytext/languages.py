@@ -64,7 +64,7 @@ _SCRIPT_EXTENSIONS = {
         "comment": "(*",
         "comment_suffix": "*)",
     },  # OCaml only has block comments
-    ".hs": {"language": "haskell", "comment": "--"}
+    ".hs": {"language": "haskell", "comment": "--"},
 }
 
 _COMMENT_CHARS = [
