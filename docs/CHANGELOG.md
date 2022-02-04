@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.13.7 (2022-02-??)
+-------------------
+
+**Added**
+- Added Haskell as supported language - thanks to [codeweber](https://github.com/codeweber) for this contribution ([#909](https://github.com/mwouts/jupytext/issues/909))
+
+
 1.13.6 (2022-01-11)
 -------------------
 
