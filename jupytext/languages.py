@@ -26,6 +26,7 @@ _JUPYTER_LANGUAGES = [
     "spark",
     "sql",
     "cython",
+    "haskell",
 ]
 
 # Supported file extensions (and languages)
@@ -63,6 +64,7 @@ _SCRIPT_EXTENSIONS = {
         "comment": "(*",
         "comment_suffix": "*)",
     },  # OCaml only has block comments
+    ".hs": {"language": "haskell", "comment": "--"},
 }
 
 _COMMENT_CHARS = [

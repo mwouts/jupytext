@@ -27,5 +27,6 @@ Jupytext works with notebooks in any of the following languages:
 - Scheme
 - Script of Script
 - TypeScript
+- Haskell
 
 Extending Jupytext to more languages should be easy, see the sections on [contributing to](contributing.md) and [developing](developing.md) Jupytext.
