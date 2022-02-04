@@ -7,6 +7,9 @@ Jupytext ChangeLog
 **Added**
 - Added Haskell as supported language - thanks to [codeweber](https://github.com/codeweber) for this contribution ([#909](https://github.com/mwouts/jupytext/issues/909))
 
+**Changed**
+- We have updated the pre-commit hooks and in particular we switched to the first stable version of `black==22.1.0`.
+
 
 1.13.6 (2022-01-11)
 -------------------
