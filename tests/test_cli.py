@@ -674,7 +674,7 @@ def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir, cwd_tmpdir):
 
 
 def test_set_kernel_works_with_pipes_326(capsys):
-    md = u"""```python
+    md = """```python
 1 + 1
 ```"""
 
@@ -690,7 +690,7 @@ def test_set_kernel_works_with_pipes_326(capsys):
 @skip_on_windows
 @pytest.mark.filterwarnings("ignore")
 def test_utf8_out_331(capsys, caplog):
-    py = u"from IPython.core.display import HTML; HTML(u'\xd7')"
+    py = "from IPython.core.display import HTML; HTML(u'\xd7')"
 
     with mock.patch("sys.stdin", StringIO(py)):
         jupytext(["--to", "ipynb", "--execute", "-"])
@@ -701,7 +701,7 @@ def test_utf8_out_331(capsys, caplog):
     nb = reads(out, "ipynb")
     assert len(nb.cells) == 1
     print(nb.cells[0].outputs)
-    assert nb.cells[0].outputs[0]["data"]["text/html"] == u"\xd7"
+    assert nb.cells[0].outputs[0]["data"]["text/html"] == "\xd7"
 
 
 @requires_jupytext_installed

@@ -49,7 +49,7 @@ def test_no_error_on_path_object(tmpdir):
 def test_read_ipynb_from_stream():
     def stream():
         return StringIO(
-            u"""{
+            """{
  "cells": [
   {
    "cell_type": "code",
@@ -74,7 +74,7 @@ def test_read_ipynb_from_stream():
 def test_read_py_percent_from_stream():
     def stream():
         return StringIO(
-            u"""# %%
+            """# %%
 1 + 1
 """
         )

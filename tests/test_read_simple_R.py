@@ -106,7 +106,7 @@ h <- function(y) {
 @pytest.mark.parametrize("ext", [".r", ".R"])
 def test_no_space_after_code(
     ext,
-    rnb=u"""# -*- coding: utf-8 -*-
+    rnb="""# -*- coding: utf-8 -*-
 #' Markdown cell
 
 f <- function(x)
@@ -131,7 +131,7 @@ f <- function(x)
 }"""
     )
     assert nb.cells[2].cell_type == "markdown"
-    assert nb.cells[2].source == u"And a new cell, and non ascii contênt"
+    assert nb.cells[2].source == "And a new cell, and non ascii contênt"
 
     rnb2 = jupytext.writes(nb, ext)
     compare(rnb2, rnb)

@@ -617,7 +617,7 @@ and it ends here'''"""
 
 
 def test_no_space_after_code(
-    pynb=u"""# -*- coding: utf-8 -*-
+    pynb="""# -*- coding: utf-8 -*-
 # Markdown cell
 
 def f(x):
@@ -634,7 +634,7 @@ def f(x):
     assert nb.cells[1].cell_type == "code"
     assert nb.cells[1].source == "def f(x):\n    return x+1"
     assert nb.cells[2].cell_type == "markdown"
-    assert nb.cells[2].source == u"And a new cell, and non ascii contênt"
+    assert nb.cells[2].source == "And a new cell, and non ascii contênt"
 
     pynb2 = jupytext.writes(nb, "py")
     compare(pynb2, pynb)

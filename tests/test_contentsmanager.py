@@ -421,12 +421,12 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
 
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
-    tmp_ipynb = u"notebôk.ipynb"
-    tmp_nbpy = u"notebôk.nb.py"
+    tmp_ipynb = "notebôk.ipynb"
+    tmp_nbpy = "notebôk.nb.py"
 
     cm = jupytext.TextFileContentsManager()
     cm.formats = "ipynb,.nb.py"
-    tmpdir = u"" + str(tmpdir)
+    tmpdir = "" + str(tmpdir)
     cm.root_dir = tmpdir
 
     # open ipynb, save nb.py, reopen
@@ -444,20 +444,20 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     cm.save(model=notebook_model(nb), path=tmp_ipynb)
 
     # rename notebôk.nb.py to nêw.nb.py
-    cm.rename(tmp_nbpy, u"nêw.nb.py")
+    cm.rename(tmp_nbpy, "nêw.nb.py")
     assert not os.path.isfile(os.path.join(tmpdir, tmp_ipynb))
     assert not os.path.isfile(os.path.join(tmpdir, tmp_nbpy))
 
-    assert os.path.isfile(os.path.join(tmpdir, u"nêw.ipynb"))
-    assert os.path.isfile(os.path.join(tmpdir, u"nêw.nb.py"))
+    assert os.path.isfile(os.path.join(tmpdir, "nêw.ipynb"))
+    assert os.path.isfile(os.path.join(tmpdir, "nêw.nb.py"))
 
     # rename nêw.ipynb to notebôk.ipynb
-    cm.rename(u"nêw.ipynb", tmp_ipynb)
+    cm.rename("nêw.ipynb", tmp_ipynb)
     assert os.path.isfile(os.path.join(tmpdir, tmp_ipynb))
     assert os.path.isfile(os.path.join(tmpdir, tmp_nbpy))
 
-    assert not os.path.isfile(os.path.join(tmpdir, u"nêw.ipynb"))
-    assert not os.path.isfile(os.path.join(tmpdir, u"nêw.nb.py"))
+    assert not os.path.isfile(os.path.join(tmpdir, "nêw.ipynb"))
+    assert not os.path.isfile(os.path.join(tmpdir, "nêw.nb.py"))
 
 
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
@@ -843,8 +843,8 @@ def test_pair_notebook_with_dot(nb_file, tmpdir):
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
 def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
     # 1. write py ipynb
-    tmp_ipynb = u"notebook.ipynb"
-    tmp_nbpy = u"notebook.py"
+    tmp_ipynb = "notebook.ipynb"
+    tmp_nbpy = "notebook.py"
 
     cm = jupytext.TextFileContentsManager()
     cm.preferred_jupytext_formats_save = "py:light"
@@ -884,7 +884,7 @@ def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
 
 
 def test_preferred_formats_read_auto(tmpdir):
-    tmp_py = u"notebook.py"
+    tmp_py = "notebook.py"
     with open(str(tmpdir.join(tmp_py)), "w") as script:
         script.write(
             """# cell one
