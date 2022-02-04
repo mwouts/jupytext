@@ -4,8 +4,11 @@ Jupytext ChangeLog
 1.13.7 (2022-02-??)
 -------------------
 
+**Fixed**
+- The Jupytext CLI only suggest --update when the target is an .ipynb file ([#905](https://github.com/mwouts/jupytext/issues/905)) - thanks to [st--](https://github.com/st--) for this contribution
+
 **Added**
-- Added Haskell as supported language - thanks to [codeweber](https://github.com/codeweber) for this contribution ([#909](https://github.com/mwouts/jupytext/issues/909))
+- Added Haskell as supported language ([#909](https://github.com/mwouts/jupytext/issues/909)) - thanks to [codeweber](https://github.com/codeweber) for this contribution
 
 
 1.13.6 (2022-01-11)
