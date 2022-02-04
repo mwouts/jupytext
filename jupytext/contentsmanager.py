@@ -175,11 +175,9 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 return write_pair(path, jupytext_formats, save_one_file)
 
             except Exception as e:
-                self.log.error(
-                    u"Error while saving file: %s %s", path, e, exc_info=True
-                )
+                self.log.error("Error while saving file: %s %s", path, e, exc_info=True)
                 raise HTTPError(
-                    500, u"Unexpected error while saving file: %s %s" % (path, e)
+                    500, "Unexpected error while saving file: %s %s" % (path, e)
                 )
 
         def get(
@@ -223,7 +221,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                         )
                     except Exception as err:
                         self.log.error(
-                            u"Error while reading file: %s %s", path, err, exc_info=True
+                            "Error while reading file: %s %s", path, err, exc_info=True
                         )
                         raise HTTPError(500, str(err))
 
@@ -263,7 +261,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     self.update_paired_notebooks(path, formats)
                 except InconsistentPath as err:
                     self.log.error(
-                        u"Unable to read paired notebook: %s %s",
+                        "Unable to read paired notebook: %s %s",
                         path,
                         err,
                         exc_info=True,
@@ -292,12 +290,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 if alt_path == path:
                     return model["content"]
                 if alt_path.endswith(".ipynb"):
-                    self.log.info(u"Reading OUTPUTS from {}".format(alt_path))
+                    self.log.info("Reading OUTPUTS from {}".format(alt_path))
                     return self.super.get(
                         alt_path, content=True, type="notebook", format=format
                     )["content"]
 
-                self.log.info(u"Reading SOURCE from {}".format(alt_path))
+                self.log.info("Reading SOURCE from {}".format(alt_path))
                 text = self.super.get(
                     alt_path, content=True, type="file", format=format
                 )["content"]
@@ -372,7 +370,7 @@ to your jupytext.toml file
                     raise
                 except Exception as err:
                     self.log.error(
-                        u"Error while reading file: %s %s", path, err, exc_info=True
+                        "Error while reading file: %s %s", path, err, exc_info=True
                     )
                     raise HTTPError(500, str(err))
 
@@ -403,7 +401,7 @@ to your jupytext.toml file
             untitled = self.untitled_notebook
             config = self.get_config(path)
             name = self.increment_notebook_filename(config, untitled + ext, path)
-            path = u"{0}/{1}".format(path, name)
+            path = "{0}/{1}".format(path, name)
 
             model = {"type": "notebook"}
             if format_name:
@@ -429,7 +427,7 @@ to your jupytext.toml file
                 basename_i = basename + insert_i
                 name = basename_i + ext
                 if not any(
-                    self.exists(u"{}/{}{}".format(path, basename_i, nb_ext))
+                    self.exists("{}/{}{}".format(path, basename_i, nb_ext))
                     for nb_ext in config.notebook_extensions
                 ):
                     break
@@ -470,7 +468,7 @@ to your jupytext.toml file
                 raise
             except Exception as err:
                 self.log.error(
-                    u"Error while renaming file from %s to %s: %s",
+                    "Error while renaming file from %s to %s: %s",
                     old_path,
                     new_path,
                     err,
@@ -553,7 +551,7 @@ to your jupytext.toml file
                     self.cached_config.path = parent_dir
                 except JupytextConfigurationError as err:
                     self.log.error(
-                        u"Error while reading config file: %s %s",
+                        "Error while reading config file: %s %s",
                         config_file,
                         err,
                         exc_info=True,
