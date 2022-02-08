@@ -10,6 +10,7 @@ Jupytext ChangeLog
 
 **Added**
 - Added Haskell as supported language ([#909](https://github.com/mwouts/jupytext/issues/909)) - thanks to [codeweber](https://github.com/codeweber) for this contribution
+- We added an example that document how one needs to reload the notebook to update the metadata (e.g. the encoding) when the text version has changed (#907)
 
 **Changed**
 - We have updated the pre-commit hooks and in particular we switched to the first stable version of `black==22.1.0`.
