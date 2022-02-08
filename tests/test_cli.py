@@ -1421,3 +1421,18 @@ def test_round_trip_with_null_metadata_792(tmpdir, cwd_tmpdir, python_notebook):
     jupytext(["--to", "ipynb", "test.py"])
     nb = read("test.ipynb")
     assert nb.metadata.kernelspec.env is None
+
+
+def test_set_shebang_with_update_metadata(tmp_path, python_notebook):
+    tmp_py = tmp_path / "nb.py"
+    write(python_notebook, tmp_py, fmt="py:percent")
+
+    jupytext(
+        [
+            str(tmp_py),
+            "--update-metadata",
+            '{"jupytext":{"executable":"/usr/bin/python"}}',
+        ]
+    )
+
+    assert tmp_py.read_text().startswith("#!/usr/bin/python")
