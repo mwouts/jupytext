@@ -6,6 +6,7 @@ Jupytext ChangeLog
 
 **Fixed**
 - The Jupytext CLI only suggest --update when the target is an .ipynb file ([#905](https://github.com/mwouts/jupytext/issues/905)) - thanks to [st--](https://github.com/st--) for this contribution
+- We made sure that commands like `cat notebook.md | jupytext --execute` work ([#908](https://github.com/mwouts/jupytext/issues/908))
 
 **Added**
 - Added Haskell as supported language ([#909](https://github.com/mwouts/jupytext/issues/909)) - thanks to [codeweber](https://github.com/codeweber) for this contribution
