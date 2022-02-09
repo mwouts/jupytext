@@ -10,12 +10,11 @@ Jupytext ChangeLog
 
 **Added**
 - Added Haskell as supported language ([#909](https://github.com/mwouts/jupytext/issues/909)) - thanks to [codeweber](https://github.com/codeweber) for this contribution
-- We added an example that document how one needs to reload the notebook to update the metadata (e.g. the encoding) when the text version has changed (#907)
 
 **Changed**
 - We have updated the pre-commit hooks and in particular we switched to the first stable version of `black==22.1.0`.
 - We require `pandoc==2.16.2` for testing. The representation for code cells changed from ` ``` {.python}` to ` ``` python` in that version of Pandoc ([#906](https://github.com/mwouts/jupytext/issues/906)). We don't use `pandoc>=2.17` in tests at the moment because of the introduction of cell ids that cannot be filtered.
-
+- Jupytext will not add anymore a UTF-8 encoding on Python scripts when the notebook contains non-ascii characters ([#907](https://github.com/mwouts/jupytext/issues/907))
 
 1.13.6 (2022-01-11)
 -------------------
