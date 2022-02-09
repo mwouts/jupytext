@@ -395,6 +395,9 @@ def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, config=None, **kwargs):
 
     if fp == "-":
         text = sys.stdin.read()
+        # Update the input format by reference if missing
+        if isinstance(fmt, dict) and not fmt:
+            fmt.update(long_form_one_format(divine_format(text)))
         return reads(text, fmt)
 
     if not hasattr(fp, "read"):

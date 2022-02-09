@@ -507,7 +507,7 @@ def jupytext_single_file(nb_file, args, log):
     nb_dest = None
     if args.output:
         nb_dest = args.output
-    elif args.output_format and nb_file == "-":
+    elif nb_file == "-":
         nb_dest = "-"
     else:
         try:
