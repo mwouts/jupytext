@@ -53,7 +53,7 @@ def test_jupytext_commands_in_the_documentation_work(tmpdir):
                 if '"' not in comment:
                     cmd = left
 
-            print("Testing: {}".format(cmd))
+            print(f"Testing: {cmd}")
             args = shlex.split(cmd)[1:]
             assert not jupytext_cli(args), cmd
             cmd_tested += 1

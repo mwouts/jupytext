@@ -45,7 +45,7 @@ def three_backticks_or_more(lines):
     return code_cell_delimiter
 
 
-class BaseCellExporter(object):
+class BaseCellExporter:
     """A class that represent a notebook cell as text"""
 
     default_comment_magics = None
@@ -217,9 +217,9 @@ class MarkdownCellExporter(BaseCellExporter):
             ]
             region_start = " ".join(region_start)
         else:
-            region_start = "<!-- #{} -->".format(code)
+            region_start = f"<!-- #{code} -->"
 
-        return [region_start] + self.source + ["<!-- #end{} -->".format(code)]
+        return [region_start] + self.source + [f"<!-- #end{code} -->"]
 
     def cell_to_text(self):
         """Return the text representation of a cell"""
@@ -284,7 +284,7 @@ class RMarkdownCellExporter(MarkdownCellExporter):
         options = metadata_to_rmd_options(
             self.language, self.metadata, self.use_runtools
         )
-        lines.append("```{{{}}}".format(options))
+        lines.append(f"```{{{options}}}")
         lines.extend(source)
         lines.append("```")
         return lines
@@ -295,9 +295,7 @@ def endofcell_marker(source, comment):
     we add an end-of-cell marker"""
     endofcell = "-"
     while True:
-        endofcell_re = re.compile(
-            r"^{}( )".format(re.escape(comment)) + endofcell + r"\s*$"
-        )
+        endofcell_re = re.compile(rf"^{re.escape(comment)}( )" + endofcell + r"\s*$")
         if list(filter(endofcell_re.match, source)):
             endofcell = endofcell + "-"
         else:
@@ -339,7 +337,7 @@ class LightScriptCellExporter(BaseCellExporter):
                 self.unfiltered_metadata = copy(self.unfiltered_metadata)
                 self.unfiltered_metadata.pop("cell_marker", "")
             return True
-        return super(LightScriptCellExporter, self).is_code()
+        return super().is_code()
 
     def code_to_text(self):
         """Return the text representation of a code cell"""
@@ -380,7 +378,7 @@ class LightScriptCellExporter(BaseCellExporter):
             cell_start.append(options)
         lines.append(" ".join(cell_start))
         lines.extend(source)
-        lines.append(self.comment + " {}".format(endofcell))
+        lines.append(self.comment + f" {endofcell}")
         return lines
 
     def explicit_start_marker(self, source):
@@ -469,7 +467,7 @@ class RScriptCellExporter(BaseCellExporter):
             self.metadata["eval"] = False
         options = metadata_to_rmd_options(None, self.metadata, self.use_runtools)
         if options:
-            lines.append("#+ {}".format(options))
+            lines.append(f"#+ {options}")
         lines.extend(source)
         return lines
 

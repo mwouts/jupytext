@@ -30,7 +30,7 @@ def pandoc(args, filein=None, fileout=None):
     out, err = proc.communicate()
     if proc.returncode:
         raise PandocError(
-            "pandoc exited with return code {}\n{}".format(proc.returncode, str(err))
+            f"pandoc exited with return code {proc.returncode}\n{str(err)}"
         )
     return out.decode("utf-8")
 
@@ -79,7 +79,7 @@ def pandoc_version():
     """Pandoc's version number"""
     try:
         return pandoc("--version").splitlines()[0].split()[1]
-    except (IOError, OSError):
+    except OSError:
         return "N/A"
 
 

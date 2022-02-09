@@ -59,4 +59,4 @@ def kernelspec_from_language(language):
                 "display_name": kernel_specs.display_name,
             }
 
-    raise ValueError("No kernel found for the language {}".format(language))
+    raise ValueError(f"No kernel found for the language {language}")

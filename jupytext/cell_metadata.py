@@ -43,7 +43,7 @@ _JUPYTEXT_CELL_METADATA = [
     "lines_to_end_of_cell_marker",
 ]
 _IGNORE_CELL_METADATA = ",".join(
-    "-{}".format(name)
+    f"-{name}"
     for name in [
         # Frequent cell metadata that should not enter the text representation
         # (these metadata are preserved in the paired Jupyter notebook).
@@ -108,23 +108,23 @@ def metadata_to_rmd_options(language, metadata, use_runtools=False):
         opt_value = metadata[opt_name]
         opt_name = opt_name.strip()
         if opt_name == "active":
-            options += ' {}="{}",'.format(opt_name, str(opt_value))
+            options += f' {opt_name}="{str(opt_value)}",'
         elif isinstance(opt_value, bool):
             options += " {}={},".format(opt_name, "TRUE" if opt_value else "FALSE")
         elif isinstance(opt_value, list):
             options += " {}={},".format(
                 opt_name,
-                "c({})".format(", ".join(['"{}"'.format(str(v)) for v in opt_value])),
+                "c({})".format(", ".join([f'"{str(v)}"' for v in opt_value])),
             )
         elif isinstance(opt_value, str):
             if opt_value.startswith("#R_CODE#"):
-                options += " {}={},".format(opt_name, opt_value[8:])
+                options += f" {opt_name}={opt_value[8:]},"
             elif '"' not in opt_value:
-                options += ' {}="{}",'.format(opt_name, opt_value)
+                options += f' {opt_name}="{opt_value}",'
             else:
-                options += " {}='{}',".format(opt_name, opt_value)
+                options += f" {opt_name}='{opt_value}',"
         else:
-            options += " {}={},".format(opt_name, str(opt_value))
+            options += f" {opt_name}={str(opt_value)},"
     if not language:
         options = options[2:]
     return options.strip(",").strip()
@@ -247,7 +247,7 @@ def parse_rmd_options(line):
 
     if not parsing_context.in_global_expression():
         raise RMarkdownOptionParsingError(
-            'Option line "{}" is not properly terminated'.format(line)
+            f'Option line "{line}" is not properly terminated'
         )
 
     return result
@@ -512,5 +512,5 @@ def metadata_to_text(language_or_title, metadata=None, plain_json=False):
             elif metadata[key] is None:
                 text.append(key)
             else:
-                text.append("{}={}".format(key, dumps(metadata[key])))
+                text.append(f"{key}={dumps(metadata[key])}")
     return " ".join(text)

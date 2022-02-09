@@ -293,11 +293,10 @@ def global_jupytext_configuration_directories():
         config_dirs.extend(["/usr/local/share/", "/usr/share/"])
 
     for config_dir in config_dirs:
-        for config_dir_jupytext_or_not in [
+        yield from [
             os.path.join(config_dir, "jupytext"),
             config_dir,
-        ]:
-            yield config_dir_jupytext_or_not
+        ]
 
 
 def find_global_jupytext_configuration_file():
@@ -323,7 +322,7 @@ def find_jupytext_configuration_file(path, search_parent_dirs=True):
     if os.path.isfile(pyproject_path):
         import toml
 
-        with open(pyproject_path, "r") as stream:
+        with open(pyproject_path) as stream:
             doc = toml.loads(stream.read())
             if doc.get("tool", {}).get("jupytext") is not None:
                 return pyproject_path

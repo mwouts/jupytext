@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import pytest
 from nbformat.v4.nbbase import (
     new_code_cell,

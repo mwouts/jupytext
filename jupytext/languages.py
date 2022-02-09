@@ -167,10 +167,10 @@ def set_main_and_cell_language(metadata, cells, ext, custom_cell_magics):
                 if "magic_args" in cell["metadata"]:
                     magic_args = cell["metadata"].pop("magic_args")
                     cell["source"] = (
-                        "{}{} {}\n".format(magic, language, magic_args) + cell["source"]
+                        f"{magic}{language} {magic_args}\n" + cell["source"]
                     )
                 else:
-                    cell["source"] = "{}{}\n".format(magic, language) + cell["source"]
+                    cell["source"] = f"{magic}{language}\n" + cell["source"]
 
 
 def cell_language(source, default_language, custom_cell_magics):

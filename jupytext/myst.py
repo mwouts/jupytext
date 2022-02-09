@@ -88,9 +88,7 @@ def matches_mystnb(
     try:
         tokens = get_parser().parse(text + "\n")
     except (TypeError, ValueError) as err:
-        warnings.warn(
-            "myst-parser failed unexpectedly: {}".format(err)
-        )  # pragma: no cover
+        warnings.warn(f"myst-parser failed unexpectedly: {err}")  # pragma: no cover
         return False
 
     # Is the format information available in the jupytext text representation?
@@ -160,8 +158,8 @@ def dump_yaml_blocks(data, compact=True):
     string = yaml.dump(data, Dumper=CompactDumper)
     lines = string.splitlines()
     if compact and all(line and line[0].isalpha() for line in lines):
-        return "\n".join([":{}".format(line) for line in lines]) + "\n\n"
-    return "---\n{}---\n".format(string)
+        return "\n".join([f":{line}" for line in lines]) + "\n\n"
+    return f"---\n{string}---\n"
 
 
 def from_nbnode(value):
@@ -186,7 +184,7 @@ def strip_blank_lines(text):
 def read_fenced_cell(token, cell_index, cell_type):
     """Parse (and validate) the full directive text."""
     content = token.content
-    error_msg = "{0} cell {1} at line {2} could not be read: ".format(
+    error_msg = "{} cell {} at line {} could not be read: ".format(
         cell_type, cell_index, token.map[0] + 1
     )
 
@@ -242,13 +240,13 @@ def read_cell_metadata(token, cell_index):
             metadata = json.loads(token.content.strip())
         except Exception as err:
             raise MystMetadataParsingError(
-                "Markdown cell {0} at line {1} could not be read: {2}".format(
+                "Markdown cell {} at line {} could not be read: {}".format(
                     cell_index, token.map[0] + 1, err
                 )
             )
         if not isinstance(metadata, dict):
             raise MystMetadataParsingError(
-                "Markdown cell {0} at line {1} is not a dict".format(
+                "Markdown cell {} at line {} is not a dict".format(
                     cell_index, token.map[0] + 1
                 )
             )
@@ -289,7 +287,7 @@ def myst_to_notebook(
         try:
             metadata_nb = yaml.safe_load(metadata.content)
         except (yaml.parser.ParserError, yaml.scanner.ScannerError) as error:
-            raise MystMetadataParsingError("Notebook metadata: {}".format(error))
+            raise MystMetadataParsingError(f"Notebook metadata: {error}")
 
     # create an empty notebook
     nbf_version = nbf.v4
@@ -388,7 +386,7 @@ def notebook_to_myst(
             metadata = from_nbnode(cell.metadata)
             if metadata or last_cell_md:
                 if metadata:
-                    string += "\n+++ {}\n".format(json.dumps(metadata))
+                    string += f"\n+++ {json.dumps(metadata)}\n"
                 else:
                     string += "\n+++\n"
             string += "\n" + cell.source
@@ -403,7 +401,7 @@ def notebook_to_myst(
                 code_directive if cell.cell_type == "code" else raw_directive,
             )
             if pygments_lexer and cell.cell_type == "code":
-                string += " {}".format(pygments_lexer)
+                string += f" {pygments_lexer}"
             string += "\n"
             metadata = from_nbnode(cell.metadata)
             if metadata:
@@ -417,6 +415,6 @@ def notebook_to_myst(
             last_cell_md = False
 
         else:
-            raise NotImplementedError("cell {}, type: {}".format(i, cell.cell_type))
+            raise NotImplementedError(f"cell {i}, type: {cell.cell_type}")
 
     return string.rstrip() + "\n"

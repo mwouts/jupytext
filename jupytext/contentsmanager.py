@@ -58,7 +58,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             # Configuration cache, useful when notebooks are listed in a given directory
             self.cached_config = namedtuple("cached_config", "path config_file config")
-            self.super = super(JupytextContentsManager, self)
+            self.super = super()
             self.super.__init__(*args, **kwargs)
 
         def all_nb_extensions(self, config):
@@ -176,9 +176,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             except Exception as e:
                 self.log.error("Error while saving file: %s %s", path, e, exc_info=True)
-                raise HTTPError(
-                    500, "Unexpected error while saving file: %s %s" % (path, e)
-                )
+                raise HTTPError(500, f"Unexpected error while saving file: {path} {e}")
 
         def get(
             self,
@@ -290,12 +288,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 if alt_path == path:
                     return model["content"]
                 if alt_path.endswith(".ipynb"):
-                    self.log.info("Reading OUTPUTS from {}".format(alt_path))
+                    self.log.info(f"Reading OUTPUTS from {alt_path}")
                     return self.super.get(
                         alt_path, content=True, type="notebook", format=format
                     )["content"]
 
-                self.log.info("Reading SOURCE from {}".format(alt_path))
+                self.log.info(f"Reading SOURCE from {alt_path}")
                 text = self.super.get(
                     alt_path, content=True, type="file", format=format
                 )["content"]
@@ -401,7 +399,7 @@ to your jupytext.toml file
             untitled = self.untitled_notebook
             config = self.get_config(path)
             name = self.increment_notebook_filename(config, untitled + ext, path)
-            path = "{0}/{1}".format(path, name)
+            path = f"{path}/{name}"
 
             model = {"type": "notebook"}
             if format_name:
@@ -421,13 +419,13 @@ to your jupytext.toml file
 
             for i in itertools.count():
                 if i:
-                    insert_i = "{}".format(i)
+                    insert_i = f"{i}"
                 else:
                     insert_i = ""
                 basename_i = basename + insert_i
                 name = basename_i + ext
                 if not any(
-                    self.exists("{}/{}{}".format(path, basename_i, nb_ext))
+                    self.exists(f"{path}/{basename_i}{nb_ext}")
                     for nb_ext in config.notebook_extensions
                 ):
                     break
@@ -556,7 +554,7 @@ to your jupytext.toml file
                         err,
                         exc_info=True,
                     )
-                    raise HTTPError(500, "{}".format(err))
+                    raise HTTPError(500, f"{err}")
 
             if self.cached_config.config is not None:
                 self.log.debug(

@@ -318,5 +318,5 @@ def test_ipynb_to_r_spin(nb_file, no_jupytext_version_number):
 )
 def test_ipynb_to_scheme_percent(nb_file, extension, no_jupytext_version_number):
     assert_conversion_same_as_mirror(
-        nb_file, "{}:percent".format(extension), "ipynb_to_percent"
+        nb_file, f"{extension}:percent", "ipynb_to_percent"
     )

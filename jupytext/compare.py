@@ -163,7 +163,7 @@ def compare_notebooks(
         )
     except AssertionError as error:
         if raise_on_first_difference:
-            raise NotebookDifference("Notebook metadata differ: {}".format(str(error)))
+            raise NotebookDifference(f"Notebook metadata differ: {str(error)}")
         modified_metadata = True
 
     error = []
