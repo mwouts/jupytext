@@ -377,3 +377,69 @@ def test_write_raises_when_fmt_does_not_exists(tmpdir):
 
     with pytest.raises(JupytextFormatError):
         jupytext.write(nb, tmp_md, fmt="unknown_format")
+
+
+@pytest.mark.parametrize(
+    "config_file,config_contents",
+    [
+        (
+            "jupytext.toml",
+            """# Always pair ipynb notebooks to md files
+formats = "ipynb,md"
+""",
+        ),
+        (
+            "jupytext.toml",
+            """# Always pair ipynb notebooks to py:percent files
+formats = "ipynb,py:percent"
+""",
+        ),
+        (
+            "jupytext.toml",
+            """# Always pair ipynb notebooks to py:percent files
+formats = ["ipynb", "py:percent"]
+""",
+        ),
+        (
+            "pyproject.toml",
+            """[tool.jupytext]
+formats = "ipynb,py:percent"
+""",
+        ),
+        (
+            "jupytext.toml",
+            """# Pair notebooks in subfolders of 'notebooks' to scripts in subfolders of 'scripts'
+formats = "notebooks///ipynb,scripts///py:percent"
+""",
+        ),
+        (
+            "jupytext.toml",
+            """[formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+""",
+        ),
+    ],
+)
+def test_configuration_examples_from_documentation(
+    config_file, config_contents, python_notebook, tmp_path
+):
+    """Here we make sure that the config examples from
+    https://jupytext.readthedocs.io/en/latest/config.html#configuring-paired-notebooks-globally
+    just work
+    """
+    (tmp_path / config_file).write_text(config_contents)
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmp_path)
+
+    # Save the notebook
+    (tmp_path / "notebooks").mkdir()
+    cm.save(dict(type="notebook", content=python_notebook), "notebooks/nb.ipynb")
+
+    # Make sure that ipynb and text version are created
+    assert (tmp_path / "notebooks" / "nb.ipynb").is_file()
+    assert (
+        (tmp_path / "notebooks" / "nb.py").is_file()
+        or (tmp_path / "notebooks" / "nb.md").is_file()
+        or (tmp_path / "scripts" / "nb.py").is_file()
+    )
