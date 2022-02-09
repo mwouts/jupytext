@@ -8,7 +8,11 @@ import yaml
 from nbformat.v4.nbbase import new_raw_cell
 from yaml.representer import SafeRepresenter
 
-from .languages import _SCRIPT_EXTENSIONS, comment_lines
+from .languages import (
+    _SCRIPT_EXTENSIONS,
+    comment_lines,
+    default_language_from_metadata_and_ext,
+)
 from .metadata_filter import _DEFAULT_NOTEBOOK_METADATA, filter_metadata
 from .pep8 import pep8_lines_between_cells
 from .version import __version__
@@ -58,7 +62,7 @@ def encoding_and_executable(notebook, metadata, ext):
     if comment is not None:
         if "encoding" in jupytext_metadata:
             lines.append(jupytext_metadata.pop("encoding"))
-        else:
+        elif default_language_from_metadata_and_ext(metadata, ext) != "python":
             for cell in notebook.cells:
                 try:
                     cell.source.encode("ascii")
