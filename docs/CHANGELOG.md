@@ -12,6 +12,7 @@ Jupytext ChangeLog
 
 **Changed**
 - We have updated the pre-commit hooks and in particular we switched to the first stable version of `black==22.1.0`.
+- We now require `pandoc>=2.16.2` for testing, as the representation for code cells changed from ` ``` {.python}` to ` ``` python` ([#906](https://github.com/mwouts/jupytext/issues/906))
 
 
 1.13.6 (2022-01-11)
