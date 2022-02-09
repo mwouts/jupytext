@@ -439,6 +439,7 @@ def test_update_metadata(py_file, tmpdir, capsys):
     assert "invalid" in err
 
 
+@requires_user_kernel_python3
 @pytest.mark.parametrize("py_file", list_notebooks("python"))
 def test_set_kernel_inplace(py_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
@@ -453,6 +454,7 @@ def test_set_kernel_inplace(py_file, tmpdir):
     assert cmd == "python" or os.path.samefile(cmd, sys.executable)
 
 
+@requires_user_kernel_python3
 @pytest.mark.parametrize("py_file", list_notebooks("python"))
 def test_set_kernel_auto(py_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
@@ -468,6 +470,7 @@ def test_set_kernel_auto(py_file, tmpdir):
     assert cmd == "python" or os.path.samefile(cmd, sys.executable)
 
 
+@requires_user_kernel_python3
 @pytest.mark.parametrize("py_file", list_notebooks("python"))
 def test_set_kernel_with_name(py_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
@@ -673,6 +676,7 @@ def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir, cwd_tmpdir):
     compare_notebooks(nb2, nb, "Rmd")
 
 
+@requires_user_kernel_python3
 def test_set_kernel_works_with_pipes_326(capsys):
     md = """```python
 1 + 1
@@ -687,6 +691,7 @@ def test_set_kernel_works_with_pipes_326(capsys):
     assert "kernelspec" in nb.metadata
 
 
+@requires_user_kernel_python3
 @skip_on_windows
 @pytest.mark.filterwarnings("ignore")
 def test_utf8_out_331(capsys, caplog):
@@ -1018,6 +1023,7 @@ def test_create_header_with_set_formats(format_name, cwd_tmpdir, tmpdir):
     assert nb["metadata"]["jupytext"]["formats"] == format_name
 
 
+@requires_user_kernel_python3
 @requires_myst
 @requires_pandoc
 @pytest.mark.parametrize(
