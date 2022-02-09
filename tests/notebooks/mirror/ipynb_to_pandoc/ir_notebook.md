@@ -13,18 +13,18 @@ This is a jupyter notebook that uses the IR kernel.
 :::
 
 ::: {.cell .code}
-``` {.R}
+``` R
 sum(1:10)
 ```
 :::
 
 ::: {.cell .code}
-``` {.R}
+``` R
 plot(cars)
 ```
 :::
 
 ::: {.cell .code}
-``` {.R}
+``` R
 ```
 :::

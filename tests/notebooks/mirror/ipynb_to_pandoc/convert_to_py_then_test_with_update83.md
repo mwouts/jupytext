@@ -9,7 +9,7 @@ jupyter:
 ---
 
 ::: {.cell .code}
-``` {.python}
+``` python
 %%time
 
 print('asdf')
@@ -21,6 +21,6 @@ Thanks for jupytext!
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 ```
 :::

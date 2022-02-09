@@ -15,7 +15,7 @@ This notebook is a simple jupyter notebook. It only has markdown and code cells.
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 a = 1
 b = 2
 a + b
@@ -27,13 +27,13 @@ Now we return a few tuples
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 a, b
 ```
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 a, b, a+b
 ```
 :::

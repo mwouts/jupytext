@@ -21,14 +21,14 @@ We use Plotly\'s connected mode to make the notebook lighter - when connected, t
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 import plotly.offline as offline
 offline.init_notebook_mode(connected=True)
 ```
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 import plotly.graph_objects as go
 fig = go.Figure(
     data=[go.Bar(y=[2, 3, 1])],
