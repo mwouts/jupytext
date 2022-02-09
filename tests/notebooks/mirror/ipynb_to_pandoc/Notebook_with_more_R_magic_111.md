@@ -9,7 +9,7 @@ jupyter:
 ---
 
 ::: {.cell .code}
-``` {.python}
+``` python
 %load_ext rpy2.ipython
 import pandas as pd
 
@@ -25,7 +25,7 @@ df = pd.DataFrame(
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 %%R -i df
 library("ggplot2")
 ggplot(data = df) + geom_point(aes(x = X, y = Y, color = Letter, size = Z))

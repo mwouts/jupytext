@@ -89,6 +89,7 @@ def test_pipe_into_flake8():
 
 
 @requires_black
+@requires_flake8
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
 def test_apply_black_through_jupytext(tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work

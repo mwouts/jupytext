@@ -35,16 +35,18 @@ def pandoc(args, filein=None, fileout=None):
     return out.decode("utf-8")
 
 
-def is_pandoc_available(min_version="2.7.2"):
+def is_pandoc_available(min_version="2.7.2", max_version=None):
     """Is Pandoc>=2.7.2 available?"""
     try:
-        raise_if_pandoc_is_not_available(min_version=min_version)
+        raise_if_pandoc_is_not_available(
+            min_version=min_version, max_version=max_version
+        )
         return True
     except PandocError:
         return False
 
 
-def raise_if_pandoc_is_not_available(min_version="2.7.2"):
+def raise_if_pandoc_is_not_available(min_version="2.7.2", max_version=None):
     """Raise with an informative error message if pandoc is not available"""
     try:
         from pkg_resources import parse_version
@@ -61,7 +63,13 @@ def raise_if_pandoc_is_not_available(min_version="2.7.2"):
     if parse_version(version) < parse_version(min_version):
         raise PandocError(
             f"The Pandoc Markdown format requires 'pandoc>={min_version}', "
-            f"but pandoc version {version} was not found"
+            f"but pandoc version {version} was found"
+        )
+
+    if max_version and parse_version(version) > parse_version(max_version):
+        raise PandocError(
+            f"The Pandoc Markdown format requires 'pandoc<={max_version}', "
+            f"but pandoc version {version} was found"
         )
 
     return version

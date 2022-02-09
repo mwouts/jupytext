@@ -9,7 +9,7 @@ jupyter:
 ---
 
 ::: {.cell .code}
-``` {.python}
+``` python
 c = '''
 title: "Quick test"
 output:
@@ -23,14 +23,14 @@ editor_options:
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 import yaml
 print(yaml.dump(yaml.load(c)))
 ```
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 ?next
 ```
 :::

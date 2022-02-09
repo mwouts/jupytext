@@ -13,7 +13,7 @@ A markdown cell
 :::
 
 ::: {.cell .code slideshow="{\"slide_type\":\"\"}"}
-``` {.python}
+``` python
 1+1
 ```
 :::

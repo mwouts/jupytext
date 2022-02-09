@@ -19,7 +19,7 @@ using the [wbdata](https://github.com/OliverSherouse/wbdata) python package
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 import pandas as pd
 import wbdata as wb
 
@@ -34,7 +34,7 @@ the World Bank site.
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 wb.search_indicators('Population, total')  # SP.POP.TOTL
 # wb.search_indicators('area')
 # => https://data.worldbank.org/indicator is easier to use
@@ -46,7 +46,7 @@ Now we download the population data
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 indicators = {'SP.POP.TOTL': 'Population, total',
               'AG.SRF.TOTL.K2': 'Surface area (sq. km)',
               'AG.LND.TOTL.K2': 'Land area (sq. km)',
@@ -61,7 +61,7 @@ World is one of the countries
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 data.loc['World']
 ```
 :::
@@ -71,7 +71,7 @@ Can we classify over continents?
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 data.loc[(slice(None), '2017-01-01'), :]['Population, total'].dropna(
 ).sort_values().tail(60).index.get_level_values('country')
 ```
@@ -82,7 +82,7 @@ Extract zones manually (in order of increasing population)
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 zones = ['North America', 'Middle East & North Africa',
          'Latin America & Caribbean', 'Europe & Central Asia',
          'Sub-Saharan Africa', 'South Asia',
@@ -95,7 +95,7 @@ And extract population information (and check total is right)
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 population = data.loc[zones]['Population, total'].swaplevel().unstack()
 population = population[zones]
 assert all(data.loc['World']['Population, total'] == population.sum(axis=1))
@@ -107,13 +107,13 @@ assert all(data.loc['World']['Population, total'] == population.sum(axis=1))
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 import matplotlib.pyplot as plt
 ```
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 plt.clf()
 plt.figure(figsize=(10, 5), dpi=100)
 plt.stackplot(population.index, population.values.T / 1e9)
@@ -135,7 +135,7 @@ now we just do a stacked bar plot.
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 import plotly.offline as offline
 import plotly.graph_objs as go
 
@@ -144,7 +144,7 @@ offline.init_notebook_mode()
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 bars = [go.Bar(x=population.index, y=population[zone], name=zone)
         for zone in zones]
 fig = go.Figure(data=bars,

@@ -19,7 +19,7 @@ Using `print`, `sys.stdout` and `sys.stderr`
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 import sys
 print('using print')
 sys.stdout.write('using sys.stdout.write')
@@ -28,7 +28,7 @@ sys.stderr.write('using sys.stderr.write')
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 import logging
 logging.debug('Debug')
 logging.info('Info')
@@ -44,14 +44,14 @@ Using `pandas`. Here we find two representations: both text and HTML.
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 import pandas as pd
 pd.DataFrame([4])
 ```
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 from IPython.display import display
 display(pd.DataFrame([5]))
 display(pd.DataFrame([6]))
@@ -63,13 +63,13 @@ display(pd.DataFrame([6]))
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 %matplotlib inline
 ```
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 # First plot
 from matplotlib import pyplot as plt
 import numpy as np
@@ -95,7 +95,7 @@ plt.show()
 :::
 
 ::: {.cell .code}
-``` {.python}
+``` python
 undefined_variable
 ```
 :::

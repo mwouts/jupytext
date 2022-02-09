@@ -9,7 +9,7 @@ jupyter:
 ---
 
 ::: {.cell .code}
-``` {.python}
+``` python
 1+2+3
 ```
 :::

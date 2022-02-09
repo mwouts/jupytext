@@ -55,7 +55,9 @@ requires_sphinx_gallery = pytest.mark.skipif(
 requires_pandoc = pytest.mark.skipif(
     # The mirror files changed slightly when Pandoc 2.11 was introduced
     # https://github.com/mwouts/jupytext/commit/c07d919702999056ce47f92b74f63a15c8361c5d
-    not is_pandoc_available(min_version="2.11"),
+    # The mirror files changed again when Pandoc 2.16 was introduced
+    # https://github.com/mwouts/jupytext/pull/919/commits/1fa1451ecdaa6ad8d803bcb6fb0c0cf09e5371bf
+    not is_pandoc_available(min_version="2.16.2", max_version="2.16.2"),
     reason="pandoc>=2.11 is not available",
 )
 requires_quarto = pytest.mark.skipif(

@@ -11,19 +11,19 @@ jupyter:
 ---
 
 ::: {.cell .code inputHidden="false" outputHidden="false" tags="[\"parameters\"]"}
-``` {.python}
+``` python
 param = 4
 ```
 :::
 
 ::: {.cell .code inputHidden="false" outputHidden="false"}
-``` {.python}
+``` python
 import pandas as pd
 ```
 :::
 
 ::: {.cell .code inputHidden="false" outputHidden="false"}
-``` {.python}
+``` python
 df = pd.DataFrame({'A': [1, 2], 'B': [3 + param, 4]},
                   index=pd.Index(['x0', 'x1'], name='x'))
 df
@@ -31,7 +31,7 @@ df
 :::
 
 ::: {.cell .code inputHidden="false" outputHidden="false"}
-``` {.python}
+``` python
 %matplotlib inline
 df.plot(kind='bar')
 ```

@@ -9,7 +9,7 @@ jupyter:
 ---
 
 ::: {.cell .code}
-``` {.julia}
+``` julia
 # IJulia rocks! So does Plotly. Check it out
 
 using Plotly
@@ -21,7 +21,7 @@ Plotly.signin(username, api_key)
 :::
 
 ::: {.cell .code}
-``` {.julia}
+``` julia
 # Following data taken from http://julialang.org/ frontpage 
 benchmarks = ["fib", "parse_int", "quicksort3", "mandel", "pi_sum", "rand_mat_stat", "rand_mat_mul"]
 platforms = ["Fortran", "Julia", "Python", "R", "Matlab", "Mathematica", "Javascript", "Go"]
@@ -70,7 +70,7 @@ display("text/html", s)
 :::
 
 ::: {.cell .code}
-``` {.julia}
+``` julia
 # checkout https://plot.ly/api/ for more Julia examples!
 # But to show off some other Plotly features:
 x = 1:1500

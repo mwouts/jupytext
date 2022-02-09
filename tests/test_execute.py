@@ -7,9 +7,15 @@ from jupytext import read
 from jupytext.cli import jupytext
 from jupytext.version import __version__
 
-from .utils import requires_ir_kernel, requires_nbconvert, skip_on_windows
+from .utils import (
+    requires_ir_kernel,
+    requires_nbconvert,
+    requires_user_kernel_python3,
+    skip_on_windows,
+)
 
 
+@requires_user_kernel_python3
 @requires_nbconvert
 @skip_on_windows
 def test_pipe_nbconvert_execute(tmpdir):
@@ -39,6 +45,7 @@ def test_pipe_nbconvert_execute(tmpdir):
     assert nb.cells[0].outputs[0]["data"] == {"text/plain": "3"}
 
 
+@requires_user_kernel_python3
 @requires_nbconvert
 @skip_on_windows
 def test_pipe_nbconvert_execute_sync(tmpdir):
@@ -69,6 +76,7 @@ def test_pipe_nbconvert_execute_sync(tmpdir):
     assert nb.cells[0].outputs[0]["data"] == {"text/plain": "3"}
 
 
+@requires_user_kernel_python3
 @requires_nbconvert
 @skip_on_windows
 def test_execute(tmpdir, caplog, capsys):
@@ -88,6 +96,7 @@ def test_execute(tmpdir, caplog, capsys):
     assert nb.cells[0].outputs[0]["data"] == {"text/plain": "3"}
 
 
+@requires_user_kernel_python3
 @requires_nbconvert
 def test_execute_readme_ok(tmpdir):
     tmp_md = str(tmpdir.join("notebook.md"))
@@ -106,6 +115,7 @@ A readme with correct instructions
     jupytext(args=[tmp_md, "--execute"])
 
 
+@requires_user_kernel_python3
 @requires_nbconvert
 @skip_on_windows
 def test_execute_readme_not_ok(tmpdir):
@@ -130,6 +140,7 @@ a + 1
         jupytext(args=[tmp_md, "--execute"])
 
 
+@requires_user_kernel_python3
 @requires_nbconvert
 @skip_on_windows
 def test_execute_sync(tmpdir, caplog, capsys):
@@ -171,6 +182,7 @@ def test_execute_r(tmpdir, caplog, capsys):  # pragma: no cover
     assert nb.cells[0].outputs[0]["data"]["text/markdown"] == "6"
 
 
+@requires_user_kernel_python3
 @requires_nbconvert
 @skip_on_windows
 def test_execute_in_subfolder(tmpdir, caplog, capsys):
