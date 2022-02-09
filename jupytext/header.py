@@ -185,7 +185,7 @@ def header_to_metadata_and_cell(
     comment = "#" if header_prefix == "#'" else header_prefix
 
     encoding_re = re.compile(
-        r"^[ \t\f]*{}.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)".format(re.escape(comment))
+        rf"^[ \t\f]*{re.escape(comment)}.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)"
     )
 
     for i, line in enumerate(lines):

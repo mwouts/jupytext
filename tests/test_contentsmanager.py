@@ -1,5 +1,3 @@
-# coding: utf-8
-
 import itertools
 import logging
 import os
@@ -1871,7 +1869,7 @@ def fs_meta_manager(tmpdir):
     cm = cm_class(parent=None, log=logger)
     cm.initResource(
         {
-            "url": "osfs://{}".format(tmpdir),
+            "url": f"osfs://{tmpdir}",
         }
     )
     return cm
@@ -1895,7 +1893,7 @@ def test_jupytext_jupyter_fs_metamanager(tmpdir):
 
     # list the directory
     directory = cm.get(osfs + ":/")
-    assert set(file["name"] for file in directory["content"]) == {
+    assert {file["name"] for file in directory["content"]} == {
         "text.md",
         "text_notebook.md",
         "notebook.ipynb",
@@ -1940,7 +1938,7 @@ def test_config_jupytext_jupyter_fs_meta_manager(tmpdir):
 
     # list the directory
     directory = cm.get(osfs + ":/")
-    assert set(file["name"] for file in directory["content"]) == {
+    assert {file["name"] for file in directory["content"]} == {
         "jupytext.toml",
         "text.md",
         "text_notebook.md",

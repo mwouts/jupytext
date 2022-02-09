@@ -40,7 +40,7 @@ def test_config_file_is_called_just_once(tmpdir, n=2):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     tmpdir.join("jupytext.toml").write("")
-    nb_files = [str(tmpdir.join("notebook{}.ipynb".format(i))) for i in range(n)]
+    nb_files = [str(tmpdir.join(f"notebook{i}.ipynb")) for i in range(n)]
 
     for nb_file in nb_files:
         jupytext.write(SAMPLE_NOTEBOOK, nb_file)
@@ -51,7 +51,7 @@ def test_config_file_is_called_just_once(tmpdir, n=2):
         "jupytext.contentsmanager.load_jupytext_configuration_file", mock_config
     ):
         for i in range(n):
-            cm.get("notebook{}.ipynb".format(i), content=False)
+            cm.get(f"notebook{i}.ipynb", content=False)
 
     # Listing the contents should not call the config more than once
     assert mock_config.call_count == 1
@@ -127,7 +127,7 @@ def test_global_config_file(tmpdir):
         nb = new_notebook(cells=[new_code_cell("1+1")])
         model = notebook_model(nb)
         cm.save(model, "notebook.ipynb")
-        assert set(model["path"] for model in cm.get("/", content=True)["content"]) == {
+        assert {model["path"] for model in cm.get("/", content=True)["content"]} == {
             "notebook.ipynb",
             "notebook.Rmd",
         }

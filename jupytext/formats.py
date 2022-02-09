@@ -259,7 +259,7 @@ def get_format_implementation(ext, format_name=None):
                 format_name, ext, ", ".join(formats_for_extension)
             )
         )
-    raise JupytextFormatError("No format associated to extension '{}'".format(ext))
+    raise JupytextFormatError(f"No format associated to extension '{ext}'")
 
 
 def read_metadata(text, ext):
@@ -317,13 +317,11 @@ def guess_format(text, ext):
         comment = re.escape(unescaped_comment)
         language = _SCRIPT_EXTENSIONS[ext]["language"]
         twenty_hash_re = re.compile(r"^#( |)#{19,}\s*$")
-        double_percent_re = re.compile(r"^{}( %%|%%)$".format(comment))
-        double_percent_and_space_re = re.compile(r"^{}( %%|%%)\s".format(comment))
-        nbconvert_script_re = re.compile(
-            r"^{}( <codecell>| In\[[0-9 ]*\]:?)".format(comment)
-        )
-        vim_folding_markers_re = re.compile(r"^{}\s*".format(comment) + "{{{")
-        vscode_folding_markers_re = re.compile(r"^{}\s*region".format(comment))
+        double_percent_re = re.compile(rf"^{comment}( %%|%%)$")
+        double_percent_and_space_re = re.compile(rf"^{comment}( %%|%%)\s")
+        nbconvert_script_re = re.compile(rf"^{comment}( <codecell>| In\[[0-9 ]*\]:?)")
+        vim_folding_markers_re = re.compile(rf"^{comment}\s*" + "{{{")
+        vscode_folding_markers_re = re.compile(rf"^{comment}\s*region")
 
         twenty_hash_count = 0
         double_percent_count = 0

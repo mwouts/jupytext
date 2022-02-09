@@ -16,7 +16,7 @@ from jupytext.metadata_filter import filter_metadata
 
 
 def r_options_language_metadata():
-    for r_options, language, metadata in [
+    yield from [
         ("r", "R", {}),
         (
             'r plot_1, dpi=72, fig.path="fig_path/"',
@@ -56,8 +56,7 @@ def r_options_language_metadata():
             {"name": "chunk_name", "active": "Rmd", "tags": ["remove_cell"]},
         ),
         ('python tags=c("parameters")', "python", {"tags": ["parameters"]}),
-    ]:
-        yield r_options, language, metadata
+    ]
 
 
 @pytest.mark.parametrize("options,language, metadata", r_options_language_metadata())
@@ -76,7 +75,7 @@ def test_build_options_random_order(options, language, metadata):
     # assert to_chunk_options(metadata) == options
 
     def split_and_strip(opt):
-        set([o.strip() for o in opt.split(",")])
+        {o.strip() for o in opt.split(",")}
 
     assert split_and_strip(
         metadata_to_rmd_options(*(language, metadata))

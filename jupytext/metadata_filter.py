@@ -34,7 +34,7 @@ def metadata_filter_as_dict(metadata_config):
         return {"excluded": "all"}
 
     if isinstance(metadata_config, dict):
-        assert set(metadata_config) <= set(["additional", "excluded"])
+        assert set(metadata_config) <= {"additional", "excluded"}
         return metadata_config
 
     metadata_keys = metadata_config.split(",")

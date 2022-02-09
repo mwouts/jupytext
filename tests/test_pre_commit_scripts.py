@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 import stat
 import unittest.mock as mock

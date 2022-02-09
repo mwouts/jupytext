@@ -1,4 +1,3 @@
-# coding: utf-8
 import pytest
 from nbformat.v4.nbbase import new_markdown_cell, new_notebook
 

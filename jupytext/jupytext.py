@@ -1,6 +1,5 @@
 """Read and write Jupyter notebooks as text files"""
 
-import io
 import logging
 import os
 import sys
@@ -408,7 +407,7 @@ def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, config=None, **kwargs):
         if not isinstance(fmt, dict):
             fmt = long_form_one_format(fmt)
         fmt.update({"extension": ext})
-        with io.open(fp, encoding="utf-8") as stream:
+        with open(fp, encoding="utf-8") as stream:
             return read(stream, as_version=as_version, fmt=fmt, config=config, **kwargs)
 
     if fmt is not None:
@@ -524,7 +523,7 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, config=None, **kwargs):
         fmt = long_form_one_format(fmt, update={"extension": ext})
         create_prefix_dir(fp, fmt)
 
-        with io.open(fp, "w", encoding="utf-8") as stream:
+        with open(fp, "w", encoding="utf-8") as stream:
             write(nb, stream, version=version, fmt=fmt, config=config, **kwargs)
             return
     else:

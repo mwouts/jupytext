@@ -132,15 +132,15 @@ def test_path_in_tree_limited_to_config_dir(tmpdir):
     # Notebook in nested 'notebook' dir is paired
     notebook_in_nb_dir = nb_dir.join("subfolder").join("nb.ipynb")
 
-    assert set(
+    assert {
         path for (path, _) in paired_paths(str(notebook_in_nb_dir), fmt, formats)
-    ) == {str(notebook_in_nb_dir), str(src_dir.join("subfolder").join("nb.py"))}
+    } == {str(notebook_in_nb_dir), str(src_dir.join("subfolder").join("nb.py"))}
 
     # Notebook in base 'notebook' dir is paired if no config file is found
     notebook_in_other_dir = other_dir.mkdir("subfolder").join("nb.ipynb")
-    assert set(
+    assert {
         path for (path, _) in paired_paths(str(notebook_in_other_dir), fmt, formats)
-    ) == {
+    } == {
         str(notebook_in_other_dir),
         str(tmpdir.join("scripts").join("other").join("subfolder").join("nb.py")),
     }
@@ -149,9 +149,9 @@ def test_path_in_tree_limited_to_config_dir(tmpdir):
     root_nb_dir.join("jupytext.toml").write("\n")
 
     # Notebook in nested 'notebook' dir is still paired
-    assert set(
+    assert {
         path for (path, _) in paired_paths(str(notebook_in_nb_dir), fmt, formats)
-    ) == {str(notebook_in_nb_dir), str(src_dir.join("subfolder").join("nb.py"))}
+    } == {str(notebook_in_nb_dir), str(src_dir.join("subfolder").join("nb.py"))}
 
     # But the notebook in base 'notebook' dir is not paired any more
     alert = (

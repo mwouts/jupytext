@@ -2,7 +2,6 @@
 
 import argparse
 import glob
-import io
 import json
 import os
 import re
@@ -93,20 +92,20 @@ def parse_jupytext_args(args=None):
             "'md', 'Rmd', 'jl', 'py', 'R', ..., 'auto' (script extension matching the notebook language), "
             "or a combination of an extension and a format name, e.g. {} ".format(
                 ", ".join(
-                    set(
-                        "md:{}".format(fmt.format_name)
+                    {
+                        f"md:{fmt.format_name}"
                         for fmt in JUPYTEXT_FORMATS
                         if fmt.extension == ".md"
-                    )
+                    }
                 )
             )
             + " or {}. ".format(
                 ", ".join(
-                    set(
-                        "py:{}".format(fmt.format_name)
+                    {
+                        f"py:{fmt.format_name}"
                         for fmt in JUPYTEXT_FORMATS
                         if fmt.extension == ".py"
-                    )
+                    }
                 )
             )
             + "The default format for scripts is the 'light' format, "
@@ -458,7 +457,7 @@ def jupytext(args=None):
     ):
 
         def single_line(msg, *args, **kwargs):
-            return "[warning] {}\n".format(msg)
+            return f"[warning] {msg}\n"
 
         warnings.formatwarning = single_line
         warnings.warn(
@@ -491,7 +490,7 @@ def jupytext(args=None):
             try:
                 exit_code += jupytext_single_file(nb_file, args, log)
             except Exception as err:
-                sys.stderr.write("[jupytext] Error: {}\n".format(str(err)))
+                sys.stderr.write(f"[jupytext] Error: {str(err)}\n")
 
     return exit_code
 
@@ -501,7 +500,7 @@ def jupytext_single_file(nb_file, args, log):
     if nb_file == "-" and args.sync:
         msg = "Missing notebook path."
         if args.set_formats is not None and os.path.isfile(args.set_formats):
-            msg += " Maybe you mean 'jupytext --sync {}' ?".format(args.set_formats)
+            msg += f" Maybe you mean 'jupytext --sync {args.set_formats}' ?"
         raise ValueError(msg)
 
     nb_dest = None
@@ -517,9 +516,7 @@ def jupytext_single_file(nb_file, args, log):
                 log(
                     "[jupytext] Ignoring unmatched input path {}{}".format(
                         nb_file,
-                        " for format {}".format(args.input_format)
-                        if args.input_format
-                        else "",
+                        f" for format {args.input_format}" if args.input_format else "",
                     )
                 )
                 return 0
@@ -548,9 +545,7 @@ def jupytext_single_file(nb_file, args, log):
     log(
         "[jupytext] Reading {}{}".format(
             nb_file if nb_file != "-" else "stdin",
-            " in format {}".format(short_form_one_format(fmt))
-            if "extension" in fmt
-            else "",
+            f" in format {short_form_one_format(fmt)}" if "extension" in fmt else "",
         )
     )
 
@@ -690,7 +685,7 @@ def jupytext_single_file(nb_file, args, log):
     # Execute the notebook
     if args.execute:
         kernel_name = notebook.metadata.get("kernelspec", {}).get("name")
-        log("[jupytext] Executing notebook with kernel {}".format(kernel_name))
+        log(f"[jupytext] Executing notebook with kernel {kernel_name}")
 
         if nb_dest is not None and nb_dest != "-":
             nb_path = os.path.dirname(nb_dest)
@@ -708,9 +703,7 @@ def jupytext_single_file(nb_file, args, log):
                     run_path = try_path
                     break
             if not os.path.isdir(run_path):
-                raise ValueError(
-                    "--run-path={} is not a valid path".format(args.run_path)
-                )
+                raise ValueError(f"--run-path={args.run_path} is not a valid path")
 
         if run_path:
             resources = {"metadata": {"path": run_path}}
@@ -781,7 +774,7 @@ def jupytext_single_file(nb_file, args, log):
                     )
 
         except (NotebookDifference, AssertionError) as err:
-            sys.stdout.write("{}: {}".format(nb_file, str(err)))
+            sys.stdout.write(f"{nb_file}: {str(err)}")
             return 1
         return 0
 
@@ -823,7 +816,7 @@ def jupytext_single_file(nb_file, args, log):
         if modified:
             # The text representation of the notebook has changed, we write it on disk
             if action is None:
-                message = "[jupytext] Updating {}".format(shlex.quote(path))
+                message = f"[jupytext] Updating {shlex.quote(path)}"
             else:
                 message = "[jupytext] Writing {path}{format}{action}".format(
                     path=shlex.quote(path),
@@ -837,7 +830,7 @@ def jupytext_single_file(nb_file, args, log):
 
             log(message)
             create_prefix_dir(path, fmt)
-            with io.open(path, "w", encoding="utf-8") as fp:
+            with open(path, "w", encoding="utf-8") as fp:
                 fp.write(new_content)
 
         # Otherwise, we only update the timestamp of the text file to make sure

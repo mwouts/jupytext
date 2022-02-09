@@ -225,9 +225,9 @@ def test_myst_representation_same_cli_or_contents_manager(
     text_api = jupytext.writes(nb, fmt="md:myst")
 
     # How do code cells look like?
-    code_cells = set(
+    code_cells = {
         line for line in text_api.splitlines() if line.startswith("```{code-cell")
-    )
+    }
 
     if language_info == "std":
         assert code_cells == {"```{code-cell} ipython3"}

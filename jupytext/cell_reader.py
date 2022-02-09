@@ -117,7 +117,7 @@ def last_two_lines_blank(source):
     )
 
 
-class BaseCellReader(object):
+class BaseCellReader:
     """A class that can read notebook cells from their text representation"""
 
     default_comment_magics = None
@@ -353,7 +353,7 @@ class MarkdownCellReader(BaseCellReader):
     default_comment_magics = False
 
     def __init__(self, fmt=None, default_language=None):
-        super(MarkdownCellReader, self).__init__(fmt, default_language)
+        super().__init__(fmt, default_language)
         self.split_at_heading = (fmt or {}).get("split_at_heading", False)
         self.in_region = False
         self.in_raw = False
@@ -368,9 +368,7 @@ class MarkdownCellReader(BaseCellReader):
             self.in_region = True
             groups = match_region.groups()
             region_name = groups[0]
-            self.end_region_re = re.compile(
-                r"^<!--\s*#end{}\s*-->\s*$".format(region_name)
-            )
+            self.end_region_re = re.compile(rf"^<!--\s*#end{region_name}\s*-->\s*$")
             self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(
                 groups[1]
             )
@@ -636,7 +634,7 @@ class LightScriptCellReader(ScriptCellReader):
     cell_marker_end = None
 
     def __init__(self, fmt=None, default_language=None):
-        super(LightScriptCellReader, self).__init__(fmt, default_language)
+        super().__init__(fmt, default_language)
         self.ext = self.ext or ".py"
         script = _SCRIPT_EXTENSIONS[self.ext]
         self.default_language = default_language or script["language"]
@@ -698,7 +696,7 @@ class LightScriptCellReader(ScriptCellReader):
 
         # Cell type
         for cell_type in ["markdown", "raw", "md"]:
-            code = "[{}]".format(cell_type)
+            code = f"[{cell_type}]"
             if code in title:
                 title = title.replace(code, "").strip()
                 metadata["cell_type"] = cell_type
@@ -811,7 +809,7 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
         self.comment = script["comment"]
         self.comment_suffix = script.get("comment_suffix", "")
         self.start_code_re = re.compile(
-            r"^\s*{}\s*%%(%*)\s(.*)$".format(re.escape(self.comment))
+            rf"^\s*{re.escape(self.comment)}\s*%%(%*)\s(.*)$"
         )
         self.alternative_start_code_re = re.compile(
             r"^\s*{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(
@@ -907,7 +905,7 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):  # pylint: disable=W0223
     markdown_marker = None
 
     def __init__(self, fmt=None, default_language="python"):
-        super(SphinxGalleryScriptCellReader, self).__init__(fmt, default_language)
+        super().__init__(fmt, default_language)
         self.ext = ".py"
         self.rst2md = (fmt or {}).get("rst2md", False)
 
