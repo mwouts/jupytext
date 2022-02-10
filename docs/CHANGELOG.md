@@ -1,11 +1,18 @@
 Jupytext ChangeLog
 ==================
 
+1.13.8 (2022-02-??)
+-------------------
+
+**Fixed**
+- We made sure that our tests also work in absence of a Python kernel ([#906](https://github.com/mwouts/jupytext/issues/906))
+
+
 1.13.7 (2022-02-09)
 -------------------
 
 **Fixed**
-- The Jupytext CLI only suggest --update when the target is an .ipynb file ([#905](https://github.com/mwouts/jupytext/issues/905)) - thanks to [st--](https://github.com/st--) for this contribution
+- The Jupytext CLI only suggest `--update` when the target is an .ipynb file ([#905](https://github.com/mwouts/jupytext/issues/905)) - thanks to [st--](https://github.com/st--) for this contribution
 - We made sure that commands like `cat notebook.md | jupytext --execute` work ([#908](https://github.com/mwouts/jupytext/issues/908))
 
 **Added**

@@ -23,6 +23,7 @@ from .utils import (
     requires_pandoc,
     requires_quarto,
     requires_sphinx_gallery,
+    requires_user_kernel_python3,
 )
 
 
@@ -1215,6 +1216,7 @@ def test_global_pairing_allows_to_save_other_file_types(nb_file, tmpdir):
     compare_notebooks(nb2, nb)
 
 
+@requires_user_kernel_python3
 @pytest.mark.parametrize("nb_file", list_notebooks("R"))
 def test_python_kernel_preserves_R_files(nb_file, tmpdir):
     """Opening a R file with a Jupyter server that has no R kernel should not modify the file"""

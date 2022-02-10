@@ -263,6 +263,7 @@ jupyter:
 """
 
 
+@requires_user_kernel_python3
 def test_execute_text_file_does_update_the_metadata(sample_md_notebook, tmp_path):
     md_file = tmp_path / "nb.md"
     md_file.write_text(sample_md_notebook)
@@ -274,6 +275,7 @@ def test_execute_text_file_does_update_the_metadata(sample_md_notebook, tmp_path
     assert "kernelspec" in new_md_text
 
 
+@requires_user_kernel_python3
 def test_cat_execute_does_not_update_the_metadata(sample_md_notebook, tmp_path):
     md_file = tmp_path / "nb.md"
     md_file.write_text(sample_md_notebook)
