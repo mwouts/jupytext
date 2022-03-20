@@ -577,11 +577,16 @@ try:
     TextFileContentsManager = build_jupytext_contents_manager_class(LargeFileManager)
 except ImportError:
     # If we can't find jupyter_server then we take it from notebook
-    from notebook.services.contents.largefilemanager import LargeFileManager
+    try:
+        from notebook.services.contents.largefilemanager import LargeFileManager
 
-    TextFileContentsManager = build_jupytext_contents_manager_class(LargeFileManager)
-except ImportError:
-    # Older versions of notebook do not have the LargeFileManager #217
-    from notebook.services.contents.filemanager import FileContentsManager
+        TextFileContentsManager = build_jupytext_contents_manager_class(
+            LargeFileManager
+        )
+    except ImportError:
+        # Older versions of notebook do not have the LargeFileManager #217
+        from notebook.services.contents.filemanager import FileContentsManager
 
-    TextFileContentsManager = build_jupytext_contents_manager_class(FileContentsManager)
+        TextFileContentsManager = build_jupytext_contents_manager_class(
+            FileContentsManager
+        )
