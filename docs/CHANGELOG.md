@@ -7,6 +7,9 @@ Jupytext ChangeLog
 **Fixed**
 - We made sure that our tests also work in absence of a Python kernel ([#906](https://github.com/mwouts/jupytext/issues/906))
 
+**Changed**
+- The Jupytext contents manager is derived from the `LargeFileManager` imported from `jupyter_server` rathen than `notebook` ([#933](https://github.com/mwouts/jupytext/issues/933))
+
 
 1.13.7 (2022-02-09)
 -------------------
