@@ -7,8 +7,12 @@ Jupytext ChangeLog
 **Fixed**
 - We made sure that our tests also work in absence of a Python kernel ([#906](https://github.com/mwouts/jupytext/issues/906))
 
+**Added**
+- Added Tcl as a supported language ([#930](https://github.com/mwouts/jupytext/issues/930)) - thanks to [shishitao](https://github.com/shishitao) for this contribution
+
 **Changed**
 - The Jupytext contents manager is derived from the `LargeFileManager` imported from `jupyter_server` rathen than `notebook` ([#933](https://github.com/mwouts/jupytext/issues/933))
+- Allow for markdown-it-py v2 ([#924](https://github.com/mwouts/jupytext/issues/924))
 
 
 1.13.7 (2022-02-09)
