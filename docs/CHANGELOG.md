@@ -6,6 +6,7 @@ Jupytext ChangeLog
 
 **Fixed**
 - We made sure that our tests also work in absence of a Python kernel ([#906](https://github.com/mwouts/jupytext/issues/906))
+- The coverage of the `tests` folder has been restored at 100%
 
 **Added**
 - Added Tcl as a supported language ([#930](https://github.com/mwouts/jupytext/issues/930)) - thanks to [shishitao](https://github.com/shishitao) for this contribution
