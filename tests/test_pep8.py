@@ -201,7 +201,9 @@ def test_no_metadata_when_py_is_pep8(py_file):
         if "title" in cell.metadata:
             cell.metadata.pop("title")  # pragma: no cover
         if i == 0 and not cell.source:
-            assert cell.metadata == {"lines_to_next_cell": 0}, py_file
+            assert cell.metadata == {
+                "lines_to_next_cell": 0
+            }, py_file  # pragma: no cover
         else:
             assert not cell.metadata, (py_file, cell.source)
 

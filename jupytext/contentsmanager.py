@@ -571,11 +571,22 @@ to your jupytext.toml file
 
 
 try:
-    from notebook.services.contents.largefilemanager import LargeFileManager
+    # The LargeFileManager is taken by default from jupyter_server if available
+    from jupyter_server.services.contents.largefilemanager import LargeFileManager
 
     TextFileContentsManager = build_jupytext_contents_manager_class(LargeFileManager)
 except ImportError:
-    # Older versions of notebook do not have the LargeFileManager #217
-    from notebook.services.contents.filemanager import FileContentsManager
+    # If we can't find jupyter_server then we take it from notebook
+    try:
+        from notebook.services.contents.largefilemanager import LargeFileManager
 
-    TextFileContentsManager = build_jupytext_contents_manager_class(FileContentsManager)
+        TextFileContentsManager = build_jupytext_contents_manager_class(
+            LargeFileManager
+        )
+    except ImportError:
+        # Older versions of notebook do not have the LargeFileManager #217
+        from notebook.services.contents.filemanager import FileContentsManager
+
+        TextFileContentsManager = build_jupytext_contents_manager_class(
+            FileContentsManager
+        )
