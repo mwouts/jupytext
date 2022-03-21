@@ -1007,11 +1007,24 @@ def test_set_format_with_subfolder(tmpdir, cwd_tmpdir):
     )
 
 
-@requires_myst
-@requires_pandoc
+def skip_if_format_missing(format_name):
+    """Check whether MyST or Pandoc are available and skip if not"""
+    if format_name == "md:myst":
+        mark = requires_myst()
+    elif format_name == "md:pandoc":
+        mark = requires_pandoc()
+    else:
+        return
+
+    if mark.args[0]:
+        pytest.skip(**mark.kwargs)
+
+
 @pytest.mark.parametrize("format_name", ["md", "md:myst", "md:pandoc"])
 def test_create_header_with_set_formats(format_name, cwd_tmpdir, tmpdir):
     """Test jupytext --set-formats <format_name> #485"""
+
+    skip_if_format_missing(format_name)
 
     tmpdir.join("notebook.md").write("\n")
 
@@ -1022,13 +1035,13 @@ def test_create_header_with_set_formats(format_name, cwd_tmpdir, tmpdir):
 
 
 @requires_user_kernel_python3
-@requires_myst
-@requires_pandoc
 @pytest.mark.parametrize(
     "format_name", ["md", "md:myst", "md:pandoc", "py:light", "py:percent"]
 )
 def test_create_header_with_set_formats_and_set_kernel(format_name, tmpdir, cwd_tmpdir):
     """Test jupytext --set-formats <format_name> --set-kernel - #485"""
+
+    skip_if_format_missing(format_name)
 
     ext = format_name.split(":")[0]
     tmp_nb = "notebook." + ext
