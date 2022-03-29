@@ -25,6 +25,12 @@ repos:
     - id: end-of-file-fixer
     - id: trailing-whitespace
 
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.31.1
+    hooks:
+    - id: pyupgrade
+      args: ["--py36-plus"]
+
   - repo: https://github.com/myint/autoflake
     rev: v1.4
     hooks:
@@ -48,9 +54,3 @@ repos:
     rev: 22.3.0
     hooks:
     - id: black
-
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v2.31.1
-    hooks:
-    - id: pyupgrade
-      args: ["--py3-plus", "--py36-plus"]
