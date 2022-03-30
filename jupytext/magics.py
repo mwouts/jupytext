@@ -42,7 +42,7 @@ _MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*escape
 _MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*noescape")
 
 # Commands starting with a question or exclamation mark have to be escaped
-_PYTHON_HELP_OR_BASH_CMD = re.compile(r"^\s*(# |#)*\s*(\?|!)\s*[A-Za-z\.\~\$\\\/]")
+_PYTHON_HELP_OR_BASH_CMD = re.compile(r"^\s*(# |#)*\s*(\?|!)\s*[A-Za-z\.\~\$\\\/\{\}]")
 
 # A bash command not followed by an equal sign or a parenthesis is a magic command
 _PYTHON_MAGIC_CMD = re.compile(

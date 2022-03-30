@@ -190,6 +190,7 @@ def test_force_comment_using_contents_manager(tmpdir):
         "cat ",
         "cat hello.txt",
         "cat --option=value hello.txt",
+        "!{x}",
     ],
 )
 def test_comment_bash_commands_in_python(magic_cmd):
