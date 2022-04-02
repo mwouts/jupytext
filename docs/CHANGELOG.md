@@ -1,7 +1,7 @@
 Jupytext ChangeLog
 ==================
 
-1.13.8 (2022-02-??)
+1.13.8 (2022-04-??)
 -------------------
 
 **Fixed**
@@ -10,6 +10,7 @@ Jupytext ChangeLog
 
 **Added**
 - Added Tcl as a supported language ([#930](https://github.com/mwouts/jupytext/issues/930)) - thanks to [shishitao](https://github.com/shishitao) for this contribution
+- Added Maxima as a supported language ([#927](https://github.com/mwouts/jupytext/issues/927)) - thanks to [Alberto Lusiani](https://github.com/alusiani) for contributing a sample Maxima notebook.
 
 **Changed**
 - The Jupytext contents manager is derived from the `LargeFileManager` imported from `jupyter_server` rathen than `notebook` ([#933](https://github.com/mwouts/jupytext/issues/933))
