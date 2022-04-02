@@ -14,6 +14,7 @@ Jupytext ChangeLog
 **Changed**
 - The Jupytext contents manager is derived from the `LargeFileManager` imported from `jupyter_server` rathen than `notebook` ([#933](https://github.com/mwouts/jupytext/issues/933))
 - Allow for markdown-it-py v2 ([#924](https://github.com/mwouts/jupytext/issues/924))
+- We have updated the hooks used in the test pre-commits (#940, #942)
 
 
 1.13.7 (2022-02-09)
