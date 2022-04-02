@@ -5,11 +5,13 @@ import os
 import sys
 import warnings
 from copy import copy, deepcopy
+from unittest import mock
 
 import nbformat
 from nbformat.v4.nbbase import NotebookNode, new_code_cell, new_notebook
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 
+from .cell_ids import random_cell_id_with_fixed_seed
 from .cell_metadata import _IGNORE_CELL_METADATA
 from .formats import (
     _VALID_FORMAT_OPTIONS,
@@ -367,7 +369,17 @@ def reads(text, fmt=None, as_version=nbformat.NO_CONVERT, config=None, **kwargs)
 
     fmt.update(format_options)
     reader = TextNotebookConverter(fmt, config)
-    notebook = reader.reads(text, **kwargs)
+
+    # Cell ids for text notebooks are generated with a fixed see
+    # (otherwise text notebooks cannot be trusted, see e.g. #941)
+    if hasattr(nbformat.v4.nbbase, "random_cell_id"):
+        with mock.patch(
+            "nbformat.v4.nbbase.random_cell_id", random_cell_id_with_fixed_seed(text)
+        ):
+            notebook = reader.reads(text, **kwargs)
+    else:
+        notebook = reader.reads(text, **kwargs)
+
     rearrange_jupytext_metadata(notebook.metadata)
 
     if format_name and insert_or_test_version_number():

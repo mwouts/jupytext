@@ -1,10 +1,25 @@
-from nbformat.v4.nbbase import new_code_cell
+import pytest
+
+from jupytext import reads
+from jupytext.compare import compare_notebooks
 
 
-def test_cell_id_is_not_random():
-    id1 = new_code_cell().id
-    id2 = new_code_cell().id
+@pytest.fixture()
+def text_notebook():
+    return """# %% [markdown]
+# Some text
 
-    n1 = int(id1.split("-")[1])
-    n2 = int(id2.split("-")[1])
-    assert n2 == n1 + 1
+# %%
+1 + 1
+"""
+
+
+def test_cell_ids_are_distinct(text_notebook):
+    nb = reads(text_notebook, "py:percent")
+    assert nb.cells[0].id != nb.cells[1].id
+
+
+def test_cell_ids_are_deterministic(text_notebook):
+    nb = reads(text_notebook, "py:percent")
+    nb2 = reads(text_notebook, "py:percent")
+    compare_notebooks(nb2, nb, compare_ids=True)
