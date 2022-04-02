@@ -67,6 +67,11 @@ _SCRIPT_EXTENSIONS = {
     },  # OCaml only has block comments
     ".hs": {"language": "haskell", "comment": "--"},
     ".tcl": {"language": "tcl", "comment": "#"},
+    ".mac": {
+        "language": "maxima",
+        "comment": "/*",
+        "comment_suffix": "*/",
+    },  # Maxima only has block comments
 }
 
 _COMMENT_CHARS = [

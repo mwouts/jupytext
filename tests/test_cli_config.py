@@ -81,7 +81,7 @@ def test_preferred_jupytext_formats_save(tmpdir):
         text_jl = stream.read()
 
     # Parse the YAML header
-    metadata, _, _, _ = header_to_metadata_and_cell(text_jl.splitlines(), "#")
+    metadata, _, _, _ = header_to_metadata_and_cell(text_jl.splitlines(), "#", "")
     assert metadata["jupytext"]["formats"] == "ipynb,jl:percent"
 
 

@@ -1,0 +1,19 @@
+/* --- */
+/* jupyter: */
+/*   kernelspec: */
+/*     display_name: Maxima */
+/*     language: maxima */
+/*     name: maxima */
+/* --- */
+
+/* ## maxima misc */
+
+kill(all)$
+
+f(x) := 1/(x^2+l^2)^(3/2);
+
+integrate(f(x), x);
+
+tex(%)$
+
+

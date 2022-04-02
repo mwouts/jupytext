@@ -1,7 +1,7 @@
 Jupytext ChangeLog
 ==================
 
-1.13.8 (2022-02-??)
+1.13.8 (2022-04-??)
 -------------------
 
 **Fixed**
@@ -10,10 +10,12 @@ Jupytext ChangeLog
 
 **Added**
 - Added Tcl as a supported language ([#930](https://github.com/mwouts/jupytext/issues/930)) - thanks to [shishitao](https://github.com/shishitao) for this contribution
+- Added Maxima as a supported language ([#927](https://github.com/mwouts/jupytext/issues/927)) - thanks to [Alberto Lusiani](https://github.com/alusiani) for contributing a sample Maxima notebook.
 
 **Changed**
 - The Jupytext contents manager is derived from the `LargeFileManager` imported from `jupyter_server` rathen than `notebook` ([#933](https://github.com/mwouts/jupytext/issues/933))
 - Allow for markdown-it-py v2 ([#924](https://github.com/mwouts/jupytext/issues/924))
+- We have updated the hooks used in the test pre-commits, to fix an issue on the CI ([#940](https://github.com/mwouts/jupytext/issues/940), [#942](https://github.com/mwouts/jupytext/issues/942))
 
 
 1.13.7 (2022-02-09)
