@@ -24,7 +24,7 @@ title: Sample header
 Header is followed by a blank line
 """
     lines = text.splitlines()
-    metadata, _, cell, pos = header_to_metadata_and_cell(lines, "")
+    metadata, _, cell, pos = header_to_metadata_and_cell(lines, "", "")
 
     assert metadata == {}
     assert cell.cell_type == "raw"
@@ -45,7 +45,7 @@ title: Sample header
 Header is not followed by a blank line
 """
     lines = text.splitlines()
-    metadata, _, cell, pos = header_to_metadata_and_cell(lines, "")
+    metadata, _, cell, pos = header_to_metadata_and_cell(lines, "", "")
 
     assert metadata == {}
     assert cell.cell_type == "raw"
@@ -67,7 +67,7 @@ jupyter:
 ---
 """
     lines = text.splitlines()
-    metadata, _, cell, pos = header_to_metadata_and_cell(lines, "")
+    metadata, _, cell, pos = header_to_metadata_and_cell(lines, "", "")
 
     assert metadata == {"mainlanguage": "python"}
     assert cell.cell_type == "raw"
@@ -162,7 +162,7 @@ jupyter:
 -->
 """
     lines = text.splitlines()
-    metadata, _, cell, _ = header_to_metadata_and_cell(lines, "")
+    metadata, _, cell, _ = header_to_metadata_and_cell(lines, "", "")
 
     assert metadata == {"title": "Sample header"}
     assert cell is None
