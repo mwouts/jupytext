@@ -163,7 +163,7 @@ def recursive_update(target, update):
 
 
 def header_to_metadata_and_cell(
-    lines, header_prefix, ext=None, root_level_metadata_as_raw_cell=True
+    lines, header_prefix, header_suffix, ext=None, root_level_metadata_as_raw_cell=True
 ):
     """
     Return the metadata, a boolean to indicate if a jupyter section was found,
@@ -214,12 +214,6 @@ def header_to_metadata_and_cell(
                     break
             if not started and not line.strip():
                 continue
-
-        # OCAML
-        if header_prefix == "(*":
-            header_suffix = "*)"
-        else:
-            header_suffix = ""
 
         line = uncomment_line(line, header_prefix, header_suffix)
         if _HEADER_RE.match(line):

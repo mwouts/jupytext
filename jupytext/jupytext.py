@@ -108,6 +108,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         metadata, jupyter_md, header_cell, pos = header_to_metadata_and_cell(
             lines,
             self.implementation.header_prefix,
+            self.implementation.header_suffix,
             self.implementation.extension,
             self.fmt.get(
                 "root_level_metadata_as_raw_cell",
