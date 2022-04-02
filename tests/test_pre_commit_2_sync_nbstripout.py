@@ -31,7 +31,7 @@ repos:
     args: [--sync]
 
 - repo: https://github.com/kynan/nbstripout
-  rev: 0.3.9
+  rev: 0.5.0
   hooks:
   - id: nbstripout
 """

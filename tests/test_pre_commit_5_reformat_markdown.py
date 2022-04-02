@@ -42,11 +42,11 @@ repos:
   - id: jupytext
     args: [--sync, --pipe, black, --show-changes]
     additional_dependencies:
-    - black==20.8b1  # Matches black hook below
+    - black==22.3.0  # Matches black hook below
     - nbformat==5.0.8  # for compatibility with the pandoc hook above
 
 - repo: https://github.com/psf/black
-  rev: 20.8b1
+  rev: 22.3.0
   hooks:
   - id: black
 """

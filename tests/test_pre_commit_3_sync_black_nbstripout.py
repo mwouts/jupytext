@@ -29,15 +29,15 @@ repos:
   - id: jupytext
     args: [--sync, --pipe, black]
     additional_dependencies:
-    - black==20.8b1  # Matches hook
+    - black==22.3.0  # Matches hook
 
 - repo: https://github.com/psf/black
-  rev: 20.8b1
+  rev: 22.3.0
   hooks:
   - id: black
 
 - repo: https://github.com/kynan/nbstripout
-  rev: 0.3.9
+  rev: 0.5.0
   hooks:
   - id: nbstripout
 """
