@@ -2,6 +2,7 @@ import os
 import shutil
 
 import pytest
+from nbformat.v4.nbbase import new_code_cell, new_output
 
 from jupytext.compare import compare_notebooks
 from jupytext.contentsmanager import TextFileContentsManager
@@ -163,3 +164,55 @@ def test_simple_notebook_is_trusted(tmpdir, python_notebook):
     # The notebook is safe so it should have been trusted before getting saved to disk
     nb = cm.get("test.ipynb")["content"]
     assert cm.notary.check_signature(nb)
+
+
+def test_myst_notebook_is_trusted_941(
+    tmp_path,
+    myst="""---
+jupytext:
+  formats: md:myst
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.11.5
+kernelspec:
+  display_name: itables
+  language: python
+  name: itables
+---
+
+# Downsampling
+
+```{code-cell} ipython3
+from itables import init_notebook_mode, show
+
+init_notebook_mode(all_interactive=True)
+```
+""",
+):
+    cm = TextFileContentsManager()
+    cm.root_dir = str(tmp_path)
+
+    test_md = tmp_path / "test.md"
+    test_md.write_text(myst)
+
+    nb = cm.get("test.md")["content"]
+
+    # All cells are trusted in this notebook
+    assert cm.notary.check_cells(nb)
+
+
+def test_paired_notebook_with_outputs_is_not_trusted_941(tmp_path, python_notebook):
+    cm = TextFileContentsManager()
+    cm.root_dir = str(tmp_path)
+
+    nb = python_notebook
+    nb.cells.append(new_code_cell(source="1+1", outputs=[new_output("execute_result")]))
+    nb.metadata["jupytext"] = {"formats": "ipynb,md:myst"}
+    cm.notary.unsign(nb)
+    cm.save(model=dict(type="notebook", content=nb), path="test.ipynb")
+
+    nb = cm.get("test.md")["content"]
+    assert not cm.notary.check_cells(nb)
+    assert not cm.notary.check_signature(nb)
