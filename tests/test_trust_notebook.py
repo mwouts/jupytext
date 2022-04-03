@@ -7,7 +7,7 @@ from nbformat.v4.nbbase import new_code_cell, new_output
 from jupytext.compare import compare_notebooks
 from jupytext.contentsmanager import TextFileContentsManager
 
-from .utils import list_notebooks
+from .utils import list_notebooks, requires_myst
 
 
 @pytest.mark.parametrize("nb_file", list_notebooks("python"))
@@ -166,6 +166,7 @@ def test_simple_notebook_is_trusted(tmpdir, python_notebook):
     assert cm.notary.check_signature(nb)
 
 
+@requires_myst
 def test_myst_notebook_is_trusted_941(
     tmp_path,
     myst="""---
@@ -203,6 +204,7 @@ init_notebook_mode(all_interactive=True)
     assert cm.notary.check_cells(nb)
 
 
+@requires_myst
 def test_paired_notebook_with_outputs_is_not_trusted_941(tmp_path, python_notebook):
     cm = TextFileContentsManager()
     cm.root_dir = str(tmp_path)
