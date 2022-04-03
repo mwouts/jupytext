@@ -1321,6 +1321,7 @@ def test_jupytext_to_ipynb_suggests_update(tmpdir, cwd_tmpdir, capsys):
     capture = capsys.readouterr()
     assert "update" not in capture.out
 
+    tmpdir.join("test.py").write("2 + 2\n")
     jupytext(["--to", "ipynb", "test.py"])
     capture = capsys.readouterr()
     assert "update" in capture.out
@@ -1409,10 +1410,14 @@ def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, forma
     cm.get("test.ipynb")
 
     # But now if we don't use --use-source-timestamp
+    test_ipynb.remove()
     jupytext(["--to", "ipynb", "test.py"])
+
+    # And restore the original timestamp of the py file
     os.utime(test_py, (src_timestamp, src_timestamp))
 
-    # Then we can't open paired notebooks
+    # Then ipynb is more recent than py
+    # and we can't open paired notebooks
     if formats == "ipynb,py":
         from tornado.web import HTTPError
 
