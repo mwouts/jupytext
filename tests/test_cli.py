@@ -1167,12 +1167,13 @@ def no_warning():
 
     # There should be no warning
     for record in records:
-        # Temporary exception for for this one, see #865
+        # Temporary exception for this one, see #865
+        # (does not seem to not occur anymore, as of April 2022, see #947)
         if (
             "Passing a schema to Validator.iter_errors is deprecated "
             "and will be removed in a future release" in str(record.message)
         ):
-            continue
+            continue  # pragma: no cover
         raise RuntimeError(record)
 
 
