@@ -5,6 +5,7 @@ Jupytext ChangeLog
 -------------------
 
 **Fixed**
+- Text-only notebooks are always trusted (as they don't include any output cells) ([#941](https://github.com/mwouts/jupytext/issues/941))
 - We made sure that our tests also work in absence of a Python kernel ([#906](https://github.com/mwouts/jupytext/issues/906))
 - The coverage of the `tests` folder has been restored at 100%
 - Bash commands like `!{cmd}` are now correctly escaped in the `py:percent` format ([#938](https://github.com/mwouts/jupytext/issues/938))
