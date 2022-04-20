@@ -248,6 +248,33 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                     self.fmt["use_runtools"] = True
                     break
 
+        if self.fmt.get("comment_out_non_nbdev_exported_cells") and self.ext not in [
+            ".md",
+            ".markdown",
+            ".Rmd",
+            ".quarto",
+        ]:
+
+            def set_active_cell_metadata(cell):
+                if cell.cell_type != "code":
+                    return cell
+
+                # we make a copy of the cells because we're changing the metadata
+                cell = copy(cell)
+
+                # we set an active-py or active-ipynb cell metadata depending on
+                # whether we find the nbdev '#export' command
+                # TODO: review this!
+                nbdev_export = "#export" in cell.source
+                active_tag = (
+                    f"active-ipynb-{self.ext[1:]}" if nbdev_export else "active-ipynb"
+                )
+                cell.metadata.setdefault("tags", []).append(active_tag)
+
+                return cell
+
+            nb.cells = [set_active_cell_metadata(cell) for cell in nb.cells]
+
         header = encoding_and_executable(nb, metadata, self.ext)
         header_content, header_lines_to_next_cell = metadata_and_cell_to_header(
             nb,

@@ -721,6 +721,7 @@ _BINARY_FORMAT_OPTIONS = [
     "cell_metadata_json",
     "use_runtools",
     "doxygen_equation_markers",
+    "comment_out_non_nbdev_exported_cells",
 ]
 _VALID_FORMAT_OPTIONS = _BINARY_FORMAT_OPTIONS + [
     "notebook_metadata_filter",

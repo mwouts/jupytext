@@ -135,6 +135,12 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
+    comment_out_non_nbdev_exported_cells = Bool(
+        False,
+        help="Comment out code cells that do not have a nbdev '#export' tag",
+        config=True,
+    )
+
     outdated_text_notebook_margin = Float(
         1.0,
         help="Refuse to overwrite inputs of a ipynb notebooks with those of a "
@@ -207,6 +213,11 @@ class JupytextConfiguration(Configurable):
         if self.doxygen_equation_markers:
             format_options.setdefault(
                 "doxygen_equation_markers", self.doxygen_equation_markers
+            )
+        if self.comment_out_non_nbdev_exported_cells:
+            format_options.setdefault(
+                "comment_out_non_nbdev_exported_cells",
+                self.comment_out_non_nbdev_exported_cells,
             )
         if not read:
             if self.default_cell_markers:
