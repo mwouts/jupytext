@@ -220,3 +220,51 @@ def test_test_no_text_representation_metadata_in_ipynb_900(
     assert "text_representation" in tmpdir.join("test.py").read()
     # But not in the ipynb notebook
     assert "text_representation" not in tmpdir.join("test.ipynb").read()
+
+
+@pytest.mark.parametrize(
+    "cm_config_log_level", ["warning", "info", "info_if_changed", "debug", "none"]
+)
+def test_cm_config_log_level(cwd_tmp_path, tmp_path, cm_config_log_level):
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmp_path)
+
+    config = f'cm_config_log_level="{cm_config_log_level}"'
+    (tmp_path / "jupytext.toml").write_text(config)
+    (tmp_path / "nb1.py").write_text("# %%")
+    (tmp_path / "subfolder").mkdir()
+    (tmp_path / "subfolder" / "jupytext.toml").write_text(config)
+    (tmp_path / "subfolder" / "nb2.py").write_text("# %%")
+
+    class expected_log_not_changed:
+        pass
+
+    def log(format, args):
+        pass
+
+    setattr(
+        expected_log_not_changed,
+        "none" if cm_config_log_level == "info_if_changed" else cm_config_log_level,
+        log,
+    )
+
+    class expected_log_changed:
+        pass
+
+    setattr(
+        expected_log_changed,
+        "info" if cm_config_log_level == "info_if_changed" else cm_config_log_level,
+        log,
+    )
+
+    cm.log = expected_log_changed
+    cm.get("nb1.py", type="notebook", content=False)
+
+    cm.log = expected_log_not_changed
+    cm.get("nb1.py", type="notebook", content=True)
+
+    cm.log = expected_log_changed
+    cm.get("subfolder/nb2.py", type="notebook", content=False)
+
+    cm.log = expected_log_not_changed
+    cm.get("subfolder/nb2.py", type="notebook", content=True)

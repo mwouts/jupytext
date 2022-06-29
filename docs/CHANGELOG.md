@@ -6,6 +6,9 @@ Jupytext ChangeLog
 
 **Changed**
 - Hidden configuration files like `.jupytext.toml` or `.jupytext.py` are now ignored by Jupytext's contents manager when `allow_hidden=False` (that option was introduced in `jupyter_server==2.0.0a1`) ([#964](https://github.com/mwouts/jupytext/issues/964)).
+- The Jupytext configuration file has a new option `cm_config_log_level` that defaults to `info_if_changed`.
+With that value, the contents manager will log a line regarding the configuration file used only when the
+config file is not the same as the one previously used ([#959](https://github.com/mwouts/jupytext/issues/959))
 
 
 1.13.8 (2022-04-04)

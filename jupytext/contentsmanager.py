@@ -526,11 +526,10 @@ to your jupytext.toml file
             parent_dir = self.get_parent_dir(directory)
             return self.get_config_file(parent_dir)
 
-        def load_config_file(self, config_file, is_os_path=False):
+        def load_config_file(self, config_file, *, prev_config_file, is_os_path=False):
             """Load the configuration file"""
             if config_file is None:
                 return None
-            self.log.info("Loading Jupytext configuration file at %s", config_file)
             if config_file.endswith(".py") and not is_os_path:
                 config_file = self._get_os_path(config_file)
                 is_os_path = True
@@ -543,7 +542,18 @@ to your jupytext.toml file
                 except HTTPError:
                     pass
 
-            return load_jupytext_configuration_file(config_file, config_content)
+            config = load_jupytext_configuration_file(config_file, config_content)
+            log_level = config.cm_config_log_level
+            if log_level == "info_if_changed":
+                if config_file != prev_config_file:
+                    log_level = "info"
+                else:
+                    log_level = "none"
+            if log_level != "none":
+                getattr(self.log, log_level)(
+                    "Loaded Jupytext configuration file at %s", config_file
+                )
+            return config
 
         def get_config(self, path, use_cache=False):
             """Return the Jupytext configuration for the given path"""
@@ -556,10 +566,16 @@ to your jupytext.toml file
                 try:
                     config_file = self.get_config_file(parent_dir)
                     if config_file:
-                        self.cached_config.config = self.load_config_file(config_file)
+                        self.cached_config.config = self.load_config_file(
+                            config_file, prev_config_file=self.cached_config.config_file
+                        )
                     else:
                         config_file = find_global_jupytext_configuration_file()
-                        self.cached_config.config = self.load_config_file(config_file)
+                        self.cached_config.config = self.load_config_file(
+                            config_file,
+                            prev_config_file=self.cached_config.config_file,
+                            is_os_path=True,
+                        )
                     self.cached_config.config_file = config_file
                     self.cached_config.path = parent_dir
                 except JupytextConfigurationError as err:
@@ -572,11 +588,6 @@ to your jupytext.toml file
                     raise HTTPError(500, f"{err}")
 
             if self.cached_config.config is not None:
-                self.log.debug(
-                    "Configuration file for %s is %s",
-                    path,
-                    self.cached_config.config_file,
-                )
                 return self.cached_config.config
             if isinstance(self.notebook_extensions, str):
                 self.notebook_extensions = self.notebook_extensions.split(",")
