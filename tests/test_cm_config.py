@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import unittest.mock as mock
@@ -225,7 +226,7 @@ def test_test_no_text_representation_metadata_in_ipynb_900(
 @pytest.mark.parametrize(
     "cm_config_log_level", ["warning", "info", "info_if_changed", "debug", "none"]
 )
-def test_cm_config_log_level(cwd_tmp_path, tmp_path, cm_config_log_level):
+def test_cm_config_log_level(cwd_tmp_path, tmp_path, cm_config_log_level, caplog):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmp_path)
 
@@ -236,35 +237,40 @@ def test_cm_config_log_level(cwd_tmp_path, tmp_path, cm_config_log_level):
     (tmp_path / "subfolder" / "jupytext.toml").write_text(config)
     (tmp_path / "subfolder" / "nb2.py").write_text("# %%")
 
-    class expected_log_not_changed:
-        pass
+    if cm_config_log_level == "none":
+        with caplog.at_level(logging.DEBUG):
+            cm.get("nb1.py", type="notebook", content=False)
+            cm.get("nb1.py", type="notebook", content=True)
+            cm.get("subfolder/nb2.py", type="notebook", content=False)
+            cm.get("subfolder/nb2.py", type="notebook", content=True)
+        assert "Jupytext configuration file" not in caplog.text
+        return
 
-    def log(format, args):
-        pass
-
-    setattr(
-        expected_log_not_changed,
-        "none" if cm_config_log_level == "info_if_changed" else cm_config_log_level,
-        log,
+    log_level_changed = (
+        "info" if cm_config_log_level == "info_if_changed" else cm_config_log_level
+    )
+    log_level_unchanged = (
+        "none" if cm_config_log_level == "info_if_changed" else cm_config_log_level
     )
 
-    class expected_log_changed:
-        pass
+    log = mock.MagicMock(return_value=None)
+    with mock.patch.object(cm.log, log_level_changed, log):
+        cm.get("nb1.py", type="notebook", content=False)
+    log.assert_called()
 
-    setattr(
-        expected_log_changed,
-        "info" if cm_config_log_level == "info_if_changed" else cm_config_log_level,
-        log,
-    )
+    log = mock.MagicMock(return_value=None)
+    if log_level_unchanged != "none":
+        with mock.patch.object(cm.log, log_level_unchanged, log):
+            cm.get("nb1.py", type="notebook", content=True)
+        log.assert_called()
 
-    cm.log = expected_log_changed
-    cm.get("nb1.py", type="notebook", content=False)
+    log = mock.MagicMock(return_value=None)
+    with mock.patch.object(cm.log, log_level_changed, log):
+        cm.get("subfolder/nb2.py", type="notebook", content=False)
+    log.assert_called()
 
-    cm.log = expected_log_not_changed
-    cm.get("nb1.py", type="notebook", content=True)
-
-    cm.log = expected_log_changed
-    cm.get("subfolder/nb2.py", type="notebook", content=False)
-
-    cm.log = expected_log_not_changed
-    cm.get("subfolder/nb2.py", type="notebook", content=True)
+    log = mock.MagicMock(return_value=None)
+    if log_level_unchanged != "none":
+        with mock.patch.object(cm.log, log_level_unchanged, log):
+            cm.get("subfolder/nb2.py", type="notebook", content=True)
+        log.assert_called()
