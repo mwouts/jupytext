@@ -1174,6 +1174,11 @@ def no_warning():
             "and will be removed in a future release" in str(record.message)
         ):
             continue  # pragma: no cover
+        if (
+            "unclosed event loop <_UnixSelectorEventLoop running=False closed=False debug=False>"
+            in str(record.message)
+        ):
+            continue  # pragma: no cover
         raise RuntimeError(record)
 
 

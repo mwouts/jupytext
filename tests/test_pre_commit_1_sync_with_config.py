@@ -34,7 +34,7 @@ repos:
     tmp_repo.git.add(".pre-commit-config.yaml")
     pre_commit(["install", "--install-hooks", "-f"])
 
-    tmpdir.join(".jupytext.toml").write('formats = "ipynb,py:percent"\n')
+    tmpdir.join("jupytext.toml").write('formats = "ipynb,py:percent"\n')
 
     # create a test notebook and save it in Jupyter
     nb = python_notebook

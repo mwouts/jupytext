@@ -504,6 +504,11 @@ to your jupytext.toml file
             for jupytext_config_file in JUPYTEXT_CONFIG_FILES:
                 path = directory + "/" + jupytext_config_file
                 if self.file_exists(path):
+                    if not self.allow_hidden and jupytext_config_file.startswith("."):
+                        self.log.warning(
+                            f"Ignoring config file {path} (see Jupytext issue #964)"
+                        )
+                        continue
                     return path
 
             pyproject_path = directory + "/" + PYPROJECT_FILE
@@ -529,10 +534,16 @@ to your jupytext.toml file
             if config_file.endswith(".py") and not is_os_path:
                 config_file = self._get_os_path(config_file)
                 is_os_path = True
-            if is_os_path:
-                return load_jupytext_configuration_file(config_file)
-            model = self.super.get(config_file, content=True, type="file")
-            return load_jupytext_configuration_file(config_file, model["content"])
+
+            config_content = None
+            if not is_os_path:
+                try:
+                    model = self.super.get(config_file, content=True, type="file")
+                    config_content = model["content"]
+                except HTTPError:
+                    pass
+
+            return load_jupytext_configuration_file(config_file, config_content)
 
         def get_config(self, path, use_cache=False):
             """Return the Jupytext configuration for the given path"""
@@ -548,9 +559,7 @@ to your jupytext.toml file
                         self.cached_config.config = self.load_config_file(config_file)
                     else:
                         config_file = find_global_jupytext_configuration_file()
-                        self.cached_config.config = self.load_config_file(
-                            config_file, True
-                        )
+                        self.cached_config.config = self.load_config_file(config_file)
                     self.cached_config.config_file = config_file
                     self.cached_config.path = parent_dir
                 except JupytextConfigurationError as err:
