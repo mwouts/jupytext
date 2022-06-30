@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.13.9 (2022-06-30)
+-------------------
+
+**Changed**
+- Hidden configuration files like `.jupytext.toml` or `.jupytext.py` are now ignored by Jupytext's contents manager when `allow_hidden=False` (that option was introduced in `jupyter_server==2.0.0a1`) ([#964](https://github.com/mwouts/jupytext/issues/964)).
+
+
 1.13.8 (2022-04-04)
 -------------------
 

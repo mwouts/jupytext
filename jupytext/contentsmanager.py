@@ -504,6 +504,11 @@ to your jupytext.toml file
             for jupytext_config_file in JUPYTEXT_CONFIG_FILES:
                 path = directory + "/" + jupytext_config_file
                 if self.file_exists(path):
+                    if not self.allow_hidden and jupytext_config_file.startswith("."):
+                        self.log.warning(
+                            f"Ignoring config file {path} (see Jupytext issue #964)"
+                        )
+                        continue
                     return path
 
             pyproject_path = directory + "/" + PYPROJECT_FILE
@@ -548,9 +553,7 @@ to your jupytext.toml file
                         self.cached_config.config = self.load_config_file(config_file)
                     else:
                         config_file = find_global_jupytext_configuration_file()
-                        self.cached_config.config = self.load_config_file(
-                            config_file, True
-                        )
+                        self.cached_config.config = self.load_config_file(config_file)
                     self.cached_config.config_file = config_file
                     self.cached_config.path = parent_dir
                 except JupytextConfigurationError as err:

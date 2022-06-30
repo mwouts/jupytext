@@ -24,7 +24,7 @@ def test_local_config_overrides_cm_config(tmpdir):
     cm.formats = "ipynb,py"
 
     nested = tmpdir.mkdir("nested")
-    with open(str(nested.join(".jupytext.yml")), "w") as fp:
+    with open(str(nested.join("jupytext.yml")), "w") as fp:
         fp.write("formats: ''\n")
 
     cm.save(notebook_model(SAMPLE_NOTEBOOK), "notebook.ipynb")
@@ -61,7 +61,7 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    cfg_file = tmpdir.join(".jupytext.yml")
+    cfg_file = tmpdir.join("jupytext.yml")
     nb_file = tmpdir.join("notebook.ipynb")
     py_file = tmpdir.join("notebook.py")
 
@@ -84,8 +84,6 @@ def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
         ("jupytext.toml", "not_a_jupytext_option = true"),
         ("pyproject.toml", "[tool.jupytext]\nnot_a_jupytext_option = true"),
         ("jupytext.json", '{"notebook_metadata_filter":"-all",}'),
-        (".jupytext.py", "c.not_a_jupytext_option = True"),
-        (".jupytext.py", "c.hide_notebook_metadata = true"),
     ],
 )
 @pytest.mark.filterwarnings(
@@ -199,7 +197,7 @@ def test_test_no_text_representation_metadata_in_ipynb_900(
     tmpdir,
     python_notebook,
 ):
-    tmpdir.join(".jupytext.toml").write('formats = "ipynb,py:percent"\n')
+    tmpdir.join("jupytext.toml").write('formats = "ipynb,py:percent"\n')
 
     # create a test notebook and save it in Jupyter
     nb = python_notebook
