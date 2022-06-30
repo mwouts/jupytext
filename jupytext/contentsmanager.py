@@ -534,10 +534,16 @@ to your jupytext.toml file
             if config_file.endswith(".py") and not is_os_path:
                 config_file = self._get_os_path(config_file)
                 is_os_path = True
-            if is_os_path or not self.exists(config_file):
-                return load_jupytext_configuration_file(config_file)
-            model = self.super.get(config_file, content=True, type="file")
-            return load_jupytext_configuration_file(config_file, model["content"])
+
+            config_content = None
+            if not is_os_path:
+                try:
+                    model = self.super.get(config_file, content=True, type="file")
+                    config_content = model["content"]
+                except HTTPError:
+                    pass
+
+            return load_jupytext_configuration_file(config_file, config_content)
 
         def get_config(self, path, use_cache=False):
             """Return the Jupytext configuration for the given path"""
