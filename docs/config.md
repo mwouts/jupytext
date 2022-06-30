@@ -35,7 +35,8 @@ list(global_jupytext_configuration_directories())
 which include `XDG_CONFIG_HOME` (defaults to `$HOME/.config`) and `XDG_CONFIG_DIR`.
 
 The name for the configuration file can be any of `jupytext.config.JUPYTEXT_CONFIG_FILES`, i.e. `.jupytext` (in TOML),
-`jupytext.toml`, `jupytext.yml`, `jupytext.yaml`, `jupytext.json` or `jupytext.py`, and their dot-file versions.
+`jupytext.toml`, `jupytext.yml`, `jupytext.yaml`, `jupytext.json` or `jupytext.py` (dot-files
+like `.jupytext.toml` are accepted by the CLI version of Jupytext, but are not effective in Jupyter).
 Alternatively, if you are using it, you can also use your Python project's `pyproject.toml` file by adding
 configuration to a `[tool.jupytext]` table within it.
 
