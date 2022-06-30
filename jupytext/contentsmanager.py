@@ -543,6 +543,9 @@ to your jupytext.toml file
                     pass
 
             config = load_jupytext_configuration_file(config_file, config_content)
+            if config is None:
+                return config
+
             log_level = config.cm_config_log_level
             if log_level == "info_if_changed":
                 if config_file != prev_config_file:
