@@ -526,7 +526,9 @@ to your jupytext.toml file
             parent_dir = self.get_parent_dir(directory)
             return self.get_config_file(parent_dir)
 
-        def load_config_file(self, config_file, *, prev_config_file, is_os_path=False):
+        def load_config_file(
+            self, config_file, *, prev_config_file, prev_config, is_os_path=False
+        ):
             """Load the configuration file"""
             if config_file is None:
                 return None
@@ -548,7 +550,7 @@ to your jupytext.toml file
 
             log_level = config.cm_config_log_level
             if log_level == "info_if_changed":
-                if config_file != prev_config_file:
+                if config_file != prev_config_file or config != prev_config:
                     log_level = "info"
                 else:
                     log_level = "none"
@@ -570,13 +572,16 @@ to your jupytext.toml file
                     config_file = self.get_config_file(parent_dir)
                     if config_file:
                         self.cached_config.config = self.load_config_file(
-                            config_file, prev_config_file=self.cached_config.config_file
+                            config_file,
+                            prev_config_file=self.cached_config.config_file,
+                            prev_config=self.cached_config,
                         )
                     else:
                         config_file = find_global_jupytext_configuration_file()
                         self.cached_config.config = self.load_config_file(
                             config_file,
                             prev_config_file=self.cached_config.config_file,
+                            prev_config=self.cached_config,
                             is_os_path=True,
                         )
                     self.cached_config.config_file = config_file
