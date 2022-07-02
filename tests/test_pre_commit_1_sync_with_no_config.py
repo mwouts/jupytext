@@ -39,7 +39,6 @@ repos:
       '--show-changes',
       '--'
     ]
-    files: \\.ipynb$
 """
     # Save a sample notebook with outputs in Jupyter
     nb = deepcopy(notebook_with_outputs)
