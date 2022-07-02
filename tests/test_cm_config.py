@@ -223,54 +223,59 @@ def test_test_no_text_representation_metadata_in_ipynb_900(
     assert "text_representation" not in tmpdir.join("test.ipynb").read()
 
 
-@pytest.mark.parametrize(
-    "cm_config_log_level", ["warning", "info", "info_if_changed", "debug", "none"]
-)
-def test_cm_config_log_level(cwd_tmp_path, tmp_path, cm_config_log_level, caplog):
+def test_cm_config_no_log(cwd_tmp_path, tmp_path, caplog):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmp_path)
 
-    config = f'cm_config_log_level="{cm_config_log_level}"'
+    config = 'cm_config_log_level="none"'
     (tmp_path / "jupytext.toml").write_text(config)
     (tmp_path / "nb1.py").write_text("# %%")
     (tmp_path / "subfolder").mkdir()
     (tmp_path / "subfolder" / "jupytext.toml").write_text(config)
     (tmp_path / "subfolder" / "nb2.py").write_text("# %%")
 
-    if cm_config_log_level == "none":
-        with caplog.at_level(logging.DEBUG):
-            cm.get("nb1.py", type="notebook", content=False)
-            cm.get("nb1.py", type="notebook", content=True)
-            cm.get("subfolder/nb2.py", type="notebook", content=False)
-            cm.get("subfolder/nb2.py", type="notebook", content=True)
-        assert "Jupytext configuration file" not in caplog.text
-        return
+    caplog.set_level(logging.DEBUG)
 
-    log_level_changed = (
-        "info" if cm_config_log_level == "info_if_changed" else cm_config_log_level
-    )
-    log_level_unchanged = (
-        "none" if cm_config_log_level == "info_if_changed" else cm_config_log_level
-    )
+    cm.get("nb1.py", type="notebook", content=False)
+    cm.get("nb1.py", type="notebook", content=True)
+    cm.get("subfolder/nb2.py", type="notebook", content=False)
+    cm.get("subfolder/nb2.py", type="notebook", content=True)
 
-    log = mock.MagicMock(return_value=None)
-    with mock.patch.object(cm.log, log_level_changed, log):
-        cm.get("nb1.py", type="notebook", content=False)
-    log.assert_called()
+    assert "Jupytext configuration file" not in caplog.text
 
-    log = mock.MagicMock(return_value=None)
-    if log_level_unchanged != "none":
-        with mock.patch.object(cm.log, log_level_unchanged, log):
-            cm.get("nb1.py", type="notebook", content=True)
-        log.assert_called()
 
-    log = mock.MagicMock(return_value=None)
-    with mock.patch.object(cm.log, log_level_changed, log):
-        cm.get("subfolder/nb2.py", type="notebook", content=False)
-    log.assert_called()
+def test_cm_config_log_only_if_changed(cwd_tmp_path, tmp_path, caplog):
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmp_path)
 
-    log = mock.MagicMock(return_value=None)
-    if log_level_unchanged != "none":
-        with mock.patch.object(cm.log, log_level_unchanged, log):
-            cm.get("subfolder/nb2.py", type="notebook", content=True)
-        log.assert_called()
+    config = ""
+    (tmp_path / "jupytext.toml").write_text(config)
+    (tmp_path / "nb1.py").write_text("# %%")
+    (tmp_path / "subfolder").mkdir()
+    (tmp_path / "subfolder" / "jupytext.toml").write_text(config)
+    (tmp_path / "subfolder" / "nb2.py").write_text("# %%")
+
+    caplog.set_level(logging.INFO)
+
+    cm.get("nb1.py", type="notebook", content=False)
+    assert "Jupytext configuration file" in caplog.text
+    caplog.clear()
+
+    # Same notebook, same config => no log
+    cm.get("nb1.py", type="notebook", content=True)
+    assert "Jupytext configuration file" not in caplog.text
+
+    # Same notebook, config changed => log
+    (tmp_path / "jupytext.toml").write_text('formats="ipynb,py:percent"')
+    cm.get("nb1.py", type="notebook", content=True)
+    assert "Jupytext configuration file" in caplog.text
+    caplog.clear()
+
+    # Different folder, different config
+    cm.get("subfolder/nb2.py", type="notebook", content=False)
+    assert "Jupytext configuration file" in caplog.text
+    caplog.clear()
+
+    # Same config as previously => no log
+    cm.get("subfolder/nb2.py", type="notebook", content=False)
+    assert "Jupytext configuration file" not in caplog.text

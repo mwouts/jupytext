@@ -574,14 +574,14 @@ to your jupytext.toml file
                         self.cached_config.config = self.load_config_file(
                             config_file,
                             prev_config_file=self.cached_config.config_file,
-                            prev_config=self.cached_config,
+                            prev_config=self.cached_config.config,
                         )
                     else:
                         config_file = find_global_jupytext_configuration_file()
                         self.cached_config.config = self.load_config_file(
                             config_file,
                             prev_config_file=self.cached_config.config_file,
-                            prev_config=self.cached_config,
+                            prev_config=self.cached_config.config,
                             is_os_path=True,
                         )
                     self.cached_config.config_file = config_file

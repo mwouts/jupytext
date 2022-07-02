@@ -251,6 +251,13 @@ class JupytextConfiguration(Configurable):
 
         return None
 
+    def __eq__(self, other):
+        for key in self.class_trait_names():
+            if getattr(self, key) != getattr(other, key):
+                return False
+
+        return True
+
 
 def preferred_format(incomplete_format, preferred_formats):
     """Return the preferred format for the given extension"""
