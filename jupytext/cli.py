@@ -629,27 +629,24 @@ def jupytext_single_file(nb_file, args, log):
 
         recursive_update(notebook.metadata, args.update_metadata)
 
-    # Read paired notebooks, except if the pair is being created
+    # Read paired notebooks
     nb_files = [nb_file, nb_dest]
     if args.sync:
         formats = notebook_formats(
             notebook, config, nb_file, fallback_on_current_fmt=False
         )
         set_prefix_and_suffix(fmt, formats, nb_file)
-        if args.set_formats is None:
-            try:
-                notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(
-                    notebook, fmt, config, formats, nb_file, log, args.pre_commit_mode
-                )
-                nb_files = [inputs_nb_file, outputs_nb_file]
-            except NotAPairedNotebook as err:
-                sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
-                return 0
-            except InconsistentVersions as err:
-                sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
-                return 1
-        else:
-            nb_files = [nb_file]
+        try:
+            notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(
+                notebook, fmt, config, formats, nb_file, log, args.pre_commit_mode
+            )
+            nb_files = [inputs_nb_file, outputs_nb_file]
+        except NotAPairedNotebook as err:
+            sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
+            return 0
+        except InconsistentVersions as err:
+            sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
+            return 1
 
     # II. ### Apply commands onto the notebook ###
     # Pipe the notebook into the desired commands

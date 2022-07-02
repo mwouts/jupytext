@@ -1,11 +1,14 @@
 Jupytext ChangeLog
 ==================
 
-1.13.9 (2022-06-30)
+1.13.9 (2022-07-??)
 -------------------
 
 **Changed**
 - Hidden configuration files like `.jupytext.toml` or `.jupytext.py` are now ignored by Jupytext's contents manager when `allow_hidden=False` (that option was introduced in `jupyter_server==2.0.0a1`) ([#964](https://github.com/mwouts/jupytext/issues/964)).
+
+**Changed**
+- `jupytext --set-formats ipynb,py test.py` will not override `test.ipynb` if the file exists already ([#969](https://github.com/mwouts/jupytext/issues/969)).
 
 
 1.13.8 (2022-04-04)
