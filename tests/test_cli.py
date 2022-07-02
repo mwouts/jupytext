@@ -1459,3 +1459,24 @@ def test_set_shebang_with_update_metadata(tmp_path, python_notebook):
     )
 
     assert tmp_py.read_text().startswith("#!/usr/bin/python")
+
+
+@pytest.mark.parametrize("compare_ids", [False, True])
+@pytest.mark.parametrize("compare_outputs", [False, True])
+def test_set_formats_does_not_override_existing_ipynb(
+    tmp_path, notebook_with_outputs, compare_ids, compare_outputs
+):
+    tmp_py = tmp_path / "nb.py"
+    tmp_ipynb = tmp_path / "nb.ipynb"
+    write(notebook_with_outputs, tmp_ipynb)
+
+    jupytext([str(tmp_ipynb), "--set-formats", "ipynb,py:percent"])
+    jupytext([str(tmp_py), "--set-formats", "ipynb,py:percent"])
+
+    nb = read(tmp_ipynb)
+    compare_notebooks(
+        nb,
+        notebook_with_outputs,
+        compare_ids=compare_ids,
+        compare_outputs=compare_outputs,
+    )
