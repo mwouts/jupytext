@@ -39,17 +39,17 @@ repos:
       '--show-changes',
       '--'
     ]
-    files: ^notebooks/
+    files: \\.ipynb$
 """
     # Save a sample notebook with outputs in Jupyter
     nb = deepcopy(notebook_with_outputs)
     (tmpdir / "notebooks").mkdir()
     cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
-    cm.save(dict(type="notebook", content=nb), "notebooks/nb.ipynb")
+    cm.save(dict(type="notebook", content=nb), "nb.ipynb")
 
     # Add it to git
-    tmp_repo.git.add("notebooks/nb.ipynb")
+    tmp_repo.git.add("nb.ipynb")
     tmp_repo.index.commit("Notebook with outputs")
 
     # Configure the pre-commit hook
@@ -59,31 +59,31 @@ repos:
 
     # Modify and save the notebook
     nb.cells.append(new_markdown_cell("New markdown cell"))
-    cm.save(dict(type="notebook", content=nb), "notebooks/nb.ipynb")
+    cm.save(dict(type="notebook", content=nb), "nb.ipynb")
 
     # No .py file at the moment
-    assert not (tmpdir / "notebooks" / "nb.py").exists()
+    assert not (tmpdir / "nb.py").exists()
 
     # try to commit it, should fail as the py version hasn't been added
-    tmp_repo.git.add("notebooks/nb.ipynb")
+    tmp_repo.git.add("nb.ipynb")
     with pytest.raises(
         HookExecutionError,
-        match="git add notebooks/nb.py",
+        match="git add nb.py",
     ):
         tmp_repo.index.commit("failing")
 
     # Now the .py file is present
-    assert "New markdown cell" in tmpdir.join("notebooks/nb.py").read()
+    assert "New markdown cell" in tmpdir.join("nb.py").read()
 
     # add the ipynb and the py file, now the commit will succeed
-    tmp_repo.git.add("notebooks/nb.ipynb")
-    tmp_repo.git.add("notebooks/nb.py")
+    tmp_repo.git.add("nb.ipynb")
+    tmp_repo.git.add("nb.py")
     tmp_repo.index.commit("passing")
-    assert "notebooks/nb.ipynb" in tmp_repo.tree()
-    assert "notebooks/nb.py" in tmp_repo.tree()
+    assert "nb.ipynb" in tmp_repo.tree()
+    assert "nb.py" in tmp_repo.tree()
 
     # The notebook on disk is the same as the original, except for the new cell added
-    nb = jupytext.read(tmpdir / "notebooks" / "nb.ipynb")
+    nb = jupytext.read(tmpdir / "nb.ipynb")
     extra_cell = nb.cells.pop()
     assert extra_cell.cell_type == "markdown"
     assert extra_cell.source == "New markdown cell"
