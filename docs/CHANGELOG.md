@@ -1,21 +1,22 @@
 Jupytext ChangeLog
 ==================
 
-1.13.9 (2022-07-??)
+1.14.0 (2022-07-03)
 -------------------
 
 **Changed**
-- Hidden configuration files like `.jupytext.toml` or `.jupytext.py` are now ignored by Jupytext's contents manager when `allow_hidden=False` (that option was introduced in `jupyter_server==2.0.0a1`) ([#964](https://github.com/mwouts/jupytext/issues/964)).
 - The Jupytext configuration file has a new option `cm_config_log_level` that defaults to `info_if_changed`.
 With that value, the contents manager will log a line regarding the configuration file used only when the
-config file is not the same as the one previously used ([#959](https://github.com/mwouts/jupytext/issues/959))
+config file is not the same as the one previously used ([#959](https://github.com/mwouts/jupytext/issues/959)) -
+many thanks to R.C. Thomas for suggesting this and thoughtfully testing the patch.
+- Hidden configuration files like `.jupytext.toml` or `.jupytext.py` are now ignored by Jupytext's contents manager
+when `allow_hidden=False` (that option was introduced in `jupyter_server==2.0.0a1`) ([#964](https://github.com/mwouts/jupytext/issues/964)).
+- We have changed `jupytext --set-formats` to make it more similar to `jupytext --sync`. Now `--set-formats` will not
+override existing paired files anymore ([#969](https://github.com/mwouts/jupytext/issues/969)).
 
-**Changed**
-- `jupytext --set-formats ipynb,py test.py` will not override `test.ipynb` if the file exists already ([#969](https://github.com/mwouts/jupytext/issues/969)).
-
-**Changed**
-- `jupytext --set-formats ipynb,py test.py` will not override `test.ipynb` if the file exists already ([#969](https://github.com/mwouts/jupytext/issues/969)).
-
+**Added**
+- We have added a test `test_pre_commit_hook_sync_with_no_config` that documents how to use the pre-commit hook without
+a configuration file (#967)
 
 1.13.8 (2022-04-04)
 -------------------
