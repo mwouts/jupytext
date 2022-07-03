@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import unittest.mock as mock
@@ -220,3 +221,61 @@ def test_test_no_text_representation_metadata_in_ipynb_900(
     assert "text_representation" in tmpdir.join("test.py").read()
     # But not in the ipynb notebook
     assert "text_representation" not in tmpdir.join("test.ipynb").read()
+
+
+def test_cm_config_no_log(cwd_tmp_path, tmp_path, caplog):
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmp_path)
+
+    config = 'cm_config_log_level="none"'
+    (tmp_path / "jupytext.toml").write_text(config)
+    (tmp_path / "nb1.py").write_text("# %%")
+    (tmp_path / "subfolder").mkdir()
+    (tmp_path / "subfolder" / "jupytext.toml").write_text(config)
+    (tmp_path / "subfolder" / "nb2.py").write_text("# %%")
+
+    caplog.set_level(logging.DEBUG)
+
+    cm.get("nb1.py", type="notebook", content=False)
+    cm.get("nb1.py", type="notebook", content=True)
+    cm.get("subfolder/nb2.py", type="notebook", content=False)
+    cm.get("subfolder/nb2.py", type="notebook", content=True)
+
+    assert "Jupytext configuration file" not in caplog.text
+
+
+def test_cm_config_log_only_if_changed(cwd_tmp_path, tmp_path, caplog):
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmp_path)
+
+    config = ""
+    (tmp_path / "jupytext.toml").write_text(config)
+    (tmp_path / "nb1.py").write_text("# %%")
+    (tmp_path / "subfolder").mkdir()
+    (tmp_path / "subfolder" / "jupytext.toml").write_text(config)
+    (tmp_path / "subfolder" / "nb2.py").write_text("# %%")
+
+    caplog.set_level(logging.INFO)
+
+    cm.get("nb1.py", type="notebook", content=False)
+    assert "Jupytext configuration file" in caplog.text
+    caplog.clear()
+
+    # Same notebook, same config => no log
+    cm.get("nb1.py", type="notebook", content=True)
+    assert "Jupytext configuration file" not in caplog.text
+
+    # Same notebook, config changed => log
+    (tmp_path / "jupytext.toml").write_text('formats="ipynb,py:percent"')
+    cm.get("nb1.py", type="notebook", content=True)
+    assert "Jupytext configuration file" in caplog.text
+    caplog.clear()
+
+    # Different folder, different config
+    cm.get("subfolder/nb2.py", type="notebook", content=False)
+    assert "Jupytext configuration file" in caplog.text
+    caplog.clear()
+
+    # Same config as previously => no log
+    cm.get("subfolder/nb2.py", type="notebook", content=False)
+    assert "Jupytext configuration file" not in caplog.text

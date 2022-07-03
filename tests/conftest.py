@@ -38,6 +38,13 @@ def cwd_tmpdir(tmpdir):
         yield tmpdir
 
 
+@pytest.fixture()
+def cwd_tmp_path(tmp_path):
+    # Run the whole test from inside tmp_path
+    with tmp_path.cwd():
+        yield tmp_path
+
+
 @pytest.fixture
 def jupytext_repo_root():
     """The local path of this repo, to use in .pre-commit-config.yaml in tests"""

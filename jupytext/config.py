@@ -143,6 +143,13 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
+    cm_config_log_level = Enum(
+        values=["warning", "info", "info_if_changed", "debug", "none"],
+        default_value="info_if_changed",
+        help="The log level for config file logs in the Jupytext contents manager",
+        config=True,
+    )
+
     cell_markers = Unicode(
         help='Start and end cell markers for the light format, comma separated. Use "{{{,}}}" to mark cells'
         'as foldable regions in Vim, and "region,endregion" to mark cells as Vscode/PyCharm regions',
@@ -243,6 +250,13 @@ class JupytextConfiguration(Configurable):
                 continue
 
         return None
+
+    def __eq__(self, other):
+        for key in self.class_trait_names():
+            if getattr(self, key) != getattr(other, key):
+                return False
+
+        return True
 
 
 def preferred_format(incomplete_format, preferred_formats):
