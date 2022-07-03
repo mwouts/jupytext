@@ -83,7 +83,7 @@ def notebook_with_outputs():
                 execution_count=1,
                 outputs=[
                     new_output(
-                        data={"text/plain": ["2"]},
+                        data={"text/plain": "2"},
                         execution_count=1,
                         output_type="execute_result",
                     )

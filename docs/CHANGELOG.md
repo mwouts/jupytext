@@ -1,7 +1,7 @@
 Jupytext ChangeLog
 ==================
 
-1.13.9 (2022-06-30)
+1.13.9 (2022-07-??)
 -------------------
 
 **Changed**
@@ -9,6 +9,9 @@ Jupytext ChangeLog
 - The Jupytext configuration file has a new option `cm_config_log_level` that defaults to `info_if_changed`.
 With that value, the contents manager will log a line regarding the configuration file used only when the
 config file is not the same as the one previously used ([#959](https://github.com/mwouts/jupytext/issues/959))
+
+**Changed**
+- `jupytext --set-formats ipynb,py test.py` will not override `test.ipynb` if the file exists already ([#969](https://github.com/mwouts/jupytext/issues/969)).
 
 
 1.13.8 (2022-04-04)
