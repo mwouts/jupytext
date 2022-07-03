@@ -26,11 +26,6 @@ jupytext --set-formats ipynb,py notebook.ipynb  # Turn notebook.ipynb into a pai
 jupytext --sync notebook.ipynb                  # Update whichever of notebook.ipynb/notebook.py is outdated
 ```
 
-If you wanted to convert a collection of Markdown files to paired notebooks, and execute them in the current Python environment, you could run:
-```bash
-jupytext --set-formats ipynb,md --execute *.md
-```
-
 You may also find useful to `--pipe` the text representation of a notebook into tools like `black`:
 ```bash
 jupytext --sync --pipe black notebook.ipynb    # read most recent version of notebook, reformat with black, save
@@ -59,6 +54,11 @@ For convenience, when creating a notebook from text you can execute it:
 jupytext --set-kernel - notebook.md             # create a YAML header with kernel metadata matching the current python executable
 jupytext --set-formats md:myst notebook.md      # create a YAML header with an explicit jupytext format
 jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipynb file and run it
+```
+
+If you wanted to convert a collection of Markdown files to paired notebooks, and execute them in the current Python environment, you could run:
+```bash
+jupytext --set-formats ipynb,md --execute *.md
 ```
 
 Please note: if any notebook cell errors, execution will terminate and `jupytext` will not save the notebook. This can cause headaches as the details of any error would be encoded in the notebook that isn't saved. But there's a way: `jupyter nbconvert` has a mode which will still save a notebook if a cell errors, producing something akin to what would happen if you ran all cells manually in Jupyter's notebook UI.
