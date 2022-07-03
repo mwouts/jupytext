@@ -13,6 +13,9 @@ config file is not the same as the one previously used ([#959](https://github.co
 **Changed**
 - `jupytext --set-formats ipynb,py test.py` will not override `test.ipynb` if the file exists already ([#969](https://github.com/mwouts/jupytext/issues/969)).
 
+**Changed**
+- `jupytext --set-formats ipynb,py test.py` will not override `test.ipynb` if the file exists already ([#969](https://github.com/mwouts/jupytext/issues/969)).
+
 
 1.13.8 (2022-04-04)
 -------------------
