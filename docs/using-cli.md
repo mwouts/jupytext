@@ -26,18 +26,6 @@ jupytext --set-formats ipynb,py notebook.ipynb  # Turn notebook.ipynb into a pai
 jupytext --sync notebook.ipynb                  # Update whichever of notebook.ipynb/notebook.py is outdated
 ```
 
-For convenience, when creating a notebook from text you can execute it:
-```bash
-jupytext --set-kernel - notebook.md             # create a YAML header with kernel metadata matching the current python executable
-jupytext --set-formats md:myst notebook.md      # create a YAML header with an explicit jupytext format
-jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipynb file and run it
-```
-
-If you wanted to convert a collection of Markdown files to paired notebooks, and execute them in the current Python environment, you could run:
-```bash
-jupytext --set-formats ipynb,md --execute *.md
-```
-
 You may also find useful to `--pipe` the text representation of a notebook into tools like `black`:
 ```bash
 jupytext --sync --pipe black notebook.ipynb    # read most recent version of notebook, reformat with black, save
@@ -57,6 +45,39 @@ Read more about running `pytest` on notebooks in our example [`Tests in a notebo
 Note also that on Windows you need to use double quotes instead of single quotes and type e.g. `jupytext --check "pytest {}" notebook.ipynb`.
 
 Execute `jupytext --help` to access the full documentation.
+
+### Execute notebook cells
+
+For convenience, when creating a notebook from text you can execute it:
+
+```bash
+jupytext --set-kernel - notebook.md             # create a YAML header with kernel metadata matching the current python executable
+jupytext --set-formats md:myst notebook.md      # create a YAML header with an explicit jupytext format
+jupytext --to notebook --execute notebook.md    # convert notebook.md to an .ipynb file and run it
+```
+
+If you wanted to convert a collection of Markdown files to paired notebooks, and execute them in the current Python environment, you could run:
+```bash
+jupytext --set-formats ipynb,md --execute *.md
+```
+
+#### Advanced usage: error tolerance
+
+If any notebook cell errors, execution will terminate and `jupytext` will not save the notebook. This can cause headaches as the details of any error would be encoded in the notebook, which would not have been saved. But there's an error-tolerant way to execute a notebook: `jupyter nbconvert` has a mode which will still save a notebook if a cell errors, producing something akin to what would happen if you ran all cells manually in Jupyter's notebook UI.
+
+```bash
+# First, convert script (py/sh/R/jl etc) -> notebook. May need additional args to define input format etc as above.
+jupytext --to ipynb script.py
+# Then, execute notebook in place and allowing cells to produce errors
+jupyter nbconvert --to ipynb --inplace --execute --allow-errors script.ipynb
+# One can also combine these to a single command using jupytext --pipe
+jupytext --to ipynb --pipe-fmt ipynb \
+  --pipe 'jupyter nbconvert --to ipynb --execute --allow-errors --stdin --stdout' \
+  script.py
+```
+
+In each of the above, `jupyter nbconvert` could be replaced with any alternative tool to execute a jupyter notebook non-interactively, including [papermill](https://github.com/nteract/papermill) which would allow notebook parameterisation (see [@mwouts' post on the topic here](https://github.com/CFMTech/jupytext_papermill_post/blob/master/README.md)).
+
 
 ## Notebook and cell metadata filters
 
