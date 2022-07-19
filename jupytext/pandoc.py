@@ -91,7 +91,7 @@ def md_to_notebook(text):
     tmp_file.close()
 
     pandoc(
-        "--from markdown --to ipynb -s --atx-headers --wrap=preserve --preserve-tabs",
+        "--from markdown --to ipynb -s --markdown-headings=atx --wrap=preserve --preserve-tabs",
         tmp_file.name,
         tmp_file.name,
     )
@@ -111,7 +111,7 @@ def notebook_to_md(notebook):
     tmp_file.close()
 
     pandoc(
-        "--from ipynb --to markdown -s --atx-headers --wrap=preserve --preserve-tabs",
+        "--from ipynb --to markdown -s --markdown-headings=atx --wrap=preserve --preserve-tabs",
         tmp_file.name,
         tmp_file.name,
     )
