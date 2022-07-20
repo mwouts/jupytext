@@ -1,12 +1,12 @@
 Jupytext ChangeLog
 ==================
 
-1.14.1 (2022-07-??)
+1.14.1 (2022-07-20)
 -------------------
 
 **Fixed**
 - The timestamp of a paired notebook is the timestamp of the most recent paired file. This fixes the warning "File Changed"
-after reloading the notebook in Jupyter ([#978](https://github.com/mwouts/jupytext/issues/978))
+after reloading the notebook in Jupyter ([#978](https://github.com/mwouts/jupytext/issues/978)).
 
 
 1.14.0 (2022-07-03)
