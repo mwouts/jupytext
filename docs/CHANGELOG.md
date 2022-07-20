@@ -6,7 +6,7 @@ Jupytext ChangeLog
 
 **Fixed**
 - The timestamp of a paired notebook is the timestamp of the most recent paired file. This fixes the warning "File Changed"
-after reloading the notebook in Jupyter (#978)
+after reloading the notebook in Jupyter ([#978](https://github.com/mwouts/jupytext/issues/978))
 
 
 1.14.0 (2022-07-03)
@@ -24,7 +24,7 @@ override existing paired files anymore ([#969](https://github.com/mwouts/jupytex
 
 **Added**
 - We have added a test `test_pre_commit_hook_sync_with_no_config` that documents how to use the pre-commit hook without
-a configuration file (#967)
+a configuration file ([#967](https://github.com/mwouts/jupytext/issues/967))
 
 1.13.8 (2022-04-04)
 -------------------
