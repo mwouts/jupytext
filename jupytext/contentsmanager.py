@@ -232,29 +232,21 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             if not load_alternative_format:
                 return model
 
-            if not content:
-                # Modification time of a paired notebook, in this context - Jupyter is checking timestamp
-                # before saving - is the most recent among all representations #118
+            # We will now read a second file if this is a paired notebooks.
+            if content:
+                nbk = model["content"]
+                formats = nbk.metadata.get("jupytext", {}).get(
+                    "formats"
+                ) or config.default_formats(path)
+                formats = long_form_multiple_formats(
+                    formats, nbk.metadata, auto_ext_requires_language_info=False
+                )
+            else:
                 if path not in self.paired_notebooks:
                     return model
 
-                fmt, formats = self.paired_notebooks.get(path)
-                for alt_path, _ in paired_paths(path, fmt, formats):
-                    if alt_path != path and self.exists(alt_path):
-                        alt_model = self.super.get(alt_path, content=False)
-                        if alt_model["last_modified"] > model["last_modified"]:
-                            model["last_modified"] = alt_model["last_modified"]
-
-                return model
-
-            # We will now read a second file if this is a paired notebooks.
-            nbk = model["content"]
-            formats = nbk.metadata.get("jupytext", {}).get(
-                "formats"
-            ) or config.default_formats(path)
-            formats = long_form_multiple_formats(
-                formats, nbk.metadata, auto_ext_requires_language_info=False
-            )
+                _, formats = self.paired_notebooks.get(path)
+                formats = long_form_multiple_formats(formats)
 
             # Compute paired notebooks from formats
             alt_paths = [(path, fmt)]
@@ -276,7 +268,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     alt_paths = paired_paths(path, fmt, formats)
                     formats = long_form_multiple_formats(formats)
 
-            if len(alt_paths) > 1 and ext == ".ipynb":
+            if content and len(alt_paths) > 1 and ext == ".ipynb":
                 # Apply default options (like saving and reloading would do)
                 jupytext_metadata = model["content"]["metadata"].get("jupytext", {})
                 config.set_default_format_options(jupytext_metadata, read=True)
@@ -308,6 +300,12 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             inputs, outputs = latest_inputs_and_outputs(
                 path, fmt, formats, get_timestamp, contents_manager_mode=True
             )
+
+            # Modification time of a paired notebook is the timestamp of inputs #118 #978
+            model["last_modified"] = inputs.timestamp
+
+            if not content:
+                return model
 
             # Before we combine the two files, we make sure we're not overwriting ipynb cells
             # with an outdated text file
