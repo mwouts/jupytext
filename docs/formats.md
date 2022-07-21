@@ -297,7 +297,7 @@ By default, [Jupyter magics](#magic-commands) are commented in the `percent` rep
 
 ### Sphinx-gallery scripts
 
-Another popular notebook-like format for Python scripts is the Sphinx-gallery [format](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-Gallery notebooks by Jupytext.
+Another popular notebook-like format for Python scripts is the Sphinx-gallery [format](https://sphinx-gallery.github.io/stable/syntax.html). Scripts that contain at least two lines with more than twenty hash signs are classified as Sphinx-Gallery notebooks by Jupytext.
 
 Comments in Sphinx-Gallery scripts are formatted using reStructuredText rather than markdown. They can be converted to markdown for a nicer display in Jupyter by adding a `sphinx_convert_rst2md = True` line to your Jupytext configuration file. Please note that this is a non-reversible transformation—use this only with Binder. Revert to the default value `sphinx_convert_rst2md = False` when you edit Sphinx-Gallery files with Jupytext.
 
