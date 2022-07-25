@@ -815,7 +815,7 @@ formats = "examples//example/ipynb,examples//example/py:percent"
 """
     )
 
-    write(python_notebook, tmp_path / "notebook.ipynb")
+    write(python_notebook, tmp_path / "example_notebook.ipynb")
     (tmp_path / "examples" / "folder1").mkdir(parents=True)
     write(python_notebook, tmp_path / "examples/folder1/utils.py")
     write(python_notebook, tmp_path / "examples/folder1/example_paired.ipynb")
@@ -823,13 +823,15 @@ formats = "examples//example/ipynb,examples//example/py:percent"
     jupytext(
         [
             "--sync",
-            str(tmp_path / "notebook.ipynb"),
-            str(tmp_path / "examples/folder1/example_paired.ipynb"),
+            str(tmp_path / "example_notebook.ipynb"),
             str(tmp_path / "examples/folder1/utils.py"),
+            str(tmp_path / "examples/folder1/example_paired.ipynb"),
         ]
     )
 
-    assert not (tmp_path / "notebook.py").exists(), "Not in the 'examples' directory"
+    assert not (
+        tmp_path / "example_notebook.py"
+    ).exists(), "Not in the 'examples' directory"
     assert not (
         tmp_path / "examples/folder1/utils_not_paired.ipynb"
     ).exists(), "Not with the 'example' prefix"
