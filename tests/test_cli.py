@@ -517,7 +517,7 @@ def test_sync(nb_file, tmpdir, cwd_tmpdir, capsys):
     # Test that sync issues a warning when the notebook is not paired
     jupytext(["--sync", tmp_ipynb])
     _, err = capsys.readouterr()
-    assert "is not a paired notebook" in err
+    assert "no paired file was found" in err
 
     # Now with a pairing information
     nb.metadata.setdefault("jupytext", {})["formats"] = "py,Rmd,ipynb"
@@ -570,7 +570,7 @@ def test_sync_pandoc(nb_file, tmpdir, cwd_tmpdir, capsys):
     # Test that sync issues a warning when the notebook is not paired
     jupytext(["--sync", tmp_ipynb])
     _, err = capsys.readouterr()
-    assert "is not a paired notebook" in err
+    assert "no paired file was found" in err
 
     # Now with a pairing information
     nb.metadata.setdefault("jupytext", {})["formats"] = "ipynb,md:pandoc"

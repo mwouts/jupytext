@@ -483,14 +483,27 @@ def jupytext(args=None):
 
     # Count how many file have round-trip issues when testing
     exit_code = 0
+    unpaired_files = []
     for nb_file in notebooks:
         if not args.warn_only:
-            exit_code += jupytext_single_file(nb_file, args, log)
+            try:
+                exit_code += jupytext_single_file(nb_file, args, log)
+            except NotAPairedNotebook:
+                log(f"[jupytext] {nb_file} is not a paired notebook")
+                unpaired_files.append(nb_file)
         else:
             try:
                 exit_code += jupytext_single_file(nb_file, args, log)
+            except NotAPairedNotebook:
+                log(f"[jupytext] {nb_file} is not a paired notebook")
+                unpaired_files.append(nb_file)
             except Exception as err:
                 sys.stderr.write(f"[jupytext] Error: {str(err)}\n")
+
+    if len(unpaired_files) == len(notebooks):
+        sys.stderr.write(
+            f"[jupytext] Warning: no paired file was found among {unpaired_files}\n"
+        )
 
     return exit_code
 
@@ -641,9 +654,6 @@ def jupytext_single_file(nb_file, args, log):
                 notebook, fmt, config, formats, nb_file, log, args.pre_commit_mode
             )
             nb_files = [inputs_nb_file, outputs_nb_file]
-        except NotAPairedNotebook as err:
-            sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
-            return 0
         except InconsistentVersions as err:
             sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
             return 1
