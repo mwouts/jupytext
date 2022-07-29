@@ -1949,3 +1949,45 @@ def test_config_jupytext_jupyter_fs_meta_manager(tmpdir):
         "script.py",
         "script.ipynb",
     }
+
+
+def test_timestamp_is_correct_after_reload_978(tmp_path, python_notebook):
+    """Here we reproduce the conditions in Issue #978 and make sure no
+    warning is generated"""
+    nb = python_notebook
+    nb.metadata["jupytext"] = {"formats": "ipynb,py:percent"}
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmp_path)
+
+    ipynb_file = tmp_path / "nb.ipynb"
+    py_file = tmp_path / "nb.py"
+
+    # 1. Save the paired notebook
+    cm.save(notebook_model(nb), path="nb.ipynb")
+    assert ipynb_file.exists()
+    assert py_file.exists()
+
+    # and reload to get the original timestamp
+    org_model = cm.get("nb.ipynb")
+
+    # 2. Edit the py file
+    time.sleep(0.5)
+    text = py_file.read_text()
+    text = (
+        text
+        + """
+
+# %%
+# A new cell
+2 + 2
+"""
+    )
+
+    py_file.write_text(text)
+
+    # 3. Reload the paired notebook and make sure it has the modified content
+    model = cm.get("nb.ipynb")
+    nb = model["content"]
+    assert "A new cell" in nb.cells[-1].source
+    assert model["last_modified"] > org_model["last_modified"]
