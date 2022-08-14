@@ -47,14 +47,20 @@ class JupytextConfiguration(Configurable):
 
     formats = Union(
         [Unicode(), List(Unicode()), Dict(Unicode())],
-        help="Save notebooks to these file extensions. "
-        "Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R "
-        "comma separated. If you want another format than the "
-        "default one, append the format name to the extension, "
-        "e.g. ipynb,py:percent to save the notebook to "
-        "hydrogen/spyder/vscode compatible scripts",
+        help="The formats to which notebooks should be saved - a coma separated list."
+        "Use ipynb,py:percent to pair ipynb notebooks to py files in the percent format,"
+        "ipynb,md,auto:percent to pair ipynb notebooks to both md files and scripts in "
+        "the percent format. The option also accept file prefix and suffix, see the full"
+        "documentation at https://jupytext.readthedocs.io/en/latest/config.html",
         config=True,
     )
+
+    ignore = List(
+        Unicode(),
+        help="A list of glob patterns. Any file among these patterns will be ignored.",
+        config=True,
+    )
+
     default_jupytext_formats = Unicode(
         help="Deprecated. Use 'formats' instead", config=True
     )

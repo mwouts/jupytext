@@ -4,6 +4,7 @@ import argparse
 import glob
 import json
 import os
+import pathlib
 import re
 import shlex
 import subprocess
@@ -38,6 +39,10 @@ from .paired_paths import (
 )
 from .pairs import latest_inputs_and_outputs, read_pair, write_pair
 from .version import __version__
+
+
+class IgnoredFile(ValueError):
+    pass
 
 
 def system(*args, **kwargs):
@@ -75,6 +80,12 @@ def parse_jupytext_args(args=None):
         "notebooks",
         help="One or more notebook(s). "
         "Notebook is read from stdin when this argument is empty.",
+        nargs="*",
+    )
+    parser.add_argument(
+        "--ignore",
+        "-i",
+        help="One or more glob that should be ignored",
         nargs="*",
     )
     parser.add_argument(
@@ -483,14 +494,34 @@ def jupytext(args=None):
 
     # Count how many file have round-trip issues when testing
     exit_code = 0
+    unpaired_files = []
+    ignored_files = []
     for nb_file in notebooks:
         if not args.warn_only:
-            exit_code += jupytext_single_file(nb_file, args, log)
+            try:
+                exit_code += jupytext_single_file(nb_file, args, log)
+            except IgnoredFile:
+                ignored_files.append(nb_file)
+            except NotAPairedNotebook:
+                log(f"[jupytext] {nb_file} is not a paired notebook")
+                unpaired_files.append(nb_file)
         else:
             try:
                 exit_code += jupytext_single_file(nb_file, args, log)
+            except IgnoredFile:
+                ignored_files.append(nb_file)
+            except NotAPairedNotebook:
+                log(f"[jupytext] {nb_file} is not a paired notebook")
+                unpaired_files.append(nb_file)
             except Exception as err:
                 sys.stderr.write(f"[jupytext] Error: {str(err)}\n")
+
+    if len(ignored_files) == len(notebooks):
+        sys.stderr.write("Warning: all input files were ignored\n")
+    elif len(unpaired_files) + len(ignored_files) == len(notebooks):
+        sys.stderr.write(
+            f"[jupytext] Warning: no paired file was found among {unpaired_files}\n"
+        )
 
     return exit_code
 
@@ -525,6 +556,20 @@ def jupytext_single_file(nb_file, args, log):
             nb_dest = full_path(bp, args.output_format)
 
     config = load_jupytext_config(os.path.abspath(nb_file))
+
+    for pattern in args.ignore or config.ignore:
+        if "*" in pattern or "?" in pattern:
+            ignored_files = glob.glob(pattern, recursive=True)
+        else:
+            ignored_files = pattern
+
+        nb_file_path = pathlib.Path(nb_file)
+        for ignored in ignored_files:
+            if (
+                nb_file_path.exists() and nb_file_path.samefile(ignored)
+            ) or nb_file_path == ignored:
+                log(f"[jupytext] Ignoring {nb_file}")
+                raise IgnoredFile()
 
     # Just acting on metadata / pipe => save in place
     save_in_place = not nb_dest and not args.sync
@@ -641,9 +686,6 @@ def jupytext_single_file(nb_file, args, log):
                 notebook, fmt, config, formats, nb_file, log, args.pre_commit_mode
             )
             nb_files = [inputs_nb_file, outputs_nb_file]
-        except NotAPairedNotebook as err:
-            sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
-            return 0
         except InconsistentVersions as err:
             sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
             return 1

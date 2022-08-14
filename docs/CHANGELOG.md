@@ -1,6 +1,16 @@
 Jupytext ChangeLog
 ==================
 
+1.14.2 (2022-07-??)
+-------------------
+
+**Added**
+- New `ignore` option for both the command line version of `jupytext` and the configuration files. The value of `ignore` can be a glob or a list of glob expressions ([#986](https://github.com/mwouts/jupytext/issues/986))
+
+**Changed**
+- `jupytext --sync` won't issue a warning when an unpaired file is passed as an argument (except if no paired file is found at all) ([#986](https://github.com/mwouts/jupytext/issues/986))
+
+
 1.14.1 (2022-07-29)
 -------------------
 
