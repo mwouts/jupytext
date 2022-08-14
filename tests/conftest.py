@@ -1,3 +1,4 @@
+import os
 import unittest.mock as mock
 from pathlib import Path
 
@@ -41,8 +42,12 @@ def cwd_tmpdir(tmpdir):
 @pytest.fixture()
 def cwd_tmp_path(tmp_path):
     # Run the whole test from inside tmp_path
-    with tmp_path.cwd():
-        yield tmp_path
+    prev_cwd = Path.cwd()
+    os.chdir(tmp_path)
+    try:
+        yield
+    finally:
+        os.chdir(prev_cwd)
 
 
 @pytest.fixture
