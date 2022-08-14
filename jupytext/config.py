@@ -54,6 +54,13 @@ class JupytextConfiguration(Configurable):
         "documentation at https://jupytext.readthedocs.io/en/latest/config.html",
         config=True,
     )
+
+    ignore = List(
+        Unicode(),
+        help="A list of glob patterns. Any file among these patterns will be ignored.",
+        config=True,
+    )
+
     default_jupytext_formats = Unicode(
         help="Deprecated. Use 'formats' instead", config=True
     )
