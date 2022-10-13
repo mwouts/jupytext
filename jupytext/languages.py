@@ -28,6 +28,7 @@ _JUPYTER_LANGUAGES = [
     "cython",
     "haskell",
     "tcl",
+    "gnuplot",
 ]
 
 # Supported file extensions (and languages)
@@ -72,6 +73,7 @@ _SCRIPT_EXTENSIONS = {
         "comment": "/*",
         "comment_suffix": "*/",
     },  # Maxima only has block comments
+    ".gp": {"language": "gnuplot", "comment": "#"},
 }
 
 _COMMENT_CHARS = [
