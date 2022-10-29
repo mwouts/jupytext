@@ -8,17 +8,17 @@
 #     name: python3
 # ---
 
-# + outputHidden=false inputHidden=false tags=["parameters"]
+# + inputHidden=false outputHidden=false tags=["parameters"]
 param = 4
 
-# + outputHidden=false inputHidden=false
+# + inputHidden=false outputHidden=false
 import pandas as pd
 
-# + outputHidden=false inputHidden=false
+# + inputHidden=false outputHidden=false
 df = pd.DataFrame({'A': [1, 2], 'B': [3 + param, 4]},
                   index=pd.Index(['x0', 'x1'], name='x'))
 df
 
-# + outputHidden=false inputHidden=false
+# + inputHidden=false outputHidden=false
 # %matplotlib inline
 df.plot(kind='bar')
