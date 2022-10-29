@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.14.2-dev (2022-10-??)
+-------------------
+
+**Fixed**
+- The sample notebooks have been normalized with `nbformat.validator.normalize` ([#1002](https://github.com/mwouts/jupytext/issues/1002)).
+
+
 1.14.1 (2022-07-29)
 -------------------
 
