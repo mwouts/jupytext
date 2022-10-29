@@ -1,19 +1,21 @@
 import nbformat
 import pytest
 
+import jupytext
+
 from .utils import list_notebooks
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_all"))
+@pytest.mark.parametrize("nb_file", list_notebooks("all", skip="(invalid|pyc)"))
 def test_sample_notebooks_are_normalized(nb_file):
-    nb = nbformat.read(nb_file, as_version=nbformat.current_nbformat)
+    nb = jupytext.read(nb_file)
 
     changes, normalized_nb = nbformat.validator.normalize(nb)
     nbformat.validate(normalized_nb)
 
     if changes:
         with open(nb_file, "w") as fp:
-            nbformat.write(normalized_nb, fp)
+            jupytext.write(normalized_nb, fp)
 
         assert not changes
 
