@@ -48,9 +48,10 @@ def test_jupytext_markdown_similar_to_nbconvert(nb_file):
 
     # Remove cell outputs and metadata
     for cell in nb.cells:
-        cell.outputs = []
-        cell.execution_count = None
-        cell.metadata = {}
+        if "outputs" in cell:
+            cell.outputs = []
+        if "metadata" in cell:
+            cell.metadata = {}
 
     md_jupytext = jupytext.writes(nb, fmt="md")
 
