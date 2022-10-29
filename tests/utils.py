@@ -1,5 +1,5 @@
+import itertools
 import json
-import os
 import re
 import sys
 from pathlib import Path
@@ -99,34 +99,36 @@ def list_notebooks(path="ipynb", skip="World"):
             + list_notebooks("ipynb_R", skip=skip)
         )
 
+    nb_path = Path(__file__).parent / "notebooks"
+
     if path == "ipynb_all":
-        all_notebooks = []
+        return itertools.chain(
+            *(
+                list_notebooks(folder.name, skip=skip)
+                for folder in nb_path.iterdir()
+                if folder.name.startswith("ipynb_")
+            )
+        )
 
-        nb_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "notebooks")
-        for dir in os.listdir(nb_path):
-            if dir.startswith("ipynb_"):
-                all_notebooks.extend(list_notebooks(dir, skip=skip))
+    if path == "all":
+        return itertools.chain(
+            *(list_notebooks(folder.name, skip=skip) for folder in nb_path.iterdir())
+        )
 
-        return all_notebooks
-
-    nb_path = os.path.dirname(os.path.abspath(__file__))
     if path.startswith("."):
-        nb_path = os.path.join(nb_path, path)
+        nb_path = nb_path / ".." / path
     else:
-        nb_path = os.path.join(nb_path, "notebooks", path)
+        nb_path = nb_path / path
 
     if skip:
         skip_re = re.compile(".*" + skip + ".*")
-        notebooks = [
-            os.path.join(nb_path, nb_file)
-            for nb_file in os.listdir(nb_path)
-            if not skip_re.match(nb_file)
+        return [
+            str(nb_file)
+            for nb_file in nb_path.iterdir()
+            if nb_file.is_file() and not skip_re.match(nb_file.name)
         ]
-    else:
-        notebooks = [os.path.join(nb_path, nb_file) for nb_file in os.listdir(nb_path)]
 
-    # ignore ".ipynb_checkpoints" sub-folder
-    return [nb_file for nb_file in notebooks if os.path.isfile(nb_file)]
+    return [str(nb_file) for nb_file in nb_path.iterdir() if nb_file.is_file()]
 
 
 def notebook_model(nb):
