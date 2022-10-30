@@ -728,9 +728,10 @@ def test_cli_expect_errors(tmp_ipynb):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:You have passed a file name to the '--to' option, "
+    "error",
+    "ignore:You might have passed a file name to the '--to' option, "
     "when a format description was expected. "
-    "Maybe you want to use the '-o' option instead?"
+    "Maybe you want to use the '-o' option instead?",
 )
 def test_format_prefix_suffix(tmpdir, cwd_tmpdir):
     os.makedirs("notebooks")
