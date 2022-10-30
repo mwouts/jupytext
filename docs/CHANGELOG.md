@@ -6,6 +6,7 @@ Jupytext ChangeLog
 
 **Fixed**
 - The sample notebooks have been normalized with `nbformat.validator.normalize` ([#1002](https://github.com/mwouts/jupytext/issues/1002)).
+- The warnings in the test suite that we cannot fix are filtered using a new `pytest.ini` file
 
 **Changed**
 - The CI uses Python 3.9 rather than 3.7 when testing conda environments
