@@ -4,7 +4,6 @@ import time
 import unittest.mock as mock
 import warnings
 from argparse import ArgumentTypeError
-from contextlib import contextmanager
 from io import StringIO
 from shutil import copyfile
 from subprocess import check_call
@@ -1160,34 +1159,6 @@ def test_sync_script_dotdot_folder_564(tmpdir):
     jupytext(["--sync", str(nb_file)])
 
 
-@contextmanager
-def no_warning():
-    with pytest.warns(None) as records:
-        yield
-
-    # There should be no warning
-    for record in records:
-        # Temporary exception for this one, see #865
-        # (does not seem to not occur anymore, as of April 2022, see #947)
-        if (
-            "Passing a schema to Validator.iter_errors is deprecated "
-            "and will be removed in a future release" in str(record.message)
-        ):
-            continue  # pragma: no cover
-        if (
-            "unclosed event loop <_UnixSelectorEventLoop running=False closed=False debug=False>"
-            in str(record.message)
-        ):
-            continue  # pragma: no cover
-        raise RuntimeError(record)
-
-
-def test_no_warning():
-    with pytest.raises(RuntimeError, match="a sample warning"):
-        with no_warning():
-            warnings.warn("a sample warning")
-
-
 def test_jupytext_to_file_emits_a_warning(tmpdir):
     """The user may type
         jupytext notebook.ipynb --to script.py
@@ -1199,7 +1170,8 @@ def test_jupytext_to_file_emits_a_warning(tmpdir):
     nb_file = tmpdir.join("notebook.ipynb")
     write(new_notebook(), str(nb_file))
 
-    with no_warning():
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
         jupytext(["notebook.ipynb", "-o", "script.py"])
 
     with pytest.warns(UserWarning, match="Maybe you want to use the '-o' option"):
@@ -1220,7 +1192,8 @@ def test_jupytext_set_formats_file_gives_an_informative_error(tmpdir, cwd_tmpdir
     nb_file = tmpdir.join("notebook.ipynb")
     md_file.write("Some text")
 
-    with no_warning():
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
         jupytext(["--sync", "notebook.md"])
 
     assert py_file.exists()
