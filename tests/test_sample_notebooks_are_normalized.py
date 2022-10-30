@@ -14,7 +14,7 @@ def test_sample_notebooks_are_normalized(nb_file):
     changes, normalized_nb = nbformat.validator.normalize(nb)
     nbformat.validate(normalized_nb)
 
-    if changes:
+    if changes:  # pragma: no cover
         with open(nb_file, "w") as fp:
             jupytext.write(normalized_nb, fp)
 
