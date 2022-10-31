@@ -8,21 +8,21 @@ jupyter:
     name: python3
 ---
 
-```{python outputHidden=FALSE, inputHidden=FALSE, tags=c("parameters")}
+```{python inputHidden=FALSE, outputHidden=FALSE, tags=c("parameters")}
 param = 4
 ```
 
-```{python outputHidden=FALSE, inputHidden=FALSE}
+```{python inputHidden=FALSE, outputHidden=FALSE}
 import pandas as pd
 ```
 
-```{python outputHidden=FALSE, inputHidden=FALSE}
+```{python inputHidden=FALSE, outputHidden=FALSE}
 df = pd.DataFrame({'A': [1, 2], 'B': [3 + param, 4]},
                   index=pd.Index(['x0', 'x1'], name='x'))
 df
 ```
 
-```{python outputHidden=FALSE, inputHidden=FALSE}
+```{python inputHidden=FALSE, outputHidden=FALSE}
 # %matplotlib inline
 df.plot(kind='bar')
 ```

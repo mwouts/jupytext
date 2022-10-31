@@ -1,6 +1,19 @@
 Jupytext ChangeLog
 ==================
 
+1.14.2-dev (2022-10-??)
+-------------------
+
+**Fixed**
+- The sample notebooks have been normalized with `nbformat.validator.normalize` ([#1002](https://github.com/mwouts/jupytext/issues/1002)).
+
+**Changed**
+- The CI uses Python 3.9 rather than 3.7 when testing conda environments
+
+**Added**
+- We now test Jupytext against Python 3.6 to 3.11 on the CI
+
+
 1.14.1 (2022-07-29)
 -------------------
 
