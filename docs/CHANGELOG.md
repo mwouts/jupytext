@@ -7,6 +7,7 @@ Jupytext ChangeLog
 **Fixed**
 - The sample notebooks have been normalized with `nbformat.validator.normalize` ([#1002](https://github.com/mwouts/jupytext/issues/1002)).
 - The warnings in the test suite that we cannot fix are filtered using a new `pytest.ini` file
+- We updated the `yarn.lock` file for the jupyter lab extension to address security vulnerabilities ([#904](https://github.com/mwouts/jupytext/issues/904), [#925](https://github.com/mwouts/jupytext/issues/925), [#935](https://github.com/mwouts/jupytext/issues/935), [#939](https://github.com/mwouts/jupytext/issues/939), [#984](https://github.com/mwouts/jupytext/issues/984), [#1005](https://github.com/mwouts/jupytext/issues/1005), [#1011](https://github.com/mwouts/jupytext/issues/1011))
 
 **Changed**
 - The CI uses Python 3.9 rather than 3.7 when testing conda environments
