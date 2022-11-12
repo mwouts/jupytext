@@ -1,7 +1,7 @@
 Jupytext ChangeLog
 ==================
 
-1.14.2-dev (2022-10-??)
+1.14.2 (2022-11-12)
 -------------------
 
 **Fixed**
@@ -12,6 +12,7 @@ Jupytext ChangeLog
 - The CI uses Python 3.9 rather than 3.7 when testing conda environments
 
 **Added**
+- Gnuplot is now supported ([#998](https://github.com/mwouts/jupytext/issues/998)) - thanks to [razimantv](https://github.com/razimantv) for this contribution
 - We now test Jupytext against Python 3.6 to 3.11 on the CI
 - We have added a test to document how to use the folder and prefix matching when pairing notebooks ([#974](https://github.com/mwouts/jupytext/issues/974))
 
