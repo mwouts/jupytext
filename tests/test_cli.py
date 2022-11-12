@@ -807,6 +807,37 @@ def test_cli_sync_file_with_suffix(tmpdir, cwd_tmpdir):
         fp.read().splitlines()[-4:] == ["", "```{python}", "1+1", "```"]
 
 
+def test_cli_sync_file_with_prefix_974(tmp_path, python_notebook):
+    """Only the files that are in the example directory and that start with 'example' should be paired"""
+    (tmp_path / "pyproject.toml").write_text(
+        """[tool.jupytext]
+formats = "examples//example/ipynb,examples//example/py:percent"
+"""
+    )
+
+    write(python_notebook, tmp_path / "example_notebook.ipynb")
+    (tmp_path / "examples" / "folder1").mkdir(parents=True)
+    write(python_notebook, tmp_path / "examples/folder1/utils.py")
+    write(python_notebook, tmp_path / "examples/folder1/example_paired.ipynb")
+
+    jupytext(
+        [
+            "--sync",
+            str(tmp_path / "example_notebook.ipynb"),
+            str(tmp_path / "examples/folder1/utils.py"),
+            str(tmp_path / "examples/folder1/example_paired.ipynb"),
+        ]
+    )
+
+    assert not (
+        tmp_path / "example_notebook.py"
+    ).exists(), "Not in the 'examples' directory"
+    assert not (
+        tmp_path / "examples/folder1/utils_not_paired.ipynb"
+    ).exists(), "Not with the 'example' prefix"
+    assert (tmp_path / "examples/folder1/example_paired.py").exists(), "Paired"
+
+
 @requires_sphinx_gallery
 def test_rst2md(tmpdir, cwd_tmpdir):
     tmp_py = "notebook.py"

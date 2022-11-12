@@ -13,6 +13,7 @@ Jupytext ChangeLog
 
 **Added**
 - We now test Jupytext against Python 3.6 to 3.11 on the CI
+- We have added a test to document how to use the folder and prefix matching when pairing notebooks ([#974](https://github.com/mwouts/jupytext/issues/974))
 
 
 1.14.1 (2022-07-29)
