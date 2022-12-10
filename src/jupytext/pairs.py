@@ -20,7 +20,7 @@ class PairedFilesDiffer(ValueError):
     """An error when the two representations of a paired notebook differ"""
 
 
-def write_pair(path, formats, write_one_file):
+async def write_pair(path, formats, write_one_file):
     """
     Call the function 'write_one_file' on each of the paired path/formats
     """
@@ -35,7 +35,7 @@ def write_pair(path, formats, write_one_file):
             continue
 
         alt_path = full_path(base, fmt)
-        value = write_one_file(alt_path, fmt)
+        value = await write_one_file(alt_path, fmt)
         if alt_path == path:
             return_value = value
 
@@ -46,7 +46,7 @@ def write_pair(path, formats, write_one_file):
             continue
 
         alt_path = full_path(base, fmt)
-        value = write_one_file(alt_path, fmt)
+        value = await write_one_file(alt_path, fmt)
         if alt_path == path:
             return_value = value
 
@@ -57,7 +57,7 @@ def write_pair(path, formats, write_one_file):
     return return_value
 
 
-def latest_inputs_and_outputs(
+async def latest_inputs_and_outputs(
     path, fmt, formats, get_timestamp, contents_manager_mode=False
 ):
     """Given a notebook path, its format and paired formats, and a function that
@@ -87,7 +87,7 @@ def latest_inputs_and_outputs(
             ):
                 continue
 
-        timestamp = get_timestamp(alt_path)
+        timestamp = await get_timestamp(alt_path)
         if timestamp is None:
             continue
 
@@ -113,15 +113,15 @@ def latest_inputs_and_outputs(
     )
 
 
-def read_pair(inputs, outputs, read_one_file, must_match=False):
+async def read_pair(inputs, outputs, read_one_file, must_match=False):
     """Read a notebook given its inputs and outputs path and formats"""
     if not outputs.path or outputs.path == inputs.path:
-        return read_one_file(inputs.path, inputs.fmt)
+        return await read_one_file(inputs.path, inputs.fmt)
 
-    notebook = read_one_file(inputs.path, inputs.fmt)
+    notebook = await read_one_file(inputs.path, inputs.fmt)
     check_file_version(notebook, inputs.path, outputs.path)
 
-    notebook_with_outputs = read_one_file(outputs.path, outputs.fmt)
+    notebook_with_outputs = await read_one_file(outputs.path, outputs.fmt)
 
     if must_match:
         in_text = jupytext.writes(notebook, inputs.fmt)
