@@ -49,6 +49,7 @@ Documentation = "https://jupytext.readthedocs.io"
 # Test related dependencies
 test = [
   "pytest",
+  "pytest-asyncio",
   "pytest-randomly"
 ]
 test-functional = [
@@ -184,6 +185,7 @@ ignore = [
 ]
 
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
 markers = [
     "requires_black",
     "requires_isort",
