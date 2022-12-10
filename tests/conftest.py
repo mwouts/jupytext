@@ -7,6 +7,10 @@ from pathlib import Path
 
 import pytest
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
+from jupyter_server.services.contents.largefilemanager import (
+    AsyncLargeFileManager,
+    LargeFileManager,
+)
 from nbformat.v4 import nbbase
 from nbformat.v4.nbbase import (
     new_code_cell,
@@ -49,6 +53,12 @@ def cwd_tmp_path(tmp_path):
     # Run the whole test from inside tmp_path
     with tmp_path.cwd():
         yield tmp_path
+
+
+@pytest.fixture(params=[LargeFileManager, AsyncLargeFileManager])
+def cm(request, tmp_path):
+    """Returns a TextContentsManager"""
+    return jupytext.build_jupytext_contents_manager_class(request.param)()
 
 
 @pytest.fixture

@@ -106,8 +106,8 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             """Create the prefix dir, if missing"""
             if "prefix" in fmt and "/" in path:
                 parent_dir = self.get_parent_dir(path)
-                if not self.dir_exists(parent_dir):
-                    self.create_prefix_dir(parent_dir, fmt)
+                if not await ensure_async(self.dir_exists(parent_dir)):
+                    await self.create_prefix_dir(parent_dir, fmt)
                     self.log.info("Creating directory %s", parent_dir)
                     await ensure_async(
                         self.super.save(dict(type="directory"), parent_dir)
@@ -121,7 +121,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             path = path.strip("/")
             nbk = model["content"]
             try:
-                config = await self.get_config(path)
+                config = await ensure_async(self.get_config(path))
                 jupytext_formats = notebook_formats(nbk, config, path)
                 self.update_paired_notebooks(path, jupytext_formats)
 
@@ -140,7 +140,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     else:
                         self.log.info("Saving %s", os.path.basename(path))
 
-                    self.create_prefix_dir(path, fmt)
+                    await self.create_prefix_dir(path, fmt)
                     if fmt["extension"] == ".ipynb":
                         return await ensure_async(
                             self.super.save(
@@ -197,13 +197,15 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             # Not a notebook?
             if (
-                not await self.file_exists(path)
-                or await self.dir_exists(path)
+                not await ensure_async(self.file_exists(path))
+                or await ensure_async(self.dir_exists(path))
                 or (type is not None and type != "notebook")
             ):
                 return await ensure_async(self.super.get(path, content, type, format))
 
-            config = await self.get_config(path, use_cache=content is False)
+            config = await ensure_async(
+                self.get_config(path, use_cache=content is False)
+            )
             if ext not in self.all_nb_extensions(config):
                 return await ensure_async(self.super.get(path, content, type, format))
 
@@ -233,6 +235,8 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                                 cell["metadata"]["trusted"] = True
 
                     except Exception as err:
+                        if not self.intercept_errors:
+                            raise
                         self.log.error(
                             "Error while reading file: %s %s", path, err, exc_info=True
                         )
@@ -285,7 +289,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     model["content"]["metadata"]["jupytext"] = jupytext_metadata
 
             async def get_timestamp(alt_path):
-                if not self.exists(alt_path):
+                if not await ensure_async(self.exists(alt_path)):
                     return None
                 if alt_path == path:
                     return model["last_modified"]
@@ -416,11 +420,11 @@ to your jupytext.toml file
                 format_name = ""
 
             path = path.strip("/")
-            if not self.dir_exists(path):
+            if not await ensure_async(self.dir_exists(path)):
                 raise HTTPError(404, "No such directory: %s" % path)
 
             untitled = self.untitled_notebook
-            config = await self.get_config(path)
+            config = await ensure_async(self.get_config(path))
             name = self.increment_notebook_filename(config, untitled + ext, path)
             path = f"{path}/{name}"
 
@@ -431,7 +435,7 @@ to your jupytext.toml file
                     metadata={"jupytext": {"formats": ext + ":" + format_name}}
                 )
 
-            return self.new(model, path)
+            return await ensure_async(self.new(model, path))
 
         def increment_notebook_filename(self, config, filename, path=""):
             """Increment a notebook filename until it is unique, regardless of extension"""
@@ -465,13 +469,26 @@ to your jupytext.toml file
                 if alt_fmt["extension"] == ".ipynb":
                     await ensure_async(self.super.trust_notebook(alt_path))
 
+        async def rename(self, old_path, new_path):
+            """Rename a file and any checkpoints associated with that file."""
+            await ensure_async(self.rename_file(old_path, new_path))
+            await ensure_async(
+                self.checkpoints.rename_all_checkpoints(old_path, new_path)
+            )
+            self.emit(
+                data={"action": "rename", "path": new_path, "source_path": old_path}
+            )
+
+        async def delete(self, path):
+            return await ensure_async(self.super.delete(path))
+
         async def rename_file(self, old_path, new_path):
             """Rename the current notebook, as well as its alternative representations"""
             if old_path not in self.paired_notebooks:
                 try:
                     # we do not know yet if this is a paired notebook (#190)
                     # -> to get this information we open the notebook
-                    self.get(old_path, content=True)
+                    await ensure_async(self.get(old_path, content=True))
                 except Exception:
                     pass
 
@@ -499,7 +516,7 @@ to your jupytext.toml file
 
             for old_alt_path, alt_fmt in old_alt_paths:
                 new_alt_path = full_path(new_base, alt_fmt)
-                if self.exists(old_alt_path):
+                if await ensure_async(self.exists(old_alt_path)):
                     self.create_prefix_dir(new_alt_path, alt_fmt)
                     await ensure_async(
                         self.super.rename_file(old_alt_path, new_alt_path)
@@ -523,7 +540,7 @@ to your jupytext.toml file
             """Return the jupytext configuration file, if any"""
             for jupytext_config_file in JUPYTEXT_CONFIG_FILES:
                 path = directory + "/" + jupytext_config_file
-                if await self.file_exists(path):
+                if await ensure_async(self.file_exists(path)):
                     if not self.allow_hidden and jupytext_config_file.startswith("."):
                         self.log.warning(
                             f"Ignoring config file {path} (see Jupytext issue #964)"
@@ -532,10 +549,10 @@ to your jupytext.toml file
                     return path
 
             pyproject_path = directory + "/" + PYPROJECT_FILE
-            if await self.file_exists(pyproject_path):
+            if await ensure_async(self.file_exists(pyproject_path)):
                 import toml
 
-                model = await self.get(pyproject_path, type="file")
+                model = await ensure_async(self.get(pyproject_path, type="file"))
                 try:
                     doc = toml.loads(model["content"])
                 except toml.decoder.TomlDecodeError as e:
@@ -548,7 +565,7 @@ to your jupytext.toml file
                 return None
 
             parent_dir = self.get_parent_dir(directory)
-            return await self.get_config_file(parent_dir)
+            return await ensure_async(self.get_config_file(parent_dir))
 
         async def load_config_file(
             self, config_file, *, prev_config_file, prev_config, is_os_path=False
@@ -595,7 +612,7 @@ to your jupytext.toml file
             # to a different directory.
             if not use_cache or parent_dir != self.cached_config.path:
                 try:
-                    config_file = await self.get_config_file(parent_dir)
+                    config_file = await ensure_async(self.get_config_file(parent_dir))
                     if config_file:
                         self.cached_config.config = await self.load_config_file(
                             config_file,

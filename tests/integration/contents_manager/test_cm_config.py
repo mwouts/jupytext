@@ -4,12 +4,12 @@ import sys
 import unittest.mock as mock
 
 import pytest
+from jupyter_core.utils import ensure_async
 from nbformat import read
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 from tornado.web import HTTPError
 
 import jupytext
-from jupytext import TextFileContentsManager
 from jupytext.compare import compare_cells, notebook_model
 
 SAMPLE_NOTEBOOK = new_notebook(
@@ -17,8 +17,7 @@ SAMPLE_NOTEBOOK = new_notebook(
 )
 
 
-async def test_local_config_overrides_cm_config(tmpdir):
-    cm = jupytext.TextFileContentsManager()
+async def test_local_config_overrides_cm_config(cm, tmpdir):
     cm.root_dir = str(tmpdir)
     cm.formats = "ipynb,py"
 
@@ -35,8 +34,7 @@ async def test_local_config_overrides_cm_config(tmpdir):
     assert not os.path.isfile(str(nested.join("notebook.py")))
 
 
-async def test_config_file_is_called_just_once(tmpdir, n=2):
-    cm = jupytext.TextFileContentsManager()
+async def test_config_file_is_called_just_once(cm, tmpdir, n=2):
     cm.root_dir = str(tmpdir)
     tmpdir.join("jupytext.toml").write("")
     nb_files = [str(tmpdir.join(f"notebook{i}.ipynb")) for i in range(n)]
@@ -56,8 +54,7 @@ async def test_config_file_is_called_just_once(tmpdir, n=2):
     assert mock_config.call_count == 1
 
 
-async def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
-    cm = jupytext.TextFileContentsManager()
+async def test_pairing_through_config_leaves_ipynb_unmodified(cm, tmpdir):
     cm.root_dir = str(tmpdir)
 
     cfg_file = tmpdir.join("jupytext.yml")
@@ -89,8 +86,7 @@ async def test_pairing_through_config_leaves_ipynb_unmodified(tmpdir):
     r"ignore:Passing (unrecognized|unrecoginized) arguments "
     r"to super\(JupytextConfiguration\).__init__"
 )
-async def test_incorrect_config_message(tmpdir, cfg_file, cfg_text):
-    cm = jupytext.TextFileContentsManager()
+async def test_incorrect_config_message(cm, tmpdir, cfg_file, cfg_text):
     cm.root_dir = str(tmpdir)
 
     tmpdir.join(cfg_file).write(cfg_text)
@@ -107,9 +103,8 @@ async def test_incorrect_config_message(tmpdir, cfg_file, cfg_text):
         await cm.save(notebook_model(SAMPLE_NOTEBOOK), "notebook.ipynb")
 
 
-async def test_global_config_file(tmpdir):
+async def test_global_config_file(cm, tmpdir):
     cm_dir = tmpdir.join("cm_dir").mkdir()
-    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(cm_dir)
 
     tmpdir.join("jupytext.toml").write('formats = "ipynb,Rmd"')
@@ -124,9 +119,9 @@ async def test_global_config_file(tmpdir):
         nb = new_notebook(cells=[new_code_cell("1+1")])
         model = notebook_model(nb)
         await cm.save(model, "notebook.ipynb")
-        assert {
-            model["path"] for model in (await cm.get("/", content=True))["content"]
-        } == {
+        dir_content = (await cm.get("/", content=True))["content"]
+        print(dir_content)
+        assert {(await ensure_async(model))["path"] for model in dir_content} == {
             "notebook.ipynb",
             "notebook.Rmd",
         }
@@ -136,7 +131,7 @@ async def test_global_config_file(tmpdir):
     sys.platform.startswith("win"),
     reason="AttributeError: 'LocalPath' object has no attribute 'mksymlinkto'",
 )
-async def test_paired_files_and_symbolic_links(tmpdir):
+async def test_paired_files_and_symbolic_links(cm, tmpdir):
     """We test that we don't get issues when pairing files into folders
     that are symbolic links"""
 
@@ -146,7 +141,6 @@ async def test_paired_files_and_symbolic_links(tmpdir):
 
     # Open the contents manager in another dir
     jupyter_dir = tmpdir.mkdir("jupyter_dir")
-    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(jupyter_dir)
 
     # Create sym links to the notebook/script folders
@@ -180,12 +174,11 @@ async def test_paired_files_and_symbolic_links(tmpdir):
 
 
 async def test_metadata_filter_from_config_has_precedence_over_notebook_metadata(
-    tmpdir, cwd_tmpdir, python_notebook
+    cm, tmpdir, cwd_tmpdir, python_notebook
 ):
     python_notebook.metadata["jupytext"] = {"notebook_metadata_filter": "-all"}
     tmpdir.join("jupytext.toml").write('notebook_metadata_filter = "all"')
 
-    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
     await cm.save(notebook_model(python_notebook), "test.py")
@@ -195,6 +188,7 @@ async def test_metadata_filter_from_config_has_precedence_over_notebook_metadata
 
 
 async def test_test_no_text_representation_metadata_in_ipynb_900(
+    cm,
     tmpdir,
     python_notebook,
 ):
@@ -202,7 +196,6 @@ async def test_test_no_text_representation_metadata_in_ipynb_900(
 
     # create a test notebook and save it in Jupyter
     nb = python_notebook
-    cm = TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     await cm.save(dict(type="notebook", content=nb), "test.ipynb")
 
@@ -223,8 +216,7 @@ async def test_test_no_text_representation_metadata_in_ipynb_900(
     assert "text_representation" not in tmpdir.join("test.ipynb").read()
 
 
-async def test_cm_config_no_log(cwd_tmp_path, tmp_path, caplog):
-    cm = jupytext.TextFileContentsManager()
+async def test_cm_config_no_log(cm, tmp_path, caplog):
     cm.root_dir = str(tmp_path)
 
     config = 'cm_config_log_level="none"'
@@ -244,8 +236,7 @@ async def test_cm_config_no_log(cwd_tmp_path, tmp_path, caplog):
     assert "Jupytext configuration file" not in caplog.text
 
 
-async def test_cm_config_log_only_if_changed(cwd_tmp_path, tmp_path, caplog):
-    cm = jupytext.TextFileContentsManager()
+async def test_cm_config_log_only_if_changed(cm, tmp_path, caplog):
     cm.root_dir = str(tmp_path)
 
     config = ""
