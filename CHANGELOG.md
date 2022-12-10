@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.17.0-dev (2023-??)
+-------------------
+
+**Fixed**
+- Jupytext's contents manager can be derived from asynchronous contents manager (now the default since `jupyter_server==2.0.0`) ([#1020](https://github.com/mwouts/jupytext/issues/1020))
+
+
 1.16.0-dev (2023-10-??)
 -------------------
 
