@@ -39,7 +39,12 @@ from .paired_paths import (
     full_path,
     paired_paths,
 )
-from .pairs import PairedFilesDiffer, latest_inputs_and_outputs, read_pair, write_pair
+from .pairs import (
+    PairedFilesDiffer,
+    latest_inputs_and_outputs,
+    read_pair_async,
+    write_pair_async,
+)
 
 
 def build_jupytext_contents_manager_class(base_contents_manager_class):
@@ -177,7 +182,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
                     return await ensure_async(self.super.save(text_model, path))
 
-                return await write_pair(path, jupytext_formats, save_one_file)
+                return await write_pair_async(path, jupytext_formats, save_one_file)
 
             except Exception as e:
                 self.log.error("Error while saving file: %s %s", path, e, exc_info=True)
@@ -320,8 +325,17 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 )["content"]
                 return reads(text, fmt=alt_fmt, config=config)
 
-            inputs, outputs = await latest_inputs_and_outputs(
-                path, fmt, formats, get_timestamp, contents_manager_mode=True
+            timestamps = {
+                alt_path: await get_timestamp(alt_path)
+                for alt_path, alt_fmt in paired_paths(path, fmt, formats)
+            }
+
+            inputs, outputs = latest_inputs_and_outputs(
+                path,
+                fmt,
+                formats,
+                lambda alt_path: timestamps[alt_path],
+                contents_manager_mode=True,
             )
 
             # Modification time of a paired notebook is the timestamp of inputs #118 #978
@@ -352,7 +366,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     self.log.warning(ts_mismatch)
 
                     try:
-                        content = await read_pair(
+                        content = await read_pair_async(
                             inputs, outputs, read_one_file, must_match=True
                         )
                         self.log.warning(
@@ -390,7 +404,9 @@ to your jupytext.toml file
                 model["content"] = content
             else:
                 try:
-                    model["content"] = await read_pair(inputs, outputs, read_one_file)
+                    model["content"] = await read_pair_async(
+                        inputs, outputs, read_one_file
+                    )
                 except HTTPError:
                     raise
                 except Exception as err:

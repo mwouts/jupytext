@@ -20,24 +20,18 @@ class PairedFilesDiffer(ValueError):
     """An error when the two representations of a paired notebook differ"""
 
 
-async def write_pair(path, formats, write_one_file):
-    """
-    Call the function 'write_one_file' on each of the paired path/formats
-    """
+def _enumerate_paired_paths_for_write(path, formats):
+    """Enumerate (alt_path, fmt) in the order in which the paired files should be written"""
     formats = long_form_multiple_formats(formats)
     base, _ = find_base_path_and_format(path, formats)
 
     # Save as ipynb first
-    return_value = None
-    value = None
     for fmt in formats[::-1]:
         if fmt["extension"] != ".ipynb":
             continue
 
         alt_path = full_path(base, fmt)
-        value = await write_one_file(alt_path, fmt)
-        if alt_path == path:
-            return_value = value
+        yield alt_path, fmt
 
     # And then to the other formats, in reverse order so that
     # the first format is the most recent
@@ -46,18 +40,36 @@ async def write_pair(path, formats, write_one_file):
             continue
 
         alt_path = full_path(base, fmt)
-        value = await write_one_file(alt_path, fmt)
+        yield alt_path, fmt
+
+
+def write_pair(path, formats, write_one_file):
+    """
+    Call the function 'write_one_file' on each of the paired path/formats
+    """
+    for alt_path, fmt in _enumerate_paired_paths_for_write(path, formats):
+        write_one_file(alt_path, fmt)
+
+
+async def write_pair_async(path, formats, write_one_file_async):
+    """
+    Call the function 'write_one_file' on each of the paired path/formats
+    """
+    return_value = None
+    value = None
+
+    for alt_path, fmt in _enumerate_paired_paths_for_write(path, formats):
+        value = await write_one_file_async(alt_path, fmt)
         if alt_path == path:
             return_value = value
 
     # Update modified timestamp to match that of the pair #207
-    if isinstance(return_value, dict) and "last_modified" in return_value:
-        return_value["last_modified"] = value["last_modified"]
+    return_value["last_modified"] = value["last_modified"]
 
     return return_value
 
 
-async def latest_inputs_and_outputs(
+def latest_inputs_and_outputs(
     path, fmt, formats, get_timestamp, contents_manager_mode=False
 ):
     """Given a notebook path, its format and paired formats, and a function that
@@ -87,7 +99,7 @@ async def latest_inputs_and_outputs(
             ):
                 continue
 
-        timestamp = await get_timestamp(alt_path)
+        timestamp = get_timestamp(alt_path)
         if timestamp is None:
             continue
 
@@ -113,16 +125,21 @@ async def latest_inputs_and_outputs(
     )
 
 
-async def read_pair(inputs, outputs, read_one_file, must_match=False):
+def read_pair(inputs, outputs, read_one_file, must_match=False):
     """Read a notebook given its inputs and outputs path and formats"""
     if not outputs.path or outputs.path == inputs.path:
-        return await read_one_file(inputs.path, inputs.fmt)
+        return read_one_file(inputs.path, inputs.fmt)
 
-    notebook = await read_one_file(inputs.path, inputs.fmt)
+    notebook = read_one_file(inputs.path, inputs.fmt)
     check_file_version(notebook, inputs.path, outputs.path)
 
-    notebook_with_outputs = await read_one_file(outputs.path, outputs.fmt)
+    notebook_with_outputs = read_one_file(outputs.path, outputs.fmt)
+    return combine_and_check(
+        notebook, notebook_with_outputs, inputs, outputs, must_match
+    )
 
+
+def combine_and_check(notebook, notebook_with_outputs, inputs, outputs, must_match):
     if must_match:
         in_text = jupytext.writes(notebook, inputs.fmt)
         out_text = jupytext.writes(notebook_with_outputs, inputs.fmt)
@@ -135,3 +152,17 @@ async def read_pair(inputs, outputs, read_one_file, must_match=False):
     )
 
     return notebook
+
+
+async def read_pair_async(inputs, outputs, read_one_file_async, must_match=False):
+    """Read a notebook given its inputs and outputs path and formats"""
+    if not outputs.path or outputs.path == inputs.path:
+        return await read_one_file_async(inputs.path, inputs.fmt)
+
+    notebook = await read_one_file_async(inputs.path, inputs.fmt)
+    check_file_version(notebook, inputs.path, outputs.path)
+
+    notebook_with_outputs = await read_one_file_async(outputs.path, outputs.fmt)
+    return combine_and_check(
+        notebook, notebook_with_outputs, inputs, outputs, must_match
+    )
