@@ -10,7 +10,8 @@ from jupytext import TextFileContentsManager
 from jupytext.compare import compare_notebooks
 
 
-async def test_pre_commit_hook_sync_with_no_config(cm,
+async def test_pre_commit_hook_sync_with_no_config(
+    cm,
     tmpdir,
     cwd_tmpdir,
     tmp_repo,

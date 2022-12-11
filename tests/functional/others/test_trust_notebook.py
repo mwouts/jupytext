@@ -162,7 +162,7 @@ async def test_simple_notebook_is_trusted(cm, tmpdir, python_notebook):
 
 @pytest.mark.requires_myst
 async def test_myst_notebook_is_trusted_941(
-        cm,
+    cm,
     tmp_path,
     myst="""---
 jupytext:
@@ -199,7 +199,9 @@ init_notebook_mode(all_interactive=True)
 
 
 @pytest.mark.requires_myst
-async def test_paired_notebook_with_outputs_is_not_trusted_941(cm, tmp_path, python_notebook):
+async def test_paired_notebook_with_outputs_is_not_trusted_941(
+    cm, tmp_path, python_notebook
+):
     cm.root_dir = str(tmp_path)
 
     nb = python_notebook

@@ -7,6 +7,7 @@ from jupytext import read
 
 
 async def test_pre_commit_hook_sync_with_config(
+    cm,
     tmpdir,
     cwd_tmpdir,
     tmp_repo,
