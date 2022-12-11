@@ -26,9 +26,9 @@ def test_convert_invalid_md_file_fails(invalid_md_file):
         jupytext_cli(["--to", "ipynb", str(invalid_md_file)])
 
 
-def test_open_invalid_md_file_fails(invalid_md_file, tmp_path):
+async def test_open_invalid_md_file_fails(invalid_md_file, tmp_path):
     cm = TextFileContentsManager()
     cm.root_dir = str(invalid_md_file.parent)
 
     with pytest.raises(HTTPError, match="invalid_file_896.md is not UTF-8 encoded"):
-        cm.get(invalid_md_file.name)
+        await cm.get(invalid_md_file.name)

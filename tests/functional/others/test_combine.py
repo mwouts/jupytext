@@ -39,7 +39,7 @@ def test_combine():
     assert nb_source.cells[5].outputs == ["5"]
 
 
-def test_read_text_and_combine_with_outputs(tmpdir):
+async def test_read_text_and_combine_with_outputs(tmpdir):
     tmp_ipynb = "notebook.ipynb"
     tmp_script = "notebook.py"
 
@@ -115,7 +115,7 @@ def test_read_text_and_combine_with_outputs(tmpdir):
     cm.root_dir = str(tmpdir)
 
     # load notebook from script
-    model = cm.get(tmp_script)
+    model = await cm.get(tmp_script)
     nb = model["content"]
 
     assert nb.cells[0]["source"] == "1+1"
