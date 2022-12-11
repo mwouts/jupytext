@@ -477,16 +477,20 @@ to your jupytext.toml file
         async def trust_notebook(self, path):
             """Trust the current notebook"""
             if path.endswith(".ipynb") or path not in self.paired_notebooks:
-                await ensure_async(self.super.trust_notebook(path))
+                model = await self.get(path)
+                nb = model["content"]
+                self.log.warning("Trusting notebook %s", path)
+                self.notary.mark_cells(nb, True)
+                self.check_and_sign(nb, path)
                 return
 
             fmt, formats = self.paired_notebooks[path]
             for alt_path, alt_fmt in paired_paths(path, fmt, formats):
                 if alt_fmt["extension"] == ".ipynb":
-                    await ensure_async(self.super.trust_notebook(alt_path))
+                    await self.trust_notebook(alt_path)
 
         async def rename(self, old_path, new_path):
-            """Rename a file and any checkpoints associated with that file."""
+            """NB: This method was added for the async port"""
             await ensure_async(self.rename_file(old_path, new_path))
             await ensure_async(
                 self.checkpoints.rename_all_checkpoints(old_path, new_path)
