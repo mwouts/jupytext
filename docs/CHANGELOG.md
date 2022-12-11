@@ -6,6 +6,7 @@ Jupytext ChangeLog
 
 **Fixed**
 - When the default contents manager is _async_ (i.e. `jupyter_server>=2.0.0`), the Jupyter server extension for Jupytext derives a contents manager from `LargeFileManager` instead, as async contents managers are not supported by Jupytext at the moment ([#1020](https://github.com/mwouts/jupytext/issues/1020))
+- We have made adjustments on the CI as flake8 was moved to GitHub, and Python 3.6 is not available anymore on `ubuntu-latest`
 
 
 1.14.2 (2022-11-12)
