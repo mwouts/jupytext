@@ -5,8 +5,7 @@ Jupytext ChangeLog
 -------------------
 
 **Added**
-- Added Wolfram Language as a supported language ([#1014](https://github.com/mwouts/jupytext/issues/1014)) - thanks to [ Avatar
-Etienne Dechamps](https://github.com/dechamps) for this contribution
+- Added Wolfram Language as a supported language ([#1014](https://github.com/mwouts/jupytext/issues/1014)) - thanks to [Etienne Dechamps](https://github.com/dechamps) for this contribution
 
 
 1.14.3 (2022-12-11)
