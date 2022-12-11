@@ -29,6 +29,7 @@ _JUPYTER_LANGUAGES = [
     "haskell",
     "tcl",
     "gnuplot",
+    "wolfram language",
 ]
 
 # Supported file extensions (and languages)
@@ -47,6 +48,14 @@ _SCRIPT_EXTENSIONS = {
     ".ps1": {"language": "powershell", "comment": "#"},
     ".q": {"language": "q", "comment": "/"},
     ".m": {"language": "matlab", "comment": "%"},
+    # Unfortunately, Wolfram Mathematica also uses the .m extension which
+    # conflicts with Matlab. To work around this problem we arbitrarily use a
+    # made-up .wolfram extension.
+    ".wolfram": {
+        "language": "wolfram language",
+        "comment": "(*",
+        "comment_suffix": "*)",
+    },
     ".pro": {"language": "idl", "comment": ";"},
     ".js": {"language": "javascript", "comment": "//"},
     ".ts": {"language": "typescript", "comment": "//"},
