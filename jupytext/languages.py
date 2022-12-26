@@ -83,6 +83,7 @@ _SCRIPT_EXTENSIONS = {
         "comment_suffix": "*/",
     },  # Maxima only has block comments
     ".gp": {"language": "gnuplot", "comment": "#"},
+    ".do": {"language": "stata", "comment": "//"},
 }
 
 _COMMENT_CHARS = [
