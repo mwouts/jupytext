@@ -27,6 +27,7 @@ Jupytext works with notebooks in any of the following languages:
 - Scala
 - Scheme
 - Script of Script
+- Stata
 - TypeScript
 - Haskell
 - Tcl
