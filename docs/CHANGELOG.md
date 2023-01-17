@@ -10,6 +10,8 @@ Jupytext ChangeLog
 **Changed**
 - Empty tags are not exported to the text notebook anymore ([#960](https://github.com/mwouts/jupytext/issues/960))
 
+**Added**
+- We have added a series of test to make sure that the main formats support cell tags ([#1024](https://github.com/mwouts/jupytext/issues/1024))
 
 1.14.4 (2022-12-11)
 -------------------
