@@ -770,7 +770,6 @@ class LightScriptCellReader(ScriptCellReader):
                     self.cell_marker_start or i == 0 or _BLANK_LINE.match(lines[i - 1])
                 )
             ):
-
                 if self.explicit_end_marker_required:
                     # Metadata here was conditioned on finding an explicit end marker
                     # before the next start marker. So we dismiss it.

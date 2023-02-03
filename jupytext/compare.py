@@ -246,7 +246,6 @@ def compare_cells(
         if (ref_cell.cell_type == "code" and not allow_missing_code_cell_metadata) or (
             ref_cell.cell_type != "code" and not allow_missing_markdown_cell_metadata
         ):
-
             ref_metadata = ref_cell.metadata
             test_metadata = test_cell.metadata
             if allow_filtered_cell_metadata:

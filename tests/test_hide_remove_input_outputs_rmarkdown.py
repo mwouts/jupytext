@@ -56,7 +56,8 @@ def test_jupyter_book_options_to_rmarkdown(md, rmd):
 )
 def test_runtools_options_to_rmarkdown(md, rmd):
     """Options set by the runtools extension are mapped to the corresponding R Markdown options
-    https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html"""
+    https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/runtools/readme.html
+    """
     md = (
         "```python "
         + md
