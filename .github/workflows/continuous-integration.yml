@@ -24,11 +24,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.9
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
-      - uses: pre-commit/action@v2.0.0
+          python-version: "3.x"
+      - uses: pre-commit/action@v3.0.0
 
   analyse:
     name: Analyse
