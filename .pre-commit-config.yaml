@@ -18,7 +18,7 @@ exclude: >
 repos:
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.4.0
     hooks:
     - id: check-json
     - id: check-yaml
@@ -26,24 +26,24 @@ repos:
     - id: trailing-whitespace
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.31.1
+    rev: v3.3.1
     hooks:
     - id: pyupgrade
       args: ["--py36-plus"]
 
   - repo: https://github.com/myint/autoflake
-    rev: v1.4
+    rev: v2.0.1
     hooks:
     - id: autoflake
       args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
 
   - repo: https://github.com/pycqa/flake8
-    rev: 3.9.2
+    rev: 6.0.0
     hooks:
     - id: flake8
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
+    rev: 5.12.0
     hooks:
       # isort needs the 'black' profile when used in combination with black
       # See https://github.com/PyCQA/isort/issues/1518
@@ -51,6 +51,6 @@ repos:
       args: ["--profile", "black"]
 
   - repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 23.1.0
     hooks:
     - id: black
