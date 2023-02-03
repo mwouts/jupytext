@@ -311,7 +311,6 @@ def myst_to_notebook(
     md_metadata = {}
 
     for token in tokens:
-
         nesting_level += token.nesting
 
         if nesting_level != 0:
@@ -381,7 +380,6 @@ def notebook_to_myst(
 
     last_cell_md = False
     for i, cell in enumerate(nb.cells):
-
         if cell.cell_type == "markdown":
             metadata = from_nbnode(cell.metadata)
             if metadata or last_cell_md:

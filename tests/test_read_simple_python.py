@@ -1209,7 +1209,6 @@ if True:
     ],
 )
 def test_indented_magic_commands(script, cell):
-
     nb = jupytext.reads(script, "py")
     assert len(nb.cells) == 1
     assert nb.cells[0].cell_type == "code"
