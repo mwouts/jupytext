@@ -374,8 +374,10 @@ class LightScriptCellExporter(BaseCellExporter):
         options = metadata_to_double_percent_options(
             self.metadata, self.cell_metadata_json
         )
-        if options:
+        if len(options) > 0:
             cell_start.append(options)
+        else:
+            return source
         lines.append(" ".join(cell_start))
         lines.extend(source)
         lines.append(self.comment + f" {endofcell}")
