@@ -12,20 +12,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  skip_duplicate:
-    runs-on: ubuntu-latest
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - id: skip_check
-        uses: fkirc/skip-duplicate-actions@master
-        with:
-          github_token: ${{ github.token }}
-
   pre-commit:
-    needs: skip_duplicate
-    if: ${{ needs.skip_duplicate.outputs.should_skip == 'false' }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -36,9 +27,10 @@ jobs:
 
   lint:
     name: Lint
-    needs: skip_duplicate
-    if: ${{ needs.skip_duplicate.outputs.should_skip == 'false' }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -61,11 +53,13 @@ jobs:
 
   test-pip:
     needs: lint
-    if: ${{ needs.skip_duplicate.outputs.should_skip == 'false' }}
     strategy:
       matrix:
         python-version: [ 3.7, 3.8, 3.9, "3.10", "3.11"]
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -100,12 +94,14 @@ jobs:
 
   test-conda:
     needs: lint
-    if: ${{ needs.skip_duplicate.outputs.should_skip == 'false' }}
     strategy:
       matrix:
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
         python-version: [ 3.9 ]
     runs-on: ${{ matrix.os }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -148,12 +144,13 @@ jobs:
         if: ${{ matrix.os != 'windows-latest' }}
 
   test-pip-no-myst:
-      needs: skip_duplicate
-      if: ${{ needs.skip_duplicate.outputs.should_skip == 'false' }}
       strategy:
         matrix:
           python-version: [ 3.9 ]
       runs-on: ubuntu-latest
+      concurrency:
+        group: ${{ github.workflow }}-${{ github.ref }}
+        cancel-in-progress: true
       steps:
         - name: Checkout
           uses: actions/checkout@v3
@@ -175,12 +172,13 @@ jobs:
           uses: codecov/codecov-action@v1
 
   test-pip-no-kernel:
-    needs: skip_duplicate
-    if: ${{ needs.skip_duplicate.outputs.should_skip == 'false' }}
     strategy:
       matrix:
         python-version: [ 3.9 ]
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -199,12 +197,13 @@ jobs:
         uses: codecov/codecov-action@v1
 
   test-pip-notebook-pre:
-    needs: skip_duplicate
-    if: ${{ needs.skip_duplicate.outputs.should_skip == 'false' }}
     strategy:
       matrix:
         python-version: [ 3.9 ]
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
