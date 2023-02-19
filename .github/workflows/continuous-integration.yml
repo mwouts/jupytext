@@ -15,9 +15,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -44,9 +41,6 @@ jobs:
       matrix:
         python-version: [ 3.7, 3.8, 3.9, "3.10", "3.11"]
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -86,9 +80,6 @@ jobs:
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
         python-version: [ 3.9 ]
     runs-on: ${{ matrix.os }}
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -135,9 +126,6 @@ jobs:
         matrix:
           python-version: [ 3.9 ]
       runs-on: ubuntu-latest
-      concurrency:
-        group: ${{ github.workflow }}-${{ github.ref }}
-        cancel-in-progress: true
       steps:
         - name: Checkout
           uses: actions/checkout@v3
@@ -163,9 +151,6 @@ jobs:
       matrix:
         python-version: [ 3.9 ]
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -188,9 +173,6 @@ jobs:
       matrix:
         python-version: [ 3.9 ]
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
