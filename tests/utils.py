@@ -9,6 +9,7 @@ from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 
 from jupytext.cell_reader import rst2md
 from jupytext.cli import system
+from jupytext.formats import JUPYTEXT_FORMATS
 from jupytext.myst import is_myst_available
 from jupytext.pandoc import is_pandoc_available
 from jupytext.quarto import is_quarto_available
@@ -134,3 +135,9 @@ def list_notebooks(path="ipynb", skip="World"):
 def notebook_model(nb):
     """Return a notebook model, with content a dictionary rather than a notebook object"""
     return dict(type="notebook", content=json.loads(json.dumps(nb)))
+
+
+def formats_with_support_for_cell_metadata():
+    for fmt in JUPYTEXT_FORMATS:
+        if fmt.format_name not in ["sphinx", "nomarker", "spin", "quarto"]:
+            yield f"{fmt.extension[1:]}:{fmt.format_name}"

@@ -57,7 +57,7 @@ _IGNORE_CELL_METADATA = ",".join(
     + _JUPYTEXT_CELL_METADATA
 )
 
-_IDENTIFIER_RE = re.compile(r"^[a-zA-Z_\.]+[a-zA-Z0-9_\.]*$")
+_IS_VALID_METADATA_KEY = re.compile(r"^[a-zA-Z0-9_\.]+[a-zA-Z0-9_\.]*$")
 
 
 class RLogicalValueError(Exception):
@@ -348,9 +348,9 @@ def incorrectly_encoded_metadata(text):
     return {"incorrectly_encoded_metadata": text}
 
 
-def isidentifier(text):
+def is_valid_metadata_key(text):
     """Can this text be a proper key?"""
-    return _IDENTIFIER_RE.match(text)
+    return bool(_IS_VALID_METADATA_KEY.match(text))
 
 
 def is_jupyter_language(language):
@@ -371,7 +371,7 @@ def parse_key_equal_value(text):
     last_space_pos = text.rfind(" ")
 
     # Just an identifier?
-    if not text.startswith("--") and isidentifier(text[last_space_pos + 1 :]):
+    if not text.startswith("--") and is_valid_metadata_key(text[last_space_pos + 1 :]):
         key = text[last_space_pos + 1 :]
         value = None
         result = {key: value}
@@ -389,7 +389,7 @@ def parse_key_equal_value(text):
         # Do we have an identifier on the left of the equal sign?
         prev_whitespace = text[:equal_sign_pos].rstrip().rfind(" ")
         key = text[prev_whitespace + 1 : equal_sign_pos].strip()
-        if not isidentifier(key.replace(".", "")):
+        if not is_valid_metadata_key(key):
             continue
 
         try:
