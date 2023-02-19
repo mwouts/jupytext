@@ -1,11 +1,9 @@
 name: CI
 on:
-  push:
-    paths-ignore:
-      - 'CHANGELOG.md'
-  pull_request:
-  schedule:
-    - cron: '0 11 * * 4'
+  workflow_run:
+    workflows: ["skip_duplicate"]
+    types:
+      - completed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,6 +13,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -122,31 +121,33 @@ jobs:
         if: ${{ matrix.os != 'windows-latest' }}
 
   test-pip-no-myst:
-      strategy:
-        matrix:
-          python-version: [ 3.9 ]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v3
-        - name: Set up Python ${{ matrix.python-version }}
-          uses: actions/setup-python@v4
-          with:
-            python-version: ${{ matrix.python-version }}
-        - name: Install dependencies, except markdown-it-py
-          run: |
-            python -m pip install --upgrade pip
-            # All dependencies but markdown-it-py
-            python -m pip install nbformat pyyaml toml
-            python -m pip install -r requirements-dev.txt
-        - name: Install a Jupyter Kernel
-          run: python -m ipykernel install --name python_kernel --user
-        - name: Test with pytest
-          run: pytest --cov=./ --cov-report=xml
-        - name: Upload coverage
-          uses: codecov/codecov-action@v1
+    needs: lint
+    strategy:
+      matrix:
+        python-version: [ 3.9 ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies, except markdown-it-py
+        run: |
+          python -m pip install --upgrade pip
+          # All dependencies but markdown-it-py
+          python -m pip install nbformat pyyaml toml
+          python -m pip install -r requirements-dev.txt
+      - name: Install a Jupyter Kernel
+        run: python -m ipykernel install --name python_kernel --user
+      - name: Test with pytest
+        run: pytest --cov=./ --cov-report=xml
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
 
   test-pip-no-kernel:
+    needs: lint
     strategy:
       matrix:
         python-version: [ 3.9 ]
@@ -169,6 +170,7 @@ jobs:
         uses: codecov/codecov-action@v1
 
   test-pip-notebook-pre:
+    needs: lint
     strategy:
       matrix:
         python-version: [ 3.9 ]

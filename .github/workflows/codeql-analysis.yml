@@ -1,11 +1,9 @@
 name: CodeQL
 on:
-  push:
-    paths-ignore:
-      - 'CHANGELOG.md'
-  pull_request:
-  schedule:
-    - cron: '0 11 * * 4'
+  workflow_run:
+    workflows: ["skip_duplicate"]
+    types:
+      - completed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,6 +13,7 @@ jobs:
   analyse:
     name: Analyse
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
