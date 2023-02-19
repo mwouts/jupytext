@@ -495,7 +495,9 @@ def metadata_to_text(language_or_title, metadata=None, plain_json=False):
         metadata, language_or_title = language_or_title, metadata
 
     metadata = {
-        key: metadata[key] for key in metadata if key not in _JUPYTEXT_CELL_METADATA and len(metadata[key]) > 0
+        key: metadata[key]
+        for key in metadata
+        if key not in _JUPYTEXT_CELL_METADATA and len(metadata[key]) > 0
     }
     text = [language_or_title] if language_or_title else []
     if language_or_title is None:
