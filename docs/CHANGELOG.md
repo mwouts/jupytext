@@ -4,6 +4,9 @@ Jupytext ChangeLog
 1.14.7-dev (2023-06-??)
 -------------------
 
+**Changed**
+- We have updated the CI configuration - thanks to Matthew Feickert and to Cristian Le for their recommendations ([#1037](https://github.com/mwouts/jupytext/issues/1037))
+
 **Fixed**
 - Notebooks with an empty YAML header work ([#1070](https://github.com/mwouts/jupytext/issues/1070))
 - Double quote strings in R Markdown options can contain single quotes ([#1079](https://github.com/mwouts/jupytext/issues/1079))
