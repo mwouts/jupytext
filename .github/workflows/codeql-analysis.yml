@@ -1,9 +1,10 @@
 name: CodeQL
 on:
-  workflow_run:
-    workflows: ["skip_duplicate"]
-    types:
-      - completed
+  push:
+    paths-ignore:
+      - 'CHANGELOG.md'
+  schedule:
+    - cron: '0 11 * * 4'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
