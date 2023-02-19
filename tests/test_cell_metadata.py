@@ -1,8 +1,11 @@
 import pytest
+from nbformat.v4.nbbase import new_markdown_cell
 
+import jupytext
 from jupytext.cell_metadata import (
     _IGNORE_CELL_METADATA,
     RMarkdownOptionParsingError,
+    is_valid_metadata_key,
     metadata_to_rmd_options,
     metadata_to_text,
     parse_key_equal_value,
@@ -11,6 +14,7 @@ from jupytext.cell_metadata import (
     text_to_metadata,
     try_eval_metadata,
 )
+from jupytext.combine import combine_inputs_with_outputs
 from jupytext.compare import compare
 from jupytext.metadata_filter import filter_metadata
 
@@ -226,3 +230,36 @@ def test_parse_key_value_key():
         "key": "value",
         "key2": None,
     }
+
+
+@pytest.mark.parametrize("key", ["ok", "also.ok", "all_right_55", "not,ok"])
+def test_is_valid_metadata_key(key):
+    assert is_valid_metadata_key(key) == ("," not in key)
+
+
+@pytest.fixture()
+def notebook_with_collapsed_cell(python_notebook):
+    nb = python_notebook
+    nb.cells.append(
+        new_markdown_cell("## Data", metadata={"jp-MarkdownHeadingCollapsed": True})
+    )
+    return nb
+
+
+def test_unsupported_key_in_metadata(
+    notebook_with_collapsed_cell, fmt_with_cell_metadata
+):
+    """Notebook metadata that can't be parsed in text notebook cannot go to the text file,
+    but it should still remain available in the ipynb file for paired notebooks."""
+    with pytest.warns(
+        UserWarning,
+        match="The following metadata cannot be exported to the text notebook",
+    ):
+        text = jupytext.writes(notebook_with_collapsed_cell, fmt_with_cell_metadata)
+    assert "MarkdownHeadingCollapsed" not in text
+    nb_text = jupytext.reads(text, fmt=fmt_with_cell_metadata)
+    print(notebook_with_collapsed_cell)
+    nb = combine_inputs_with_outputs(
+        nb_text, notebook_with_collapsed_cell, fmt=fmt_with_cell_metadata
+    )
+    assert nb.cells[-1].metadata == {"jp-MarkdownHeadingCollapsed": True}

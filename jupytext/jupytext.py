@@ -179,8 +179,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
     def filter_notebook(self, nb, metadata):
         self.update_fmt_with_notebook_options(nb.metadata)
+        unsupported_keys = set()
         metadata = insert_jupytext_info_and_filter_metadata(
-            metadata, self.fmt, self.implementation
+            metadata, self.fmt, self.implementation, unsupported_keys=unsupported_keys
         )
 
         cells = []
@@ -189,6 +190,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 cell.metadata,
                 self.fmt.get("cell_metadata_filter"),
                 _IGNORE_CELL_METADATA,
+                unsupported_keys=unsupported_keys,
             )
             if cell.cell_type == "code":
                 cells.append(new_code_cell(source=cell.source, metadata=cell_metadata))
@@ -200,6 +202,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                         cell_type=cell.cell_type,
                     )
                 )
+
+        _warn_on_unsupported_keys(unsupported_keys)
+
         return NotebookNode(
             nbformat=nb.nbformat,
             nbformat_minor=nb.nbformat_minor,
@@ -249,11 +254,13 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                     break
 
         header = encoding_and_executable(nb, metadata, self.ext)
+        unsupported_keys = set()
         header_content, header_lines_to_next_cell = metadata_and_cell_to_header(
             nb,
             metadata,
             self.implementation,
             self.fmt,
+            unsupported_keys=unsupported_keys,
         )
         header.extend(header_content)
 
@@ -271,9 +278,11 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
             cell_exporters.append(
                 self.implementation.cell_exporter_class(
-                    cell, default_language, self.fmt
+                    cell, default_language, self.fmt, unsupported_keys=unsupported_keys
                 )
             )
+
+        _warn_on_unsupported_keys(unsupported_keys)
 
         texts = [cell.cell_to_text() for cell in cell_exporters]
         lines = []
@@ -549,3 +558,11 @@ def create_prefix_dir(nb_file, fmt):
                 logging.WARNING, "[jupytext] creating missing directory %s", nb_dir
             )
             os.makedirs(nb_dir)
+
+
+def _warn_on_unsupported_keys(unsupported_keys):
+    if unsupported_keys:
+        warnings.warn(
+            f"The following metadata cannot be exported "
+            f"to the text notebook: {sorted(unsupported_keys)}"
+        )

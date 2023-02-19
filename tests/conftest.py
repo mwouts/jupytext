@@ -14,6 +14,8 @@ from nbformat.v4.nbbase import (
 import jupytext
 from jupytext.cli import system
 
+from .utils import formats_with_support_for_cell_metadata
+
 # Pytest's tmpdir is in /tmp (at least for me), so this helps avoiding interferences between
 # global configuration on HOME and the test collection
 jupytext.config.JUPYTEXT_CEILING_DIRECTORIES = ["/tmp/"]
@@ -98,6 +100,11 @@ def notebook_with_outputs():
             }
         },
     )
+
+
+@pytest.fixture(params=list(formats_with_support_for_cell_metadata()))
+def fmt_with_cell_metadata(request):
+    return request.param
 
 
 """To make sure that cell ids are distinct we use a global counter.

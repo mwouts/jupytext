@@ -51,14 +51,17 @@ class BaseCellExporter:
     default_comment_magics = None
     parse_cell_language = True
 
-    def __init__(self, cell, default_language, fmt=None):
+    def __init__(self, cell, default_language, fmt=None, unsupported_keys=None):
         self.fmt = fmt or {}
         self.ext = self.fmt.get("extension")
         self.cell_type = cell.cell_type
         self.source = cell_source(cell)
         self.unfiltered_metadata = cell.metadata
         self.metadata = filter_metadata(
-            cell.metadata, self.fmt.get("cell_metadata_filter"), _IGNORE_CELL_METADATA
+            cell.metadata,
+            self.fmt.get("cell_metadata_filter"),
+            _IGNORE_CELL_METADATA,
+            unsupported_keys=unsupported_keys,
         )
         if self.parse_cell_language:
             custom_cell_magics = self.fmt.get("custom_cell_magics", "").split(",")

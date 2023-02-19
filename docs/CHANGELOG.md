@@ -4,6 +4,9 @@ Jupytext ChangeLog
 1.14.5 (2023-02-??)
 -------------------
 
+**Fixed**
+- When a metadata key is not a valid identifier, a warning is emitted and the metadata is not saved to the text representation ([#1042](https://github.com/mwouts/jupytext/issues/1042))
+
 
 1.14.4 (2022-12-11)
 -------------------

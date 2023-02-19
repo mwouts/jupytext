@@ -2,7 +2,7 @@
 
 from copy import copy
 
-from .cell_metadata import _JUPYTEXT_CELL_METADATA
+from .cell_metadata import _JUPYTEXT_CELL_METADATA, is_valid_metadata_key
 
 _DEFAULT_NOTEBOOK_METADATA = ",".join(
     [
@@ -128,7 +128,7 @@ def update_metadata_filters(metadata, jupyter_md, cell_metadata):
             )
 
 
-def filter_metadata(metadata, user_filter, default_filter=""):
+def filter_metadata(metadata, user_filter, default_filter="", unsupported_keys=None):
     """Filter the cell or notebook metadata, according to the user preference"""
     default_filter = metadata_filter_as_dict(default_filter) or {}
     user_filter = metadata_filter_as_dict(user_filter) or {}
@@ -146,23 +146,33 @@ def filter_metadata(metadata, user_filter, default_filter=""):
     # notebook default filter = include only few metadata
     if default_exclude == "all":
         if user_include == "all":
-            return subset_metadata(metadata, exclude=user_exclude)
+            return subset_metadata(
+                metadata, exclude=user_exclude, unsupported_keys=unsupported_keys
+            )
         if user_exclude == "all":
-            return subset_metadata(metadata, keep_only=user_include)
+            return subset_metadata(
+                metadata, keep_only=user_include, unsupported_keys=unsupported_keys
+            )
         return subset_metadata(
             metadata,
             keep_only=set(user_include).union(default_include),
             exclude=user_exclude,
+            unsupported_keys=unsupported_keys,
         )
 
     # cell default filter = all metadata but removed ones
     if user_include == "all":
-        return subset_metadata(metadata, exclude=user_exclude)
+        return subset_metadata(
+            metadata, exclude=user_exclude, unsupported_keys=unsupported_keys
+        )
     if user_exclude == "all":
-        return subset_metadata(metadata, keep_only=user_include)
+        return subset_metadata(
+            metadata, keep_only=user_include, unsupported_keys=unsupported_keys
+        )
     return subset_metadata(
         metadata,
         exclude=set(user_exclude).union(set(default_exclude).difference(user_include)),
+        unsupported_keys=unsupported_keys,
     )
 
 
@@ -177,15 +187,27 @@ def second_level(keys):
     return sub_keys
 
 
-def subset_metadata(metadata, keep_only=None, exclude=None):
+def suppress_unsupported_keys(metadata, unsupported_keys=None):
+    # assert isinstance(unsupported_keys, set)
+    if isinstance(unsupported_keys, set):
+        for key in metadata:
+            if not is_valid_metadata_key(key):
+                unsupported_keys.add(key)
+    return {key: value for key, value in metadata.items() if is_valid_metadata_key(key)}
+
+
+def subset_metadata(metadata, keep_only=None, exclude=None, unsupported_keys=None):
     """Filter the metadata"""
+    metadata = suppress_unsupported_keys(metadata, unsupported_keys=unsupported_keys)
     if keep_only is not None:
         filtered_metadata = {key: metadata[key] for key in metadata if key in keep_only}
         sub_keep_only = second_level(keep_only)
         for key in sub_keep_only:
             if key in metadata:
                 filtered_metadata[key] = subset_metadata(
-                    metadata[key], keep_only=sub_keep_only[key]
+                    metadata[key],
+                    keep_only=sub_keep_only[key],
+                    unsupported_keys=unsupported_keys,
                 )
     else:
         filtered_metadata = copy(metadata)
@@ -198,7 +220,9 @@ def subset_metadata(metadata, keep_only=None, exclude=None):
         for key in sub_exclude:
             if key in filtered_metadata:
                 filtered_metadata[key] = subset_metadata(
-                    filtered_metadata[key], exclude=sub_exclude[key]
+                    filtered_metadata[key],
+                    exclude=sub_exclude[key],
+                    unsupported_keys=unsupported_keys,
                 )
 
     return filtered_metadata

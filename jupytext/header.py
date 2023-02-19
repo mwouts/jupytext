@@ -73,7 +73,9 @@ def encoding_and_executable(notebook, metadata, ext):
     return lines
 
 
-def insert_jupytext_info_and_filter_metadata(metadata, fmt, text_format):
+def insert_jupytext_info_and_filter_metadata(
+    metadata, fmt, text_format, unsupported_keys
+):
     """Update the notebook metadata to include Jupytext information, and filter
     the notebook metadata according to the default or user filter"""
     if insert_or_test_version_number():
@@ -89,11 +91,16 @@ def insert_jupytext_info_and_filter_metadata(metadata, fmt, text_format):
 
     notebook_metadata_filter = fmt.get("notebook_metadata_filter")
     return filter_metadata(
-        metadata, notebook_metadata_filter, _DEFAULT_NOTEBOOK_METADATA
+        metadata,
+        notebook_metadata_filter,
+        _DEFAULT_NOTEBOOK_METADATA,
+        unsupported_keys=unsupported_keys,
     )
 
 
-def metadata_and_cell_to_header(notebook, metadata, text_format, fmt):
+def metadata_and_cell_to_header(
+    notebook, metadata, text_format, fmt, unsupported_keys=None
+):
     """
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
@@ -122,7 +129,9 @@ def metadata_and_cell_to_header(notebook, metadata, text_format, fmt):
                 lines_to_next_cell = cell.metadata.get("lines_to_next_cell")
                 notebook.cells = notebook.cells[1:]
 
-    metadata = insert_jupytext_info_and_filter_metadata(metadata, fmt, text_format)
+    metadata = insert_jupytext_info_and_filter_metadata(
+        metadata, fmt, text_format, unsupported_keys
+    )
 
     if metadata:
         root_level_metadata["jupyter"] = metadata
