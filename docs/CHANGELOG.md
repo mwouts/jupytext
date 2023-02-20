@@ -4,14 +4,16 @@ Jupytext ChangeLog
 1.14.5 (2023-02-??)
 -------------------
 
+**Added**
+- Added Stata as a supported language ([#1014](https://github.com/mwouts/jupytext/issues/1027)) - thanks to [Raffaele Mancuso](https://github.com/raffaem) for this contribution
+- We have added a series of test to make sure that the main formats support cell tags ([#1024](https://github.com/mwouts/jupytext/issues/1024))
+
 **Fixed**
 - When a metadata key is not a valid identifier, a warning is emitted and the metadata is not saved to the text representation ([#1042](https://github.com/mwouts/jupytext/issues/1042))
 
 **Changed**
 - Empty tags are not exported to the text notebook anymore ([#960](https://github.com/mwouts/jupytext/issues/960))
 
-**Added**
-- We have added a series of test to make sure that the main formats support cell tags ([#1024](https://github.com/mwouts/jupytext/issues/1024))
 
 1.14.4 (2022-12-11)
 -------------------
