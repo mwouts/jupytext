@@ -169,6 +169,9 @@ def filter_metadata(metadata, user_filter, default_filter="", unsupported_keys=N
         return subset_metadata(
             metadata, keep_only=user_include, unsupported_keys=unsupported_keys
         )
+    # By default, don't serialize empty tags
+    if "tags" in metadata and not metadata["tags"]:
+        metadata.pop("tags")
     return subset_metadata(
         metadata,
         exclude=set(user_exclude).union(set(default_exclude).difference(user_include)),
