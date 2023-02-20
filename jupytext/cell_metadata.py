@@ -57,7 +57,7 @@ _IGNORE_CELL_METADATA = ",".join(
     + _JUPYTEXT_CELL_METADATA
 )
 
-_IS_VALID_METADATA_KEY = re.compile(r"^[a-zA-Z0-9_\.]+[a-zA-Z0-9_\.]*$")
+_IS_VALID_METADATA_KEY = re.compile(r"^[a-zA-Z\.]+[a-zA-Z0-9_\.-]*$")
 
 
 class RLogicalValueError(Exception):
