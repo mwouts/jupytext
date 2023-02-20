@@ -139,5 +139,9 @@ def notebook_model(nb):
 
 def formats_with_support_for_cell_metadata():
     for fmt in JUPYTEXT_FORMATS:
+        if fmt.format_name == "myst" and not is_myst_available():
+            continue
+        if fmt.format_name == "pandoc" and not is_pandoc_available():
+            continue
         if fmt.format_name not in ["sphinx", "nomarker", "spin", "quarto"]:
             yield f"{fmt.extension[1:]}:{fmt.format_name}"
