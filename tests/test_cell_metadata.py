@@ -1,6 +1,5 @@
 import pytest
-from nbformat.v4.nbbase import new_code_cell
-from nbformat.v4.nbbase import new_markdown_cell
+from nbformat.v4.nbbase import new_code_cell, new_markdown_cell
 
 import jupytext
 from jupytext.cell_metadata import (
@@ -292,3 +291,6 @@ def test_empty_tags_are_not_saved_in_text_notebooks(
     nb.cells.append(new_code_cell(metadata={"tags": []}))
     text = jupytext.writes(nb, fmt=fmt)
     assert "tags" not in text
+    nb_text = jupytext.reads(text, fmt=fmt)
+    nb2 = combine_inputs_with_outputs(nb_text, nb, fmt=fmt)
+    assert nb2.cells[-1].metadata["tags"] == []
