@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: '0 11 * * 4'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   skip_duplicate:
     runs-on: ubuntu-latest
