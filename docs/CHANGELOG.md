@@ -15,6 +15,7 @@ Jupytext ChangeLog
 
 **Changed**
 - Empty tags are not exported to the text notebook anymore ([#960](https://github.com/mwouts/jupytext/issues/960))
+- We updated the `yarn.lock` file for the jupyter lab extension to address security vulnerabilities ([#1030](https://github.com/mwouts/jupytext/issues/1030), [#1036](https://github.com/mwouts/jupytext/issues/1036))
 
 
 1.14.4 (2022-12-11)
