@@ -7,6 +7,9 @@ Jupytext ChangeLog
 **Fixed**
 - When a metadata key is not a valid identifier, a warning is emitted and the metadata is not saved to the text representation ([#1042](https://github.com/mwouts/jupytext/issues/1042))
 
+**Changed**
+- Empty tags are not exported to the text notebook anymore ([#960](https://github.com/mwouts/jupytext/issues/960))
+
 
 1.14.4 (2022-12-11)
 -------------------
