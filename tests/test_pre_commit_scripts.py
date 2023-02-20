@@ -26,7 +26,7 @@ def git_in_tmpdir(tmpdir):
         print(out)
         return out
 
-    git("init")
+    git("init", "--initial-branch", "main")
     git("status")
     git("config", "user.name", "jupytext-test-cli")
     git("config", "user.email", "jupytext@tests.com")
@@ -66,7 +66,7 @@ def test_pre_commit_hook(tmpdir):
     git("commit", "-m", "created")
     git("status")
 
-    assert "nb with spaces.py" in git("ls-tree", "-r", "master", "--name-only")
+    assert "nb with spaces.py" in git("ls-tree", "-r", "main", "--name-only")
     assert os.path.isfile(tmp_py)
 
 
@@ -94,8 +94,8 @@ def test_sync_with_pre_commit_hook(tmpdir):
     git("commit", "-m", "created")
     git("status")
 
-    assert "notebook.ipynb" in git("ls-tree", "-r", "master", "--name-only")
-    assert "notebook.md" not in git("ls-tree", "-r", "master", "--name-only")
+    assert "notebook.ipynb" in git("ls-tree", "-r", "main", "--name-only")
+    assert "notebook.md" not in git("ls-tree", "-r", "main", "--name-only")
 
     assert os.path.isfile(tmp_ipynb)
     assert not os.path.exists(tmp_md)
@@ -113,8 +113,8 @@ def test_sync_with_pre_commit_hook(tmpdir):
     git("status")
 
     # The pre-commit script should have created and committed the md file
-    assert "notebook.ipynb" in git("ls-tree", "-r", "master", "--name-only")
-    assert "notebook.md" in git("ls-tree", "-r", "master", "--name-only")
+    assert "notebook.ipynb" in git("ls-tree", "-r", "main", "--name-only")
+    assert "notebook.md" in git("ls-tree", "-r", "main", "--name-only")
     assert os.path.isfile(tmp_md)
     nb_md = read(tmp_md)
     compare_notebooks(nb_md, nb)
@@ -133,8 +133,8 @@ def test_sync_with_pre_commit_hook(tmpdir):
     git("status")
 
     # The pre-commit script should have sync and committed the ipynb file
-    assert "notebook.ipynb" in git("ls-tree", "-r", "master", "--name-only")
-    assert "notebook.md" in git("ls-tree", "-r", "master", "--name-only")
+    assert "notebook.ipynb" in git("ls-tree", "-r", "main", "--name-only")
+    assert "notebook.md" in git("ls-tree", "-r", "main", "--name-only")
 
     nb = read(tmp_ipynb)
     compare_cells(
@@ -174,7 +174,7 @@ def test_pre_commit_hook_in_subfolder(tmpdir):
     git("commit", "-m", "created")
     git("status")
 
-    assert "nb with spaces.py" in git("ls-tree", "-r", "master", "--name-only")
+    assert "nb with spaces.py" in git("ls-tree", "-r", "main", "--name-only")
     assert os.path.isfile(tmp_py)
 
 
@@ -207,8 +207,8 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     git("commit", "-m", "created")
     git("status")
 
-    assert "nb with spaces.ipynb" in git("ls-tree", "-r", "master", "--name-only")
-    assert "nb with spaces.md" in git("ls-tree", "-r", "master", "--name-only")
+    assert "nb with spaces.ipynb" in git("ls-tree", "-r", "main", "--name-only")
+    assert "nb with spaces.md" in git("ls-tree", "-r", "main", "--name-only")
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_md)
@@ -283,7 +283,7 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
     git("commit", "-m", "created")
     git("status")
 
-    assert "notebook.py" in git("ls-tree", "-r", "master", "--name-only")
+    assert "notebook.py" in git("ls-tree", "-r", "main", "--name-only")
     assert os.path.isfile(tmp_py)
 
 
