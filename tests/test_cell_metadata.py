@@ -1,4 +1,5 @@
 import pytest
+from nbformat.v4.nbbase import new_code_cell
 from nbformat.v4.nbbase import new_markdown_cell
 
 import jupytext
@@ -282,3 +283,12 @@ def test_notebook_with_collapsed_cell(
     assert "MarkdownHeadingCollapsed" in text
     nb = jupytext.reads(text, fmt=fmt_with_cell_metadata)
     compare_notebooks(nb, notebook_with_collapsed_cell, fmt=fmt_with_cell_metadata)
+
+
+def test_empty_tags_are_not_saved_in_text_notebooks(
+    no_jupytext_version_number, python_notebook, fmt="py:percent"
+):
+    nb = python_notebook
+    nb.cells.append(new_code_cell(metadata={"tags": []}))
+    text = jupytext.writes(nb, fmt=fmt)
+    assert "tags" not in text
