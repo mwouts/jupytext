@@ -57,7 +57,9 @@ _IGNORE_CELL_METADATA = ",".join(
     + _JUPYTEXT_CELL_METADATA
 )
 
-_IS_VALID_METADATA_KEY = re.compile(r"^[a-zA-Z\.]+[a-zA-Z0-9_\.-]*$")
+# In R Markdown we might have options without a value
+_IS_IDENTIFIER = re.compile(r"^[a-zA-Z_\.]+[a-zA-Z0-9_\.]*$")
+_IS_VALID_METADATA_KEY = re.compile(r"^[a-zA-Z0-9_\.-]+$")
 
 
 class RLogicalValueError(Exception):
@@ -348,6 +350,10 @@ def incorrectly_encoded_metadata(text):
     return {"incorrectly_encoded_metadata": text}
 
 
+def is_identifier(text):
+    return bool(_IS_IDENTIFIER.match(text))
+
+
 def is_valid_metadata_key(text):
     """Can this text be a proper key?"""
     return bool(_IS_VALID_METADATA_KEY.match(text))
@@ -371,7 +377,7 @@ def parse_key_equal_value(text):
     last_space_pos = text.rfind(" ")
 
     # Just an identifier?
-    if not text.startswith("--") and is_valid_metadata_key(text[last_space_pos + 1 :]):
+    if not text.startswith("--") and is_identifier(text[last_space_pos + 1 :]):
         key = text[last_space_pos + 1 :]
         value = None
         result = {key: value}
