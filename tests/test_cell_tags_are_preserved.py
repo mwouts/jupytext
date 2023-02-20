@@ -21,7 +21,7 @@ def notebook_with_tags(python_notebook):
 )
 def test_main_formats_support_cell_metadata(fmt):
     if fmt == "md:myst" and not is_myst_available():
-        pytest.mark.skip()
+        pytest.skip("myst is not available")
     assert fmt in set(formats_with_support_for_cell_metadata())
 
 
