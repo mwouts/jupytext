@@ -5,11 +5,13 @@ Jupytext ChangeLog
 -------------------
 
 **Added**
-- Added Stata as a supported language ([#1014](https://github.com/mwouts/jupytext/issues/1027)) - thanks to [Raffaele Mancuso](https://github.com/raffaem) for this contribution
+- Added Stata as a supported language ([#1014](https://github.com/mwouts/jupytext/pull/1027)) - thanks to [Raffaele Mancuso](https://github.com/raffaem) for this contribution
 - We have added a series of test to make sure that the main formats support cell tags ([#1024](https://github.com/mwouts/jupytext/issues/1024))
 
 **Fixed**
 - When a metadata key is not a valid identifier, a warning is emitted and the metadata is not saved to the text representation ([#1042](https://github.com/mwouts/jupytext/issues/1042))
+- The CI was fixed by [Matthew Feickert](https://github.com/matthewfeickert) ([#1035](https://github.com/mwouts/jupytext/pull/1035))
+- We now use `concurrency` to cancel previous runs on the same branch/PR ([#1037](https://github.com/mwouts/jupytext/issues/1037))
 
 **Changed**
 - Empty tags are not exported to the text notebook anymore ([#960](https://github.com/mwouts/jupytext/issues/960))
