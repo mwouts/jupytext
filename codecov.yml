@@ -1,5 +1,9 @@
+codecov:
+    notify:
+        after_n_builds: 13
+
 comment:
-  after_n_builds: 11
+  after_n_builds: 13
 
 coverage:
   status:
