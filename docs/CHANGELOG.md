@@ -12,6 +12,7 @@ Jupytext ChangeLog
 - When a metadata key is not a valid identifier, a warning is emitted and the metadata is not saved to the text representation ([#1042](https://github.com/mwouts/jupytext/issues/1042))
 - The CI was fixed by [Matthew Feickert](https://github.com/matthewfeickert) ([#1035](https://github.com/mwouts/jupytext/pull/1035))
 - We now use `concurrency` to cancel previous runs on the same branch/PR ([#1037](https://github.com/mwouts/jupytext/issues/1037))
+- We use both `codecov.notify.after_n_builds` and `comment.after_n_builds` to get only the final codecov comment
 
 **Changed**
 - Empty tags are not exported to the text notebook anymore ([#960](https://github.com/mwouts/jupytext/issues/960))
