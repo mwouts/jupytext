@@ -23,6 +23,7 @@ _JUPYTER_LANGUAGES = [
     "octave",
     "idl",
     "robotframework",
+    "sas",
     "spark",
     "sql",
     "cython",
@@ -84,6 +85,11 @@ _SCRIPT_EXTENSIONS = {
     },  # Maxima only has block comments
     ".gp": {"language": "gnuplot", "comment": "#"},
     ".do": {"language": "stata", "comment": "//"},
+    ".sas": {
+        "language": "sas",
+        "comment": "/*",
+        "comment_suffix": "*/",
+    },
 }
 
 _COMMENT_CHARS = [
@@ -121,7 +127,7 @@ def default_language_from_metadata_and_ext(metadata, ext, pop_main_language=Fals
     ):
         metadata["jupytext"].pop("main_language")
 
-    if language is None or language == "R":
+    if language is None or language in ["R", "sas"]:
         return language
 
     if language.startswith("C++"):
@@ -143,6 +149,8 @@ def usual_language_name(language):
         return "csharp"
     if language in ["fs", "f#"]:
         return "fsharp"
+    if language == "sas":
+        return "SAS"
     return language
 
 
