@@ -36,28 +36,19 @@ repos:
   rev: {jupytext_repo_rev}
   hooks:
   - id: jupytext
-    args: [--sync, --pipe-fmt, ipynb, --pipe, 'pandoc --from ipynb --to ipynb --markdown-headings=atx', --show-changes]
+    args: [--pipe-fmt, ipynb, --pipe, 'pandoc --from ipynb --to ipynb --markdown-headings=atx', --show-changes]
     additional_dependencies:
     - nbformat==5.0.8  # because pandoc 2.11.4 does not preserve yet the new cell ids
   - id: jupytext
-    args: [--sync, --pipe, black, --show-changes]
+    args: [--pipe, black, --show-changes]
     additional_dependencies:
-    - black==22.3.0  # Matches black hook below
+    - black==22.3.0
     - nbformat==5.0.8  # for compatibility with the pandoc hook above
-
-- repo: https://github.com/psf/black
-  rev: 22.3.0
-  hooks:
-  - id: black
 """
     tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
 
     tmp_repo.git.add(".pre-commit-config.yaml")
     pre_commit(["install", "--install-hooks", "-f"])
-
-    tmpdir.join("jupytext.toml").write('formats = "ipynb,py:percent"')
-    tmp_repo.git.add("jupytext.toml")
-    tmp_repo.index.commit("pair notebooks")
 
     # write a test notebook
     notebook = new_notebook(
@@ -88,30 +79,27 @@ And a VERY long line.
     # We write the notebook in version 4.4, i.e. with the equivalent of nbformat version 5.0.8
     notebook.nbformat = 4
     notebook.nbformat_minor = 4
-    write(notebook, "test.ipynb")
+    write(notebook, "test.md")
 
     # try to commit it, should fail because
-    # 1. the py version hasn't been added
-    # 2. the first cell is '1+1' which is not black compliant
-    # 3. the second cell needs to be wrapped
-    tmp_repo.git.add("test.ipynb")
+    # 1. the first cell is '1+1' which is not black compliant
+    # 2. the second cell needs to be wrapped
+    tmp_repo.git.add("test.md")
     with pytest.raises(
         HookExecutionError,
         match="files were modified by this hook",
     ):
         tmp_repo.index.commit("failing")
 
-    # Add the two files
-    tmp_repo.git.add("test.ipynb")
-    tmp_repo.git.add("test.py")
+    # Add the modified file
+    tmp_repo.git.add("test.md")
 
     # now the commit will succeed
     tmp_repo.index.commit("passing")
-    assert "test.ipynb" in tmp_repo.tree()
-    assert "test.py" in tmp_repo.tree()
+    assert "test.md" in tmp_repo.tree()
 
     # both the code and the markdown cells were reformatted
-    nb = read("test.ipynb")
+    nb = read("test.md")
     assert nb.cells[0].source == "1 + 1"
 
     print(nb.cells[1].source)
