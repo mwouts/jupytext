@@ -1,11 +1,12 @@
 Jupytext ChangeLog
 ==================
 
-1.14.5 (2023-02-??)
+1.14.5 (2023-02-25)
 -------------------
 
 **Added**
-- Added Stata as a supported language ([#1014](https://github.com/mwouts/jupytext/pull/1027)) - thanks to [Raffaele Mancuso](https://github.com/raffaem) for this contribution
+- Added Stata as a supported language ([#1027](https://github.com/mwouts/jupytext/pull/1027)) - thanks to [Raffaele Mancuso](https://github.com/raffaem) for this contribution
+- Added SAS as a supported language ([#1047](https://github.com/mwouts/jupytext/pull/1047)) - thanks to [lawrencet149](https://github.com/lawrencet149) for this contribution
 - We have added a series of test to make sure that the main formats support cell tags ([#1024](https://github.com/mwouts/jupytext/issues/1024))
 
 **Fixed**
