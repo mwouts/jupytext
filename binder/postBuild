@@ -21,7 +21,3 @@ jupyter trust demo/World\ population.ipynb
 
 # Install the bash kernel
 python -m bash_kernel.install
-
-# This is a **TEMPORARY** workaround for https://github.com/mwouts/jupytext/issues/1051
-# Please make sure to remove this when a fix is provided in nbclassic
-pip install git+https://github.com/mwouts/nbclassic.git@do_not_redirect_notebook_to_files
