@@ -1,4 +1,4 @@
-jupyterlab>=4.0.0a16
+jupyterlab>=3.6
 plotly
 matplotlib
 wordcloud
