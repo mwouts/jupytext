@@ -76,7 +76,7 @@ Another possibility is to activate this with a [default_setting_overrides.json](
 wget https://raw.githubusercontent.com/mwouts/jupytext/main/binder/labconfig/default_setting_overrides.json -P  ~/.jupyter/labconfig/
 ```
 
-Note: to open links to `.md` files in notebooks with the Notebook editor, use `jupyterlab>=4.0.0a16`.
+Note: to open links to `.md` files in notebooks with the Notebook editor, use `jupyterlab>=3.6.0`.
 </details><details>
   <summary>With a right click and <i>open with notebook</i> in Jupyter Lab</summary>
 
