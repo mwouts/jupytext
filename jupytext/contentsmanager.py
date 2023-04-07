@@ -481,6 +481,7 @@ to your jupytext.toml file
             for old_alt_path, alt_fmt in old_alt_paths:
                 new_alt_path = full_path(new_base, alt_fmt)
                 if self.exists(old_alt_path):
+                    os.makedirs(os.path.dirname(new_alt_path), exist_ok=True)
                     self.super.rename_file(old_alt_path, new_alt_path)
 
             self.drop_paired_notebook(old_path)
