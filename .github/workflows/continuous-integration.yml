@@ -119,7 +119,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
           # download the latest release
-          gh release download --repo quarto-dev/quarto-cli --pattern '*.deb'
+          gh release download --repo quarto-dev/quarto-cli --pattern 'quarto-*-linux-amd64.deb'
           # install it
           sudo apt install ./*.deb
       - name: Test with pytest
