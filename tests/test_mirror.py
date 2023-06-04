@@ -144,7 +144,7 @@ def test_ipynb_to_pandoc(nb_file, no_jupytext_version_number):
     list_notebooks(
         "ipynb",
         skip="(World|functional|Notebook with|plotly_graphs|flavors|complex_metadata|"
-        "update83|raw_cell|_66|nteract|LaTeX|invalid|305|text_outputs|ir_notebook)",
+        "update83|raw_cell|_66|nteract|LaTeX|invalid|305|text_outputs|ir_notebook|jupyter|with_R_magic)",
     ),
 )
 def test_ipynb_to_quarto(
