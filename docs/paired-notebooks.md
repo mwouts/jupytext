@@ -39,7 +39,8 @@ By default, Jupyter Notebook open scripts and Markdown documents as notebooks. I
 ![](https://github.com/mwouts/jupytext-screenshots/raw/master/JupytextDocumentation/OpenAsText.png)
 
 
-In JupyterLab this is slightly different. Scripts and Markdown document also have a notebook icon. But they open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu (available in JupyterLab 0.35 and above):
+In JupyterLab this is slightly different. Scripts and Markdown document also have a notebook icon.
+But they open as text by default. Open them as notebooks with the  _Open With -> Notebook_ context menu:
 
 ![](https://github.com/mwouts/jupytext-screenshots/raw/master/JupytextDocumentation/ContextMenuLab.png)
 

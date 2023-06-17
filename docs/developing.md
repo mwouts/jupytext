@@ -7,13 +7,14 @@ If you want to test a feature that has been integrated in `main` but not deliver
 pip install git+https://github.com/mwouts/jupytext.git
 ```
 
-If you want to test Jupytext in JupyterLab 3 then you will have to build the extension for JupyterLab. To do so, make sure that you have a recent version of `node`, and prefix the command above with `BUILD_JUPYTERLAB_EXTENSION=1`.
-
-Finally, if you want to test a development branch, use
+If you want to test a development branch, use
 ```
 pip install git+https://github.com/mwouts/jupytext.git@branch
 ```
 where `branch` is the name of the branch you want to test (again, prefix the command above with `BUILD_JUPYTERLAB_EXTENSION=1` if you want to use Jupytext within JupyterLab 3).
+
+If you want to test the Jupytext extension for JupyterLab, follow the corresponding
+[README](https://github.com/mwouts/jupytext/blob/main/packages/labextension/README.md).
 
 ## Install and develop Jupytext locally
 

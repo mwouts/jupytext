@@ -12,7 +12,7 @@ ipykernel
 sphinx-gallery<=0.7.0
 setuptools
 toml
-jupyterlab==3.0.17
+jupyterlab
 jupyter-packaging
 pre-commit
 gitpython

@@ -268,7 +268,7 @@ jobs:
           python-version: 3.9
       - name: Build package
         run: |
-          python -m pip install wheel jupyter-packaging 'jupyterlab>=3,<4'
+          python -m pip install wheel jupyter-packaging 'jupyterlab>=4,<5'
           BUILD_JUPYTERLAB_EXTENSION=1 python setup.py sdist bdist_wheel
           # Don't publish a tar.gz file over 1MB  (Issue #730)
           if (($(wc -c < dist/*.tar.gz) > 1000000)); then exit 1; fi
@@ -294,7 +294,7 @@ jobs:
           python-version: 3.9
       - name: Build package
         run: |
-          python -m pip install wheel jupyter-packaging 'jupyterlab>=3,<4'
+          python -m pip install wheel jupyter-packaging 'jupyterlab>=4,<5'
           BUILD_JUPYTERLAB_EXTENSION=1 python setup.py sdist bdist_wheel
       - name: Publish
         uses: pypa/gh-action-pypi-publish@v1.1.0

@@ -56,10 +56,12 @@ In JupyterLab, Jupytext adds a set of commands to the command palette (View / Ac
 
 The Jupytext extension for JupyterLab is bundled with Jupytext. In most cases you don't need to install it explicitly.
 
-From Jupytext 1.9.0 on, the version of the extension is compatible with JupyterLab 3.x only. If you wish to use Jupytext with JupyterLab 2.x or 1.x, please
+From Jupytext 1.15.0 on, the version of the extension is compatible with JupyterLab 4.x only.
+If you wish to use Jupytext with an older version of JupyterLab, please
 - install the `jupytext` package using `pip` or `conda`
 - and then, install the last version of the `jupyterlab-jupytext` extension that is compatible with your version of JupyterLab, i.e.
 ```
+jupyter labextension install jupyterlab-jupytext@1.3.9  # for JupyterLab 3.x
 jupyter labextension install jupyterlab-jupytext@1.2.2  # for JupyterLab 2.x
 jupyter labextension install jupyterlab-jupytext@1.1.1  # for JupyterLab 1.x
 ```

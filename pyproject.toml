@@ -1,5 +1,5 @@
 [build-system]
-requires = ["jupyter_packaging~=0.7.9", "jupyterlab>=3,<=4", "setuptools>=40.8.0", "wheel"]
+requires = ["jupyter_packaging~=0.7.9", "jupyterlab>=4,<=5", "setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 filterwarnings = [
