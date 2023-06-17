@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.15.0-dev (2023-06-??)
+-------------------
+
+**Changed**
+- This version comes with a version of the JupyterLab extension that is compatible with JupyterLab 4.x. (#1054, #1067)
+
+
 1.14.6 (2023-06-04)
 -------------------
 
