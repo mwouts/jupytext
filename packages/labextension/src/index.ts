@@ -109,12 +109,11 @@ const LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS = ["ipynb", "md", "Rmd", "qmd"];
 function get_jupytext_formats(notebook_tracker: INotebookTracker): Array<string> {
   if (!notebook_tracker.currentWidget) return [];
 
-  if (!notebook_tracker.currentWidget.context.model.metadata.has("jupytext"))
-    return [];
-
-  const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
+  const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.getMetadata(
       "jupytext"
   ) as unknown) as JupytextSection;
+  if ( ! jupytext )
+    return [];
   let formats: Array<string> = jupytext && jupytext.formats ? jupytext.formats.split(',') : [];
   return formats.filter(function (fmt) {
     return fmt !== '';
@@ -126,7 +125,7 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
 
   let formats = get_jupytext_formats(notebook_tracker);
 
-  const lang = notebook_tracker.currentWidget.context.model.metadata.get(
+  const lang = notebook_tracker.currentWidget.context.model.getMetadata(
       "language_info"
   ) as nbformat.ILanguageInfoMetadata;
   if (lang && lang.file_extension) {
@@ -155,14 +154,13 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
     formats.push(notebook_extension);
   else {
     let format_name = 'light';
-    if (notebook_tracker.currentWidget.context.model.metadata.has("jupytext")) {
-      const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.metadata.get(
+    // if (notebook_tracker.currentWidget.context.model.metadata.has("jupytext")) {
+      const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.getMetadata(
           "jupytext"
       ) as unknown) as JupytextSection;
-
       if (jupytext && jupytext.text_representation && jupytext.text_representation.format_name)
         format_name = jupytext.text_representation.format_name;
-    }
+    // }
     formats.push('auto:' + format_name);
   }
   return formats;
@@ -237,7 +235,9 @@ const extension: JupyterFrontEndPlugin<void> = {
             return true;
         },
         execute: () => {
-            const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.metadata.get(
+            if ( notebookTracker.currentWidget === null)
+              return;
+            const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.getMetadata(
             "jupytext"
           ) as unknown) as JupytextSection;
           let formats: Array<string> = get_selected_formats(notebookTracker);
@@ -253,8 +253,8 @@ const extension: JupyterFrontEndPlugin<void> = {
             );
             return;
           }
-            // Toggle the selected format
-            let notebook_extension: string = notebookTracker.currentWidget.context.path.split('.').pop();
+        // Toggle the selected format
+            let notebook_extension: string = notebookTracker.currentWidget.context.path.split('.').pop() as string;
             notebook_extension = LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS.indexOf(notebook_extension) == -1 ? 'auto' : notebook_extension;
 
             // Toggle the selected format
@@ -309,7 +309,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
           if (formats.length === 0) {
             if (
-              !notebookTracker.currentWidget.context.model.metadata.has(
+              !notebookTracker.currentWidget.context.model.getMetadata(
                 "jupytext"
               )
             )
@@ -320,7 +320,7 @@ const extension: JupyterFrontEndPlugin<void> = {
             }
 
             if (Object.keys(jupytext).length == 0)
-              notebookTracker.currentWidget.context.model.metadata.delete(
+              notebookTracker.currentWidget.context.model.deleteMetadata(
                 "jupytext"
               );
             return;
@@ -329,7 +329,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           // set the desired format
           if (jupytext) jupytext.formats = formats.join();
           else
-            notebookTracker.currentWidget.context.model.metadata.set(
+            notebookTracker.currentWidget.context.model.setMetadata(
               "jupytext",
               { formats: formats.join() });
       }
@@ -367,10 +367,10 @@ const extension: JupyterFrontEndPlugin<void> = {
         if (!notebookTracker.currentWidget)
           return false;
 
-        if (!notebookTracker.currentWidget.context.model.metadata.has("jupytext"))
+        if (!notebookTracker.currentWidget.context.model.getMetadata("jupytext"))
           return false;
 
-        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
+        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.getMetadata("jupytext") as unknown) as JupytextSection;
 
         if (jupytext.notebook_metadata_filter === '-all')
           return false;
@@ -381,10 +381,10 @@ const extension: JupyterFrontEndPlugin<void> = {
         if (!notebookTracker.currentWidget)
           return false;
 
-        if (!notebookTracker.currentWidget.context.model.metadata.has("jupytext"))
+        if (!notebookTracker.currentWidget.context.model.getMetadata("jupytext"))
           return false;
 
-        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
+        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.getMetadata("jupytext") as unknown) as JupytextSection;
 
         if (jupytext.notebook_metadata_filter === undefined)
           return true;
@@ -399,10 +399,10 @@ const extension: JupyterFrontEndPlugin<void> = {
         if (!notebookTracker.currentWidget)
           return;
 
-        if (!notebookTracker.currentWidget.context.model.metadata.has("jupytext"))
+        if (!notebookTracker.currentWidget.context.model.getMetadata("jupytext"))
           return;
 
-        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.metadata.get("jupytext") as unknown) as JupytextSection;
+        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.getMetadata("jupytext") as unknown) as JupytextSection;
 
         if (jupytext.notebook_metadata_filter) {
           delete jupytext.notebook_metadata_filter;
@@ -450,7 +450,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     //   Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
     const factory = new NotebookWidgetFactory({
       name: "Jupytext Notebook",
-      // label: trans.__("Jupytext Notebook"), // will be needed in JupyterLab 4
+      label: trans.__("Jupytext Notebook"),
       fileTypes: ["markdown", "myst", "r-markdown", "quarto", "julia", "python", "r"],
       modelName: notebookFactory.modelName ?? "notebook",
       preferKernel: notebookFactory.preferKernel ?? true,
@@ -460,9 +460,9 @@ const extension: JupyterFrontEndPlugin<void> = {
       editorConfig: notebookFactory.editorConfig,
       notebookConfig: notebookFactory.notebookConfig,
       mimeTypeService: editorServices.mimeTypeService,
-      sessionDialogs: sessionContextDialogs,
+      // sessionDialogs: sessionContextDialogs,
       toolbarFactory: notebookFactory.toolbarFactory,
-      translator,
+      // translator?: ITranslator,
     });
     app.docRegistry.addWidgetFactory(factory);
 
