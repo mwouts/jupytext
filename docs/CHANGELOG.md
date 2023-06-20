@@ -10,7 +10,8 @@ Jupytext ChangeLog
 **Fixed**
 - Notebooks with an empty YAML header work ([#1070](https://github.com/mwouts/jupytext/issues/1070))
 - Double quote strings in R Markdown options can contain single quotes ([#1079](https://github.com/mwouts/jupytext/issues/1079))
-- The necessary directories are created when paired notebooks are moved to a subfolder ([#1059](https://github.com/mwouts/jupytext/issues/1059))
+- The necessary directories are created when paired notebooks are moved to a sub-folder ([#1059](https://github.com/mwouts/jupytext/issues/1059))
+- Commented quotes are recognized as such ([#1060](https://github.com/mwouts/jupytext/issues/1060))
 
 
 1.14.6 (2023-06-04)
