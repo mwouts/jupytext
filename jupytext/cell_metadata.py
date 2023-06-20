@@ -201,9 +201,9 @@ class ParsingContext:
                     'Option line "{}" has too many '
                     "closing square brackets".format(self.line)
                 )
-        elif char == "'" and prev_char != "\\":
+        elif char == "'" and prev_char != "\\" and not self.in_double_quote:
             self.in_single_quote = not self.in_single_quote
-        elif char == '"' and prev_char != "\\":
+        elif char == '"' and prev_char != "\\" and not self.in_single_quote:
             self.in_double_quote = not self.in_double_quote
 
 

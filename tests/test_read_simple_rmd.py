@@ -232,3 +232,17 @@ plot(3:30)
 
     # The new code chunk has the new code, and options are still there
     compare(rmd2, rmd.replace("3", "4"))
+
+
+def test_apostrophe_in_parameter_1079(
+    no_jupytext_version_number,
+    rmd="""```{python some-name, param="Problem's"}
+a = 1
+```
+""",
+):
+    nb = jupytext.reads(rmd, fmt="Rmd")
+    rmd2 = jupytext.writes(nb, fmt="Rmd")
+    compare(rmd2, rmd)
+    nb2 = jupytext.reads(rmd, fmt="Rmd")
+    compare_notebooks(nb2, nb)
