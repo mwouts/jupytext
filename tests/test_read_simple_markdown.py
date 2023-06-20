@@ -941,3 +941,18 @@ jupyter:
     compare(md2, md)
     nb2 = jupytext.reads(md, "md")
     compare_notebooks(nb2, nb)
+
+
+def test_notebook_with_empty_header_1070(
+    md="""---
+
+---
+
+This file has empty frontmatter.
+""",
+):
+    nb = jupytext.reads(md, fmt="md:markdown")
+    md2 = jupytext.writes(nb, "md")
+    compare(md2, md)
+    nb2 = jupytext.reads(md, "md")
+    compare_notebooks(nb2, nb)
