@@ -5,7 +5,8 @@ Jupytext ChangeLog
 -------------------
 
 **Fixed**
-- Fix opening of notebooks with empty YAML header ([#1070](https://github.com/mwouts/jupytext/issues/1070))
+- Fix opening notebooks with empty YAML header ([#1070](https://github.com/mwouts/jupytext/issues/1070))
+- Fix single quote in double quote strings in R Markdown options ([#1079](https://github.com/mwouts/jupytext/issues/1079))
 
 
 1.14.6 (2023-06-04)
