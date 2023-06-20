@@ -5,8 +5,9 @@ Jupytext ChangeLog
 -------------------
 
 **Fixed**
-- Fix opening notebooks with empty YAML header ([#1070](https://github.com/mwouts/jupytext/issues/1070))
-- Fix single quote in double quote strings in R Markdown options ([#1079](https://github.com/mwouts/jupytext/issues/1079))
+- Notebooks with an empty YAML header work ([#1070](https://github.com/mwouts/jupytext/issues/1070))
+- Double quote strings in R Markdown options can contain single quotes ([#1079](https://github.com/mwouts/jupytext/issues/1079))
+- The necessary directories are created when paired notebooks are moved to a subfolder ([#1059](https://github.com/mwouts/jupytext/issues/1059))
 
 
 1.14.6 (2023-06-04)
