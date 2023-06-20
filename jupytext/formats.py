@@ -280,6 +280,8 @@ def read_metadata(text, ext):
     # MyST has the metadata at the root level
     if not metadata and ext in myst_extensions() and text.startswith("---"):
         for header in yaml.safe_load_all(text):
+            if not isinstance(header, dict):
+                continue
             if (
                 header.get("jupytext", {})
                 .get("text_representation", {})
