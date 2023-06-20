@@ -1991,3 +1991,31 @@ def test_timestamp_is_correct_after_reload_978(tmp_path, python_notebook):
     nb = model["content"]
     assert "A new cell" in nb.cells[-1].source
     assert model["last_modified"] > org_model["last_modified"]
+
+
+def test_move_paired_notebook_to_subdir_1059(tmp_path, python_notebook):
+    (tmp_path / "jupytext.toml").write_text(
+        'formats = "notebooks///ipynb,scripts///py:percent"\n'
+    )
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmp_path)
+
+    # create paired notebook
+    (tmp_path / "notebooks").mkdir()
+    cm.save(notebook_model(python_notebook), path="notebooks/my_notebook.ipynb")
+    assert (tmp_path / "notebooks" / "my_notebook.ipynb").exists()
+    assert (tmp_path / "scripts" / "my_notebook.py").exists()
+
+    # move notebook
+    (tmp_path / "notebooks" / "subdir").mkdir()
+    cm.rename_file("notebooks/my_notebook.ipynb", "notebooks/subdir/my_notebook.ipynb")
+    assert (tmp_path / "notebooks" / "subdir" / "my_notebook.ipynb").exists()
+    assert (tmp_path / "scripts" / "subdir" / "my_notebook.py").exists()
+
+    assert not (tmp_path / "notebooks" / "my_notebook.ipynb").exists()
+    assert not (tmp_path / "scripts" / "my_notebook.py").exists()
+
+    # check notebook content
+    model = cm.get("scripts/subdir/my_notebook.py")
+    nb = model["content"]
+    compare_notebooks(nb, python_notebook, fmt="py:percent")
