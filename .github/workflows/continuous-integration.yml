@@ -95,7 +95,7 @@ jobs:
         uses: codecov/codecov-action@v3
 
   test-conda:
-    needs: test-pip
+    needs: pre-commit
     strategy:
       matrix:
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
@@ -170,7 +170,7 @@ jobs:
 
   publish:
     name: Publish to PyPi
-    needs: [test-pip, test-conda, build]
+    needs: [codeql, test-pip, test-conda, build]
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
     runs-on: ubuntu-latest
     environment:
