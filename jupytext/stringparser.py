@@ -38,7 +38,13 @@ class StringParser:
         self.triple_start = -1
 
         for i, char in enumerate(line):
-            if self.single is None and self.triple is None and char == self.comment:
+            if (
+                self.single is None
+                and self.triple is None
+                and self.comment
+                and self.comment.startswith(char)
+                and line[i:].startswith(self.comment)
+            ):
                 break
             if char not in ['"', "'"]:
                 continue
