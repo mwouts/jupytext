@@ -75,7 +75,7 @@ jobs:
         if: ${{ matrix.markdown-it-py-version }}
         run: python -m pip install markdown-it-py==${{ matrix.markdown-it-py-version }}
       - name: Install from source (required for the pre-commit tests)
-        run: python -m pip install .
+        run: python -m pip install . --no-deps
       - name: Install a Jupyter Kernel
         if: ${{ !matrix.no-kernel }}
         run: python -m ipykernel install --name python_kernel --user
