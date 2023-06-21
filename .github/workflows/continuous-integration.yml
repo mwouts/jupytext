@@ -45,14 +45,13 @@ jobs:
       matrix:
         python-version: [ 3.7, 3.8, 3.9, "3.10", "3.11"]
         markdown-it-py-version: [2]
-        kernel: [true]
         include:
           - python-version: 3.9
             markdown-it-py-version: null
           - python-version: 3.9
             markdown-it-py-version: 3
           - python-version: 3.9
-            kernel: false
+            no-kernel: true
           - python-version: 3.9
             quarto: true
     runs-on: ubuntu-latest
@@ -78,7 +77,7 @@ jobs:
       - name: Install from source (required for the pre-commit tests)
         run: python -m pip install .
       - name: Install a Jupyter Kernel
-        if: ${{ matrix.kernel }}
+        if: ${{ !matrix.no-kernel }}
         run: python -m ipykernel install --name python_kernel --user
       - name: Install Quarto
         if: ${{ matrix.quarto }}
