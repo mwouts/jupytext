@@ -1,4 +1,4 @@
-name: CI
+name: Publish
 on:
   push:
     tags:
