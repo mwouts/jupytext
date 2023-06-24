@@ -3,10 +3,13 @@
 import os
 import subprocess
 import tempfile
+from functools import partial
 
 # Copy nbformat reads and writes to avoid them being patched in the contents manager!!
 from nbformat import reads as ipynb_reads
 from nbformat import writes as ipynb_writes
+
+from .parse_version import parse_version as parse
 
 
 class PandocError(OSError):
@@ -48,11 +51,6 @@ def is_pandoc_available(min_version="2.7.2", max_version=None):
 
 def raise_if_pandoc_is_not_available(min_version="2.7.2", max_version=None):
     """Raise with an informative error message if pandoc is not available"""
-    try:
-        from pkg_resources import parse_version
-    except ImportError:
-        raise PandocError("Please install pkg_resources")
-
     version = pandoc_version()
     if version == "N/A":
         raise PandocError(
@@ -60,6 +58,7 @@ def raise_if_pandoc_is_not_available(min_version="2.7.2", max_version=None):
             "but pandoc was not found"
         )
 
+    parse_version = partial(parse, custom_error=PandocError)
     if parse_version(version) < parse_version(min_version):
         raise PandocError(
             f"The Pandoc Markdown format requires 'pandoc>={min_version}', "
