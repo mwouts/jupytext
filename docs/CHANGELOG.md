@@ -12,6 +12,7 @@ Jupytext ChangeLog
 - Double quote strings in R Markdown options can contain single quotes ([#1079](https://github.com/mwouts/jupytext/issues/1079))
 - The necessary directories are created when paired notebooks are moved to a sub-folder ([#1059](https://github.com/mwouts/jupytext/issues/1059))
 - Commented quotes are recognized as such ([#1060](https://github.com/mwouts/jupytext/issues/1060))
+- Jupytext can use either `pkg_resources` or `packaging` to parse version numbers ([#1085](https://github.com/mwouts/jupytext/issues/1085))
 
 
 1.14.6 (2023-06-04)

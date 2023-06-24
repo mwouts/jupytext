@@ -8,10 +8,10 @@ from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_raw_cell
 
 from .doxygen import doxygen_to_markdown
 from .languages import _SCRIPT_EXTENSIONS
+from .parse_version import parse_version
 
 # Sphinx Gallery is an optional dependency. And we intercept the SyntaxError for #301
 try:
-    from pkg_resources import parse_version
     from sphinx_gallery import __version__ as sg_version
 
     if parse_version(sg_version) <= parse_version("0.7.0"):
