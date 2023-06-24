@@ -235,13 +235,31 @@ plot(3:30)
 
 
 def test_apostrophe_in_parameter_1079(
-    no_jupytext_version_number,
     rmd="""```{python some-name, param="Problem's"}
 a = 1
 ```
 """,
 ):
     nb = jupytext.reads(rmd, fmt="Rmd")
+    rmd2 = jupytext.writes(nb, fmt="Rmd")
+    compare(rmd2, rmd)
+    nb2 = jupytext.reads(rmd, fmt="Rmd")
+    compare_notebooks(nb2, nb)
+
+
+@pytest.mark.parametrize("line", [" #'''", "a = 2  #'''"])
+def test_commented_triple_quote_1060(line):
+    rmd = f"""```{{python}}
+{line}
+```
+
+```{{python}}
+# Another cell
+```
+"""
+    nb = jupytext.reads(rmd, fmt="Rmd")
+    assert nb.cells[0].source == line
+
     rmd2 = jupytext.writes(nb, fmt="Rmd")
     compare(rmd2, rmd)
     nb2 = jupytext.reads(rmd, fmt="Rmd")

@@ -31,13 +31,21 @@ class StringParser:
         if (
             not self.is_quoted()
             and self.comment is not None
-            and line.startswith(self.comment)
+            and line.lstrip().startswith(self.comment)
         ):
             return
 
         self.triple_start = -1
 
         for i, char in enumerate(line):
+            if (
+                self.single is None
+                and self.triple is None
+                and self.comment
+                and self.comment.startswith(char)
+                and line[i:].startswith(self.comment)
+            ):
+                break
             if char not in ['"', "'"]:
                 continue
             # Is the char escaped?
