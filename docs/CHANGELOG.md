@@ -6,6 +6,7 @@ Jupytext ChangeLog
 
 **Changed**
 - We have updated the GitHub workflows - thanks to Matthew Feickert and to Cristian Le for their help on this subject ([#1037](https://github.com/mwouts/jupytext/issues/1037))
+- We have removed the upper bound on `markdown-it-py<3`. Now we test Jupytext with `markdown-it-py` in versions `2.x` and `3.x` on the CI ([#1075](https://github.com/mwouts/jupytext/issues/1075))
 
 **Fixed**
 - Notebooks with an empty YAML header work ([#1070](https://github.com/mwouts/jupytext/issues/1070))
