@@ -44,7 +44,7 @@ jobs:
     strategy:
       matrix:
         python-version: [ 3.7, 3.8, 3.9, "3.10", "3.11"]
-        markdown-it-py-version: [2]
+        markdown-it-py-version: [2.0]
         kernel: [true]
         experimental: [false]
         include:
@@ -53,7 +53,7 @@ jobs:
           - python-version: 3.9
             markdown-it-py-version: null
           - python-version: 3.9
-            markdown-it-py-version: 3
+            markdown-it-py-version: 3.0
           - python-version: 3.9
             kernel: false
           - python-version: 3.9
@@ -78,7 +78,7 @@ jobs:
           python -m pip install jupyter-fs || true
       - name: Install markdown-it-py
         if: ${{ matrix.markdown-it-py-version }}
-        run: python -m pip install markdown-it-py==${{ matrix.markdown-it-py-version }}
+        run: python -m pip install "markdown-it-py~=${{ matrix.markdown-it-py-version }}"
       - name: Install from source (required for the pre-commit tests)
         run: python -m pip install . --no-deps
       - name: Install a Jupyter Kernel
