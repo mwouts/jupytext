@@ -59,6 +59,7 @@ jobs:
           - python-version: 3.9
             quarto: true
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -66,7 +67,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-        continue-on-error: ${{ matrix.experimental }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
