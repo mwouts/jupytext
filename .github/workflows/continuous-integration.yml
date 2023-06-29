@@ -81,7 +81,7 @@ jobs:
           python -m pip install jupyter-fs || true
       - name: Install markdown-it-py
         if: ${{ matrix.markdown-it-py-version }}
-        run: python -m pip install "markdown-it-py~=${{ matrix.markdown-it-py-version }}"
+        run: python -m pip install markdown-it-py~=${{ matrix.markdown-it-py-version }}
       - name: Install from source (required for the pre-commit tests)
         run: python -m pip install . --no-deps
       - name: Install a Jupyter Kernel
