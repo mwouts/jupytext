@@ -41,6 +41,8 @@ jobs:
 
   test-pip:
     needs: pre-commit
+    continue-on-error: ${{ matrix.experimental || false }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -52,7 +54,7 @@ jobs:
           - python-version: "3.12"
             experimental: true
           - python-version: 3.9
-            markdown-it-py-version: null
+            markdown-it-py-version: ""
           - python-version: 3.9
             markdown-it-py-version: 3.0
           - python-version: "3.11"
@@ -62,8 +64,6 @@ jobs:
             kernel: false
           - python-version: 3.9
             quarto: true
-    runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
