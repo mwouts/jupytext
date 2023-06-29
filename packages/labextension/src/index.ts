@@ -40,16 +40,16 @@ interface IJupytextFormat {
   label: string;
 }
 
-interface JupytextRepresentation {
+interface IJupytextRepresentation {
   format_name: string;
   extension: string;
 }
 
-interface JupytextSection {
+interface IJupytextSection {
   formats?: string;
   notebook_metadata_filter?: string;
   cell_metadata_filter?: string;
-  text_representation?: JupytextRepresentation;
+  text_representation?: IJupytextRepresentation;
 }
 
 function getJupytextFormats(trans: TranslationBundle): IJupytextFormat[] {
@@ -106,12 +106,26 @@ function getJupytextFormats(trans: TranslationBundle): IJupytextFormat[] {
  */
 const LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS = ["ipynb", "md", "Rmd", "qmd"];
 
+// will get updated upon activation
+// default is true, and we will turn this off only iff
+// app.name is "JupyterLab" and the version is 3.x or below
+let JLAB4 = true;
+
 function get_jupytext_formats(notebook_tracker: INotebookTracker): Array<string> {
   if (!notebook_tracker.currentWidget) return [];
 
-  const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.getMetadata(
-      "jupytext"
-  ) as unknown) as JupytextSection;
+  const model = notebook_tracker.currentWidget.context.model;
+
+  // xxx not sure this is useful
+  // if metadata.get("jupytext") used to return something that is void
+  // then we're in the clear
+  // if (! JLAB4)
+  //   if (! (model.metadata as any)?.has("jupytext"))
+  //     return [];
+
+  const jupytext: IJupytextSection = (JLAB4
+    ? model.getMetadata('jupytext')
+    : (model.metadata as any)?.get('jupytext')) as unknown as IJupytextSection;
   if ( ! jupytext )
     return [];
   let formats: Array<string> = jupytext && jupytext.formats ? jupytext.formats.split(',') : [];
@@ -125,8 +139,11 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
 
   let formats = get_jupytext_formats(notebook_tracker);
 
-  const lang = notebook_tracker.currentWidget.context.model.getMetadata(
-      "language_info"
+  const model = notebook_tracker.currentWidget.context.model;
+
+  const lang = ( JLAB4
+      ? model.getMetadata('language_info')
+      : (model.metadata as any)?.get('language_info')
   ) as nbformat.ILanguageInfoMetadata;
   if (lang && lang.file_extension) {
     const script_ext = lang.file_extension.substring(1);
@@ -154,12 +171,14 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
     formats.push(notebook_extension);
   else {
     let format_name = 'light';
+    // xxx same here, the test is probably not needed
     // if (notebook_tracker.currentWidget.context.model.metadata.has("jupytext")) {
-      const jupytext: JupytextSection = (notebook_tracker.currentWidget.context.model.getMetadata(
-          "jupytext"
-      ) as unknown) as JupytextSection;
-      if (jupytext && jupytext.text_representation && jupytext.text_representation.format_name)
-        format_name = jupytext.text_representation.format_name;
+    const model = notebook_tracker.currentWidget.context.model;
+    const jupytext: IJupytextSection = (JLAB4
+      ? model.getMetadata('jupytext')
+      : (model.metadata as any)?.get('jupytext')) as unknown as IJupytextSection;
+    if (jupytext && jupytext.text_representation && jupytext.text_representation.format_name)
+      format_name = jupytext.text_representation.format_name;
     // }
     formats.push('auto:' + format_name);
   }
@@ -195,7 +214,19 @@ const extension: JupyterFrontEndPlugin<void> = {
     translator: ITranslator | null,
     palette: ICommandPalette | null
   ) => {
-    console.log("JupyterLab extension jupyterlab-jupytext is activated");
+    // https://semver.org/#semantic-versioning-specification-semver
+    // npm semver requires pre-release versions to come with a hyphen
+    // so 7.0.0rc2 won't work with semver
+    // in addition, when running in the notebook7 context, app refers
+    // to the notebook7 application, not the jupyterlab application
+    if (app.name == "JupyterLab") {
+      const app_numbers = app.version.match(/[0-9]+/);
+      if (app_numbers) {
+        JLAB4 = parseInt(app_numbers[0]) >= 4;
+      }
+    }
+    console.log("JupyterLab extension jupyterlab-jupytext is activated!");
+    console.debug(`JLAB4=${JLAB4}`);
     const trans = (translator ?? nullTranslator).load("jupytext");
 
     // Jupytext formats
@@ -237,9 +268,11 @@ const extension: JupyterFrontEndPlugin<void> = {
         execute: () => {
             if ( notebookTracker.currentWidget === null)
               return;
-            const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.getMetadata(
-            "jupytext"
-          ) as unknown) as JupytextSection;
+            const model = notebookTracker.currentWidget.context.model;
+            const jupytext: IJupytextSection = (JLAB4
+              ? model.getMetadata('jupytext')
+              : (model.metadata as any)?.get('jupytext')
+            ) as unknown as IJupytextSection;
           let formats: Array<string> = get_selected_formats(notebookTracker);
 
           // Toggle the selected format
@@ -319,19 +352,23 @@ const extension: JupyterFrontEndPlugin<void> = {
               delete jupytext.formats;
             }
 
-            if (Object.keys(jupytext).length == 0)
-              notebookTracker.currentWidget.context.model.deleteMetadata(
-                "jupytext"
-              );
+            if (Object.keys(jupytext).length == 0) {
+              const model = notebookTracker.currentWidget.context.model;
+              JLAB4
+                ? model.deleteMetadata("jupytext")
+                : (model.metadata as any).delete("jupytext");
+            }
             return;
           }
 
           // set the desired format
           if (jupytext) jupytext.formats = formats.join();
-          else
-            notebookTracker.currentWidget.context.model.setMetadata(
-              "jupytext",
-              { formats: formats.join() });
+          else {
+            const model = notebookTracker.currentWidget.context.model;
+            JLAB4
+              ? model.setMetadata("jupytext", { formats: formats.join() })
+              : (model.metadata as any)?.set( { formats: formats.join() });
+            }
       }
       });
 
@@ -367,10 +404,14 @@ const extension: JupyterFrontEndPlugin<void> = {
         if (!notebookTracker.currentWidget)
           return false;
 
-        if (!notebookTracker.currentWidget.context.model.getMetadata("jupytext"))
+        const model = notebookTracker.currentWidget.context.model;
+        const jupytext_metadata = JLAB4
+          ? model.getMetadata("jupytext")
+          : (model.metadata as any)?.get("jupytext")
+        if (!jupytext_metadata)
           return false;
 
-        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.getMetadata("jupytext") as unknown) as JupytextSection;
+        const jupytext: IJupytextSection = (jupytext_metadata as unknown) as IJupytextSection;
 
         if (jupytext.notebook_metadata_filter === '-all')
           return false;
@@ -381,10 +422,14 @@ const extension: JupyterFrontEndPlugin<void> = {
         if (!notebookTracker.currentWidget)
           return false;
 
-        if (!notebookTracker.currentWidget.context.model.getMetadata("jupytext"))
+        const model = notebookTracker.currentWidget.context.model;
+        const jupytext_metadata = JLAB4
+          ? model.getMetadata("jupytext")
+          : (model.metadata as any)?.get("jupytext")
+        if (!jupytext_metadata)
           return false;
 
-        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.getMetadata("jupytext") as unknown) as JupytextSection;
+        const jupytext: IJupytextSection = (jupytext_metadata as unknown) as IJupytextSection;
 
         if (jupytext.notebook_metadata_filter === undefined)
           return true;
@@ -399,10 +444,14 @@ const extension: JupyterFrontEndPlugin<void> = {
         if (!notebookTracker.currentWidget)
           return;
 
-        if (!notebookTracker.currentWidget.context.model.getMetadata("jupytext"))
-          return;
+        const model = notebookTracker.currentWidget.context.model;
+        const jupytext_metadata = JLAB4
+          ? model.getMetadata("jupytext")
+          : (model.metadata as any)?.get("jupytext")
+        if (!jupytext_metadata)
+          return false;
 
-        const jupytext: JupytextSection = (notebookTracker.currentWidget.context.model.getMetadata("jupytext") as unknown) as JupytextSection;
+        const jupytext: IJupytextSection = (jupytext_metadata as unknown) as IJupytextSection;
 
         if (jupytext.notebook_metadata_filter) {
           delete jupytext.notebook_metadata_filter;
