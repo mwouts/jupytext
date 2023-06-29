@@ -54,6 +54,9 @@ jobs:
             markdown-it-py-version: null
           - python-version: 3.9
             markdown-it-py-version: 3.0
+          - python-version: 3.11
+            markdown-it-py-version: 4.0
+            experimental: true
           - python-version: 3.9
             kernel: false
           - python-version: 3.9
