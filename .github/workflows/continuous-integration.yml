@@ -50,7 +50,8 @@ jobs:
         markdown-it-py-version: ["~=2.0"]
         kernel: [true]
         include:
-          - python-version: "3.12"
+          - python-version: "3.12-dev"
+          - python-version: "3.13-dev"
             experimental: true
           - python-version: 3.9
             markdown-it-py-version: ""
