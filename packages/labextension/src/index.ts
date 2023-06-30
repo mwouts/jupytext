@@ -124,8 +124,8 @@ function get_jupytext_formats(notebook_tracker: INotebookTracker): Array<string>
   //     return [];
 
   const jupytext: IJupytextSection = (JLAB4
-    ? model.getMetadata('jupytext')
-    : (model.metadata as any)?.get('jupytext')) as unknown as IJupytextSection;
+    ? (model as any).getMetadata("jupytext")
+    : (model.metadata as any)?.get('jupytext')) as IJupytextSection;
   if ( ! jupytext )
     return [];
   let formats: Array<string> = jupytext && jupytext.formats ? jupytext.formats.split(',') : [];
@@ -142,7 +142,7 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
   const model = notebook_tracker.currentWidget.context.model;
 
   const lang = ( JLAB4
-      ? model.getMetadata('language_info')
+      ? (model as any).getMetadata('language_info')
       : (model.metadata as any)?.get('language_info')
   ) as nbformat.ILanguageInfoMetadata;
   if (lang && lang.file_extension) {
@@ -175,8 +175,8 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
     // if (notebook_tracker.currentWidget.context.model.metadata.has("jupytext")) {
     const model = notebook_tracker.currentWidget.context.model;
     const jupytext: IJupytextSection = (JLAB4
-      ? model.getMetadata('jupytext')
-      : (model.metadata as any)?.get('jupytext')) as unknown as IJupytextSection;
+      ? (model as any).getMetadata('jupytext')
+      : (model.metadata as any)?.get('jupytext')) as IJupytextSection;
     if (jupytext && jupytext.text_representation && jupytext.text_representation.format_name)
       format_name = jupytext.text_representation.format_name;
     // }
@@ -225,7 +225,7 @@ const extension: JupyterFrontEndPlugin<void> = {
         JLAB4 = parseInt(app_numbers[0]) >= 4;
       }
     }
-    console.log("JupyterLab extension jupyterlab-jupytext is activated!");
+    console.log("JupyterLab extension jupytext is activated!");
     console.debug(`JLAB4=${JLAB4}`);
     const trans = (translator ?? nullTranslator).load("jupytext");
 
@@ -270,9 +270,9 @@ const extension: JupyterFrontEndPlugin<void> = {
               return;
             const model = notebookTracker.currentWidget.context.model;
             const jupytext: IJupytextSection = (JLAB4
-              ? model.getMetadata('jupytext')
+              ? (model as any).getMetadata('jupytext')
               : (model.metadata as any)?.get('jupytext')
-            ) as unknown as IJupytextSection;
+            ) as IJupytextSection;
           let formats: Array<string> = get_selected_formats(notebookTracker);
 
           // Toggle the selected format
@@ -341,12 +341,9 @@ const extension: JupyterFrontEndPlugin<void> = {
           }
 
           if (formats.length === 0) {
-            if (
-              !notebookTracker.currentWidget.context.model.getMetadata(
-                "jupytext"
-              )
-            )
-              return;
+            // an older version was re-fetching the jupytext metadata here
+            // but this is not necessary, as the metadata is already available
+            if (!jupytext) return;
 
             if (jupytext.formats) {
               delete jupytext.formats;
@@ -355,7 +352,7 @@ const extension: JupyterFrontEndPlugin<void> = {
             if (Object.keys(jupytext).length == 0) {
               const model = notebookTracker.currentWidget.context.model;
               JLAB4
-                ? model.deleteMetadata("jupytext")
+                ? (model as any).deleteMetadata("jupytext")
                 : (model.metadata as any).delete("jupytext");
             }
             return;
@@ -366,7 +363,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           else {
             const model = notebookTracker.currentWidget.context.model;
             JLAB4
-              ? model.setMetadata("jupytext", { formats: formats.join() })
+              ? (model as any).setMetadata("jupytext", { formats: formats.join() })
               : (model.metadata as any)?.set( { formats: formats.join() });
             }
       }
@@ -406,7 +403,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
         const model = notebookTracker.currentWidget.context.model;
         const jupytext_metadata = JLAB4
-          ? model.getMetadata("jupytext")
+          ? (model as any).getMetadata("jupytext")
           : (model.metadata as any)?.get("jupytext")
         if (!jupytext_metadata)
           return false;
@@ -424,7 +421,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
         const model = notebookTracker.currentWidget.context.model;
         const jupytext_metadata = JLAB4
-          ? model.getMetadata("jupytext")
+          ? (model as any).getMetadata("jupytext")
           : (model.metadata as any)?.get("jupytext")
         if (!jupytext_metadata)
           return false;
@@ -446,7 +443,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
         const model = notebookTracker.currentWidget.context.model;
         const jupytext_metadata = JLAB4
-          ? model.getMetadata("jupytext")
+          ? (model as any).getMetadata("jupytext")
           : (model.metadata as any)?.get("jupytext")
         if (!jupytext_metadata)
           return false;
@@ -499,7 +496,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     //   Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
     const factory = new NotebookWidgetFactory({
       name: "Jupytext Notebook",
-      label: trans.__("Jupytext Notebook"),
+      label: trans.__("Jupytext Notebook"), // mandatory in jlab4 (not in jlab3)
       fileTypes: ["markdown", "myst", "r-markdown", "quarto", "julia", "python", "r"],
       modelName: notebookFactory.modelName ?? "notebook",
       preferKernel: notebookFactory.preferKernel ?? true,
@@ -512,7 +509,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       // sessionDialogs: sessionContextDialogs,
       toolbarFactory: notebookFactory.toolbarFactory,
       // translator?: ITranslator,
-    });
+    } as NotebookWidgetFactory.IOptions<NotebookPanel>);
     app.docRegistry.addWidgetFactory(factory);
 
     // Register widget created with the new factory in the notebook tracker
