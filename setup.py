@@ -35,7 +35,7 @@ setup_args = dict(
         "nbformat",
         "pyyaml",
         "toml",
-        "markdown-it-py>=1.0.0,<3.0.0",
+        "markdown-it-py>=1.0.0",
         "mdit_py_plugins",
     ],
     python_requires="~=3.6",
