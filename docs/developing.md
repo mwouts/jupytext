@@ -19,7 +19,6 @@ where `branch` is the name of the branch you want to test (again, prefix the com
 
 Most of Jupytext's code is written in Python. To develop the Python part of Jupytext, you should clone Jupytext, then create a dedicated Python env:
 ```
-cd jupytext
 conda env create --file environment.yml  # or conda env update --file ...
 conda activate jupytext-dev
 python -m ipykernel install --name jupytext-dev --user
@@ -50,7 +49,7 @@ or with
 BUILD_JUPYTERLAB_EXTENSION=1 pip install .
 ```
 
-Finally, note that you can remove `BUILD_JUPYTERLAB_EXTENSION=1` if you don't need the lab extension, and if you don't want to install `nodejs` or if you want a faster build.
+Finally, note that you can remove `BUILD_JUPYTERLAB_EXTENSION=1` if you don't need the lab extension - the build time will be much shorter.
 
 ## Jupytext's extension for Jupyter Notebook
 

@@ -1,147 +1,135 @@
-# Jupyter Notebooks as Markdown Documents, Julia, Python or R Scripts
+![CI](https://github.com/mwouts/jupytext/workflows/CI/badge.svg)
+[![Documentation Status](https://readthedocs.org/projects/jupytext/badge/?version=latest)](https://jupytext.readthedocs.io/en/latest/?badge=latest)
+[![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=main)](https://codecov.io/gh/mwouts/jupytext/branch/main)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![GitHub language count](https://img.shields.io/github/languages/count/mwouts/jupytext)](languages.md)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/jupytext.svg)](https://anaconda.org/conda-forge/jupytext)
+[![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
+[![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
+[![Binder:notebook](https://img.shields.io/badge/binder-notebook-0172B2.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo)
+[![Binder:lab](https://img.shields.io/badge/binder-jupyterlab-0172B2.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
+[![launch - renku](https://renkulab.io/renku-badge.svg)](https://renkulab.io/projects/best-practices/jupytext/sessions/new?autostart=1)
+[![](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48)
 
-Have you always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningful diffs when doing version control? Then... Jupytext may well be the tool you're looking for!
 
-Jupytext is a plugin for Jupyter that can save Jupyter notebooks as either
-- Markdown files (or [MyST Markdown](formats.md#MyST-Markdown) files, or [R Markdown](formats.md#R-Markdown) or [Quarto](formats.md#Quarto) text notebooks)
-- Scripts in [many languages](languages.md).
+# Jupytext
 
-## Use cases
+Have you always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningful diffs when doing version control? Then, Jupytext may well be the tool you're looking for!
 
-Common [use cases](examples.md) for Jupytext are:
-- Doing version control on Jupyter Notebooks
-- Editing, merging or refactoring notebooks in your favorite text editor
-- Applying Q&A checks on notebooks.
+## Text Notebooks
 
-## Install
+A Python notebook encoded in the `py:percent` [format](formats-scripts.md#the-percent-format) has a `.py` extension and look like this:
 
-You can install Jupytext with
-- `pip install jupytext`
-- or `conda install jupytext -c conda-forge`.
+```
+# %% [markdown]
+# This is a markdown cell
 
-Then, restart your Jupyter server (for more installation details, see the [install section](install.md) in the documentation).
-
-When Jupytext is installed, `.py` and `.md` files have a notebook icon. And you can really open and run these files as notebooks
-<ul>
-<details>
-  <summary>With a click on the text file in Jupyter Notebook</summary>
-
-[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/TextNotebooks.png)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo)
-(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo))
-</details>
-<details>
-<summary>With a click on the text file in JupyterLab (<b>⭐New⭐</b>)</summary>
-To do that, you will need to change the default viewer for text notebooks by copy-pasting the following settings (or the subset that matches your use case) in the `Document Manager` section:
-
-```json
-{
-  "defaultViewers": {
-    "markdown": "Jupytext Notebook",
-    "myst": "Jupytext Notebook",
-    "r-markdown": "Jupytext Notebook",
-    "quarto": "Jupytext Notebook",
-    "julia": "Jupytext Notebook",
-    "python": "Jupytext Notebook",
-    "r": "Jupytext Notebook"
-  }
-}
+# %%
+def f(x):
+  return 3*x+1
 ```
 
-Here is a screencast of the steps to follow:
+Only the notebook inputs (and optionally, the metadata) are included. Text notebooks are well suited for version control. You can also edit or refactor them in an IDE - the `.py` notebook above is a regular Python file.
 
-[![](https://raw.githubusercontent.com/mwouts/jupytext/main/docs/jupyterlab_default_viewer.gif)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
-(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb))
+We recommend the `percent` format for notebooks that mostly contains code. The `percent` format is available for Julia, Python, R and many others [languages](languages.md).
 
-Another possibility is to activate this with a [default_setting_overrides.json](https://github.com/mwouts/jupytext/blob/main/binder/labconfig/default_setting_overrides.json) file in the `.jupyter/labconfig` folder with e.g.
+If your notebook is documentation-oriented, a [Markdown-based format](formats-markdown.md) (text notebooks with a `.md` extension) might be more appropriate. Depending on what you plan to do with your notebook, you might prefer the Myst Markdown format, which interoperates very well with Jupyter Book, or Quarto Markdown, or even Pandoc Markdown.
+
+## Installation
+
+Install Jupytext in the Python environment that you use for Jupyter. Use either
+
+    pip install jupytext
+
+or
+
+    conda install jupytext -c conda-forge
+
+Then, restart your Jupyter Lab server, and make sure Jupytext is activated in Jupyter:  `.py` and `.md` files have a Notebook icon, and you can open them as Notebooks with a right click in Jupyter Lab.
+
+![](images/jupyterlab_right_click.png)
+
+## Paired Notebooks
+
+Text notebooks with a `.py` or `.md` extension are well suited for version control. They can be edited or authored conveniently in an IDE. You can open and run them as notebooks in Jupyter Lab with a right click. However the notebook outputs are lost when the notebook is closed, as only the notebook inputs are saved in text notebooks.
+
+A convenient alternative to text notebooks are [paired notebooks](paired-notebooks.md). These are a set of two files, say `.ipynb` and `.py`, that contain the same notebook, but in different formats.
+
+You can edit the `.py` version of the paired notebook, and get the edits back in Jupyter by selecting _reload notebook from disk_. The outputs will be reloaded from the `.ipynb` file, if it exists. The `.ipynb` version will be updated or recreated the next time you save the notebook in Jupyter.
+
+To pair a notebook in Jupyter Lab, use the command `Pair Notebook with percent Script` from the Command Palette:
+
+![](images/pair_commands.png)
+
+To pair all the notebooks in a certain directory, create a [configuration file](config.md) with this content:
+
 ```
-wget https://raw.githubusercontent.com/mwouts/jupytext/main/binder/labconfig/default_setting_overrides.json -P  ~/.jupyter/labconfig/
-```
-
-Note: to open links to `.md` files in notebooks with the Notebook editor, use `jupyterlab>=3.6.0`.
-</details>
-<details>
-  <summary>With a right click and <i>open with notebook</i> in Jupyter Lab</summary>
-
-[![](https://raw.githubusercontent.com/mwouts/jupytext-screenshots/master/JupytextDocumentation/ContextMenuLab.png)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
-(click on the image above to try this on [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb))
-</details>
-</ul>
-
-## Paired notebooks
-
-The most convenient way to use Jupytext is probably through [paired notebooks](paired-notebooks.md).
-
-To pair a given `.ipynb` or text notebook to an additional notebook format, use either
-<ul>
-<details>
-  <summary>the <i>"pair notebook with..."</i> commands in Jupyter Lab</summary>
-
-[![](https://raw.githubusercontent.com/mwouts/jupytext/main/packages/labextension/jupytext_commands.png)](install.md#Jupytext-commands-in-JupyterLab)
-</details>
-
-<details>
-  <summary>the <i>"pair notebook with..."</i> menu entries in Jupyter Notebook</summary>
-
-[![](https://raw.githubusercontent.com/mwouts/jupytext/main/jupytext/nbextension/jupytext_menu.png)](install.md#Jupytext-menu-in-Jupyter-Notebook)
-</details>
-
-<details>
-  <summary><code>jupytext</code> at the command line</summary>
-
-with e.g.
-```
-jupytext --set-formats ipynb,py:percent notebook.ipynb
-```
-see the [documentation](config.md#Per-notebook-configuration).
-</details>
-
-<details>
-  <summary>or a local or global <code>jupytext.toml</code> configuration file.</summary>
-
-with e.g. the following content:
-```
+# jupytext.toml at the root of your notebook directory
 formats = "ipynb,py:percent"
 ```
-see the [documentation](config.md#Configuring-paired-notebooks-globally).
-</details>
-</ul>
 
-When you save a paired notebook in Jupyter, both the `.ipynb` file and the text version are updated on disk.
+## Command line
 
-When a paired notebook is opened or _reloaded_ in Jupyter, the input cells are loaded from the text file, and combined with the output cells from the `.ipynb` file.
+Jupytext is also available at the [command line](using-cli.md). You can
 
-You can edit the text representation of the notebook in your favorite editor, and get the changes back in Jupyter by simply _reloading_ the notebook (Ctrl+R in Jupyter Notebook, <i>"reload notebook"</i> in Jupyter Lab). And the changes are propagated to the `.ipynb` file when you _save_ the notebook.
+- pair a notebook with `jupytext --set-formats ipynb,py:percent notebook.ipynb`
+- synchronize the paired files with `jupytext --sync notebook.py` (the inputs are loaded from the most recent paired file)
+- convert a notebook in one format to another with `jupytext --to ipynb notebook.py` (use `-o` if you want a specific output file)
+- pipe a notebook to a linter with e.g. `jupytext --pipe black notebook.ipynb`
 
-Alternatively, you can synchronise the two representations by running `jupytext --sync notebook.ipynb` at the command line.
+## Sample use cases
 
-## Which text format?
+### Notebooks under version control
 
-Jupytext implements many text [formats](formats.md) for Jupyter Notebooks. If your notebook is mostly made of code, you will probably prefer to save it as a script:
--  Use the [percent format](formats.md#The-percent-format), a format with explicit cell delimiters (`# %%`), supported by many IDE (Spyder, Hydrogen, VS Code, PyCharm and PTVS)
--  Or use the [light format](formats.md#The-light-format), if you prefer to see fewer cell markers.
+This is a quick how-to:
+- Open your `.ipynb` notebook in Jupyter and [pair](paired-notebooks.md) it to a `.py` notebook, using either the _pair_ command in Jupyter Lab, or a global [configuration file](config.md)
+- Save the notebook - this creates a `.py` notebook
+- Add this `.py` notebook to version control
 
-If your notebook contains more text than code, if you are writing a documentation or a book, you probably want to save your notebook as a Markdown document
-- Use the [Jupytext Markdown format](formats.md#Jupytext-Markdown) if you wish to render your notebook as a `.md` file (without its outputs) on GitHub
-- Use the [MyST Markdown format](formats.md#MyST-Markdown), a markdown flavor that “implements the best parts of reStructuredText”, if you wish to render your notebooks using Sphinx or [Jupyter Book](https://jupyterbook.org).
-- Use the [R Markdown format](formats.md#R-Markdown) or the [Quarto format](formats.md#Quarto) if you want to open your Jupyter Notebooks in RStudio.
+You might exclude `.ipynb` files from version control (unless you want to see the outputs versioned!). Jupytext will recreate the `.ipynb` files locally when the users open and save the `.py` notebooks.
 
-## More resources?
+### Collaborating on notebooks with Git
+
+Collaborating on Jupyter notebooks through Git becomes as easy as collaborating on text files.
+
+Assume that you have your `.py` notebooks under version control (see above). Then,
+- Your collaborator pulls the `.py` notebook
+- They open it _as a notebook_ in Jupyter (right-click in Jupyter Lab)
+- At that stage the notebook has no outputs. They run the notebook and save it. Outputs are regenerated, and a local `.ipynb` file is created
+- They edit the notebook, and push the updated `notebook.py` file. The diff is nothing else than a standard diff on a Python script.
+- You pull the updated `notebook.py` script, and refresh your browser. The input cells are updated based on the new content of `notebook.py`. The outputs are reloaded from your local `.ipynb` file. Finally, the kernel variables are untouched, so you have the option to run only the modified cells to get the new outputs.
+
+### Editing or refactoring a notebook in an IDE
+
+Once your notebook is [paired](paired-notebooks.md) with a `.py` file, you can easily edit or refactor the `.py` representation of the notebook in an IDE.
+
+Once you are done editing the `.py` notebook, you will just have to _reload_ the notebook in Jupyter to get the latest edits there.
+
+Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the paired `.py` file. There is no obligation to do so, however if you don't, you should be prepared to read carefully the pop-up messages. If Jupyter tries to save the notebook while the paired `.py` file has also been edited on disk since the last reload, a conflict will be detected and you will be asked to decide which version of the notebook (in memory, or on disk) is the appropriate one.
+
+## More ressources
+
+Read more about Jupytext in the [documentation](https://jupytext.readthedocs.io).
 
 If you're new to Jupytext, you may want to start with the [FAQ](faq.md) or with the [Tutorials](tutorials.md).
+
+There is also this short introduction to Jupytext: [![](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48).
+
 
 ## Table of Contents
 
 ```{toctree}
 :maxdepth: 1
 install.md
+text-notebooks.md
 paired-notebooks.md
 config.md
-formats.md
+advanced-options.md
+formats-scripts.md
+formats-markdown.md
 languages.md
 using-cli.md
 using-pre-commit.md
-using-library.md
-examples.md
 faq.md
 tutorials.md
 contributing.md
