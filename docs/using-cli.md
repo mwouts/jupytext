@@ -1,8 +1,8 @@
-# Using at the Command Line
+# Jupytext CLI
 
 ## Command line conversion
 
-The package provides a `jupytext` script for command line conversion between the various notebook extensions:
+Jupytext provides command line interface for converting notebooks between the different formats.
 
 ```bash
 jupytext --to py notebook.ipynb                 # convert notebook.ipynb to a .py file
@@ -78,22 +78,11 @@ jupytext --to ipynb --pipe-fmt ipynb \
 
 In each of the above, `jupyter nbconvert` could be replaced with any alternative tool to execute a jupyter notebook non-interactively, including [papermill](https://github.com/nteract/papermill) which would allow notebook parameterisation (see [@mwouts' post on the topic here](https://github.com/CFMTech/jupytext_papermill_post/blob/master/README.md)).
 
-
-## Notebook and cell metadata filters
-
-If you want to preserve (or filter out) certain notebook or cell metadata, change the value of either `notebook_metadata_filter` or `cell_metadata_filter` with the `--update-metadata` option. For instance, if you wish to convert an `.ipynb` document to a `.md` file and preserve all the notebook metadata in that document, run
-
-```bash
-jupytext --to md --update-metadata '{"jupytext": {"notebook_metadata_filter":"all"}}' notebook.ipynb
-```
-
-Read more on the default and possible values for the metadata filters in [this section](config.md#Metadata-filtering).
-
 ## Testing the round-trip conversion
 
-Representing Jupyter notebooks as scripts requires a solid round trip conversion. You don't want your notebooks (nor your scripts) to be modified because you are converting them to the other form. Our test suite includes a few hundred tests to ensure that round trip conversion is safe.
+Representing Jupyter notebooks as scripts requires a solid round trip conversion. You don't want your notebooks (nor your scripts) to change because you are converting them to the other form. Our test suite includes a few hundred tests to ensure that round trip conversion is safe.
 
-You can easily test that the round trip conversion preserves your Jupyter notebooks and scripts. Run for instance:
+You can test yourself that the round trip conversion preserves your Jupyter notebooks and scripts. Run for instance:
 ```bash
 # Test the ipynb -> py:percent -> ipynb round trip conversion
 jupytext --test notebook.ipynb --to py:percent
@@ -104,8 +93,10 @@ jupytext --test --update notebook.ipynb --to py:percent
 
 Note that `jupytext --test` compares the resulting notebooks according to its expectations. If you wish to proceed to a strict comparison of the two notebooks, use `jupytext --test-strict`, and use the flag `-x` to report with more details on the first difference, if any.
 
-Please note that
-- Scripts opened with Jupyter have a default [metadata filter](config.md#Metadata-filtering) that prevents additional notebook or cell
-metadata to be added back to the script. Remove the filter if you want to store Jupytext's settings, or the kernel information, in the text file.
-- Cell metadata are available in the `light` and `percent` formats, as well as in the Markdown and R Markdown formats. R scripts in `spin` format support cell metadata for code cells only. Sphinx Gallery scripts in `sphinx` format do not support cell metadata.
-- By default, a few cell metadata are not included in the text representation of the notebook. And only the most standard notebook metadata are exported. Learn more on this in the sections for [notebook specific](config.md#Per-notebook-configuration) and [global settings](config.md#Metadata-filtering) for metadata filtering.
+## Cell and notebook metadata
+
+When a scripts is converted to an `.ipynb` notebook, Jupytext will set empty notebook and cell [metadata filters](advanced-options.md) to avoid having notebook or cell metadata added back to the script. Remove these filters if you want to store Jupytext's settings, or the kernel information, in the text file.
+
+Cell metadata are available in the `light` and `percent` formats, as well as in the MyST Markdown, R Markdown and Jupytext Markdown formats. R scripts in `spin` format support cell metadata for code cells only. Sphinx Gallery scripts in `sphinx` format do not support cell metadata.
+
+A few cell metadata are not included in the text representation of the notebook, and only the most standard notebook metadata are exported - see the section on [metadata filters](advanced-options.md).

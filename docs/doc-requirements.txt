@@ -1,4 +1,5 @@
 sphinx
 sphinx_copybutton
+sphinx_rtd_theme
 jupytext
 myst_parser

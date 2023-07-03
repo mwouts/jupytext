@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.14.7+dev (2023-07-??)
+-----------------------
+
+**Changed**
+- We have reorganized the documentation and the README.md ([#1031](https://github.com/mwouts/jupytext/issues/1031), [#1073](https://github.com/mwouts/jupytext/issues/1073))
+
+
 1.14.7 (2023-06-29)
 -------------------
 

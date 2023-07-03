@@ -17,7 +17,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "Jupytext"
-copyright = "2018-2020, The Jupytext Team"
+copyright = "2018-2023, The Jupytext Team"
 author = "The Jupytext Team"
 
 # -- General configuration ---------------------------------------------------
@@ -56,10 +56,12 @@ html_sidebars = {"**": ["about.html", "navigation.html", "searchbox.html"]}
 
 html_theme_options = {
     "github_button": True,
+    "github_banner": True,
     "github_user": "mwouts",
     "github_repo": "jupytext",
     "github_type": "star",
     "logo": "logo.svg",
+    "show_relbars": True,
 }
 
 pygments_style = "sphinx"
