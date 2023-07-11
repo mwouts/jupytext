@@ -89,8 +89,13 @@ def md_to_notebook(text):
     tmp_file.write(text.encode("utf-8"))
     tmp_file.close()
 
+    parse_version = partial(parse, custom_error=PandocError)
+    if parse_version(pandoc_version()) < parse_version('2.11.2'):
+        pandoc_args = "--from markdown --to ipynb -s --atx-headers --wrap=preserve --preserve-tabs"
+    else:
+        pandoc_args = "--from markdown --to ipynb -s --markdown-headings=atx --wrap=preserve --preserve-tabs"
     pandoc(
-        "--from markdown --to ipynb -s --atx-headers --wrap=preserve --preserve-tabs",
+        pandoc_args,
         tmp_file.name,
         tmp_file.name,
     )
@@ -109,8 +114,13 @@ def notebook_to_md(notebook):
     tmp_file.write(ipynb_writes(notebook).encode("utf-8"))
     tmp_file.close()
 
+    parse_version = partial(parse, custom_error=PandocError)
+    if parse_version(pandoc_version()) < parse_version('2.11.2'):
+        pandoc_args = "--from ipynb --to markdown -s --atx-headers --wrap=preserve --preserve-tabs"
+    else:
+        pandoc_args = "--from ipynb --to markdown -s --markdown-headings=atx --wrap=preserve --preserve-tabs"
     pandoc(
-        "--from ipynb --to markdown -s --atx-headers --wrap=preserve --preserve-tabs",
+        pandoc_args,
         tmp_file.name,
         tmp_file.name,
     )
