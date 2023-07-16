@@ -105,7 +105,6 @@ jobs:
           fail_ci_if_error: true
           verbose: true
 
-
   test-conda:
     needs: pre-commit
     strategy:
@@ -144,15 +143,9 @@ jobs:
         run: conda list
       - name: Test with pytest
         shell: pwsh
-        run: |
-          if("${{ matrix.os }}" -eq "windows-latest"){
-             pytest
-          } else {
-             pytest --cov=./
-          }
+        run: pytest --cov=./
       - name: Upload coverage
         uses: codecov/codecov-action@v3
-        if: ${{ matrix.os != 'windows-latest' }}
         with:
           fail_ci_if_error: true
           verbose: true
