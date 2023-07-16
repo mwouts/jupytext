@@ -1,4 +1,5 @@
 codecov:
+  token: d006bed5-f698-4007-b95f-58e8b21f8ba3
   notify:
     after_n_builds: 12
 
