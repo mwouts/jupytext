@@ -98,7 +98,7 @@ jobs:
           # install it
           sudo apt install ./*.deb
       - name: Test with pytest
-        run: pytest --cov=./ --cov-report=xml
+        run: pytest --cov=./
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
@@ -148,7 +148,7 @@ jobs:
           if("${{ matrix.os }}" -eq "windows-latest"){
              pytest
           } else {
-             pytest --cov=./ --cov-report=xml
+             pytest --cov=./
           }
       - name: Upload coverage
         uses: codecov/codecov-action@v3
