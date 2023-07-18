@@ -5,7 +5,7 @@ Jupytext ChangeLog
 ------------------------
 
 **Changed**
-- This version comes with a version of the JupyterLab extension that is compatible with JupyterLab 4.x. (#1092)
+- This version comes with a version of the JupyterLab extension that is compatible with JupyterLab 4.x. Many thanks to [Thierry Parmentelat](https://github.com/parmentelat) for this PR! ([#1092](https://github.com/mwouts/jupytext/pull/1092))
 - We have reorganized the documentation and the README.md ([#1031](https://github.com/mwouts/jupytext/issues/1031), [#1073](https://github.com/mwouts/jupytext/issues/1073))
 
 
