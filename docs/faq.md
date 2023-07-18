@@ -1,4 +1,4 @@
-# Frequently Asked Questions
+# FAQ
 
 ## What is Jupytext?
 
@@ -10,11 +10,9 @@ The text representation only contains the part of the notebook that you wrote (n
 
 ## How do I use Jupytext?
 
-Open the notebook that you want to version control. _Pair_ the notebook to a script or a Markdown file using either the [Jupytext Menu](install.md#Jupytext-menu-in-Jupyter-Notebook) in Jupyter Notebook or the [Jupytext Commands](install.md#Jupytext-commands-in-JupyterLab) in JupyterLab.
+Open the notebook that you want to version control. _Pair_ the notebook to a script or a Markdown file using either the [Jupytext Commands](install.md#jupytext-commands-in-jupyterlab) in JupyterLab or the [Jupytext Menu](install.md#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook.
 
 Save the notebook, and you get two copies of the notebook: the original `*.ipynb` file, together with its paired text representation.
-
-Read more about how to use Jupytext in the [documentation](config.md).
 
 ## Which Jupytext format do you recommend?
 
@@ -32,20 +30,11 @@ Yes! When you're done, reload the notebook in Jupyter. There, you will see the u
 
 ## Do I need to close my notebook in Jupyter?
 
-No, you don't (*). You can edit the paired text file and simply refresh your navigator to reload the updated input cells. When you refresh the notebook, the kernel variables are preserved, so you can continue your work where you left it.
-
-(*) Please read about Jupyter's autosave below.
+Closing the notebook in Jupyter while you refactor it in another editor will help you avoid the message _Untitled.ipynb has changed on disk_. However, you don't really need to close the notebook. You can simply use _Reload Notebook from disk_ to load the latest edits once you're done with the other editor. When you reload the notebook, the kernel variables are preserved (and the outputs too if the notebook is paired to an `.ipynb` file), so you can continue your work where you left it.
 
 ## How do paired notebooks work?
 
 The `.ipynb` file contains the full notebook. The paired text file only contains the input cells and selected metadata. When the notebook is loaded by Jupyter, input cells are loaded from the text file, while the output cells and the filtered metadata are restored using the `.ipynb` file. When the notebook is saved in Jupyter, the two files are updated to match the current content of the notebook.
-
-## How do I remove pairing?
-
-Paired Jupyter notebooks contains specific `jupytext` metadata that you may want to remove. You may want to keep the pairing only while editing the files, and when it comes the time to distribute them, it may make sense to remove the pairing. To do so, you can update the metadata in the `.ipynb` files as follows:
-```shell
-jupytext --update-metadata '{"jupytext": null}' path/to/notebooks/*.ipynb
-```
 
 ## Can I create a notebook from a text file?
 
@@ -71,7 +60,7 @@ jupytext --to md *.ipynb                         # convert all .ipynb files to .
 
 ## I want a specific cell to be commented out in the paired script
 
-That's possible! See how to [activate or deactivate cells](formats.md#Active-and-inactive-cells).
+That's possible! See how to [activate or deactivate cells](advanced-options.md#active-and-inactive-cells).
 
 ## Which files should I version control?
 
@@ -81,48 +70,29 @@ Note that if you version both the `.md` and `.ipynb` files, you can configure `g
 
 ## I have modified a text file, but git reports no diff for the paired `.ipynb` file
 
-The synchronization between the two files happens when you reload and *save* the notebook in Jupyter, or when you explicitly run `jupytext --sync`. If you want to force the synchronization on every commit, create a file `.git/hooks/pre-commit` with the following content:
-```sh
-#!/bin/sh
-jupytext --sync --pre-commit
-```
-and make it executable:
-```shell
-chmod u+x .git/hooks/pre-commit
-```
-
-Alternatively, Vim users can give a try to the [jupytext.vim](https://github.com/goerz/jupytext.vim) plugin.
+The synchronization between the two files happens when you reload and *save* the notebook in Jupyter, or when you explicitly run `jupytext --sync`. If you want to force the synchronization on every commit, you could use `jupytext` as a [pre-commit hook](using-pre-commit.md).
 
 ## Jupyter warns me that the file has changed on disk
 
-By default, Jupyter saves your notebook every 2 minutes. Fortunately, it is also aware that you have edited the text file, yielding this message.
+By default, Jupyter tries to save your notebooks every 2 minutes. If you have edited the text representation in another editor, it will detect that and ask you if you want to either overwrite, or _reload_ the notebook from disk.
 
 You should simply click on _Reload_.
 
-Note you can deactivate Jupyter's autosave function with the Jupytext Menu in Jupyter Notebook, and with the _Autosave Document_ setting in JupyterLab. If you want to permanently deactivate autosave in Jupyter Notebook, use a [`custom.js` file](https://nbviewer.jupyter.org/github/jupyter/notebook/blob/master/docs/source/examples/Notebook/JavaScript%20Notebook%20Extensions.ipynb):
-```shell
-mkdir -p ~/.jupyter/custom
-echo "Jupyter.notebook.set_autosave_interval(0);" >> ~/.jupyter/custom/custom.js
-```
+Note you can deactivate Jupyter's autosave function with the _Autosave Document_ setting in JupyterLab (search for _autosave_ in the _advanced settings editor_).
 
 ## When I reload, Jupyter warns me that my notebook has unsaved changes
 
-Oh - you have edited both the notebook and the paired text file at the same time? If you know which version you want to keep, save it and reload the other. If you want to compare and merge both versions, backup the text file (with e.g. `git stash`), save the notebook, and merge the updated paired file with the backup (with e.g. `git stash pop`). Then, refresh the notebook in Jupyter.
-
-If your IDE has the ability to compare the changes in memory versus on disk (like PyCharm), you can simply save the notebook and let your IDE do the merge.
+That happens if you have edited both the notebook and the paired text file at the same time... If you know which version you want to keep, save it and reload the other. If you want to compare and merge both versions, backup the text file (with e.g. `git stash`), save the notebook, and merge the updated paired file with the backup (with e.g. `git stash pop`). Then, refresh the notebook in Jupyter.
 
 ## Jupyter complains that the `.ipynb` file is more recent than the text representation
 
-This happens if you have edited the `.ipynb` file outside of Jupyter. It is a safeguard to avoid overwriting the input cells of the notebook with an outdated text file.
+This happens if you have edited the `.ipynb` file outside of Jupyter. This is a safeguard to avoid overwriting the notebook with an outdated text file.
 
-Manual action is requested as the paired text representation may be outdated. Please edit (`touch`) the paired `.md` or `.py` file if it is not outdated, or if it is, delete it, or update it with
-```shell
-jupytext --sync notebook.ipynb
-```
+In this case, a manual action is requested. Remove the paired `.md` or `.py` file if it is outdated, otherwise, edit and save it to update the file timestamp.
 
 ## Can I use Jupytext with JupyterHub, Binder, Nteract, Colab, Saturn or Azure?
 
-Jupytext is compatible with JupyterHub (execute `pip install jupytext --user` to install it in user mode) and with Binder (add `jupytext` to the project requirements and `jupyter lab build` to `postBuild`).
+Jupytext is compatible with JupyterHub (execute `pip install jupytext --user` to install it in user mode) and with Binder (add `jupytext` to the project requirements).
 
 If you use another editor than Jupyter Notebook, Lab or Hub, you probably can't get Jupytext there. However you can still use Jupytext at the command line to manually sync the two representations of the notebook:
 ```shell

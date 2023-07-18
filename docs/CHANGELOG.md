@@ -1,11 +1,15 @@
 Jupytext ChangeLog
 ==================
 
-1.15.0-dev1 (2023-06-30)
--------------------
+1.15.0-dev1 (2023-07-17)
+------------------------
 
 **Changed**
 - This version comes with a version of the JupyterLab extension that is compatible with JupyterLab 4.x. (#1092)
+- We have reorganized the documentation and the README.md ([#1031](https://github.com/mwouts/jupytext/issues/1031), [#1073](https://github.com/mwouts/jupytext/issues/1073))
+
+
+1.14.7 (2023-06-29)
 -------------------
 
 **Changed**
@@ -27,6 +31,7 @@ Jupytext ChangeLog
 - This version comes with a build requirement `jupyterlab>=3,<4`, as the Jupyterlab
 extension for Jupytext is not compatible with JupyterLab 4 yet ([#1054](https://github.com/mwouts/jupytext/issues/1054))
 - The JupyterLab extension was released to `npm` in version 1.3.9.
+
 
 1.14.5 (2023-02-25)
 -------------------

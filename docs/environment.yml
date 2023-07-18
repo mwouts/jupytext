@@ -3,9 +3,10 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python=3.7
+  - python=3.9
   - sphinx
   - pip
   - pip:
       - myst_parser
       - sphinx_copybutton
+      - sphinx_rtd_theme

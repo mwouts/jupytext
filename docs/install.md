@@ -1,60 +1,48 @@
 # Installation
 
-[![](https://img.shields.io/conda/vn/conda-forge/jupytext.svg)](https://anaconda.org/conda-forge/jupytext)
-[![](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
-[![](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
-
-Jupytext is available on pypi and on conda-forge. Run either of
+Installing Jupytext is as simple as
 ```bash
-pip install jupytext --upgrade
+pip install jupytext
 ```
 or
 ```bash
 conda install jupytext -c conda-forge
 ```
 
-If you want to use Jupytext within Jupyter Notebook or JupyterLab, make sure you install Jupytext in the Python environment where the Jupyter server runs. If that environment is read-only, for instance if your server is started using JupyterHub, install Jupytext in user mode with:
+You should run either one of these commands in the Python environment from which you launch Jupyter Lab. Once you have installed Jupytext, you need to restart Jupyter to be able to use Jupytext within Jupyter.
+
+If the Python environment where the Jupyter server runs is read-only, for instance if your server is started using JupyterHub, you can still install Jupytext in user mode with:
 ```
-/path_to_your_jupyter_environment/python -m pip install jupytext --upgrade --user
+/path_to_your_jupyter_environment/python -m pip install jupytext --user
 ```
+
+Jupytext comes with a series of tools and plugin, which we will now briefly describe.
 
 ## Jupytext's contents manager
 
-Jupytext provides a contents manager for Jupyter that allows Jupyter to open and save notebooks as text files. When Jupytext's content manager is active in Jupyter, scripts and Markdown documents have a notebook icon.
+Jupytext provides a contents manager that let Jupyter open and save notebooks as text files. When Jupytext's content manager is active in Jupyter, scripts and Markdown documents have a notebook icon.
 
-In most cases, Jupytext's contents manager is activated automatically by Jupytext's server extension. When you restart either `jupyter lab` or `jupyter notebook`, you should see a line that looks like:
+Jupytext's contents manager is activated automatically by Jupytext's server extension. When you start either `jupyter lab` or `jupyter notebook`, you should see a line that looks like:
 ```bash
 [I 10:28:31.646 LabApp] [Jupytext Server Extension] Changing NotebookApp.contents_manager_class from LargeFileManager to jupytext.TextFileContentsManager
 ```
 
-If you don't have the notebook icon on text documents after a fresh restart of your Jupyter server, you can either enable our server extension explicitly (with `jupyter serverextension enable jupytext`), or install the contents manager manually. Append
-```python
-c.NotebookApp.contents_manager_class = "jupytext.TextFileContentsManager"
+If you don't have the notebook icon on text documents after a fresh restart of your Jupyter server, please enable our server extension explicitly with
 ```
-to your `.jupyter/jupyter_notebook_config.py` file (generate a Jupyter config, if you don't have one yet, with `jupyter notebook --generate-config`). Our contents manager accepts a few options: default formats, default metadata filter, etc. Then, restart Jupyter Notebook or JupyterLab, either from the JupyterHub interface or from the command line with
-```bash
-jupyter notebook # or lab
-```
-
-## Jupytext menu in Jupyter Notebook
-
-Jupytext includes an extensions for Jupyter Notebook that adds a Jupytext section in the File menu.
-
-![](https://raw.githubusercontent.com/mwouts/jupytext/main/jupytext/nbextension/jupytext_menu.png)
-
-If the extension was not automatically installed, install and activate it with
-```
-jupyter nbextension install --py jupytext [--user]
-jupyter nbextension enable --py jupytext [--user]
+jupyter serverextension enable jupytext
 ```
 
 ## Jupytext commands in JupyterLab
 
-In JupyterLab, Jupytext adds a set of commands to the command palette (View / Activate Command Palette, or Ctrl+Shift+C):
+Jupytext comes with a frontend extension for JupyterLab which provides pairing commands (accessible with View / Activate Command Palette, or Ctrl+Shift+C):
 
-![](https://raw.githubusercontent.com/mwouts/jupytext/main/packages/labextension/jupytext_commands.png)
+![](images/pair_commands.png)
 
-The Jupytext extension for JupyterLab is bundled with Jupytext. In most cases you don't need to install it explicitly.
+The Jupytext extension for JupyterLab is bundled with Jupytext. It should be installed and enabled automatically. You can `enable` or `disable` it manually with either
+```
+jupyter labextension enable jupyterlab-jupytext
+jupyter labextension disable jupyterlab-jupytext
+```
 
 From Jupytext 1.9.0 on, the version of the extension is compatible with JupyterLab 3.x only. If you wish to use Jupytext with JupyterLab 2.x or 1.x, please
 - install the `jupytext` package using `pip` or `conda`
@@ -63,3 +51,42 @@ From Jupytext 1.9.0 on, the version of the extension is compatible with JupyterL
 jupyter labextension install jupyterlab-jupytext@1.2.2  # for JupyterLab 2.x
 jupyter labextension install jupyterlab-jupytext@1.1.1  # for JupyterLab 1.x
 ```
+
+## Jupytext menu in Jupyter Notebook
+
+Jupytext includes an extensions for Jupyter Notebook that adds a Jupytext section in the File menu.
+
+![](images/jupytext_menu.png)
+
+Here again, the extension should be automatically installed. If need be, you can install and activate it manually with
+```
+jupyter nbextension install --py jupytext [--user]
+jupyter nbextension enable --py jupytext [--user]
+```
+
+## Jupytext's command line interface
+
+Jupytext provides a `jupytext` command in the terminal that you can use to pair, synchronize or convert notebooks in different formats.
+
+The CLI is documented [here](using-cli.md).
+
+Run `jupytext --version` to check which version of Jupytext is installed.
+
+## Jupytext as a Python library
+
+Jupytext is also available as a Python library. The `jupytext` package exposes the same `read`, `write`, `reads` and `writes` functions than `nbformat`, meaning that you can read and write notebooks within Python like this:
+
+```
+import jupytext
+
+# read a notebook from a file
+nb = jupytext.read("notebook.py")
+
+# or from a string
+nb = jupytext.reads(text, fmt="md:myst")
+
+# write a notebook to a file in the 'py:percent' format
+jupytext.write(nb, "notebook.py", fmt="py:percent")
+```
+
+In the above, `nb` is an instance of an `nbformat` `NotebookNode`. The notebook format is documented in the [nbformat documentation](https://nbformat.readthedocs.io).
