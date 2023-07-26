@@ -7,7 +7,11 @@ import {
   ICommandPalette,
   ISessionContextDialogs,
   showErrorMessage,
+  IToolbarWidgetRegistry,
+  createToolbarFactory,
 } from "@jupyterlab/apputils";
+
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 import { IEditorServices } from "@jupyterlab/codeeditor";
 
@@ -202,6 +206,11 @@ const extension: JupyterFrontEndPlugin<void> = {
     ISessionContextDialogs,
     INotebookWidgetFactory,
     INotebookTracker,
+    ISettingRegistry,
+    IToolbarWidgetRegistry,
+    ICommandPalette,
+    ITranslator,
+
   ],
   activate: (
     app: JupyterFrontEnd,
@@ -211,8 +220,10 @@ const extension: JupyterFrontEndPlugin<void> = {
     sessionContextDialogs: ISessionContextDialogs,
     notebookFactory: NotebookWidgetFactory.IFactory,
     notebookTracker: INotebookTracker,
+    settingRegistry: ISettingRegistry | null,
+    toolbarRegistry: IToolbarWidgetRegistry,
+    palette: ICommandPalette | null,
     translator: ITranslator | null,
-    palette: ICommandPalette | null
   ) => {
     // https://semver.org/#semantic-versioning-specification-semver
     // npm semver requires pre-release versions to come with a hyphen
@@ -225,8 +236,8 @@ const extension: JupyterFrontEndPlugin<void> = {
         JLAB4 = parseInt(app_numbers[0]) >= 4;
       }
     }
-    console.log("JupyterLab extension jupytext is activated!");
-    console.debug(`JLAB4=${JLAB4}`);
+    console.log("JupyterLab extension jupytext is activating...");
+    console.debug(`bundled jupytext labextension: JLAB4=${JLAB4}`);
     const trans = (translator ?? nullTranslator).load("jupytext");
 
     // Jupytext formats
@@ -494,6 +505,25 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     // Duplicate notebook factory to apply it on Jupytext notebooks
     //   Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
+    let toolbarFactory
+    if (! JLAB4) {
+      toolbarFactory = notebookFactory.toolbarFactory
+    } else {
+      const FACTORY = 'Jupytext Notebook';
+      const PANEL_SETTINGS = '@jupyterlab/notebook-extension:panel';
+
+      toolbarFactory = createToolbarFactory(
+        toolbarRegistry,
+        settingRegistry,
+        FACTORY,
+        PANEL_SETTINGS,
+        translator
+      )
+    }
+    console.log("jupytext extension - using toolbarFactory", toolbarFactory)
+    // using this breaks it all
+    // const deferred_notebook_factory = (widget: any) => notebookFactory.toolbarFactory(widget)
+    // console.log(deferred_notebook_factory)
     const factory = new NotebookWidgetFactory({
       name: "Jupytext Notebook",
       label: trans.__("Jupytext Notebook"), // mandatory in jlab4 (not in jlab3)
@@ -507,7 +537,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       notebookConfig: notebookFactory.notebookConfig,
       mimeTypeService: editorServices.mimeTypeService,
       // sessionDialogs: sessionContextDialogs,
-      toolbarFactory: notebookFactory.toolbarFactory,
+      toolbarFactory: toolbarFactory,
       // translator?: ITranslator,
     } as NotebookWidgetFactory.IOptions<NotebookPanel>);
     app.docRegistry.addWidgetFactory(factory);
