@@ -509,7 +509,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     if (! JLAB4) {
       toolbarFactory = notebookFactory.toolbarFactory
     } else {
-      const FACTORY = 'Jupytext Notebook';
+      const FACTORY = 'Notebook';
       const PANEL_SETTINGS = '@jupyterlab/notebook-extension:panel';
 
       toolbarFactory = createToolbarFactory(
