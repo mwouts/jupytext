@@ -503,12 +503,15 @@ const extension: JupyterFrontEndPlugin<void> = {
       icon: markdownIcon
     });
 
-    // Duplicate notebook factory to apply it on Jupytext notebooks
-    //   Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
+    // the way to create the toolbar factory is different in JupyterLab 3 and 4
     let toolbarFactory
     if (! JLAB4) {
       toolbarFactory = notebookFactory.toolbarFactory
     } else {
+      // primarily this block is copied/pasted from jlab4 code and specifically
+      // jupyterlab/packages/notebook-extension/src/index.ts
+      // inside the function `activateWidgetFactory` at line 1150 as of this writing
+      //
       const FACTORY = 'Notebook';
       const PANEL_SETTINGS = '@jupyterlab/notebook-extension:panel';
 
@@ -520,10 +523,8 @@ const extension: JupyterFrontEndPlugin<void> = {
         translator
       )
     }
-    console.log("jupytext extension - using toolbarFactory", toolbarFactory)
-    // using this breaks it all
-    // const deferred_notebook_factory = (widget: any) => notebookFactory.toolbarFactory(widget)
-    // console.log(deferred_notebook_factory)
+    // Duplicate notebook factory to apply it on Jupytext notebooks
+    //   Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
     const factory = new NotebookWidgetFactory({
       name: "Jupytext Notebook",
       label: trans.__("Jupytext Notebook"), // mandatory in jlab4 (not in jlab3)
