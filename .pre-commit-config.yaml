@@ -26,19 +26,19 @@ repos:
     - id: trailing-whitespace
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
+    rev: v3.9.0
     hooks:
     - id: pyupgrade
       args: ["--py36-plus"]
 
   - repo: https://github.com/myint/autoflake
-    rev: v2.0.1
+    rev: v2.2.0
     hooks:
     - id: autoflake
       args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
 
   - repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
+    rev: 6.1.0
     hooks:
     - id: flake8
 
@@ -51,6 +51,6 @@ repos:
       args: ["--profile", "black"]
 
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.7.0
     hooks:
     - id: black
