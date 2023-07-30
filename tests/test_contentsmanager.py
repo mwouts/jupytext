@@ -1704,6 +1704,25 @@ def test_notebook_extensions_in_config(tmpdir, cwd_tmpdir):
     assert model["type"] == "file"
 
 
+def test_invalid_config_in_cm(tmpdir, cwd_tmpdir):
+    nb = new_notebook()
+    write(nb, "notebook.ipynb")
+    tmpdir.join("pyproject.toml").write(
+        """[tool.jupysql.SqlMagic]
+autopandas = False
+displaylimit = 1"""
+    )
+
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmpdir)
+
+    # list directory
+    cm.get("")
+
+    model = cm.get("notebook.ipynb")
+    assert model["type"] == "notebook"
+
+
 def test_download_file_318(tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))

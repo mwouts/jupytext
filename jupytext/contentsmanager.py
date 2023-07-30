@@ -515,9 +515,13 @@ to your jupytext.toml file
                 import toml
 
                 model = self.get(pyproject_path, type="file")
-                doc = toml.loads(model["content"])
-                if doc.get("tool", {}).get("jupytext") is not None:
-                    return pyproject_path
+                try:
+                    doc = toml.loads(model["content"])
+                except toml.decoder.TomlDecodeError as e:
+                    self.log.warning(f"Cannot load {pyproject_path}: {e}")
+                else:
+                    if doc.get("tool", {}).get("jupytext") is not None:
+                        return pyproject_path
 
             if not directory:
                 return None

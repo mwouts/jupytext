@@ -8,6 +8,7 @@ Jupytext ChangeLog
 - This version comes with a version of the JupyterLab extension that is compatible with JupyterLab 4.x. Many thanks to [Thierry Parmentelat](https://github.com/parmentelat) for his PRs! ([#1092](https://github.com/mwouts/jupytext/pull/1092), [#1109](https://github.com/mwouts/jupytext/pull/1109))
 - Pandoc 3.0 is now supported, thanks to [Raniere Silva](https://github.com/rgaiacs) for his PR ([#1099](https://github.com/mwouts/jupytext/pull/1099))
 - We have reorganized the documentation and the README.md ([#1031](https://github.com/mwouts/jupytext/issues/1031), [#1073](https://github.com/mwouts/jupytext/issues/1073))
+- Invalid `pyproject.toml` files will be ignored by Jupytext in Jupyter ([#1103](https://github.com/mwouts/jupytext/issues/1103))
 - We have updated the pre-commit tools
 
 
