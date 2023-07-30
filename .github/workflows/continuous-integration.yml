@@ -51,6 +51,7 @@ jobs:
         kernel: [true]
         include:
           - python-version: "3.12-dev"
+            experimental: true
           - python-version: "3.13-dev"
             experimental: true
           - python-version: 3.9
