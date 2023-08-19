@@ -29,7 +29,12 @@ setup_args = dict(
     long_description_content_type="text/markdown",
     url="https://github.com/mwouts/jupytext",
     packages=find_packages(exclude=["tests"]),
-    entry_points={"console_scripts": ["jupytext = jupytext.cli:jupytext"]},
+    entry_points={
+        "console_scripts": [
+            "jupytext = jupytext.cli:jupytext",
+            "jupytext-config = jupytext.jupytext_config:main",
+        ]
+    },
     tests_require=["pytest"],
     install_requires=[
         "nbformat",
