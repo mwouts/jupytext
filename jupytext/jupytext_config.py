@@ -1,16 +1,22 @@
+"""
+the code for
+jupytext-config set-default-viewer
+and related subcommands
+"""
+
 from argparse import ArgumentParser
 
 from .labconfig import LabConfig
 
-# list of subcommands - filled by SubCommand.__init__
-SUBCOMMANDS = []
-
 
 class SubCommand:
+    """
+    a subcommand for jupytext-config
+    """
+
     def __init__(self, name, help):
         self.name = name
         self.help = help
-        SUBCOMMANDS.append(self)
 
     def main(self, args):
         """
@@ -49,8 +55,10 @@ class SetDefaultViewer(SubCommand):
 
 
 # create the subcommands
-List()
-SetDefaultViewer()
+SUBCOMMANDS = [
+    List(),
+    SetDefaultViewer(),
+]
 
 
 def main():
