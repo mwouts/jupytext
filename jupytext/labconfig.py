@@ -16,7 +16,7 @@ from pathlib import Path
 class LabConfig:
     SETTINGS = Path.home() / ".jupyter" / "labconfig" / "default_setting_overrides.json"
 
-    LANGUAGES = [
+    DOCTYPES = [
         "python",
         "markdown",
         "myst",
@@ -59,14 +59,14 @@ class LabConfig:
         for key, value in viewers.items():
             print(f"{key}: {value}")
 
-    def set_default_viewers(self, languages=None):
-        if not languages:
-            languages = self.LANGUAGES
-        for language in languages:
-            self.set_default_viewer(language)
+    def set_default_viewers(self, doctypes=None):
+        if not doctypes:
+            doctypes = self.DOCTYPES
+        for doctype in doctypes:
+            self.set_default_viewer(doctype)
         return self
 
-    def set_default_viewer(self, language):
+    def set_default_viewer(self, doctype):
         if "@jupyterlab/docmanager-extension:plugin" not in self.config:
             self.config["@jupyterlab/docmanager-extension:plugin"] = {}
         if (
@@ -79,8 +79,8 @@ class LabConfig:
         viewers = self.config["@jupyterlab/docmanager-extension:plugin"][
             "defaultViewers"
         ]
-        if language not in viewers:
-            viewers[language] = "Jupytext Notebook"
+        if doctype not in viewers:
+            viewers[doctype] = "Jupytext Notebook"
 
     def write(self) -> bool:
         """

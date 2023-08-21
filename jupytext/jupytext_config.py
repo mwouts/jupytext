@@ -47,12 +47,15 @@ class SetDefaultViewer(SubCommand):
         super().__init__("set-default-viewer", "Set default viewers for JupyterLab")
 
     def main(self, args):
-        LabConfig().read().set_default_viewers(args.language).write()
+        LabConfig().read().set_default_viewers(args.doctype).write()
         return 0
 
     def fill_parser(self, subparser):
         subparser.add_argument(
-            "language", nargs="*", help="the language(s) that the viewer applies to"
+            "doctype",
+            nargs="*",
+            help=f"the document types to be associated with the notebook editor. "
+            f"Defaults to {' '.join(LabConfig.DOCTYPES)}",
         )
 
 
