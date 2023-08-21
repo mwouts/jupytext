@@ -4,6 +4,7 @@ jupytext-config set-default-viewer
 and related subcommands
 """
 
+import sys
 from argparse import ArgumentParser
 
 from .labconfig import LabConfig
@@ -73,5 +74,5 @@ def main():
         subparser = subparsers.add_parser(subcommand.name, help=subcommand.help)
         subparser.set_defaults(subcommand=subcommand)
         subcommand.fill_parser(subparser)
-    args = parser.parse_args()
+    args = parser.parse_args(sys.argv[1:] or ["--help"])
     return args.subcommand.main(args)
