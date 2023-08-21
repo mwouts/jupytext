@@ -8,7 +8,8 @@ notebook will cause jupyterlab to open it in an editor, i.e. as a text file
 import copy
 import json
 import logging
-import pprint
+
+# import pprint
 from pathlib import Path
 
 
@@ -46,7 +47,7 @@ class LabConfig:
         self._prior_config = copy.deepcopy(self.config)
         return self
 
-    def list(self):
+    def list_default_viewer(self):
         """
         list the current labconfig settings
         """
@@ -54,9 +55,9 @@ class LabConfig:
             f"Current @jupyterlab/docmanager-extension:plugin in {self.SETTINGS}"
         )
         docmanager = self.config.get("@jupyterlab/docmanager-extension:plugin", {})
-        for key, value in docmanager.items():
-            print(f"{key}:")
-            pprint.pprint(value)
+        viewers = docmanager.get("defaultViewers", {})
+        for key, value in viewers.items():
+            print(f"{key}: {value}")
 
     def set_default_viewers(self, languages=None):
         if not languages:
