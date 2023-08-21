@@ -28,12 +28,14 @@ class SubCommand:
         return 1
 
 
-class List(SubCommand):
+class ListDefaultViewer(SubCommand):
     def __init__(self):
-        super().__init__("list", "Display current settings in labconfig/")
+        super().__init__(
+            "list-default-viewer", "Display current settings in labconfig/"
+        )
 
     def main(self, args):
-        LabConfig().read().list()
+        LabConfig().read().list_default_viewer()
         return 0
 
     def fill_parser(self, subparser):
@@ -56,7 +58,7 @@ class SetDefaultViewer(SubCommand):
 
 # create the subcommands
 SUBCOMMANDS = [
-    List(),
+    ListDefaultViewer(),
     SetDefaultViewer(),
 ]
 
