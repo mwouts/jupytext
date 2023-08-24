@@ -23,6 +23,7 @@ a bit of what happens under the hood.
 installation instructions and activate the JupyterLab plugin. If you're on
 Binder, it should already work.**
 
+
 ## Enabling Jupytext in a new notebook
 
 This notebook is brand new - it hasn't had any special extra metadata added
@@ -35,7 +36,7 @@ we can use the JupyterLab **command palette** to do so.
 * Then type **`Jupytext`**. You should see a number of commands come up. Each
   one tells Jupytext to save the notebook in a different
   file format automatically.
-* Select **Pair notebook with Markdown**
+* Select **Pair notebook with MyST Markdown**
 
 That's it! If you have Jupytext installed, it will now save your notebook in
 markdown format automatically when you save this `.ipynb` file
@@ -43,6 +44,7 @@ markdown format automatically when you save this `.ipynb` file
 
 After you've done this, save the notebook. You should now see a new file called
 **`get_started.md`** in the same directory as this notebook.
+
 
 ## How does Jupytext know to do this?
 
@@ -76,6 +78,6 @@ plt.scatter(*np.random.randn(2, 100), c=np.random.randn(100), s=np.random.rand(1
 
 # Experiment with the demo notebook!
 
-In the "demo" folder for `jupytext` there is a notebook called **`World population.ipynb`**.
+In the *`demo/`* folder for `jupytext` there is a notebook called **`World population.ipynb`**.
 By default, saving the demo notebook will also create *many* possible Jupytext
 outputs so you can see what each looks like and which you prefer.
