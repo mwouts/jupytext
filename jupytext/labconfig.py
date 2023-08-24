@@ -82,6 +82,21 @@ class LabConfig:
         if doctype not in viewers:
             viewers[doctype] = "Jupytext Notebook"
 
+    def unset_default_viewers(self, doctypes=None):
+        if not doctypes:
+            doctypes = self.DOCTYPES
+        for doctype in doctypes:
+            self.unset_default_viewer(doctype)
+        return self
+
+    def unset_default_viewer(self, doctype):
+        viewers = self.config.get("@jupyterlab/docmanager-extension:plugin", {}).get(
+            "defaultViewers", {}
+        )
+        if doctype not in viewers:
+            return
+        del viewers[doctype]
+
     def write(self) -> bool:
         """
         write the labconfig settings file

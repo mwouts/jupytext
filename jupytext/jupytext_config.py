@@ -55,8 +55,25 @@ class SetDefaultViewer(SubCommand):
         subparser.add_argument(
             "doctype",
             nargs="*",
-            help=f"the document types to be associated with the notebook editor. "
-            f"Defaults to {' '.join(LabConfig.DOCTYPES)}",
+            help=f"the document types to be associated with the notebook editor; "
+            f"defaults to {' '.join(LabConfig.DOCTYPES)}",
+        )
+
+
+class UnsetDefaultViewer(SubCommand):
+    def __init__(self):
+        super().__init__("unset-default-viewer", "Unset default viewers for JupyterLab")
+
+    def main(self, args):
+        LabConfig().read().unset_default_viewers(args.doctype).write()
+        return 0
+
+    def fill_parser(self, subparser):
+        subparser.add_argument(
+            "doctype",
+            nargs="*",
+            help=f"the document types for which the default viewer will be unset; "
+            f"defaults to {' '.join(LabConfig.DOCTYPES)}",
         )
 
 
@@ -64,6 +81,7 @@ class SetDefaultViewer(SubCommand):
 SUBCOMMANDS = [
     ListDefaultViewer(),
     SetDefaultViewer(),
+    UnsetDefaultViewer(),
 ]
 
 
