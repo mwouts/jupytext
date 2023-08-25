@@ -54,6 +54,11 @@ jupyter labextension install jupyterlab-jupytext@1.1.1  # for JupyterLab 1.x
 
 ## Jupytext menu in Jupyter Notebook
 
+*Note*: as of this writing (version 1.15.1) this section **applies only to
+notebook classic**, i.e. Jupyter Notebook 6.x and below. See [PR
+#1095](https://github.com/mwouts/jupytext/issues/1095) where we discuss how to
+add a Jupytext menu to Jupyter Lab and Notebook 7.x.
+
 Jupytext includes an extensions for Jupyter Notebook that adds a Jupytext section in the File menu.
 
 ![](images/jupytext_menu.png)
