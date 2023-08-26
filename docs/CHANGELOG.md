@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.15.1 (2023-08-26)
+-------------------
+
+**Added**
+- We have added a new command line interface `jupytext-config` that you can use to set Jupytext as the default viewer for text notebooks in Jupyter Lab and Jupyter Notebook 7. Thanks to [Thierry Parmentelat](https://github.com/parmentelat) for this contribution! ([#1094](https://github.com/mwouts/jupytext/pull/1094))
+
+
 1.15.0 (2023-07-30)
 -------------------
 
