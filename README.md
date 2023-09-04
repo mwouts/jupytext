@@ -108,7 +108,7 @@ Once you are done editing the `.py` notebook, you will just have to _reload_ the
 
 Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the paired `.py` file. There is no obligation to do so, however if you don't, you should be prepared to read carefully the pop-up messages. If Jupyter tries to save the notebook while the paired `.py` file has also been edited on disk since the last reload, a conflict will be detected and you will be asked to decide which version of the notebook (in memory, or on disk) is the appropriate one.
 
-## More ressources
+## More resources
 
 Read more about Jupytext in the [documentation](https://jupytext.readthedocs.io).
 
