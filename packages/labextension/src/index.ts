@@ -33,6 +33,9 @@ import {
 
 import { markdownIcon } from "@jupyterlab/ui-components";
 
+import { IRisePreviewFactory } from 'jupyterlab-rise';
+
+
 interface IJupytextFormat {
   /**
    * Conversion format
@@ -120,13 +123,6 @@ function get_jupytext_formats(notebook_tracker: INotebookTracker): Array<string>
 
   const model = notebook_tracker.currentWidget.context.model;
 
-  // xxx not sure this is useful
-  // if metadata.get("jupytext") used to return something that is void
-  // then we're in the clear
-  // if (! JLAB4)
-  //   if (! (model.metadata as any)?.has("jupytext"))
-  //     return [];
-
   const jupytext: IJupytextSection = (JLAB4
     ? (model as any).getMetadata("jupytext")
     : (model.metadata as any)?.get('jupytext')) as IJupytextSection;
@@ -175,15 +171,14 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
     formats.push(notebook_extension);
   else {
     let format_name = 'light';
-    // xxx same here, the test is probably not needed
-    // if (notebook_tracker.currentWidget.context.model.metadata.has("jupytext")) {
+
     const model = notebook_tracker.currentWidget.context.model;
     const jupytext: IJupytextSection = (JLAB4
       ? (model as any).getMetadata('jupytext')
       : (model.metadata as any)?.get('jupytext')) as IJupytextSection;
     if (jupytext && jupytext.text_representation && jupytext.text_representation.format_name)
       format_name = jupytext.text_representation.format_name;
-    // }
+
     formats.push('auto:' + format_name);
   }
   return formats;
@@ -195,10 +190,7 @@ function get_selected_formats(notebook_tracker: INotebookTracker): Array<string>
 const extension: JupyterFrontEndPlugin<void> = {
   id: "jupyterlab-jupytext",
   autoStart: true,
-  // IEditorTracker and IMarkdownViewerTracker are optionally requested only
-  // to ensure this is called after they are activated and we properly overwrite
-  // the default factory for non-notebook file format
-  optional: [ITranslator, ICommandPalette],
+  optional: [ITranslator, ICommandPalette, IRisePreviewFactory],
   requires: [
     NotebookPanel.IContentFactory,
     IEditorServices,
@@ -207,10 +199,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     INotebookWidgetFactory,
     INotebookTracker,
     ISettingRegistry,
-    IToolbarWidgetRegistry,
-    ICommandPalette,
-    ITranslator,
-
+    IToolbarWidgetRegistry
   ],
   activate: (
     app: JupyterFrontEnd,
@@ -220,10 +209,11 @@ const extension: JupyterFrontEndPlugin<void> = {
     sessionContextDialogs: ISessionContextDialogs,
     notebookFactory: NotebookWidgetFactory.IFactory,
     notebookTracker: INotebookTracker,
-    settingRegistry: ISettingRegistry | null,
+    settingRegistry: ISettingRegistry,
     toolbarRegistry: IToolbarWidgetRegistry,
-    palette: ICommandPalette | null,
     translator: ITranslator | null,
+    palette: ICommandPalette | null,
+    riseFactory: IRisePreviewFactory | null
   ) => {
     // https://semver.org/#semantic-versioning-specification-semver
     // npm semver requires pre-release versions to come with a hyphen
@@ -233,7 +223,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     if (app.name == "JupyterLab") {
       const app_numbers = app.version.match(/[0-9]+/);
       if (app_numbers) {
-        JLAB4 = parseInt(app_numbers[0]) >= 4;
+        JLAB4 = parseInt(app_numbers[0], 10) >= 4;
       }
     }
     console.log("JupyterLab extension jupytext is activating...");
@@ -280,10 +270,10 @@ const extension: JupyterFrontEndPlugin<void> = {
             if ( notebookTracker.currentWidget === null)
               return;
             const model = notebookTracker.currentWidget.context.model;
-            const jupytext: IJupytextSection = (JLAB4
+            let jupytext: IJupytextSection = (JLAB4
               ? (model as any).getMetadata('jupytext')
               : (model.metadata as any)?.get('jupytext')
-            ) as IJupytextSection;
+            ) as IJupytextSection | undefined;
           let formats: Array<string> = get_selected_formats(notebookTracker);
 
           // Toggle the selected format
@@ -344,7 +334,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           if (formats.length === 1) {
             if (notebook_extension !== 'auto')
               formats = [];
-            else if (jupytext && jupytext.text_representation) {
+            else if (jupytext?.text_representation) {
               const format_name = formats[0].split(':')[1];
               jupytext.text_representation.format_name = format_name;
               formats = [];
@@ -359,12 +349,12 @@ const extension: JupyterFrontEndPlugin<void> = {
             if (jupytext.formats) {
               delete jupytext.formats;
             }
-
             if (Object.keys(jupytext).length == 0) {
-              const model = notebookTracker.currentWidget.context.model;
               JLAB4
                 ? (model as any).deleteMetadata("jupytext")
                 : (model.metadata as any).delete("jupytext");
+            } else if (JLAB4) {
+              (model as any).setMetadata('jupytext', jupytext)
             }
             return;
           }
@@ -372,11 +362,12 @@ const extension: JupyterFrontEndPlugin<void> = {
           // set the desired format
           if (jupytext) jupytext.formats = formats.join();
           else {
-            const model = notebookTracker.currentWidget.context.model;
-            JLAB4
-              ? (model as any).setMetadata("jupytext", { formats: formats.join() })
-              : (model.metadata as any)?.set( { formats: formats.join() });
-            }
+            jupytext = { formats: formats.join() }
+            if(!JLAB4)
+              (model.metadata as any)?.set("jupytext", jupytext);
+          }
+          if (JLAB4)
+            (model as any).setMetadata('jupytext', jupytext);
       }
       });
 
@@ -457,20 +448,21 @@ const extension: JupyterFrontEndPlugin<void> = {
           ? (model as any).getMetadata("jupytext")
           : (model.metadata as any)?.get("jupytext")
         if (!jupytext_metadata)
-          return false;
+          return;
 
-        const jupytext: IJupytextSection = (jupytext_metadata as unknown) as IJupytextSection;
+        const jupytext = (jupytext_metadata as unknown ?? {}) as IJupytextSection;
 
         if (jupytext.notebook_metadata_filter) {
           delete jupytext.notebook_metadata_filter;
           if (jupytext.cell_metadata_filter === '-all')
             delete jupytext.cell_metadata_filter;
-          return
+        } else {
+          jupytext.notebook_metadata_filter = '-all';
+          if (jupytext.cell_metadata_filter === undefined)
+            jupytext.cell_metadata_filter = '-all';
         }
-
-        jupytext.notebook_metadata_filter = '-all'
-        if (jupytext.cell_metadata_filter === undefined)
-          jupytext.cell_metadata_filter = '-all';
+        if (JLAB4)
+          (model as any).setMetadata('jupytext', jupytext);
       }
     });
 
@@ -481,27 +473,42 @@ const extension: JupyterFrontEndPlugin<void> = {
     });
 
     // Define file types
-    app.docRegistry.addFileType({
-      name: "myst",
-      displayName: trans.__("MyST Markdown Notebook"),
-      extensions: [".myst", ".mystnb", ".mnb"],
-      icon: markdownIcon
-    });
+    app.docRegistry.addFileType(
+      {
+        name: "myst",
+        displayName: trans.__("MyST Markdown Notebook"),
+        extensions: [".myst", ".mystnb", ".mnb"],
+        icon: markdownIcon
+      },
+      [
+        'Notebook'
+      ]
+    );
 
-    app.docRegistry.addFileType({
-      name: "r-markdown",
-      displayName: trans.__("R Markdown Notebook"),
-      // Extension file are transformed to lower case...
-      extensions: [".rmd"],
-      icon: markdownIcon
-    });
+    app.docRegistry.addFileType(
+      {
+        name: "r-markdown",
+        displayName: trans.__("R Markdown Notebook"),
+        // Extension file are transformed to lower case...
+        extensions: [".rmd"],
+        icon: markdownIcon
+      },
+      [
+        'Notebook'
+      ]
+    );
 
-    app.docRegistry.addFileType({
-      name: "quarto",
-      displayName: trans.__("Quarto Notebook"),
-      extensions: [".qmd"],
-      icon: markdownIcon
-    });
+    app.docRegistry.addFileType(
+      {
+        name: "quarto",
+        displayName: trans.__("Quarto Notebook"),
+        extensions: [".qmd"],
+        icon: markdownIcon
+      },
+      [
+        'Notebook'
+      ]
+    );
 
     // the way to create the toolbar factory is different in JupyterLab 3 and 4
     let toolbarFactory
@@ -527,7 +534,8 @@ const extension: JupyterFrontEndPlugin<void> = {
     //   Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
     const factory = new NotebookWidgetFactory({
       name: "Jupytext Notebook",
-      label: trans.__("Jupytext Notebook"), // mandatory in jlab4 (not in jlab3)
+      // @ts-expect-error Available in jlab4+
+      label: trans.__("Jupytext Notebook"),
       fileTypes: ["markdown", "myst", "r-markdown", "quarto", "julia", "python", "r"],
       modelName: notebookFactory.modelName ?? "notebook",
       preferKernel: notebookFactory.preferKernel ?? true,
@@ -537,10 +545,10 @@ const extension: JupyterFrontEndPlugin<void> = {
       editorConfig: notebookFactory.editorConfig,
       notebookConfig: notebookFactory.notebookConfig,
       mimeTypeService: editorServices.mimeTypeService,
-      // sessionDialogs: sessionContextDialogs,
+      sessionDialogs: sessionContextDialogs,
       toolbarFactory: toolbarFactory,
-      // translator?: ITranslator,
-    } as NotebookWidgetFactory.IOptions<NotebookPanel>);
+      translator,
+    });
     app.docRegistry.addWidgetFactory(factory);
 
     // Register widget created with the new factory in the notebook tracker
@@ -559,15 +567,24 @@ const extension: JupyterFrontEndPlugin<void> = {
 
       // Notify the widget tracker if restore data needs to update.
       widget.context.pathChanged.connect(() => {
-        // Trick using private API
-        // @ts-ignore
+        // @ts-expect-error Trick using private API
         void notebookTracker.save(widget);
       });
       // Add the notebook panel to the tracker.
-      //   Trick using private API
-      //   @ts-ignore
+      //   @ts-expect-error Trick using private API
       void notebookTracker.add(widget);
     });
+
+    // Add support for RISE slides
+    if(riseFactory) {
+      riseFactory.addFileType('markdown');
+      riseFactory.addFileType('myst');
+      riseFactory.addFileType('r-markdown');
+      riseFactory.addFileType('quarto');
+      riseFactory.addFileType('julia');
+      riseFactory.addFileType('python');
+      riseFactory.addFileType('r');
+    }
   },
 };
 
