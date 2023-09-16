@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.15.2 (2023-09-16)
+-------------------
+
+**Added**
+- The Jupyter Lab extension is now compatible with the [JupyterLab RISE](https://github.com/jupyterlab-contrib/rise) extension. Many thanks to [Frédéric Collonval](https://github.com/fcollonval) for his PR ([#1126](https://github.com/mwouts/jupytext/pull/1126))!
+
+
 1.15.1 (2023-08-26)
 -------------------
 
