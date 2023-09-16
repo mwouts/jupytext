@@ -152,7 +152,6 @@ jobs:
         if: ${{ matrix.os != 'windows-latest' }}
 
   build:
-    needs: test-pip
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -175,3 +174,8 @@ jobs:
           # Install
           python -m pip install dist/*.tar.gz
           echo "Install went OK"
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist
