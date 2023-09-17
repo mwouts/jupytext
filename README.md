@@ -12,14 +12,13 @@
 [![Binder:lab](https://img.shields.io/badge/binder-jupyterlab-0172B2.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
 [![launch - renku](https://renkulab.io/renku-badge.svg)](https://renkulab.io/projects/best-practices/jupytext/sessions/new?autostart=1)
 [![](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48)
-
 # Jupytext
 
 Have you always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningful diffs when doing version control? Then, Jupytext may well be the tool you're looking for!
 
 ## Text Notebooks
 
-A Python notebook encoded in the `py:percent` [format](docs/formats-scripts.md#the-percent-format) has a `.py` extension and look like this:
+A Python notebook encoded in the `py:percent` [format](docs/formats-scripts.md#the-percent-format) has a `.py` extension and looks like this:
 
 ```
 # %% [markdown]
@@ -32,7 +31,7 @@ def f(x):
 
 Only the notebook inputs (and optionally, the metadata) are included. Text notebooks are well suited for version control. You can also edit or refactor them in an IDE - the `.py` notebook above is a regular Python file.
 
-We recommend the `percent` format for notebooks that mostly contains code. The `percent` format is available for Julia, Python, R and many others [languages](docs/languages.md).
+We recommend the `percent` format for notebooks that mostly contain code. The `percent` format is available for Julia, Python, R and many other [languages](docs/languages.md).
 
 If your notebook is documentation-oriented, a [Markdown-based format](docs/formats-markdown.md) (text notebooks with a `.md` extension) might be more appropriate. Depending on what you plan to do with your notebook, you might prefer the Myst Markdown format, which interoperates very well with Jupyter Book, or Quarto Markdown, or even Pandoc Markdown.
 
@@ -52,7 +51,7 @@ Then, restart your Jupyter Lab server, and make sure Jupytext is activated in Ju
 
 ## Paired Notebooks
 
-Text notebooks with a `.py` or `.md` extension are well suited for version control. They can be edited or authored conveniently in an IDE. You can open and run them as notebooks in Jupyter Lab with a right click. However the notebook outputs are lost when the notebook is closed, as only the notebook inputs are saved in text notebooks.
+Text notebooks with a `.py` or `.md` extension are well suited for version control. They can be edited or authored conveniently in an IDE. You can open and run them as notebooks in Jupyter Lab with a right click. However, the notebook outputs are lost when the notebook is closed, as only the notebook inputs are saved in text notebooks.
 
 A convenient alternative to text notebooks are [paired notebooks](docs/paired-notebooks.md). These are a set of two files, say `.ipynb` and `.py`, that contain the same notebook, but in different formats.
 
@@ -106,12 +105,13 @@ Once your notebook is [paired](docs/paired-notebooks.md) with a `.py` file, you 
 
 Once you are done editing the `.py` notebook, you will just have to _reload_ the notebook in Jupyter to get the latest edits there.
 
-Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the paired `.py` file. There is no obligation to do so, however if you don't, you should be prepared to read carefully the pop-up messages. If Jupyter tries to save the notebook while the paired `.py` file has also been edited on disk since the last reload, a conflict will be detected and you will be asked to decide which version of the notebook (in memory, or on disk) is the appropriate one.
+Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the paired `.py` file. There is no obligation to do so; however, if you don't, you should be prepared to read carefully the pop-up messages. If Jupyter tries to save the notebook while the paired `.py` file has also been edited on disk since the last reload, a conflict will be detected and you will be asked to decide which version of the notebook (in memory or on disk) is the appropriate one.
 
-## More ressources
+## More resources
 
 Read more about Jupytext in the [documentation](https://jupytext.readthedocs.io).
 
 If you're new to Jupytext, you may want to start with the [FAQ](docs/faq.md) or with the [Tutorials](docs/tutorials.md).
 
 There is also this short introduction to Jupytext: [![](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48).
+
