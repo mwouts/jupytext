@@ -11,14 +11,13 @@
 [![launch - renku](https://renkulab.io/renku-badge.svg)](https://renkulab.io/projects/best-practices/jupytext/sessions/new?autostart=1)
 [![](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48)
 
-
 # Jupytext
 
 Have you always wished Jupyter notebooks were plain text documents? Wished you could edit them in your favorite IDE? And get clear and meaningful diffs when doing version control? Then, Jupytext may well be the tool you're looking for!
 
 ## Text Notebooks
 
-A Python notebook encoded in the `py:percent` [format](formats-scripts.md#the-percent-format) has a `.py` extension and look like this:
+A Python notebook encoded in the `py:percent` [format](formats-scripts.md#the-percent-format) has a `.py` extension and looks like this:
 
 ```
 # %% [markdown]
@@ -31,7 +30,7 @@ def f(x):
 
 Only the notebook inputs (and optionally, the metadata) are included. Text notebooks are well suited for version control. You can also edit or refactor them in an IDE - the `.py` notebook above is a regular Python file.
 
-We recommend the `percent` format for notebooks that mostly contains code. The `percent` format is available for Julia, Python, R and many others [languages](languages.md).
+We recommend the `percent` format for notebooks that mostly contain code. The `percent` format is available for Julia, Python, R, and many other [languages](languages.md).
 
 If your notebook is documentation-oriented, a [Markdown-based format](formats-markdown.md) (text notebooks with a `.md` extension) might be more appropriate. Depending on what you plan to do with your notebook, you might prefer the Myst Markdown format, which interoperates very well with Jupyter Book, or Quarto Markdown, or even Pandoc Markdown.
 
@@ -45,17 +44,17 @@ or
 
     conda install jupytext -c conda-forge
 
-Then, restart your Jupyter Lab server, and make sure Jupytext is activated in Jupyter:  `.py` and `.md` files have a Notebook icon, and you can open them as Notebooks with a right click in Jupyter Lab.
+Then, restart your Jupyter Lab server, and make sure Jupytext is activated in Jupyter: `.py` and `.md` files have a Notebook icon, and you can open them as Notebooks with a right-click in Jupyter Lab.
 
 ![](images/jupyterlab_right_click.png)
 
 ## Paired Notebooks
 
-Text notebooks with a `.py` or `.md` extension are well suited for version control. They can be edited or authored conveniently in an IDE. You can open and run them as notebooks in Jupyter Lab with a right click. However the notebook outputs are lost when the notebook is closed, as only the notebook inputs are saved in text notebooks.
+Text notebooks with a `.py` or `.md` extension are well suited for version control. They can be edited or authored conveniently in an IDE. You can open and run them as notebooks in Jupyter Lab with a right-click. However, the notebook outputs are lost when the notebook is closed, as only the notebook inputs are saved in text notebooks.
 
-A convenient alternative to text notebooks are [paired notebooks](paired-notebooks.md). These are a set of two files, say `.ipynb` and `.py`, that contain the same notebook, but in different formats.
+A convenient alternative to text notebooks are [paired notebooks](paired-notebooks.md). These are a set of two files, say `.ipynb` and `.py`, that contain the same notebook but in different formats.
 
-You can edit the `.py` version of the paired notebook, and get the edits back in Jupyter by selecting _reload notebook from disk_. The outputs will be reloaded from the `.ipynb` file, if it exists. The `.ipynb` version will be updated or recreated the next time you save the notebook in Jupyter.
+You can edit the `.py` version of the paired notebook and get the edits back in Jupyter by selecting _reload notebook from disk_. The outputs will be reloaded from the `.ipynb` file if it exists. The `.ipynb` version will be updated or recreated the next time you save the notebook in Jupyter.
 
 To pair a notebook in Jupyter Lab, use the command `Pair Notebook with percent Script` from the Command Palette:
 
@@ -82,7 +81,7 @@ Jupytext is also available at the [command line](using-cli.md). You can
 ### Notebooks under version control
 
 This is a quick how-to:
-- Open your `.ipynb` notebook in Jupyter and [pair](paired-notebooks.md) it to a `.py` notebook, using either the _pair_ command in Jupyter Lab, or a global [configuration file](config.md)
+- Open your `.ipynb` notebook in Jupyter and [pair](paired-notebooks.md) it to a `.py` notebook, using either the _pair_ command in Jupyter Lab or a global [configuration file](config.md)
 - Save the notebook - this creates a `.py` notebook
 - Add this `.py` notebook to version control
 
@@ -95,9 +94,9 @@ Collaborating on Jupyter notebooks through Git becomes as easy as collaborating 
 Assume that you have your `.py` notebooks under version control (see above). Then,
 - Your collaborator pulls the `.py` notebook
 - They open it _as a notebook_ in Jupyter (right-click in Jupyter Lab)
-- At that stage the notebook has no outputs. They run the notebook and save it. Outputs are regenerated, and a local `.ipynb` file is created
-- They edit the notebook, and push the updated `notebook.py` file. The diff is nothing else than a standard diff on a Python script.
-- You pull the updated `notebook.py` script, and refresh your browser. The input cells are updated based on the new content of `notebook.py`. The outputs are reloaded from your local `.ipynb` file. Finally, the kernel variables are untouched, so you have the option to run only the modified cells to get the new outputs.
+- At that stage, the notebook has no outputs. They run the notebook and save it. Outputs are regenerated, and a local `.ipynb` file is created
+- They edit the notebook and push the updated `notebook.py` file. The diff is nothing else than a standard diff on a Python script.
+- You pull the updated `notebook.py` script and refresh your browser. The input cells are updated based on the new content of `notebook.py`. The outputs are reloaded from your local `.ipynb` file. Finally, the kernel variables are untouched, so you have the option to run only the modified cells to get the new outputs.
 
 ### Editing or refactoring a notebook in an IDE
 
@@ -105,9 +104,9 @@ Once your notebook is [paired](paired-notebooks.md) with a `.py` file, you can e
 
 Once you are done editing the `.py` notebook, you will just have to _reload_ the notebook in Jupyter to get the latest edits there.
 
-Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the paired `.py` file. There is no obligation to do so, however if you don't, you should be prepared to read carefully the pop-up messages. If Jupyter tries to save the notebook while the paired `.py` file has also been edited on disk since the last reload, a conflict will be detected and you will be asked to decide which version of the notebook (in memory, or on disk) is the appropriate one.
+Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the paired `.py` file. There is no obligation to do so; however, if you don't, you should be prepared to read carefully the pop-up messages. If Jupyter tries to save the notebook while the paired `.py` file has also been edited on disk since the last reload, a conflict will be detected, and you will be asked to decide which version of the notebook (in memory or on disk) is the appropriate one.
 
-## More ressources
+## More resources
 
 Read more about Jupytext in the [documentation](https://jupytext.readthedocs.io).
 
@@ -136,3 +135,4 @@ contributing.md
 developing.md
 CHANGELOG.md
 ```
+
