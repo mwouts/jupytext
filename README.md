@@ -1,6 +1,6 @@
 ![](https://github.com/mwouts/jupytext/blob/17aea37c612f33a4e27eeee4b81966f1506920fd/docs/images/logo_large.png?raw=true)
 
-![CI](https://github.com/mwouts/jupytext/workflows/CI/badge.svg)
+![CI](https://github.com/mwouts/jupytext/actions/workflows/continuous-integration.yml/badge.svg?branch=main)
 [![Documentation Status](https://readthedocs.org/projects/jupytext/badge/?version=latest)](https://jupytext.readthedocs.io/en/latest/?badge=latest)
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=main)](https://codecov.io/gh/mwouts/jupytext/branch/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -114,4 +114,3 @@ Read more about Jupytext in the [documentation](https://jupytext.readthedocs.io)
 If you're new to Jupytext, you may want to start with the [FAQ](docs/faq.md) or with the [Tutorials](docs/tutorials.md).
 
 There is also this short introduction to Jupytext: [![](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48).
-
