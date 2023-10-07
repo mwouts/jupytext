@@ -1,4 +1,4 @@
-![CI](https://github.com/mwouts/jupytext/workflows/CI/badge.svg)
+![CI](https://github.com/mwouts/jupytext/actions/workflows/continuous-integration.yml/badge.svg?branch=main)
 [![Documentation Status](https://readthedocs.org/projects/jupytext/badge/?version=latest)](https://jupytext.readthedocs.io/en/latest/?badge=latest)
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=main)](https://codecov.io/gh/mwouts/jupytext/branch/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -135,4 +135,3 @@ contributing.md
 developing.md
 CHANGELOG.md
 ```
-
