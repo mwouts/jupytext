@@ -31,3 +31,10 @@ demo/get_started.ipynb
 # Test related files
 *.coverage*
 *.xml
+
+# Ignore node_modules and yarn cache
+node_modules
+.yarn
+
+# Ignore jupyter-releaser related stuff
+.jupyter_releaser_checkout

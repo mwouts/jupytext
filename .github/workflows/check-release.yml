@@ -1,0 +1,26 @@
+name: Check Release
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  check_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - name: Check Release
+        uses: jupyter-server/jupyter_releaser/.github/actions/check-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Distributions
+        uses: actions/upload-artifact@v2
+        with:
+          name: jupyter-resource-usage-releaser-dist-${{ github.run_number }}
+          path: .jupyter_releaser_checkout/dist
