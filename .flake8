@@ -1,0 +1,4 @@
+[flake8]
+max-line-length=127
+exclude=tests/notebooks/*
+ignore=E203,E231,W503

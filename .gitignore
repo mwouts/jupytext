@@ -27,3 +27,7 @@ demo/get_started.ipynb
 .history
 .vscode/*
 !.vscode/*.template
+
+# Test related files
+*.coverage*
+*.xml
