@@ -5,7 +5,6 @@ import {
 
 import {
   ICommandPalette,
-  ISessionContextDialogs,
   showErrorMessage,
   IToolbarWidgetRegistry,
   createToolbarFactory,
@@ -195,7 +194,6 @@ const extension: JupyterFrontEndPlugin<void> = {
     NotebookPanel.IContentFactory,
     IEditorServices,
     IRenderMimeRegistry,
-    ISessionContextDialogs,
     INotebookWidgetFactory,
     INotebookTracker,
     ISettingRegistry,
@@ -206,7 +204,6 @@ const extension: JupyterFrontEndPlugin<void> = {
     contentFactory: NotebookPanel.IContentFactory,
     editorServices: IEditorServices,
     rendermime: IRenderMimeRegistry,
-    sessionContextDialogs: ISessionContextDialogs,
     notebookFactory: NotebookWidgetFactory.IFactory,
     notebookTracker: INotebookTracker,
     settingRegistry: ISettingRegistry,
@@ -534,7 +531,6 @@ const extension: JupyterFrontEndPlugin<void> = {
     //   Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
     const factory = new NotebookWidgetFactory({
       name: "Jupytext Notebook",
-      // @ts-expect-error Available in jlab4+
       label: trans.__("Jupytext Notebook"),
       fileTypes: ["markdown", "myst", "r-markdown", "quarto", "julia", "python", "r"],
       modelName: notebookFactory.modelName ?? "notebook",
@@ -545,7 +541,6 @@ const extension: JupyterFrontEndPlugin<void> = {
       editorConfig: notebookFactory.editorConfig,
       notebookConfig: notebookFactory.notebookConfig,
       mimeTypeService: editorServices.mimeTypeService,
-      sessionDialogs: sessionContextDialogs,
       toolbarFactory: toolbarFactory,
       translator,
     });

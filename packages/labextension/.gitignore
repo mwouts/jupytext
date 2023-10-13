@@ -4,3 +4,12 @@ node_modules/
 *.egg-info/
 .ipynb_checkpoints
 *.tgz
+
+# Ignore yarn cache
+.yarn/
+
+# Ignore labextension
+jupyterlab_jupytext/labextension
+
+# Ignore _version.py. Handled by hatch
+jupyterlab_jupytext/_version.py
