@@ -31,6 +31,7 @@ demo/get_started.ipynb
 # Test related files
 *.coverage*
 *.xml
+.ruff_cache
 
 # Ignore node_modules and yarn cache
 node_modules
