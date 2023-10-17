@@ -30,4 +30,5 @@ jobs:
     uses: ./.github/workflows/step_tests-conda.yml
 
   build:
+    needs: [codeql, test-pip, test-conda]
     uses: ./.github/workflows/step_build.yml
