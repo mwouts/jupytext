@@ -1,0 +1,33 @@
+name: CI
+on:
+  push:
+    paths-ignore:
+      - 'CHANGELOG.md'
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 11 * * 4'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    uses: ./.github/workflows/step_pre-commit.yml
+
+  codeql:
+    needs: pre-commit
+    uses: ./.github/workflows/step_static-analysis.yml
+
+  test-pip:
+    needs: pre-commit
+    uses: ./.github/workflows/step_tests-pip.yml
+
+  test-conda:
+    needs: pre-commit
+    uses: ./.github/workflows/step_tests-conda.yml
+
+  build:
+    uses: ./.github/workflows/step_build.yml

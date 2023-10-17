@@ -1,0 +1,64 @@
+name: build
+run-name: Build test
+
+on:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Base Setup
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+
+      - name: Lint the extension
+        run: |
+          # Install JupyterLab in an isolated env to get jlpm
+          pipx install jupyterlab>=4
+          pipx list
+
+          # Install lint deps and lint extension
+          jlpm
+          jlpm run lint:check
+
+          # Uninstall pipx env
+          pipx uninstall jupyterlab
+
+      - name: Build package
+        run: |
+          python -m pip install build wheel
+
+          # Build jupytext package
+          HATCH_BUILD_HOOKS_ENABLE=true python -m build
+
+          # Don't publish a tar.gz file over 1MB  (Issue #730)
+          if (($(wc -c < dist/*.tar.gz) > 1000000)); then exit 1; fi
+
+          # node_modules should not be in the package
+          if (($(tar -tf dist/*.tar.gz | grep node_modules | wc -l)>0)); then echo "node_modules should not be included" && exit 1; fi
+
+          # Check that the lab is there
+          if (($(tar -tf dist/*.tar.gz | grep jupyterlab/packages/jupyterlab_jupytext/labextension/package.json$ | wc -l)==0)); then echo "Missing lab extension" && exit 1; fi
+
+          # Install package and extension
+          python -m pip install dist/*.tar.gz
+
+          # Check extension
+          jupyter labextension list
+          jupyter labextension list 2>&1 | grep -ie "jupyterlab-jupytext.*OK"
+          python -m jupyterlab.browser_check
+
+          echo "Install went OK"
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist

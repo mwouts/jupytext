@@ -7,45 +7,28 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+-dev[0-9]+"
 
 jobs:
-  publish-jupytext:
+  publish:
     runs-on: ubuntu-latest
+
     environment:
       name: pypi
       url: https://pypi.org/p/jupytext
+
     permissions:
       id-token: write
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
+
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-        with:
-          python_version: 3.9
-      - name: Build package
-        run: |
-          python -m pip install wheel build
-          python -m build
-      - name: Publish
-        uses: pypa/gh-action-pypi-publish@release/v1
 
-  publish-jupyterlab_jupytext:
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/jupyterlab_jupytext
-    permissions:
-      id-token: write
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v3
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
       - name: Build package
         run: |
-          cd packages/labextension
           python -m pip install wheel build
-          python -m build
+          # Ensure that we build jupyterlab extension and distribute it with wheel
+          HATCH_BUILD_HOOKS_ENABLE=true python -m build
+
       - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1

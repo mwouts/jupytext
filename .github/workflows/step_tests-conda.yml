@@ -1,0 +1,60 @@
+name: test-conda
+run-name: Run tests using Conda
+
+on:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-conda:
+    strategy:
+      matrix:
+        os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
+        python-version: [ 3.9 ]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache conda
+        uses: actions/cache@v3
+        with:
+          path: ~/conda_pkgs_dir
+          key: conda-${{ matrix.os }}-python-${{ matrix.python-version }}-${{ hashFiles('.ci/environment-ci.yml') }}
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          auto-activate-base: false
+          activate-environment: jupytext-ci
+          python-version: ${{ matrix.python-version }}
+          channels: defaults,conda-forge
+          environment-file: .ci/environment-ci.yml
+          use-only-tar-bz2: true
+
+      - name: Install from source
+        # This is required for the pre-commit tests
+        shell: pwsh
+        run: python -m pip install '.[test-cov]'
+
+      - name: Create kernel
+        shell: pwsh
+        run: |
+          python -m ipykernel install --name jupytext-ci --user
+
+      - name: Conda list
+        shell: pwsh
+        run: conda list
+
+      - name: Test with pytest
+        shell: pwsh
+        run: pytest --cov=jupytext --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        if: ${{ matrix.os != 'windows-latest' }}
