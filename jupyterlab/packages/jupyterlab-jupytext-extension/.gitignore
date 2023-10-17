@@ -9,7 +9,7 @@ node_modules/
 .yarn/
 
 # Ignore labextension
-jupyterlab_jupytext/labextension
+jupyter_jupytext/labextension
 
 # Ignore _version.py. Handled by hatch
-jupyterlab_jupytext/_version.py
+jupyter_jupytext/_version.py

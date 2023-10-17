@@ -16,6 +16,9 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Environment :: Console",
     "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Topic :: Text Processing :: Markup",
@@ -30,52 +33,118 @@ dependencies = [
     "nbformat",
     "pyyaml",
     "toml",
-    "markdown-it-py>=1.0.0",
     "mdit_py_plugins",
+    "markdown-it-py>=1.0.0",
 ]
 dynamic = ["version"]
 
 [project.urls]
-homepage = "https://github.com/mwouts/jupytext"
-source = "https://github.com/mwouts/jupytext"
-documentation = "https://jupytext.readthedocs.io/en/latest/index.html"
+Homepage = "https://github.com/mwouts/jupytext"
+"Source Code" = "https://github.com/mwouts/jupytext"
+Documentation = "https://jupytext.readthedocs.io/en/latest/index.html"
 
 [project.optional-dependencies]
-extension = [
-    "jupytext_extension",
-]
-dev = [
+# Test related dependencies
+# TODO: Split them into unit, integration and functional tests groups
+test = [
     "autopep8",
     "black",
     "isort",
+    "ruff",
     "flake8",
     "pytest",
-    "pytest-cov>=2.6.1",
+    "pytest-randomly",
     "gitpython",
     "jupyterlab",
     "notebook",
     "nbconvert",
+    "jupyter-fs",
     "ipykernel",
+    "pre-commit",
 ]
-# left for back-compatibility
-rst2md = [
-    "sphinx-gallery~=0.7.0",
+# Coverage requirements
+test-cov = [
+    "jupytext[test]",
+    "pytest-cov>=2.6.1",
+]
+dev = [
+    "jupytext[test]",
+]
+# Documentation dependencies
+docs = [
+    "sphinx",
+    "sphinx_copybutton",
+    "sphinx_rtd_theme",
+    "myst_parser",
 ]
 
 [project.scripts]
 "jupytext" = "jupytext.cli:jupytext"
-"jupytext-config" = "jupytext.jupytext_config:main"
+"jupytext-config" = "jupytext_config.__main__:main"
 
 [tool.hatch.version]
-path = "jupytext/version.py"
+# Read version string from version.py and use it for the package
+path = "src/jupytext/version.py"
+
+[tool.hatch.build]
+sources = ["src", "jupyterlab"]
+
+# Following config is related to JupyterLab extension
+[tool.hatch.build.targets.sdist]
+artifacts = ["jupyterlab/jupyterlab_jupytext/labextension"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupytext"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"jupyter-config" = "etc/jupyter"
-"jupytext/nbextension" = "share/jupyter/nbextensions/jupytext"
+"jupyterlab/jupyter-config" = "etc/jupyter"
+"jupyterlab/jupyterlab_jupytext/labextension" = "share/jupyter/labextensions/jupyterlab-jupytext"
+
+[tool.hatch.build.hooks.jupyter-builder]
+# Disable running hook by default.
+# We invoke this hook only by setting env var HATCH_BUILD_HOOKS_ENABLE=true
+# So `HATCH_BUILD_HOOKS_ENABLE=true pip install .` will build JupyterLab related
+# extensions. A simple `pip install .` will skip building extensions
+enable-by-default = false
+# Runtime dependency for this build hook
+# We need jupyterlab as build time depdendency to get jlpm (wrapper around yarn)
+dependencies = [
+    "hatch-jupyter-builder>=0.5", "jupyterlab>=4,<5"
+]
+# We use npm_builder to build the jupyterlab extension
+build-function = "hatch_jupyter_builder.npm_builder"
+# Hatch will mark this hook as success upon creation of following files
+# in the build_dir
+ensured-targets = [
+    "jupyterlab/jupyterlab_jupytext/labextension/static/style.js",
+    "jupyterlab/jupyterlab_jupytext/labextension/package.json",
+]
+# If these files already exists in build_dir (after first build),
+# hatch will skip build step. If there are changes in src/ of
+# the extension, build will be triggered even if the build assets exist
+skip-if-exists = ["jupyterlab/jupyterlab_jupytext/labextension/static/style.js"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+# Root directory where build should be done
+path = "jupyterlab"
+# Build command that is defined in package.json
+build_cmd = "build:prod"
+# We use jlpm, which is wrapper around yarn to build transpiled assets
+npm = ["jlpm"]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+path = "jupyterlab"
+build_cmd = "build"
+npm = ["jlpm"]
+# hatch-jupyter-builder hook will check the mtime of source_dir and
+# compare it with build_dir to decide if build is necessary or not
+source_dir = "jupyterlab/packages"
+build_dir = "jupyterlab/jupyterlab_jupytext/labextension"
 
 [tool.check-wheel-contents]
 ignore = ["W002"]
 
+# TODO: We are not using pylint anymore. Maybe we can remove this config?
 [tool.pylint.'MASTER']
 max-line-length = 127
 
@@ -85,13 +154,20 @@ disable = [
     "bad-continuation",
 ]
 
-[tool.pytest.ini_options]
-addopts = [
-    "--color=yes",
-    "--cov-report=xml",
-    "--cov=jupytext",
-    "--cov-branch",
+# flake8 config has been moved to ruff and a pre-commit config has been
+# added
+[tool.ruff]
+line-length = 127
+exclude = [
+    "tests/notebooks/*",
 ]
+# Seems like W503 is not implemented in ruff
+# ref: https://github.com/astral-sh/ruff/issues/4125
+ignore = [
+    "E203", "E231",
+]
+
+[tool.pytest.ini_options]
 filterwarnings = [
     # Uncomment this "error" to turn all unfiltered warnings into errors
     # "error",
@@ -122,7 +198,6 @@ omit = [
     "tests/*",
 ]
 parallel = true
-branch = false
 
 [tool.coverage.report]
 # Regexes for lines to exclude from consideration
@@ -141,58 +216,44 @@ ignore_errors = true
 omit = [
     "tests/*",
     "jupytext/version.py",
-    "*/site-packages/*"
 ]
 
-# To use tox, see https://tox.readthedocs.io
-# Simply pip or conda install tox
-# If you use conda, you may also want to install tox-conda
-# then run `tox` or `tox -- {pytest args}`
-# To run in parallel using `tox -p` (this does not appear to work for this repo)
-
-# To rebuild the tox environment, for example when dependencies change, use
-# `tox -r`
-
-# Note: if the following error is encountered: `ImportError while loading conftest`
-# then then deleting compiled files has been found to fix it: `find . -name \*.pyc -delete`
-[tool.tox]
-legacy_tox_ini = """
-    [tox]
-    envlist = py{35,36,37,38}
-
-    [testenv:py{35,36,37,38}]
-    ; recreate = false
-    deps =
-        -rrequirements.txt
-        -rrequirements-dev.txt
-        jupyter-fs
-    commands_pre = python -m ipykernel install --name jupytext-tox-{envname} --user
-    commands = pytest {posargs}
-
-    [testenv:docs-{update,clean}]
-    deps = -rdocs/doc-requirements.txt
-    whitelist_externals = rm
-    commands =
-        clean: rm -rf docs/_build
-        sphinx-build {posargs} -nW --keep-going -b html docs/ docs/_build/html
-"""
+[tool.coverage.xml]
+output = "coverage.xml"
 
 # Jupyter releaser config for check-release.yml workflow
+# This config is only relevant if we migrate to jupyter-releaser workflows
+# for publishing packages. If we decide to not, we can remove this config
 [tool.jupyter-releaser]
+# Skip the bump-version step as we are bumping versions manually at the moment.
+# If we use hatch versionining, we should be able to bump versions via workflows
 skip = [
     "bump-version",
 ]
 
 [tool.jupyter-releaser.options]
+# List all the python packages to be built in <path_to_package>:<name_of_package>
+# format. If we add new packages to the repo, we need to include them here for
+# jupyter-releaser to build and publish
 python_packages = [
     ".:jupytext",
-    "packages/labextension:jupyterlab_jupytext",
 ]
 
 [tool.jupyter-releaser.hooks]
+# Top level package.json file will ensure that all npm packages will be found, built
+# and published by build-npm step in jupyter-releaser.
+#
+# Currently, we do not have a top level package.json. So build-npm and check-npm
+# steps will not be trigged. If we would like to publish npm packages via
+# jupyter-releaser as well, we need to bring
+# jupyterlab/{package.json,lerna.json,.yarnrc.yml} files into the top level repo.
+#
+# In any case, we need to actually build the packages before the step as build-npm will
+# only execute `npm package` command. So we need to have build artifacts ready before
+# the step
 before-build-npm = [
-    "python -m pip install 'jupyterlab>=4.0.0,<5'",
+    "python -m pip install 'jupyterlab>=4,<5'",
     "jlpm",
+    "jlpm clean:all",
     "jlpm build:prod"
 ]
-before-build-python = ["jlpm clean:all"]

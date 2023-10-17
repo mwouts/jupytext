@@ -6,7 +6,7 @@
     "jupyter",
     "jupytext",
     "jupyterlab",
-    "jupyterlab-extension"
+    "jupyter-extension"
   ],
   "homepage": "https://github.com/mwouts/jupytext/tree/main/packages/labextension",
   "bugs": {
@@ -25,17 +25,17 @@
     "url": "https://github.com/mwouts/jupytext.git"
   },
   "scripts": {
-    "build": "jlpm run build:lib && jlpm run build:labextension:dev",
+    "build": "jlpm run build:lib && jlpm run build:labextension:dev && jlpm run copy:extensioncfgfile",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
     "build:lib": "tsc",
-    "build:prod": "jlpm run build:lib && jlpm run build:labextension",
+    "build:prod": "jlpm run build:lib && jlpm run build:labextension && jlpm run copy:extensioncfgfile",
+    "copy:extensioncfgfile": "cp ../../install.json ../../jupyterlab_jupytext/labextension",
     "clean": "jlpm run clean:lib",
     "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
-    "clean:labextension": "rimraf jupyterlab-jupytext/labextension",
+    "clean:labextension": "rimraf ../../jupyterlab_jupytext/labextension",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "install:extension": "jupyter labextension develop --overwrite .",
-    "prepare": "jlpm run clean && jlpm run build:prod",
     "watch": "run-p watch:src watch:labextension",
     "watch:labextension": "jupyter labextension watch .",
     "watch:src": "tsc -w"
@@ -54,7 +54,7 @@
     },
     "extension": true,
     "schemaDir": "schema",
-    "outputDir": "jupyterlab_jupytext/labextension",
+    "outputDir": "../../jupyterlab_jupytext/labextension",
     "sharedPackages": {
       "jupyterlab-rise": {
         "singleton": true

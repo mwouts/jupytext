@@ -1,0 +1,7 @@
+{
+  "lerna": "3.10.7",
+  "npmClient": "jlpm",
+  "useWorkspaces": true,
+  "version": "independent",
+  "packages": ["packages/*"]
+}

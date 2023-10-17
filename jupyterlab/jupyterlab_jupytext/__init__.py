@@ -1,19 +1,11 @@
-"""Read and write Jupyter notebooks as text files"""
+"""Jupyter server and lab extension entry points"""
 
-from .formats import NOTEBOOK_EXTENSIONS, get_format_implementation, guess_format
-from .jupytext import read, reads, write, writes
-from .reraise import reraise
-from .version import __version__
+from jupytext.reraise import reraise
 
 try:
-    from .contentsmanager import build_jupytext_contents_manager_class
+    from jupytext.contentsmanager import build_jupytext_contents_manager_class
 except ImportError as err:
     build_jupytext_contents_manager = reraise(err)
-
-try:
-    from .contentsmanager import TextFileContentsManager
-except ImportError as err:
-    TextFileContentsManager = reraise(err)
 
 
 def load_jupyter_server_extension(app):  # pragma: no cover
@@ -96,14 +88,5 @@ def _jupyter_nbextension_paths():  # pragma: no cover
     ]
 
 
-__all__ = [
-    "read",
-    "write",
-    "writes",
-    "reads",
-    "NOTEBOOK_EXTENSIONS",
-    "guess_format",
-    "get_format_implementation",
-    "TextFileContentsManager",
-    "__version__",
-]
+def _jupyter_labextension_paths():
+    return [{"src": "labextension", "dest": "jupyterlab-jupytext"}]

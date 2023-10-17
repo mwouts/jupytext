@@ -1,0 +1,8 @@
+node_modules
+**/node_modules
+**/lib
+**/labextension
+**/package.json
+**/venv
+**/.venv
+**/jupyter-config
