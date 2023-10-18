@@ -4,7 +4,7 @@ channels:
   - conda-forge
 dependencies:
   - python>=3.8
-  - jupyterlab>=4
+  - jupyterlab>=4.0.0
   - nbformat>=5.1.2
   - pyyaml
   - toml

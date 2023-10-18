@@ -1,11 +1,15 @@
 # This environment is smaller than the dev environment.
-# In particular it does not include JupyterLab nor the community notebook extensions
+#
+# Until conda supports creating env from pyproject.toml
+# (https://github.com/conda/conda/pull/12666)
+# we need to maintain environment-ci.yml file that is inline with deps in
+# pyproject.toml
+#
 name: jupytext-ci
 channels:
   - defaults
   - conda-forge
 dependencies:
-  - jupyter
   - ipykernel
   - nbconvert
   - nbformat>=5.1.2
