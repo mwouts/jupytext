@@ -3,10 +3,9 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python>=3.6
-  - jupyterlab>=3.0.13
+  - python>=3.8
+  - jupyterlab>=4
   - nbformat>=5.1.2
-  - jupyter-packaging
   - pyyaml
   - toml
   - markdown-it-py>=1.0.0,<3.0.0
