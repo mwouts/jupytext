@@ -1,0 +1,27 @@
+.build
+.cache
+.coverage
+.pytest_cache
+.eggs
+.tox
+build
+/dist
+venv
+jupytext.egg-info
+future
+*.pyc
+gits*
+.ipynb_checkpoints
+jupyterlab_jupytext/labextension
+
+# Ignore node_modules and yarn cache
+node_modules/
+.yarn
+*.bundle.*
+lib/
+*.log
+.eslintcache
+.stylelintcache
+*.egg-info/
+.ipynb_checkpoints
+*.tsbuildinfo
