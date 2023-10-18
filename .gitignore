@@ -27,3 +27,15 @@ demo/get_started.ipynb
 .history
 .vscode/*
 !.vscode/*.template
+
+# Test related files
+*.coverage*
+*.xml
+.ruff_cache
+
+# Ignore node_modules and yarn cache
+node_modules
+.yarn
+
+# Ignore jupyter-releaser related stuff
+.jupyter_releaser_checkout

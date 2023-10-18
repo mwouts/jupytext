@@ -29,7 +29,7 @@ repos:
     rev: v3.9.0
     hooks:
     - id: pyupgrade
-      args: ["--py36-plus"]
+      args: ["--py38-plus"]
 
   - repo: https://github.com/myint/autoflake
     rev: v2.2.0
