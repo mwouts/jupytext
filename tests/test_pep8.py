@@ -16,7 +16,7 @@ from .utils import list_notebooks
 
 def test_next_instruction_is_function_or_class():
     text = """@pytest.mark.parametrize('py_file',
-    [py_file for py_file in list_notebooks('../jupytext') + list_notebooks('.') if
+    [py_file for py_file in list_notebooks('../src/jupytext') + list_notebooks('.') if
                                      py_file.endswith('.py')])
 def test_no_metadata_when_py_is_pep8(py_file):
     pass
@@ -189,7 +189,7 @@ def f(x):
     "py_file",
     [
         py_file
-        for py_file in list_notebooks("../jupytext") + list_notebooks(".")
+        for py_file in list_notebooks("../src/jupytext") + list_notebooks(".")
         if py_file.endswith(".py") and "folding_markers" not in py_file
     ],
 )

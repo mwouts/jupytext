@@ -15,7 +15,6 @@ try:
 except ImportError as err:
     TextFileContentsManager = reraise(err)
 
-
 __all__ = [
     "read",
     "write",
