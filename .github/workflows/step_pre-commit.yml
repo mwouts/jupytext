@@ -1,0 +1,45 @@
+name: pre-commit
+run-name: Pre-commit
+
+on:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-pre-commit
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - uses: pre-commit/action@v3.0.0
+
+  lint-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Base Setup
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+
+      # Current repo organization will not permit to set up pre-commit config for
+      # TS lint related packages due to absence of package.json in the top level
+      # repo. So we run lint step separately here
+      - name: Lint the extension
+        run: |
+          # Install JupyterLab in an isolated env to get jlpm
+          pip install jupyterlab>=4
+
+          # Install lint deps and lint extension
+          cd jupyterlab/
+          jlpm
+          jlpm run lint:check

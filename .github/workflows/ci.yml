@@ -1,0 +1,62 @@
+name: CI
+on:
+  workflow_dispatch:
+    inputs:
+      upload-build-artifacts:
+        type: boolean
+        required: false
+        default: false
+        description: Upload build artifacts
+  push:
+    paths-ignore:
+      - 'CHANGELOG.md'
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 11 * * 4'
+
+permissions:
+  # All nested workflows will inherit these permissions and so no need to declare
+  # in each step file
+  contents: read
+  # Cannot use it in codeql nested workflow without declaring it on
+  # top level workflow
+  # Ref: https://docs.github.com/en/actions/using-workflows/reusing-workflows#access-and-permissions
+  security-events: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    uses: ./.github/workflows/step_pre-commit.yml
+
+  codeql:
+    needs: [ pre-commit ]
+    uses: ./.github/workflows/step_static-analysis.yml
+
+  test-pip:
+    needs: [ codeql ]
+    uses: ./.github/workflows/step_tests-pip.yml
+
+  test-conda:
+    needs: [ codeql ]
+    uses: ./.github/workflows/step_tests-conda.yml
+
+  build:
+    needs: [ test-pip, test-conda ]
+    uses: ./.github/workflows/step_build.yml
+    with:
+      upload: ${{ inputs.upload-build-artifacts || false }}
+
+  pass:
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check jobs
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
+    if: always()
