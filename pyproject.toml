@@ -105,6 +105,7 @@ artifacts = ["jupyterlab/jupyterlab_jupytext/labextension"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupytext"]
+exclude = ["**/.yarn", "**/node_modules"]
 
 [tool.hatch.build.targets.wheel.shared-data]
 "jupyterlab/jupyter-config" = "etc/jupyter"
