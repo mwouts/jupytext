@@ -1,6 +1,172 @@
 [build-system]
-requires = ["jupyter_packaging~=0.7.9", "jupyterlab>=3,<=4", "setuptools>=40.8.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.5.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jupytext"
+description = "Jupyter notebooks as Markdown documents, Julia, Python or R scripts"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Marc Wouts", email = "marc.wouts@gmail.com" },
+]
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Environment :: Console",
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Text Processing :: Markup",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "nbformat",
+    "pyyaml",
+    "toml",
+    "mdit_py_plugins",
+    "markdown-it-py>=1.0.0",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/mwouts/jupytext"
+"Source Code" = "https://github.com/mwouts/jupytext"
+Documentation = "https://jupytext.readthedocs.io/en/latest/index.html"
+
+[project.optional-dependencies]
+# Test related dependencies
+# TODO: Split them into unit, integration and functional tests groups
+test = [
+    "autopep8",
+    "black",
+    "isort",
+    "ruff",
+    "flake8",
+    "pytest",
+    "pytest-randomly",
+    "gitpython",
+    "jupyterlab",
+    "notebook",
+    "nbconvert",
+    "jupyter-fs",
+    "ipykernel",
+    "pre-commit",
+]
+# Coverage requirements
+test-cov = [
+    "jupytext[test]",
+    "pytest-cov>=2.6.1",
+]
+dev = [
+    "jupytext[test]",
+]
+# Documentation dependencies
+docs = [
+    "sphinx",
+    "sphinx_copybutton",
+    "sphinx_rtd_theme",
+    "myst_parser",
+]
+
+[project.scripts]
+"jupytext" = "jupytext.cli:jupytext"
+"jupytext-config" = "jupytext_config.__main__:main"
+
+[tool.hatch.version]
+# Read version string from version.py and use it for the package
+path = "src/jupytext/version.py"
+
+# Hatch first build sdist and then builds a wheel out of that sdist
+# By using the below config, we remove path prefixes in sdist meaning
+# that sdist will not have a src in root but directly jupytext and other
+# modules. 
+#
+# So when it attempts to build wheel out of the sdist there is no more
+# src folder and hence it complains about not finding src/jupytext/version.py
+# file. So, we **should not** use hatch.build.sources here which removes
+# path prefixes
+# [tool.hatch.build]
+# sources = ["src", "jupyterlab"]
+
+# Following config is related to JupyterLab extension
+[tool.hatch.build.targets.sdist]
+artifacts = ["jupyterlab/jupyterlab_jupytext/labextension"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupytext"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"jupyterlab/jupyter-config" = "etc/jupyter"
+"jupyterlab/jupyterlab_jupytext/labextension" = "share/jupyter/labextensions/jupyterlab-jupytext"
+
+[tool.hatch.build.hooks.jupyter-builder]
+# Enable running hook by default. 
+# We disable this hook only by setting env var HATCH_BUILD_HOOKS_ENABLE=false
+# So `HATCH_BUILD_HOOKS_ENABLE=false pip install .` will **not** build JupyterLab related
+# extension. A simple `pip install .` will **always** build extension
+enable-by-default = true
+# Runtime dependency for this build hook
+# We need jupyterlab as build time depdendency to get jlpm (wrapper around yarn)
+dependencies = [
+    "hatch-jupyter-builder>=0.5", "jupyterlab>=4,<5"
+]
+# We use npm_builder to build the jupyterlab extension
+build-function = "hatch_jupyter_builder.npm_builder"
+# Hatch will mark this hook as success upon creation of following files
+# in the build_dir
+ensured-targets = [
+    "jupyterlab/jupyterlab_jupytext/labextension/static/style.js",
+    "jupyterlab/jupyterlab_jupytext/labextension/package.json",
+]
+# If these files already exists in build_dir (after first build),
+# hatch will skip build step. If there are changes in src/ of
+# the extension, build will be triggered even if the build assets exist
+skip-if-exists = ["jupyterlab/jupyterlab_jupytext/labextension/static/style.js"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+# Root directory where build should be done
+path = "jupyterlab"
+# Build command that is defined in package.json
+build_cmd = "build:prod"
+# We use jlpm, which is wrapper around yarn to build transpiled assets
+npm = ["jlpm"]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+path = "jupyterlab"
+build_cmd = "build"
+npm = ["jlpm"]
+# hatch-jupyter-builder hook will check the mtime of source_dir and
+# compare it with build_dir to decide if build is necessary or not
+source_dir = "jupyterlab/packages"
+build_dir = "jupyterlab/jupyterlab_jupytext/labextension"
+
+[tool.check-wheel-contents]
+ignore = ["W002"]
+
+# flake8 config has been moved to ruff and a pre-commit config has been
+# added
+[tool.ruff]
+line-length = 127
+exclude = [
+    "tests/notebooks/*",
+]
+# Seems like W503 is not implemented in ruff
+# ref: https://github.com/astral-sh/ruff/issues/4125
+ignore = [
+    "E203", "E231",
+]
+
 [tool.pytest.ini_options]
 filterwarnings = [
     # Uncomment this "error" to turn all unfiltered warnings into errors
@@ -22,5 +188,33 @@ filterwarnings = [
     # test_config_jupytext_jupyter_fs_meta_manager
     'ignore:The alias `_\(\)` will be deprecated. Use `_i18n\(\)` instead.:FutureWarning',
     # Conda/Python 3.7/Windows - ImportError while loading conftest
-    "ignore:the imp module is deprecated in favour of importlib:DeprecationWarning"
+    "ignore:the imp module is deprecated in favour of importlib:DeprecationWarning",
+    "ignore:Code cell is missing an id field:FutureWarning",
+    "ignore:There is no current event loop:DeprecationWarning",
 ]
+
+[tool.coverage.run]
+omit = [
+    "tests/*",
+]
+parallel = true
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+    "if self.debug:",
+    # Have to re-enable the standard pragma
+    "pragma: no cover",
+
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise NotImplementedError",
+    "except ImportError",
+]
+ignore_errors = true
+omit = [
+    "tests/*",
+    "src/jupytext/version.py",
+]
+
+[tool.coverage.xml]
+output = "coverage.xml"
