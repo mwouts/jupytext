@@ -90,7 +90,7 @@ path = "src/jupytext/version.py"
 # Hatch first build sdist and then builds a wheel out of that sdist
 # By using the below config, we remove path prefixes in sdist meaning
 # that sdist will not have a src in root but directly jupytext and other
-# modules. 
+# modules.
 #
 # So when it attempts to build wheel out of the sdist there is no more
 # src folder and hence it complains about not finding src/jupytext/version.py
@@ -111,7 +111,7 @@ packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupyte
 "jupyterlab/jupyterlab_jupytext/labextension" = "share/jupyter/labextensions/jupyterlab-jupytext"
 
 [tool.hatch.build.hooks.jupyter-builder]
-# Enable running hook by default. 
+# Enable running hook by default.
 # We disable this hook only by setting env var HATCH_BUILD_HOOKS_ENABLE=false
 # So `HATCH_BUILD_HOOKS_ENABLE=false pip install .` will **not** build JupyterLab related
 # extension. A simple `pip install .` will **always** build extension
