@@ -1,0 +1,124 @@
+{
+    "name": "jupyterlab-jupytext-extensions",
+    "version": "1.3.9",
+    "private": true,
+    "files": [],
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "build": "lerna run --parallel build",
+        "build-py": "mkdir -p dist && lerna run --parallel clean:all && lerna exec --concurrency 4 -- python -m build && lerna exec --concurrency 4 -- mv ./dist/jupyterlab* ../../dist/",
+        "build:prod": "lerna run --parallel build:prod",
+        "install-ext": "lerna run build:labextension:dev",
+        "install-py": "lerna exec --concurrency 4 -- python -m pip install -e .",
+        "clean:all": "lerna run --parallel clean:all",
+        "eslint": "eslint . --ext .ts,.tsx --fix",
+        "eslint:check": "eslint . --ext .ts,.tsx",
+        "prettier": "prettier --write \"**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}\"",
+        "prettier:check": "prettier --list-different \"**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}\"",
+        "stylelint": "jlpm stylelint:check --fix",
+        "stylelint:check": "stylelint --cache \"packages/*/style/**/*.css\"",
+        "stylelint:files": "stylelint --fix",
+        "lint": "jlpm && jlpm prettier && jlpm eslint && jlpm stylelint",
+        "lint:check": "jlpm prettier:check && jlpm eslint:check && jlpm stylelint:check",
+        "update-dependency": "update-dependency --lerna",
+        "watch": "lerna run --parallel watch"
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^5.55.0",
+        "@typescript-eslint/parser": "^5.55.0",
+        "eslint": "^8.36.0",
+        "eslint-config-prettier": "^8.7.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "lerna": "^6.6.0",
+        "prettier": "^2.8.7",
+        "stylelint": "^14.9.1",
+        "stylelint-config-prettier": "^9.0.4",
+        "stylelint-config-recommended": "^8.0.0",
+        "stylelint-config-standard": "^26.0.0",
+        "stylelint-prettier": "^2.0.0"
+    },
+    "styleModule": "packages/*/style/index.js",
+    "eslintIgnore": [
+        "**/*.d.ts",
+        "dist",
+        "*node_modules*",
+        "coverage",
+        "tests",
+        "venv",
+        ".venv"
+    ],
+    "prettier": {
+        "singleQuote": true
+    },
+    "eslintConfig": {
+        "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/eslint-recommended",
+            "plugin:@typescript-eslint/recommended",
+            "plugin:prettier/recommended"
+        ],
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+            "project": "tsconfig.eslint.json",
+            "sourceType": "module",
+            "tsconfigRootDir": "."
+        },
+        "plugins": [
+            "@typescript-eslint"
+        ],
+        "rules": {
+            "@typescript-eslint/naming-convention": [
+                "error",
+                {
+                    "selector": "interface",
+                    "format": [
+                        "PascalCase"
+                    ],
+                    "custom": {
+                        "regex": "^I[A-Z]",
+                        "match": true
+                    }
+                }
+            ],
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                {
+                    "args": "none"
+                }
+            ],
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-namespace": "off",
+            "@typescript-eslint/no-use-before-define": "off",
+            "@typescript-eslint/quotes": [
+                "error",
+                "single",
+                {
+                    "avoidEscape": true,
+                    "allowTemplateLiterals": false
+                }
+            ],
+            "curly": [
+                "error",
+                "all"
+            ],
+            "eqeqeq": "error",
+            "prefer-arrow-callback": "error"
+        }
+    },
+    "stylelint": {
+        "extends": [
+            "stylelint-config-recommended",
+            "stylelint-config-standard",
+            "stylelint-prettier/recommended"
+        ],
+        "rules": {
+            "no-empty-source": null,
+            "selector-class-pattern": null,
+            "property-no-vendor-prefix": null,
+            "selector-no-vendor-prefix": null,
+            "value-no-vendor-prefix": null
+        }
+    }
+}
