@@ -10,6 +10,7 @@ Jupytext works with notebooks in any of the following languages:
 - F#
 - Gnuplot
 - Groovy
+- Haskell
 - IDL
 - Java
 - Javascript
@@ -29,9 +30,8 @@ Jupytext works with notebooks in any of the following languages:
 - Scheme
 - Script of Script
 - Stata
-- TypeScript
-- Haskell
 - Tcl
+- TypeScript
 - Wolfram Language
   - Note that Jupytext uses the non-standard `.wolfram` file extension for Wolfram Language files to avoid conflicts with Matlab.
 
