@@ -17,11 +17,7 @@ In JupyterLab, pair your notebook to one or more text formats with the [Jupytext
 
 ![](images/pair_commands.png)
 
-In Jupyter Notebook, use the [Jupytext menu](install.md#jupytext-menu-in-jupyter-notebook):
-
-![](https://raw.githubusercontent.com/mwouts/jupytext/main/jupytext/nbextension/jupytext_menu.png)
-
-These command simply add a `"jupytext": {"formats": "ipynb,md"}` entry to the notebook metadata.
+These commands simply add a `"jupytext": {"formats": "ipynb,md"}` entry to the notebook metadata.
 
 You can also configure the notebook pairing [globally](config.md) for all your notebooks.
 

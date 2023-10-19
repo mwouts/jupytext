@@ -44,22 +44,25 @@ jupyter labextension enable jupyterlab-jupytext
 jupyter labextension disable jupyterlab-jupytext
 ```
 
-From Jupytext 1.9.0 on, the version of the extension is compatible with JupyterLab 3.x only. If you wish to use Jupytext with JupyterLab 2.x or 1.x, please
+From Jupytext 1.16.0 on, the version of the extension is compatible with JupyterLab 4.x only. If you wish to use Jupytext with JupyterLab 3.x or older, please
 - install the `jupytext` package using `pip` or `conda`
 - and then, install the last version of the `jupyterlab-jupytext` extension that is compatible with your version of JupyterLab, i.e.
 ```
+jupyter labextension install jupyterlab-jupytext@1.3.11  # for JupyterLab 3.x
 jupyter labextension install jupyterlab-jupytext@1.2.2  # for JupyterLab 2.x
 jupyter labextension install jupyterlab-jupytext@1.1.1  # for JupyterLab 1.x
 ```
 
 ## Jupytext menu in Jupyter Notebook
 
-*Note*: as of this writing (version 1.15.1) this section **applies only to
-notebook classic**, i.e. Jupyter Notebook 6.x and below. See [PR
-#1095](https://github.com/mwouts/jupytext/issues/1095) where we discuss how to
+Please note that
+- this section **applies only to notebook classic**, i.e. Jupyter Notebook 6.x and below
+- the Jupytext menu was removed in `jupytext==1.16`.
+
+See [PR #1095](https://github.com/mwouts/jupytext/issues/1095) where we discuss how to
 add a Jupytext menu to Jupyter Lab and Notebook 7.x.
 
-Jupytext includes an extensions for Jupyter Notebook that adds a Jupytext section in the File menu.
+Jupytext (in versions `<1.16`) includes an extensions for Jupyter Notebook that adds a Jupytext section in the File menu.
 
 ![](images/jupytext_menu.png)
 

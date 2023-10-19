@@ -7,13 +7,14 @@ If you want to test a feature that has been integrated in `main` but not deliver
 pip install git+https://github.com/mwouts/jupytext.git
 ```
 
-If you want to test Jupytext in JupyterLab 3 then you will have to build the extension for JupyterLab. To do so, make sure that you have a recent version of `node`, and prefix the command above with `BUILD_JUPYTERLAB_EXTENSION=1`.
+If you want only to build Jupytext core (e.g. not the JupyterLab extension) you can prefix the
+above with `HATCH_BUILD_HOOKS_ENABLE=false`.
 
 Finally, if you want to test a development branch, use
 ```
 pip install git+https://github.com/mwouts/jupytext.git@branch
 ```
-where `branch` is the name of the branch you want to test (again, prefix the command above with `BUILD_JUPYTERLAB_EXTENSION=1` if you want to use Jupytext within JupyterLab 3).
+where `branch` is the name of the branch you want to test.
 
 ## Install and develop Jupytext locally
 
@@ -36,24 +37,19 @@ Tests are executed with `pytest`. You can run them in parallel with for instance
 pytest -n 5
 ```
 
-We also have a `tox.ini` file available if you wish to test your contribution on multiple version of Python before making a PR - just run `tox`.
-
 Build the `jupytext` package and install it with
 ```
-BUILD_JUPYTERLAB_EXTENSION=1 python setup.py sdist bdist_wheel
+pip install -U build wheel
+python -m build
 pip install dist/jupytext-x.x.x-py3-none-any.whl
 ```
 
 or with
 ```
-BUILD_JUPYTERLAB_EXTENSION=1 pip install .
+pip install .
 ```
 
-Finally, note that you can remove `BUILD_JUPYTERLAB_EXTENSION=1` if you don't need the lab extension - the build time will be much shorter.
-
-## Jupytext's extension for Jupyter Notebook
-
-Our extension for Jupyter Notebook adds a Jupytext entry to Jupyter Notebook Menu. The code is found at `jupytext/nbextension/index.js`. Instructions to develop that extension are at `jupytext/nbextension/README.md`.
+Finally, note that you can use `HATCH_BUILD_HOOKS_ENABLE=false` if you don't need the lab extension - the build time will be slightly shorter.
 
 ## Jupytext's extension for JupyterLab
 

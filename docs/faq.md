@@ -10,7 +10,7 @@ The text representation only contains the part of the notebook that you wrote (n
 
 ## How do I use Jupytext?
 
-Open the notebook that you want to version control. _Pair_ the notebook to a script or a Markdown file using either the [Jupytext Commands](install.md#jupytext-commands-in-jupyterlab) in JupyterLab or the [Jupytext Menu](install.md#jupytext-menu-in-jupyter-notebook) in Jupyter Notebook.
+Open the notebook that you want to version control. _Pair_ the notebook to a script or a Markdown file using the [Jupytext Commands](install.md#jupytext-commands-in-jupyterlab) in JupyterLab.
 
 Save the notebook, and you get two copies of the notebook: the original `*.ipynb` file, together with its paired text representation.
 
@@ -38,9 +38,7 @@ The `.ipynb` file contains the full notebook. The paired text file only contains
 
 ## Can I create a notebook from a text file?
 
-Certainly. Open your pre-existing scripts or Markdown files as notebooks with a click in Jupyter Notebook, and with the _Open as Notebook_ menu in JupyterLab.
-
-In Jupyter Notebook you can also create text notebooks with the _New Text Notebook_ menu.
+Certainly. Open your pre-existing scripts or Markdown files as notebooks with the _Open as Notebook_ menu in JupyterLab.
 
 Output cells appear in the browser when you execute the notebook, but they are not written to the disk when you save the notebook.
 
@@ -94,7 +92,7 @@ In this case, a manual action is requested. Remove the paired `.md` or `.py` fil
 
 Jupytext is compatible with JupyterHub (execute `pip install jupytext --user` to install it in user mode) and with Binder (add `jupytext` to the project requirements).
 
-If you use another editor than Jupyter Notebook, Lab or Hub, you probably can't get Jupytext there. However you can still use Jupytext at the command line to manually sync the two representations of the notebook:
+If you use another editor than Jupyter Lab, you probably can't get Jupytext there. However, you can still use Jupytext at the command line to manually sync the two representations of the notebook:
 ```shell
 jupytext --set-formats ipynb,py:light notebook.ipynb   # Pair a notebook to a light script
 jupytext --sync notebook.ipynb                         # Sync the two representations

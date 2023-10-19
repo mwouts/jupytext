@@ -41,7 +41,7 @@ The `notebook/` prefix above is matched with the top-most parent folder of the m
 
 ## Global pairing vs individual pairing
 
-Alternatively, notebooks can be paired individually using either the Jupytext commands in Jupyter Lab, the Jupyter Menu in Jupyter Notebook, or the command line interface:
+Alternatively, notebooks can be paired individually using either the Jupytext commands in Jupyter Lab, or the command line interface:
 
 ```bash
 jupytext --set-formats ipynb,py:percent notebook.ipynb
