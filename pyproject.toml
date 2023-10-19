@@ -42,7 +42,7 @@ dynamic = ["version"]
 [project.urls]
 Homepage = "https://github.com/mwouts/jupytext"
 "Source Code" = "https://github.com/mwouts/jupytext"
-Documentation = "https://jupytext.readthedocs.io/en/latest/index.html"
+Documentation = "https://jupytext.readthedocs.io"
 
 [project.optional-dependencies]
 # Test related dependencies
@@ -102,10 +102,12 @@ path = "src/jupytext/version.py"
 # Following config is related to JupyterLab extension
 [tool.hatch.build.targets.sdist]
 artifacts = ["jupyterlab/jupyterlab_jupytext/labextension"]
+# Exclude tests (contains Notebooks that have a total size of ~8MB) to reduce sdist
+# tarball. (See #1142)
+exclude = ["tests", "**/.yarn", "**/node_modules"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupytext"]
-exclude = ["**/.yarn", "**/node_modules"]
 
 [tool.hatch.build.targets.wheel.shared-data]
 "jupyterlab/jupyter-config" = "etc/jupyter"
