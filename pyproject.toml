@@ -104,7 +104,7 @@ path = "src/jupytext/version.py"
 artifacts = ["jupyterlab/jupyterlab_jupytext/labextension"]
 # Exclude tests (contains Notebooks that have a total size of ~8MB) to reduce sdist
 # tarball. (See #1142)
-exclude = ["tests", "**/.yarn", "**/node_modules"]
+exclude = ["tests", "demo", "**/.yarn", "**/node_modules"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupytext"]
