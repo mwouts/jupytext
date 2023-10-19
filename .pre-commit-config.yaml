@@ -38,7 +38,7 @@ repos:
       args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.292
+    rev: v0.1.0
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
