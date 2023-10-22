@@ -1,3 +1,7 @@
+# 1.4.0 (2023-10-22)
+
+- This version of the JupyterLab extension requires JupyterLab 4.x.
+
 # 1.3.11 (2023-10-22)
 
 - This version is the same as 1.3.10. It was re-published to include the README that was missing in 1.3.10.
