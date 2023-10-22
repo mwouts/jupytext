@@ -1,3 +1,13 @@
+# 1.3.11 (2023-10-22)
+
+- This version is the same as 1.3.10. It was re-published to include the README that was missing in 1.3.10.
+
+# 1.3.10 (2023-10-22)
+
+- The server extension for `jupytext` has been moved from core Jupytext to the (Python) `jupyterlab-jupytext` extension.
+- The Jupyter Lab extension is now compatible with the [JupyterLab RISE](https://github.com/jupyterlab-contrib/rise) extension. Many thanks to [Frédéric Collonval](https://github.com/fcollonval) for his PR ([#1126](https://github.com/mwouts/jupytext/pull/1126))!
+- This version of the JupyterLab extension is compatible with JupyterLab 4.x. Many thanks to [Thierry Parmentelat](https://github.com/parmentelat) for his PRs! ([#1092](https://github.com/mwouts/jupytext/pull/1092), [#1109](https://github.com/mwouts/jupytext/pull/1109))
+
 # 1.3.9 (2022-06-02)
 
 - We updated the `yarn.lock` file for the jupyter lab extension to address security vulnerabilities ([#904](https://github.com/mwouts/jupytext/issues/904), [#925](https://github.com/mwouts/jupytext/issues/925), [#935](https://github.com/mwouts/jupytext/issues/935), [#939](https://github.com/mwouts/jupytext/issues/939), [#984](https://github.com/mwouts/jupytext/issues/984), [#1005](https://github.com/mwouts/jupytext/issues/1005), [#1011](https://github.com/mwouts/jupytext/issues/1011), [#1030](https://github.com/mwouts/jupytext/issues/1030), [#1036](https://github.com/mwouts/jupytext/issues/1036), [#1052](https://github.com/mwouts/jupytext/pull/1052))
