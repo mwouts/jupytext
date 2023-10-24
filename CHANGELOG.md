@@ -6,7 +6,7 @@ Jupytext ChangeLog
 
 **Changed**
 - Jupytext is now configured with `pyproject.toml` and built with `hatch`. The layout has been reorganised to follow `src-layout` ([#1140](https://github.com/mwouts/jupytext/issues/1140)). This outstanding update was contributed by [Mahendra Paipuri](https://github.com/mahendrapaipuri).
-- The extension for Jupyter Notebook (the Jupytext Menu) has been removed.
+- The legacy extension for Jupyter Notebook <=6 (the Jupytext Menu) has been removed.
 
 
 1.15.2 (2023-09-16)
