@@ -1,5 +1,6 @@
 ```{include} ../README.md
 :relative-docs: docs/
+:start-after: <!-- INDEX-START -->
 ```
 
 ## Table of Contents
