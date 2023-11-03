@@ -59,7 +59,8 @@ test = [
     "jupyterlab",
     "notebook",
     "nbconvert",
-    "jupyter-fs",
+    # jupyter-fs==0.4.0 is async, which is not supported by Jupytext ATM
+    "jupyter-fs<0.4.0",
     "ipykernel",
     "pre-commit",
 ]
