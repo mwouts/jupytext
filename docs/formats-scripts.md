@@ -2,7 +2,7 @@
 
 ## The `percent` format
 
-The `percent` format is a representation of Jupyter notebooks as scripts, in which all cells are explicitly delimited with a commented double percent sign `# %%`. The `percent` format is currently available for these [languages](https://github.com/mwouts/jupytext/blob/main/jupytext/languages.py).
+The `percent` format is a representation of Jupyter notebooks as scripts, in which all cells are explicitly delimited with a commented double percent sign `# %%`. The `percent` format is currently available for these [languages](https://github.com/mwouts/jupytext/blob/main/src/jupytext/languages.py).
 
 The format was introduced by Spyder in 2013, and is now supported by many editors, including
 - [Spyder IDE](https://docs.spyder-ide.org/editor.html#defining-code-cells),
@@ -70,7 +70,7 @@ By default, [Jupyter magics](advanced-options.md#magic-commands) are commented i
 
 ## The `light` format
 
-The `light` format was introduced by Jupytext. That format can represent any script in one of these [languages](https://github.com/mwouts/jupytext/blob/main/jupytext/languages.py) as a Jupyter notebook.
+The `light` format was introduced by Jupytext. That format can represent any script in one of these [languages](https://github.com/mwouts/jupytext/blob/main/src/jupytext/languages.py) as a Jupyter notebook.
 
 When a script in the `light` format is converted to a notebook, Jupytext code paragraphs are turned into code cells, and comments that are not adjacent to code are converted to Markdown cells. Cell breaks occurs on blank lines outside of functions, classes or multiline comments.
 
