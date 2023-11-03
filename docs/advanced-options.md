@@ -39,4 +39,4 @@ You might want to make some cell active only when the notebook is run in Jupyter
 
 ## More options
 
-There are a couple more options available - please have a look at the `JupytextConfiguration` class in [config.py](https://github.com/mwouts/jupytext/blob/main/jupytext/config.py).
+There are a couple more options available - please have a look at the `JupytextConfiguration` class in [config.py](https://github.com/mwouts/jupytext/blob/main/src/jupytext/config.py).
