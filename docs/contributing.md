@@ -20,5 +20,5 @@ You want to submit an enhancement on Jupytext? Unless this is a small change, we
 A pull request for which you do not need to contact us in advance is the addition of a new language to Jupytext. In principle that should be easy - you would only have to:
 - document the language extension and comment by adding one line to `_SCRIPT_EXTENSIONS` in `jupytext/languages.py`.
 - add the language to `docs/languages.md`
-- contribute a sample notebook in `tests/notebooks/ipynb_[language]`.
-- run the tests suite (create a [development environment](developing.md), then execute `pytest` locally). The tests will generate various text representations corresponding to your notebook under  `tests/notebooks/mirror/`. Please verify that these files are valid scripts, and include them in your PR.
+- contribute a sample notebook in `tests/data/notebooks/inputs/ipynb_[language]`.
+- run the tests suite (create a [development environment](developing.md), then execute `pytest` locally). The tests will generate various text representations corresponding to your notebook under  `tests/data/notebooks/outputs/`. Please verify that these files are valid scripts, and include them in your PR.

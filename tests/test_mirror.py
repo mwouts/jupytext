@@ -47,7 +47,7 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
     fmt = check_auto_ext(fmt, notebook.metadata, "")
     ext = fmt["extension"]
     mirror_file = os.path.join(
-        dirname, "..", "mirror", mirror_name, full_path(file_name, fmt)
+        dirname, "..", "..", "outputs", mirror_name, full_path(file_name, fmt)
     )
 
     # it's better not to have Jupytext metadata in test notebooks:

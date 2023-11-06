@@ -163,7 +163,7 @@ ignore = ["W002"]
 [tool.ruff]
 line-length = 127
 exclude = [
-    "tests/notebooks/*",
+    "tests/data/notebooks/*",
 ]
 # Seems like W503 is not implemented in ruff
 # ref: https://github.com/astral-sh/ruff/issues/4125

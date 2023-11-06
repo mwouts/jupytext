@@ -13,7 +13,7 @@
 exclude: >
     (?x)^(
       demo/.*|
-      tests/notebooks/.*|
+      tests/data/notebooks/.*|
     )$
 repos:
 

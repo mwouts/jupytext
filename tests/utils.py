@@ -100,7 +100,7 @@ def list_notebooks(path="ipynb", skip="World"):
             + list_notebooks("ipynb_R", skip=skip)
         )
 
-    nb_path = Path(__file__).parent / "notebooks"
+    nb_path = Path(__file__).parent / "data" / "notebooks" / "inputs"
 
     if path == "ipynb_all":
         return itertools.chain(
@@ -117,7 +117,7 @@ def list_notebooks(path="ipynb", skip="World"):
         )
 
     if path.startswith("."):
-        nb_path = nb_path / ".." / path
+        nb_path = Path(__file__).parent / ".." / path
     else:
         nb_path = nb_path / path
 
