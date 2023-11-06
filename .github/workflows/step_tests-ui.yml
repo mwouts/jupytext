@@ -1,0 +1,46 @@
+name: test-ui
+run-name: Run UI tests with Galata
+
+on:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-ui-test
+  cancel-in-progress: true
+
+jobs:
+  test-ui:
+    continue-on-error: false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Base Setup
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+
+      - name: Install from source (required for the pre-commit tests)
+        run: python -m pip install -e '.[test-cov]'
+
+      - name: Install galata
+        working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+        run: jlpm install
+
+      - name: Install browser
+        working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
+        run: jlpm playwright install chromium
+
+      - name: Integration tests
+        working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
+        run: jlpm playwright test
+
+      - name: Upload UI Test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ui-test-output
+          path: |
+            jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests/test-results
