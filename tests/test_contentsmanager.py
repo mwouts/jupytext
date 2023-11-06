@@ -1857,12 +1857,23 @@ def test_new_untitled(tmpdir):
     assert untitled
     assert ext == "ipynb"
 
+    # Jupytext related files
     assert cm.new_untitled(type="notebook", ext=".md")["path"] == untitled + "1.md"
     assert cm.new_untitled(type="notebook", ext=".py")["path"] == untitled + "2.py"
-    assert cm.new_untitled(type="notebook")["path"] == untitled + "3.ipynb"
+    assert (
+        cm.new_untitled(type="notebook", ext=".md:myst")["path"] == untitled + "3.md"
+    )
     assert (
         cm.new_untitled(type="notebook", ext=".py:percent")["path"] == untitled + "4.py"
     )
+    assert (
+        cm.new_untitled(type="notebook", ext=".Rmd")["path"] == untitled + "5.Rmd"
+    )
+
+    # Test native formats that should not be changed by Jupytext
+    assert cm.new_untitled(type="file", ext=".py")["path"] == "untitled.py"
+    assert cm.new_untitled(type="file", ext=".md")["path"] == "untitled.md"
+    assert cm.new_untitled(type="directory")["path"] == "Untitled Folder"
 
 
 def test_nested_prefix(tmpdir):
