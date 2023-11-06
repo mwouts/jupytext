@@ -11,9 +11,8 @@
 
 import os
 
-from jupyterlab.federated_labextensions import build_labextension, develop_labextension
-
 import jupyterlab_jupytext
+from jupyterlab.federated_labextensions import build_labextension, develop_labextension
 
 
 def main():
@@ -22,7 +21,7 @@ def main():
     labexts = jupyterlab_jupytext._jupyter_labextension_paths()
     base_path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        'jupyterlab_jupytext'
+        "jupyterlab_jupytext",
     )
 
     for labext in labexts:

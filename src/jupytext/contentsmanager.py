@@ -390,7 +390,7 @@ to your jupytext.toml file
             """
             # We are excluding all the cases that come up with Jupytext and using
             # base method to create file. Is there a better way to get all the
-            # extensions that Jupytext uses so that we dont hard code them 
+            # extensions that Jupytext uses so that we dont hard code them
             # (even with regex) as below?
             #
             if not (type == "notebook" and re.match(r"[\.py\:\w+ | \.md]", ext)):
