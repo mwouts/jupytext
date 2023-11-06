@@ -7,7 +7,7 @@ from jupytext import read, write
 from jupytext.cli import jupytext
 from jupytext.compare import compare_cells
 
-from .utils import (
+from ...utils import (
     skip_pre_commit_tests_on_windows,
     skip_pre_commit_tests_when_jupytext_folder_is_not_a_git_repo,
 )

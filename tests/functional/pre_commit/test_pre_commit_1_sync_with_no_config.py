@@ -9,7 +9,7 @@ import jupytext
 from jupytext import TextFileContentsManager
 from jupytext.compare import compare_notebooks
 
-from .utils import (
+from ...utils import (
     skip_pre_commit_tests_on_windows,
     skip_pre_commit_tests_when_jupytext_folder_is_not_a_git_repo,
 )

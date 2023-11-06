@@ -5,7 +5,7 @@ from pre_commit.main import main as pre_commit
 
 from jupytext import TextFileContentsManager, read
 
-from .utils import (
+from ...utils import (
     skip_pre_commit_tests_on_windows,
     skip_pre_commit_tests_when_jupytext_folder_is_not_a_git_repo,
 )

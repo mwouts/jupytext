@@ -9,7 +9,7 @@ from jupytext import read, write
 from jupytext.cli import jupytext, system
 from jupytext.compare import compare_cells, compare_notebooks
 
-from .utils import (
+from ...utils import (
     list_notebooks,
     requires_black,
     requires_flake8,
