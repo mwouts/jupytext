@@ -1,0 +1,161 @@
+{
+  "title": "Jupytext",
+  "description": "Jupytext Menu Settings.",
+  "jupyter.lab.menus": {
+    "main": [
+      {
+        "id": "jp-mainmenu-jupytext-menu",
+        "label": "Jupytext",
+        "rank": 80,
+        "items": [
+          {
+            "type": "submenu",
+            "submenu": {
+              "id": "jp-mainmenu-jupytext-new",
+              "label": "New Text Notebook",
+              "items": [
+                {
+                  "command": "jupytext:create-new-text-noteboook-auto:light",
+                  "rank": 1
+                },
+                {
+                  "command": "jupytext:create-new-text-noteboook-auto:percent",
+                  "rank": 5
+                },
+                {
+                  "command": "jupytext:create-new-text-noteboook-auto:hydrogen",
+                  "rank": 10
+                },
+                {
+                  "command": "jupytext:create-new-text-noteboook-auto:nomarker",
+                  "rank": 15
+                },
+                {
+                  "type": "separator",
+                  "rank": 16
+                },
+                {
+                  "command": "jupytext:create-new-text-noteboook-md",
+                  "rank": 20
+                },
+                {
+                  "command": "jupytext:create-new-text-noteboook-md:myst",
+                  "rank": 25
+                },
+                {
+                  "type": "separator",
+                  "rank": 26
+                },
+                {
+                  "command": "jupytext:create-new-text-noteboook-Rmd",
+                  "rank": 30
+                },
+                {
+                  "command": "jupytext:create-new-text-noteboook-qmd",
+                  "rank": 35
+                }
+              ]
+            },
+            "rank": 1
+          },
+          {
+            "type": "submenu",
+            "submenu": {
+              "id": "jp-mainmenu-jupytext-new",
+              "label": "Pair Notebook",
+              "items": [
+                {
+                  "command": "jupytext:ipynb",
+                  "rank": 1
+                },
+                {
+                  "type": "separator",
+                  "rank": 2
+                },
+                {
+                  "command": "jupytext:auto:light",
+                  "rank": 5
+                },
+                {
+                  "command": "jupytext:auto:percent",
+                  "rank": 10
+                },
+                {
+                  "command": "jupytext:auto:hydrogen",
+                  "rank": 15
+                },
+                {
+                  "command": "jupytext:auto:nomarker",
+                  "rank": 20
+                },
+                {
+                  "type": "separator",
+                  "rank": 25
+                },
+                {
+                  "command": "jupytext:md",
+                  "rank": 30
+                },
+                {
+                  "command": "jupytext:md:myst",
+                  "rank": 35
+                },
+                {
+                  "type": "separator",
+                  "rank": 40
+                },
+                {
+                  "command": "jupytext:Rmd",
+                  "rank": 45
+                },
+                {
+                  "command": "jupytext:qmd",
+                  "rank": 50
+                },
+                {
+                  "type": "separator",
+                  "rank": 55
+                },
+                {
+                  "command": "jupytext:custom",
+                  "rank": 60
+                },
+                {
+                  "type": "separator",
+                  "rank": 65
+                },
+                {
+                  "command": "jupytext:none",
+                  "rank": 70
+                }
+              ]
+            },
+            "rank": 10
+          },
+          {
+            "type": "separator",
+            "rank": 11
+          },
+          {
+            "command": "jupytext:metadata",
+            "rank": 30
+          },
+          {
+            "type": "separator",
+            "rank": 31
+          },
+          {
+            "command": "jupytext:faq",
+            "rank": 40
+          },
+          {
+            "command": "jupytext:reference",
+            "rank": 41
+          }
+        ]
+      }
+    ]
+  },
+  "additionalProperties": false,
+  "type": "object"
+}
