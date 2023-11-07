@@ -16,7 +16,7 @@ from jupytext.cli import system
 
 from .utils import formats_with_support_for_cell_metadata
 
-# Pytest's tmpdir is in /tmp (at least for me), so this helps avoiding interferences between
+# Pytest's tmpdir is in /tmp (at least for me), so this helps to avoid interferences between
 # global configuration on HOME and the test collection
 jupytext.config.JUPYTEXT_CEILING_DIRECTORIES = ["/tmp/"]
 
