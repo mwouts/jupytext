@@ -26,7 +26,7 @@ conda activate jupytext-dev
 
 Install the `jupytext` package in development mode with
 ```
-pip install '.[dev]'
+pip install -e '.[dev]'
 ```
 
 We use the [pre-commit](https://pre-commit.com) package to run pre-commit scripts like `black` and `ruff` on the code.
@@ -44,15 +44,6 @@ Some tests require a Jupyter kernel pointing to the current environment:
 ```
 python -m ipykernel install --name jupytext-dev --user
 ```
-
-Finally, you can build the package and install it with
-```
-pip install -U build wheel
-python -m build
-pip install dist/jupytext-x.x.x-py3-none-any.whl
-```
-
-Note that you can use `HATCH_BUILD_HOOKS_ENABLE=false` if you don't need the lab extension - the build time will be slightly shorter.
 
 ## Jupytext's extension for JupyterLab
 
