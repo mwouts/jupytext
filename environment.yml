@@ -24,5 +24,5 @@ dependencies:
   - isort==5.12.0
   - autopep8
   - sphinx-gallery<0.8
-  - pandoc>=3.0
+  - pandoc==2.16.2
   - nodejs>=20

@@ -26,7 +26,7 @@ dependencies:
   - autopep8
   - black
   - isort
-  - pandoc>=3.0
+  - pandoc==2.16.2
   - sphinx-gallery<0.8
   - pre-commit
   - gitpython
