@@ -31,18 +31,6 @@ repos:
     - id: pyupgrade
       args: ["--py38-plus"]
 
-  - repo: https://github.com/myint/autoflake
-    rev: v2.2.1
-    hooks:
-    - id: autoflake
-      args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.5
-    hooks:
-      - id: ruff
-        args: ["--fix", "--show-fixes"]
-
   - repo: https://github.com/PyCQA/isort
     rev: 5.12.0
     hooks:
@@ -55,3 +43,9 @@ repos:
     rev: 23.11.0
     hooks:
     - id: black
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.5
+    hooks:
+      - id: ruff
+        args: ["--fix", "--show-fixes"]
