@@ -46,27 +46,34 @@ Documentation = "https://jupytext.readthedocs.io"
 
 [project.optional-dependencies]
 # Test related dependencies
-# TODO: Split them into unit, integration and functional tests groups
 test = [
-    "autopep8",
-    "black",
-    "isort",
-    "ruff",
-    "flake8",
-    "pytest",
-    "pytest-randomly",
-    "gitpython",
-    "jupyterlab",
-    "notebook",
-    "nbconvert",
-    # jupyter-fs==0.4.0 is async, which is not supported by Jupytext ATM
-    "jupyter-fs<0.4.0",
-    "ipykernel",
-    "pre-commit",
+  "pytest",
+  "pytest-randomly"
+]
+test-integration = [
+  "jupytext[test]",
+  "jupyter-server",
+  "nbconvert"
+]
+test-functional = [
+  "jupytext[test-integration]",
+  # jupytext --pipe and --check
+  "autopep8",
+  "black",
+  "isort",
+  "flake8",
+  # jupytext --execute
+  "ipykernel",
+  # Pre-commit tests
+  "gitpython",
+  "pre-commit",
+  # Interaction with other contents managers
+  # jupyter-fs==0.4.0 is async, which is not supported by Jupytext ATM
+  "jupyter-fs<0.4.0"
 ]
 # Coverage requirements
 test-cov = [
-    "jupytext[test]",
+    "jupytext[test-functional]",
     "pytest-cov>=2.6.1",
 ]
 dev = [
