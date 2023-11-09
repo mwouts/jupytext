@@ -22,11 +22,14 @@ Most of Jupytext's code is written in Python. To develop the Python part of Jupy
 ```
 conda env create --file environment.yml  # or conda env update --file ...
 conda activate jupytext-dev
-python -m ipykernel install --name jupytext-dev --user
-pip install -e .
 ```
 
-We use the [pre-commit](https://pre-commit.com) package to run pre-commit scripts like `black` and `flake8` on the code.
+Install the `jupytext` package in development mode with
+```
+pip install '.[dev]'
+```
+
+We use the [pre-commit](https://pre-commit.com) package to run pre-commit scripts like `black` and `ruff` on the code.
 Install it with
 ```
 pre-commit install
@@ -37,19 +40,19 @@ Tests are executed with `pytest`. You can run them in parallel with for instance
 pytest -n 5
 ```
 
-Build the `jupytext` package and install it with
+Some tests require a Jupyter kernel pointing to the current environment:
+```
+python -m ipykernel install --name jupytext-dev --user
+```
+
+Finally, you can build the package and install it with
 ```
 pip install -U build wheel
 python -m build
 pip install dist/jupytext-x.x.x-py3-none-any.whl
 ```
 
-or with
-```
-pip install .
-```
-
-Finally, note that you can use `HATCH_BUILD_HOOKS_ENABLE=false` if you don't need the lab extension - the build time will be slightly shorter.
+Note that you can use `HATCH_BUILD_HOOKS_ENABLE=false` if you don't need the lab extension - the build time will be slightly shorter.
 
 ## Jupytext's extension for JupyterLab
 
