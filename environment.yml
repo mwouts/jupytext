@@ -12,7 +12,6 @@ dependencies:
   - mdit-py-plugins
   - nbconvert
   - ipykernel
-  - jupyter_contrib_nbextensions
   - pytest
   - pytest-xdist
   - pytest-randomly
@@ -20,17 +19,10 @@ dependencies:
   - pre-commit
   - gitpython
   - pylint
-  - flake8==3.9.1
-  - black==21.4b2
-  - isort==5.8.0
+  - flake8
+  - black==23.11.0
+  - isort==5.12.0
   - autopep8
   - sphinx-gallery<0.8
-  - pip
-  - setuptools
-  - twine
-  - pandoc==2.16.2
-  # make html in docs folder
-  - sphinx
-  - tox-conda
-  - pip:
-    - sphinx_copybutton
+  - pandoc>=3.0
+  - nodejs>=20
