@@ -1866,9 +1866,12 @@ def test_new_untitled(tmpdir):
     )
     assert cm.new_untitled(type="notebook", ext=".Rmd")["path"] == untitled + "5.Rmd"
 
-    # Test native formats that should not be changed by Jupytext
-    assert cm.new_untitled(type="file", ext=".py")["path"] == "untitled.py"
-    assert cm.new_untitled(type="file", ext=".md")["path"] == "untitled.md"
+    # Test native formats that should not be changed by Jupytext and model should
+    # not contain any Jupytext metadata neither file name should start with Uppercase
+    for ext in [".py", ".md"]:
+        model = cm.new_untitled(type="file", ext=ext)
+        assert model["content"] is None
+        assert model["path"] == f"untitled{ext}"
     assert cm.new_untitled(type="directory")["path"] == "Untitled Folder"
 
 
