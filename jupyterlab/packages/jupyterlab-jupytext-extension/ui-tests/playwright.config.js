@@ -5,6 +5,20 @@ const baseConfig = require('@jupyterlab/galata/lib/playwright-config');
 
 module.exports = {
   ...baseConfig,
+  projects: [
+    {
+      name: 'jupytext',
+      testMatch: 'tests/*.ts',
+      testIgnore: '**/.ipynb_checkpoints/**',
+      timeout: 60000,
+      // use: {
+      //   launchOptions: {
+      //     // Force slow motion
+      //     slowMo: 1000,
+      //   },
+      // },
+    },
+  ],
   // Visual comparison of screenshots can be flaky. Use a tolerance
   expect: {
     toMatchSnapshot: {
