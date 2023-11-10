@@ -22,15 +22,29 @@ jupyter labextension install jupyterlab-jupytext@1.1.1  # for JupyterLab 1.x
 
 # How to develop this extension
 
-We assume that you have activated the conda environment described in [CONTRIBUTING.md](https://github.com/mwouts/jupytext/blob/main/CONTRIBUTING.md).
-
-Then you can rebuild the Jupytext python package (with `python -m build`) and reinstall it (`pip install dist/jupytext-x.x.x-py3-none-any.whl`).
-
-Alternatively, if you prefer to develop iteratively, you could install a development version of the extension with
+For fine-grained access to the `jlpm` command and various build steps:
 
 ```bash
-jupyter labextension develop . --overwrite
+pip install -e '.[dev]'
+cd jupyterlab/packages/jupyterlab-jupytext
+jlpm
+jlpm install:extension     # Symlink into `{sys.prefix}/share/jupyter/labextensions`
 ```
+
+Watch the source directory and automatically rebuild the `lib` folder:
+
+```bash
+cd jupyterlab/packages/jupyterlab-jupytext
+# Watch the source directory in one terminal, automatically rebuilding when needed
+jlpm watch
+# Run JupyterLab in another terminal
+jupyter lab
+```
+
+While running `jlpm watch`, every saved change to a `.ts` file will immediately be
+built locally and available in your running Jupyter client. "Hard" refresh JupyterLab or Notebook
+with <kbd>CTRL-F5</kbd> or <kbd>⌘-F5</kbd> to load the change in your browser
+(you may need to wait several seconds for the extension to be fully rebuilt).
 
 Read more on this on the [JupyterLab documentation](https://jupyterlab.readthedocs.io/en/latest/extension/extension_dev.html#developing-a-prebuilt-extension).
 
