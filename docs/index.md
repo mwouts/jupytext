@@ -10,6 +10,7 @@
 install.md
 text-notebooks.md
 paired-notebooks.md
+jupyterlab-extension.md
 config.md
 advanced-options.md
 formats-scripts.md
