@@ -2,7 +2,6 @@
 """
 import itertools
 import os
-import re
 from collections import namedtuple
 from datetime import timedelta
 
@@ -388,12 +387,7 @@ to your jupytext.toml file
             We override the base function because that one does not take the 'ext' argument
             into account when type=="notebook". See https://github.com/mwouts/jupytext/issues/443
             """
-            # We are excluding all the cases that come up with Jupytext and using
-            # base method to create file. Is there a better way to get all the
-            # extensions that Jupytext uses so that we dont hard code them
-            # (even with regex) as below?
-            #
-            if not (type == "notebook" and re.match(r"[\.py\:\w+ | \.md]", ext)):
+            if type != "notebook" and ext != ".ipynb":
                 return self.super.new_untitled(path, type, ext)
 
             ext = ext or ".ipynb"
