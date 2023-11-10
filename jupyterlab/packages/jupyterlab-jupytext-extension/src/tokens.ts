@@ -19,6 +19,19 @@ export const LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS = [
 ];
 
 /**
+ * Supported file types.
+ */
+export const FILE_TYPES = [
+  'markdown',
+  'myst',
+  'r-markdown',
+  'quarto',
+  'julia',
+  'python',
+  'r',
+];
+
+/**
  * The short namespace for commands, etc.
  */
 export const NS = 'jupytext';
@@ -93,6 +106,21 @@ export const ALL_JUPYTEXT_FORMAT_EXTENSIONS = ALL_JUPYTEXT_FORMATS.map(
 ).filter((format) => {
   return !['custom', 'none'].includes(format);
 });
+
+/**
+ * List of formats that would be added to launcher icons
+ */
+export const TEXT_NOTEBOOKS_LAUNCHER_ICONS =
+  ALL_JUPYTEXT_FORMAT_EXTENSIONS.filter((format) => {
+    return ![
+      'ipynb',
+      'auto:hydrogen',
+      'auto:nomarker',
+      'qmd',
+      'custom',
+      'none',
+    ].includes(format);
+  });
 
 /**
  * An interface for Jupytext format

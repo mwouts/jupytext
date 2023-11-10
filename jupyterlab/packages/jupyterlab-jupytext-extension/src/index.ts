@@ -45,6 +45,8 @@ import { IRisePreviewFactory } from 'jupyterlab-rise';
 
 import {
   JUPYTEXT_EXTENSION_ID,
+  FILE_TYPES,
+  TEXT_NOTEBOOKS_LAUNCHER_ICONS,
   FACTORY,
   CommandIDs,
   IJupytextFormat,
@@ -101,6 +103,15 @@ const extension: JupyterFrontEndPlugin<void> = {
   ) => {
     console.log('JupyterLab extension jupytext is activating...');
     const trans = (translator ?? nullTranslator).load('jupytext');
+
+    // Load settings
+    let launcherItems = TEXT_NOTEBOOKS_LAUNCHER_ICONS;
+    let launcherItemsCategory = 'Jupytext';
+    if (settingRegistry) {
+      const settings = await settingRegistry.load(extension.id);
+      launcherItems = settings.get('format').composite as string[];
+      launcherItemsCategory = settings.get('category').composite as string;
+    }
 
     // Unpack necessary components
     const { commands, serviceManager, docRegistry } = app;
@@ -227,15 +238,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     const factory = new NotebookWidgetFactory({
       name: FACTORY,
       label: trans.__(FACTORY),
-      fileTypes: [
-        'markdown',
-        'myst',
-        'r-markdown',
-        'quarto',
-        'julia',
-        'python',
-        'r',
-      ],
+      fileTypes: FILE_TYPES,
       modelName: notebookFactory.modelName ?? 'notebook',
       preferKernel: notebookFactory.preferKernel ?? true,
       canStartKernel: notebookFactory.canStartKernel ?? true,
@@ -275,13 +278,9 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     // Add support for RISE slides
     if (riseFactory) {
-      riseFactory.addFileType('markdown');
-      riseFactory.addFileType('myst');
-      riseFactory.addFileType('r-markdown');
-      riseFactory.addFileType('quarto');
-      riseFactory.addFileType('julia');
-      riseFactory.addFileType('python');
-      riseFactory.addFileType('r');
+      for (const fileType of FILE_TYPES) {
+        riseFactory.addFileType(fileType);
+      }
     }
 
     // All supported format extensions bar ipynb, custom and none
@@ -299,7 +298,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     // files with different Jupytext supported extensions. So we create a dedicated
     // create new text notebook command here and make sure we pass extension in options
     commands.addCommand(CommandIDs.newUntitled, {
-      execute: (args) => {
+      execute: async (args) => {
         const errorTitle = (args['error'] as string) || trans.__('Error');
         const path =
           typeof args['path'] === 'undefined' ? '' : (args['path'] as string);
@@ -330,12 +329,12 @@ const extension: JupyterFrontEndPlugin<void> = {
     jupytextTextNotebookFormats.forEach(
       (jupytextFormat: IJupytextFormat, rank: number) => {
         const command = `jupytext:create-new-text-noteboook-${jupytextFormat.format}`;
-        const label = trans.__(jupytextFormat.label.split('with')[1]).trim();
+        const label = trans.__(jupytextFormat.label.split('with')[1].trim());
         console.log('Registering text notebook command=', command);
         commands.addCommand(command, {
           label: (args) => {
             if (args['isLauncher']) {
-              return trans.__(`Jupytext (${label.toLocaleLowerCase()})`);
+              return trans.__(label);
             }
             if (args['isPalette'] || args['isContextMenu']) {
               return trans.__(`New Text Notebook with ${label}`);
@@ -360,7 +359,7 @@ const extension: JupyterFrontEndPlugin<void> = {
         });
 
         // Add a launcher item if the launcher is available.
-        if (launcher) {
+        if (launcher && launcherItems.includes(jupytextFormat.format)) {
           void serviceManager.ready.then(() => {
             let disposables: DisposableSet | null = null;
             const onSpecsChanged = () => {
@@ -383,7 +382,7 @@ const extension: JupyterFrontEndPlugin<void> = {
                   launcher.add({
                     command: command,
                     args: { isLauncher: true, kernelName: name },
-                    category: trans.__('Notebook'),
+                    category: trans.__(launcherItemsCategory),
                     rank,
                     kernelIconUrl,
                     metadata: {

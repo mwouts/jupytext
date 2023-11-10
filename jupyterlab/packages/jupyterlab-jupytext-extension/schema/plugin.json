@@ -1,6 +1,23 @@
 {
   "title": "Jupytext",
   "description": "Jupytext Menu Settings.",
+  "properties": {
+    "category": {
+      "title": "Category",
+      "description": "Category under which Jupytext Text Notebooks will be placed. Refresh the current browser tab for the changes to take effect.",
+      "type": "string",
+      "default": "Jupytext"
+    },
+    "format": {
+      "title": "Jupytext Text Notebook Launcher Items Formats",
+      "description": "List of Jupytext Text Notebook formats that will be added to launcher. Refresh the current browser tab for the changes to take effect.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "default": ["auto:light", "auto:percent", "md", "md:myst", "Rmd"]
+    }
+  },
   "jupyter.lab.menus": {
     "main": [
       {
@@ -15,11 +32,15 @@
               "label": "New Text Notebook",
               "items": [
                 {
-                  "command": "jupytext:create-new-text-noteboook-auto:light",
+                  "command": "jupytext:create-new-text-noteboook-auto:percent",
                   "rank": 1
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-auto:percent",
+                  "type": "separator",
+                  "rank": 2
+                },
+                {
+                  "command": "jupytext:create-new-text-noteboook-auto:light",
                   "rank": 5
                 },
                 {
