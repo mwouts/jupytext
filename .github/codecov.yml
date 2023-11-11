@@ -1,6 +1,6 @@
 codecov:
-    notify:
-        after_n_builds: 11
+  notify:
+    after_n_builds: 11
 
 comment:
   after_n_builds: 11
@@ -8,14 +8,13 @@ comment:
 coverage:
   status:
     project:
-      default: false  # disable the default status that measures entire project
       tests:
         paths:
           - "tests/"
         target: 100%
       source:
         paths:
-          - "jupytext/"
+          - "src/jupytext/"
         target: 97%
         threshold: 0.002
     patch:
