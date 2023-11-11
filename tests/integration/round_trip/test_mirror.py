@@ -18,13 +18,7 @@ from jupytext.formats import (
 from jupytext.languages import _SCRIPT_EXTENSIONS
 from jupytext.paired_paths import full_path
 
-from ...utils import (
-    list_notebooks,
-    requires_myst,
-    requires_pandoc,
-    requires_quarto,
-    requires_sphinx_gallery,
-)
+from ...utils import list_notebooks
 
 
 def create_mirror_file_if_missing(mirror_file, notebook, fmt):
@@ -129,7 +123,7 @@ def test_ipynb_to_Rmd(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, "Rmd", "ipynb_to_Rmd")
 
 
-@requires_pandoc
+@pytest.mark.requires_pandoc
 @pytest.mark.parametrize(
     "nb_file",
     list_notebooks("ipynb", skip="(functional|Notebook with|flavors|invalid|305)"),
@@ -138,7 +132,7 @@ def test_ipynb_to_pandoc(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, "md:pandoc", "ipynb_to_pandoc")
 
 
-@requires_quarto
+@pytest.mark.requires_quarto
 @pytest.mark.parametrize(
     "nb_file",
     list_notebooks(
@@ -154,7 +148,7 @@ def test_ipynb_to_quarto(
     assert_conversion_same_as_mirror(nb_file, "qmd", "ipynb_to_quarto")
 
 
-@requires_myst
+@pytest.mark.requires_myst
 @pytest.mark.parametrize(
     "nb_file",
     list_notebooks(
@@ -165,7 +159,7 @@ def test_ipynb_to_myst(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, "md:myst", "ipynb_to_myst")
 
 
-@requires_sphinx_gallery
+@pytest.mark.requires_sphinx_gallery
 @pytest.mark.parametrize(
     "nb_file", list_notebooks("ipynb_py", skip="(raw|hash|frozen|magic|html|164|long)")
 )
@@ -216,13 +210,13 @@ def test_Rmd_to_ipynb(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, "ipynb", "Rmd_to_ipynb")
 
 
-@requires_sphinx_gallery
+@pytest.mark.requires_sphinx_gallery
 @pytest.mark.parametrize("nb_file", list_notebooks("sphinx"))
 def test_sphinx_to_ipynb(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(nb_file, "ipynb:sphinx", "sphinx_to_ipynb")
 
 
-@requires_sphinx_gallery
+@pytest.mark.requires_sphinx_gallery
 @pytest.mark.parametrize("nb_file", list_notebooks("sphinx"))
 def test_sphinx_md_to_ipynb(nb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(

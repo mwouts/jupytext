@@ -17,17 +17,11 @@ from jupytext import __version__, read, reads, write, writes
 from jupytext.cli import jupytext, parse_jupytext_args, str2bool, system
 from jupytext.compare import compare, compare_notebooks
 from jupytext.formats import JupytextFormatError, long_form_one_format
+from jupytext.myst import is_myst_available
 from jupytext.paired_paths import InconsistentPath, paired_paths
+from jupytext.pandoc import is_pandoc_available
 
-from ...utils import (
-    list_notebooks,
-    requires_jupytext_installed,
-    requires_myst,
-    requires_pandoc,
-    requires_sphinx_gallery,
-    requires_user_kernel_python3,
-    skip_on_windows,
-)
+from ...utils import list_notebooks
 
 
 def test_str2bool():
@@ -64,7 +58,7 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
     compare_notebooks(nb2, nb1)
 
 
-@requires_jupytext_installed
+@pytest.mark.requires_jupytext
 def test_convert_single_file_in_place_m(tmpdir):
     nb_file = list_notebooks("ipynb_py")[0]
     nb_org = str(tmpdir.join(os.path.basename(nb_file)))
@@ -436,7 +430,7 @@ def test_update_metadata(py_file, tmpdir, capsys):
     assert "invalid" in err
 
 
-@requires_user_kernel_python3
+@pytest.mark.requires_user_kernel_python3
 @pytest.mark.parametrize("py_file", list_notebooks("python"))
 def test_set_kernel_inplace(py_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
@@ -451,7 +445,7 @@ def test_set_kernel_inplace(py_file, tmpdir):
     assert cmd == "python" or os.path.samefile(cmd, sys.executable)
 
 
-@requires_user_kernel_python3
+@pytest.mark.requires_user_kernel_python3
 @pytest.mark.parametrize("py_file", list_notebooks("python"))
 def test_set_kernel_auto(py_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
@@ -467,7 +461,7 @@ def test_set_kernel_auto(py_file, tmpdir):
     assert cmd == "python" or os.path.samefile(cmd, sys.executable)
 
 
-@requires_user_kernel_python3
+@pytest.mark.requires_user_kernel_python3
 @pytest.mark.parametrize("py_file", list_notebooks("python"))
 def test_set_kernel_with_name(py_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
@@ -556,7 +550,7 @@ def test_sync(nb_file, tmpdir, cwd_tmpdir, capsys):
     assert os.path.getmtime(tmp_ipynb) <= os.path.getmtime(tmp_py)
 
 
-@requires_pandoc
+@pytest.mark.requires_pandoc
 @pytest.mark.parametrize(
     "nb_file", list_notebooks("ipynb_py", skip="(Notebook with|flavors|305)")
 )
@@ -673,7 +667,7 @@ def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir, cwd_tmpdir):
     compare_notebooks(nb2, nb, "Rmd")
 
 
-@requires_user_kernel_python3
+@pytest.mark.requires_user_kernel_python3
 def test_set_kernel_works_with_pipes_326(capsys):
     md = """```python
 1 + 1
@@ -688,8 +682,8 @@ def test_set_kernel_works_with_pipes_326(capsys):
     assert "kernelspec" in nb.metadata
 
 
-@requires_user_kernel_python3
-@skip_on_windows
+@pytest.mark.requires_user_kernel_python3
+@pytest.mark.skip_on_windows
 @pytest.mark.filterwarnings("ignore")
 def test_utf8_out_331(capsys, caplog):
     py = "from IPython.core.display import HTML; HTML(u'\xd7')"
@@ -706,7 +700,7 @@ def test_utf8_out_331(capsys, caplog):
     assert nb.cells[0].outputs[0]["data"]["text/html"] == "\xd7"
 
 
-@requires_jupytext_installed
+@pytest.mark.requires_jupytext
 @pytest.mark.filterwarnings("ignore:The --pre-commit argument is deprecated")
 def test_cli_expect_errors(tmp_ipynb):
     with pytest.raises(ValueError):
@@ -838,7 +832,7 @@ formats = "examples//example/ipynb,examples//example/py:percent"
     assert (tmp_path / "examples/folder1/example_paired.py").exists(), "Paired"
 
 
-@requires_sphinx_gallery
+@pytest.mark.requires_sphinx_gallery
 def test_rst2md(tmpdir, cwd_tmpdir):
     tmp_py = "notebook.py"
     tmp_ipynb = "notebook.ipynb"
@@ -1040,15 +1034,10 @@ def test_set_format_with_subfolder(tmpdir, cwd_tmpdir):
 
 def skip_if_format_missing(format_name):
     """Check whether MyST or Pandoc are available and skip if not"""
-    if format_name == "md:myst":
-        mark = requires_myst()
-    elif format_name == "md:pandoc":
-        mark = requires_pandoc()
-    else:
-        return
-
-    if mark.args[0]:
-        pytest.skip(**mark.kwargs)
+    if format_name == "md:myst" and not is_myst_available():
+        pytest.skip("MyST markdown is not available")
+    elif format_name == "md:pandoc" and not is_pandoc_available():
+        pytest.skip("Pandoc is not available")
 
 
 @pytest.mark.parametrize("format_name", ["md", "md:myst", "md:pandoc"])
@@ -1065,7 +1054,7 @@ def test_create_header_with_set_formats(format_name, cwd_tmpdir, tmpdir):
     assert nb["metadata"]["jupytext"]["formats"] == format_name
 
 
-@requires_user_kernel_python3
+@pytest.mark.requires_user_kernel_python3
 @pytest.mark.parametrize(
     "format_name", ["md", "md:myst", "md:pandoc", "py:light", "py:percent"]
 )
@@ -1136,7 +1125,7 @@ def test_pair_in_tree_and_parent(tmpdir):
     assert "A markdown cell" in py_file.read()
 
 
-@requires_pandoc
+@pytest.mark.requires_pandoc
 def test_sync_pipe_config(tmpdir):
     """Sync a notebook to a script paired in a tree, and reformat the markdown cells using pandoc"""
 
@@ -1256,7 +1245,7 @@ def test_show_changes(tmpdir, cwd_tmpdir, capsys):
     assert "-2 + 2\n+1 + 1" in captured.out
 
 
-@requires_user_kernel_python3
+@pytest.mark.requires_user_kernel_python3
 def test_skip_execution(tmpdir, cwd_tmpdir, tmp_repo, python_notebook, capsys):
     write(
         new_notebook(cells=[new_code_cell("1 + 1")], metadata=python_notebook.metadata),

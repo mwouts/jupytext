@@ -8,8 +8,6 @@ from jupytext.cli import jupytext as jupytext_cli
 from jupytext.compare import compare, compare_notebooks
 from jupytext.metadata_filter import filter_metadata, metadata_filter_as_dict
 
-from ...utils import requires_myst
-
 
 def to_dict(keys):
     return {key: None for key in keys}
@@ -175,7 +173,7 @@ def test_default_config_has_priority_over_current_metadata(
     )
 
 
-@requires_myst
+@pytest.mark.requires_myst
 def test_metadata_filter_in_notebook_757():
     md = """---
 jupytext:

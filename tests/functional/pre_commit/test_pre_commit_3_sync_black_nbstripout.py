@@ -4,14 +4,7 @@ from pre_commit.main import main as pre_commit
 
 from jupytext import read, write
 
-from ...utils import (
-    skip_pre_commit_tests_on_windows,
-    skip_pre_commit_tests_when_jupytext_folder_is_not_a_git_repo,
-)
 
-
-@skip_pre_commit_tests_on_windows
-@skip_pre_commit_tests_when_jupytext_folder_is_not_a_git_repo
 def test_pre_commit_hook_sync_black_nbstripout(
     tmpdir,
     cwd_tmpdir,

@@ -8,15 +8,13 @@ from tornado.web import HTTPError
 from jupytext import TextFileContentsManager, read
 from jupytext.cli import jupytext as jupytext_cli
 
-from ...utils import skip_on_windows
-
 
 @pytest.fixture
 def invalid_md_file():
     return Path(__file__).parent / "invalid_file_896.md"
 
 
-@skip_on_windows
+@pytest.mark.skip_on_windows
 def test_read_invalid_md_file_fails(invalid_md_file):
     with open(invalid_md_file) as fp:
         with pytest.raises(UnicodeDecodeError):

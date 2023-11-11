@@ -1,12 +1,11 @@
+import pytest
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 
 import jupytext
 from jupytext.compare import compare, compare_notebooks
 
-from ...utils import requires_quarto
 
-
-@requires_quarto
+@pytest.mark.requires_quarto
 def test_qmd_to_ipynb(
     qmd="""Some text
 

@@ -3,9 +3,8 @@ from nbformat.notebooknode import NotebookNode
 
 import jupytext
 from jupytext.formats import NOTEBOOK_EXTENSIONS
-from jupytext.myst import myst_extensions
-
-from ...utils import is_myst_available, is_quarto_available
+from jupytext.myst import is_myst_available, myst_extensions
+from jupytext.quarto import is_quarto_available
 
 
 @pytest.mark.parametrize("ext", sorted(set(NOTEBOOK_EXTENSIONS) - {".ipynb"}))

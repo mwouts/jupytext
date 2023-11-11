@@ -7,14 +7,12 @@ from nbformat.v4.nbbase import new_code_cell, new_notebook
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
 
-from ...utils import requires_black, requires_myst, requires_user_kernel_python3
-
 doc_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs")
 
 
-@requires_user_kernel_python3
-@requires_black
-@requires_myst
+@pytest.mark.requires_user_kernel_python3
+@pytest.mark.requires_black
+@pytest.mark.requires_myst
 @pytest.mark.skipif(
     not os.path.isdir(doc_path), reason="Documentation folder is missing"
 )

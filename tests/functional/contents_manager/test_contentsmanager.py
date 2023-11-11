@@ -17,14 +17,7 @@ from jupytext.header import header_to_metadata_and_cell
 from jupytext.jupytext import read, write, writes
 from jupytext.kernels import kernelspec_from_language
 
-from ...utils import (
-    list_notebooks,
-    notebook_model,
-    requires_pandoc,
-    requires_quarto,
-    requires_sphinx_gallery,
-    requires_user_kernel_python3,
-)
+from ...utils import list_notebooks, notebook_model
 
 
 def test_create_contentsmanager():
@@ -177,7 +170,7 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
     assert nb_md["content"].metadata["jupytext"]["formats"] == "ipynb,md"
 
 
-@requires_pandoc
+@pytest.mark.requires_pandoc
 @pytest.mark.parametrize(
     "nb_file",
     list_notebooks("ipynb", skip="(functional|Notebook with|flavors|invalid|305)"),
@@ -200,7 +193,7 @@ def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
     assert nb_md["content"].metadata["jupytext"]["formats"] == "ipynb,md:pandoc"
 
 
-@requires_quarto
+@pytest.mark.requires_quarto
 @pytest.mark.parametrize(
     "nb_file",
     list_notebooks(
@@ -1216,7 +1209,7 @@ def test_global_pairing_allows_to_save_other_file_types(nb_file, tmpdir):
     compare_notebooks(nb2, nb)
 
 
-@requires_user_kernel_python3
+@pytest.mark.requires_user_kernel_python3
 @pytest.mark.parametrize("nb_file", list_notebooks("R"))
 def test_python_kernel_preserves_R_files(nb_file, tmpdir):
     """Opening a R file with a Jupyter server that has no R kernel should not modify the file"""
@@ -1287,7 +1280,7 @@ def test_pair_notebook_in_dotdot_folder(tmpdir):
     cm.get("scripts/notebook_name.py")
 
 
-@requires_sphinx_gallery
+@pytest.mark.requires_sphinx_gallery
 def test_rst2md_option(tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
 

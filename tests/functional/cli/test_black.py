@@ -11,10 +11,10 @@ from jupytext.combine import black_invariant
 from jupytext.compare import compare, compare_cells, compare_notebooks
 from jupytext.header import _DEFAULT_NOTEBOOK_METADATA
 
-from ...utils import list_notebooks, requires_autopep8, requires_black, requires_flake8
+from ...utils import list_notebooks
 
 
-@requires_black
+@pytest.mark.requires_black
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
 def test_apply_black_on_python_notebooks(tmpdir, cwd_tmpdir, nb_file):
     copyfile(nb_file, "notebook.ipynb")
@@ -54,7 +54,7 @@ def test_black_invariant():
     assert black_invariant(text_org) == black_invariant(text_black)
 
 
-@requires_black
+@pytest.mark.requires_black
 def test_pipe_into_black():
     nb_org = new_notebook(cells=[new_code_cell("1        +1", id="cell-id")])
     nb_dest = new_notebook(cells=[new_code_cell("1 + 1", id="cell-id")])
@@ -65,7 +65,7 @@ def test_pipe_into_black():
     )
 
 
-@requires_autopep8
+@pytest.mark.requires_autopep8
 def test_pipe_into_autopep8():
     nb_org = new_notebook(cells=[new_code_cell("1        +1", id="cell-id")])
     nb_dest = new_notebook(cells=[new_code_cell("1 + 1", id="cell-id")])
@@ -76,7 +76,7 @@ def test_pipe_into_autopep8():
     )
 
 
-@requires_flake8
+@pytest.mark.requires_flake8
 def test_pipe_into_flake8():
     # Notebook OK
     nb = new_notebook(cells=[new_code_cell("# correct code\n1 + 1")])
@@ -88,8 +88,8 @@ def test_pipe_into_flake8():
         pipe_notebook(nb, "flake8", update=False)
 
 
-@requires_black
-@requires_flake8
+@pytest.mark.requires_black
+@pytest.mark.requires_flake8
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
 def test_apply_black_through_jupytext(tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
@@ -141,7 +141,7 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
     compare_notebooks(nb_now, nb_black)
 
 
-@requires_black
+@pytest.mark.requires_black
 @pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
 def test_apply_black_and_sync_on_paired_notebook(tmpdir, cwd_tmpdir, nb_file):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
@@ -174,7 +174,7 @@ def test_apply_black_and_sync_on_paired_notebook(tmpdir, cwd_tmpdir, nb_file):
     compare_notebooks(nb_now, nb_black)
 
 
-@requires_black
+@pytest.mark.requires_black
 def test_apply_black_on_markdown_notebook(tmpdir):
     text = """---
 jupyter:
@@ -210,7 +210,7 @@ jupyter:
     compare_cells(nb.cells, [new_code_cell("1 + 2 + 3 + 4")], compare_ids=False)
 
 
-@requires_black
+@pytest.mark.requires_black
 def test_black_through_tempfile(
     tmpdir,
     text="""```python
@@ -231,7 +231,7 @@ def test_black_through_tempfile(
         compare(fp.read(), black)
 
 
-@requires_black
+@pytest.mark.requires_black
 def test_pipe_black_removes_lines_to_next_cell_metadata(
     tmpdir,
     cwd_tmpdir,
@@ -255,7 +255,7 @@ func()""",
     assert "\n\n# %%\nfunc()" in new_text
 
 
-@requires_black
+@pytest.mark.requires_black
 @pytest.mark.parametrize(
     "code,black_should_fail",
     [("myvar = %dont_format_me", False), ("incomplete_instruction = (...", True)],
@@ -288,7 +288,7 @@ def test_pipe_black_uses_warn_only_781(
     compare_notebooks(actual, nb)
 
 
-@requires_black
+@pytest.mark.requires_black
 def test_pipe_black_preserve_outputs(notebook_with_outputs, tmpdir, cwd_tmpdir, capsys):
     write(notebook_with_outputs, "test.ipynb")
     jupytext(["--pipe", "black", "test.ipynb"])

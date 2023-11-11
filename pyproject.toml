@@ -179,6 +179,24 @@ ignore = [
 ]
 
 [tool.pytest.ini_options]
+markers = [
+    "requires_jupytext",
+    "requires_black",
+    "requires_isort",
+    "requires_flake8",
+    "requires_autopep8",
+    "requires_nbconvert",
+    "requires_myst",
+    "requires_no_myst",
+    "requires_quarto",
+    "requires_pandoc",
+    "requires_no_pandoc",
+    "requires_sphinx_gallery",
+    "requires_user_kernel_python3",
+    "requires_ir_kernel",
+    "skip_on_windows",
+    "pre_commit",
+]
 filterwarnings = [
     # Uncomment this "error" to turn all unfiltered warnings into errors
     # "error",

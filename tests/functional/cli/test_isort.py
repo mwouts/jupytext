@@ -1,11 +1,11 @@
+import pytest
+
 from jupytext import reads, writes
 from jupytext.cli import pipe_notebook
 from jupytext.compare import compare
 
-from ...utils import requires_isort
 
-
-@requires_isort
+@pytest.mark.requires_isort
 def test_pipe_into_isort():
     text_org = """# %%
 import numpy as np

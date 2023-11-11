@@ -16,7 +16,7 @@ from jupytext.formats import (
     validate_one_format,
 )
 
-from ..utils import list_notebooks, requires_myst, requires_pandoc
+from ..utils import list_notebooks
 
 
 @pytest.mark.parametrize("nb_file", list_notebooks("python"))
@@ -347,7 +347,7 @@ def test_set_auto_ext():
         long_form_multiple_formats("ipynb,auto:percent", {})
 
 
-@requires_pandoc
+@pytest.mark.requires_pandoc
 def test_pandoc_format_is_preserved():
     formats_org = "ipynb,md,.pandoc.md:pandoc,py:light"
     long = long_form_multiple_formats(formats_org)
@@ -356,7 +356,7 @@ def test_pandoc_format_is_preserved():
     compare(formats_new, formats_org)
 
 
-@requires_myst
+@pytest.mark.requires_myst
 def test_write_as_myst(tmpdir):
     """Inspired by https://github.com/mwouts/jupytext/issues/462"""
     nb = new_notebook()

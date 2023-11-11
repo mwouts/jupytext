@@ -1,8 +1,10 @@
+import sys
 import unittest.mock as mock
 from pathlib import Path
 
 import pytest
 from git import Repo
+from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from nbformat.v4 import nbbase
 from nbformat.v4.nbbase import (
     new_code_cell,
@@ -12,13 +14,26 @@ from nbformat.v4.nbbase import (
 )
 
 import jupytext
+from jupytext.cell_reader import rst2md
 from jupytext.cli import system
+from jupytext.myst import is_myst_available
+from jupytext.pandoc import is_pandoc_available
+from jupytext.quarto import is_quarto_available
 
-from .utils import formats_with_support_for_cell_metadata
+from .utils import formats_with_support_for_cell_metadata, tool_version
 
 # Pytest's tmpdir is in /tmp (at least for me), so this helps to avoid interferences between
 # global configuration on HOME and the test collection
 jupytext.config.JUPYTEXT_CEILING_DIRECTORIES = ["/tmp/"]
+
+
+def isort_version():
+    try:
+        import isort
+
+        return isort.__version__
+    except ImportError:
+        return None
 
 
 @pytest.fixture
@@ -105,6 +120,71 @@ def notebook_with_outputs():
 @pytest.fixture(params=list(formats_with_support_for_cell_metadata()))
 def fmt_with_cell_metadata(request):
     return request.param
+
+
+def pytest_runtest_setup(item):
+    for mark in item.iter_markers():
+        for tool in [
+            "jupytext",
+            "black",
+            "isort",
+            "flake8",
+            "autopep8",
+            "jupyter nbconvert",
+        ]:
+            if mark.name == f"requires_{tool.replace(' ', '_')}":
+                if not tool_version(tool):
+                    pytest.skip(f"{tool} is not installed")
+        if mark.name == "requires_sphinx_gallery":
+            if not rst2md:
+                pytest.skip("sphinx_gallery is not available")
+        if mark.name == "requires_pandoc":
+            # The mirror files changed slightly when Pandoc 2.11 was introduced
+            # https://github.com/mwouts/jupytext/commit/c07d919702999056ce47f92b74f63a15c8361c5d
+            # The mirror files changed again when Pandoc 2.16 was introduced
+            # https://github.com/mwouts/jupytext/pull/919/commits/1fa1451ecdaa6ad8d803bcb6fb0c0cf09e5371bf
+            if not is_pandoc_available(min_version="2.16.2", max_version="2.16.2"):
+                pytest.skip("pandoc==2.16.2 is not available")
+        if mark.name == "requires_quarto":
+            if not is_quarto_available(min_version="0.2.0"):
+                pytest.skip("quarto>=0.2 is not available")
+        if mark.name == "requires_no_pandoc":
+            if is_pandoc_available():
+                pytest.skip("Pandoc is installed")
+        if mark.name == "requires_ir_kernel":
+            if not any(
+                get_kernel_spec(name).language == "R" for name in find_kernel_specs()
+            ):
+                pytest.skip("irkernel is not installed")
+        if mark.name == "requires_user_kernel_python3":
+            if "python_kernel" not in find_kernel_specs():
+                pytest.skip(
+                    "Please run 'python -m ipykernel install --name python_kernel --user'"
+                )
+        if mark.name == "requires_myst":
+            if not is_myst_available():
+                pytest.skip("myst_parser not found")
+        if mark.name == "requires_no_myst":
+            if is_myst_available():
+                pytest.skip("myst is available")
+        if mark.name == "skip_on_windows":
+            if sys.platform.startswith("win"):
+                pytest.skip("Issue 489")
+        if mark.name == "pre_commit":
+            if sys.platform.startswith("win"):
+                pytest.skip(
+                    "OSError: [WinError 193] %1 is not a valid Win32 application"
+                )
+            if not (Path(__file__).parent.parent / ".git").is_dir():
+                pytest.skip("Jupytext folder is not a git repository #814")
+
+
+def pytest_collection_modifyitems(config, items):
+    for item in items:
+        if (
+            config.rootdir / "tests" / "functional" / "pre_commit"
+        ) in item.path.parents:
+            item.add_marker(pytest.mark.pre_commit)
 
 
 """To make sure that cell ids are distinct we use a global counter.

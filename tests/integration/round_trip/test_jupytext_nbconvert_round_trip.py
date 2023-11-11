@@ -3,10 +3,10 @@ import pytest
 import jupytext
 from jupytext.header import header_to_metadata_and_cell
 
-from ...utils import list_notebooks, requires_nbconvert
+from ...utils import list_notebooks
 
 
-@requires_nbconvert
+@pytest.mark.requires_nbconvert
 @pytest.mark.parametrize("md_file", list_notebooks("md", skip="jupytext"))
 def test_markdown_jupytext_nbconvert_is_identity(md_file):
     """Test that a Markdown file, converted to a notebook, then
@@ -39,7 +39,7 @@ def test_markdown_jupytext_nbconvert_is_identity(md_file):
     jupytext.compare.compare(md_nbconvert, md_expected)
 
 
-@requires_nbconvert
+@pytest.mark.requires_nbconvert
 @pytest.mark.parametrize("nb_file", list_notebooks(skip="(html|magic)"))
 def test_jupytext_markdown_similar_to_nbconvert(nb_file):
     """Test that the nbconvert export for a notebook matches Jupytext's one"""

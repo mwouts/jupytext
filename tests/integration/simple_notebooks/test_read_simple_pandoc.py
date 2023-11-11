@@ -6,10 +6,8 @@ from jupytext.cli import jupytext as jupytext_cli
 from jupytext.compare import compare, compare_notebooks
 from jupytext.pandoc import PandocError
 
-from ...utils import requires_no_pandoc, requires_pandoc
 
-
-@requires_pandoc
+@pytest.mark.requires_pandoc
 def test_pandoc_implicit(
     markdown="""# Lorem ipsum
 
@@ -31,7 +29,7 @@ print("hello")
     compare(markdown3, markdown2)
 
 
-@requires_pandoc
+@pytest.mark.requires_pandoc
 def test_pandoc_explicit(
     markdown="""::: {.cell .markdown}
 # Lorem
@@ -46,7 +44,7 @@ bibendum felis dictum sodales.
     compare("\n".join(markdown2.splitlines()[12:]), markdown)
 
 
-@requires_pandoc
+@pytest.mark.requires_pandoc
 def test_pandoc_utf8_in_md(
     markdown="""::: {.cell .markdown}
 # Utf-8 support
@@ -60,7 +58,7 @@ This is the greek letter $\\pi$: π
     compare("\n".join(markdown2.splitlines()[12:]), markdown)
 
 
-@requires_pandoc
+@pytest.mark.requires_pandoc
 def test_pandoc_utf8_in_nb(
     nb=new_notebook(
         cells=[
@@ -78,7 +76,7 @@ This is the greek letter $\\pi$: π"""
     compare_notebooks(nb, nb2, "md:pandoc")
 
 
-@requires_no_pandoc
+@pytest.mark.requires_no_pandoc
 def test_meaningfull_error_when_pandoc_is_missing(tmpdir):
     nb_file = tmpdir.join("notebook.ipynb")
     jupytext.write(new_notebook(), str(nb_file))
