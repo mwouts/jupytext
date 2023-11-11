@@ -28,7 +28,7 @@ def formats_with_support_for_cell_metadata():
             yield f"{fmt.extension[1:]}:{fmt.format_name}"
 
 
-def list_notebooks(path="ipynb", skip="World"):
+def list_notebooks(path="ipynb", skip=""):
     """All notebooks in the directory notebooks/path,
     or in the package itself"""
     if path == "ipynb":
