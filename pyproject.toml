@@ -200,6 +200,11 @@ markers = [
 filterwarnings = [
     # Uncomment this "error" to turn all unfiltered warnings into errors
     # "error",
+    # Jupyter notebook
+    "ignore:Support for bleach <5 will be removed in a future version of nbconvert:DeprecationWarning",
+    # jupyterfs
+    "ignore:run_pre_save_hook is deprecated, use run_pre_save_hooks instead:DeprecationWarning",
+    "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning",
     # use single quote to denote raw strings in toml
     # (10 warnings)
     'ignore:Passing unrecognized arguments to super\(KernelSpec\).__init__:DeprecationWarning',
