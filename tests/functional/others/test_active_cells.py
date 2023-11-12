@@ -291,6 +291,60 @@ print('should only be displayed in py file')
     compare(text2, text)
 
 
+def test_comments_work_in_active_cells_from_py_percent_1131(
+    text="""# %% tags=["active-py"]
+# this is a comment
+""",
+):
+    nb = jupytext.reads(text, "py:percent")
+    assert nb.cells[0].cell_type == "raw"
+    assert nb.cells[0].source == "# this is a comment"
+
+    text2 = jupytext.writes(nb, "py:percent")
+    compare(text2, text)
+
+
+def test_comments_work_in_active_cells_from_py_light_1131(
+    text="""# + tags=["active-py"]
+# this is a comment
+""",
+):
+    nb = jupytext.reads(text, "py:light")
+    assert nb.cells[0].cell_type == "raw"
+    assert nb.cells[0].source == "# this is a comment"
+
+    text2 = jupytext.writes(nb, "py:light")
+    compare(text2, text)
+
+
+def test_comments_plus_code_work_in_active_cells_from_py_percent_1131(
+    text="""# %% tags=["active-py"]
+# this is a comment
+1 + 1
+""",
+):
+    nb = jupytext.reads(text, "py:percent")
+    assert nb.cells[0].cell_type == "raw"
+    assert nb.cells[0].source == "# this is a comment\n1 + 1"
+
+    text2 = jupytext.writes(nb, "py:percent")
+    compare(text2, text)
+
+
+def test_comments_plus_code_work_in_active_cells_from_py_light_1131(
+    text="""# + tags=["active-py"]
+# this is a comment
+1 + 1
+""",
+):
+    nb = jupytext.reads(text, "py:light")
+    assert nb.cells[0].cell_type == "raw"
+    assert nb.cells[0].source == "# this is a comment\n1 + 1"
+
+    text2 = jupytext.writes(nb, "py:light")
+    compare(text2, text)
+
+
 def test_active_cells_from_py_light(
     text="""# + active="py"
 print('should only be displayed in py file')
