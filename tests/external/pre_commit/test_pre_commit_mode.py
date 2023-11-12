@@ -40,7 +40,7 @@ def test_ignore_unmatched_ignores(tmpdir, cwd_tmpdir):
 
     # Run jupytext
     status = jupytext(
-        ["--from", "ipynb", "--to", "py:light", "--pre-commit-mode", file]
+        ["--from", "ipynb", "--to", "py:percent", "--pre-commit-mode", file]
     )
 
     assert status == 0
@@ -90,7 +90,7 @@ def test_alert_untracked_alerts_for_modified(tmpdir, cwd_tmpdir, tmp_repo, capsy
 
     # Run jupytext
     status = jupytext(
-        ["--from", "ipynb", "--to", "py:light", "--pre-commit-mode", "test.ipynb"]
+        ["--from", "ipynb", "--to", "py:percent", "--pre-commit-mode", "test.ipynb"]
     )
 
     assert status == 1

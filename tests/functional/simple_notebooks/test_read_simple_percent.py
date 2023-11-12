@@ -459,7 +459,10 @@ async def test_cell_markers_in_contents_manager_does_not_impact_light_format(
     nb = new_notebook(
         cells=[new_code_cell("1 + 1"), new_markdown_cell("a\nlong\ncell")],
         metadata={
-            "jupytext": {"formats": "ipynb,py", "notebook_metadata_filter": "-all"}
+            "jupytext": {
+                "formats": "ipynb,py:light",
+                "notebook_metadata_filter": "-all",
+            }
         },
     )
     with pytest.warns(UserWarning, match="Ignored cell markers"):

@@ -23,7 +23,7 @@ Console.WriteLine("Hello World!");
     cs = jupytext.writes(nb, "cs")
     assert source in cs
     if lang != "csharp":
-        assert cs.startswith(f'// + language="{lang}"')
+        assert cs.startswith(f'// %% language="{lang}"')
 
     md2 = jupytext.writes(nb, "md")
     compare(md2, md)

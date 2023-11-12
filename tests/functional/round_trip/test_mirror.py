@@ -42,7 +42,7 @@ def test_ipynb_to_hydrogen(ipynb_file, no_jupytext_version_number):
 
 
 def test_ipynb_to_light(ipynb_to_light, no_jupytext_version_number):
-    assert_conversion_same_as_mirror(ipynb_to_light, "auto", "ipynb_to_script")
+    assert_conversion_same_as_mirror(ipynb_to_light, "auto:light", "ipynb_to_script")
 
 
 def test_ipynb_to_md(ipynb_file, no_jupytext_version_number):
@@ -70,7 +70,7 @@ Part II: text -> ipynb -> text
 
 
 def test_script_to_ipynb(script_to_ipynb, no_jupytext_version_number):
-    assert_conversion_same_as_mirror(script_to_ipynb, "ipynb", "script_to_ipynb")
+    assert_conversion_same_as_mirror(script_to_ipynb, "ipynb:light", "script_to_ipynb")
 
 
 def test_percent_to_ipynb(percent_file, no_jupytext_version_number):
@@ -129,8 +129,8 @@ def test_ipynb_to_python_vscode(ipynb_py_file, no_jupytext_version_number):
     )
 
 
-def test_ipynb_to_r(ipynb_R_file, no_jupytext_version_number):
-    assert_conversion_same_as_mirror(ipynb_R_file, ".low.r", "ipynb_to_script")
+def test_ipynb_to_r_light(ipynb_R_file, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(ipynb_R_file, ".low.r:light", "ipynb_to_script")
 
 
 def test_ipynb_to_r_percent(ipynb_R_file, no_jupytext_version_number):
@@ -138,16 +138,20 @@ def test_ipynb_to_r_percent(ipynb_R_file, no_jupytext_version_number):
 
 
 def test_ipynb_to_R_spin(ipynb_R_file, no_jupytext_version_number):
-    assert_conversion_same_as_mirror(ipynb_R_file, "R", "ipynb_to_spin")
+    assert_conversion_same_as_mirror(ipynb_R_file, "R:spin", "ipynb_to_spin")
 
 
 def test_ipynb_to_r_spin(ipynb_R_file, no_jupytext_version_number):
-    assert_conversion_same_as_mirror(ipynb_R_file, ".low.r", "ipynb_to_spin")
+    assert_conversion_same_as_mirror(ipynb_R_file, ".low.r:spin", "ipynb_to_spin")
 
 
 @pytest.mark.parametrize("extension", ("ss", "scm"))
-def test_ipynb_to_scheme(ipynb_scheme_file, extension, no_jupytext_version_number):
-    assert_conversion_same_as_mirror(ipynb_scheme_file, extension, "ipynb_to_script")
+def test_ipynb_to_scheme_light(
+    ipynb_scheme_file, extension, no_jupytext_version_number
+):
+    assert_conversion_same_as_mirror(
+        ipynb_scheme_file, f"{extension}:light", "ipynb_to_script"
+    )
 
 
 @pytest.mark.parametrize("extension", ("ss", "scm"))
