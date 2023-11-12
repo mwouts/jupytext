@@ -978,7 +978,6 @@ Jupyter.utils.load_extensions('jupytext')"""
 
 
 def test_raw_with_metadata(
-    no_jupytext_version_number,
     text="""# + key="value" active=""
 # Raw cell
 # # Commented line
@@ -989,7 +988,7 @@ def test_raw_with_metadata(
 ):
     nb2 = jupytext.reads(text, "py")
     compare_notebooks(nb2, notebook)
-    text2 = jupytext.writes(notebook, "py")
+    text2 = jupytext.writes(nb2, "py")
     compare(text2, text)
 
 
@@ -1008,7 +1007,6 @@ def test_raw_with_metadata_2(
 
 
 def test_markdown_with_metadata(
-    no_jupytext_version_number,
     text="""# + [markdown] key="value"
 # Markdown cell
 """,
@@ -1018,7 +1016,7 @@ def test_markdown_with_metadata(
 ):
     nb2 = jupytext.reads(text, "py")
     compare_notebooks(nb2, notebook)
-    text2 = jupytext.writes(notebook, "py")
+    text2 = jupytext.writes(nb2, "py")
     compare(text2, text)
 
 
@@ -1139,7 +1137,7 @@ except:
 """,
 ):
     """Reproduces https://github.com/mwouts/jupytext/issues/437"""
-    py = jupytext.writes(nb, "py")
+    py = jupytext.writes(nb, "py:light")
     compare(py, text)
     nb2 = jupytext.reads(py, "py")
     compare_notebooks(nb2, nb)
