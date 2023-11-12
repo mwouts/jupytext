@@ -15,7 +15,7 @@ dependencies:
   - nbformat>=5.1.2
   - pyyaml
   - toml
-  - markdown-it-py~=1.0
+  - markdown-it-py
   - mdit-py-plugins
   - pip
   - pytest
@@ -25,7 +25,7 @@ dependencies:
   - flake8
   - autopep8
   - black
-  - isort>=5.3.0
+  - isort
   - pandoc==2.16.2
   - sphinx-gallery<0.8
   - pre-commit

@@ -13,9 +13,10 @@ Most users do not need to install this extension, since it is already included i
 
 Please install [Jupytext](https://github.com/mwouts/jupytext/blob/main/README.md#Install) first. As mentioned above, both the `pip` and `conda` packages do include the latest version of the JupyterLab extension, so in most cases you don't need to specifically install this `npm` package.
 
-In case you're not using JupyterLab 3.x, you will have to install an older version of the extension that is compatible with your version. Please first install `jupytext` using `pip` or `conda`, and then downgrade the extension to a version compatible with your version of Jupyter Lab with:
+In case you're not using JupyterLab 4.x, you will have to install an older version of the extension that is compatible with your version. Please first install `jupytext` using `pip` or `conda`, and then downgrade the extension to a version compatible with your version of Jupyter Lab with:
 
 ```bash
+jupyter labextension install jupyterlab-jupytext@1.3.11  # for JupyterLab 3.x
 jupyter labextension install jupyterlab-jupytext@1.2.2  # for JupyterLab 2.x
 jupyter labextension install jupyterlab-jupytext@1.1.1  # for JupyterLab 1.x
 ```
@@ -30,6 +31,8 @@ cd jupyterlab/packages/jupyterlab-jupytext
 jlpm
 jlpm install:extension     # Symlink into `{sys.prefix}/share/jupyter/labextensions`
 ```
+
+(see also the instructions at [developing.md](../../../docs/developing.md) on how to create a Python environment with a recent version of `nodejs`)
 
 Watch the source directory and automatically rebuild the `lib` folder:
 

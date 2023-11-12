@@ -1,4 +1,0 @@
-extraction:
-  python:
-    index:
-      exclude: demo
