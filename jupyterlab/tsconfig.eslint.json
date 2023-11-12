@@ -14,5 +14,6 @@
     "types": [],
     "esModuleInterop": true
   },
+  "extends": "../../tsconfig.eslint.json",
   "include": ["**/src/*"]
 }

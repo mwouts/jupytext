@@ -25,3 +25,7 @@ lib/
 *.egg-info/
 .ipynb_checkpoints
 *.tsbuildinfo
+
+# Ignore playwright stuff
+**/playwright-report
+**/test-results

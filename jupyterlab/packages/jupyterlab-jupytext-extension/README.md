@@ -23,15 +23,33 @@ jupyter labextension install jupyterlab-jupytext@1.1.1  # for JupyterLab 1.x
 
 # How to develop this extension
 
-Please follow the instructions at [developing.md](../../../docs/developing.md), i.e.
-create a Python environment with a recent version of `nodejs`, and install
-a development version of Jupytext by running
+For fine-grained access to the `jlpm` command and various build steps:
 
 ```bash
 pip install -e '.[dev]'
+cd jupyterlab/packages/jupyterlab-jupytext
+jlpm
+jlpm install:extension     # Symlink into `{sys.prefix}/share/jupyter/labextensions`
 ```
 
-at the root of the Jupytext repository.
+(see also the instructions at [developing.md](../../../docs/developing.md) on how to create a Python environment with a recent version of `nodejs`)
+
+Watch the source directory and automatically rebuild the `lib` folder:
+
+```bash
+cd jupyterlab/packages/jupyterlab-jupytext
+# Watch the source directory in one terminal, automatically rebuilding when needed
+jlpm watch
+# Run JupyterLab in another terminal
+jupyter lab
+```
+
+While running `jlpm watch`, every saved change to a `.ts` file will immediately be
+built locally and available in your running Jupyter client. "Hard" refresh JupyterLab or Notebook
+with <kbd>CTRL-F5</kbd> or <kbd>⌘-F5</kbd> to load the change in your browser
+(you may need to wait several seconds for the extension to be fully rebuilt).
+
+Read more on this on the [JupyterLab documentation](https://jupyterlab.readthedocs.io/en/latest/extension/extension_dev.html#developing-a-prebuilt-extension).
 
 # How to publish a new version of the extension on npm
 
