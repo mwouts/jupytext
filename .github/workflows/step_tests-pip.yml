@@ -73,6 +73,7 @@ jobs:
       - name: Test lab extension
         run: |
           # Check extension
+          pip install jupyterlab>=4
           jupyter labextension list
           jupyter labextension list 2>&1 | grep -ie "jupyterlab-jupytext.*OK"
           python -m jupyterlab.browser_check
