@@ -31,7 +31,7 @@ jobs:
         with:
           auto-update-conda: true
           auto-activate-base: false
-          activate-environment: jupytext-ci
+          activate-environment: jupytext-dev
           python-version: ${{ matrix.python-version }}
           channels: defaults,conda-forge
           environment-file: environment.yml
