@@ -32,18 +32,15 @@ jobs:
         run: pytest tests/functional --cov=src/jupytext --cov-report=xml
 
       - name: Install the integration test dependencies
-        if: ${{ matrix.external }}
         run: python -m pip install -e '.[test-integration]'
 
       - name: Install a Jupyter Kernel
-        if: ${{ matrix.kernel }}
         run: python -m ipykernel install --name python_kernel --user
 
       - name: Integration tests
         run: pytest tests/integration --cov=src/jupytext --cov-report=xml
 
       - name: Install the external test dependencies
-        if: ${{ matrix.external }}
         run: python -m pip install -e '.[test-external]'
 
       - name: External tests

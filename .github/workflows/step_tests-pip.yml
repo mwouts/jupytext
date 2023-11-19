@@ -18,8 +18,6 @@ jobs:
       matrix:
         python-version: [ "3.8", "3.9", "3.10", "3.11" ]
         markdown-it-py-version: ["~=2.0"]
-        kernel: [true]
-        external: [true]
         include:
           - python-version: "3.12-dev"
             experimental: true
@@ -29,16 +27,13 @@ jobs:
             markdown-it-py-version: ""
           - python-version: "3.x"
             markdown-it-py-version: "~=3.0"
-          - python-version: "3.11"
+          - python-version: "3.x"
             markdown-it-py-version: "~=4.0"
             experimental: true
           - python-version: "3.x"
-            kernel: false
-          - python-version: "3.x"
-            external: false
+            no_kernel: true
           - python-version: "3.x"
             quarto: true
-            kernel: true
 
     steps:
       - name: Checkout
@@ -49,15 +44,11 @@ jobs:
         with:
           python_version: ${{ matrix.python-version }}
 
-      - name: Install from source (required for the pre-commit tests)
+      - name: Install from source
         run: python -m pip install -e '.[test-cov]' ${{ matrix.markdown-it-py-version && format('markdown-it-py{0}', matrix.markdown-it-py-version) }}
 
-      - name: Install the external test dependencies
-        if: ${{ matrix.external }}
-        run: python -m pip install -e '.[test-external]'
-
       - name: Install a Jupyter Kernel
-        if: ${{ matrix.kernel }}
+        if: ${{ !matrix.no_kernel }}
         run: python -m ipykernel install --name python_kernel --user
 
       - name: Install Quarto
