@@ -29,7 +29,7 @@ jobs:
           python -m pip install build wheel
 
           # NOTE: These builds and verifications of the builds can be done more
-          # robustily with jupyter-releaser.
+          # robustly with jupyter-releaser.
           #
           # Removed the check on size of package as we are distributing tests/ with
           # sdist now and they are around 8MB. Seems like original check was to make

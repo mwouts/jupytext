@@ -50,20 +50,25 @@ test = [
   "pytest",
   "pytest-randomly"
 ]
-test-integration = [
-  "jupytext[test]",
-  "jupyter-server",
-  "nbconvert"
-]
 test-functional = [
+  "jupytext[test]",
+]
+test-integration = [
+  "jupytext[test-functional]",
+  "jupyter-server",
+  # jupytext --execute
+  "nbconvert",
+  "ipykernel",
+]
+test-external = [
   "jupytext[test-integration]",
   # jupytext --pipe and --check
   "autopep8",
   "black",
   "isort",
   "flake8",
-  # jupytext --execute
-  "ipykernel",
+  # Sphinx gallery
+  "sphinx-gallery<0.8",
   # Pre-commit tests
   "gitpython",
   "pre-commit",
@@ -73,11 +78,12 @@ test-functional = [
 ]
 # Coverage requirements
 test-cov = [
-    "jupytext[test-functional]",
+    "jupytext[test-integration]",
     "pytest-cov>=2.6.1",
 ]
 dev = [
     "jupytext[test]",
+    "pre-commit"
 ]
 # Documentation dependencies
 docs = [

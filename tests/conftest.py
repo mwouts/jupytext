@@ -3,7 +3,6 @@ import unittest.mock as mock
 from pathlib import Path
 
 import pytest
-from git import Repo
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from nbformat.v4 import nbbase
 from nbformat.v4.nbbase import (
@@ -40,12 +39,6 @@ def isort_version():
 def no_jupytext_version_number():
     with mock.patch("jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER", False):
         yield
-
-
-@pytest.fixture
-def tmp_repo(tmpdir):
-    repo = Repo.init(str(tmpdir))
-    return repo
 
 
 @pytest.fixture

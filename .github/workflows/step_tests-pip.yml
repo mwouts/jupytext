@@ -19,6 +19,7 @@ jobs:
         python-version: [ "3.8", "3.9", "3.10", "3.11" ]
         markdown-it-py-version: ["~=2.0"]
         kernel: [true]
+        external: [true]
         include:
           - python-version: "3.12-dev"
             experimental: true
@@ -31,8 +32,10 @@ jobs:
           - python-version: "3.11"
             markdown-it-py-version: "~=4.0"
             experimental: true
-          - python-version: "3.x"
+          - python-version: "3.11"
             kernel: false
+          - python-version: "3.11"
+            external: false
           - python-version: "3.x"
             quarto: true
             kernel: true
@@ -48,6 +51,10 @@ jobs:
 
       - name: Install from source (required for the pre-commit tests)
         run: python -m pip install -e '.[test-cov]' ${{ matrix.markdown-it-py-version && format('markdown-it-py{0}', matrix.markdown-it-py-version) }}
+
+      - name: Install the external test dependencies
+        if: ${{ matrix.external }}
+        run: python -m pip install -e '.[test-external]'
 
       - name: Install a Jupyter Kernel
         if: ${{ matrix.kernel }}
