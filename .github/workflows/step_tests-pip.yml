@@ -32,9 +32,9 @@ jobs:
           - python-version: "3.11"
             markdown-it-py-version: "~=4.0"
             experimental: true
-          - python-version: "3.11"
+          - python-version: "3.x"
             kernel: false
-          - python-version: "3.11"
+          - python-version: "3.x"
             external: false
           - python-version: "3.x"
             quarto: true
