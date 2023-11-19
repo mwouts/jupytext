@@ -254,3 +254,23 @@ def test_sync_pre_commit_mode_respects_commit_order_780(
     for file in commit_order:
         nb = read(file)
         assert nb.cells[0].source == "2 + 2", file
+
+
+@pytest.mark.requires_user_kernel_python3
+def test_skip_execution(tmpdir, cwd_tmpdir, tmp_repo, python_notebook, capsys):
+    write(
+        new_notebook(cells=[new_code_cell("1 + 1")], metadata=python_notebook.metadata),
+        "test.ipynb",
+    )
+    tmp_repo.index.add("test.ipynb")
+
+    jupytext(["--execute", "--pre-commit-mode", "test.ipynb"])
+    captured = capsys.readouterr()
+    assert "Executing notebook" in captured.out
+
+    nb = read("test.ipynb")
+    assert nb.cells[0].execution_count == 1
+
+    jupytext(["--execute", "--pre-commit-mode", "test.ipynb"])
+    captured = capsys.readouterr()
+    assert "skipped" in captured.out

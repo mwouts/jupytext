@@ -3,9 +3,8 @@ from io import StringIO
 from unittest import mock
 
 import pytest
-from nbformat.v4.nbbase import new_code_cell, new_notebook
 
-from jupytext import read, reads, write
+from jupytext import read, reads
 from jupytext.cli import jupytext
 from jupytext.version import __version__
 
@@ -283,26 +282,6 @@ def test_cat_execute_does_not_update_the_metadata(sample_md_notebook, tmp_path):
     new_md_text = md_file.read_text()
     assert __version__ not in new_md_text
     assert "kernelspec" not in new_md_text
-
-
-@pytest.mark.requires_user_kernel_python3
-def test_skip_execution(tmpdir, cwd_tmpdir, tmp_repo, python_notebook, capsys):
-    write(
-        new_notebook(cells=[new_code_cell("1 + 1")], metadata=python_notebook.metadata),
-        "test.ipynb",
-    )
-    tmp_repo.index.add("test.ipynb")
-
-    jupytext(["--execute", "--pre-commit-mode", "test.ipynb"])
-    captured = capsys.readouterr()
-    assert "Executing notebook" in captured.out
-
-    nb = read("test.ipynb")
-    assert nb.cells[0].execution_count == 1
-
-    jupytext(["--execute", "--pre-commit-mode", "test.ipynb"])
-    captured = capsys.readouterr()
-    assert "skipped" in captured.out
 
 
 @pytest.mark.requires_user_kernel_python3
