@@ -20,14 +20,16 @@ jobs:
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
 
-      - name: Install from source (required for the pre-commit tests)
-        run: python -m pip install -e '.[test-cov]'
+      - name: Install from source
+        run: python -m pip install -e .
 
       - name: Install galata
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-        run: jlpm install
+        run: |
+          pip install jupyterlab
+          jlpm install
 
       - name: Install browser
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
