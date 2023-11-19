@@ -26,15 +26,6 @@ from .utils import formats_with_support_for_cell_metadata, tool_version
 jupytext.config.JUPYTEXT_CEILING_DIRECTORIES = ["/tmp/"]
 
 
-def isort_version():
-    try:
-        import isort
-
-        return isort.__version__
-    except ImportError:
-        return None
-
-
 @pytest.fixture
 def no_jupytext_version_number():
     with mock.patch("jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER", False):
