@@ -38,7 +38,6 @@ jobs:
           use-only-tar-bz2: true
 
       - name: Install from source
-        # This is required for the pre-commit tests
         shell: pwsh
         run: python -m pip install -e '.[test-external,test-cov]'
 
