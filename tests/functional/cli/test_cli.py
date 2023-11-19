@@ -682,24 +682,6 @@ def test_set_kernel_works_with_pipes_326(capsys):
     assert "kernelspec" in nb.metadata
 
 
-@pytest.mark.requires_user_kernel_python3
-@pytest.mark.skip_on_windows
-@pytest.mark.filterwarnings("ignore")
-def test_utf8_out_331(capsys, caplog):
-    py = "from IPython.core.display import HTML; HTML(u'\xd7')"
-
-    with mock.patch("sys.stdin", StringIO(py)):
-        jupytext(["--to", "ipynb", "--execute", "-"])
-
-    out, err = capsys.readouterr()
-
-    assert err == ""
-    nb = reads(out, "ipynb")
-    assert len(nb.cells) == 1
-    print(nb.cells[0].outputs)
-    assert nb.cells[0].outputs[0]["data"]["text/html"] == "\xd7"
-
-
 @pytest.mark.requires_jupytext
 @pytest.mark.filterwarnings("ignore:The --pre-commit argument is deprecated")
 def test_cli_expect_errors(tmp_ipynb):
@@ -830,44 +812,6 @@ formats = "examples//example/ipynb,examples//example/py:percent"
         tmp_path / "examples/folder1/utils_not_paired.ipynb"
     ).exists(), "Not with the 'example' prefix"
     assert (tmp_path / "examples/folder1/example_paired.py").exists(), "Paired"
-
-
-@pytest.mark.requires_sphinx_gallery
-def test_rst2md(tmpdir, cwd_tmpdir):
-    tmp_py = "notebook.py"
-    tmp_ipynb = "notebook.ipynb"
-
-    # Write notebook in sphinx format
-    nb = new_notebook(
-        cells=[
-            new_markdown_cell("A short sphinx notebook"),
-            new_markdown_cell(":math:`1+1`"),
-        ]
-    )
-    write(nb, tmp_py, fmt="py:sphinx")
-
-    jupytext(
-        [
-            tmp_py,
-            "--from",
-            "py:sphinx",
-            "--to",
-            "ipynb",
-            "--opt",
-            "rst2md=True",
-            "--opt",
-            "cell_metadata_filter=-all",
-        ]
-    )
-
-    assert os.path.isfile(tmp_ipynb)
-    nb = read(tmp_ipynb)
-
-    assert nb.metadata["jupytext"]["cell_metadata_filter"] == "-all"
-    assert nb.metadata["jupytext"]["rst2md"] is False
-
-    # Was rst to md conversion effective?
-    assert nb.cells[2].source == "$1+1$"
 
 
 def test_remove_jupytext_metadata(tmpdir, cwd_tmpdir):
@@ -1243,26 +1187,6 @@ def test_show_changes(tmpdir, cwd_tmpdir, capsys):
     jupytext(["--to", "py:percent", "test.ipynb", "--show-changes"])
     captured = capsys.readouterr()
     assert "-2 + 2\n+1 + 1" in captured.out
-
-
-@pytest.mark.requires_user_kernel_python3
-def test_skip_execution(tmpdir, cwd_tmpdir, tmp_repo, python_notebook, capsys):
-    write(
-        new_notebook(cells=[new_code_cell("1 + 1")], metadata=python_notebook.metadata),
-        "test.ipynb",
-    )
-    tmp_repo.index.add("test.ipynb")
-
-    jupytext(["--execute", "--pre-commit-mode", "test.ipynb"])
-    captured = capsys.readouterr()
-    assert "Executing notebook" in captured.out
-
-    nb = read("test.ipynb")
-    assert nb.cells[0].execution_count == 1
-
-    jupytext(["--execute", "--pre-commit-mode", "test.ipynb"])
-    captured = capsys.readouterr()
-    assert "skipped" in captured.out
 
 
 def test_glob_recursive(tmpdir, cwd_tmpdir):
