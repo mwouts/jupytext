@@ -10,7 +10,7 @@ from ...utils import list_notebooks
     "py_file",
     [
         py_file
-        for py_file in list_notebooks(".")
+        for py_file in list_notebooks("./src/jupytext")
         if py_file.endswith(".py")
         if "folding_markers" not in py_file
     ],

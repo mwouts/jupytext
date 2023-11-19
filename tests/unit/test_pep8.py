@@ -189,7 +189,7 @@ def f(x):
     "py_file",
     [
         py_file
-        for py_file in list_notebooks(".")
+        for py_file in list_notebooks("./src/jupytext")
         if py_file.endswith(".py") and "folding_markers" not in py_file
     ],
 )
