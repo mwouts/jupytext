@@ -4,13 +4,13 @@
   "properties": {
     "category": {
       "title": "Category",
-      "description": "Category under which Jupytext Text Notebooks will be placed. Refresh the current browser tab for the changes to take effect.",
+      "description": "Category under which Jupytext Text Notebooks will be placed.\n\nRefresh the current browser tab for the changes to take effect.",
       "type": "string",
       "default": "Jupytext"
     },
     "format": {
       "title": "Jupytext Text Notebook Launcher Items Formats",
-      "description": "List of Jupytext Text Notebook formats that will be added to launcher. Refresh the current browser tab for the changes to take effect.",
+      "description": "List of Jupytext Text Notebook formats that will be added to launcher.\n\nWhen format \"auto\" is used, it will be replaced by available kernels (Python, R, Julia). For instance, if Python and R kernels are installed, format \"auto:light\" will add launcher items to create Python and R Text notebooks with light format.\n\nRefresh the current browser tab for the changes to take effect.",
       "items": {
         "type": "string"
       },
