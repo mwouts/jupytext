@@ -32,7 +32,7 @@
               "label": "New Text Notebook",
               "items": [
                 {
-                  "command": "jupytext:create-new-text-noteboook-auto:percent",
+                  "command": "jupytext:create-new-text-noteboook-py:percent",
                   "rank": 1
                 },
                 {
@@ -40,15 +40,15 @@
                   "rank": 2
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-auto:light",
+                  "command": "jupytext:create-new-text-noteboook-py:light",
                   "rank": 5
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-auto:hydrogen",
+                  "command": "jupytext:create-new-text-noteboook-py:hydrogen",
                   "rank": 10
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-auto:nomarker",
+                  "command": "jupytext:create-new-text-noteboook-py:nomarker",
                   "rank": 15
                 },
                 {
@@ -86,7 +86,7 @@
               "label": "Pair Notebook",
               "items": [
                 {
-                  "command": "jupytext:ipynb",
+                  "command": "jupytext:pair-nb-with-ipynb",
                   "rank": 1
                 },
                 {
@@ -94,19 +94,19 @@
                   "rank": 2
                 },
                 {
-                  "command": "jupytext:auto:light",
+                  "command": "jupytext:pair-nb-with-auto:light",
                   "rank": 5
                 },
                 {
-                  "command": "jupytext:auto:percent",
+                  "command": "jupytext:pair-nb-with-auto:percent",
                   "rank": 10
                 },
                 {
-                  "command": "jupytext:auto:hydrogen",
+                  "command": "jupytext:pair-nb-with-auto:hydrogen",
                   "rank": 15
                 },
                 {
-                  "command": "jupytext:auto:nomarker",
+                  "command": "jupytext:pair-nb-with-auto:nomarker",
                   "rank": 20
                 },
                 {
@@ -114,11 +114,11 @@
                   "rank": 25
                 },
                 {
-                  "command": "jupytext:md",
+                  "command": "jupytext:pair-nb-with-md",
                   "rank": 30
                 },
                 {
-                  "command": "jupytext:md:myst",
+                  "command": "jupytext:pair-nb-with-md:myst",
                   "rank": 35
                 },
                 {
@@ -126,11 +126,11 @@
                   "rank": 40
                 },
                 {
-                  "command": "jupytext:Rmd",
+                  "command": "jupytext:pair-nb-with-Rmd",
                   "rank": 45
                 },
                 {
-                  "command": "jupytext:qmd",
+                  "command": "jupytext:pair-nb-with-qmd",
                   "rank": 50
                 },
                 {
@@ -138,7 +138,7 @@
                   "rank": 55
                 },
                 {
-                  "command": "jupytext:custom",
+                  "command": "jupytext:pair-nb-with-custom",
                   "rank": 60
                 },
                 {
@@ -146,7 +146,7 @@
                   "rank": 65
                 },
                 {
-                  "command": "jupytext:none",
+                  "command": "jupytext:pair-nb-with-none",
                   "rank": 70
                 }
               ]
