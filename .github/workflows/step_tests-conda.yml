@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
-        python-version: [ 3.9 ]
+        python-version: [ 3.11 ]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -31,10 +31,10 @@ jobs:
         with:
           auto-update-conda: true
           auto-activate-base: false
-          activate-environment: jupytext-dev
+          activate-environment: jupytext-ci
           python-version: ${{ matrix.python-version }}
           channels: defaults,conda-forge
-          environment-file: environment.yml
+          environment-file: .ci/environment-ci.yml
           use-only-tar-bz2: true
 
       - name: Install from source

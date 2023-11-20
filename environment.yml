@@ -6,12 +6,6 @@ dependencies:
   - python>=3.8
   - jupyterlab>=4.0.0
   - nbformat>=5.1.2
-  - pyyaml
-  - toml
-  - markdown-it-py>=1.0.0,<3.0.0
-  - mdit-py-plugins
-  - nbconvert
-  - ipykernel
-  - pandoc==2.16.2
   - pre-commit
   - nodejs>=20
+  - pandoc==2.16.2
