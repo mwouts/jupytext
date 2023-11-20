@@ -8,22 +8,9 @@ import { TranslationBundle } from '@jupyterlab/translation';
 
 import {
   LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS,
-  ALL_JUPYTEXT_FORMATS,
-  ALL_JUPYTEXT_FORMAT_EXTENSIONS,
-  IJupytextFormat,
+  JUPYTEXT_FORMATS,
   IJupytextSection,
 } from './tokens';
-
-/**
- * Get a list of all supported Jupytext formats
- */
-export function getAvailJupytextFormats(
-  trans: TranslationBundle
-): IJupytextFormat[] {
-  return ALL_JUPYTEXT_FORMATS.map((formatObj) => {
-    return { format: formatObj.format, label: trans.__(formatObj.label) };
-  });
-}
 
 /**
  * Get Jupytext format of current widget if it is a text notebook
@@ -137,8 +124,8 @@ export function isPairCommandToggled(
   const selectedFormats = getSelectedFormats(notebookTracker);
 
   if (format === 'custom') {
-    for (const selecFormat of selectedFormats) {
-      if (!ALL_JUPYTEXT_FORMAT_EXTENSIONS.includes(selecFormat)) {
+    for (const selectedFormat of selectedFormats) {
+      if (!JUPYTEXT_FORMATS.includes(selectedFormat)) {
         return true;
       }
     }
