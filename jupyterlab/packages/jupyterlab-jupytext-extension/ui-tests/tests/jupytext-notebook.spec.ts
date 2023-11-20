@@ -5,25 +5,49 @@ import { expect, test } from '@jupyterlab/galata';
 // opened by JupyterLab in the markdown format.
 // Quarto must be available for qmd to work
 const formats = [
-  { label: 'Light Script', extension: '.py' },
-  { label: 'Percent Script', extension: '.py' },
-  { label: 'Hydrogen Script', extension: '.py' },
-  { label: 'Nomarker Script', extension: '.py' },
-  { label: 'Markdown', extension: '.md' },
-  { label: 'MyST Markdown', extension: '.md' },
+  {
+    createLabel: 'New Python Text Notebook with Light Format',
+    pairLabel: 'Light Format',
+    extension: '.py',
+  },
+  {
+    createLabel: 'New Python Text Notebook with Percent Format',
+    pairLabel: 'Percent Format',
+    extension: '.py',
+  },
+  {
+    createLabel: 'New Python Text Notebook with Hydrogen Format',
+    pairLabel: 'Hydrogen Format',
+    extension: '.py',
+  },
+  {
+    createLabel: 'New Python Text Notebook with Nomarker Format',
+    pairLabel: 'Nomarker Format',
+    extension: '.py',
+  },
+  {
+    createLabel: 'New Markdown Text Notebook',
+    pairLabel: 'Markdown',
+    extension: '.md',
+  },
+  {
+    createLabel: 'New MyST Markdown Text Notebook',
+    pairLabel: 'MyST Markdown',
+    extension: '.md',
+  },
 ];
 
 // Get all possible menuPaths
 const createNewMenuPaths = formats.map((format) => {
   return {
-    menuPath: `Jupytext>New Text Notebook>${format.label}`,
+    menuPath: `Jupytext>New Text Notebook>${format.createLabel}`,
     extension: format.extension,
   };
 });
 
 const pairMenuPaths = formats.map((format) => {
   return {
-    menuPath: `Jupytext>Pair Notebook>Pair Notebook with ${format.label}`,
+    menuPath: `Jupytext>Pair Notebook>Pair Notebook with ${format.pairLabel}`,
     extension: format.extension,
   };
 });
