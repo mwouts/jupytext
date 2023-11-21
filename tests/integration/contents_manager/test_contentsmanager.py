@@ -1,4 +1,3 @@
-import itertools
 import os
 import re
 import shutil
@@ -10,13 +9,11 @@ from tornado.web import HTTPError
 
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
-from jupytext.compare import compare, compare_notebooks
+from jupytext.compare import compare, compare_notebooks, notebook_model
 from jupytext.formats import auto_ext_from_metadata, read_format_from_metadata
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.jupytext import read, write, writes
 from jupytext.kernels import kernelspec_from_language
-
-from ...utils import list_notebooks, notebook_model
 
 
 def test_create_contentsmanager():
@@ -107,8 +104,7 @@ def test_pair_unpair_notebook(tmpdir):
     assert len(nb2.cells[0]["outputs"]) == 0
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb", skip="66"))
-def test_load_save_rename(nb_file, tmpdir):
+def test_load_save_rename(ipynb_py_R_jl_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
     tmp_rmd = "notebook.Rmd"
 
@@ -117,7 +113,7 @@ def test_load_save_rename(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save Rmd, reopen
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_R_jl_file)
     cm.save(model=notebook_model(nb), path=tmp_rmd)
     nb_rmd = cm.get(tmp_rmd)
     compare_notebooks(nb_rmd["content"], nb, "Rmd")
@@ -150,8 +146,7 @@ def test_load_save_rename(nb_file, tmpdir):
     assert not os.path.isfile(str(tmpdir.join("new.Rmd")))
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb", skip="magic"))
-def test_save_load_paired_md_notebook(nb_file, tmpdir):
+def test_save_load_paired_md_notebook(ipynb_py_R_jl_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
     tmp_md = "notebook.md"
 
@@ -159,7 +154,7 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save with cm, reopen
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_R_jl_file)
     nb.metadata["jupytext"] = {"formats": "ipynb,md"}
 
     cm.save(model=notebook_model(nb), path=tmp_ipynb)
@@ -170,11 +165,11 @@ def test_save_load_paired_md_notebook(nb_file, tmpdir):
 
 
 @pytest.mark.requires_pandoc
-@pytest.mark.parametrize(
-    "nb_file",
-    list_notebooks("ipynb", skip="(functional|Notebook with|flavors|invalid|305)"),
-)
-def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
+def test_save_load_paired_md_pandoc_notebook(ipynb_py_R_jl_file, tmpdir):
+    if re.match(
+        r".*(functional|Notebook with|flavors|invalid|305).*", ipynb_py_R_jl_file
+    ):
+        pytest.skip()
     tmp_ipynb = "notebook.ipynb"
     tmp_md = "notebook.md"
 
@@ -182,7 +177,7 @@ def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save with cm, reopen
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_R_jl_file)
     nb.metadata["jupytext"] = {"formats": "ipynb,md:pandoc"}
 
     cm.save(model=notebook_model(nb), path=tmp_ipynb)
@@ -193,15 +188,13 @@ def test_save_load_paired_md_pandoc_notebook(nb_file, tmpdir):
 
 
 @pytest.mark.requires_quarto
-@pytest.mark.parametrize(
-    "nb_file",
-    list_notebooks(
-        "ipynb",
-        skip="(functional|Notebook with|plotly_graphs|flavors|complex_metadata|"
-        "update83|raw_cell|_66|nteract|LaTeX|invalid|305|text_outputs|ir_notebook|jupyter|with_R_magic)",
-    ),
-)
-def test_save_load_paired_qmd_notebook(nb_file, tmpdir):
+def test_save_load_paired_qmd_notebook(ipynb_py_R_jl_file, tmpdir):
+    if re.match(
+        r".*(functional|Notebook with|plotly_graphs|flavors|complex_metadata|"
+        "update83|raw_cell|_66|nteract|LaTeX|invalid|305|text_outputs|ir_notebook|jupyter|with_R_magic).*",
+        ipynb_py_R_jl_file,
+    ):
+        pytest.skip()
     tmp_ipynb = "notebook.ipynb"
     tmp_qmd = "notebook.qmd"
 
@@ -209,7 +202,7 @@ def test_save_load_paired_qmd_notebook(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save with cm, reopen
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_R_jl_file)
     nb.metadata["jupytext"] = {"formats": "ipynb,qmd"}
 
     cm.save(model=notebook_model(nb), path=tmp_ipynb)
@@ -219,8 +212,7 @@ def test_save_load_paired_qmd_notebook(nb_file, tmpdir):
     assert nb_md["content"].metadata["jupytext"]["formats"] == "ipynb,qmd"
 
 
-@pytest.mark.parametrize("py_file", list_notebooks("percent"))
-def test_pair_plain_script(py_file, tmpdir, caplog):
+def test_pair_plain_script(percent_file, tmpdir, caplog):
     tmp_py = "notebook.py"
     tmp_ipynb = "notebook.ipynb"
 
@@ -228,7 +220,7 @@ def test_pair_plain_script(py_file, tmpdir, caplog):
     cm.root_dir = str(tmpdir)
 
     # open py file, pair, save with cm
-    nb = jupytext.read(py_file)
+    nb = jupytext.read(percent_file)
     nb.metadata["jupytext"]["formats"] = "ipynb,py:hydrogen"
     cm.save(model=notebook_model(nb), path=tmp_py)
 
@@ -238,7 +230,7 @@ def test_pair_plain_script(py_file, tmpdir, caplog):
     assert os.path.isfile(str(tmpdir.join(tmp_ipynb)))
 
     # Make sure we've not changed the script
-    with open(py_file) as fp:
+    with open(percent_file) as fp:
         script = fp.read()
 
     with open(str(tmpdir.join(tmp_py))) as fp:
@@ -261,8 +253,7 @@ def test_pair_plain_script(py_file, tmpdir, caplog):
     assert "formats" not in nb2.metadata["jupytext"]
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_load_save_rename_nbpy(nb_file, tmpdir):
+def test_load_save_rename_nbpy(ipynb_py_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
     tmp_nbpy = "notebook.nb.py"
 
@@ -271,7 +262,7 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_file)
     cm.save(model=notebook_model(nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
     compare_notebooks(nbpy["content"], nb)
@@ -292,15 +283,17 @@ def test_load_save_rename_nbpy(nb_file, tmpdir):
         cm.rename_file(tmp_nbpy, "suffix_missing.py")
 
 
-@pytest.mark.parametrize("script", list_notebooks("python", skip="light"))
-def test_load_save_py_freeze_metadata(script, tmpdir):
+def test_load_save_py_freeze_metadata(python_file, tmpdir):
+    if "light" in python_file:
+        pytest.skip()
+
     tmp_nbpy = "notebook.py"
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
     # read original file
-    with open(script) as fp:
+    with open(python_file) as fp:
         text_py = fp.read()
 
     # write to tmp_nbpy
@@ -343,8 +336,7 @@ def test_load_text_notebook(tmpdir):
         assert nb_model[key] == py_model[key], key
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
+def test_load_save_rename_notebook_with_dot(ipynb_py_file, tmpdir):
     tmp_ipynb = "1.notebook.ipynb"
     tmp_nbpy = "1.notebook.py"
 
@@ -353,7 +345,7 @@ def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_file)
     cm.save(model=notebook_model(nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
     compare_notebooks(nbpy["content"], nb)
@@ -370,8 +362,7 @@ def test_load_save_rename_notebook_with_dot(nb_file, tmpdir):
     assert os.path.isfile(str(tmpdir.join("2.new_notebook.py")))
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
+def test_load_save_rename_nbpy_default_config(ipynb_py_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
     tmp_nbpy = "notebook.nb.py"
 
@@ -380,7 +371,7 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save nb.py, reopen
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_file)
 
     cm.save(model=notebook_model(nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
@@ -410,8 +401,7 @@ def test_load_save_rename_nbpy_default_config(nb_file, tmpdir):
     assert not os.path.isfile(str(tmpdir.join("new.nb.py")))
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
+def test_load_save_rename_non_ascii_path(ipynb_py_file, tmpdir):
     tmp_ipynb = "notebôk.ipynb"
     tmp_nbpy = "notebôk.nb.py"
 
@@ -421,7 +411,7 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     cm.root_dir = tmpdir
 
     # open ipynb, save nb.py, reopen
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_file)
 
     cm.save(model=notebook_model(nb), path=tmp_nbpy)
     nbpy = cm.get(tmp_nbpy)
@@ -451,8 +441,7 @@ def test_load_save_rename_non_ascii_path(nb_file, tmpdir):
     assert not os.path.isfile(os.path.join(tmpdir, "nêw.nb.py"))
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
-def test_outdated_text_notebook(nb_file, tmpdir):
+def test_outdated_text_notebook(python_notebook, tmpdir):
     # 1. write py ipynb
     cm = jupytext.TextFileContentsManager()
     cm.formats = "py,ipynb"
@@ -460,7 +449,7 @@ def test_outdated_text_notebook(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # open ipynb, save py, reopen
-    nb = jupytext.read(nb_file)
+    nb = python_notebook
     cm.save(model=notebook_model(nb), path="notebook.py")
     model_py = cm.get("notebook.py", load_alternative_format=False)
     model_ipynb = cm.get("notebook.ipynb", load_alternative_format=False)
@@ -565,8 +554,7 @@ def test_outdated_text_notebook_diff_is_shown(tmpdir, python_notebook):
     )
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
-def test_reload_notebook_after_jupytext_cli(nb_file, tmpdir):
+def test_reload_notebook_after_jupytext_cli(python_notebook, tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_nbpy = str(tmpdir.join("notebook.py"))
 
@@ -575,7 +563,7 @@ def test_reload_notebook_after_jupytext_cli(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # write the paired notebook
-    nb = jupytext.read(nb_file)
+    nb = python_notebook
     nb.metadata.setdefault("jupytext", {})["formats"] = "py,ipynb"
     cm.save(model=notebook_model(nb), path="notebook.py")
 
@@ -593,10 +581,9 @@ def test_reload_notebook_after_jupytext_cli(nb_file, tmpdir):
     compare_notebooks(nb, nb2)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("percent"))
-def test_load_save_percent_format(nb_file, tmpdir):
+def test_load_save_percent_format(percent_file, tmpdir):
     tmp_py = "notebook.py"
-    with open(nb_file) as stream:
+    with open(percent_file) as stream:
         text_py = stream.read()
     with open(str(tmpdir.join(tmp_py)), "w") as stream:
         stream.write(text_py)
@@ -623,8 +610,7 @@ def test_load_save_percent_format(nb_file, tmpdir):
     compare(text_py2, text_py)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_julia"))
-def test_save_to_percent_format(nb_file, tmpdir):
+def test_save_to_percent_format(ipynb_julia_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
     tmp_jl = "notebook.jl"
 
@@ -632,7 +618,7 @@ def test_save_to_percent_format(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
     cm.preferred_jupytext_formats_save = "jl:percent"
 
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_julia_file)
     nb["metadata"]["jupytext"] = {"formats": "ipynb,jl"}
 
     # save to ipynb and jl
@@ -647,9 +633,8 @@ def test_save_to_percent_format(nb_file, tmpdir):
     assert metadata["jupytext"]["formats"] == "ipynb,jl:percent"
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
-    nb = read(nb_file)
+def test_save_using_preferred_and_default_format_170(ipynb_py_file, tmpdir):
+    nb = read(ipynb_py_file)
 
     # Way 0: preferred_jupytext_formats_save, no prefix + formats
     tmp_py = str(tmpdir.join("python/notebook.py"))
@@ -696,13 +681,12 @@ def test_save_using_preferred_and_default_format_170(nb_file, tmpdir):
     assert nb_py.metadata["jupytext"]["text_representation"]["format_name"] == "percent"
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
+def test_open_using_preferred_and_default_format_174(ipynb_py_file, tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("python/notebook.py"))
     tmp_py2 = str(tmpdir.join("other/notebook.py"))
     os.makedirs(str(tmpdir.join("other")))
-    shutil.copyfile(nb_file, tmp_ipynb)
+    shutil.copyfile(ipynb_py_file, tmp_ipynb)
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -732,11 +716,12 @@ def test_open_using_preferred_and_default_format_174(nb_file, tmpdir):
     assert not os.path.isfile(str(tmpdir.join("other/notebook.ipynb")))
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py", skip="many hash"))
-def test_kernelspec_are_preserved(nb_file, tmpdir):
+def test_kernelspec_are_preserved(ipynb_py_file, tmpdir):
+    if "many hash" in ipynb_py_file:
+        pytest.skip()
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_py = str(tmpdir.join("notebook.py"))
-    shutil.copyfile(nb_file, tmp_ipynb)
+    shutil.copyfile(ipynb_py_file, tmp_ipynb)
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -760,8 +745,7 @@ def test_kernelspec_are_preserved(nb_file, tmpdir):
     compare_notebooks(model2["content"], model["content"])
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
+def test_save_to_light_percent_sphinx_format(ipynb_py_file, tmpdir):
     tmp_ipynb = "notebook.ipynb"
     tmp_lgt_py = "notebook.lgt.py"
     tmp_pct_py = "notebook.pct.py"
@@ -770,7 +754,7 @@ def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_file)
     nb["metadata"]["jupytext"] = {
         "formats": "ipynb,.pct.py:percent,.lgt.py:light,.spx.py:sphinx"
     }
@@ -801,8 +785,7 @@ def test_save_to_light_percent_sphinx_format(nb_file, tmpdir):
     compare_notebooks(model["content"], nb)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_pair_notebook_with_dot(nb_file, tmpdir):
+def test_pair_notebook_with_dot(ipynb_py_file, tmpdir):
     # Reproduce issue #138
     tmp_py = "file.5.1.py"
     tmp_ipynb = "file.5.1.ipynb"
@@ -810,7 +793,7 @@ def test_pair_notebook_with_dot(nb_file, tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_file)
     nb["metadata"]["jupytext"] = {"formats": "ipynb,py:percent"}
 
     # save to ipynb and three python flavors
@@ -831,8 +814,7 @@ def test_pair_notebook_with_dot(nb_file, tmpdir):
     compare_notebooks(model["content"], nb)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
-def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
+def test_preferred_format_allows_to_read_others_format(python_notebook, tmpdir):
     # 1. write py ipynb
     tmp_ipynb = "notebook.ipynb"
     tmp_nbpy = "notebook.py"
@@ -842,7 +824,7 @@ def test_preferred_format_allows_to_read_others_format(nb_file, tmpdir):
     cm.root_dir = str(tmpdir)
 
     # load notebook and save it using the cm
-    nb = jupytext.read(nb_file)
+    nb = python_notebook
     nb["metadata"]["jupytext"] = {"formats": "ipynb,py"}
     cm.save(model=notebook_model(nb), path=tmp_ipynb)
 
@@ -900,10 +882,9 @@ def test_preferred_formats_read_auto(tmpdir):
     )
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb"))
-def test_save_in_auto_extension_global(nb_file, tmpdir):
+def test_save_in_auto_extension_global(ipynb_py_R_jl_file, tmpdir):
     # load notebook
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_R_jl_file)
 
     auto_ext = auto_ext_from_metadata(nb.metadata)
     tmp_ipynb = "notebook.ipynb"
@@ -984,10 +965,9 @@ def test_global_auto_pairing_works_with_empty_notebook(tmpdir):
     assert nb2.cells[0].source == "2+2"
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb"))
-def test_save_in_auto_extension_global_with_format(nb_file, tmpdir):
+def test_save_in_auto_extension_global_with_format(ipynb_py_R_jl_file, tmpdir):
     # load notebook
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_R_jl_file)
 
     auto_ext = auto_ext_from_metadata(nb.metadata)
     tmp_ipynb = "notebook.ipynb"
@@ -1014,10 +994,9 @@ def test_save_in_auto_extension_global_with_format(nb_file, tmpdir):
     compare_notebooks(model["content"], nb)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb"))
-def test_save_in_auto_extension_local(nb_file, tmpdir):
+def test_save_in_auto_extension_local(ipynb_py_R_jl_file, tmpdir):
     # load notebook
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_R_jl_file)
     nb.metadata.setdefault("jupytext", {})["formats"] = "ipynb,auto:percent"
 
     auto_ext = auto_ext_from_metadata(nb.metadata)
@@ -1041,10 +1020,9 @@ def test_save_in_auto_extension_local(nb_file, tmpdir):
     compare_notebooks(model["content"], nb)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb"))
-def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
+def test_save_in_pct_and_lgt_auto_extensions(ipynb_py_R_jl_file, tmpdir):
     # load notebook
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_R_jl_file)
 
     auto_ext = auto_ext_from_metadata(nb.metadata)
     tmp_ipynb = "notebook.ipynb"
@@ -1069,9 +1047,10 @@ def test_save_in_pct_and_lgt_auto_extensions(nb_file, tmpdir):
         assert read_format_from_metadata(stream.read(), auto_ext) == "light"
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb", skip="(magic|305)"))
-def test_metadata_filter_is_effective(nb_file, tmpdir):
-    nb = jupytext.read(nb_file)
+def test_metadata_filter_is_effective(ipynb_py_R_jl_file, tmpdir):
+    if re.match(r".*(magic|305).*", ipynb_py_R_jl_file):
+        pytest.skip()
+    nb = jupytext.read(ipynb_py_R_jl_file)
     tmp_ipynb = "notebook.ipynb"
     tmp_script = "notebook.py"
 
@@ -1155,12 +1134,10 @@ print('hello2')
         compare(fp.read(), text)
 
 
-@pytest.mark.parametrize(
-    "nb_file,ext", itertools.product(list_notebooks("ipynb_py"), [".py", ".ipynb"])
-)
-def test_local_format_can_deactivate_pairing(nb_file, ext, tmpdir):
+@pytest.mark.parametrize("ext", [".py", ".ipynb"])
+def test_local_format_can_deactivate_pairing(ipynb_py_file, ext, tmpdir):
     """This is a test for #157: local format can be used to deactivate the global pairing"""
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_file)
     nb.metadata["jupytext_formats"] = ext[1:]  # py or ipynb
 
     # create contents manager with default pairing
@@ -1186,10 +1163,9 @@ def test_local_format_can_deactivate_pairing(nb_file, ext, tmpdir):
     compare_notebooks(nb3, nb)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("Rmd"))
-def test_global_pairing_allows_to_save_other_file_types(nb_file, tmpdir):
+def test_global_pairing_allows_to_save_other_file_types(rmd_file, tmpdir):
     """This is a another test for #157: local format can be used to deactivate the global pairing"""
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(rmd_file)
 
     # create contents manager with default pairing
     cm = jupytext.TextFileContentsManager()
@@ -1209,11 +1185,10 @@ def test_global_pairing_allows_to_save_other_file_types(nb_file, tmpdir):
 
 
 @pytest.mark.requires_user_kernel_python3
-@pytest.mark.parametrize("nb_file", list_notebooks("R"))
-def test_python_kernel_preserves_R_files(nb_file, tmpdir):
+def test_python_kernel_preserves_R_files(r_file, tmpdir):
     """Opening a R file with a Jupyter server that has no R kernel should not modify the file"""
     tmp_r_file = str(tmpdir.join("script.R"))
-    with open(nb_file) as fp:
+    with open(r_file) as fp:
         script = fp.read()
     with open(tmp_r_file, "w") as fp:
         fp.write(script)
@@ -1363,12 +1338,11 @@ def test_set_then_change_formats(tmpdir):
     assert not os.path.isfile(tmp_py)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
-def test_set_then_change_auto_formats(tmpdir, nb_file):
+def test_set_then_change_auto_formats(tmpdir, python_notebook):
     tmp_ipynb = str(tmpdir.join("nb.ipynb"))
     tmp_py = str(tmpdir.join("nb.py"))
     tmp_rmd = str(tmpdir.join("nb.Rmd"))
-    nb = new_notebook(metadata=read(nb_file).metadata)
+    nb = new_notebook(metadata=python_notebook.metadata)
 
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
@@ -1402,8 +1376,7 @@ def test_set_then_change_auto_formats(tmpdir, nb_file):
     cm.get("nb.ipynb")
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_share_py_recreate_ipynb(tmpdir, nb_file):
+def test_share_py_recreate_ipynb(tmpdir, ipynb_py_R_jl_file):
     tmp_ipynb = str(tmpdir.join("nb.ipynb"))
     tmp_py = str(tmpdir.join("nb.py"))
 
@@ -1420,7 +1393,7 @@ def test_share_py_recreate_ipynb(tmpdir, nb_file):
     cm.notebook_metadata_filter = "-all"
     cm.cell_metadata_filter = "-all"
 
-    nb = read(nb_file)
+    nb = read(ipynb_py_R_jl_file)
     model_ipynb = cm.save(model=notebook_model(nb), path="nb.ipynb")
 
     assert os.path.isfile(tmp_ipynb)
@@ -1866,12 +1839,12 @@ def test_timestamp_is_correct_after_reload_978(tmp_path, python_notebook):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmp_path)
 
-    ipynb_file = tmp_path / "nb.ipynb"
+    ipynb_py_R_jl_file = tmp_path / "nb.ipynb"
     py_file = tmp_path / "nb.py"
 
     # 1. Save the paired notebook
     cm.save(notebook_model(nb), path="nb.ipynb")
-    assert ipynb_file.exists()
+    assert ipynb_py_R_jl_file.exists()
     assert py_file.exists()
 
     # and reload to get the original timestamp

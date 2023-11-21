@@ -1,16 +1,11 @@
-import pytest
-
 import jupytext
 from jupytext.compare import compare
 
-from ...utils import list_notebooks
 
-
-@pytest.mark.parametrize("nb_file", list_notebooks("Rmd"))
-def test_identity_write_read(nb_file, no_jupytext_version_number):
+def test_identity_write_read(rmd_file, no_jupytext_version_number):
     """Test that writing the notebook with ipynb, and read again, yields identity"""
 
-    with open(nb_file) as fp:
+    with open(rmd_file) as fp:
         rmd = fp.read()
 
     nb = jupytext.reads(rmd, "Rmd")

@@ -1,5 +1,4 @@
 from copy import deepcopy
-from itertools import product
 
 import pytest
 
@@ -7,18 +6,13 @@ from jupytext import read, write, writes
 from jupytext.compare import compare
 from jupytext.formats import long_form_one_format
 
-from ...utils import list_notebooks
-
 
 @pytest.mark.parametrize(
-    "nb_file,fmt",
-    product(
-        list_notebooks("ipynb_py") + list_notebooks("ipynb_R"),
-        ["auto:light", "auto:percent", "md", ".Rmd", ".ipynb"],
-    ),
+    "fmt",
+    ["auto:light", "auto:percent", "md", ".Rmd", ".ipynb"],
 )
-def test_write_notebook_does_not_change_it(nb_file, fmt, tmpdir):
-    nb_org = read(nb_file)
+def test_write_notebook_does_not_change_it(ipynb_py_R_jl_file, fmt, tmpdir):
+    nb_org = read(ipynb_py_R_jl_file)
     nb_org_copied = deepcopy(nb_org)
     ext = long_form_one_format(fmt, nb_org.metadata)["extension"]
 

@@ -16,18 +16,14 @@ from jupytext.formats import (
     validate_one_format,
 )
 
-from ..utils import list_notebooks
 
-
-@pytest.mark.parametrize("nb_file", list_notebooks("python"))
-def test_guess_format_light(nb_file):
-    with open(nb_file) as stream:
+def test_guess_format_light(python_file):
+    with open(python_file) as stream:
         assert guess_format(stream.read(), ext=".py")[0] == "light"
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("percent"))
-def test_guess_format_percent(nb_file):
-    with open(nb_file) as stream:
+def test_guess_format_percent(percent_file):
+    with open(percent_file) as stream:
         assert guess_format(stream.read(), ext=".py")[0] == "percent"
 
 
@@ -57,9 +53,8 @@ print("hello world!")
     assert guess_format(nb, ext=".py")[0] == "hydrogen"
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("sphinx"))
-def test_guess_format_sphinx(nb_file):
-    with open(nb_file) as stream:
+def test_guess_format_sphinx(sphinx_file):
+    with open(sphinx_file) as stream:
         assert guess_format(stream.read(), ext=".py")[0] == "sphinx"
 
 

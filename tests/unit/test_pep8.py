@@ -1,4 +1,3 @@
-import pytest
 from nbformat.v4.nbbase import new_code_cell, new_notebook
 
 from jupytext import read, reads, writes
@@ -10,8 +9,6 @@ from jupytext.pep8 import (
     next_instruction_is_function_or_class,
     pep8_lines_between_cells,
 )
-
-from ..utils import list_notebooks
 
 
 def test_next_instruction_is_function_or_class():
@@ -185,14 +182,6 @@ def f(x):
     compare(text2, text)
 
 
-@pytest.mark.parametrize(
-    "py_file",
-    [
-        py_file
-        for py_file in list_notebooks("./src/jupytext")
-        if py_file.endswith(".py") and "folding_markers" not in py_file
-    ],
-)
 def test_no_metadata_when_py_is_pep8(py_file):
     """This test assumes that all Python files in the jupytext folder follow PEP8 rules"""
     nb = read(py_file)

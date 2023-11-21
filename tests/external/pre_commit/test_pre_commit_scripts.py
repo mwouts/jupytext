@@ -9,8 +9,6 @@ from jupytext import read, write
 from jupytext.cli import jupytext, system
 from jupytext.compare import compare_cells, compare_notebooks
 
-from ...utils import list_notebooks
-
 
 def git_in_tmpdir(tmpdir):
     """Return a function that will execute git instruction in the desired directory"""
@@ -211,10 +209,9 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
 @pytest.mark.requires_black
 @pytest.mark.requires_flake8
 @pytest.mark.requires_jupytext
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
-def test_pre_commit_hook_sync_black_flake8(tmpdir, nb_file):
+def test_pre_commit_hook_sync_black_flake8(tmpdir, python_notebook):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
-    metadata = read(nb_file).metadata
+    metadata = python_notebook.metadata
 
     git = git_in_tmpdir(tmpdir)
     hook = str(tmpdir.join(".git/hooks/pre-commit"))

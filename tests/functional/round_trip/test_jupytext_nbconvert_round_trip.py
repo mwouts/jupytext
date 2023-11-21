@@ -3,14 +3,13 @@ import pytest
 import jupytext
 from jupytext.header import header_to_metadata_and_cell
 
-from ...utils import list_notebooks
-
 
 @pytest.mark.requires_nbconvert
-@pytest.mark.parametrize("md_file", list_notebooks("md", skip="jupytext"))
 def test_markdown_jupytext_nbconvert_is_identity(md_file):
     """Test that a Markdown file, converted to a notebook, then
     exported back to Markdown with nbconvert, yields the original file"""
+    if "jupytext" in md_file:
+        pytest.skip()
 
     with open(md_file) as fp:
         md_org = fp.read()
@@ -40,11 +39,12 @@ def test_markdown_jupytext_nbconvert_is_identity(md_file):
 
 
 @pytest.mark.requires_nbconvert
-@pytest.mark.parametrize("nb_file", list_notebooks(skip="(html|magic)"))
-def test_jupytext_markdown_similar_to_nbconvert(nb_file):
+def test_jupytext_markdown_similar_to_nbconvert(ipynb_py_R_jl_file):
     """Test that the nbconvert export for a notebook matches Jupytext's one"""
+    if "magic" in ipynb_py_R_jl_file or "html" in ipynb_py_R_jl_file:
+        pytest.skip()
 
-    nb = jupytext.read(nb_file)
+    nb = jupytext.read(ipynb_py_R_jl_file)
 
     # Remove cell outputs and metadata
     for cell in nb.cells:

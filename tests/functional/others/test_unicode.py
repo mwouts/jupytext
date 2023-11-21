@@ -1,15 +1,18 @@
-import pytest
 from nbformat.v4.nbbase import new_markdown_cell, new_notebook
 
 import jupytext
 from jupytext.compare import compare
 
-from ...utils import list_notebooks
+
+def test_notebook_contents_is_unicode(ipynb_file):
+    nb = jupytext.read(ipynb_file)
+
+    for cell in nb.cells:
+        assert isinstance(cell.source, str)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks() + list_notebooks("Rmd"))
-def test_notebook_contents_is_unicode(nb_file):
-    nb = jupytext.read(nb_file)
+def test_rmd_notebook_contents_is_unicode(rmd_file):
+    nb = jupytext.read(rmd_file)
 
     for cell in nb.cells:
         assert isinstance(cell.source, str)

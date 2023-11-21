@@ -50,6 +50,15 @@ def system(*args, **kwargs):
     return out.decode("utf-8")
 
 
+def tool_version(tool):
+    try:
+        args = tool.split(" ")
+        args.append("--version")
+        return system(*args)
+    except (OSError, SystemExit):  # pragma: no cover
+        return None
+
+
 def str2bool(value):
     """Parse Yes/No/Default string
     https://stackoverflow.com/questions/15008758/parsing-boolean-values-with-argparse"""

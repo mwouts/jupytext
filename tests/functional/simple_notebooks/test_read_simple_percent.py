@@ -9,9 +9,7 @@ from nbformat.v4.nbbase import (
 )
 
 import jupytext
-from jupytext.compare import compare, compare_notebooks
-
-from ...utils import notebook_model
+from jupytext.compare import compare, compare_notebooks, notebook_model
 
 
 def test_read_simple_file(

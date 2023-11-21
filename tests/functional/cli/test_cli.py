@@ -21,8 +21,6 @@ from jupytext.myst import is_myst_available
 from jupytext.paired_paths import InconsistentPath, paired_paths
 from jupytext.pandoc import is_pandoc_available
 
-from ...utils import list_notebooks
-
 
 def test_str2bool():
     assert str2bool("d") is None
@@ -32,20 +30,22 @@ def test_str2bool():
         str2bool("UNEXPECTED")
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks())
-def test_cli_single_file(nb_file):
-    assert parse_jupytext_args([nb_file] + ["--to", "py"]).notebooks == [nb_file]
+def test_cli_single_file(ipynb_py_R_jl_file):
+    assert parse_jupytext_args([ipynb_py_R_jl_file] + ["--to", "py"]).notebooks == [
+        ipynb_py_R_jl_file
+    ]
 
 
-@pytest.mark.parametrize("nb_files", [list_notebooks()])
-def test_cli_multiple_files(nb_files):
-    assert parse_jupytext_args(nb_files + ["--to", "py"]).notebooks == nb_files
+def test_cli_multiple_files(ipynb_py_R_jl_files):
+    assert (
+        parse_jupytext_args(ipynb_py_R_jl_files + ["--to", "py"]).notebooks
+        == ipynb_py_R_jl_files
+    )
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_convert_single_file_in_place(nb_file, tmpdir):
-    nb_org = str(tmpdir.join(os.path.basename(nb_file)))
-    copyfile(nb_file, nb_org)
+def test_convert_single_file_in_place(ipynb_py_file, tmpdir):
+    nb_org = str(tmpdir.join(os.path.basename(ipynb_py_file)))
+    copyfile(ipynb_py_file, nb_org)
 
     base, ext = os.path.splitext(nb_org)
     nb_other = base + ".py"
@@ -59,10 +59,9 @@ def test_convert_single_file_in_place(nb_file, tmpdir):
 
 
 @pytest.mark.requires_jupytext
-def test_convert_single_file_in_place_m(tmpdir):
-    nb_file = list_notebooks("ipynb_py")[0]
-    nb_org = str(tmpdir.join(os.path.basename(nb_file)))
-    copyfile(nb_file, nb_org)
+def test_convert_single_file_in_place_m(ipynb_py_file, tmpdir):
+    nb_org = str(tmpdir.join(os.path.basename(ipynb_py_file)))
+    copyfile(ipynb_py_file, nb_org)
 
     base, ext = os.path.splitext(nb_org)
 
@@ -77,12 +76,11 @@ def test_convert_single_file_in_place_m(tmpdir):
         compare_notebooks(nb2, nb1)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb") + list_notebooks("Rmd"))
-def test_convert_single_file(nb_file, tmpdir, capsys):
-    nb_org = str(tmpdir.join(os.path.basename(nb_file)))
-    copyfile(nb_file, nb_org)
+def test_convert_single_file(ipynb_or_rmd_file, tmpdir, capsys):
+    nb_org = str(tmpdir.join(os.path.basename(ipynb_or_rmd_file)))
+    copyfile(ipynb_or_rmd_file, nb_org)
 
-    nb1 = read(nb_file)
+    nb1 = read(ipynb_or_rmd_file)
     pynb = writes(nb1, "py")
     jupytext([nb_org, "--to", "py", "-o", "-"])
 
@@ -119,10 +117,9 @@ def test_wildcard(tmpdir):
         jupytext(["nb3.ipynb", "--to", "py"])
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_cpp"))
-def test_to_cpluplus(nb_file, tmpdir, capsys):
-    nb_org = str(tmpdir.join(os.path.basename(nb_file)))
-    copyfile(nb_file, nb_org)
+def test_to_cpluplus(ipynb_cpp_file, tmpdir, capsys):
+    nb_org = str(tmpdir.join(os.path.basename(ipynb_cpp_file)))
+    copyfile(ipynb_cpp_file, nb_org)
     nb1 = read(nb_org)
 
     text_cpp = writes(nb1, "cpp")
@@ -133,12 +130,11 @@ def test_to_cpluplus(nb_file, tmpdir, capsys):
     compare(out, text_cpp)
 
 
-@pytest.mark.parametrize("nb_files", [list_notebooks("ipynb_py")])
-def test_convert_multiple_file(nb_files, tmpdir):
+def test_convert_multiple_file(ipynb_py_files, tmpdir):
     nb_orgs = []
     nb_others = []
 
-    for nb_file in nb_files:
+    for nb_file in ipynb_py_files:
         nb_org = str(tmpdir.join(os.path.basename(nb_file)))
         base, ext = os.path.splitext(nb_org)
         nb_other = base + ".py"
@@ -303,13 +299,12 @@ def test_combine_lower_version_raises(tmpdir):
         jupytext([tmp_nbpy, "--to", "ipynb", "--update"])
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_ipynb_to_py_then_update_test(nb_file, tmpdir):
+def test_ipynb_to_py_then_update_test(ipynb_py_file, tmpdir):
     """Reproduce https://github.com/mwouts/jupytext/issues/83"""
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_nbpy = str(tmpdir.join("notebook.py"))
 
-    copyfile(nb_file, tmp_ipynb)
+    copyfile(ipynb_py_file, tmp_ipynb)
 
     jupytext(["--to", "py", tmp_ipynb])
     jupytext(["--test", "--update", "--to", "ipynb", tmp_nbpy])
@@ -344,12 +339,11 @@ def test_test_to_ipynb_ignore_version_number_414(
     assert jupytext(["--test", "--to", "ipynb", tmp_py]) == 0
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_convert_to_percent_format(nb_file, tmpdir):
+def test_convert_to_percent_format(ipynb_py_file, tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_nbpy = str(tmpdir.join("notebook.py"))
 
-    copyfile(nb_file, tmp_ipynb)
+    copyfile(ipynb_py_file, tmp_ipynb)
 
     jupytext(["--to", "py:percent", tmp_ipynb])
 
@@ -363,12 +357,11 @@ def test_convert_to_percent_format(nb_file, tmpdir):
     compare_notebooks(nb2, nb1)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
+def test_convert_to_percent_format_and_keep_magics(ipynb_py_file, tmpdir):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     tmp_nbpy = str(tmpdir.join("notebook.py"))
 
-    copyfile(nb_file, tmp_ipynb)
+    copyfile(ipynb_py_file, tmp_ipynb)
 
     jupytext(["--to", "py:percent", "--opt", "comment_magics=False", tmp_ipynb])
 
@@ -384,24 +377,22 @@ def test_convert_to_percent_format_and_keep_magics(nb_file, tmpdir):
     compare_notebooks(nb2, nb1)
 
 
-@pytest.mark.parametrize("py_file", list_notebooks("python"))
-def test_set_formats(py_file, tmpdir):
+def test_set_formats(python_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
 
-    copyfile(py_file, tmp_py)
+    copyfile(python_file, tmp_py)
 
     jupytext([tmp_py, "--set-formats", "ipynb,py:light"])
     nb = read(tmp_ipynb)
     assert nb.metadata["jupytext"]["formats"] == "ipynb,py:light"
 
 
-@pytest.mark.parametrize("py_file", list_notebooks("python"))
-def test_update_metadata(py_file, tmpdir, capsys):
+def test_update_metadata(python_file, tmpdir, capsys):
     tmp_py = str(tmpdir.join("notebook.py"))
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
 
-    copyfile(py_file, tmp_py)
+    copyfile(python_file, tmp_py)
 
     jupytext(
         [
@@ -431,11 +422,10 @@ def test_update_metadata(py_file, tmpdir, capsys):
 
 
 @pytest.mark.requires_user_kernel_python3
-@pytest.mark.parametrize("py_file", list_notebooks("python"))
-def test_set_kernel_inplace(py_file, tmpdir):
+def test_set_kernel_inplace(python_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
 
-    copyfile(py_file, tmp_py)
+    copyfile(python_file, tmp_py)
 
     jupytext([tmp_py, "--set-kernel", "-"])
 
@@ -446,12 +436,11 @@ def test_set_kernel_inplace(py_file, tmpdir):
 
 
 @pytest.mark.requires_user_kernel_python3
-@pytest.mark.parametrize("py_file", list_notebooks("python"))
-def test_set_kernel_auto(py_file, tmpdir):
+def test_set_kernel_auto(python_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
 
-    copyfile(py_file, tmp_py)
+    copyfile(python_file, tmp_py)
 
     jupytext(["--to", "ipynb", tmp_py, "--set-kernel", "-"])
 
@@ -462,12 +451,11 @@ def test_set_kernel_auto(py_file, tmpdir):
 
 
 @pytest.mark.requires_user_kernel_python3
-@pytest.mark.parametrize("py_file", list_notebooks("python"))
-def test_set_kernel_with_name(py_file, tmpdir):
+def test_set_kernel_with_name(python_file, tmpdir):
     tmp_py = str(tmpdir.join("notebook.py"))
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
 
-    copyfile(py_file, tmp_py)
+    copyfile(python_file, tmp_py)
 
     for kernel in find_kernel_specs():
         jupytext(["--to", "ipynb", tmp_py, "--set-kernel", kernel])
@@ -479,10 +467,9 @@ def test_set_kernel_with_name(py_file, tmpdir):
         jupytext(["--to", "ipynb", tmp_py, "--set-kernel", "non_existing_env"])
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_paired_paths(nb_file, tmpdir, capsys):
+def test_paired_paths(ipynb_py_file, tmpdir, capsys):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
-    nb = read(nb_file)
+    nb = read(ipynb_py_file)
     nb.metadata.setdefault("jupytext", {})[
         "formats"
     ] = "ipynb,_light.py,_percent.py:percent"
@@ -499,12 +486,11 @@ def test_paired_paths(nb_file, tmpdir, capsys):
     }
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_sync(nb_file, tmpdir, cwd_tmpdir, capsys):
+def test_sync(ipynb_py_file, tmpdir, cwd_tmpdir, capsys):
     tmp_ipynb = "notebook.ipynb"
     tmp_py = "notebook.py"
     tmp_rmd = "notebook.Rmd"
-    nb = read(nb_file)
+    nb = read(ipynb_py_file)
     write(nb, tmp_ipynb)
 
     # Test that sync issues a warning when the notebook is not paired
@@ -551,13 +537,10 @@ def test_sync(nb_file, tmpdir, cwd_tmpdir, capsys):
 
 
 @pytest.mark.requires_pandoc
-@pytest.mark.parametrize(
-    "nb_file", list_notebooks("ipynb_py", skip="(Notebook with|flavors|305)")
-)
-def test_sync_pandoc(nb_file, tmpdir, cwd_tmpdir, capsys):
+def test_sync_pandoc(ipynb_to_pandoc, tmpdir, cwd_tmpdir, capsys):
     tmp_ipynb = "notebook.ipynb"
     tmp_md = "notebook.md"
-    nb = read(nb_file)
+    nb = read(ipynb_to_pandoc)
     write(nb, tmp_ipynb)
 
     # Test that sync issues a warning when the notebook is not paired
@@ -579,16 +562,12 @@ def test_sync_pandoc(nb_file, tmpdir, cwd_tmpdir, capsys):
         assert "pandoc" in fp.read()
 
 
-@pytest.mark.parametrize(
-    "nb_file,ext",
-    [(nb_file, ".py") for nb_file in list_notebooks("ipynb_py")]
-    + [(nb_file, ".R") for nb_file in list_notebooks("ipynb_R")]
-    + [(nb_file, ".jl") for nb_file in list_notebooks("ipynb_julia")],
-)
-def test_cli_can_infer_jupytext_format(nb_file, ext, tmpdir, cwd_tmpdir):
+def test_cli_can_infer_jupytext_format(
+    ipynb_py_R_jl_file, ipynb_py_R_jl_ext, tmpdir, cwd_tmpdir
+):
     tmp_ipynb = "notebook.ipynb"
-    tmp_text = "notebook" + ext
-    nb = read(nb_file)
+    tmp_text = "notebook" + ipynb_py_R_jl_ext
+    nb = read(ipynb_py_R_jl_file)
 
     # Light format to Jupyter notebook
     write(nb, tmp_text)
@@ -597,21 +576,16 @@ def test_cli_can_infer_jupytext_format(nb_file, ext, tmpdir, cwd_tmpdir):
     compare_notebooks(nb2, nb)
 
     # Percent format to Jupyter notebook
-    write(nb, tmp_text, fmt=ext + ":percent")
+    write(nb, tmp_text, fmt=ipynb_py_R_jl_ext + ":percent")
     jupytext(["--to", "notebook", tmp_text])
     nb2 = read(tmp_ipynb)
     compare_notebooks(nb2, nb)
 
 
-@pytest.mark.parametrize(
-    "nb_file,ext",
-    [(nb_file, ".py") for nb_file in list_notebooks("ipynb_py")]
-    + [(nb_file, ".R") for nb_file in list_notebooks("ipynb_R")],
-)
-def test_cli_to_script(nb_file, ext, tmpdir, cwd_tmpdir):
+def test_cli_to_script(ipynb_py_R_jl_file, ipynb_py_R_jl_ext, tmpdir, cwd_tmpdir):
     tmp_ipynb = "notebook.ipynb"
-    tmp_text = "notebook" + ext
-    nb = read(nb_file)
+    tmp_text = "notebook" + ipynb_py_R_jl_ext
+    nb = read(ipynb_py_R_jl_file)
 
     write(nb, tmp_ipynb)
     jupytext(["--to", "script", tmp_ipynb])
@@ -619,15 +593,10 @@ def test_cli_to_script(nb_file, ext, tmpdir, cwd_tmpdir):
     compare_notebooks(nb2, nb)
 
 
-@pytest.mark.parametrize(
-    "nb_file,ext",
-    [(nb_file, ".py") for nb_file in list_notebooks("ipynb_py")]
-    + [(nb_file, ".R") for nb_file in list_notebooks("ipynb_R")],
-)
-def test_cli_to_auto(nb_file, ext, tmpdir, cwd_tmpdir):
+def test_cli_to_auto(ipynb_py_R_jl_file, ipynb_py_R_jl_ext, tmpdir, cwd_tmpdir):
     tmp_ipynb = "notebook.ipynb"
-    tmp_text = "notebook" + ext
-    nb = read(nb_file)
+    tmp_text = "notebook" + ipynb_py_R_jl_ext
+    nb = read(ipynb_py_R_jl_file)
 
     write(nb, tmp_ipynb)
     jupytext(["--to", "auto", tmp_ipynb])
@@ -635,15 +604,14 @@ def test_cli_to_auto(nb_file, ext, tmpdir, cwd_tmpdir):
     compare_notebooks(nb2, nb)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
-def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir, cwd_tmpdir):
+def test_cli_can_infer_jupytext_format_from_stdin(ipynb_py_file, tmpdir, cwd_tmpdir):
     tmp_ipynb = "notebook.ipynb"
     tmp_py = "notebook.py"
     tmp_rmd = "notebook.Rmd"
-    nb = read(nb_file)
+    nb = read(ipynb_py_file)
 
     # read ipynb notebook on stdin, write to python
-    with open(nb_file) as fp, mock.patch("sys.stdin", fp):
+    with open(ipynb_py_file) as fp, mock.patch("sys.stdin", fp):
         jupytext(["--to", "py:percent", "-o", tmp_py])
     nb2 = read(tmp_py)
     compare_notebooks(nb2, nb)
@@ -655,7 +623,7 @@ def test_cli_can_infer_jupytext_format_from_stdin(nb_file, tmpdir, cwd_tmpdir):
     compare_notebooks(nb2, nb)
 
     # read ipynb notebook on stdin, write to R markdown
-    with open(nb_file) as fp, mock.patch("sys.stdin", fp):
+    with open(ipynb_py_file) as fp, mock.patch("sys.stdin", fp):
         jupytext(["-o", tmp_rmd])
     nb2 = read(tmp_rmd)
     compare_notebooks(nb2, nb, "Rmd")
@@ -845,26 +813,25 @@ def test_remove_jupytext_metadata(tmpdir, cwd_tmpdir):
     }
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py"))
 @pytest.mark.parametrize("fmt", ["py:light", "py:percent", "md"])
-def test_convert_and_update_preserves_notebook(nb_file, fmt, tmpdir, cwd_tmpdir):
+def test_convert_and_update_preserves_notebook(ipynb_py_file, fmt, tmpdir, cwd_tmpdir):
     # cannot encode magic parameters in markdown yet
-    if ("magic" in nb_file or "LateX" in nb_file) and fmt == "md":
+    if ("magic" in ipynb_py_file or "LateX" in ipynb_py_file) and fmt == "md":
         return
 
     tmp_ipynb = "notebook.ipynb"
-    copyfile(nb_file, tmp_ipynb)
+    copyfile(ipynb_py_file, tmp_ipynb)
     ext = long_form_one_format(fmt)["extension"]
     tmp_text = "notebook" + ext
 
     jupytext(["--to", fmt, tmp_ipynb])
     jupytext(["--to", "ipynb", "--update", tmp_text])
 
-    nb_org = read(nb_file)
+    nb_org = read(ipynb_py_file)
     nb_now = read(tmp_ipynb)
 
     # The cell marker changes from """ to r""" on the LateX notebook #836
-    if "LateX" in nb_file and fmt == "py:percent":
+    if "LateX" in ipynb_py_file and fmt == "py:percent":
         last_cell = nb_now.cells[-1]
         last_cell.metadata["cell_marker"] = last_cell.metadata["cell_marker"][1:]
 

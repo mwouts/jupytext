@@ -1,12 +1,10 @@
 from copy import deepcopy
 
-import pytest
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 
 import jupytext
 from jupytext.combine import combine_inputs_with_outputs
 from jupytext.compare import compare, compare_notebooks
-from tests.utils import list_notebooks
 
 
 def test_combine():
@@ -132,9 +130,8 @@ def test_read_text_and_combine_with_outputs(tmpdir):
     assert len(nb.cells) == 3
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_all"))
-def test_combine_stable(nb_file):
-    nb_org = jupytext.read(nb_file)
+def test_combine_stable(ipynb_file):
+    nb_org = jupytext.read(ipynb_file)
     nb_source = deepcopy(nb_org)
     nb_outputs = deepcopy(nb_org)
 

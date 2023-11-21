@@ -2,7 +2,7 @@ import pytest
 from nbformat.v4.nbbase import new_code_cell, new_notebook
 
 import jupytext
-from jupytext.compare import compare, compare_notebooks
+from jupytext.compare import compare, compare_notebooks, notebook_model
 from jupytext.magics import (
     _PYTHON_MAGIC_ASSIGN,
     comment_magic,
@@ -10,8 +10,6 @@ from jupytext.magics import (
     uncomment_magic,
     unesc,
 )
-
-from ..utils import notebook_model
 
 
 def test_unesc():

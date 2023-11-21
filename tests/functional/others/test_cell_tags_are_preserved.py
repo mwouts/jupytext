@@ -2,7 +2,7 @@ import pytest
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell
 
 from jupytext import reads, writes
-from tests.utils import formats_with_support_for_cell_metadata, is_myst_available
+from jupytext.formats import formats_with_support_for_cell_metadata, is_myst_available
 
 
 @pytest.fixture()

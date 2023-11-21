@@ -11,19 +11,18 @@ from jupytext.combine import black_invariant
 from jupytext.compare import compare, compare_cells, compare_notebooks
 from jupytext.header import _DEFAULT_NOTEBOOK_METADATA
 
-from ...utils import list_notebooks
-
 
 @pytest.mark.requires_black
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
-def test_apply_black_on_python_notebooks(tmpdir, cwd_tmpdir, nb_file):
-    copyfile(nb_file, "notebook.ipynb")
+def test_apply_black_on_python_notebooks(tmpdir, cwd_tmpdir, ipynb_py_file):
+    if "cell metadata" in ipynb_py_file:
+        pytest.skip()
+    copyfile(ipynb_py_file, "notebook.ipynb")
 
     jupytext(args=["notebook.ipynb", "--to", "py:percent"])
     system("black", "notebook.py")
     jupytext(args=["notebook.py", "--to", "ipynb", "--update"])
 
-    nb1 = read(nb_file)
+    nb1 = read(ipynb_py_file)
     nb2 = read("notebook.ipynb")
     nb3 = read("notebook.py")
 
@@ -90,10 +89,9 @@ def test_pipe_into_flake8():
 
 @pytest.mark.requires_black
 @pytest.mark.requires_flake8
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
-def test_apply_black_through_jupytext(tmpdir, nb_file):
+def test_apply_black_through_jupytext(tmpdir, python_notebook):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
-    metadata = read(nb_file).metadata
+    metadata = python_notebook.metadata
 
     nb_org = new_notebook(
         cells=[new_code_cell("1        +1", id="cell-id")], metadata=metadata
@@ -142,10 +140,9 @@ def test_apply_black_through_jupytext(tmpdir, nb_file):
 
 
 @pytest.mark.requires_black
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py")[:1])
-def test_apply_black_and_sync_on_paired_notebook(tmpdir, cwd_tmpdir, nb_file):
+def test_apply_black_and_sync_on_paired_notebook(tmpdir, cwd_tmpdir, python_notebook):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
-    metadata = read(nb_file).metadata
+    metadata = python_notebook.metadata
     metadata["jupytext"] = {"formats": "ipynb,py"}
     assert "language_info" in metadata
 

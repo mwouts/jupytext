@@ -6,15 +6,12 @@ from nbformat.validator import NotebookValidationError
 from tornado.web import HTTPError
 
 import jupytext
-from jupytext.compare import compare_notebooks
+from jupytext.compare import compare_notebooks, notebook_model
 from jupytext.contentsmanager import TextFileContentsManager
 
-from ...utils import list_notebooks, notebook_model
 
-
-@pytest.mark.parametrize("nb_file", list_notebooks(skip="66"))
-def test_rmd_is_ok(nb_file, tmpdir):
-    nb = jupytext.read(nb_file)
+def test_rmd_is_ok(ipynb_file, tmpdir):
+    nb = jupytext.read(ipynb_file)
     tmp_ipynb = "notebook.ipynb"
     tmp_rmd = "notebook.Rmd"
 
@@ -30,9 +27,8 @@ def test_rmd_is_ok(nb_file, tmpdir):
     compare_notebooks(nb2, nb, "Rmd")
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("Rmd"))
-def test_ipynb_is_ok(nb_file, tmpdir):
-    nb = jupytext.read(nb_file)
+def test_ipynb_is_ok(rmd_file, tmpdir):
+    nb = jupytext.read(rmd_file)
     tmp_ipynb = "notebook.ipynb"
     tmp_rmd = "notebook.Rmd"
 
@@ -46,9 +42,8 @@ def test_ipynb_is_ok(nb_file, tmpdir):
     compare_notebooks(nb2, nb)
 
 
-@pytest.mark.parametrize("nb_file", list_notebooks("ipynb_py", skip="66"))
-def test_all_files_created(nb_file, tmpdir):
-    nb = jupytext.read(nb_file)
+def test_all_files_created(ipynb_py_file, tmpdir):
+    nb = jupytext.read(ipynb_py_file)
     tmp_ipynb = "notebook.ipynb"
     tmp_rmd = "notebook.Rmd"
     tmp_py = "notebook.py"

@@ -4,9 +4,7 @@ import pytest
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 
 import jupytext
-from jupytext.compare import compare_cells
-
-from ...utils import notebook_model
+from jupytext.compare import compare_cells, notebook_model
 
 
 def fs_meta_manager(tmpdir):

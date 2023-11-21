@@ -10,8 +10,7 @@ from tornado.web import HTTPError
 
 import jupytext
 from jupytext import TextFileContentsManager
-from jupytext.compare import compare_cells
-from tests.utils import notebook_model
+from jupytext.compare import compare_cells, notebook_model
 
 SAMPLE_NOTEBOOK = new_notebook(
     cells=[new_markdown_cell("A Markdown cell"), new_code_cell("# A code cell\n1 + 1")]
