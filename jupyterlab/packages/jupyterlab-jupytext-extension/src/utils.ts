@@ -5,19 +5,13 @@ import { IDocumentWidget } from '@jupyterlab/docregistry';
 import { CommandRegistry } from '@lumino/commands';
 
 import {
+  DEFAULT_LANGUAGES,
   AUTO_LANGUAGE_FILETYPE_DATA,
   JUPYTEXT_CREATE_TEXT_NOTEBOOK_FILETYPE_DATA,
   FACTORY,
   CommandIDs,
   IFileTypeData,
 } from './tokens';
-
-// NOTE: Instead of defining AUTO_LANGUAGE_FILETYPE_DATA upfront, try to
-// get extension and other file metadata from default languages model
-// This might be bit tricky as cases are not same in names in kernelspecs
-// and languages. The idea we pick up _any_ kernel directly from supported
-// default languages.
-// const defaultLangugaes = EditorLanguageRegistry.getDefaultLanguages();
 
 /**
  * Get all available kernel file types so that we replace auto format
@@ -33,9 +27,35 @@ async function getAvailableKernelFileTypes(
   Object.keys(specs).forEach((spec) => {
     const specModel = specs[spec];
     if (specModel) {
+      // First check if kernel is one of the pre-defined types (Python, R, Julia)
       const exts = AUTO_LANGUAGE_FILETYPE_DATA.get(specModel.language);
       if (exts !== undefined) {
         fileTypes.set(specModel.language, exts);
+      } else {
+        // If not, try to get filetype metadata from code-mirror editor languages
+        // file type data
+        const found = DEFAULT_LANGUAGES.findIndex(
+          (editorLanguage) =>
+            editorLanguage.name.toLowerCase() === specModel.language
+        );
+        // If we managed to find the language, construct the FileTypeData
+        // Here we make an assumption that first extension in
+        // editorLanguage.extensions is the most common one.
+        // Also, we cannot guarantee the existence of icon for this language
+        // So, we do not set icon and use a generic kernel icon
+        if (found !== -1) {
+          const editorLanguage = DEFAULT_LANGUAGES[found];
+          const exts: IFileTypeData[] = [
+            {
+              fileExt: editorLanguage.extensions[0],
+              paletteLabel: `New ${editorLanguage.displayName} Text Notebook`,
+              caption: `Create a new ${editorLanguage.displayName} Text Notebook`,
+              launcherLabel: editorLanguage.displayName,
+              kernelName: spec,
+            },
+          ];
+          fileTypes.set(specModel.language, exts);
+        }
       }
     }
   });

@@ -1,3 +1,5 @@
+import { EditorLanguageRegistry } from '@jupyterlab/codemirror';
+
 import { LabIcon } from '@jupyterlab/ui-components';
 
 import { ReadonlyJSONObject } from '@lumino/coreutils';
@@ -51,6 +53,11 @@ export namespace CommandIDs {
   export const faq = `${NS}:faq`;
   export const newUntitled = `${NS}:new-untitled-text-notebook`;
 }
+
+/**
+ * Default editor supported languages in JupyterLab
+ */
+export const DEFAULT_LANGUAGES = EditorLanguageRegistry.getDefaultLanguages();
 
 /**
  * Jupytext logo icon
