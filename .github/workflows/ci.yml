@@ -41,6 +41,10 @@ jobs:
     needs: [codeql]
     uses: ./.github/workflows/step_tests-pip.yml
 
+  test_categories:
+    needs: [codeql]
+    uses: ./.github/workflows/step_test_classification.yml
+
   test-conda:
     needs: [codeql]
     uses: ./.github/workflows/step_tests-conda.yml
