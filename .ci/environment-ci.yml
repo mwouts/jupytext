@@ -1,4 +1,3 @@
-
 # This environment is smaller than the dev environment.
 #
 # Until conda supports creating env from pyproject.toml
