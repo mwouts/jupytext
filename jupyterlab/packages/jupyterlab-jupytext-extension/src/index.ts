@@ -11,6 +11,8 @@ import {
 
 import { IDocumentManager } from '@jupyterlab/docmanager';
 
+import { IEditorLanguageRegistry } from '@jupyterlab/codemirror';
+
 import { Contents } from '@jupyterlab/services';
 
 import { ILauncher } from '@jupyterlab/launcher';
@@ -84,6 +86,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     NotebookPanel.IContentFactory,
     IEditorServices,
     IDocumentManager,
+    IEditorLanguageRegistry,
     IRenderMimeRegistry,
     INotebookWidgetFactory,
     INotebookTracker,
@@ -95,6 +98,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     contentFactory: NotebookPanel.IContentFactory,
     editorServices: IEditorServices,
     docManager: IDocumentManager,
+    languages: IEditorLanguageRegistry,
     rendermime: IRenderMimeRegistry,
     notebookFactory: NotebookWidgetFactory.IFactory,
     notebookTracker: INotebookTracker,
@@ -301,6 +305,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     const createTextNotebookCommands =
       await getAvailableCreateTextNotebookCommands(
         launcherItems,
+        languages,
         serviceManager
       );
 

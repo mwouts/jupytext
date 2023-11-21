@@ -1,3 +1,5 @@
+import { IEditorLanguageRegistry } from '@jupyterlab/codemirror';
+
 import { ServiceManager } from '@jupyterlab/services';
 
 import { IDocumentWidget } from '@jupyterlab/docregistry';
@@ -5,7 +7,6 @@ import { IDocumentWidget } from '@jupyterlab/docregistry';
 import { CommandRegistry } from '@lumino/commands';
 
 import {
-  DEFAULT_LANGUAGES,
   AUTO_LANGUAGE_FILETYPE_DATA,
   JUPYTEXT_CREATE_TEXT_NOTEBOOK_FILETYPE_DATA,
   FACTORY,
@@ -18,6 +19,7 @@ import {
  * with these file extensions
  */
 async function getAvailableKernelFileTypes(
+  languages: IEditorLanguageRegistry,
   serviceManager: ServiceManager.IManager
 ): Promise<Map<string, IFileTypeData[]>> {
   const specsManager = serviceManager.kernelspecs;
@@ -32,25 +34,20 @@ async function getAvailableKernelFileTypes(
       if (exts !== undefined) {
         fileTypes.set(specModel.language, exts);
       } else {
-        // If not, try to get filetype metadata from code-mirror editor languages
-        // file type data
-        const found = DEFAULT_LANGUAGES.findIndex(
-          (editorLanguage) =>
-            editorLanguage.name.toLowerCase() === specModel.language
-        );
+        // If not, try to get languageInfo from codemirror languages
+        const languageInfo = languages.findByName(specModel.language);
         // If we managed to find the language, construct the FileTypeData
         // Here we make an assumption that first extension in
-        // editorLanguage.extensions is the most common one.
+        // languageInfo.extensions is the most common one.
         // Also, we cannot guarantee the existence of icon for this language
         // So, we do not set icon and use a generic kernel icon
-        if (found !== -1) {
-          const editorLanguage = DEFAULT_LANGUAGES[found];
+        if (languageInfo) {
           const exts: IFileTypeData[] = [
             {
-              fileExt: editorLanguage.extensions[0],
-              paletteLabel: `New ${editorLanguage.displayName} Text Notebook`,
-              caption: `Create a new ${editorLanguage.displayName} Text Notebook`,
-              launcherLabel: editorLanguage.displayName,
+              fileExt: languageInfo.extensions[0],
+              paletteLabel: `New ${languageInfo.displayName} Text Notebook`,
+              caption: `Create a new ${languageInfo.displayName} Text Notebook`,
+              launcherLabel: specModel.display_name || languageInfo.displayName,
               kernelName: spec,
             },
           ];
@@ -68,10 +65,14 @@ async function getAvailableKernelFileTypes(
  */
 export async function getAvailableCreateTextNotebookCommands(
   launcherItems: string[],
+  languages: IEditorLanguageRegistry,
   serviceManager: ServiceManager.IManager
 ): Promise<Map<string, IFileTypeData[]>> {
   // Get a map of available kernels in current widget
-  const availableKernels = await getAvailableKernelFileTypes(serviceManager);
+  const availableKernels = await getAvailableKernelFileTypes(
+    languages,
+    serviceManager
+  );
 
   // Initialise a map of 'Create New Text Notebook' command filetypes
   const createTextNotebookCommands = new Map<string, IFileTypeData[]>();
