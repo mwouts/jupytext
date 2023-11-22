@@ -82,7 +82,7 @@
           {
             "type": "submenu",
             "submenu": {
-              "id": "jp-mainmenu-jupytext-new",
+              "id": "jp-mainmenu-jupytext-pair",
               "label": "Pair Notebook",
               "items": [
                 {
