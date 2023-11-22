@@ -32,7 +32,7 @@
               "label": "New Text Notebook",
               "items": [
                 {
-                  "command": "jupytext:create-new-text-noteboook-auto:percent",
+                  "command": "jupytext:create-new-text-notebook-auto:percent",
                   "rank": 1
                 },
                 {
@@ -40,15 +40,15 @@
                   "rank": 2
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-auto:light",
+                  "command": "jupytext:create-new-text-notebook-auto:light",
                   "rank": 5
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-auto:hydrogen",
+                  "command": "jupytext:create-new-text-notebook-auto:hydrogen",
                   "rank": 10
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-auto:nomarker",
+                  "command": "jupytext:create-new-text-notebook-auto:nomarker",
                   "rank": 15
                 },
                 {
@@ -56,11 +56,11 @@
                   "rank": 16
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-md",
+                  "command": "jupytext:create-new-text-notebook-md",
                   "rank": 20
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-md:myst",
+                  "command": "jupytext:create-new-text-notebook-md:myst",
                   "rank": 25
                 },
                 {
@@ -68,11 +68,11 @@
                   "rank": 26
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-Rmd",
+                  "command": "jupytext:create-new-text-notebook-Rmd",
                   "rank": 30
                 },
                 {
-                  "command": "jupytext:create-new-text-noteboook-qmd",
+                  "command": "jupytext:create-new-text-notebook-qmd",
                   "rank": 35
                 }
               ]

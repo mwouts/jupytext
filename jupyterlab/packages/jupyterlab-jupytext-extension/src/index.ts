@@ -328,7 +328,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     // https://github.com/jupyterlab/jupyterlab/blob/c106f0a19110efad7c5e1b136144985819e21100/packages/notebook-extension/src/index.ts#L1902-L1965
     jupytextTextNotebookFormats.forEach(
       (jupytextFormat: IJupytextFormat, rank: number) => {
-        const command = `jupytext:create-new-text-noteboook-${jupytextFormat.format}`;
+        const command = `jupytext:create-new-text-notebook-${jupytextFormat.format}`;
         const label = trans.__(jupytextFormat.label.split('with')[1].trim());
         console.log('Registering text notebook command=', command);
         commands.addCommand(command, {
