@@ -1,0 +1,45 @@
+name: test-categories
+run-name: Run Unit/Functional/Integration and External tests using Pip
+
+on:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-test_classification
+  cancel-in-progress: true
+
+jobs:
+  test-pip:
+    continue-on-error: ${{ matrix.experimental || false }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ "3.11" ]
+        coverage: [unit, functional, integration, external]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Base Setup
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+        with:
+          python_version: ${{ matrix.python-version }}
+
+      - name: Install from source
+        run: HATCH_BUILD_HOOKS_ENABLE=false python -m pip install -e '.[test-cov,test-${{ matrix.coverage }}]' markdown-it-py~=3.0
+
+      - name: Install a Jupyter Kernel
+        run: python -m ipykernel install --name python_kernel --user
+
+      - name: Run the tests
+        run: pytest tests/${{ matrix.coverage }} --cov
+
+      - name: Upload the coverage
+        uses: codecov/codecov-action@v3
+        with:
+          flags: ${{ matrix.coverage }}
+          fail_ci_if_error: true
+          verbose: true

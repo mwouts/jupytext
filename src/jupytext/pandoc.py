@@ -3,13 +3,11 @@
 import os
 import subprocess
 import tempfile
-from functools import partial
 
 # Copy nbformat reads and writes to avoid them being patched in the contents manager!!
 from nbformat import reads as ipynb_reads
 from nbformat import writes as ipynb_writes
-
-from .parse_version import parse_version as parse
+from packaging.version import parse
 
 
 class PandocError(OSError):
@@ -58,14 +56,13 @@ def raise_if_pandoc_is_not_available(min_version="2.7.2", max_version=None):
             "but pandoc was not found"
         )
 
-    parse_version = partial(parse, custom_error=PandocError)
-    if parse_version(version) < parse_version(min_version):
+    if parse(version) < parse(min_version):
         raise PandocError(
             f"The Pandoc Markdown format requires 'pandoc>={min_version}', "
             f"but pandoc version {version} was found"
         )
 
-    if max_version and parse_version(version) > parse_version(max_version):
+    if max_version and parse(version) > parse(max_version):
         raise PandocError(
             f"The Pandoc Markdown format requires 'pandoc<={max_version}', "
             f"but pandoc version {version} was found"
@@ -89,8 +86,7 @@ def md_to_notebook(text):
     tmp_file.write(text.encode("utf-8"))
     tmp_file.close()
 
-    parse_version = partial(parse, custom_error=PandocError)
-    if parse_version(pandoc_version()) < parse_version("2.11.2"):
+    if parse(pandoc_version()) < parse("2.11.2"):
         pandoc_args = "--from markdown --to ipynb -s --atx-headers --wrap=preserve --preserve-tabs"
     else:
         pandoc_args = "--from markdown --to ipynb -s --markdown-headings=atx --wrap=preserve --preserve-tabs"
@@ -114,8 +110,7 @@ def notebook_to_md(notebook):
     tmp_file.write(ipynb_writes(notebook).encode("utf-8"))
     tmp_file.close()
 
-    parse_version = partial(parse, custom_error=PandocError)
-    if parse_version(pandoc_version()) < parse_version("2.11.2"):
+    if parse(pandoc_version()) < parse("2.11.2"):
         pandoc_args = "--from ipynb --to markdown -s --atx-headers --wrap=preserve --preserve-tabs"
     else:
         pandoc_args = "--from ipynb --to markdown -s --markdown-headings=atx --wrap=preserve --preserve-tabs"

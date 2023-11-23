@@ -1,8 +1,12 @@
+import itertools
+import os.path
+import re
+import sys
 import unittest.mock as mock
 from pathlib import Path
 
 import pytest
-from git import Repo
+from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from nbformat.v4 import nbbase
 from nbformat.v4.nbbase import (
     new_code_cell,
@@ -12,25 +16,25 @@ from nbformat.v4.nbbase import (
 )
 
 import jupytext
-from jupytext.cli import system
+from jupytext.cell_reader import rst2md
+from jupytext.cli import system, tool_version
+from jupytext.formats import formats_with_support_for_cell_metadata
+from jupytext.myst import is_myst_available
+from jupytext.pandoc import is_pandoc_available
+from jupytext.quarto import is_quarto_available
 
-from .utils import formats_with_support_for_cell_metadata
-
-# Pytest's tmpdir is in /tmp (at least for me), so this helps avoiding interferences between
+# Pytest's tmpdir is in /tmp (at least for me), so this helps to avoid interferences between
 # global configuration on HOME and the test collection
 jupytext.config.JUPYTEXT_CEILING_DIRECTORIES = ["/tmp/"]
+
+SAMPLE_NOTEBOOK_PATH = Path(__file__).parent / "data" / "notebooks" / "inputs"
+ROOT_PATH = Path(__file__).parent.parent
 
 
 @pytest.fixture
 def no_jupytext_version_number():
     with mock.patch("jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER", False):
         yield
-
-
-@pytest.fixture
-def tmp_repo(tmpdir):
-    repo = Repo.init(str(tmpdir))
-    return repo
 
 
 @pytest.fixture
@@ -71,7 +75,16 @@ def python_notebook():
                 "display_name": "Python 3",
                 "language": "python",
                 "name": "python_kernel",
-            }
+            },
+            "language_info": {
+                "codemirror_mode": {"name": "ipython", "version": 3},
+                "file_extension": ".py",
+                "mimetype": "text/x-python",
+                "name": "python",
+                "nbconvert_exporter": "python",
+                "pygments_lexer": "ipython3",
+                "version": "3.6.4",
+            },
         },
     )
 
@@ -105,6 +118,296 @@ def notebook_with_outputs():
 @pytest.fixture(params=list(formats_with_support_for_cell_metadata()))
 def fmt_with_cell_metadata(request):
     return request.param
+
+
+def list_notebooks(path="ipynb", skip=""):
+    """All notebooks in the directory notebooks/path,
+    or in the package itself"""
+    if path == "ipynb":
+        return (
+            list_notebooks("ipynb_julia", skip=skip)
+            + list_notebooks("ipynb_py", skip=skip)
+            + list_notebooks("ipynb_R", skip=skip)
+        )
+
+    nb_path = SAMPLE_NOTEBOOK_PATH
+
+    if path == "ipynb_all":
+        return itertools.chain(
+            *(
+                list_notebooks(folder.name, skip=skip)
+                for folder in nb_path.iterdir()
+                if folder.name.startswith("ipynb_")
+            )
+        )
+
+    if path == "all":
+        return itertools.chain(
+            *(list_notebooks(folder.name, skip=skip) for folder in nb_path.iterdir())
+        )
+
+    if path.startswith("."):
+        nb_path = Path(__file__).parent / ".." / path
+    else:
+        nb_path = nb_path / path
+
+    if skip:
+        skip_re = re.compile(".*" + skip + ".*")
+        return [
+            str(nb_file)
+            for nb_file in nb_path.iterdir()
+            if nb_file.is_file() and not skip_re.match(nb_file.name)
+        ]
+
+    return [str(nb_file) for nb_file in nb_path.iterdir() if nb_file.is_file()]
+
+
+def notebook_id_func(nb_file):
+    nb_file = Path(nb_file)
+    if SAMPLE_NOTEBOOK_PATH in nb_file.parents:
+        return str(nb_file.relative_to(SAMPLE_NOTEBOOK_PATH))
+    return str(nb_file.relative_to(ROOT_PATH))
+
+
+@pytest.fixture(params=list_notebooks("ipynb_all"), ids=notebook_id_func)
+def ipynb_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("all"), ids=notebook_id_func)
+def any_nb_file(request):
+    return request.param
+
+
+@pytest.fixture
+def ipynb_py_R_jl_files():
+    return list_notebooks()
+
+
+@pytest.fixture(params=list_notebooks(), ids=notebook_id_func)
+def ipynb_py_R_jl_file(request):
+    return request.param
+
+
+@pytest.fixture
+def ipynb_py_R_jl_ext(ipynb_py_R_jl_file):
+    for language in "py", "R", "julia":
+        if f"{os.path.sep}ipynb_{language}{os.path.sep}" in ipynb_py_R_jl_file:
+            return ".jl" if language == "julia" else "." + language
+
+    raise RuntimeError(f"language not found for {ipynb_py_R_jl_file}")
+
+
+@pytest.fixture(
+    params=list_notebooks("ipynb") + list_notebooks("Rmd"), ids=notebook_id_func
+)
+def ipynb_or_rmd_file(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=list_notebooks("ipynb_py") + list_notebooks("ipynb_R"), ids=notebook_id_func
+)
+def ipynb_py_R_file(request):
+    return request.param
+
+
+@pytest.fixture
+def ipynb_py_files():
+    return list_notebooks("ipynb_py")
+
+
+@pytest.fixture(params=list_notebooks("ipynb_py"), ids=notebook_id_func)
+def ipynb_py_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("ipynb_R"), ids=notebook_id_func)
+def ipynb_R_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("ipynb_julia"), ids=notebook_id_func)
+def ipynb_julia_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("ipynb_scheme"), ids=notebook_id_func)
+def ipynb_scheme_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("ipynb_cpp"), ids=notebook_id_func)
+def ipynb_cpp_file(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=list_notebooks("ipynb_all", skip="many hash"), ids=notebook_id_func
+)
+def ipynb_to_light(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("ipynb_all"), ids=notebook_id_func)
+def ipynb_to_myst(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=[
+        py_file
+        for py_file in list_notebooks("./src/jupytext")
+        if py_file.endswith(".py") and "folding_markers" not in py_file
+    ],
+    ids=notebook_id_func,
+)
+def py_file(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=list_notebooks("julia")
+    + list_notebooks("python")
+    + list_notebooks("R")
+    + list_notebooks("ps1"),
+    ids=notebook_id_func,
+)
+def script_to_ipynb(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("python"), ids=notebook_id_func)
+def python_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("percent"), ids=notebook_id_func)
+def percent_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("hydrogen"), ids=notebook_id_func)
+def hydrogen_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("R"), ids=notebook_id_func)
+def r_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("R_spin"), ids=notebook_id_func)
+def r_spin_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("md"), ids=notebook_id_func)
+def md_file(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=list_notebooks(
+        "ipynb", skip="(functional|Notebook with|flavors|invalid|305)"
+    ),
+    ids=notebook_id_func,
+)
+def ipynb_to_pandoc(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=list_notebooks(
+        "ipynb",
+        skip="(functional|Notebook with|plotly_graphs|flavors|complex_metadata|"
+        "update83|raw_cell|_66|nteract|LaTeX|invalid|305|text_outputs|ir_notebook|jupyter|with_R_magic)",
+    ),
+    ids=notebook_id_func,
+)
+def ipynb_to_quarto(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=list_notebooks("ipynb_py", skip="(raw|hash|frozen|magic|html|164|long)"),
+    ids=notebook_id_func,
+)
+def ipynb_to_sphinx(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("Rmd"), ids=notebook_id_func)
+def rmd_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("sphinx"), ids=notebook_id_func)
+def sphinx_file(request):
+    return request.param
+
+
+def pytest_runtest_setup(item):
+    for mark in item.iter_markers():
+        for tool in [
+            "jupytext",
+            "black",
+            "isort",
+            "flake8",
+            "autopep8",
+            "jupyter nbconvert",
+        ]:
+            if mark.name == f"requires_{tool.replace(' ', '_')}":
+                if not tool_version(tool):
+                    pytest.skip(f"{tool} is not installed")
+        if mark.name == "requires_sphinx_gallery":
+            if not rst2md:
+                pytest.skip("sphinx_gallery is not available")
+        if mark.name == "requires_pandoc":
+            # The mirror files changed slightly when Pandoc 2.11 was introduced
+            # https://github.com/mwouts/jupytext/commit/c07d919702999056ce47f92b74f63a15c8361c5d
+            # The mirror files changed again when Pandoc 2.16 was introduced
+            # https://github.com/mwouts/jupytext/pull/919/commits/1fa1451ecdaa6ad8d803bcb6fb0c0cf09e5371bf
+            if not is_pandoc_available(min_version="2.16.2", max_version="2.16.2"):
+                pytest.skip("pandoc==2.16.2 is not available")
+        if mark.name == "requires_quarto":
+            if not is_quarto_available(min_version="0.2.0"):
+                pytest.skip("quarto>=0.2 is not available")
+        if mark.name == "requires_no_pandoc":
+            if is_pandoc_available():
+                pytest.skip("Pandoc is installed")
+        if mark.name == "requires_ir_kernel":
+            if not any(
+                get_kernel_spec(name).language == "R" for name in find_kernel_specs()
+            ):
+                pytest.skip("irkernel is not installed")
+        if mark.name == "requires_user_kernel_python3":
+            if "python_kernel" not in find_kernel_specs():
+                pytest.skip(
+                    "Please run 'python -m ipykernel install --name python_kernel --user'"
+                )
+        if mark.name == "requires_myst":
+            if not is_myst_available():
+                pytest.skip("myst_parser not found")
+        if mark.name == "requires_no_myst":
+            if is_myst_available():
+                pytest.skip("myst is available")
+        if mark.name == "skip_on_windows":
+            if sys.platform.startswith("win"):
+                pytest.skip("Issue 489")
+        if mark.name == "pre_commit":
+            if sys.platform.startswith("win"):
+                pytest.skip(
+                    "OSError: [WinError 193] %1 is not a valid Win32 application"
+                )
+            if not (Path(__file__).parent.parent / ".git").is_dir():
+                pytest.skip("Jupytext folder is not a git repository #814")
+
+
+def pytest_collection_modifyitems(config, items):
+    for item in items:
+        if (config.rootdir / "tests" / "external" / "pre_commit") in item.path.parents:
+            item.add_marker(pytest.mark.pre_commit)
 
 
 """To make sure that cell ids are distinct we use a global counter.

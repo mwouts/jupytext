@@ -10,23 +10,6 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - ipykernel
-  - nbconvert
+  - jupyterlab
   - nbformat>=5.1.2
-  - pyyaml
-  - toml
-  - markdown-it-py
-  - mdit-py-plugins
-  - pip
-  - pytest
-  - pytest-randomly
-  - pytest-cov
-  - coverage
-  - flake8
-  - autopep8
-  - black
-  - isort
   - pandoc==2.16.2
-  - sphinx-gallery<0.8
-  - pre-commit
-  - gitpython

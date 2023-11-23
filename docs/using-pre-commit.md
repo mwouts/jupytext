@@ -62,5 +62,5 @@ repos:
       language_version: python3
 ```
 
-Tested examples of how to use the pre-commit hook are available in our [tests](https://github.com/mwouts/jupytext/tree/main/tests) -
-see for instance [test_pre_commit_1_sync_with_config.py](https://github.com/mwouts/jupytext/blob/main/tests/test_pre_commit_1_sync_with_config.py).
+Tested examples of how to use the pre-commit hook are available in our [tests](https://github.com/mwouts/jupytext/tree/main/tests/functional/pre-commit) -
+see for instance [test_pre_commit_1_sync_with_config.py](https://github.com/mwouts/jupytext/blob/main/tests/functional/pre-commit/test_pre_commit_1_sync_with_config.py).

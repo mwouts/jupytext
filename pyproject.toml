@@ -32,10 +32,11 @@ classifiers = [
 ]
 dependencies = [
     "nbformat",
-    "pyyaml",
-    "toml",
     "mdit_py_plugins",
     "markdown-it-py>=1.0.0",
+    "packaging",
+    "pyyaml",
+    "toml",
 ]
 dynamic = ["version"]
 
@@ -46,31 +47,44 @@ Documentation = "https://jupytext.readthedocs.io"
 
 [project.optional-dependencies]
 # Test related dependencies
-# TODO: Split them into unit, integration and functional tests groups
 test = [
-    "autopep8",
-    "black",
-    "isort",
-    "ruff",
-    "flake8",
-    "pytest",
-    "pytest-randomly",
-    "gitpython",
-    "jupyterlab",
-    "notebook",
-    "nbconvert",
-    # jupyter-fs==0.4.0 is async, which is not supported by Jupytext ATM
-    "jupyter-fs<0.4.0",
-    "ipykernel",
-    "pre-commit",
+  "pytest",
+  "pytest-randomly"
+]
+test-functional = [
+  "jupytext[test]",
+]
+test-integration = [
+  "jupytext[test-functional]",
+  "jupyter-server",
+  # jupytext --execute
+  "nbconvert",
+  "ipykernel",
+]
+test-external = [
+  "jupytext[test-integration]",
+  # jupytext --pipe and --check
+  "autopep8",
+  "black",
+  "isort",
+  "flake8",
+  # Sphinx gallery
+  "sphinx-gallery<0.8",
+  # Pre-commit tests
+  "gitpython",
+  "pre-commit",
+  # Interaction with other contents managers
+  # jupyter-fs==0.4.0 is async, which is not supported by Jupytext ATM
+  "jupyter-fs<0.4.0"
 ]
 # Coverage requirements
 test-cov = [
-    "jupytext[test]",
+    "jupytext[test-integration]",
     "pytest-cov>=2.6.1",
 ]
 dev = [
     "jupytext[test]",
+    "pre-commit"
 ]
 # Documentation dependencies
 docs = [
@@ -103,9 +117,7 @@ path = "src/jupytext/version.py"
 # Following config is related to JupyterLab extension
 [tool.hatch.build.targets.sdist]
 artifacts = ["jupyterlab/jupyterlab_jupytext/labextension"]
-# Exclude tests (contains Notebooks that have a total size of ~8MB) to reduce sdist
-# tarball. (See #1142)
-exclude = ["tests", "demo", "**/.yarn", "**/node_modules"]
+exclude = ["demo", "**/.yarn", "**/node_modules"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupytext"]
@@ -163,7 +175,7 @@ ignore = ["W002"]
 [tool.ruff]
 line-length = 127
 exclude = [
-    "tests/notebooks/*",
+    "tests/data/notebooks/*",
 ]
 # Seems like W503 is not implemented in ruff
 # ref: https://github.com/astral-sh/ruff/issues/4125
@@ -172,9 +184,40 @@ ignore = [
 ]
 
 [tool.pytest.ini_options]
+markers = [
+    "requires_black",
+    "requires_isort",
+    "requires_flake8",
+    "requires_autopep8",
+    "requires_nbconvert",
+    "requires_myst",
+    "requires_no_myst",
+    "requires_quarto",
+    "requires_pandoc",
+    "requires_no_pandoc",
+    "requires_sphinx_gallery",
+    "requires_user_kernel_python3",
+    "requires_ir_kernel",
+    "skip_on_windows",
+    "pre_commit",
+]
 filterwarnings = [
     # Uncomment this "error" to turn all unfiltered warnings into errors
     # "error",
+    # Our cwd_tmpdir fixture
+    "ignore:pathlib.Path.__enter__\\(\\) is deprecated and scheduled for removal in Python 3.13:DeprecationWarning",
+    # Pre-commit
+    "ignore:read_text is deprecated. Use files\\(\\) instead:DeprecationWarning",
+    "ignore:open_text is deprecated. Use files\\(\\) instead:DeprecationWarning",
+    # Jupyter
+    "ignore:Jupyter is migrating its paths to use standard platformdirs:DeprecationWarning",
+    # Jupyter notebook
+    "ignore:Support for bleach <5 will be removed in a future version of nbconvert:DeprecationWarning",
+    # jupyterfs
+    "ignore:run_pre_save_hook is deprecated, use run_pre_save_hooks instead:DeprecationWarning",
+    "ignore:run_post_save_hook is deprecated, use run_post_save_hooks instead:DeprecationWarning",
+    "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning",
+    "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
     # use single quote to denote raw strings in toml
     # (10 warnings)
     'ignore:Passing unrecognized arguments to super\(KernelSpec\).__init__:DeprecationWarning',
