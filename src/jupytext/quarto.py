@@ -3,7 +3,6 @@
 import os
 import subprocess
 import tempfile
-from functools import partial
 
 # Copy nbformat reads and writes to avoid them being patched in the contents manager!!
 from nbformat import reads as ipynb_reads
@@ -52,8 +51,7 @@ def raise_if_quarto_is_not_available(min_version=QUARTO_MIN_VERSION):
             "but quarto was not found"
         )
 
-    parse_version = partial(parse, custom_error=QuartoError)
-    if parse_version(version) < parse_version(min_version):
+    if parse(version) < parse(min_version):
         raise QuartoError(
             f"The Quarto Markdown format requires 'quarto>={min_version}', "
             f"but quarto version {version} was not found"
