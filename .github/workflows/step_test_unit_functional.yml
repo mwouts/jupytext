@@ -17,6 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ "3.11" ]
+        coverage: [unit, functional, integration, external]
 
     steps:
       - name: Checkout
@@ -28,28 +29,17 @@ jobs:
           python_version: ${{ matrix.python-version }}
 
       - name: Install from source
-        run: python -m pip install -e '.[test-cov]' markdown-it-py~=3.0
-
-      - name: Run the unit tests
-        run: pytest tests/unit --cov=src/jupytext --cov-report=xml
-
-      - name: Run the functional tests
-        run: pytest tests/functional --cov=src/jupytext --cov-report=xml
-
-      - name: Install the integration test dependencies
-        run: python -m pip install -e '.[test-integration]'
+        run: HATCH_BUILD_HOOKS_ENABLE=false python -m pip install -e '.[test-cov,test-${{ matrix.coverage }}]' markdown-it-py~=3.0
 
       - name: Install a Jupyter Kernel
         run: python -m ipykernel install --name python_kernel --user
 
-      - name: Run the integration tests
-        run: pytest tests/integration --cov=src/jupytext --cov-report=xml
-
-      - name: Install the external test dependencies
-        run: python -m pip install -e '.[test-external]'
-
-      - name: Run the external tests
-        run: pytest tests/external --cov=src/jupytext --cov-report=xml
+      - name: Run the tests
+        run: pytest tests/${{ matrix.coverage }} --cov=./
 
       - name: Upload the coverage
         uses: codecov/codecov-action@v3
+        with:
+          flags: ${{ matrix.coverage }}
+          fail_ci_if_error: true
+          verbose: true

@@ -41,9 +41,9 @@ jobs:
     needs: [codeql]
     uses: ./.github/workflows/step_tests-pip.yml
 
-  test_categories:
+  test-unit-functional-integration:
     needs: [codeql]
-    uses: ./.github/workflows/step_test_classification.yml
+    uses: ./.github/workflows/step_test_unit_functional.yml
 
   test-conda:
     needs: [codeql]
@@ -60,7 +60,7 @@ jobs:
       upload: ${{ inputs.upload-build-artifacts || false }}
 
   pass:
-    needs: [pre-commit, codeql, test-pip, test-conda, test-ui, build]
+    needs: [pre-commit, codeql, test-unit-functional-integration, test-pip, test-conda, test-ui, build]
     runs-on: ubuntu-latest
     steps:
       - name: Check jobs
