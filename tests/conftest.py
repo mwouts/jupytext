@@ -1,4 +1,5 @@
 import itertools
+import os.path
 import re
 import sys
 import unittest.mock as mock
@@ -191,7 +192,7 @@ def ipynb_py_R_jl_file(request):
 @pytest.fixture
 def ipynb_py_R_jl_ext(ipynb_py_R_jl_file):
     for language in "py", "R", "julia":
-        if f"/ipynb_{language}/" in str(ipynb_py_R_jl_file):
+        if f"{os.path.sep}ipynb_{language}{os.path.sep}" in ipynb_py_R_jl_file:
             return ".jl" if language == "julia" else "." + language
 
     raise RuntimeError(f"language not found for {ipynb_py_R_jl_file}")
@@ -405,9 +406,7 @@ def pytest_runtest_setup(item):
 
 def pytest_collection_modifyitems(config, items):
     for item in items:
-        if (
-            config.rootdir / "tests" / "functional" / "pre_commit"
-        ) in item.path.parents:
+        if (config.rootdir / "tests" / "external" / "pre_commit") in item.path.parents:
             item.add_marker(pytest.mark.pre_commit)
 
 
