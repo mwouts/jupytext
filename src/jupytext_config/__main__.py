@@ -7,7 +7,7 @@ Call with (e.g.)::
 
 import sys
 
-from jupytext.jupytext_config import main
+from .jupytext_config import main
 
 if __name__ == "__main__":
     sys.exit(main())

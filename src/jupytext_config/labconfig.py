@@ -14,8 +14,6 @@ from pathlib import Path
 
 
 class LabConfig:
-    SETTINGS = Path.home() / ".jupyter" / "labconfig" / "default_setting_overrides.json"
-
     DOCTYPES = [
         "python",
         "markdown",
@@ -26,22 +24,25 @@ class LabConfig:
         "r",
     ]
 
-    def __init__(self, logger=None):
+    def __init__(
+        self, logger=None, settings_path=Path.home() / ".jupyter" / "labconfig"
+    ):
         self.logger = logger or logging.getLogger(__name__)
         self.config = {}
         # the state before any changes
         self._prior_config = {}
+        self.settings_file = Path(settings_path) / "default_setting_overrides.json"
 
     def read(self):
         """
         read the labconfig settings file
         """
         try:
-            if self.SETTINGS.exists():
-                with self.SETTINGS.open() as fid:
+            if self.settings_file.exists():
+                with self.settings_file.open() as fid:
                     self.config = json.load(fid)
         except OSError as exc:
-            self.logger.error(f"Could not read {self.SETTINGS}", exc)
+            self.logger.error(f"Could not read {self.settings_file}", exc)
             return False
         # store for further comparison
         self._prior_config = copy.deepcopy(self.config)
@@ -52,7 +53,7 @@ class LabConfig:
         list the current labconfig settings
         """
         self.logger.debug(
-            f"Current @jupyterlab/docmanager-extension:plugin in {self.SETTINGS}"
+            f"Current @jupyterlab/docmanager-extension:plugin in {self.settings_file}"
         )
         docmanager = self.config.get("@jupyterlab/docmanager-extension:plugin", {})
         viewers = docmanager.get("defaultViewers", {})
@@ -103,17 +104,17 @@ class LabConfig:
         """
         # compare - avoid changing the file if nothing changed
         if self.config == self._prior_config:
-            self.logger.info(f"Nothing to do for {self.SETTINGS}")
+            self.logger.info(f"Nothing to do for {self.settings_file}")
             return True
 
         # save
         try:
-            self.SETTINGS.parent.mkdir(parents=True, exist_ok=True)
-            with self.SETTINGS.open("w") as fid:
+            self.settings_file.parent.mkdir(parents=True, exist_ok=True)
+            with self.settings_file.open("w") as fid:
                 json.dump(self.config, fid, indent=2)
             # useful in case of successive write's
             self._prior_config = copy.deepcopy(self.config)
             return True
         except OSError as exc:
-            self.logger.error(f"Could not write {self.SETTINGS}", exc)
+            self.logger.error(f"Could not write {self.settings_file}", exc)
             return False
