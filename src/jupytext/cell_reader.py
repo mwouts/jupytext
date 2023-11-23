@@ -5,16 +5,16 @@ import warnings
 from copy import copy
 
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_raw_cell
+from packaging.version import parse
 
 from .doxygen import doxygen_to_markdown
 from .languages import _SCRIPT_EXTENSIONS
-from .parse_version import parse_version
 
 # Sphinx Gallery is an optional dependency. And we intercept the SyntaxError for #301
 try:
     from sphinx_gallery import __version__ as sg_version
 
-    if parse_version(sg_version) <= parse_version("0.7.0"):
+    if parse(sg_version) <= parse("0.7.0"):
         from sphinx_gallery.notebook import rst2md
     else:
         warnings.warn(

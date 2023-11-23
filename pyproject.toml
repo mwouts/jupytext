@@ -32,10 +32,11 @@ classifiers = [
 ]
 dependencies = [
     "nbformat",
-    "pyyaml",
-    "toml",
     "mdit_py_plugins",
     "markdown-it-py>=1.0.0",
+    "packaging",
+    "pyyaml",
+    "toml",
 ]
 dynamic = ["version"]
 

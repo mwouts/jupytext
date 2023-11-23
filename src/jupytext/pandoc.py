@@ -8,8 +8,7 @@ from functools import partial
 # Copy nbformat reads and writes to avoid them being patched in the contents manager!!
 from nbformat import reads as ipynb_reads
 from nbformat import writes as ipynb_writes
-
-from .parse_version import parse_version as parse
+from packaging.version import parse
 
 
 class PandocError(OSError):
