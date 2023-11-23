@@ -58,7 +58,6 @@ def test_convert_single_file_in_place(ipynb_py_file, tmpdir):
     compare_notebooks(nb2, nb1)
 
 
-@pytest.mark.requires_jupytext
 def test_convert_single_file_in_place_m(ipynb_py_file, tmpdir):
     nb_org = str(tmpdir.join(os.path.basename(ipynb_py_file)))
     copyfile(ipynb_py_file, nb_org)
@@ -650,7 +649,6 @@ def test_set_kernel_works_with_pipes_326(capsys):
     assert "kernelspec" in nb.metadata
 
 
-@pytest.mark.requires_jupytext
 @pytest.mark.filterwarnings("ignore:The --pre-commit argument is deprecated")
 def test_cli_expect_errors(tmp_ipynb):
     with pytest.raises(ValueError):

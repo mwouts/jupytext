@@ -35,7 +35,6 @@ def system_in_tmpdir(tmpdir):
     return system_
 
 
-@pytest.mark.requires_jupytext
 def test_pre_commit_hook(tmpdir):
     tmp_ipynb = str(tmpdir.join("nb with spaces.ipynb"))
     tmp_py = str(tmpdir.join("nb with spaces.py"))
@@ -62,7 +61,6 @@ def test_pre_commit_hook(tmpdir):
     assert os.path.isfile(tmp_py)
 
 
-@pytest.mark.requires_jupytext
 def test_sync_with_pre_commit_hook(tmpdir):
     # Init git and create a pre-commit hook
     git = git_in_tmpdir(tmpdir)
@@ -141,7 +139,6 @@ def test_sync_with_pre_commit_hook(tmpdir):
     git("commit", "-m", "added image")
 
 
-@pytest.mark.requires_jupytext
 def test_pre_commit_hook_in_subfolder(tmpdir):
     tmp_ipynb = str(tmpdir.join("nb with spaces.ipynb"))
     tmp_py = str(tmpdir.join("python", "nb with spaces.py"))
@@ -170,7 +167,6 @@ def test_pre_commit_hook_in_subfolder(tmpdir):
     assert os.path.isfile(tmp_py)
 
 
-@pytest.mark.requires_jupytext
 def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     tmp_ipynb = str(tmpdir.join("nb with spaces.ipynb"))
     tmp_py = str(tmpdir.join("nb with spaces.py"))
@@ -208,7 +204,6 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
 
 @pytest.mark.requires_black
 @pytest.mark.requires_flake8
-@pytest.mark.requires_jupytext
 def test_pre_commit_hook_sync_black_flake8(tmpdir, python_notebook):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
     metadata = python_notebook.metadata
@@ -278,7 +273,6 @@ def test_manual_call_of_pre_commit_hook(tmpdir):
     assert os.path.isfile(tmp_py)
 
 
-@pytest.mark.requires_jupytext
 def test_pre_commit_hook_with_subfolders_issue_506(tmpdir):
     """I have the following directory structure, where the nb/test.ipynb is paired with the py/test.py.
 
@@ -323,7 +317,6 @@ def test_pre_commit_hook_with_subfolders_issue_506(tmpdir):
 
 
 @pytest.mark.requires_pandoc
-@pytest.mark.requires_jupytext
 def test_wrap_markdown_cell(tmpdir):
     """Use a pre-commit hook to sync a notebook to a script paired in a tree, and reformat
     the markdown cells using pandoc"""

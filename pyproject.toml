@@ -185,7 +185,6 @@ ignore = [
 
 [tool.pytest.ini_options]
 markers = [
-    "requires_jupytext",
     "requires_black",
     "requires_isort",
     "requires_flake8",
