@@ -32,11 +32,15 @@ import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 
 import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
 
+import { IMainMenu } from '@jupyterlab/mainmenu';
+
 import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
 import { LabIcon } from '@jupyterlab/ui-components';
 
 import { DisposableSet } from '@lumino/disposable';
+
+import { Menu } from '@lumino/widgets';
 
 import { JSONExt, ReadonlyJSONValue } from '@lumino/coreutils';
 
@@ -65,6 +69,7 @@ import { registerFileTypes } from './registry';
 import { createFactory } from './factory';
 
 import {
+  getAvailableKernelFileTypes,
   getAvailableCreateTextNotebookCommands,
   createNewTextNotebook,
 } from './utils';
@@ -77,6 +82,7 @@ const extension: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   optional: [
     ILauncher,
+    IMainMenu,
     IDefaultFileBrowser,
     ITranslator,
     ICommandPalette,
@@ -105,6 +111,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     settingRegistry: ISettingRegistry,
     toolbarRegistry: IToolbarWidgetRegistry,
     launcher: ILauncher | null,
+    mainmenu: IMainMenu | null,
     defaultBrowser: IDefaultFileBrowser | null,
     translator: ITranslator | null,
     palette: ICommandPalette | null,
@@ -125,8 +132,38 @@ const extension: JupyterFrontEndPlugin<void> = {
     // Unpack necessary components
     const { commands, serviceManager, docRegistry } = app;
 
+    // Initialise Jupytext menu and add it to main menu
+    const jupytextMenu = new Menu({ commands: app.commands });
+    mainmenu.addMenu(jupytextMenu, true, { rank: 40 });
+    jupytextMenu.id = 'jp-mainmenu-jupytext-menu';
+    jupytextMenu.title.label = trans.__('Jupytext');
+
+    // Initialise Jupytext create notebook submenu and add it to Jupytext menu
+    const jupytextCreateMenu = new Menu({ commands: app.commands });
+    jupytextCreateMenu.id = 'jp-mainmenu-jupytext-new-menu';
+    jupytextCreateMenu.title.label = trans.__('New Text Notebook');
+    jupytextMenu.addItem({
+      type: 'submenu',
+      submenu: jupytextCreateMenu,
+    });
+
+    // Initialise Jupytext pair notebook submenu and add it to Jupytext menu
+    const jupytextPairMenu = new Menu({ commands: app.commands });
+    jupytextPairMenu.id = 'jp-mainmenu-jupytext-pair-menu';
+    jupytextPairMenu.title.label = trans.__('Pair Notebook');
+    jupytextMenu.addItem({
+      type: 'submenu',
+      submenu: jupytextPairMenu,
+    });
+
+    // Add a separator
+    jupytextMenu.addItem({
+      type: 'separator',
+    });
+
     // Get all Jupytext formats
     let rank = 0;
+    const separatorIndex: number[] = [];
     JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA.forEach(
       (value: IFileTypeData[], key: string) => {
         value.map((fileType: IFileTypeData) => {
@@ -178,10 +215,24 @@ const extension: JupyterFrontEndPlugin<void> = {
             rank: rank + 1,
             category: 'Jupytext',
           });
+          // Add to jupytext pair menu
+          jupytextPairMenu.addItem({
+            command: command,
+          });
+          if (fileType.separator) {
+            separatorIndex.push(rank);
+          }
           rank += 1;
         });
       }
     );
+
+    // Add separators in jupytext pair menu
+    separatorIndex.map((index, idx) => {
+      jupytextPairMenu.insertItem(index + idx + 1, {
+        type: 'separator',
+      });
+    });
 
     // Metadata in text representation
     commands.addCommand(CommandIDs.metadata, {
@@ -209,6 +260,12 @@ const extension: JupyterFrontEndPlugin<void> = {
       rank: 98,
       category: 'Jupytext',
     });
+    jupytextMenu.addItem({
+      type: 'separator',
+    });
+    jupytextMenu.addItem({
+      command: CommandIDs.metadata,
+    });
 
     // Register Jupytext FAQ command
     commands.addCommand(CommandIDs.faq, {
@@ -230,6 +287,9 @@ const extension: JupyterFrontEndPlugin<void> = {
       rank: 99,
       category: 'Jupytext',
     });
+    jupytextMenu.addItem({
+      command: CommandIDs.faq,
+    });
 
     // Register Jupytext Reference
     commands.addCommand(CommandIDs.reference, {
@@ -246,10 +306,13 @@ const extension: JupyterFrontEndPlugin<void> = {
       },
     });
     palette?.addItem({
-      command: CommandIDs.faq,
+      command: CommandIDs.reference,
       args: { isPalette: true },
       rank: 100,
       category: 'Jupytext',
+    });
+    jupytextMenu.addItem({
+      command: CommandIDs.reference,
     });
 
     // Register a new command to create untitled file. This snippet is taken
@@ -284,11 +347,32 @@ const extension: JupyterFrontEndPlugin<void> = {
       category: 'Jupytext',
     });
 
-    // Register Jupytext text notebooks file types
-    registerFileTypes(docRegistry, trans);
+    // Get a map of available kernels in current widget
+    const availableKernels = await getAvailableKernelFileTypes(
+      languages,
+      serviceManager
+    );
 
+    // Get a map of all create text notebook commands
+    const createTextNotebookCommands =
+      await getAvailableCreateTextNotebookCommands(
+        launcherItems,
+        availableKernels
+      );
+
+    // Register Jupytext text notebooks file types
+    registerFileTypes(availableKernels, docRegistry, trans);
+
+    // Get all kernel file types to add to Jupytext factory
+    const kernelFileTypeNames = [];
+    for (const kernelFileTypes of availableKernels.values()) {
+      for (const kernelFileType of kernelFileTypes) {
+        kernelFileTypeNames.push(kernelFileType.kernelName);
+      }
+    }
     // Create a factory for Jupytext
     createFactory(
+      kernelFileTypeNames,
       toolbarRegistry,
       settingRegistry,
       docRegistry,
@@ -302,21 +386,15 @@ const extension: JupyterFrontEndPlugin<void> = {
       riseFactory
     );
 
-    const createTextNotebookCommands =
-      await getAvailableCreateTextNotebookCommands(
-        launcherItems,
-        languages,
-        serviceManager
-      );
-
     // Register all the commands that create text notebooks with different formats
     // Nicked from notebook-extension package in JupyterLab
     // https://github.com/jupyterlab/jupyterlab/blob/c106f0a19110efad7c5e1b136144985819e21100/packages/notebook-extension/src/index.ts#L1902-L1965
     createTextNotebookCommands.forEach((fileTypes: IFileTypeData[], _) => {
       fileTypes.map((fileType: IFileTypeData) => {
         const format = fileType.fileExt;
-        const command = `jupytext:create-new-text-noteboook-${format}`;
-        const iconName = fileType.iconName || 'ui-components:kernel';
+        const command = `jupytext:create-new-text-notebook-${format}`;
+        const iconName = fileType.iconName;
+        const kernelIcon = fileType.kernelIcon;
         commands.addCommand(command, {
           label: (args) => {
             if (args['isLauncher']) {
@@ -329,8 +407,16 @@ const extension: JupyterFrontEndPlugin<void> = {
             if (args.isPalette) {
               return undefined;
             } else {
+              if (iconName) {
+                return LabIcon.resolve({
+                  icon: iconName as string,
+                });
+              }
+              if (kernelIcon) {
+                return kernelIcon;
+              }
               return LabIcon.resolve({
-                icon: iconName as string,
+                icon: 'ui-components:kernel',
               });
             }
           },
@@ -352,7 +438,7 @@ const extension: JupyterFrontEndPlugin<void> = {
         console.log(
           'Registering create new text notebook command=' +
             command +
-            'with rank=' +
+            ' with rank=' +
             rank
         );
         palette?.addItem({
@@ -361,6 +447,16 @@ const extension: JupyterFrontEndPlugin<void> = {
           rank: rank,
           category: 'Jupytext',
         });
+        jupytextCreateMenu.addItem({
+          command: command,
+          args: { isMainMenu: true },
+        });
+        // Add separator after each kernel type
+        if (fileType.separator) {
+          jupytextCreateMenu.addItem({
+            type: 'separator',
+          });
+        }
 
         // Add a launcher item if the launcher is available.
         if (launcher && launcherItems.includes(format)) {

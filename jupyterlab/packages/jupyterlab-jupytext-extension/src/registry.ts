@@ -2,13 +2,34 @@ import { DocumentRegistry } from '@jupyterlab/docregistry';
 
 import { TranslationBundle } from '@jupyterlab/translation';
 
-import { markdownIcon } from '@jupyterlab/ui-components';
+import { markdownIcon, kernelIcon } from '@jupyterlab/ui-components';
+
+import { IFileTypeData } from './tokens';
 
 export function registerFileTypes(
+  availableKernels: Map<string, IFileTypeData[]>,
   docRegistry: DocumentRegistry,
   trans: TranslationBundle
 ) {
-  // Add file types to registry
+  // Add kernel file types to registry
+  availableKernels.forEach((kernelFileTypes: IFileTypeData[], _: string) => {
+    kernelFileTypes.map((kernelFileType) => {
+      docRegistry.addFileType(
+        {
+          name: kernelFileType.kernelName,
+          contentType: 'notebook',
+          displayName: trans.__(
+            kernelFileType.paletteLabel.split('New')[1].trim()
+          ),
+          extensions: [`.${kernelFileType.fileExt}`],
+          icon: kernelFileType.kernelIcon || kernelIcon,
+        },
+        ['Notebook']
+      );
+    });
+  });
+
+  // Add markdown file types to registry
   docRegistry.addFileType(
     {
       name: 'myst',

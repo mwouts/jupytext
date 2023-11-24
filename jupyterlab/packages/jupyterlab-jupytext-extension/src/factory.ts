@@ -24,6 +24,7 @@ import { IRisePreviewFactory } from 'jupyterlab-rise';
 import { FACTORY, FILE_TYPES } from './tokens';
 
 export function createFactory(
+  kernelFileTypeNames: string[],
   toolbarRegistry: IToolbarWidgetRegistry,
   settingRegistry: ISettingRegistry,
   docRegistry: DocumentRegistry,
@@ -36,6 +37,7 @@ export function createFactory(
   trans: TranslationBundle,
   riseFactory: IRisePreviewFactory | null
 ) {
+  const allFileTypes = FILE_TYPES.concat(kernelFileTypeNames);
   // primarily this block is copied/pasted from jlab4 code and specifically
   // jupyterlab/packages/notebook-extension/src/index.ts
   // inside the function `activateWidgetFactory` at line 1150 as of this writing
@@ -52,7 +54,7 @@ export function createFactory(
   const factory = new NotebookWidgetFactory({
     name: FACTORY,
     label: trans.__(FACTORY),
-    fileTypes: FILE_TYPES,
+    fileTypes: allFileTypes,
     modelName: notebookFactory.modelName ?? 'notebook',
     preferKernel: notebookFactory.preferKernel ?? true,
     canStartKernel: notebookFactory.canStartKernel ?? true,
@@ -92,7 +94,7 @@ export function createFactory(
 
   // Add support for RISE slides
   if (riseFactory) {
-    for (const fileType of FILE_TYPES) {
+    for (const fileType of allFileTypes) {
       riseFactory.addFileType(fileType);
     }
   }
