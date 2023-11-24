@@ -1,12 +1,20 @@
 import { IEditorLanguageRegistry } from '@jupyterlab/codemirror';
 
-import { ServiceManager } from '@jupyterlab/services';
+import { ServiceManager, ServerConnection } from '@jupyterlab/services';
+
+import { LabIcon } from '@jupyterlab/ui-components';
+
+import { URLExt } from '@jupyterlab/coreutils';
 
 import { IDocumentWidget } from '@jupyterlab/docregistry';
 
 import { CommandRegistry } from '@lumino/commands';
 
+import { Buffer } from 'buffer';
+
 import {
+  NS,
+  SERVER_SETTINGS,
   AUTO_LANGUAGE_FILETYPE_DATA,
   JUPYTEXT_CREATE_TEXT_NOTEBOOK_FILETYPE_DATA,
   FACTORY,
@@ -15,10 +23,40 @@ import {
 } from './tokens';
 
 /**
+ * Get kernel icon SVG string
+ */
+async function getKernelIconBase64String(
+  kernelIconUrl: string
+): Promise<string> {
+  const url = URLExt.join(
+    SERVER_SETTINGS.baseUrl,
+    kernelIconUrl
+    // specModel.resources['logo-64x64']
+  );
+  const response = await ServerConnection.makeRequest(url, {}, SERVER_SETTINGS);
+  const blob = await response.arrayBuffer();
+  const contentType = response.headers.get('content-type');
+  return `data:${contentType};base64,${Buffer.from(blob).toString('base64')}`;
+  // return base64ToSvgStr(base64String);
+}
+
+/**
+ * Make a SVG string from base64 image
+ */
+function base64ToSvgStr(imageBase64: string): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none" viewBox="0 0 64 64">
+  <g id="layer1">
+     <image xlink:href="${imageBase64}"/>
+  </g>
+</svg>`.replace(/\n/g, ' ');
+}
+
+/**
  * Get all available kernel file types so that we replace auto format
  * with these file extensions
  */
-async function getAvailableKernelFileTypes(
+export async function getAvailableKernelFileTypes(
   languages: IEditorLanguageRegistry,
   serviceManager: ServiceManager.IManager
 ): Promise<Map<string, IFileTypeData[]>> {
@@ -26,8 +64,7 @@ async function getAvailableKernelFileTypes(
   await specsManager.ready;
   const fileTypes = new Map<string, IFileTypeData[]>();
   const specs = specsManager.specs?.kernelspecs ?? {};
-  Object.keys(specs).forEach((spec) => {
-    const specModel = specs[spec];
+  for (const [spec, specModel] of Object.entries(specs)) {
     if (specModel) {
       // First check if kernel is one of the pre-defined types (Python, R, Julia)
       const exts = AUTO_LANGUAGE_FILETYPE_DATA.get(specModel.language);
@@ -42,11 +79,18 @@ async function getAvailableKernelFileTypes(
         // Also, we cannot guarantee the existence of icon for this language
         // So, we do not set icon and use a generic kernel icon
         if (languageInfo) {
+          const iconBase64String = await getKernelIconBase64String(
+            specModel.resources['logo-64x64']
+          );
           const exts: IFileTypeData[] = [
             {
               fileExt: languageInfo.extensions[0],
               paletteLabel: `New ${languageInfo.displayName} Text Notebook`,
               caption: `Create a new ${languageInfo.displayName} Text Notebook`,
+              kernelIcon: new LabIcon({
+                name: `${NS}:icon:${spec}`,
+                svgstr: base64ToSvgStr(iconBase64String),
+              }),
               launcherLabel: specModel.display_name || languageInfo.displayName,
               kernelName: spec,
             },
@@ -55,7 +99,7 @@ async function getAvailableKernelFileTypes(
         }
       }
     }
-  });
+  }
   return fileTypes;
 }
 
@@ -65,14 +109,9 @@ async function getAvailableKernelFileTypes(
  */
 export async function getAvailableCreateTextNotebookCommands(
   launcherItems: string[],
-  languages: IEditorLanguageRegistry,
-  serviceManager: ServiceManager.IManager
+  availableKernels: Map<string, IFileTypeData[]>
 ): Promise<Map<string, IFileTypeData[]>> {
-  // Get a map of available kernels in current widget
-  const availableKernels = await getAvailableKernelFileTypes(
-    languages,
-    serviceManager
-  );
+  const numKernels = availableKernels.size;
 
   // Initialise a map of 'Create New Text Notebook' command filetypes
   const createTextNotebookCommands = new Map<string, IFileTypeData[]>();
@@ -86,10 +125,12 @@ export async function getAvailableCreateTextNotebookCommands(
         // auto:light will be replaced by py:light and R:light
         if (format.startsWith('auto')) {
           const formatType = format.split(':')[1];
+          let mapIndex = 0;
           availableKernels.forEach(
             (kernelFileTypes: IFileTypeData[], kernelKey: string) => {
               const updatedKernelKey = `${kernelKey}:${formatType}`;
               createTextNotebookCommands.set(updatedKernelKey, []);
+              mapIndex += 1;
               kernelFileTypes.map((kernelFileType) => {
                 // Merge fileType object from kernel and Jupytext format and push
                 // it to createTextNotebookCommands
@@ -98,6 +139,9 @@ export async function getAvailableCreateTextNotebookCommands(
                 updatedKernelFileType.paletteLabel = `${updatedKernelFileType.paletteLabel} with ${fileType.paletteLabel}`;
                 updatedKernelFileType.caption = `${updatedKernelFileType.caption} with ${fileType.caption}`;
                 updatedKernelFileType.launcherLabel = `${updatedKernelFileType.launcherLabel} - ${fileType.launcherLabel}`;
+                if (numKernels === mapIndex) {
+                  updatedKernelFileType.separator = true;
+                }
                 createTextNotebookCommands
                   .get(updatedKernelKey)
                   .push(updatedKernelFileType);

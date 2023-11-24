@@ -1,6 +1,6 @@
-import { LabIcon } from '@jupyterlab/ui-components';
+import { ServerConnection } from '@jupyterlab/services';
 
-import { ReadonlyJSONObject } from '@lumino/coreutils';
+import { LabIcon } from '@jupyterlab/ui-components';
 
 import jupytextSvgstr from '../style/icons/logo.svg';
 
@@ -61,6 +61,11 @@ export const JupytextIcon = new LabIcon({
 });
 
 /**
+ * Current Jupyter server settings
+ */
+export const SERVER_SETTINGS = ServerConnection.makeSettings();
+
+/**
  * Supported Jupytext pairings along with metadata.
  */
 export const JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA = new Map<
@@ -75,6 +80,7 @@ export const JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA = new Map<
         paletteLabel: 'Pair with ipynb',
         caption: 'Pair Notebook with ipynb document',
         iconName: 'ui-components:notebook',
+        separator: true,
       },
     ],
   ],
@@ -119,6 +125,7 @@ export const JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA = new Map<
         paletteLabel: 'Pair with nomarker script',
         caption: 'Pair Notebook with Nomarker Format',
         iconName: 'ui-components:text-editor',
+        separator: true,
       },
     ],
   ],
@@ -141,6 +148,7 @@ export const JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA = new Map<
         paletteLabel: 'Pair with myst md',
         caption: 'Pair Notebook with MyST Markdown',
         iconName: 'ui-components:markdown',
+        separator: true,
       },
     ],
   ],
@@ -163,6 +171,7 @@ export const JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA = new Map<
         paletteLabel: 'Pair with qmd',
         caption: 'Pair Notebook with Quatro (qmd)',
         iconName: 'ui-components:markdown',
+        separator: true,
       },
     ],
   ],
@@ -367,13 +376,15 @@ export const TEXT_NOTEBOOKS_LAUNCHER_ICONS = JUPYTEXT_FORMATS.filter(
 /**
  * An interface for file type metadata
  */
-export interface IFileTypeData extends ReadonlyJSONObject {
+export interface IFileTypeData {
   fileExt: string;
   paletteLabel: string;
   caption: string;
   iconName?: string;
+  kernelIcon?: LabIcon;
   launcherLabel?: string;
   kernelName?: string;
+  separator?: boolean;
 }
 
 /**
