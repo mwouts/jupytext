@@ -23,17 +23,12 @@ class SubCommand:
         """
         return 0 if all goes well
         """
-        print(
-            f"{self.__class__.__name__}: redefine main() to implement this subcommand"
-        )
-        return 1
+        raise NotImplementedError()  # pragma: no cover
 
 
 class ListDefaultViewer(SubCommand):
     def __init__(self):
-        super().__init__(
-            "list-default-viewer", "Display current settings in labconfig/"
-        )
+        super().__init__("list-default-viewer", "Display current settings in labconfig")
 
     def main(self, args):
         LabConfig(settings_file=args.settings_file).read().list_default_viewer()
