@@ -22,25 +22,25 @@ def sample_lab_config():
     }
 
 
-def test_read_config(tmp_path, sample_lab_config):
-    (tmp_path / "default_setting_overrides.json").write_text(
-        json.dumps(sample_lab_config)
-    )
-    labconfig = LabConfig(settings_path=tmp_path).read()
+@pytest.fixture()
+def settings_file(tmp_path):
+    return tmp_path / "default_setting_overrides.json"
+
+
+def test_read_config(settings_file, sample_lab_config):
+    (settings_file).write_text(json.dumps(sample_lab_config))
+    labconfig = LabConfig(settings_file=settings_file).read()
     assert labconfig.config == sample_lab_config
 
 
-def test_set_default_viewers(tmp_path, sample_lab_config):
-    labconfig = LabConfig(settings_path=tmp_path)
+def test_set_default_viewers(settings_file, sample_lab_config):
+    labconfig = LabConfig(settings_file=settings_file)
     labconfig.set_default_viewers()
     assert labconfig.config == sample_lab_config
 
 
-def test_write_config(tmp_path, sample_lab_config):
-    labconfig = LabConfig(settings_path=tmp_path)
+def test_write_config(settings_file, sample_lab_config):
+    labconfig = LabConfig(settings_file=settings_file)
     labconfig.set_default_viewers()
     labconfig.write()
-    assert (
-        json.loads((tmp_path / "default_setting_overrides.json").read_text())
-        == sample_lab_config
-    )
+    assert json.loads(settings_file.read_text()) == sample_lab_config

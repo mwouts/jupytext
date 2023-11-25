@@ -6,9 +6,8 @@ and related subcommands
 
 import sys
 from argparse import ArgumentParser
-from pathlib import Path
 
-from .labconfig import LabConfig
+from .labconfig import DEFAULT_SETTINGS_FILE, LabConfig
 
 
 class SubCommand:
@@ -37,7 +36,7 @@ class ListDefaultViewer(SubCommand):
         )
 
     def main(self, args):
-        LabConfig(settings_path=args.settings_path).read().list_default_viewer()
+        LabConfig(settings_file=args.settings_file).read().list_default_viewer()
         return 0
 
     def fill_parser(self, subparser):
@@ -49,7 +48,7 @@ class SetDefaultViewer(SubCommand):
         super().__init__("set-default-viewer", "Set default viewers for JupyterLab")
 
     def main(self, args):
-        LabConfig(settings_path=args.settings_path).read().set_default_viewers(
+        LabConfig(settings_file=args.settings_file).read().set_default_viewers(
             args.doctype
         ).write()
         return 0
@@ -68,7 +67,7 @@ class UnsetDefaultViewer(SubCommand):
         super().__init__("unset-default-viewer", "Unset default viewers for JupyterLab")
 
     def main(self, args):
-        LabConfig(settings_path=args.settings_path).read().unset_default_viewers(
+        LabConfig(settings_file=args.settings_file).read().unset_default_viewers(
             args.doctype
         ).write()
         return 0
@@ -92,9 +91,7 @@ SUBCOMMANDS = [
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument(
-        "--settings-path", default=Path.home() / ".jupyter" / "labconfig"
-    )
+    parser.add_argument("--settings-file", default=DEFAULT_SETTINGS_FILE)
     subparsers = parser.add_subparsers(required=True)
     for subcommand in SUBCOMMANDS:
         subparser = subparsers.add_parser(subcommand.name, help=subcommand.help)

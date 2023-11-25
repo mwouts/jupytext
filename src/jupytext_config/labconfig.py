@@ -12,6 +12,10 @@ import logging
 # import pprint
 from pathlib import Path
 
+DEFAULT_SETTINGS_FILE = (
+    Path.home() / ".jupyter" / "labconfig" / "default_setting_overrides.json"
+)
+
 
 class LabConfig:
     DOCTYPES = [
@@ -24,14 +28,12 @@ class LabConfig:
         "r",
     ]
 
-    def __init__(
-        self, logger=None, settings_path=Path.home() / ".jupyter" / "labconfig"
-    ):
+    def __init__(self, logger=None, settings_file=DEFAULT_SETTINGS_FILE):
         self.logger = logger or logging.getLogger(__name__)
         self.config = {}
         # the state before any changes
         self._prior_config = {}
-        self.settings_file = Path(settings_path) / "default_setting_overrides.json"
+        self.settings_file = Path(settings_file)
 
     def read(self):
         """
