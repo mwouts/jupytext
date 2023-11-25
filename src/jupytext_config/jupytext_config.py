@@ -6,8 +6,11 @@ and related subcommands
 
 import sys
 from argparse import ArgumentParser
+from pathlib import Path
 
-from .labconfig import DEFAULT_SETTINGS_FILE, LabConfig
+import jupyter_core.paths as jupyter_core_paths
+
+from .labconfig import LabConfig
 
 
 class SubCommand:
@@ -86,7 +89,12 @@ SUBCOMMANDS = [
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument("--settings-file", default=DEFAULT_SETTINGS_FILE)
+    parser.add_argument(
+        "--settings-file",
+        default=Path(jupyter_core_paths.jupyter_config_dir())
+        / "labconfig"
+        / "default_setting_overrides.json",
+    )
     subparsers = parser.add_subparsers(required=True)
     for subcommand in SUBCOMMANDS:
         subparser = subparsers.add_parser(subcommand.name, help=subcommand.help)

@@ -9,10 +9,6 @@ import json
 import logging
 from pathlib import Path
 
-DEFAULT_SETTINGS_FILE = (
-    Path.home() / ".jupyter" / "labconfig" / "default_setting_overrides.json"
-)
-
 
 class LabConfig:
     DOCTYPES = [
