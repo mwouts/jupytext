@@ -56,7 +56,7 @@ test-functional = [
 ]
 test-integration = [
   "jupytext[test-functional]",
-  "jupyter-server",
+  "jupyter-server!=2.11", # issue 1165
   # jupytext --execute
   "nbconvert",
   "ipykernel",

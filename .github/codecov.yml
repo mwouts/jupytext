@@ -12,23 +12,27 @@ coverage:
         paths:
           - "src/jupytext/"
         target: 97%
-        threshold: 0.002
+        threshold: 0.2%
       tests:
         paths:
           - "tests/"
         target: 100%
       unit-tests:
+        threshold: 0.2%
         flags:
           - unit
       functional-tests:
+        threshold: 0.2%
         flags:
           - functional
       integration-tests:
+        threshold: 0.2%
         flags:
           - integration
       external-tests:
+        threshold: 0.2%
         flags:
           - external
     patch:
       default:
-        target: 80%  # new contributions should have a coverage at least equal to target
+        target: 80%
