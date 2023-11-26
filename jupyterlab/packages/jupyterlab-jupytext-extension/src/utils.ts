@@ -1,6 +1,10 @@
 import { IEditorLanguageRegistry } from '@jupyterlab/codemirror';
 
-import { ServiceManager, ServerConnection } from '@jupyterlab/services';
+import {
+  ServiceManager,
+  ServerConnection,
+  KernelSpec,
+} from '@jupyterlab/services';
 
 import { LabIcon } from '@jupyterlab/ui-components';
 
@@ -28,28 +32,65 @@ import {
 async function getKernelIconBase64String(
   kernelIconUrl: string
 ): Promise<string> {
-  const url = URLExt.join(
-    SERVER_SETTINGS.baseUrl,
-    kernelIconUrl
-    // specModel.resources['logo-64x64']
-  );
+  const url = URLExt.join(SERVER_SETTINGS.baseUrl, kernelIconUrl);
   const response = await ServerConnection.makeRequest(url, {}, SERVER_SETTINGS);
   const blob = await response.arrayBuffer();
   const contentType = response.headers.get('content-type');
   return `data:${contentType};base64,${Buffer.from(blob).toString('base64')}`;
-  // return base64ToSvgStr(base64String);
 }
 
 /**
  * Make a SVG string from base64 image
  */
-function base64ToSvgStr(imageBase64: string): string {
+function base64ToSvgStr(width: number, imageBase64: string): string {
   return `<svg xmlns="http://www.w3.org/2000/svg"
-  xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none" viewBox="0 0 64 64">
+  xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none" viewBox="0 0 ${width} ${width}">
   <g id="layer1">
      <image xlink:href="${imageBase64}"/>
   </g>
 </svg>`.replace(/\n/g, ' ');
+}
+
+/**
+ * Get kernel Icon
+ */
+async function getKernelIcon(
+  specModel: KernelSpec.ISpecModel
+): Promise<LabIcon> {
+  // First check for logo-svg
+  if (specModel.resources['logo-svg']) {
+    const svgStr = await getKernelIconBase64String(
+      specModel.resources['logo-svg']
+    );
+    return new LabIcon({
+      name: `${NS}:icon:${specModel.name}`,
+      svgstr: svgStr,
+    });
+  }
+  // Else check if 64x64 kernel icon is availble
+  if (specModel.resources['logo-64x64']) {
+    const iconBase64String = await getKernelIconBase64String(
+      specModel.resources['logo-64x64']
+    );
+    return new LabIcon({
+      name: `${NS}:icon:${specModel.name}`,
+      svgstr: base64ToSvgStr(64, iconBase64String),
+    });
+  }
+  // Finally check for 32x32 kernel icon
+  if (specModel.resources['logo-32x32']) {
+    const iconBase64String = await getKernelIconBase64String(
+      specModel.resources['logo-32x32']
+    );
+    return new LabIcon({
+      name: `${NS}:icon:${specModel.name}`,
+      svgstr: base64ToSvgStr(32, iconBase64String),
+    });
+  }
+  // If not found, make a generic kernel icon
+  return LabIcon.resolve({
+    icon: 'ui-components:kernel',
+  });
 }
 
 /**
@@ -76,21 +117,16 @@ export async function getAvailableKernelFileTypes(
         // If we managed to find the language, construct the FileTypeData
         // Here we make an assumption that first extension in
         // languageInfo.extensions is the most common one.
-        // Also, we cannot guarantee the existence of icon for this language
-        // So, we do not set icon and use a generic kernel icon
         if (languageInfo) {
-          const iconBase64String = await getKernelIconBase64String(
-            specModel.resources['logo-64x64']
-          );
+          // We attempt to get kernelIcon here for specModel.resources
+          // If none provided, we return generic kernel icon
+          const kernelIcon = await getKernelIcon(specModel);
           const exts: IFileTypeData[] = [
             {
               fileExt: languageInfo.extensions[0],
               paletteLabel: `New ${languageInfo.displayName} Text Notebook`,
               caption: `Create a new ${languageInfo.displayName} Text Notebook`,
-              kernelIcon: new LabIcon({
-                name: `${NS}:icon:${spec}`,
-                svgstr: base64ToSvgStr(iconBase64String),
-              }),
+              kernelIcon: kernelIcon,
               launcherLabel: specModel.display_name || languageInfo.displayName,
               kernelName: spec,
             },
