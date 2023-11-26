@@ -56,7 +56,7 @@ export namespace CommandIDs {
  * Jupytext logo icon
  */
 export const JupytextIcon = new LabIcon({
-  name: `${NS}:logoIcon`,
+  name: `${NS}:icon:logo`,
   svgstr: jupytextSvgstr,
 });
 
@@ -169,7 +169,7 @@ export const JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA = new Map<
       {
         fileExt: 'qmd',
         paletteLabel: 'Pair with qmd',
-        caption: 'Pair Notebook with Quatro (qmd)',
+        caption: 'Pair Notebook with Quarto (qmd)',
         iconName: 'ui-components:markdown',
         separator: true,
       },
@@ -335,10 +335,10 @@ export const JUPYTEXT_CREATE_TEXT_NOTEBOOK_FILETYPE_DATA = new Map<
     [
       {
         fileExt: 'qmd',
-        paletteLabel: 'New Quatro Markdown Text Notebook',
-        caption: 'Create a new Quatro Markdown Text Notebook',
+        paletteLabel: 'New Quarto Markdown Text Notebook',
+        caption: 'Create a new Quarto Markdown Text Notebook',
         iconName: 'ui-components:markdown',
-        launcherLabel: 'Quatro Markdown',
+        launcherLabel: 'Quarto Markdown',
       },
     ],
   ],

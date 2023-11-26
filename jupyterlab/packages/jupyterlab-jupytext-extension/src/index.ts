@@ -49,6 +49,7 @@ import { IRisePreviewFactory } from 'jupyterlab-rise';
 import {
   JUPYTEXT_EXTENSION_ID,
   JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA,
+  JUPYTEXT_FORMATS,
   TEXT_NOTEBOOKS_LAUNCHER_ICONS,
   CommandIDs,
   IFileTypeData,
@@ -121,11 +122,18 @@ const extension: JupyterFrontEndPlugin<void> = {
     const trans = (translator ?? nullTranslator).load('jupytext');
 
     // Load settings
-    let launcherItems = TEXT_NOTEBOOKS_LAUNCHER_ICONS;
+    const includeFormats = TEXT_NOTEBOOKS_LAUNCHER_ICONS;
     let launcherItemsCategory = 'Jupytext';
     if (settingRegistry) {
       const settings = await settingRegistry.load(extension.id);
-      launcherItems = settings.get('format').composite as string[];
+      for (const format of JUPYTEXT_FORMATS) {
+        const addFormat = settings.get(format).composite as boolean;
+        if (addFormat && !includeFormats.includes(format)) {
+          includeFormats.push(format);
+        } else if (!addFormat && includeFormats.includes(format)) {
+          includeFormats.splice(includeFormats.indexOf(format), 1);
+        }
+      }
       launcherItemsCategory = settings.get('category').composite as string;
     }
 
@@ -206,7 +214,7 @@ const extension: JupyterFrontEndPlugin<void> = {
             },
           });
 
-          console.log(
+          console.debug(
             'Registering pairing command=' + command + ' with rank=' + rank
           );
           palette?.addItem({
@@ -356,12 +364,12 @@ const extension: JupyterFrontEndPlugin<void> = {
     // Get a map of all create text notebook commands
     const createTextNotebookCommands =
       await getAvailableCreateTextNotebookCommands(
-        launcherItems,
+        includeFormats,
         availableKernels
       );
 
     // Register Jupytext text notebooks file types
-    registerFileTypes(availableKernels, docRegistry, trans);
+    registerFileTypes(docRegistry, trans);
 
     // Get all kernel file types to add to Jupytext factory
     const kernelFileTypeNames = [];
@@ -435,7 +443,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           },
         });
 
-        console.log(
+        console.debug(
           'Registering create new text notebook command=' +
             command +
             ' with rank=' +
@@ -447,19 +455,21 @@ const extension: JupyterFrontEndPlugin<void> = {
           rank: rank,
           category: 'Jupytext',
         });
-        jupytextCreateMenu.addItem({
-          command: command,
-          args: { isMainMenu: true },
-        });
-        // Add separator after each kernel type
-        if (fileType.separator) {
+        if (includeFormats.includes(format)) {
           jupytextCreateMenu.addItem({
-            type: 'separator',
+            command: command,
+            args: { isMainMenu: true },
           });
+          // Add separator after each kernel type
+          if (fileType.separator) {
+            jupytextCreateMenu.addItem({
+              type: 'separator',
+            });
+          }
         }
 
         // Add a launcher item if the launcher is available.
-        if (launcher && launcherItems.includes(format)) {
+        if (launcher && includeFormats.includes(format)) {
           void serviceManager.ready.then(() => {
             let disposables: DisposableSet | null = null;
             const onSpecsChanged = () => {
