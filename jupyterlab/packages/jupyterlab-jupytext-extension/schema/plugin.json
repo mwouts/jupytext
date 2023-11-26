@@ -1,21 +1,52 @@
 {
   "title": "Jupytext",
-  "description": "Jupytext Menu Settings.",
+  "description": "List of Jupytext Text Notebook formats that will be added to launcher.\n\nWhen any of percent, light, hydrogen and nomarker formats is selected, all the available kernel variants will be added to launcher. For instance, if Python and R kernels are installed, percent format will add launcher items to create Python and R Text notebooks with percent format.\n\nRefresh the current browser tab for the changes to take effect.",
   "properties": {
+    "auto:percent": {
+      "type": "boolean",
+      "title": "Text Notebook as Script in Percent Format",
+      "default": true
+    },
+    "auto:light": {
+      "type": "boolean",
+      "title": "Text Notebook as Script in Light Format",
+      "default": false
+    },
+    "auto:hydrogen": {
+      "type": "boolean",
+      "title": "Text Notebook as Script in Hydrogen Format",
+      "default": false
+    },
+    "auto:nomarker": {
+      "type": "boolean",
+      "title": "Text Notebook as Script in Nomarker Format",
+      "default": false
+    },
+    "md:myst": {
+      "type": "boolean",
+      "title": "MyST Markdown Notebook",
+      "default": true
+    },
+    "md": {
+      "type": "boolean",
+      "title": "Markdown Notebook",
+      "default": false
+    },
+    "Rmd": {
+      "type": "boolean",
+      "title": "R Markdown Notebook",
+      "default": false
+    },
+    "qmd": {
+      "type": "boolean",
+      "title": "Quarto Markdown Notebook",
+      "default": false
+    },
     "category": {
       "title": "Category",
-      "description": "Category under which Jupytext Text Notebooks will be placed.\n\nRefresh the current browser tab for the changes to take effect.",
+      "description": "Category under which Jupytext Text Notebooks will be placed.",
       "type": "string",
       "default": "Jupytext"
-    },
-    "format": {
-      "title": "Jupytext Text Notebook Launcher Items Formats",
-      "description": "List of Jupytext Text Notebook formats that will be added to launcher.\n\nWhen format \"auto\" is used, it will be replaced by available kernels. For instance, if Python and R kernels are installed, format \"auto:light\" will add launcher items to create Python and R Text notebooks with light format.\n\nRefresh the current browser tab for the changes to take effect.",
-      "items": {
-        "type": "string"
-      },
-      "type": "array",
-      "default": ["auto:light", "auto:percent", "md", "md:myst", "Rmd"]
     }
   },
   "additionalProperties": false,
