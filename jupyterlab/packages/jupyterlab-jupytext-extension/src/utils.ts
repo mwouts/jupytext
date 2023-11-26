@@ -32,6 +32,9 @@ import {
 async function getKernelIconBase64String(
   kernelIconUrl: string
 ): Promise<string> {
+  // Seems like URL prefix is already included in kernelIconUrl. We need to strip
+  // it off as baseUrl will already has url prefix.
+  kernelIconUrl = `/kernelspecs${kernelIconUrl.split('kernelspecs')[1]}`;
   const url = URLExt.join(SERVER_SETTINGS.baseUrl, kernelIconUrl);
   const response = await ServerConnection.makeRequest(url, {}, SERVER_SETTINGS);
   const blob = await response.arrayBuffer();
