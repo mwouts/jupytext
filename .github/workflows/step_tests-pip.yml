@@ -42,6 +42,12 @@ jobs:
         if: ${{ !matrix.no_kernel }}
         run: python -m ipykernel install --name python_kernel --user
 
+      - name: Uninstall markdown-it-py
+        # Markdown-it-py is a dependency of Jupytext,
+        # but Jupytext should still work if it is not installed
+        if: ${{ matrix.markdown-it-py-version == '' }}
+        run: python -m pip uninstall markdown-it-py --yes
+
       - name: Install Quarto
         if: ${{ matrix.quarto }}
         env:
