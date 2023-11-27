@@ -11,7 +11,7 @@
     "strict": true,
     "strictNullChecks": false,
     "target": "es2018",
-    "types": [],
+    "types": ["node"],
     "esModuleInterop": true
   },
   "include": ["src/*"]

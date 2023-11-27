@@ -77,8 +77,10 @@
     "@jupyterlab/settingregistry": "^4.0.0",
     "@jupyterlab/translation": "^4.0.0",
     "@jupyterlab/ui-components": "^4.0.0",
+    "@lumino/commands": "^2.0.0",
     "@lumino/coreutils": "^2.0.0",
     "@lumino/disposable": "^2.0.0",
+    "buffer": "^6.0.3",
     "jupyterlab-rise": "^0.41.0"
   },
   "devDependencies": {

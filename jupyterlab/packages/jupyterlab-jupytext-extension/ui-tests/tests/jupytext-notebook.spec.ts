@@ -1,32 +1,59 @@
 import { expect, test } from '@jupyterlab/galata';
 
-// Define all formats that we would like to test
-// We dont test Rmd and qmd formats here. Rmd cannot be
-// opened by JupyterLab in the markdown format.
-// Quarto must be available for qmd to work
+// Currently we are enabling only percent and MyST formats in Jupytext menu
+// So test for only these cases.
+// If we update our test env with more external kernels, we can include them
+// here in the formats
 const formats = [
-  { label: 'Light Script', extension: '.py' },
-  { label: 'Percent Script', extension: '.py' },
-  { label: 'Hydrogen Script', extension: '.py' },
-  { label: 'Nomarker Script', extension: '.py' },
-  { label: 'Markdown', extension: '.md' },
-  { label: 'MyST Markdown', extension: '.md' },
+  {
+    createLabel: 'New Python Text Notebook with Percent Format',
+    pairLabel: 'Percent Format',
+    extension: '.py',
+  },
+  {
+    createLabel: 'New MyST Markdown Text Notebook',
+    pairLabel: 'MyST Markdown',
+    extension: '.md',
+  },
+  // {
+  //   createLabel: 'New Python Text Notebook with Light Format',
+  //   pairLabel: 'Light Format',
+  //   extension: '.py',
+  // },
+  // {
+  //   createLabel: 'New Python Text Notebook with Hydrogen Format',
+  //   pairLabel: 'Hydrogen Format',
+  //   extension: '.py',
+  // },
+  // {
+  //   createLabel: 'New Python Text Notebook with Nomarker Format',
+  //   pairLabel: 'Nomarker Format',
+  //   extension: '.py',
+  // },
+  // {
+  //   createLabel: 'New Markdown Text Notebook',
+  //   pairLabel: 'Markdown',
+  //   extension: '.md',
+  // },
 ];
 
 // Get all possible menuPaths
 const createNewMenuPaths = formats.map((format) => {
   return {
-    menuPath: `Jupytext>New Text Notebook>${format.label}`,
+    menuPath: `Jupytext>New Text Notebook>${format.createLabel}`,
     extension: format.extension,
   };
 });
 
 const pairMenuPaths = formats.map((format) => {
   return {
-    menuPath: `Jupytext>Pair Notebook>Pair Notebook with ${format.label}`,
+    menuPath: `Jupytext>Pair Notebook>Pair Notebook with ${format.pairLabel}`,
     extension: format.extension,
   };
 });
+
+// Toggle metadata
+const toggleMetadataPath = 'Jupytext>Include Metadata';
 
 // Name of notebook file
 const fileName = 'notebook.ipynb';
@@ -58,12 +85,14 @@ test.describe('Jupytext Create Text Notebooks from Menu Tests', () => {
 
       // Populate page
       await populateNotebook(page);
+      // Toggle Include Metadata. It is enabled by default.
+      // It is to avoid having Jupytext version in metadata in snapshot
+      // If we include it, for every version bump we need to update snapshots as
+      // version changes which will fail UI tests. Just do not include metadata
+      // which will ensure smooth version bumping
+      await page.menu.clickMenuItem(toggleMetadataPath);
       // Save notebook
       await page.notebook.save();
-
-      //   // Compare screenshots
-      //   let imageName = `opened-${paths.menuPath.replace(/>/g, '-')}.png`;
-      //   expect(await page.screenshot()).toMatchSnapshot(imageName.toLowerCase());
 
       // Try to open saved text notebook with Editor factory
       await page.filebrowser.open(`Untitled${paths.extension}`, 'Editor');
@@ -86,6 +115,12 @@ test.describe('Jupytext Pair Notebooks from Menu Tests', () => {
     test(`Open menu item ${paths.menuPath}`, async ({ page }) => {
       // Click pairing command
       await page.menu.clickMenuItem(paths.menuPath);
+      // Toggle Include Metadata. It is enabled by default.
+      // It is to avoid having Jupytext version in metadata in snapshot
+      // If we include it, for every version bump we need to update snapshots as
+      // version changes which will fail UI tests. Just do not include metadata
+      // which will ensure smooth version bumping
+      await page.menu.clickMenuItem(toggleMetadataPath);
       // Wait until we save notebook. Once we save it, paired file appears
       await page.notebook.save();
       // Try to open paired file

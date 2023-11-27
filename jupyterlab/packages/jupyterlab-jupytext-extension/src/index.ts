@@ -6,11 +6,12 @@ import {
 import {
   ICommandPalette,
   IToolbarWidgetRegistry,
-  createToolbarFactory,
   showErrorMessage,
 } from '@jupyterlab/apputils';
 
 import { IDocumentManager } from '@jupyterlab/docmanager';
+
+import { IEditorLanguageRegistry } from '@jupyterlab/codemirror';
 
 import { Contents } from '@jupyterlab/services';
 
@@ -31,13 +32,15 @@ import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 
 import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
 
-import { IDocumentWidget } from '@jupyterlab/docregistry';
+import { IMainMenu } from '@jupyterlab/mainmenu';
 
 import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
-import { markdownIcon, notebookIcon } from '@jupyterlab/ui-components';
+import { LabIcon } from '@jupyterlab/ui-components';
 
 import { DisposableSet } from '@lumino/disposable';
+
+import { Menu } from '@lumino/widgets';
 
 import { JSONExt, ReadonlyJSONValue } from '@lumino/coreutils';
 
@@ -45,22 +48,32 @@ import { IRisePreviewFactory } from 'jupyterlab-rise';
 
 import {
   JUPYTEXT_EXTENSION_ID,
-  FILE_TYPES,
+  JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA,
+  JUPYTEXT_FORMATS,
   TEXT_NOTEBOOKS_LAUNCHER_ICONS,
-  FACTORY,
   CommandIDs,
-  IJupytextFormat,
+  IFileTypeData,
+  JupytextIcon,
 } from './tokens';
 
 import {
-  getAvailJupytextFormats,
   isPairCommandToggled,
   isPairCommandEnabled,
   executePairCommand,
   isMetadataCommandToggled,
   isMetadataCommandEnabled,
   executeMetadataCommand,
-} from './jupytext';
+} from './commands';
+
+import { registerFileTypes } from './registry';
+
+import { createFactory } from './factory';
+
+import {
+  getAvailableKernelFileTypes,
+  getAvailableCreateTextNotebookCommands,
+  createNewTextNotebook,
+} from './utils';
 
 /**
  * Initialization data for the jupyterlab-jupytext extension.
@@ -70,6 +83,7 @@ const extension: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   optional: [
     ILauncher,
+    IMainMenu,
     IDefaultFileBrowser,
     ITranslator,
     ICommandPalette,
@@ -79,6 +93,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     NotebookPanel.IContentFactory,
     IEditorServices,
     IDocumentManager,
+    IEditorLanguageRegistry,
     IRenderMimeRegistry,
     INotebookWidgetFactory,
     INotebookTracker,
@@ -90,12 +105,14 @@ const extension: JupyterFrontEndPlugin<void> = {
     contentFactory: NotebookPanel.IContentFactory,
     editorServices: IEditorServices,
     docManager: IDocumentManager,
+    languages: IEditorLanguageRegistry,
     rendermime: IRenderMimeRegistry,
     notebookFactory: NotebookWidgetFactory.IFactory,
     notebookTracker: INotebookTracker,
     settingRegistry: ISettingRegistry,
     toolbarRegistry: IToolbarWidgetRegistry,
     launcher: ILauncher | null,
+    mainmenu: IMainMenu | null,
     defaultBrowser: IDefaultFileBrowser | null,
     translator: ITranslator | null,
     palette: ICommandPalette | null,
@@ -105,46 +122,136 @@ const extension: JupyterFrontEndPlugin<void> = {
     const trans = (translator ?? nullTranslator).load('jupytext');
 
     // Load settings
-    let launcherItems = TEXT_NOTEBOOKS_LAUNCHER_ICONS;
+    const includeFormats = TEXT_NOTEBOOKS_LAUNCHER_ICONS;
     let launcherItemsCategory = 'Jupytext';
     if (settingRegistry) {
       const settings = await settingRegistry.load(extension.id);
-      launcherItems = settings.get('format').composite as string[];
+      for (const format of JUPYTEXT_FORMATS) {
+        const addFormat = settings.get(format).composite as boolean;
+        if (addFormat && !includeFormats.includes(format)) {
+          includeFormats.push(format);
+        } else if (!addFormat && includeFormats.includes(format)) {
+          includeFormats.splice(includeFormats.indexOf(format), 1);
+        }
+      }
       launcherItemsCategory = settings.get('category').composite as string;
     }
 
     // Unpack necessary components
     const { commands, serviceManager, docRegistry } = app;
 
+    // Initialise Jupytext menu and add it to main menu
+    const jupytextMenu = new Menu({ commands: app.commands });
+    mainmenu.addMenu(jupytextMenu, true, { rank: 40 });
+    jupytextMenu.id = 'jp-mainmenu-jupytext-menu';
+    jupytextMenu.title.label = trans.__('Jupytext');
+
+    // Initialise Jupytext create notebook submenu and add it to Jupytext menu
+    const jupytextCreateMenu = new Menu({ commands: app.commands });
+    jupytextCreateMenu.id = 'jp-mainmenu-jupytext-new-menu';
+    jupytextCreateMenu.title.label = trans.__('New Text Notebook');
+    jupytextMenu.addItem({
+      type: 'submenu',
+      submenu: jupytextCreateMenu,
+    });
+
+    // Initialise Jupytext pair notebook submenu and add it to Jupytext menu
+    const jupytextPairMenu = new Menu({ commands: app.commands });
+    jupytextPairMenu.id = 'jp-mainmenu-jupytext-pair-menu';
+    jupytextPairMenu.title.label = trans.__('Pair Notebook');
+    jupytextMenu.addItem({
+      type: 'submenu',
+      submenu: jupytextPairMenu,
+    });
+
+    // Add a separator
+    jupytextMenu.addItem({
+      type: 'separator',
+    });
+
     // Get all Jupytext formats
-    const JUPYTEXT_FORMATS = getAvailJupytextFormats(trans);
+    let rank = 0;
+    const separatorIndex: number[] = [];
+    JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA.forEach(
+      (value: IFileTypeData[], key: string) => {
+        value.map((fileType: IFileTypeData) => {
+          const format = key;
+          const command = `jupytext:pair-nb-with-${format}`;
+          commands.addCommand(command, {
+            label: (args) => {
+              if (args.isPalette) {
+                return (
+                  (fileType.paletteLabel as string) ?? trans.__('Pair notebook')
+                );
+              }
+              return (fileType.caption as string) ?? trans.__('Pair notebook');
+            },
+            caption: trans.__(fileType.caption),
+            icon: (args) => {
+              if (args.isPalette) {
+                return undefined;
+              } else {
+                return fileType.iconName
+                  ? LabIcon.resolve({
+                      icon: fileType.iconName as string,
+                    })
+                  : undefined;
+              }
+            },
+            isToggled: () => {
+              return isPairCommandToggled(format, notebookTracker);
+            },
+            isEnabled: () => {
+              return isPairCommandEnabled(format, notebookTracker);
+            },
+            execute: () => {
+              return executePairCommand(
+                command,
+                format,
+                notebookTracker,
+                trans
+              );
+            },
+          });
 
-    // Register all pairing commands
-    JUPYTEXT_FORMATS.forEach((args: IJupytextFormat, rank: number) => {
-      const format: string = args['format'];
-      const command = `jupytext:${format}`;
-      commands.addCommand(command, {
-        label: args['label'],
-        isToggled: () => {
-          return isPairCommandToggled(format, notebookTracker);
-        },
-        isEnabled: () => {
-          return isPairCommandEnabled(format, notebookTracker);
-        },
-        execute: () => {
-          return executePairCommand(command, format, notebookTracker, trans);
-        },
+          console.debug(
+            'Registering pairing command=' + command + ' with rank=' + rank
+          );
+          palette?.addItem({
+            command,
+            args: { isPalette: true },
+            rank: rank + 1,
+            category: 'Jupytext',
+          });
+          // Add to jupytext pair menu
+          jupytextPairMenu.addItem({
+            command: command,
+          });
+          if (fileType.separator) {
+            separatorIndex.push(rank);
+          }
+          rank += 1;
+        });
+      }
+    );
+
+    // Add separators in jupytext pair menu
+    separatorIndex.map((index, idx) => {
+      jupytextPairMenu.insertItem(index + idx + 1, {
+        type: 'separator',
       });
-
-      console.log(
-        'Registering pairing command=' + command + ' with rank=' + (rank + 1)
-      );
-      palette?.addItem({ command, rank: rank + 2, category: 'Jupytext' });
     });
 
     // Metadata in text representation
     commands.addCommand(CommandIDs.metadata, {
       label: trans.__('Include Metadata'),
+      icon: (args) => {
+        if (args.isPalette) {
+          return undefined;
+        } else {
+          return JupytextIcon;
+        }
+      },
       isToggled: () => {
         return isMetadataCommandToggled(notebookTracker);
       },
@@ -157,139 +264,64 @@ const extension: JupyterFrontEndPlugin<void> = {
     });
     palette?.addItem({
       command: CommandIDs.metadata,
-      rank: JUPYTEXT_FORMATS.length + 3,
+      args: { isPalette: true },
+      rank: 98,
       category: 'Jupytext',
+    });
+    jupytextMenu.addItem({
+      type: 'separator',
+    });
+    jupytextMenu.addItem({
+      command: CommandIDs.metadata,
     });
 
     // Register Jupytext FAQ command
     commands.addCommand(CommandIDs.faq, {
       label: trans.__('Jupytext FAQ'),
+      icon: (args) => {
+        if (args.isPalette) {
+          return undefined;
+        } else {
+          return JupytextIcon;
+        }
+      },
       execute: () => {
         window.open('https://jupytext.readthedocs.io/en/latest/faq.html');
       },
     });
     palette?.addItem({
       command: CommandIDs.faq,
+      args: { isPalette: true },
       rank: 99,
       category: 'Jupytext',
+    });
+    jupytextMenu.addItem({
+      command: CommandIDs.faq,
     });
 
     // Register Jupytext Reference
     commands.addCommand(CommandIDs.reference, {
       label: trans.__('Jupytext Reference'),
+      icon: (args) => {
+        if (args.isPalette) {
+          return undefined;
+        } else {
+          return JupytextIcon;
+        }
+      },
       execute: () => {
         window.open('https://jupytext.readthedocs.io/en/latest/');
       },
     });
     palette?.addItem({
-      command: CommandIDs.faq,
+      command: CommandIDs.reference,
+      args: { isPalette: true },
       rank: 100,
       category: 'Jupytext',
     });
-
-    // Define file types
-    docRegistry.addFileType(
-      {
-        name: 'myst',
-        contentType: 'notebook',
-        displayName: trans.__('MyST Markdown Notebook'),
-        extensions: ['.myst', '.mystnb', '.mnb'],
-        icon: markdownIcon,
-      },
-      ['Notebook']
-    );
-
-    docRegistry.addFileType(
-      {
-        name: 'r-markdown',
-        contentType: 'notebook',
-        displayName: trans.__('R Markdown Notebook'),
-        // Extension file are transformed to lower case...
-        extensions: ['.Rmd'],
-        icon: markdownIcon,
-      },
-      ['Notebook']
-    );
-
-    docRegistry.addFileType(
-      {
-        name: 'quarto',
-        contentType: 'notebook',
-        displayName: trans.__('Quarto Notebook'),
-        extensions: ['.qmd'],
-        icon: markdownIcon,
-      },
-      ['Notebook']
-    );
-
-    // primarily this block is copied/pasted from jlab4 code and specifically
-    // jupyterlab/packages/notebook-extension/src/index.ts
-    // inside the function `activateWidgetFactory` at line 1150 as of this writing
-    //
-    const toolbarFactory = createToolbarFactory(
-      toolbarRegistry,
-      settingRegistry,
-      'Notebook',
-      '@jupyterlab/notebook-extension:panel',
-      translator
-    );
-    // Duplicate notebook factory to apply it on Jupytext notebooks
-    // Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
-    const factory = new NotebookWidgetFactory({
-      name: FACTORY,
-      label: trans.__(FACTORY),
-      fileTypes: FILE_TYPES,
-      modelName: notebookFactory.modelName ?? 'notebook',
-      preferKernel: notebookFactory.preferKernel ?? true,
-      canStartKernel: notebookFactory.canStartKernel ?? true,
-      rendermime,
-      contentFactory,
-      editorConfig: notebookFactory.editorConfig,
-      notebookConfig: notebookFactory.notebookConfig,
-      mimeTypeService: editorServices.mimeTypeService,
-      toolbarFactory: toolbarFactory,
-      translator,
+    jupytextMenu.addItem({
+      command: CommandIDs.reference,
     });
-    docRegistry.addWidgetFactory(factory);
-
-    // Register widget created with the new factory in the notebook tracker
-    // This is required to activate notebook commands (and therefore shortcuts)
-    let id = 0; // The ID counter for notebook panels.
-    const ft = docRegistry.getFileType('notebook');
-
-    factory.widgetCreated.connect((sender, widget) => {
-      // If the notebook panel does not have an ID, assign it one.
-      widget.id = widget.id || `notebook-jupytext-${++id}`;
-
-      // Set up the title icon
-      widget.title.icon = ft?.icon;
-      widget.title.iconClass = ft?.iconClass ?? '';
-      widget.title.iconLabel = ft?.iconLabel ?? '';
-
-      // Notify the widget tracker if restore data needs to update.
-      widget.context.pathChanged.connect(() => {
-        // @ts-expect-error Trick using private API
-        void notebookTracker.save(widget);
-      });
-      // Add the notebook panel to the tracker.
-      //   @ts-expect-error Trick using private API
-      void notebookTracker.add(widget);
-    });
-
-    // Add support for RISE slides
-    if (riseFactory) {
-      for (const fileType of FILE_TYPES) {
-        riseFactory.addFileType(fileType);
-      }
-    }
-
-    // All supported format extensions bar ipynb, custom and none
-    // must be added to create new text notebook commands
-    const jupytextTextNotebookFormats = JUPYTEXT_FORMATS.filter(
-      (jupytextFormat: IJupytextFormat) => {
-        return !['ipynb', 'custom', 'none'].includes(jupytextFormat.format);
-      }
-    );
 
     // Register a new command to create untitled file. This snippet is taken
     // from docManager package https://github.com/jupyterlab/jupyterlab/blob/c106f0a19110efad7c5e1b136144985819e21100/packages/docmanager-extension/src/index.tsx#L679-L680
@@ -323,43 +355,121 @@ const extension: JupyterFrontEndPlugin<void> = {
       category: 'Jupytext',
     });
 
+    // Get a map of available kernels in current widget
+    const availableKernels = await getAvailableKernelFileTypes(
+      languages,
+      serviceManager
+    );
+
+    // Get a map of all create text notebook commands
+    const createTextNotebookCommands =
+      await getAvailableCreateTextNotebookCommands(
+        includeFormats,
+        availableKernels
+      );
+
+    // Register Jupytext text notebooks file types
+    registerFileTypes(docRegistry, trans);
+
+    // Get all kernel file types to add to Jupytext factory
+    const kernelFileTypeNames = [];
+    for (const kernelFileTypes of availableKernels.values()) {
+      for (const kernelFileType of kernelFileTypes) {
+        kernelFileTypeNames.push(kernelFileType.kernelName);
+      }
+    }
+    // Create a factory for Jupytext
+    createFactory(
+      kernelFileTypeNames,
+      toolbarRegistry,
+      settingRegistry,
+      docRegistry,
+      notebookTracker,
+      notebookFactory,
+      contentFactory,
+      editorServices,
+      rendermime,
+      translator,
+      trans,
+      riseFactory
+    );
+
     // Register all the commands that create text notebooks with different formats
     // Nicked from notebook-extension package in JupyterLab
     // https://github.com/jupyterlab/jupyterlab/blob/c106f0a19110efad7c5e1b136144985819e21100/packages/notebook-extension/src/index.ts#L1902-L1965
-    jupytextTextNotebookFormats.forEach(
-      (jupytextFormat: IJupytextFormat, rank: number) => {
-        const command = `jupytext:create-new-text-noteboook-${jupytextFormat.format}`;
-        const label = trans.__(jupytextFormat.label.split('with')[1].trim());
-        console.log('Registering text notebook command=', command);
+    createTextNotebookCommands.forEach((fileTypes: IFileTypeData[], _) => {
+      fileTypes.map((fileType: IFileTypeData) => {
+        const format = fileType.fileExt;
+        const command = `jupytext:create-new-text-notebook-${format}`;
+        const iconName = fileType.iconName;
+        const kernelIcon = fileType.kernelIcon;
         commands.addCommand(command, {
           label: (args) => {
             if (args['isLauncher']) {
-              return trans.__(label);
+              return trans.__(fileType.launcherLabel);
             }
-            if (args['isPalette'] || args['isContextMenu']) {
-              return trans.__(`New Text Notebook with ${label}`);
-            }
-            return trans.__(label);
+            return trans.__(fileType.paletteLabel);
           },
-          caption: trans.__(`Create New Text Notebook with ${label}`),
-          icon: (args) => (args['isPalette'] ? undefined : notebookIcon),
+          caption: trans.__(fileType.caption),
+          icon: (args) => {
+            if (args.isPalette) {
+              return undefined;
+            } else {
+              if (iconName) {
+                return LabIcon.resolve({
+                  icon: iconName as string,
+                });
+              }
+              if (kernelIcon) {
+                return kernelIcon;
+              }
+              return LabIcon.resolve({
+                icon: 'ui-components:kernel',
+              });
+            }
+          },
           execute: (args) => {
             const cwd =
               (args['cwd'] as string) || (defaultBrowser?.model.path ?? '');
             const kernelId = (args['kernelId'] as string) || '';
             const kernelName = (args['kernelName'] as string) || '';
-            return createNew(cwd, kernelId, kernelName, jupytextFormat.format);
+            return createNewTextNotebook(
+              cwd,
+              kernelId,
+              kernelName,
+              format,
+              commands
+            );
           },
         });
+
+        console.debug(
+          'Registering create new text notebook command=' +
+            command +
+            ' with rank=' +
+            rank
+        );
         palette?.addItem({
           command,
           args: { isPalette: true },
-          rank: rank + 51,
+          rank: rank,
           category: 'Jupytext',
         });
+        if (includeFormats.includes(format)) {
+          jupytextCreateMenu.addItem({
+            command: command,
+            args: { isMainMenu: true },
+          });
+          // Add separator after each kernel type
+          if (fileType.separator) {
+            jupytextCreateMenu.addItem({
+              type: 'separator',
+            });
+          }
+        }
 
         // Add a launcher item if the launcher is available.
-        if (launcher && launcherItems.includes(jupytextFormat.format)) {
+        if (launcher && includeFormats.includes(format)) {
           void serviceManager.ready.then(() => {
             let disposables: DisposableSet | null = null;
             const onSpecsChanged = () => {
@@ -372,57 +482,32 @@ const extension: JupyterFrontEndPlugin<void> = {
                 return;
               }
               disposables = new DisposableSet();
-
-              for (const name in specs.kernelspecs) {
-                const rank = name === specs.default ? 0 : Infinity;
-                const spec = specs.kernelspecs[name]!;
-                const kernelIconUrl =
-                  spec.resources['logo-svg'] || spec.resources['logo-64x64'];
-                disposables.add(
-                  launcher.add({
-                    command: command,
-                    args: { isLauncher: true, kernelName: name },
-                    category: trans.__(launcherItemsCategory),
-                    rank,
-                    kernelIconUrl,
-                    metadata: {
-                      kernel: JSONExt.deepCopy(
-                        spec.metadata || {}
-                      ) as ReadonlyJSONValue,
-                    },
-                  })
-                );
-              }
+              const kernelIconUrl =
+                specs.kernelspecs[fileType.kernelName]?.resources['logo-svg'] ||
+                specs.kernelspecs[fileType.kernelName]?.resources['logo-64x64'];
+              disposables.add(
+                launcher.add({
+                  command: command,
+                  args: { isLauncher: true, kernelName: fileType.kernelName },
+                  category: trans.__(launcherItemsCategory),
+                  rank: rank++,
+                  kernelIconUrl,
+                  metadata: {
+                    kernel: JSONExt.deepCopy(
+                      specs.kernelspecs[fileType.kernelName]?.metadata || {}
+                    ) as ReadonlyJSONValue,
+                  },
+                })
+              );
             };
             onSpecsChanged();
             serviceManager.kernelspecs.specsChanged.connect(onSpecsChanged);
           });
         }
-      }
-    );
-
-    // Utility function to create a new notebook.
-    const createNew = async (
-      cwd: string,
-      kernelId: string,
-      kernelName: string,
-      format: string
-    ) => {
-      const model = await commands.execute(CommandIDs.newUntitled, {
-        path: cwd,
-        type: 'notebook',
-        ext: format.replace('auto', 'py'), // Replace auto with py
+        // Increment rank
+        rank += 1;
       });
-      if (model !== undefined) {
-        const widget = (await commands.execute('docmanager:open', {
-          path: model.path,
-          factory: FACTORY,
-          kernel: { id: kernelId, name: kernelName },
-        })) as unknown as IDocumentWidget;
-        widget.isUntitled = true;
-        return widget;
-      }
-    };
+    });
   },
 };
 
