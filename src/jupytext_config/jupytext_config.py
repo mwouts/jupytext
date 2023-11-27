@@ -6,6 +6,9 @@ and related subcommands
 
 import sys
 from argparse import ArgumentParser
+from pathlib import Path
+
+import jupyter_core.paths as jupyter_core_paths
 
 from .labconfig import LabConfig
 
@@ -23,20 +26,15 @@ class SubCommand:
         """
         return 0 if all goes well
         """
-        print(
-            f"{self.__class__.__name__}: redefine main() to implement this subcommand"
-        )
-        return 1
+        raise NotImplementedError()  # pragma: no cover
 
 
 class ListDefaultViewer(SubCommand):
     def __init__(self):
-        super().__init__(
-            "list-default-viewer", "Display current settings in labconfig/"
-        )
+        super().__init__("list-default-viewer", "Display current settings in labconfig")
 
     def main(self, args):
-        LabConfig().read().list_default_viewer()
+        LabConfig(settings_file=args.settings_file).read().list_default_viewer()
         return 0
 
     def fill_parser(self, subparser):
@@ -48,7 +46,9 @@ class SetDefaultViewer(SubCommand):
         super().__init__("set-default-viewer", "Set default viewers for JupyterLab")
 
     def main(self, args):
-        LabConfig().read().set_default_viewers(args.doctype).write()
+        LabConfig(settings_file=args.settings_file).read().set_default_viewers(
+            args.doctype
+        ).write()
         return 0
 
     def fill_parser(self, subparser):
@@ -65,7 +65,9 @@ class UnsetDefaultViewer(SubCommand):
         super().__init__("unset-default-viewer", "Unset default viewers for JupyterLab")
 
     def main(self, args):
-        LabConfig().read().unset_default_viewers(args.doctype).write()
+        LabConfig(settings_file=args.settings_file).read().unset_default_viewers(
+            args.doctype
+        ).write()
         return 0
 
     def fill_parser(self, subparser):
@@ -87,6 +89,12 @@ SUBCOMMANDS = [
 
 def main():
     parser = ArgumentParser()
+    parser.add_argument(
+        "--settings-file",
+        default=Path(jupyter_core_paths.jupyter_config_dir())
+        / "labconfig"
+        / "default_setting_overrides.json",
+    )
     subparsers = parser.add_subparsers(required=True)
     for subcommand in SUBCOMMANDS:
         subparser = subparsers.add_parser(subcommand.name, help=subcommand.help)
