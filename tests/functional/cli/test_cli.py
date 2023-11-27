@@ -1263,7 +1263,9 @@ def test_jupytext_to_ipynb_does_not_update_timestamp_if_not_paired(
 
 
 @pytest.mark.parametrize("formats", ["ipynb,py", "py:percent", "py", None])
-def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, formats):
+async def test_use_source_timestamp(
+    cm, tmpdir, cwd_tmpdir, python_notebook, capsys, formats
+):
     # Write a text notebook
     nb = python_notebook
     if formats:
@@ -1288,14 +1290,11 @@ def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, forma
     assert src_timestamp - 1e-6 <= dest_timestamp <= src_timestamp
 
     # Make sure that we can open the file in Jupyter
-    from jupytext.contentsmanager import TextFileContentsManager
-
-    cm = TextFileContentsManager()
     cm.outdated_text_notebook_margin = 0.001
     cm.root_dir = str(tmpdir)
 
     # No error here
-    cm.get("test.ipynb")
+    await cm.get("test.ipynb")
 
     # But now if we don't use --use-source-timestamp
     jupytext(["--to", "ipynb", "test.py"])
@@ -1306,9 +1305,9 @@ def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, forma
         from tornado.web import HTTPError
 
         with pytest.raises(HTTPError, match="is more recent than test.py"):
-            cm.get("test.ipynb")
+            await cm.get("test.ipynb")
     else:
-        cm.get("test.ipynb")
+        await cm.get("test.ipynb")
 
 
 def test_round_trip_with_null_metadata_792(tmpdir, cwd_tmpdir, python_notebook):

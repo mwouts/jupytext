@@ -21,27 +21,13 @@ def load_jupyter_server_extension(app):  # pragma: no cover
     # The contents manager was set at NotebookApp.init_configurables
 
     # Let's change the contents manager class
-    base_class = app.contents_manager_class
-    if "async" in base_class.__name__.lower():
-        app.log.warning(
-            "[Jupytext Server Extension] Async contents managers like {} "
-            "are not supported at the moment "
-            "(https://github.com/mwouts/jupytext/issues/1020). "
-            "We will derive a contents manager from LargeFileManager instead.".format(
-                base_class.__name__
-            )
-        )
-        from jupyter_server.services.contents.largefilemanager import (  # noqa
-            LargeFileManager,
-        )
-
-        base_class = LargeFileManager
-
     app.log.info(
         "[Jupytext Server Extension] Deriving a JupytextContentsManager "
-        "from {}".format(base_class.__name__)
+        "from {}".format(app.contents_manager_class.__name__)
     )
-    app.contents_manager_class = build_jupytext_contents_manager_class(base_class)
+    app.contents_manager_class = build_jupytext_contents_manager_class(
+        app.contents_manager_class
+    )
 
     try:
         # And rerun selected init steps from https://github.com/jupyter/notebook/blob/

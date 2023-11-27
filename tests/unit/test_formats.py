@@ -416,7 +416,7 @@ formats = "notebooks///ipynb,scripts///py:percent"
         ),
     ],
 )
-def test_configuration_examples_from_documentation(
+async def test_configuration_examples_from_documentation(
     config_file, config_contents, python_notebook, tmp_path
 ):
     """Here we make sure that the config examples from
@@ -429,7 +429,7 @@ def test_configuration_examples_from_documentation(
 
     # Save the notebook
     (tmp_path / "notebooks").mkdir()
-    cm.save(dict(type="notebook", content=python_notebook), "notebooks/nb.ipynb")
+    await cm.save(dict(type="notebook", content=python_notebook), "notebooks/nb.ipynb")
 
     # Make sure that ipynb and text version are created
     assert (tmp_path / "notebooks" / "nb.ipynb").is_file()

@@ -335,7 +335,7 @@ some text, and a fake cell marker
     compare(py, text)
 
 
-def test_cell_markers_option_in_contents_manager(tmpdir):
+async def test_cell_markers_option_in_contents_manager(tmpdir):
     tmp_ipynb = tmpdir / "notebook.ipynb"
     tmp_py = tmpdir / "notebook.py"
 
@@ -352,7 +352,7 @@ def test_cell_markers_option_in_contents_manager(tmpdir):
             }
         },
     )
-    cm.save(model=notebook_model(nb), path="notebook.ipynb")
+    await cm.save(model=notebook_model(nb), path="notebook.ipynb")
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
@@ -378,7 +378,7 @@ cell
     compare_notebooks(nb, nb2)
 
 
-def test_cell_markers_in_config(tmpdir, python_notebook):
+async def test_cell_markers_in_config(tmpdir, python_notebook):
     (tmpdir / "jupytext.toml").write('''cell_markers = '"""'\n''')
 
     cm = jupytext.TextFileContentsManager()
@@ -386,7 +386,7 @@ def test_cell_markers_in_config(tmpdir, python_notebook):
     nb = python_notebook
     nb.metadata["jupytext"] = {"formats": "ipynb,py:percent"}
 
-    cm.save(model=notebook_model(nb), path="notebook.ipynb")
+    await cm.save(model=notebook_model(nb), path="notebook.ipynb")
 
     text = (tmpdir / "notebook.py").read()
     assert (
@@ -402,7 +402,7 @@ A short notebook
     compare_notebooks(nb, nb2)
 
 
-def test_cell_markers_in_contents_manager(tmpdir):
+async def test_cell_markers_in_contents_manager(tmpdir):
     tmp_ipynb = tmpdir / "notebook.ipynb"
     tmp_py = tmpdir / "notebook.py"
 
@@ -419,7 +419,7 @@ def test_cell_markers_in_contents_manager(tmpdir):
             }
         },
     )
-    cm.save(model=notebook_model(nb), path="notebook.ipynb")
+    await cm.save(model=notebook_model(nb), path="notebook.ipynb")
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
@@ -445,7 +445,7 @@ cell
     compare_notebooks(nb, nb2)
 
 
-def test_cell_markers_in_contents_manager_does_not_impact_light_format(tmpdir):
+async def test_cell_markers_in_contents_manager_does_not_impact_light_format(tmpdir):
     tmp_ipynb = tmpdir / "notebook.ipynb"
     tmp_py = tmpdir / "notebook.py"
 
@@ -460,7 +460,7 @@ def test_cell_markers_in_contents_manager_does_not_impact_light_format(tmpdir):
         },
     )
     with pytest.warns(UserWarning, match="Ignored cell markers"):
-        cm.save(model=notebook_model(nb), path="notebook.ipynb")
+        await cm.save(model=notebook_model(nb), path="notebook.ipynb")
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)

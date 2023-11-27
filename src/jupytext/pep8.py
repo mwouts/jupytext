@@ -14,7 +14,7 @@ def next_instruction_is_function_or_class(lines):
             if i > 0 and not lines[i - 1].strip():
                 return False
             continue
-        if line.startswith("def ") or line.startswith("class "):
+        if line.startswith(("def ", "async def ", "class ", "async class ")):
             return True
         if line.startswith(("#", "@", " ", ")")):
             continue
