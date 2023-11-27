@@ -14,20 +14,20 @@ jupyter:
 This notebook shows the use of R cells to generate plots
 :::
 
-::: {.cell .code}
+::: {#cell-1 .cell .code}
 ``` python
 %load_ext rpy2.ipython
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-2 .cell .code}
 ``` python
 %%R
 suppressMessages(require(tidyverse))
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-3 .cell .code}
 ``` python
 %%R
 ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color=Species)) + geom_point()
@@ -38,7 +38,7 @@ ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color=Species)) + geom_poin
 The default plot dimensions are not good for us, so we use the -w and -h parameters in %%R magic to set the plot size
 :::
 
-::: {.cell .code}
+::: {#cell-4 .cell .code}
 ``` python
 %%R -w 400 -h 240
 ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color=Species)) + geom_point()

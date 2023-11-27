@@ -368,8 +368,8 @@ def pytest_runtest_setup(item):
             # https://github.com/mwouts/jupytext/commit/c07d919702999056ce47f92b74f63a15c8361c5d
             # The mirror files changed again when Pandoc 2.16 was introduced
             # https://github.com/mwouts/jupytext/pull/919/commits/1fa1451ecdaa6ad8d803bcb6fb0c0cf09e5371bf
-            if not is_pandoc_available(min_version="2.16.2", max_version="2.16.2"):
-                pytest.skip("pandoc==2.16.2 is not available")
+            if not is_pandoc_available(min_version="3.0"):
+                pytest.skip("pandoc>=3.0 is not available")
         if mark.name == "requires_quarto":
             if not is_quarto_available(min_version="0.2.0"):
                 pytest.skip("quarto>=0.2 is not available")
@@ -410,15 +410,15 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(pytest.mark.pre_commit)
 
 
-"""To make sure that cell ids are distinct we use a global counter.
+@pytest.fixture(autouse=True)
+def cell_id():
+    """To make sure that cell ids are distinct we use a global counter.
     This solves https://github.com/mwouts/jupytext/issues/747"""
-global_cell_count = 0
+    local_cell_count = 0
 
+    def enumerate_cell_ids():
+        nonlocal local_cell_count
+        local_cell_count += 1
+        return f"cell-{local_cell_count}"
 
-def generate_corpus_id():
-    global global_cell_count
-    global_cell_count += 1
-    return f"cell-{global_cell_count}"
-
-
-nbbase.random_cell_id = generate_corpus_id
+    nbbase.random_cell_id = enumerate_cell_ids

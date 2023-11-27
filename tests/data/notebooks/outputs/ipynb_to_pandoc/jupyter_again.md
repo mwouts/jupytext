@@ -8,7 +8,7 @@ jupyter:
   nbformat_minor: 2
 ---
 
-::: {.cell .code}
+::: {#cell-1 .cell .code}
 ``` python
 c = '''
 title: "Quick test"
@@ -22,14 +22,14 @@ editor_options:
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-2 .cell .code}
 ``` python
 import yaml
 print(yaml.dump(yaml.load(c)))
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-3 .cell .code}
 ``` python
 ?next
 ```

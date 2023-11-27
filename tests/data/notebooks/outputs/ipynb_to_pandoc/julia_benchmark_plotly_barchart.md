@@ -8,7 +8,7 @@ jupyter:
   nbformat_minor: 1
 ---
 
-::: {.cell .code}
+::: {#cell-1 .cell .code}
 ``` julia
 # IJulia rocks! So does Plotly. Check it out
 
@@ -20,7 +20,7 @@ Plotly.signin(username, api_key)
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-2 .cell .code}
 ``` julia
 # Following data taken from http://julialang.org/ frontpage 
 benchmarks = ["fib", "parse_int", "quicksort3", "mandel", "pi_sum", "rand_mat_stat", "rand_mat_mul"]
@@ -69,7 +69,7 @@ display("text/html", s)
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-3 .cell .code}
 ``` julia
 # checkout https://plot.ly/api/ for more Julia examples!
 # But to show off some other Plotly features:

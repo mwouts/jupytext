@@ -8,7 +8,7 @@ jupyter:
   nbformat_minor: 2
 ---
 
-::: {.cell .code}
+::: {#cell-1 .cell .code}
 ``` python
 cat = 42
 ```
