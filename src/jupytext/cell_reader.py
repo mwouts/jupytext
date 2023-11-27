@@ -862,6 +862,7 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
             if self.metadata.get("active") == "":
                 del self.metadata["active"]
             self.cell_type = "raw"
+            self.comment = ""
         else:
             self.cell_type = "code"
 
