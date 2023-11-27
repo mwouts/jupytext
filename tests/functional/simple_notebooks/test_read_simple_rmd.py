@@ -264,3 +264,20 @@ def test_commented_triple_quote_1060(line):
     compare(rmd2, rmd)
     nb2 = jupytext.reads(rmd, fmt="Rmd")
     compare_notebooks(nb2, nb)
+
+
+def test_bibliography_in_rmd(
+    rmd="""Issue #1161
+
+The bibliography section below should not
+become a code cell
+
+```{bibliography}
+```
+""",
+):
+    nb = jupytext.reads(rmd, fmt="Rmd")
+    assert len(nb.cells) == 1, nb.cells
+    assert nb.cells[0].cell_type == "markdown"
+    rmd2 = jupytext.writes(nb, fmt="Rmd")
+    compare(rmd2, rmd)
