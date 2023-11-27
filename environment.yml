@@ -8,4 +8,4 @@ dependencies:
   - nbformat>=5.1.2
   - pre-commit
   - nodejs>=20
-  - pandoc==2.16.2
+  - pandoc>=3.0

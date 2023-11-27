@@ -7,6 +7,9 @@ Jupytext ChangeLog
 **Changed**
 - Temporary text notebooks for the `--pipe` or `--check` commands are now created in the notebook directory ([#1206](https://github.com/mwouts/jupytext/issues/1206))
 
+**Fixed**
+- Jupytext is now tested with `pandoc>=3.0`. Please note that switching to `pandoc>=3.0` will add cell ids to your `pandoc:md` notebooks ([#1006](https://github.com/mwouts/jupytext/issues/1006))
+
 
 1.16.1 (2024-01-13)
 -------------------

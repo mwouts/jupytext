@@ -39,11 +39,8 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
-          auto-activate-base: false
           activate-environment: jupytext-ci
-          channels: defaults,conda-forge
           environment-file: .ci/environment-ci.yml
-          use-only-tar-bz2: true
 
       - name: Install from source
         run: python -m pip install -e '.[test-external,test-cov]'

@@ -8,7 +8,7 @@ jupyter:
   nbformat_minor: 2
 ---
 
-::: {.cell .code}
+::: {#cell-1 .cell .code}
 ``` python
 %load_ext rpy2.ipython
 import pandas as pd
@@ -24,7 +24,7 @@ df = pd.DataFrame(
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-2 .cell .code}
 ``` python
 %%R -i df
 library("ggplot2")

@@ -9,6 +9,7 @@ from jupytext.pandoc import PandocError
 
 @pytest.mark.requires_pandoc
 def test_pandoc_implicit(
+    cell_id,
     markdown="""# Lorem ipsum
 
 **Lorem ipsum** dolor sit amet, consectetur adipiscing elit. Nunc luctus
@@ -31,7 +32,7 @@ print("hello")
 
 @pytest.mark.requires_pandoc
 def test_pandoc_explicit(
-    markdown="""::: {.cell .markdown}
+    markdown="""::: {#cell_id .cell .markdown}
 # Lorem
 
 **Lorem ipsum** dolor sit amet, consectetur adipiscing elit. Nunc luctus
@@ -46,7 +47,7 @@ bibendum felis dictum sodales.
 
 @pytest.mark.requires_pandoc
 def test_pandoc_utf8_in_md(
-    markdown="""::: {.cell .markdown}
+    markdown="""::: {#cell_id .cell .markdown}
 # Utf-8 support
 
 This is the greek letter $\\pi$: π

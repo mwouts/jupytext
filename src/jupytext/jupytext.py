@@ -177,7 +177,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         return new_notebook(cells=cells, metadata=metadata)
 
-    def filter_notebook(self, nb, metadata):
+    def filter_notebook(self, nb, metadata, preserve_cell_ids=False):
         self.update_fmt_with_notebook_options(nb.metadata)
         unsupported_keys = set()
         metadata = insert_jupytext_info_and_filter_metadata(
@@ -192,14 +192,23 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 _IGNORE_CELL_METADATA,
                 unsupported_keys=unsupported_keys,
             )
+
+            if preserve_cell_ids and hasattr(cell, "id"):
+                id = {"id": cell.id}
+            else:
+                id = {}
+
             if cell.cell_type == "code":
-                cells.append(new_code_cell(source=cell.source, metadata=cell_metadata))
+                cells.append(
+                    new_code_cell(source=cell.source, metadata=cell_metadata, **id)
+                )
             else:
                 cells.append(
                     NotebookNode(
                         source=cell.source,
                         metadata=cell_metadata,
                         cell_type=cell.cell_type,
+                        **id,
                     )
                 )
 
@@ -215,7 +224,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
     def writes(self, nb, metadata=None, **kwargs):
         """Return the text representation of the notebook"""
         if self.fmt.get("format_name") == "pandoc":
-            return notebook_to_md(self.filter_notebook(nb, metadata))
+            return notebook_to_md(
+                self.filter_notebook(nb, metadata, preserve_cell_ids=True)
+            )
         if self.fmt.get("format_name") == "quarto" or self.ext == ".qmd":
             return notebook_to_qmd(self.filter_notebook(nb, metadata))
         if self.fmt.get(
