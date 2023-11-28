@@ -349,11 +349,13 @@ const extension: JupyterFrontEndPlugin<void> = {
       label: (args) =>
         (args['label'] as string) || `New ${args['type'] as string}`,
     });
-    palette?.addItem({
-      command: CommandIDs.newUntitled,
-      rank: 50,
-      category: 'Jupytext',
-    });
+    // We dont need to add this command to palettte as it is a utility one
+    // which does not have direct usage
+    // palette?.addItem({
+    //   command: CommandIDs.newUntitled,
+    //   rank: 50,
+    //   category: 'Jupytext',
+    // });
 
     // Get a map of available kernels in current widget
     const availableKernels = await getAvailableKernelFileTypes(
