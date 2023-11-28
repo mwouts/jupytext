@@ -1,6 +1,6 @@
 {
     "name": "jupyterlab-jupytext-ui-tests",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "Basic Integration Tests",
     "private": true,
     "scripts": {

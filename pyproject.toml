@@ -49,6 +49,7 @@ Documentation = "https://jupytext.readthedocs.io"
 # Test related dependencies
 test = [
   "pytest",
+  "pytest-xdist",
   "pytest-randomly"
 ]
 test-functional = [
@@ -83,8 +84,7 @@ test-cov = [
     "pytest-cov>=2.6.1",
 ]
 dev = [
-    "jupytext[test]",
-    "pre-commit"
+    "jupytext[test-cov,test-external]",
 ]
 # Documentation dependencies
 docs = [

@@ -1741,6 +1741,7 @@ def test_filter_jupytext_version_information_416(python_notebook, tmpdir, cwd_tm
     assert "jupytext_version:" not in text
 
 
+@pytest.mark.requires_myst
 def test_new_untitled(tmpdir):
     cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)

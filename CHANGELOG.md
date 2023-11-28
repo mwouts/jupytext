@@ -1,12 +1,22 @@
 Jupytext ChangeLog
 ==================
 
-1.16.0-dev (2023-10-??)
+1.16.0-dev (2023-11-??)
 -------------------
 
+**Added**
+- The Jupytext Menu is back! And text notebooks can be created directly from the launcher. This is an outstanding contribution by [Mahendra Paipuri](https://github.com/mahendrapaipuri) ([#1154](https://github.com/mwouts/jupytext/issues/1154), [#1163](https://github.com/mwouts/jupytext/issues/1163)). This requires JupyterLab 4.x or Jupyter Notebook 7.x.
+
 **Changed**
-- Jupytext is now configured with `pyproject.toml` and built with `hatch`. The layout has been reorganised to follow `src-layout` ([#1140](https://github.com/mwouts/jupytext/issues/1140)). This outstanding update was contributed by [Mahendra Paipuri](https://github.com/mahendrapaipuri).
+- Jupytext is now configured with `pyproject.toml` and built with `hatch`. The layout has been reorganised to follow `src-layout` ([#1140](https://github.com/mwouts/jupytext/issues/1140)). This is another outstanding contribution by [Mahendra Paipuri](https://github.com/mahendrapaipuri).
+- The tests are now part of the `sdist`. They have been reorganized into unit/functional/integration/external ([#1167](https://github.com/mwouts/jupytext/issues/1167), [#1173](https://github.com/mwouts/jupytext/issues/1173)).
 - The legacy extension for Jupyter Notebook <=6 (the Jupytext Menu) has been removed.
+
+**Fixed**
+- The bibliography section in Rmd files does not become a code cell anymore ([#1161](https://github.com/mwouts/jupytext/issues/1161))
+- Commented code in `active-py` cells is not uncommented anymore ([#1131](https://github.com/mwouts/jupytext/issues/1131))
+- The test coverage has been restored ([#1167](https://github.com/mwouts/jupytext/issues/1167), [#1173](https://github.com/mwouts/jupytext/issues/1173))
+- We test Jupytext against the pre-release version of JupyterLab, and other dependencies ([#1168](https://github.com/mwouts/jupytext/issues/1168))
 
 
 1.15.2 (2023-09-16)
