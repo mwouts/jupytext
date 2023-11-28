@@ -15,6 +15,8 @@ Jupytext ChangeLog
 **Fixed**
 - The bibliography section in Rmd files does not become a code cell anymore ([#1161](https://github.com/mwouts/jupytext/issues/1161))
 - Commented code in `active-py` cells is not uncommented anymore ([#1131](https://github.com/mwouts/jupytext/issues/1131))
+- The test coverage has been restored ([#1167](https://github.com/mwouts/jupytext/issues/1167), [#1173](https://github.com/mwouts/jupytext/issues/1173))
+- We test Jupytext against the pre-release version of JupyterLab, and other dependencies ([#1168](https://github.com/mwouts/jupytext/issues/1168))
 
 
 1.15.2 (2023-09-16)
