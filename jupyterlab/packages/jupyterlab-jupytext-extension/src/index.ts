@@ -123,7 +123,6 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     // Load settings
     const includeFormats = TEXT_NOTEBOOKS_LAUNCHER_ICONS;
-    let launcherItemsCategory = 'Jupytext';
     if (settingRegistry) {
       const settings = await settingRegistry.load(extension.id);
       for (const format of JUPYTEXT_FORMATS) {
@@ -134,7 +133,6 @@ const extension: JupyterFrontEndPlugin<void> = {
           includeFormats.splice(includeFormats.indexOf(format), 1);
         }
       }
-      launcherItemsCategory = settings.get('category').composite as string;
     }
 
     // Unpack necessary components
@@ -146,11 +144,12 @@ const extension: JupyterFrontEndPlugin<void> = {
     jupytextMenu.id = 'jp-mainmenu-jupytext-menu';
     jupytextMenu.title.label = trans.__('Jupytext');
 
-    // Initialise Jupytext create notebook submenu and add it to Jupytext menu
+    // Initialise Jupytext create notebook submenu and add it to File menu
     const jupytextCreateMenu = new Menu({ commands: app.commands });
     jupytextCreateMenu.id = 'jp-mainmenu-jupytext-new-menu';
     jupytextCreateMenu.title.label = trans.__('New Text Notebook');
-    jupytextMenu.addItem({
+    mainmenu.fileMenu.addItem({
+      rank: 0.98,
       type: 'submenu',
       submenu: jupytextCreateMenu,
     });
@@ -491,7 +490,7 @@ const extension: JupyterFrontEndPlugin<void> = {
                 launcher.add({
                   command: command,
                   args: { isLauncher: true, kernelName: fileType.kernelName },
-                  category: trans.__(launcherItemsCategory),
+                  category: trans.__('Jupytext'),
                   rank: rank++,
                   kernelIconUrl,
                   metadata: {
