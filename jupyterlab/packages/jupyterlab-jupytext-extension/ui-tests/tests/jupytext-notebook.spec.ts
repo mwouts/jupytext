@@ -40,7 +40,7 @@ const formats = [
 // Get all possible menuPaths
 const createNewMenuPaths = formats.map((format) => {
   return {
-    menuPath: `Jupytext>New Text Notebook>${format.createLabel}`,
+    menuPath: `File>New Text Notebook>${format.createLabel}`,
     extension: format.extension,
   };
 });

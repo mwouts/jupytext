@@ -2,8 +2,8 @@ import { expect, test } from '@jupyterlab/galata';
 
 // Main Jupytext menu
 const jupytextMenu = [
+  'File>New Text Notebook',
   'Jupytext',
-  'Jupytext>New Text Notebook',
   'Jupytext>Pair Notebook',
 ];
 
@@ -20,8 +20,8 @@ test.describe('Jupytext Menu Tests', () => {
         />/g,
         '-'
       )}.png`;
-      const menu = await page.menu.getOpenMenu();
-      expect(await menu!.screenshot()).toMatchSnapshot(imageName.toLowerCase());
+      // const menu = await page.menu.getOpenMenu();
+      expect(await page!.screenshot()).toMatchSnapshot(imageName.toLowerCase());
     });
   });
 });
