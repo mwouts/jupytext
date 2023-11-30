@@ -83,6 +83,11 @@ test-cov = [
     "jupytext[test-integration]",
     "pytest-cov>=2.6.1",
 ]
+# Galata test env
+# Install a non python kernel to ensure extension is working as expected
+test-ui = [
+    "calysto_bash",
+]
 dev = [
     "jupytext[test-cov,test-external]",
 ]
