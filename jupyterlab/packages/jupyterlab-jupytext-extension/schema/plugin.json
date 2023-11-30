@@ -5,25 +5,21 @@
     "auto:percent": {
       "type": "boolean",
       "title": "Text Notebook as Script in Percent Format",
-      "description": "All the available kernel variants will be added to launcher and jupytext menu",
       "default": true
     },
     "auto:light": {
       "type": "boolean",
       "title": "Text Notebook as Script in Light Format",
-      "description": "All the available kernel variants will be added to launcher and jupytext menu",
       "default": false
     },
     "auto:hydrogen": {
       "type": "boolean",
       "title": "Text Notebook as Script in Hydrogen Format",
-      "description": "All the available kernel variants will be added to launcher and jupytext menu",
       "default": false
     },
     "auto:nomarker": {
       "type": "boolean",
       "title": "Text Notebook as Script in Nomarker Format",
-      "description": "All the available kernel variants will be added to launcher and jupytext menu",
       "default": false
     },
     "md:myst": {
