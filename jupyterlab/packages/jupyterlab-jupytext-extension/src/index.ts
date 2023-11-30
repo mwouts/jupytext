@@ -70,7 +70,7 @@ import { registerFileTypes } from './registry';
 import { createFactory } from './factory';
 
 import {
-  getAvailableKernelFileTypes,
+  getAvailableKernelLanguages,
   getAvailableCreateTextNotebookCommands,
   createNewTextNotebook,
 } from './utils';
@@ -356,8 +356,8 @@ const extension: JupyterFrontEndPlugin<void> = {
     //   category: 'Jupytext',
     // });
 
-    // Get a map of available kernels in current widget
-    const availableKernels = await getAvailableKernelFileTypes(
+    // Get a map of available kernel languages in current widget
+    const availableKernelLanguages = await getAvailableKernelLanguages(
       languages,
       serviceManager
     );
@@ -366,22 +366,22 @@ const extension: JupyterFrontEndPlugin<void> = {
     const createTextNotebookCommands =
       await getAvailableCreateTextNotebookCommands(
         includeFormats,
-        availableKernels
+        availableKernelLanguages
       );
 
     // Register Jupytext text notebooks file types
     registerFileTypes(docRegistry, trans);
 
     // Get all kernel file types to add to Jupytext factory
-    const kernelFileTypeNames = [];
-    for (const kernelFileTypes of availableKernels.values()) {
-      for (const kernelFileType of kernelFileTypes) {
-        kernelFileTypeNames.push(kernelFileType.kernelName);
+    const kernelLanguageNames = [];
+    for (const kernelLanguages of availableKernelLanguages.values()) {
+      for (const kernelLanguage of kernelLanguages) {
+        kernelLanguageNames.push(kernelLanguage.kernelName);
       }
     }
     // Create a factory for Jupytext
     createFactory(
-      kernelFileTypeNames,
+      kernelLanguageNames,
       toolbarRegistry,
       settingRegistry,
       docRegistry,

@@ -97,10 +97,10 @@ async function getKernelIcon(
 }
 
 /**
- * Get all available kernel file types so that we replace auto format
- * with these file extensions
+ * Get all available kernel languages so that we replace auto format
+ * with these language file extensions
  */
-export async function getAvailableKernelFileTypes(
+export async function getAvailableKernelLanguages(
   languages: IEditorLanguageRegistry,
   serviceManager: ServiceManager.IManager
 ): Promise<Map<string, IFileTypeData[]>> {
@@ -147,10 +147,10 @@ export async function getAvailableKernelFileTypes(
  * formats and available kernels
  */
 export async function getAvailableCreateTextNotebookCommands(
-  launcherItems: string[],
-  availableKernels: Map<string, IFileTypeData[]>
+  includeFormats: string[],
+  availableKernelLanguages: Map<string, IFileTypeData[]>
 ): Promise<Map<string, IFileTypeData[]>> {
-  const numKernels = availableKernels.size;
+  const numKernels = availableKernelLanguages.size;
 
   // Initialise a map of 'Create New Text Notebook' command filetypes
   const createTextNotebookCommands = new Map<string, IFileTypeData[]>();
@@ -165,27 +165,31 @@ export async function getAvailableCreateTextNotebookCommands(
         if (format.startsWith('auto')) {
           const formatType = format.split(':')[1];
           let mapIndex = 0;
-          availableKernels.forEach(
-            (kernelFileTypes: IFileTypeData[], kernelKey: string) => {
+          availableKernelLanguages.forEach(
+            (kernelLanguages: IFileTypeData[], kernelKey: string) => {
               const updatedKernelKey = `${kernelKey}:${formatType}`;
               createTextNotebookCommands.set(updatedKernelKey, []);
               mapIndex += 1;
-              kernelFileTypes.map((kernelFileType) => {
+              kernelLanguages.map((kernelLanguageFileType) => {
                 // Merge fileType object from kernel and Jupytext format and push
                 // it to createTextNotebookCommands
-                const updatedKernelFileType = { ...kernelFileType };
-                updatedKernelFileType.fileExt = `${updatedKernelFileType.fileExt}:${formatType}`;
-                updatedKernelFileType.paletteLabel = `${updatedKernelFileType.paletteLabel} with ${fileType.paletteLabel}`;
-                updatedKernelFileType.caption = `${updatedKernelFileType.caption} with ${fileType.caption}`;
-                updatedKernelFileType.launcherLabel = `${updatedKernelFileType.launcherLabel} - ${fileType.launcherLabel}`;
+                const updatedKernelLanguageFileType = {
+                  ...kernelLanguageFileType,
+                };
+                updatedKernelLanguageFileType.fileExt = `${updatedKernelLanguageFileType.fileExt}:${formatType}`;
+                updatedKernelLanguageFileType.paletteLabel = `${updatedKernelLanguageFileType.paletteLabel} with ${fileType.paletteLabel}`;
+                updatedKernelLanguageFileType.caption = `${updatedKernelLanguageFileType.caption} with ${fileType.caption}`;
+                updatedKernelLanguageFileType.launcherLabel = `${updatedKernelLanguageFileType.launcherLabel} - ${fileType.launcherLabel}`;
                 if (numKernels === mapIndex) {
-                  updatedKernelFileType.separator = true;
+                  updatedKernelLanguageFileType.separator = true;
                 }
                 createTextNotebookCommands
                   .get(updatedKernelKey)
-                  .push(updatedKernelFileType);
-                if (launcherItems.includes(format)) {
-                  launcherItems.push(updatedKernelFileType.fileExt);
+                  .push(updatedKernelLanguageFileType);
+                // Update includeFormats with the language specific formats
+                // Effectiviely we will add formats like py:light, js:light here
+                if (includeFormats.includes(format)) {
+                  includeFormats.push(updatedKernelLanguageFileType.fileExt);
                 }
               });
             }
