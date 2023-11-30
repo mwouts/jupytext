@@ -124,13 +124,15 @@ export async function getAvailableKernelLanguages(
           // We attempt to get kernelIcon here for specModel.resources
           // If none provided, we return generic kernel icon
           const kernelIcon = await getKernelIcon(specModel);
+          const displayName =
+            languageInfo.displayName || specModel.display_name;
           const exts: IFileTypeData[] = [
             {
               fileExt: languageInfo.extensions[0],
-              paletteLabel: `New ${languageInfo.displayName} Text Notebook`,
-              caption: `Create a new ${languageInfo.displayName} Text Notebook`,
+              paletteLabel: `New ${displayName} Text Notebook`,
+              caption: `Create a new ${displayName} Text Notebook`,
               kernelIcon: kernelIcon,
-              launcherLabel: specModel.display_name || languageInfo.displayName,
+              launcherLabel: displayName,
               kernelName: spec,
             },
           ];
