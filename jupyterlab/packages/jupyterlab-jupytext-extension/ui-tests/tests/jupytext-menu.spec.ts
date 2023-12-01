@@ -1,11 +1,7 @@
 import { expect, test } from '@jupyterlab/galata';
 
 // Main Jupytext menu
-const jupytextMenu = [
-  'File>New Text Notebook',
-  'Jupytext',
-  'Jupytext>Pair Notebook',
-];
+const jupytextMenu = ['File>New Text Notebook', 'File>Jupytext'];
 
 test.describe('Jupytext Menu Tests', () => {
   test.use({ autoGoto: false });

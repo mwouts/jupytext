@@ -43,7 +43,7 @@ const createNewMenuPaths = createTests.map((format) => {
 
 const pairMenuPaths = pairTests.map((format) => {
   return {
-    menuPath: `Jupytext>Pair Notebook>Pair Notebook with ${format.label}`,
+    menuPath: `File>Jupytext>Pair Notebook>Pair Notebook with ${format.label}`,
     extension: format.extension,
   };
 });
