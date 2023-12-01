@@ -138,35 +138,25 @@ const extension: JupyterFrontEndPlugin<void> = {
     // Unpack necessary components
     const { commands, serviceManager, docRegistry } = app;
 
-    // Initialise Jupytext menu and add it to main menu
-    const jupytextMenu = new Menu({ commands: app.commands });
-    mainmenu.addMenu(jupytextMenu, true, { rank: 40 });
-    jupytextMenu.id = 'jp-mainmenu-jupytext-menu';
-    jupytextMenu.title.label = trans.__('Jupytext');
-
     // Initialise Jupytext create notebook submenu and add it to File menu
     const jupytextCreateMenu = new Menu({ commands: app.commands });
     jupytextCreateMenu.id = 'jp-mainmenu-jupytext-new-menu';
     jupytextCreateMenu.title.label = trans.__('New Text Notebook');
     mainmenu.fileMenu.addItem({
-      rank: 0.98,
+      rank: 0.97,
       type: 'submenu',
       submenu: jupytextCreateMenu,
     });
 
-    // Initialise Jupytext pair notebook submenu and add it to Jupytext menu
-    const jupytextPairMenu = new Menu({ commands: app.commands });
-    jupytextPairMenu.id = 'jp-mainmenu-jupytext-pair-menu';
-    jupytextPairMenu.title.label = trans.__('Pair Notebook');
-    jupytextMenu.addItem({
+    // Initialise Jupytext menu and add it to main menu
+    const jupytextMenu = new Menu({ commands: app.commands });
+    mainmenu.fileMenu.addItem({
+      rank: 0.98,
       type: 'submenu',
-      submenu: jupytextPairMenu,
+      submenu: jupytextMenu,
     });
-
-    // Add a separator
-    jupytextMenu.addItem({
-      type: 'separator',
-    });
+    jupytextMenu.id = 'jp-mainmenu-jupytext-menu';
+    jupytextMenu.title.label = trans.__('Jupytext');
 
     // Get all Jupytext formats
     let rank = 0;
@@ -223,7 +213,7 @@ const extension: JupyterFrontEndPlugin<void> = {
             category: 'Jupytext',
           });
           // Add to jupytext pair menu
-          jupytextPairMenu.addItem({
+          jupytextMenu.addItem({
             command: command,
           });
           if (fileType.separator) {
@@ -236,7 +226,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     // Add separators in jupytext pair menu
     separatorIndex.map((index, idx) => {
-      jupytextPairMenu.insertItem(index + idx + 1, {
+      jupytextMenu.insertItem(index + idx + 1, {
         type: 'separator',
       });
     });
@@ -272,6 +262,9 @@ const extension: JupyterFrontEndPlugin<void> = {
     });
     jupytextMenu.addItem({
       command: CommandIDs.metadata,
+    });
+    jupytextMenu.addItem({
+      type: 'separator',
     });
 
     // Register Jupytext FAQ command
