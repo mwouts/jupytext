@@ -1,9 +1,8 @@
 jupyterlab>=4
+notebook>=7
 plotly
 matplotlib
 wordcloud
 pandas
 wbdata
 bash_kernel
-# https://github.com/mwouts/jupytext/issues/1051
-nbclassic>=0.5.5
