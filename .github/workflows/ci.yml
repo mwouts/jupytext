@@ -30,6 +30,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  comment-pr:
+    uses: ./.github/workflows/step_comment-pr.yml
+
   pre-commit:
     uses: ./.github/workflows/step_pre-commit.yml
 

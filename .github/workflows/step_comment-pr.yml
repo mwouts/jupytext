@@ -1,0 +1,24 @@
+name: comment-pr
+run-name: comment-pr
+
+on:
+  workflow_call:
+
+jobs:
+  example_comment_pr:
+    runs-on: ubuntu-latest
+    name: Link to Binder
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Thanks for making this pull request. Did you know? You can try it on Binder:
+            [![Binder:lab](https://img.shields.io/badge/binder-jupyterlab-0172B2.svg)](https://mybinder.org/v2/gh/${{ github.repository }}/${{ github.head_ref }}?urlpath=lab/tree/demo/get_started.ipynb)
+            or [![Binder:notebook](https://img.shields.io/badge/binder-notebook-0172B2.svg)](https://mybinder.org/v2/gh/${{ github.repository }}/${{ github.head_ref }}?filepath=demo)
+
+          comment_tag: binder_link
