@@ -1,16 +1,14 @@
-name: comment-pr
-run-name: comment-pr
+name: link_to_binder
+run-name: link_to_binder
 
 on:
   workflow_call:
 
 jobs:
-  example_comment_pr:
+  link_to_binder:
     runs-on: ubuntu-latest
     name: Link to Binder
     if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3

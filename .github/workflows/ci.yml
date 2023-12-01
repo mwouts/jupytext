@@ -30,8 +30,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  comment-pr:
-    uses: ./.github/workflows/step_comment-pr.yml
+  link-to-binder:
+    permissions:
+      pull-requests: write
+    uses: ./.github/workflows/step_link-to-binder.yml
 
   pre-commit:
     uses: ./.github/workflows/step_pre-commit.yml
