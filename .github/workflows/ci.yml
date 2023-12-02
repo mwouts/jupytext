@@ -11,7 +11,10 @@ on:
     paths-ignore:
       - "CHANGELOG.md"
     branches: [main]
-  pull_request:
+  # We use pull_request_target rather than pull_request
+  # because the latter does not let us comment on PR
+  # coming from a fork.
+  pull_request_target:
     branches: [main]
   schedule:
     - cron: "0 11 * * 4"
