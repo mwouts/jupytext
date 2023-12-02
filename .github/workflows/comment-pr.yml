@@ -1,0 +1,31 @@
+name: Comment PR
+
+on:
+  pull_request_target:
+
+comment-pr:
+  permissions:
+    pull-requests: write
+
+jobs:
+  comment-pr:
+    runs-on: ubuntu-latest
+    name: Comment PR
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Thank you for making this pull request.
+
+            Did you know? You can try it on Binder: [![Binder:lab](https://img.shields.io/badge/binder-jupyterlab-0172B2.svg)](https://mybinder.org/v2/gh/${{ github.event.pull_request.head.repo.full_name }}/${{ github.event.pull_request.head.ref }}?urlpath=lab/tree/demo/get_started.ipynb) or [![Binder:notebook](https://img.shields.io/badge/binder-notebook-0172B2.svg)](https://mybinder.org/v2/gh/${{ github.event.pull_request.head.repo.full_name }}/${{ github.event.pull_request.head.ref }}?filepath=demo).
+
+            Also, the version of Jupytext developed in this PR can be installed with `pip`:
+            ```
+            pip install git+${{ github.event.pull_request.head.repo.clone_url }}@${{ github.event.pull_request.head.ref }}
+            ```
+            (this requires `nodejs`, see more at [Developing Jupytext](https://jupytext.readthedocs.io/en/latest/developing.html))
+          comment_tag: binder_link
