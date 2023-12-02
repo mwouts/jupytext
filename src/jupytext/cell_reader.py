@@ -443,9 +443,12 @@ class MarkdownCellReader(BaseCellReader):
                         return i - 1, i, False
                     return i, i, False
 
-                if self.start_code_re.match(line) and not line.startswith(
-                    "```{bibliography}"
-                ):
+                if self.start_code_re.match(line):
+                    if line.startswith("```{bibliography}"):
+                        in_explicit_code_block = True
+                        prev_blank = 0
+                        continue
+
                     # Cells with a .noeval attribute are markdown cells #347
                     _, metadata = self.options_to_metadata(
                         self.start_code_re.findall(line)[0]
