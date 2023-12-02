@@ -1,6 +1,6 @@
 {
   "title": "Jupytext",
-  "description": "List of Jupytext Text Notebook formats that will be added to launcher.\n\nWhen any of percent, light, hydrogen and nomarker formats is selected, all the available kernel variants will be added to launcher. For instance, if Python and R kernels are installed, percent format will add launcher items to create Python and R Text notebooks with percent format.\n\nRefresh the current browser tab for the changes to take effect.",
+  "description": "List of Jupytext Text Notebook formats that will be added to launcher and jupytext menu.",
   "properties": {
     "auto:percent": {
       "type": "boolean",
@@ -42,11 +42,9 @@
       "title": "Quarto Markdown Notebook",
       "default": false
     },
-    "category": {
-      "title": "Category",
-      "description": "Category under which Jupytext Text Notebooks will be placed.",
-      "type": "string",
-      "default": "Jupytext"
+    "NOTE": {
+      "description": "Refresh the current browser tab for the changes to take effect.",
+      "type": "null"
     }
   },
   "additionalProperties": false,

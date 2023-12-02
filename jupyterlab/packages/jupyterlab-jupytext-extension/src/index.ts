@@ -70,7 +70,7 @@ import { registerFileTypes } from './registry';
 import { createFactory } from './factory';
 
 import {
-  getAvailableKernelFileTypes,
+  getAvailableKernelLanguages,
   getAvailableCreateTextNotebookCommands,
   createNewTextNotebook,
 } from './utils';
@@ -123,7 +123,6 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     // Load settings
     const includeFormats = TEXT_NOTEBOOKS_LAUNCHER_ICONS;
-    let launcherItemsCategory = 'Jupytext';
     if (settingRegistry) {
       const settings = await settingRegistry.load(extension.id);
       for (const format of JUPYTEXT_FORMATS) {
@@ -134,40 +133,30 @@ const extension: JupyterFrontEndPlugin<void> = {
           includeFormats.splice(includeFormats.indexOf(format), 1);
         }
       }
-      launcherItemsCategory = settings.get('category').composite as string;
     }
 
     // Unpack necessary components
     const { commands, serviceManager, docRegistry } = app;
 
-    // Initialise Jupytext menu and add it to main menu
-    const jupytextMenu = new Menu({ commands: app.commands });
-    mainmenu.addMenu(jupytextMenu, true, { rank: 40 });
-    jupytextMenu.id = 'jp-mainmenu-jupytext-menu';
-    jupytextMenu.title.label = trans.__('Jupytext');
-
-    // Initialise Jupytext create notebook submenu and add it to Jupytext menu
+    // Initialise Jupytext create notebook submenu and add it to File menu
     const jupytextCreateMenu = new Menu({ commands: app.commands });
     jupytextCreateMenu.id = 'jp-mainmenu-jupytext-new-menu';
     jupytextCreateMenu.title.label = trans.__('New Text Notebook');
-    jupytextMenu.addItem({
+    mainmenu.fileMenu.addItem({
+      rank: 0.97,
       type: 'submenu',
       submenu: jupytextCreateMenu,
     });
 
-    // Initialise Jupytext pair notebook submenu and add it to Jupytext menu
-    const jupytextPairMenu = new Menu({ commands: app.commands });
-    jupytextPairMenu.id = 'jp-mainmenu-jupytext-pair-menu';
-    jupytextPairMenu.title.label = trans.__('Pair Notebook');
-    jupytextMenu.addItem({
+    // Initialise Jupytext menu and add it to main menu
+    const jupytextMenu = new Menu({ commands: app.commands });
+    mainmenu.fileMenu.addItem({
+      rank: 0.98,
       type: 'submenu',
-      submenu: jupytextPairMenu,
+      submenu: jupytextMenu,
     });
-
-    // Add a separator
-    jupytextMenu.addItem({
-      type: 'separator',
-    });
+    jupytextMenu.id = 'jp-mainmenu-jupytext-menu';
+    jupytextMenu.title.label = trans.__('Jupytext');
 
     // Get all Jupytext formats
     let rank = 0;
@@ -224,7 +213,7 @@ const extension: JupyterFrontEndPlugin<void> = {
             category: 'Jupytext',
           });
           // Add to jupytext pair menu
-          jupytextPairMenu.addItem({
+          jupytextMenu.addItem({
             command: command,
           });
           if (fileType.separator) {
@@ -237,7 +226,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     // Add separators in jupytext pair menu
     separatorIndex.map((index, idx) => {
-      jupytextPairMenu.insertItem(index + idx + 1, {
+      jupytextMenu.insertItem(index + idx + 1, {
         type: 'separator',
       });
     });
@@ -273,6 +262,9 @@ const extension: JupyterFrontEndPlugin<void> = {
     });
     jupytextMenu.addItem({
       command: CommandIDs.metadata,
+    });
+    jupytextMenu.addItem({
+      type: 'separator',
     });
 
     // Register Jupytext FAQ command
@@ -349,14 +341,16 @@ const extension: JupyterFrontEndPlugin<void> = {
       label: (args) =>
         (args['label'] as string) || `New ${args['type'] as string}`,
     });
-    palette?.addItem({
-      command: CommandIDs.newUntitled,
-      rank: 50,
-      category: 'Jupytext',
-    });
+    // We dont need to add this command to palettte as it is a utility one
+    // which does not have direct usage
+    // palette?.addItem({
+    //   command: CommandIDs.newUntitled,
+    //   rank: 50,
+    //   category: 'Jupytext',
+    // });
 
-    // Get a map of available kernels in current widget
-    const availableKernels = await getAvailableKernelFileTypes(
+    // Get a map of available kernel languages in current widget
+    const availableKernelLanguages = await getAvailableKernelLanguages(
       languages,
       serviceManager
     );
@@ -365,22 +359,22 @@ const extension: JupyterFrontEndPlugin<void> = {
     const createTextNotebookCommands =
       await getAvailableCreateTextNotebookCommands(
         includeFormats,
-        availableKernels
+        availableKernelLanguages
       );
 
     // Register Jupytext text notebooks file types
     registerFileTypes(docRegistry, trans);
 
     // Get all kernel file types to add to Jupytext factory
-    const kernelFileTypeNames = [];
-    for (const kernelFileTypes of availableKernels.values()) {
-      for (const kernelFileType of kernelFileTypes) {
-        kernelFileTypeNames.push(kernelFileType.kernelName);
+    const kernelLanguageNames = [];
+    for (const kernelLanguages of availableKernelLanguages.values()) {
+      for (const kernelLanguage of kernelLanguages) {
+        kernelLanguageNames.push(kernelLanguage.kernelName);
       }
     }
     // Create a factory for Jupytext
     createFactory(
-      kernelFileTypeNames,
+      kernelLanguageNames,
       toolbarRegistry,
       settingRegistry,
       docRegistry,
@@ -489,7 +483,7 @@ const extension: JupyterFrontEndPlugin<void> = {
                 launcher.add({
                   command: command,
                   args: { isLauncher: true, kernelName: fileType.kernelName },
-                  category: trans.__(launcherItemsCategory),
+                  category: trans.__('Jupytext'),
                   rank: rank++,
                   kernelIconUrl,
                   metadata: {

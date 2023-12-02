@@ -21,7 +21,7 @@ jobs:
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
 
       - name: Install from source
-        run: python -m pip install -e .
+        run: python -m pip install -e '.[test-ui]'
 
       - name: Install galata
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests

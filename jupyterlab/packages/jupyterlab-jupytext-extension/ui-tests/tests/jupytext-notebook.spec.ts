@@ -4,50 +4,46 @@ import { expect, test } from '@jupyterlab/galata';
 // So test for only these cases.
 // If we update our test env with more external kernels, we can include them
 // here in the formats
-const formats = [
+const createTests = [
   {
-    createLabel: 'New Python Text Notebook with Percent Format',
-    pairLabel: 'Percent Format',
+    label: 'New Python Text Notebook with Percent Format',
     extension: '.py',
   },
   {
-    createLabel: 'New MyST Markdown Text Notebook',
-    pairLabel: 'MyST Markdown',
+    label: 'New Shell Text Notebook with Percent Format',
+    extension: '.sh',
+  },
+  {
+    label: 'New MyST Markdown Text Notebook',
     extension: '.md',
   },
-  // {
-  //   createLabel: 'New Python Text Notebook with Light Format',
-  //   pairLabel: 'Light Format',
-  //   extension: '.py',
-  // },
-  // {
-  //   createLabel: 'New Python Text Notebook with Hydrogen Format',
-  //   pairLabel: 'Hydrogen Format',
-  //   extension: '.py',
-  // },
-  // {
-  //   createLabel: 'New Python Text Notebook with Nomarker Format',
-  //   pairLabel: 'Nomarker Format',
-  //   extension: '.py',
-  // },
-  // {
-  //   createLabel: 'New Markdown Text Notebook',
-  //   pairLabel: 'Markdown',
-  //   extension: '.md',
-  // },
+];
+const pairTests = [
+  {
+    label: 'Percent Format',
+    extension: '.py',
+  },
+  {
+    label: 'Light Format',
+    extension: '.py',
+  },
+  {
+    label: 'MyST Markdown',
+    extension: '.md',
+  },
 ];
 
 // Get all possible menuPaths
-const createNewMenuPaths = formats.map((format) => {
+const createNewMenuPaths = createTests.map((format) => {
   return {
-    menuPath: `Jupytext>New Text Notebook>${format.createLabel}`,
+    menuPath: `File>New Text Notebook>${format.label}`,
     extension: format.extension,
   };
 });
 
-const pairMenuPaths = formats.map((format) => {
+const pairMenuPaths = pairTests.map((format) => {
   return {
-    menuPath: `Jupytext>Pair Notebook>Pair Notebook with ${format.pairLabel}`,
+    menuPath: `File>Jupytext>Pair Notebook>Pair Notebook with ${format.label}`,
     extension: format.extension,
   };
 });
@@ -61,14 +57,19 @@ const fileName = 'notebook.ipynb';
 /**
  * Helper function to populate notebook cells and run them
  */
-async function populateNotebook(page) {
+async function populateNotebook(extension, page) {
   await page.notebook.setCell(0, 'raw', 'Just a raw cell');
   await page.notebook.addCell(
     'markdown',
     '## This is **bold** and *italic* [link to jupyter.org!](http://jupyter.org)'
   );
   await page.notebook.runCell(1, true);
-  await page.notebook.addCell('code', '2 ** 3');
+  // For bash, use shell code
+  if (extension === '.sh') {
+    await page.notebook.addCell('code', 'echo $HOME');
+  } else {
+    await page.notebook.addCell('code', '2 ** 3');
+  }
   await page.notebook.runCell(2, true);
 }
 
@@ -81,10 +82,16 @@ test.describe('Jupytext Create Text Notebooks from Menu Tests', () => {
 
       // Wait for the kernel dialog and accept it
       await page.waitForSelector('.jp-Dialog');
+      // For bash kernel, select appropriate kernel
+      if (paths.extension === '.sh') {
+        const select = await page.$('.jp-Dialog-body >> select');
+        const option = await select!.$('option:has-text("Bash")');
+        await select!.selectOption(option);
+      }
       await page.click('.jp-Dialog .jp-mod-accept');
 
       // Populate page
-      await populateNotebook(page);
+      await populateNotebook(paths.extension, page);
       // Toggle Include Metadata. It is enabled by default.
       // It is to avoid having Jupytext version in metadata in snapshot
       // If we include it, for every version bump we need to update snapshots as
@@ -104,11 +111,11 @@ test.describe('Jupytext Create Text Notebooks from Menu Tests', () => {
   });
 });
 
-test.describe('Jupytext Pair Notebooks from Menu Tests', () => {
+test.describe('Jupytext Pair Python Notebooks from Menu Tests', () => {
   // Before each test start a new notebook and add some cell data
   test.beforeEach(async ({ page }) => {
     await page.notebook.createNew(fileName);
-    await populateNotebook(page);
+    await populateNotebook('.py', page);
   });
 
   pairMenuPaths.forEach((paths) => {

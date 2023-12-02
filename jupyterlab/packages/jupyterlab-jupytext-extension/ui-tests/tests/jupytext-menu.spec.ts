@@ -1,11 +1,7 @@
 import { expect, test } from '@jupyterlab/galata';
 
 // Main Jupytext menu
-const jupytextMenu = [
-  'Jupytext',
-  'Jupytext>New Text Notebook',
-  'Jupytext>Pair Notebook',
-];
+const jupytextMenu = ['File>New Text Notebook', 'File>Jupytext'];
 
 test.describe('Jupytext Menu Tests', () => {
   test.use({ autoGoto: false });
@@ -20,8 +16,8 @@ test.describe('Jupytext Menu Tests', () => {
         />/g,
         '-'
       )}.png`;
-      const menu = await page.menu.getOpenMenu();
-      expect(await menu!.screenshot()).toMatchSnapshot(imageName.toLowerCase());
+      // const menu = await page.menu.getOpenMenu();
+      expect(await page!.screenshot()).toMatchSnapshot(imageName.toLowerCase());
     });
   });
 });
