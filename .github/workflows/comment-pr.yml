@@ -3,9 +3,8 @@ name: Comment PR
 on:
   pull_request_target:
 
-comment-pr:
-  permissions:
-    pull-requests: write
+permissions:
+  pull-requests: write
 
 jobs:
   comment-pr:
