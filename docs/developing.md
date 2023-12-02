@@ -7,7 +7,12 @@ If you want to test a feature that has been integrated in `main` but not deliver
 pip install git+https://github.com/mwouts/jupytext.git
 ```
 
-If you want only to build Jupytext core (e.g. not the JupyterLab extension) you can prefix the
+The above requires `node`. You can install it with e.g.
+```
+conda install 'nodejs>=20' -c conda-forge
+```
+
+Alternatively you can build only Jupytext core (e.g. skip the JupyterLab extension). To do so, prefix the
 above with `HATCH_BUILD_HOOKS_ENABLE=false`.
 
 Finally, if you want to test a development branch, use
