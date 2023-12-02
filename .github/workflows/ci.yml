@@ -11,10 +11,7 @@ on:
     paths-ignore:
       - "CHANGELOG.md"
     branches: [main]
-  # We use pull_request_target rather than pull_request
-  # because the latter does not let us comment on PR
-  # coming from a fork.
-  pull_request_target:
+  pull_request:
     branches: [main]
   schedule:
     - cron: "0 11 * * 4"
@@ -33,11 +30,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  comment-pr:
-    permissions:
-      pull-requests: write
-    uses: ./.github/workflows/step_comment-pr.yml
-
   pre-commit:
     uses: ./.github/workflows/step_pre-commit.yml
 
