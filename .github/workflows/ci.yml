@@ -30,10 +30,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  link-to-binder:
+  comment-pr:
     permissions:
       pull-requests: write
-    uses: ./.github/workflows/step_link-to-binder.yml
+    uses: ./.github/workflows/step_comment-pr.yml
 
   pre-commit:
     uses: ./.github/workflows/step_pre-commit.yml
@@ -59,7 +59,7 @@ jobs:
     uses: ./.github/workflows/step_tests-ui.yml
 
   build:
-    needs: [test-pip, test-conda, test-ui]
+    needs: [test-pip, test-conda, test-unit-functional-integration, test-ui]
     uses: ./.github/workflows/step_build.yml
     with:
       upload: ${{ inputs.upload-build-artifacts || false }}

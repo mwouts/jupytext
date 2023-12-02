@@ -1,0 +1,27 @@
+name: comment-pr
+run-name: Comment PR
+
+on:
+  workflow_call:
+
+jobs:
+  comment-pr:
+    runs-on: ubuntu-latest
+    name: Comment PR
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Thank you for making this pull request. Did you know? You can try it on Binder: [![Binder:lab](https://img.shields.io/badge/binder-jupyterlab-0172B2.svg)](https://mybinder.org/v2/gh/${{ github.repository }}/${{ github.head_ref }}?urlpath=lab/tree/demo/get_started.ipynb) or [![Binder:notebook](https://img.shields.io/badge/binder-notebook-0172B2.svg)](https://mybinder.org/v2/gh/${{ github.repository }}/${{ github.head_ref }}?filepath=demo).
+
+            You can also test this PR in your environment with
+            ```
+            pip install git+https://github.com/{{ github.repository }}.git@{{ github.head_ref }}
+            ```
+            (this requires `nodejs`, see more at [Developing Jupytext](https://jupytext.readthedocs.io/en/latest/developing.html))
+          comment_tag: binder_link
