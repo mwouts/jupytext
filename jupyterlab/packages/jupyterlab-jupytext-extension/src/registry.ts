@@ -2,12 +2,35 @@ import { DocumentRegistry } from '@jupyterlab/docregistry';
 
 import { TranslationBundle } from '@jupyterlab/translation';
 
-import { markdownIcon } from '@jupyterlab/ui-components';
+import { markdownIcon, kernelIcon } from '@jupyterlab/ui-components';
+
+import { IFileTypeData } from './tokens';
 
 export function registerFileTypes(
+  availableKernelLanguages: Map<string, IFileTypeData[]>,
   docRegistry: DocumentRegistry,
   trans: TranslationBundle
 ) {
+  // Add kernel file types to registry
+  availableKernelLanguages.forEach(
+    (kernelFileTypes: IFileTypeData[], kernelLanguage: string) => {
+      // Do not add python as it will be already there by default
+      if (kernelLanguage !== 'python') {
+        kernelFileTypes.map((kernelFileType) => {
+          docRegistry.addFileType({
+            name: kernelLanguage,
+            contentType: 'file',
+            displayName: trans.__(
+              kernelFileType.paletteLabel.split('New')[1].trim()
+            ),
+            extensions: [`.${kernelFileType.fileExt}`],
+            icon: kernelFileType.kernelIcon || kernelIcon,
+          });
+        });
+      }
+    }
+  );
+
   // Add markdown file types to registry
   docRegistry.addFileType(
     {

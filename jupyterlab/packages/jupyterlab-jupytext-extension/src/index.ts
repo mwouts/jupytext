@@ -363,15 +363,14 @@ const extension: JupyterFrontEndPlugin<void> = {
       );
 
     // Register Jupytext text notebooks file types
-    registerFileTypes(docRegistry, trans);
+    registerFileTypes(availableKernelLanguages, docRegistry, trans);
 
     // Get all kernel file types to add to Jupytext factory
     const kernelLanguageNames = [];
-    for (const kernelLanguages of availableKernelLanguages.values()) {
-      for (const kernelLanguage of kernelLanguages) {
-        kernelLanguageNames.push(kernelLanguage.kernelName);
-      }
+    for (const kernelLanguage of availableKernelLanguages.keys()) {
+      kernelLanguageNames.push(kernelLanguage);
     }
+
     // Create a factory for Jupytext
     createFactory(
       kernelLanguageNames,
