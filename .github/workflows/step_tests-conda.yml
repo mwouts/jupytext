@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
-        python-version: [ 3.11 ]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -26,7 +25,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/conda_pkgs_dir
-          key: conda-${{ matrix.os }}-python-${{ matrix.python-version }}-${{ hashFiles('.ci/environment-ci.yml') }}
+          key: conda-${{ matrix.os }}-${{ hashFiles('.ci/environment-ci.yml') }}
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
@@ -34,7 +33,6 @@ jobs:
           auto-update-conda: true
           auto-activate-base: false
           activate-environment: jupytext-ci
-          python-version: ${{ matrix.python-version }}
           channels: defaults,conda-forge
           environment-file: .ci/environment-ci.yml
           use-only-tar-bz2: true

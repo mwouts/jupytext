@@ -29,6 +29,8 @@ jobs:
 
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+        with:
+          python_version: "3.x"
 
       # Current repo organization will not permit to set up pre-commit config for
       # TS lint related packages due to absence of package.json in the top level
