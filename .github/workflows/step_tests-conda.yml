@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Cache conda
         uses: actions/cache@v3
@@ -26,7 +26,7 @@ jobs:
           key: conda-${{ matrix.os }}-python-${{ matrix.python-version }}-${{ hashFiles('.ci/environment-ci.yml') }}
 
       - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
           auto-activate-base: false
