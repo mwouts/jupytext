@@ -139,7 +139,7 @@ enable-by-default = true
 # Runtime dependency for this build hook
 # We need jupyterlab as build time depdendency to get jlpm (wrapper around yarn)
 dependencies = [
-    "hatch-jupyter-builder>=0.5", "jupyterlab>=4,<5"
+    "hatch-jupyter-builder>=0.5", "jupyterlab>=4"
 ]
 # We use npm_builder to build the jupyterlab extension
 build-function = "hatch_jupyter_builder.npm_builder"
