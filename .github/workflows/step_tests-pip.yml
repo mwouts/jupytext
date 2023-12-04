@@ -27,7 +27,7 @@ jobs:
             dependency_type: "pre"
           # Test minimum markdown-it-py supported (otherwise the most recent version is used)
           - python-version: "3.x"
-            markdown-it-py-version: "~=1.0"
+            markdown-it-py-version: "~=2.0"
           - python-version: "3.x"
             markdown-it-py-version: ""
           - python-version: "3.x"
