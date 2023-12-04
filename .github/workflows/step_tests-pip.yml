@@ -14,13 +14,13 @@ jobs:
     strategy:
       matrix:
         python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12"]
-        markdown-it-py-version: ["~=3.0"]
-        pip-flags: [""]
         include:
+          # Test pre-release versions
           - python-version: "3.x"
-            pip-flags: "--pre --upgrade --upgrade-strategy eager"
+            dependency_type: "pre"
+          # Test minimum markdown-it-py supported (otherwise the most recent version is used)
           - python-version: "3.x"
-            markdown-it-py-version: "~=2.0"
+            markdown-it-py-version: "~=1.0"
           - python-version: "3.x"
             markdown-it-py-version: ""
           - python-version: "3.x"
@@ -36,6 +36,7 @@ jobs:
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           python_version: ${{ matrix.python-version }}
+          dependency_type: ${{ matrix.dependency_type }}
 
       - name: Install from source
         run: python -m pip install -e '.[test-cov,test-external]' jupyterlab ${{ matrix.markdown-it-py-version && format('markdown-it-py{0}', matrix.markdown-it-py-version) }} ${{ matrix.pip-flags }}

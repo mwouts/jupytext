@@ -15,7 +15,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.11" ]
         coverage: [unit, functional, integration, external]
 
     steps:
@@ -25,7 +24,7 @@ jobs:
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
-          python_version: ${{ matrix.python-version }}
+          python_version: 3.x
 
       - name: Install from source
         run: HATCH_BUILD_HOOKS_ENABLE=false python -m pip install -e '.[test-cov,test-${{ matrix.coverage }}]' markdown-it-py~=3.0
