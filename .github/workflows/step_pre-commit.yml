@@ -1,5 +1,5 @@
 name: pre-commit
-run-name: Pre-commit
+run-name: Run pre-commit tests
 
 on:
   workflow_call:

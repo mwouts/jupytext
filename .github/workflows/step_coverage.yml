@@ -1,5 +1,5 @@
-name: test-categories
-run-name: Run Unit/Functional/Integration and External tests using Pip
+name: coverage
+run-name: Check coverage
 
 on:
   workflow_call:
@@ -8,8 +8,9 @@ permissions:
   contents: read
 
 jobs:
-  test-pip:
-    continue-on-error: ${{ matrix.experimental || false }}
+  coverage:
+    name: >
+      ${{ matrix.coverage }}
     runs-on: ubuntu-latest
 
     strategy:

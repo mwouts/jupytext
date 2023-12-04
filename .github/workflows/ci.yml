@@ -40,9 +40,9 @@ jobs:
     needs: [ pre-commit ]
     uses: ./.github/workflows/step_tests-pip.yml
 
-  test-unit-functional-integration:
+  coverage:
     needs: [ test-pip ]
-    uses: ./.github/workflows/step_test_unit_functional.yml
+    uses: ./.github/workflows/step_coverage.yml
 
   test-conda:
     needs: [ test-pip ]
