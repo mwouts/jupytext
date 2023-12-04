@@ -27,7 +27,7 @@ jobs:
           python_version: 3.x
 
       - name: Install from source
-        run: HATCH_BUILD_HOOKS_ENABLE=false python -m pip install -e '.[test-cov,test-${{ matrix.coverage }}]' markdown-it-py~=3.0
+        run: HATCH_BUILD_HOOKS_ENABLE=false python -m pip install -e '.[test-cov,test-${{ matrix.coverage }}]'
 
       - name: Install a Jupyter Kernel
         run: python -m ipykernel install --name python_kernel --user
