@@ -26,30 +26,7 @@ jobs:
           python_version: "3.x"
 
       - name: Build package
-        run: |
-          python -m pip install build wheel
-
-          # NOTE: These builds and verifications of the builds can be done more
-          # robustly with jupyter-releaser.
-          #
-          # Removed the check on size of package as we are distributing tests/ with
-          # sdist now and they are around 8MB. Seems like original check was to make
-          # sure we are not distributing node_modules and we are quite safe with that
-          # with hatch build system.
-          #
-          # Build jupytext package
-          python -m build
-
-          # Build lab extension(s)
-          npm pack --pack-destination dist jupyterlab/packages/*
-
-          # Check that the lab is there
-          if (($(tar -tf dist/*.tar.gz | grep jupyterlab/jupyterlab_jupytext/labextension/package.json$ | wc -l)==0)); then echo "Missing jupyterlab_jupytext" && exit 1; fi
-
-          # Install package and extension
-          python -m pip install dist/*.tar.gz
-
-          echo "Install went OK"
+        run: hatch build
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v3
