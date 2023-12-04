@@ -9,6 +9,9 @@ on:
         required: false
         default: false
         description: Upload build artifacts
+      ref:
+        type: string
+        description: Tag to build
 
 permissions:
   contents: read
@@ -19,6 +22,8 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
