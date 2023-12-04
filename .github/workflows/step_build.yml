@@ -1,5 +1,5 @@
 name: build
-run-name: Build test
+run-name: Build package
 
 on:
   workflow_call:

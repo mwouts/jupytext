@@ -1,5 +1,5 @@
 name: test-pip
-run-name: Run tests using Pip
+run-name: Run main tests using Pip
 
 on:
   workflow_call:
@@ -9,6 +9,12 @@ permissions:
 
 jobs:
   test-pip:
+    name: >
+      🐍 ${{ matrix.python-version }}
+      ${{ matrix.dependency_type && format('({0})', matrix.dependency_type) }}
+      ${{ matrix.markdown-it-py-version && format('(markdown-it-py-version{0})', matrix.dependency_type) }}
+      ${{ matrix.quarto && '(Quarto)' }}
+      ${{ matrix.no_kernel && '(No kernel)' }}
     runs-on: ubuntu-latest
 
     strategy:

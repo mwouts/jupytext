@@ -1,5 +1,5 @@
 name: test-conda
-run-name: Run tests using Conda
+run-name: Run Conda tests for different OS
 
 on:
   workflow_call:
@@ -9,6 +9,8 @@ permissions:
 
 jobs:
   test-conda:
+    name: >
+      ${{ matrix.os }}
     strategy:
       matrix:
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
