@@ -122,7 +122,6 @@ path = "src/jupytext/version.py"
 # Following config is related to JupyterLab extension
 [tool.hatch.build.targets.sdist]
 artifacts = ["jupyterlab/jupyterlab_jupytext/labextension"]
-exclude = ["demo", "**/.yarn", "**/node_modules"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupytext"]
