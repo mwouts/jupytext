@@ -4,6 +4,9 @@ run-name: Run UI tests with Galata
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   test-ui:
     continue-on-error: false

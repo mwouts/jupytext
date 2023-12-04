@@ -4,6 +4,10 @@ run-name: Run CodeQL analysis
 on:
   workflow_call:
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   codeql:
     runs-on: ubuntu-latest
