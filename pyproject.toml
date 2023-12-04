@@ -181,10 +181,63 @@ line-length = 127
 exclude = [
     "tests/data/notebooks/*",
 ]
+src = ["src", "jupyterlab"]
+
 # Seems like W503 is not implemented in ruff
 # ref: https://github.com/astral-sh/ruff/issues/4125
 ignore = [
     "E203", "E231",
+]
+
+[tool.ruff.lint]
+extend-select = [
+    "F",           # pyflakes
+    "W",           # pycodestyle-warnings
+    "E",           # pycodestyle-errors
+    "C90",         # mccabe
+    "I",           # isort
+    "N",           # pep8-naming
+    "D",           # pydocstyle
+    "UP",          # pyupgrade
+    "YTT",         # flake8-2020
+    "ANN",         # flake8-annotations
+    "S",           # flake8-bandit
+    "BLE",         # flake8-blind-except
+    "FBT",         # flake8-boolean-trap
+    "B",           # flake8-bugbear
+    "A",           # flake8-builtins
+    "COM",         # flake8-comma
+    "C4",          # flake8-comprehensions
+    "T10",         # flake8-debugger
+    "EM",          # flake8-errmsg
+    "FA",          # flake8-future-annotations
+    "ISC",         # flake8-implicit-str-concat
+    "ICN",         # flake8-import-conventions
+    "G",           # flake8-logging-format
+    "PIE",         # flake8-pie
+    "T20",         # flake8-print
+    "PYI",         # flake8-pyi
+    "PT",          # flake8-pytest-style
+    "Q",           # flake8-quotes
+    "RSE",         # flake8-raise
+    "RET",         # flake8-return
+    "SLF",         # flake8-self
+    "SIM",         # flake8-simplify
+    "TID",         # flake8-tidy-imports
+    "TCH",         # flake8-type-checking
+    "ARG",         # flake8-unused-arguments
+    "PTH",         # flake8-use-pathlib
+    "TD",          # flake8-todos
+    "ERA",         # eradicate
+    "PD",          # pandas-vet
+    "PGH",         # pygrep-hooks
+    "PL",          # pylint
+    "TRY",         # tryceratops
+    "FLY",         # flynt
+    "NPY",         # NumPy
+    "PERF",        # perflint
+    "FURB",        # refurb
+    "RUF",         # Ruff-specific
 ]
 
 [tool.pytest.ini_options]

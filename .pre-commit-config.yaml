@@ -25,27 +25,11 @@ repos:
     - id: end-of-file-fixer
     - id: trailing-whitespace
 
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
-    hooks:
-    - id: pyupgrade
-      args: ["--py38-plus"]
-
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
-    hooks:
-      # isort needs the 'black' profile when used in combination with black
-      # See https://github.com/PyCQA/isort/issues/1518
-    - id: isort
-      args: ["--profile", "black"]
-
-  - repo: https://github.com/psf/black
-    rev: 23.11.0
-    hooks:
-    - id: black
-
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.5
+    rev: v0.1.6
     hooks:
       - id: ruff
+        types_or: [ python, pyi, jupyter ]
         args: ["--fix", "--show-fixes"]
+      - id: ruff-format
+        types_or: [ python, pyi, jupyter ]
