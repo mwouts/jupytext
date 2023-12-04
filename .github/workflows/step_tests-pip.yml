@@ -12,7 +12,7 @@ jobs:
     name: >
       🐍 ${{ matrix.python-version }}
       ${{ matrix.dependency_type && format('({0})', matrix.dependency_type) }}
-      ${{ matrix.markdown-it-py-version && format('(markdown-it-py-version{0})', matrix.dependency_type) }}
+      ${{ matrix.markdown-it-py && format('(markdown-it-py {0})', matrix.markdown-it-py) }}
       ${{ matrix.quarto && '(Quarto)' }}
       ${{ matrix.no_kernel && '(No kernel)' }}
     runs-on: ubuntu-latest
@@ -27,9 +27,9 @@ jobs:
             dependency_type: "pre"
           # Test minimum markdown-it-py supported (otherwise the most recent version is used)
           - python-version: "3.x"
-            markdown-it-py-version: "~=2.0"
+            markdown-it-py: "~=2.0"
           - python-version: "3.x"
-            markdown-it-py-version: ""
+            markdown-it-py: false
           - python-version: "3.x"
             no_kernel: true
           - python-version: "3.x"
@@ -46,16 +46,19 @@ jobs:
           dependency_type: ${{ matrix.dependency_type }}
 
       - name: Install from source
-        run: python -m pip install -e '.[test-cov,test-external]' jupyterlab ${{ matrix.markdown-it-py-version && format('markdown-it-py{0}', matrix.markdown-it-py-version) }} ${{ matrix.pip-flags }}
+        run: >
+          python -m pip install
+          -e '.[test-cov,test-external]'
+          jupyterlab
+          ${{ matrix.markdown-it-py && format('markdown-it-py{0}', matrix.markdown-it-py) || '' }}
 
       - name: Install a Jupyter Kernel
         if: ${{ !matrix.no_kernel }}
         run: python -m ipykernel install --name python_kernel --user
-
       - name: Uninstall markdown-it-py
         # Markdown-it-py is a dependency of Jupytext,
         # but Jupytext should still work if it is not installed
-        if: ${{ matrix.markdown-it-py-version == '' }}
+        if: ${{ matrix.markdown-it-py == 'false' }}
         run: python -m pip uninstall markdown-it-py --yes
 
       - name: Install Quarto
