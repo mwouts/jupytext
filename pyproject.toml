@@ -266,6 +266,3 @@ omit = [
     "tests/*",
     "src/jupytext/version.py",
 ]
-
-[tool.coverage.xml]
-output = "coverage.xml"
