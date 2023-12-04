@@ -10,9 +10,9 @@ on:
   push:
     paths-ignore:
       - "CHANGELOG.md"
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
   schedule:
     - cron: "0 11 * * 4"
 
@@ -33,28 +33,28 @@ jobs:
   pre-commit:
     uses: ./.github/workflows/step_pre-commit.yml
 
-  codeql:
-    needs: [pre-commit]
+  static-analysis:
+    needs: [ pre-commit ]
     uses: ./.github/workflows/step_static-analysis.yml
 
   test-pip:
-    needs: [codeql]
+    needs: [ pre-commit ]
     uses: ./.github/workflows/step_tests-pip.yml
 
   test-unit-functional-integration:
-    needs: [codeql]
+    needs: [ test-pip ]
     uses: ./.github/workflows/step_test_unit_functional.yml
 
   test-conda:
-    needs: [codeql]
+    needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-conda.yml
 
   test-ui:
-    needs: [codeql]
+    needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-ui.yml
 
   build:
-    needs: [test-pip, test-conda, test-unit-functional-integration, test-ui]
+    needs: [ test-pip, test-conda, test-ui ]
     uses: ./.github/workflows/step_build.yml
     with:
       upload: ${{ inputs.upload-build-artifacts || false }}
