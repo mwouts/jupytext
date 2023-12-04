@@ -4,6 +4,9 @@ run-name: Pre-commit
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   pre-commit:
     runs-on: ubuntu-latest

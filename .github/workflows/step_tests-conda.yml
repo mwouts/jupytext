@@ -4,6 +4,9 @@ run-name: Run tests using Conda
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   test-conda:
     strategy:

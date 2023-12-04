@@ -10,6 +10,9 @@ on:
         default: false
         description: Upload build artifacts
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
