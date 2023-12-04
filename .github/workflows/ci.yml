@@ -57,3 +57,13 @@ jobs:
     uses: ./.github/workflows/step_build.yml
     with:
       upload: ${{ inputs.upload-build-artifacts || false }}
+
+  pass:
+    name: Pass
+    needs: [ pre-commit, static-analysis, test-pip, coverage, test-conda, test-ui, build ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
+    if: always()
