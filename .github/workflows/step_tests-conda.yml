@@ -4,10 +4,6 @@ run-name: Run tests using Conda
 on:
   workflow_call:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-conda-test
-  cancel-in-progress: true
-
 jobs:
   test-conda:
     strategy:

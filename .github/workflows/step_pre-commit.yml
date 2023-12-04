@@ -4,10 +4,6 @@ run-name: Pre-commit
 on:
   workflow_call:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-pre-commit
-  cancel-in-progress: true
-
 jobs:
   pre-commit:
     runs-on: ubuntu-latest

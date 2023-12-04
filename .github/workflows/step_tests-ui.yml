@@ -4,10 +4,6 @@ run-name: Run UI tests with Galata
 on:
   workflow_call:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-ui-test
-  cancel-in-progress: true
-
 jobs:
   test-ui:
     continue-on-error: false
