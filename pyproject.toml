@@ -32,7 +32,7 @@ classifiers = [
 ]
 dependencies = [
     "nbformat",
-    "mdit_py_plugins",
+    "mdit-py-plugins",
     "markdown-it-py>=2.0",
     "packaging",
     "pyyaml",
@@ -86,7 +86,7 @@ test-cov = [
 # Galata test env
 # Install a non python kernel to ensure extension is working as expected
 test-ui = [
-    "calysto_bash",
+    "calysto-bash",
 ]
 dev = [
     "jupytext[test-cov,test-external]",
@@ -94,9 +94,9 @@ dev = [
 # Documentation dependencies
 docs = [
     "sphinx",
-    "sphinx_copybutton",
-    "sphinx_rtd_theme",
-    "myst_parser",
+    "sphinx-copybutton",
+    "sphinx-rtd-theme",
+    "myst-parser",
 ]
 
 [project.scripts]
