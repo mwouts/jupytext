@@ -266,3 +266,11 @@ omit = [
     "tests/*",
     "src/jupytext/version.py",
 ]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+warn_unused_configs = true
+show_error_codes = true
+disallow_untyped_defs = false
+follow_imports = "normal"
