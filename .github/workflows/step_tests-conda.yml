@@ -59,7 +59,7 @@ jobs:
       - name: Test with pytest
         # We use an explicit coverage file otherwise the
         # codecov action below does not find it
-        run: pytest --cov . --cov-report xml:coverage.xml
+        run: pytest -n logical --cov . --cov-report xml:coverage.xml
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3

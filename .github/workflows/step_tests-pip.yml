@@ -79,7 +79,7 @@ jobs:
           python -m jupyterlab.browser_check
 
       - name: Test with pytest
-        run: pytest --cov
+        run: pytest --cov -n logical
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3

@@ -34,7 +34,7 @@ jobs:
         run: python -m ipykernel install --name python_kernel --user
 
       - name: Run the tests
-        run: pytest tests/${{ matrix.coverage }} --cov
+        run: pytest tests/${{ matrix.coverage }} --cov -n logical
 
       - name: Upload the coverage
         uses: codecov/codecov-action@v3
