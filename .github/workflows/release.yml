@@ -27,11 +27,15 @@ jobs:
   test-pip:
     needs: [ pre-commit ]
     uses: ./.github/workflows/step_tests-pip.yml
+    with:
+      coverage: false
     if: "! inputs.skip-tests"
 
   test-conda:
     needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-conda.yml
+    with:
+      coverage: false
     if: "! inputs.skip-tests"
 
   test-ui:

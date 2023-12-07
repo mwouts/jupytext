@@ -3,6 +3,11 @@ run-name: Run main tests using Pip
 
 on:
   workflow_call:
+    inputs:
+      coverage:
+        type: boolean
+        description: Upload coverage to CodeCov
+        default: true
 
 permissions:
   contents: read
@@ -86,3 +91,4 @@ jobs:
         with:
           fail_ci_if_error: true
           verbose: true
+        if: inputs.coverage

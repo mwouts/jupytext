@@ -39,14 +39,19 @@ jobs:
   test-pip:
     needs: [ pre-commit ]
     uses: ./.github/workflows/step_tests-pip.yml
+    with:
+      coverage: ${{ github.event_name != 'schedule' }}
 
   coverage:
     needs: [ test-pip ]
     uses: ./.github/workflows/step_coverage.yml
+    if: github.event_name != 'schedule'
 
   test-conda:
     needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-conda.yml
+    with:
+      coverage: ${{ github.event_name != 'schedule' }}
 
   test-ui:
     needs: [ test-pip ]
@@ -66,4 +71,5 @@ jobs:
       - uses: re-actors/alls-green@release/v1
         with:
           jobs: ${{ toJSON(needs) }}
+          allowed-skips: coverage
     if: always()
