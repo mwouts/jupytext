@@ -4,9 +4,9 @@ run-name: Run CodeQL analysis
 on:
   workflow_call:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-static-analysis
-  cancel-in-progress: true
+permissions:
+  contents: read
+  security-events: write
 
 jobs:
   codeql:
@@ -14,7 +14,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2

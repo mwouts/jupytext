@@ -1,19 +1,20 @@
 name: test-conda
-run-name: Run tests using Conda
+run-name: Run Conda tests for different OS
 
 on:
   workflow_call:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-conda-test
-  cancel-in-progress: true
+permissions:
+  contents: read
 
 jobs:
   test-conda:
+    name: >
+      ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
-        python-version: [ 3.11 ]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -21,21 +22,20 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Cache conda
         uses: actions/cache@v3
         with:
           path: ~/conda_pkgs_dir
-          key: conda-${{ matrix.os }}-python-${{ matrix.python-version }}-${{ hashFiles('.ci/environment-ci.yml') }}
+          key: conda-${{ matrix.os }}-${{ hashFiles('.ci/environment-ci.yml') }}
 
       - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
           auto-activate-base: false
           activate-environment: jupytext-ci
-          python-version: ${{ matrix.python-version }}
           channels: defaults,conda-forge
           environment-file: .ci/environment-ci.yml
           use-only-tar-bz2: true
@@ -57,13 +57,10 @@ jobs:
           python -m jupyterlab.browser_check
 
       - name: Test with pytest
-        # We use an explicit coverage file otherwise the
-        # codecov action below does not find it
-        run: pytest --cov . --cov-report xml:coverage.xml
+        run: pytest -n logical --cov --cov-report=xml
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
           verbose: true
-          files: coverage.xml
