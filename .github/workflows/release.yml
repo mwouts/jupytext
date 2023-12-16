@@ -1,0 +1,92 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+dev[0-9]+"
+  workflow_dispatch:
+    inputs:
+      skip-tests:
+        type: boolean
+        description: Skip
+        default: false
+      ref:
+        type: string
+        description: Tag to release
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  pre-commit:
+    uses: ./.github/workflows/step_pre-commit.yml
+    if: "! inputs.skip-tests"
+
+  test-pip:
+    needs: [ pre-commit ]
+    uses: ./.github/workflows/step_tests-pip.yml
+    if: "! inputs.skip-tests"
+
+  test-conda:
+    needs: [ test-pip ]
+    uses: ./.github/workflows/step_tests-conda.yml
+    if: "! inputs.skip-tests"
+
+  test-ui:
+    needs: [ test-pip ]
+    uses: ./.github/workflows/step_tests-ui.yml
+    if: "! inputs.skip-tests"
+
+  test-status:
+    needs: [ pre-commit, test-pip, test-conda, test-ui ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          allowed-skips: pre-commit, test-pip, test-conda, test-ui
+          jobs: ${{ toJSON(needs) }}
+    if: always()
+
+  build:
+    needs: [ test-status ]
+    uses: ./.github/workflows/step_build.yml
+    with:
+      upload: true
+      ref: ${{ inputs.ref }}
+
+  publish:
+    needs: [ build ]
+    runs-on: ubuntu-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/jupytext
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  release:
+    needs: [ publish ]
+    name: Create release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: softprops/action-gh-release@v1
+        with:
+          name: Jupytext ${{ inputs.ref || github.ref_name }}
+          draft: true
+          prerelease: ${{ contains(inputs.ref || github.ref, 'rc') }}
+          generate_release_notes: true

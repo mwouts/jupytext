@@ -32,8 +32,8 @@ classifiers = [
 ]
 dependencies = [
     "nbformat",
-    "mdit_py_plugins",
-    "markdown-it-py>=1.0.0",
+    "mdit-py-plugins",
+    "markdown-it-py>=2.0",
     "packaging",
     "pyyaml",
     "toml",
@@ -86,7 +86,7 @@ test-cov = [
 # Galata test env
 # Install a non python kernel to ensure extension is working as expected
 test-ui = [
-    "calysto_bash",
+    "calysto-bash",
 ]
 dev = [
     "jupytext[test-cov,test-external]",
@@ -94,9 +94,9 @@ dev = [
 # Documentation dependencies
 docs = [
     "sphinx",
-    "sphinx_copybutton",
-    "sphinx_rtd_theme",
-    "myst_parser",
+    "sphinx-copybutton",
+    "sphinx-rtd-theme",
+    "myst-parser",
 ]
 
 [project.scripts]
@@ -122,7 +122,6 @@ path = "src/jupytext/version.py"
 # Following config is related to JupyterLab extension
 [tool.hatch.build.targets.sdist]
 artifacts = ["jupyterlab/jupyterlab_jupytext/labextension"]
-exclude = ["demo", "**/.yarn", "**/node_modules"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupytext"]
@@ -140,7 +139,7 @@ enable-by-default = true
 # Runtime dependency for this build hook
 # We need jupyterlab as build time depdendency to get jlpm (wrapper around yarn)
 dependencies = [
-    "hatch-jupyter-builder>=0.5", "jupyterlab>=4,<5"
+    "hatch-jupyter-builder>=0.5", "jupyterlab>=4"
 ]
 # We use npm_builder to build the jupyterlab extension
 build-function = "hatch_jupyter_builder.npm_builder"
@@ -268,5 +267,10 @@ omit = [
     "src/jupytext/version.py",
 ]
 
-[tool.coverage.xml]
-output = "coverage.xml"
+[tool.mypy]
+strict = true
+python_version = "3.11"
+warn_unused_configs = true
+show_error_codes = true
+disallow_untyped_defs = false
+follow_imports = "normal"

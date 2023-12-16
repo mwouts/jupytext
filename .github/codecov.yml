@@ -1,9 +1,6 @@
 codecov:
   notify:
-    after_n_builds: 16
-
-comment:
-  after_n_builds: 16
+    wait_for_ci: true
 
 coverage:
   status:
