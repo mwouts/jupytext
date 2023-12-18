@@ -182,7 +182,7 @@ export function executePairCommand(
   let selectedFormats = getSelectedFormats(notebookTracker);
 
   // Toggle the selected format
-  console.log('Jupytext: executing command=' + command, selectedFormats);
+  console.debug('Jupytext: executing command=' + command);
   if (format === 'custom') {
     showErrorMessage(
       trans.__('Error'),
@@ -256,8 +256,8 @@ export function executePairCommand(
     }
     if (Object.keys(jupytext).length === 0) {
       (model as any).deleteMetadata('jupytext');
-      (model as any).setMetadata('jupytext', jupytext);
     }
+    (model as any).setMetadata('jupytext', jupytext);
     return;
   }
 
@@ -332,7 +332,7 @@ export function isMetadataCommandEnabled(
 export function executeMetadataCommand(
   notebookTracker: INotebookTracker
 ): void {
-  console.log('Jupytext: toggling YAML header');
+  console.debug('Jupytext: toggling YAML header');
   if (!notebookTracker.currentWidget) {
     return;
   }
