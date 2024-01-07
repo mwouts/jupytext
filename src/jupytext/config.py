@@ -1,6 +1,12 @@
 """Find and read Jupytext configuration files"""
 import json
 import os
+
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
+
 import warnings
 
 import yaml
@@ -334,10 +340,8 @@ def find_jupytext_configuration_file(path, search_parent_dirs=True):
 
     pyproject_path = os.path.join(path, PYPROJECT_FILE)
     if os.path.isfile(pyproject_path):
-        import toml
-
         with open(pyproject_path) as stream:
-            doc = toml.loads(stream.read())
+            doc = tomllib.loads(stream.read())
             if doc.get("tool", {}).get("jupytext") is not None:
                 return pyproject_path
 
@@ -366,9 +370,7 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
 
     try:
         if jupytext_config_file.endswith((".toml", "jupytext")):
-            import toml
-
-            doc = toml.loads(stream)
+            doc = tomllib.loads(stream)
             if jupytext_config_file.endswith(PYPROJECT_FILE):
                 return doc["tool"]["jupytext"]
             else:
