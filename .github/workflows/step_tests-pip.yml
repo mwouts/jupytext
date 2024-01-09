@@ -17,9 +17,11 @@ jobs:
         python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12"]
         markdown-it-py-version: ["~=3.0"]
         pip-flags: [""]
+        continue-on-error: [false]
         include:
           - python-version: "3.x"
             pip-flags: "--pre --upgrade --upgrade-strategy eager"
+            continue-on-error: true
           - python-version: "3.x"
             markdown-it-py-version: "~=2.0"
           - python-version: "3.x"
@@ -69,6 +71,7 @@ jobs:
           python -m jupyterlab.browser_check
 
       - name: Test with pytest
+        continue-on-error: ${{ matrix.continue-on-error }}
         run: pytest --cov
 
       - name: Upload coverage

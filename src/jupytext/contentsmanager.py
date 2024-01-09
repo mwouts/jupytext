@@ -2,6 +2,12 @@
 """
 import itertools
 import os
+
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
+
 from collections import namedtuple
 from datetime import timedelta
 
@@ -512,12 +518,10 @@ to your jupytext.toml file
 
             pyproject_path = directory + "/" + PYPROJECT_FILE
             if self.file_exists(pyproject_path):
-                import toml
-
                 model = self.get(pyproject_path, type="file")
                 try:
-                    doc = toml.loads(model["content"])
-                except toml.decoder.TomlDecodeError as e:
+                    doc = tomllib.loads(model["content"])
+                except tomllib.TOMLDecodeError as e:
                     self.log.warning(f"Cannot load {pyproject_path}: {e}")
                 else:
                     if doc.get("tool", {}).get("jupytext") is not None:

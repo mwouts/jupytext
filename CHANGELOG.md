@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.17.0-dev (2024-01-??)
+-------------------
+
+**Changed**
+- Jupytext uses the standard library `tomllib` in Python 3.11, or `tomli` in Python 3.10 or older, to match JupyterLab's dependencies ([#1195](https://github.com/mwouts/jupytext/issues/1195))
+
+
 1.16.0 (2023-12-03)
 -------------------
 
