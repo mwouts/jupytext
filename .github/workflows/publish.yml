@@ -1,4 +1,4 @@
-name: Publish
+name: Release
 on:
   push:
     tags:
@@ -6,40 +6,41 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+dev[0-9]+"
 
+permissions:
+  contents: read
+
 jobs:
   pre-commit:
     uses: ./.github/workflows/step_pre-commit.yml
-
-  static-analysis:
-    needs: [ pre-commit ]
-    uses: ./.github/workflows/step_static-analysis.yml
-    permissions:
-      contents: read
-      security-events: write
 
   test-pip:
     needs: [ pre-commit ]
     uses: ./.github/workflows/step_tests-pip.yml
     with:
-      coverage: ${{ github.event_name != 'schedule' }}
-
-  coverage:
-    needs: [ test-pip ]
-    uses: ./.github/workflows/step_coverage.yml
-    if: github.event_name != 'schedule'
+      coverage: false
 
   test-conda:
     needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-conda.yml
     with:
-      coverage: ${{ github.event_name != 'schedule' }}
+      coverage: false
 
   test-ui:
     needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-ui.yml
 
+  test-status:
+    needs: [ pre-commit, test-pip, test-conda, test-ui ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          allowed-skips: pre-commit, test-pip, test-conda, test-ui
+          jobs: ${{ toJSON(needs) }}
+    if: always()
+
   build:
-    needs: [ test-pip, test-conda, test-ui ]
+    needs: [ test-status ]
     uses: ./.github/workflows/step_build.yml
 
   publish:
@@ -51,6 +52,7 @@ jobs:
       url: https://pypi.org/p/jupytext
 
     permissions:
+      contents: read
       id-token: write
 
     steps:
