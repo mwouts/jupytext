@@ -20,7 +20,7 @@ jobs:
       coverage: false
 
   test-conda:
-    needs: [ test-pip ]
+    needs: [ pre-commit ]
     uses: ./.github/workflows/step_tests-conda.yml
     with:
       coverage: false
