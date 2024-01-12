@@ -10,28 +10,36 @@ jobs:
   pre-commit:
     uses: ./.github/workflows/step_pre-commit.yml
 
-  codeql:
+  static-analysis:
     needs: [ pre-commit ]
     uses: ./.github/workflows/step_static-analysis.yml
+    permissions:
+      contents: read
+      security-events: write
 
   test-pip:
-    needs: [ codeql ]
+    needs: [ pre-commit ]
     uses: ./.github/workflows/step_tests-pip.yml
+    with:
+      coverage: ${{ github.event_name != 'schedule' }}
 
-  test-unit-functional-integration:
-    needs: [ codeql ]
-    uses: ./.github/workflows/step_test_unit_functional.yml
+  coverage:
+    needs: [ test-pip ]
+    uses: ./.github/workflows/step_coverage.yml
+    if: github.event_name != 'schedule'
 
   test-conda:
-    needs: [ codeql ]
+    needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-conda.yml
+    with:
+      coverage: ${{ github.event_name != 'schedule' }}
 
   test-ui:
-    needs: [ codeql ]
+    needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-ui.yml
 
   build:
-    needs: [ test-pip, test-conda, test-unit-functional-integration, test-ui ]
+    needs: [ test-pip, test-conda, test-ui ]
     uses: ./.github/workflows/step_build.yml
 
   publish:
