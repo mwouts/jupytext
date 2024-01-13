@@ -1,11 +1,15 @@
 Jupytext ChangeLog
 ==================
 
-1.16.1-dev (2024-01-??)
+1.16.1 (2024-01-13)
 -------------------
 
 **Changed**
-- The CI was updated. Thanks to [Christian Le](https://github.com/LecrisUT) for taking care of this! ([#1190](https://github.com/mwouts/jupytext/issues/1190), [#1204](https://github.com/mwouts/jupytext/issues/1204))
+- The CI has been updated. Thanks to [Christian Le](https://github.com/LecrisUT) for taking care of this! ([#1190](https://github.com/mwouts/jupytext/issues/1190), [#1204](https://github.com/mwouts/jupytext/issues/1204))
+
+**Fixed**
+- Fixed an issue about unpairing notebooks from the Jupytext Menu ([#1197](https://github.com/mwouts/jupytext/issues/1197))
+- JupyterLab's dependency `follow-redirects` was updated from 1.15.3 to 1.15.4 ([#1203](https://github.com/mwouts/jupytext/issues/1203))
 
 
 1.16.0 (2023-12-03)
