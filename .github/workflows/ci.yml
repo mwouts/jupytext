@@ -10,9 +10,9 @@ on:
   push:
     paths-ignore:
       - "CHANGELOG.md"
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
   schedule:
     - cron: "0 11 * * 4"
 
@@ -20,10 +20,6 @@ permissions:
   # All nested workflows will inherit these permissions and so no need to declare
   # in each step file
   contents: read
-  # Cannot use it in codeql nested workflow without declaring it on
-  # top level workflow
-  # Ref: https://docs.github.com/en/actions/using-workflows/reusing-workflows#access-and-permissions
-  security-events: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,28 +29,47 @@ jobs:
   pre-commit:
     uses: ./.github/workflows/step_pre-commit.yml
 
-  codeql:
-    needs: [pre-commit]
+  static-analysis:
+    needs: [ pre-commit ]
     uses: ./.github/workflows/step_static-analysis.yml
+    permissions:
+      contents: read
+      security-events: write
 
   test-pip:
-    needs: [codeql]
+    needs: [ pre-commit ]
     uses: ./.github/workflows/step_tests-pip.yml
+    with:
+      coverage: ${{ github.event_name != 'schedule' }}
 
-  test-unit-functional-integration:
-    needs: [codeql]
-    uses: ./.github/workflows/step_test_unit_functional.yml
+  coverage:
+    needs: [ test-pip ]
+    uses: ./.github/workflows/step_coverage.yml
+    if: github.event_name != 'schedule'
 
   test-conda:
-    needs: [codeql]
+    needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-conda.yml
+    with:
+      coverage: ${{ github.event_name != 'schedule' }}
 
   test-ui:
-    needs: [codeql]
+    needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-ui.yml
 
   build:
-    needs: [test-pip, test-conda, test-unit-functional-integration, test-ui]
+    needs: [ test-pip, test-conda, test-ui ]
     uses: ./.github/workflows/step_build.yml
     with:
       upload: ${{ inputs.upload-build-artifacts || false }}
+
+  pass:
+    name: Pass
+    needs: [ pre-commit, static-analysis, test-pip, coverage, test-conda, test-ui, build ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
+          allowed-skips: coverage
+    if: always()
