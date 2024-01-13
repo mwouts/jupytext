@@ -1,3 +1,8 @@
+# 1.4.2 (2024-01-13)
+
+- Fixed an issue about unpairing notebooks from the Jupytext Menu ([#1197](https://github.com/mwouts/jupytext/issues/1197))
+- JupyterLab's dependency `follow-redirects` was updated from 1.15.3 to 1.15.4 ([#1203](https://github.com/mwouts/jupytext/issues/1203))
+
 # 1.4.1 (2023-11-27)
 
 - The Jupytext Menu is back! And text notebooks can be created directly from the launcher. This is an outstanding contribution by [Mahendra Paipuri](https://github.com/mahendrapaipuri) ([#1154](https://github.com/mwouts/jupytext/issues/1154), [#1163](https://github.com/mwouts/jupytext/issues/1163)). This requires JupyterLab 4.x or Jupyter Notebook 7.x.
