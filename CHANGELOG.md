@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.16.1-dev (2024-01-??)
+-------------------
+
+**Changed**
+- The CI was updated. Thanks to [Christian Le](https://github.com/LecrisUT) for taking care of this! ([#1190](https://github.com/mwouts/jupytext/issues/1190), [#1204](https://github.com/mwouts/jupytext/issues/1204))
+
+
 1.16.0 (2023-12-03)
 -------------------
 

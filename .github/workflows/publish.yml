@@ -1,20 +1,10 @@
-name: Release
+name: Publish
 on:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+dev[0-9]+"
-  workflow_dispatch:
-    inputs:
-      skip-tests:
-        type: boolean
-        description: Skip
-        default: false
-      ref:
-        type: string
-        description: Tag to release
-        required: true
 
 permissions:
   contents: read
@@ -22,26 +12,22 @@ permissions:
 jobs:
   pre-commit:
     uses: ./.github/workflows/step_pre-commit.yml
-    if: "! inputs.skip-tests"
 
   test-pip:
     needs: [ pre-commit ]
     uses: ./.github/workflows/step_tests-pip.yml
     with:
       coverage: false
-    if: "! inputs.skip-tests"
 
   test-conda:
-    needs: [ test-pip ]
+    needs: [ pre-commit ]
     uses: ./.github/workflows/step_tests-conda.yml
     with:
       coverage: false
-    if: "! inputs.skip-tests"
 
   test-ui:
     needs: [ test-pip ]
     uses: ./.github/workflows/step_tests-ui.yml
-    if: "! inputs.skip-tests"
 
   test-status:
     needs: [ pre-commit, test-pip, test-conda, test-ui ]
@@ -56,9 +42,6 @@ jobs:
   build:
     needs: [ test-status ]
     uses: ./.github/workflows/step_build.yml
-    with:
-      upload: true
-      ref: ${{ inputs.ref }}
 
   publish:
     needs: [ build ]
@@ -73,24 +56,16 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: dist
-          path: dist
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Base Setup
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+
+      - name: Build package
+        run: |
+          python -m pip install wheel build
+          python -m build
+
       - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1
-
-  release:
-    needs: [ publish ]
-    name: Create release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.ref }}
-      - uses: softprops/action-gh-release@v1
-        with:
-          name: Jupytext ${{ inputs.ref || github.ref_name }}
-          draft: true
-          prerelease: ${{ contains(inputs.ref || github.ref, 'rc') }}
-          generate_release_notes: true

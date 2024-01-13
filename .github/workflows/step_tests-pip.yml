@@ -17,24 +17,27 @@ jobs:
     name: >
       🐍 ${{ matrix.python-version }}
       ${{ matrix.dependency_type && format('({0})', matrix.dependency_type) }}
-      ${{ matrix.markdown-it-py && format('(markdown-it-py {0})', matrix.markdown-it-py) }}
       ${{ matrix.quarto && '(Quarto)' }}
       ${{ matrix.no_kernel && '(No kernel)' }}
+      ${{ matrix.markdown-it-py && format('(markdown-it-py {0})', matrix.markdown-it-py) }}
+      ${{ matrix.no_markdown-it-py && '(No markdown-it-py)'}}
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12"]
+        experimental: [false]
         include:
           # Test pre-release versions
           - python-version: "3.x"
             dependency_type: "pre"
+            experimental: true  # fails with pytest-8.0.0rc1
           # Test minimum markdown-it-py supported (otherwise the most recent version is used)
           - python-version: "3.x"
             markdown-it-py: "~=2.0"
           - python-version: "3.x"
-            markdown-it-py: false
+            no_markdown-it-py: true
           - python-version: "3.x"
             no_kernel: true
           - python-version: "3.x"
@@ -55,15 +58,16 @@ jobs:
           python -m pip install
           -e '.[test-cov,test-external]'
           jupyterlab
-          ${{ matrix.markdown-it-py && format('markdown-it-py{0}', matrix.markdown-it-py) || '' }}
+          ${{ format('markdown-it-py{0}', matrix.markdown-it-py) }}
 
       - name: Install a Jupyter Kernel
         if: ${{ !matrix.no_kernel }}
         run: python -m ipykernel install --name python_kernel --user
+
       - name: Uninstall markdown-it-py
         # Markdown-it-py is a dependency of Jupytext,
         # but Jupytext should still work if it is not installed
-        if: ${{ matrix.markdown-it-py == 'false' }}
+        if: ${{ matrix.no_markdown-it-py }}
         run: python -m pip uninstall markdown-it-py --yes
 
       - name: Install Quarto
@@ -84,6 +88,7 @@ jobs:
           python -m jupyterlab.browser_check
 
       - name: Test with pytest
+        continue-on-error: ${{ matrix.experimental }}
         run: pytest -n logical --cov --cov-report=xml
 
       - name: Upload coverage
