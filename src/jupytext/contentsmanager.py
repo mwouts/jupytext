@@ -184,11 +184,16 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             content=True,
             type=None,
             format=None,
+            require_hash=False,
             load_alternative_format=True,
         ):
             """Takes a path for an entity and returns its model"""
             path = path.strip("/")
             ext = os.path.splitext(path)[1]
+
+            super_kwargs = {"content": content, "type": type, "format": format}
+            if require_hash:
+                super_kwargs["require_hash"] = require_hash
 
             # Not a notebook?
             if (
@@ -196,17 +201,20 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 or self.dir_exists(path)
                 or (type is not None and type != "notebook")
             ):
-                return self.super.get(path, content, type, format)
+                return self.super.get(path, **super_kwargs)
 
             config = self.get_config(path, use_cache=content is False)
             if ext not in self.all_nb_extensions(config):
-                return self.super.get(path, content, type, format)
+                return self.super.get(path, **super_kwargs)
 
             fmt = preferred_format(ext, config.preferred_jupytext_formats_read)
             if ext == ".ipynb":
-                model = self.super.get(path, content, type="notebook", format=format)
+                super_kwargs["type"] = "notebook"
+                model = self.super.get(path, **super_kwargs)
             else:
-                model = self.super.get(path, content, type="file", format="text")
+                super_kwargs["type"] = "file"
+                super_kwargs["format"] = "text"
+                model = self.super.get(path, **super_kwargs)
                 model["type"] = "notebook"
                 if content:
                     # We may need to update these keys, inherited from text files formats
@@ -303,6 +311,18 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             # Modification time of a paired notebook is the timestamp of inputs #118 #978
             model["last_modified"] = inputs.timestamp
+
+            if require_hash:
+                if inputs.path is None or outputs.path is None:
+                    return model
+                model_other = self.super.get(
+                    inputs.path if path == outputs.path else outputs.path,
+                    require_hash=True,
+                )
+                # TODO: combine the two hashes into one with the initial length
+                # we might use e.g. https://docs.python.org/3/library/hashlib.html#tree-mode
+                model["hash"] = model["hash"] + model_other["hash"]
+                return model
 
             if not content:
                 return model
