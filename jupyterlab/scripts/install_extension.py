@@ -5,7 +5,7 @@
 # in jupyterlab/jupyterlab-jupytext folder with the name of the package.
 #
 # We are only interested in making a symlink to the
-# sys.prefix/share/jupyter/labextensions folder for developement. We should be able
+# sys.prefix/share/jupyter/labextensions folder for development. We should be able
 # to do it in simple script
 #
 
