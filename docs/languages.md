@@ -34,5 +34,6 @@ Jupytext works with notebooks in any of the following languages:
 - TypeScript
 - Wolfram Language
   - Note that Jupytext uses the non-standard `.wolfram` file extension for Wolfram Language files to avoid conflicts with Matlab.
+- Xonsh
 
 Extending Jupytext to more languages should be easy, see the sections on [contributing to](contributing.md) and [developing](developing.md) Jupytext.
