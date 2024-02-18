@@ -42,9 +42,9 @@ def test_pre_commit_hook_sync_reformat_code_and_markdown(
     jupytext_pre_commit_config["repos"][0]["hooks"][0]["additional_dependencies"] = [
         "nbconvert==5.0.8"
     ]
-    jupytext_pre_commit_config["repos"][0]["hooks"][1] = jupytext_pre_commit_config[
-        "repos"
-    ][0]["hooks"][0]
+    jupytext_pre_commit_config["repos"][0]["hooks"].append(
+        jupytext_pre_commit_config["repos"][0]["hooks"][0]
+    )
     jupytext_pre_commit_config["repos"][0]["hooks"][1]["args"] = [
         "--sync",
         "--pipe",
@@ -58,11 +58,13 @@ def test_pre_commit_hook_sync_reformat_code_and_markdown(
     # Use python as language as we will need to install additional dependencies
     jupytext_pre_commit_config["repos"][0]["hooks"][0]["language"] = "python"
     jupytext_pre_commit_config["repos"][0]["hooks"][1]["language"] = "python"
-    jupytext_pre_commit_config["repos"][1] = {
-        "repo": "https://github.com/psf/black",
-        "rev": "22.3.0",
-        "hooks": [{"id": "black"}],
-    }
+    jupytext_pre_commit_config["repos"].append(
+        {
+            "repo": "https://github.com/psf/black",
+            "rev": "22.3.0",
+            "hooks": [{"id": "black"}],
+        }
+    )
 
     with open(os.path.join(tmpdir, ".pre-commit-config.yaml"), "w") as file:
         yaml.dump(jupytext_pre_commit_config, file)
