@@ -1,4 +1,7 @@
+import os
+
 import pytest
+import yaml
 from git.exc import HookExecutionError
 from nbformat.v4.nbbase import new_markdown_cell
 from pre_commit.main import main as pre_commit
@@ -12,17 +15,12 @@ def test_pre_commit_hook_sync_with_config(
     tmp_repo,
     jupytext_repo_root,
     jupytext_repo_rev,
+    jupytext_pre_commit_config,
     python_notebook,
 ):
-    pre_commit_config_yaml = f"""
-repos:
-- repo: {jupytext_repo_root}
-  rev: {jupytext_repo_rev}
-  hooks:
-  - id: jupytext
-    args: [--sync]
-"""
-    tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
+    jupytext_pre_commit_config["repos"][0]["hooks"][0]["args"] = ["--sync"]
+    with open(os.path.join(tmpdir, ".pre-commit-config.yaml"), "w") as file:
+        yaml.dump(jupytext_pre_commit_config, file)
 
     tmp_repo.git.add(".pre-commit-config.yaml")
     pre_commit(["install", "--install-hooks", "-f"])

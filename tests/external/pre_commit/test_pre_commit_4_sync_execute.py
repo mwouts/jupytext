@@ -1,4 +1,7 @@
+import os
+
 import pytest
+import yaml
 from git.exc import HookExecutionError
 from nbformat.v4.nbbase import new_code_cell
 from pre_commit.main import main as pre_commit
@@ -13,21 +16,24 @@ def test_pre_commit_hook_sync_execute(
     tmp_repo,
     jupytext_repo_root,
     jupytext_repo_rev,
+    jupytext_pre_commit_config,
     notebook_with_outputs,
 ):
     """Here we sync the ipynb notebook with a py:percent file and execute it (this is probably not a very
     recommendable hook!)"""
-    pre_commit_config_yaml = f"""
-repos:
-- repo: {jupytext_repo_root}
-  rev: {jupytext_repo_rev}
-  hooks:
-  - id: jupytext
-    args: [--sync, --execute, --show-changes]
-    additional_dependencies:
-    - nbconvert
-"""
-    tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
+    jupytext_pre_commit_config["repos"][0]["hooks"][0]["args"] = [
+        "--sync",
+        "--execute",
+        "--show-changes",
+    ]
+    jupytext_pre_commit_config["repos"][0]["hooks"][0]["additional_dependencies"] = [
+        "nbconvert"
+    ]
+    # Use python as language as we will need to install additional dependencies
+    jupytext_pre_commit_config["repos"][0]["hooks"][0]["language"] = "python"
+
+    with open(os.path.join(tmpdir, ".pre-commit-config.yaml"), "w") as file:
+        yaml.dump(jupytext_pre_commit_config, file)
 
     tmp_repo.git.add(".pre-commit-config.yaml")
     pre_commit(["install", "--install-hooks", "-f"])
