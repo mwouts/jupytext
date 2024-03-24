@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.16.2-dev (2024-03-??)
+-------------------
+
+**Changed**
+- Temporary text notebooks for the `--pipe` or `--check` commands are now created in the notebook directory ([#1206](https://github.com/mwouts/jupytext/issues/1206))
+
+
 1.16.1 (2024-01-13)
 -------------------
 
