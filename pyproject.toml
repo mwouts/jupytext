@@ -130,14 +130,14 @@ packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupyte
 "jupyterlab/jupyter-config" = "etc/jupyter"
 "jupyterlab/jupyterlab_jupytext/labextension" = "share/jupyter/labextensions/jupyterlab-jupytext"
 
-[tool.hatch.build.hooks.jupyter-builder]
+[tool.hatch.build.hooks.custom]
 # Enable running hook by default.
 # We disable this hook only by setting env var HATCH_BUILD_HOOKS_ENABLE=false
 # So `HATCH_BUILD_HOOKS_ENABLE=false pip install .` will **not** build JupyterLab related
 # extension. A simple `pip install .` will **always** build extension
 enable-by-default = true
 # Runtime dependency for this build hook
-# We need jupyterlab as build time depdendency to get jlpm (wrapper around yarn)
+# We need jupyterlab as build time dependency to get jlpm (wrapper around yarn)
 dependencies = [
     "hatch-jupyter-builder>=0.5", "jupyterlab>=4"
 ]
@@ -154,7 +154,7 @@ ensured-targets = [
 # the extension, build will be triggered even if the build assets exist
 skip-if-exists = ["jupyterlab/jupyterlab_jupytext/labextension/static/style.js"]
 
-[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+[tool.hatch.build.hooks.custom.build-kwargs]
 # Root directory where build should be done
 path = "jupyterlab"
 # Build command that is defined in package.json
@@ -162,7 +162,7 @@ build_cmd = "build:prod"
 # We use jlpm, which is wrapper around yarn to build transpiled assets
 npm = ["jlpm"]
 
-[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+[tool.hatch.build.hooks.custom.editable-build-kwargs]
 path = "jupyterlab"
 build_cmd = "build"
 npm = ["jlpm"]
