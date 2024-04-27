@@ -22,13 +22,13 @@ editor_options:
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-1 .cell .code}
 ``` python
 1+2+3
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-2 .cell .code}
 ``` python
 ```
 :::

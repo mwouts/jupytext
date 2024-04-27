@@ -659,10 +659,20 @@ def jupytext_single_file(nb_file, args, log):
 
     # II. ### Apply commands onto the notebook ###
     # Pipe the notebook into the desired commands
-    prefix = None if nb_file == "-" else os.path.splitext(os.path.basename(nb_file))[0]
+    if nb_file == "-":
+        prefix = None
+        directory = None
+    else:
+        prefix = os.path.splitext(os.path.basename(nb_file))[0]
+        directory = os.path.dirname(nb_file)
     for cmd in args.pipe or []:
         notebook = pipe_notebook(
-            notebook, cmd, args.pipe_fmt, prefix=prefix, warn_only=args.warn_only
+            notebook,
+            cmd,
+            args.pipe_fmt,
+            prefix=prefix,
+            directory=directory,
+            warn_only=args.warn_only,
         )
 
     # and/or test the desired commands onto the notebook
@@ -673,6 +683,7 @@ def jupytext_single_file(nb_file, args, log):
             args.pipe_fmt,
             update=False,
             prefix=prefix,
+            directory=directory,
             warn_only=args.warn_only,
         )
 
@@ -1143,7 +1154,13 @@ def exec_command(command, input=None, capture=False, warn_only=False):
 
 
 def pipe_notebook(
-    notebook, command, fmt="py:percent", update=True, prefix=None, warn_only=False
+    notebook,
+    command,
+    fmt="py:percent",
+    update=True,
+    prefix=None,
+    directory=None,
+    warn_only=False,
 ):
     """Pipe the notebook, in the desired representation, to the given command. Update the notebook
     with the returned content if desired."""
@@ -1167,6 +1184,7 @@ def pipe_notebook(
             encoding="utf8",
             prefix=prefix,
             suffix=fmt["extension"],
+            dir=directory,
             delete=False,
         )
         try:

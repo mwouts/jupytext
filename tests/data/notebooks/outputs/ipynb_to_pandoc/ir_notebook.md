@@ -12,19 +12,19 @@ jupyter:
 This is a jupyter notebook that uses the IR kernel.
 :::
 
-::: {.cell .code}
+::: {#cell-1 .cell .code}
 ``` R
 sum(1:10)
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-2 .cell .code}
 ``` R
 plot(cars)
 ```
 :::
 
-::: {.cell .code}
+::: {#cell-3 .cell .code}
 ``` R
 ```
 :::

@@ -1057,7 +1057,7 @@ formats = "notebooks///ipynb,scripts///py:percent"
             "--pipe-fmt",
             "ipynb",
             "--pipe",
-            "pandoc --from ipynb --to ipynb --atx-headers",
+            "pandoc --from ipynb --to ipynb --markdown-headings=atx",
             str(nb_file),
         ]
     )

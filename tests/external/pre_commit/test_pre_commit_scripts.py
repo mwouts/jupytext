@@ -334,7 +334,7 @@ def test_wrap_markdown_cell(tmpdir):
         fp.write(
             "#!/bin/sh\n"
             "jupytext --pre-commit --sync --pipe-fmt ipynb --pipe \\\n"
-            "    'pandoc --from ipynb --to ipynb --atx-headers'\n"
+            "    'pandoc --from ipynb --to ipynb --markdown-headings=atx'\n"
         )
 
     st = os.stat(hook)
