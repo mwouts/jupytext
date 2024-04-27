@@ -1,4 +1,5 @@
 codecov:
+  token: 8bdc5016-2a81-4a43-bdd5-7b3b9adc37e7
   notify:
     wait_for_ci: true
 
