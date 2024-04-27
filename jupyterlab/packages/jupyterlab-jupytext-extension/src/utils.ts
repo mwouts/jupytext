@@ -70,7 +70,7 @@ async function getKernelIcon(
       svgstr: svgStr,
     });
   }
-  // Else check if 64x64 kernel icon is availble
+  // Else check if 64x64 kernel icon is available
   if (specModel.resources['logo-64x64']) {
     const iconBase64String = await getKernelIconBase64String(
       specModel.resources['logo-64x64']
