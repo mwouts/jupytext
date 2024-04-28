@@ -36,7 +36,7 @@ dependencies = [
     "markdown-it-py>=1.0",
     "packaging",
     "pyyaml",
-    "toml",
+    "tomli;python_version<\"3.11\"",
 ]
 dynamic = ["version"]
 
