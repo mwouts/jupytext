@@ -1,8 +1,11 @@
 Jupytext ChangeLog
 ==================
 
-1.16.2-dev (2024-03-??)
+1.16.2-dev (2024-05-??)
 -------------------
+
+**Added**
+- Added support for Xonsh notebooks ([#1213](https://github.com/mwouts/jupytext/pull/1213)) - thanks to [Jeffrey Odongo](https://github.com/jsquaredosquared) for this contribution
 
 **Changed**
 - Temporary text notebooks for the `--pipe` or `--check` commands are now created in the notebook directory ([#1206](https://github.com/mwouts/jupytext/issues/1206))
