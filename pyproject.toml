@@ -131,11 +131,11 @@ packages = ["src/jupytext", "src/jupytext_config", "jupyterlab/jupyterlab_jupyte
 "jupyterlab/jupyterlab_jupytext/labextension" = "share/jupyter/labextensions/jupyterlab-jupytext"
 
 [tool.hatch.build.hooks.jupyter-builder]
-# Enable running hook by default.
-# We disable this hook only by setting env var HATCH_BUILD_HOOKS_ENABLE=false
-# So `HATCH_BUILD_HOOKS_ENABLE=false pip install .` will **not** build JupyterLab related
-# extension. A simple `pip install .` will **always** build extension
-enable-by-default = true
+enable-by-default = false
+# We enable this hook by setting env var HATCH_BUILD_HOOKS_ENABLE=true
+# So `pip install .` will **not** build JupyterLab related
+# extension. To install the extension, it is required to run
+# `HATCH_BUILD_HOOKS_ENABLE=true pip install .`
 # Runtime dependency for this build hook
 # We need jupyterlab as build time depdendency to get jlpm (wrapper around yarn)
 dependencies = [

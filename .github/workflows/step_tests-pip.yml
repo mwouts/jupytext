@@ -55,7 +55,7 @@ jobs:
 
       - name: Install from source
         run: >
-          python -m pip install
+          HATCH_BUILD_HOOKS_ENABLE=true python -m pip install
           -e '.[test-cov,test-external]'
           jupyterlab
           ${{ format('markdown-it-py{0}', matrix.markdown-it-py) }}

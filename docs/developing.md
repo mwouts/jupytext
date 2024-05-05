@@ -4,7 +4,7 @@
 
 If you want to test a feature that has been integrated in `main` but not delivered yet to `pip` or `conda`, use
 ```
-pip install git+https://github.com/mwouts/jupytext.git
+HATCH_BUILD_HOOKS_ENABLE=true pip install git+https://github.com/mwouts/jupytext.git
 ```
 
 The above requires `node`. You can install it with e.g.
@@ -12,12 +12,11 @@ The above requires `node`. You can install it with e.g.
 conda install 'nodejs>=20' -c conda-forge
 ```
 
-Alternatively you can build only Jupytext core (e.g. skip the JupyterLab extension). To do so, prefix the
-above with `HATCH_BUILD_HOOKS_ENABLE=false`.
+Alternatively you can build only Jupytext core (e.g. skip the JupyterLab extension). To do so, remove `HATCH_BUILD_HOOKS_ENABLE=true` in the above.
 
 Finally, if you want to test a development branch, use
 ```
-pip install git+https://github.com/mwouts/jupytext.git@branch
+HATCH_BUILD_HOOKS_ENABLE=true pip install git+https://github.com/mwouts/jupytext.git@branch
 ```
 where `branch` is the name of the branch you want to test.
 
@@ -31,7 +30,7 @@ conda activate jupytext-dev
 
 Install the `jupytext` package in development mode with
 ```
-pip install -e '.[dev]'
+HATCH_BUILD_HOOKS_ENABLE=true pip install -e '.[dev]'
 ```
 
 We use the [pre-commit](https://pre-commit.com) package to run pre-commit scripts like `black` and `ruff` on the code.

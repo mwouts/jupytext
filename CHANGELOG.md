@@ -8,6 +8,7 @@ Jupytext ChangeLog
 - Added support for Xonsh notebooks ([#1213](https://github.com/mwouts/jupytext/pull/1213)) - thanks to [Jeffrey Odongo](https://github.com/jsquaredosquared) for this contribution
 
 **Changed**
+- By default, the JupyterLab extension for Jupytext is not included in the build (set `HATCH_BUILD_HOOKS_ENABLE=true` to include it). This simplifies the installation of Jupytext in pre-commit hooks ([#1210](https://github.com/mwouts/jupytext/issues/1210))
 - Temporary text notebooks for the `--pipe` or `--check` commands are now created in the notebook directory ([#1206](https://github.com/mwouts/jupytext/issues/1206))
 - Jupytext uses the standard library `tomllib` in Python 3.11, or `tomli` in Python 3.10 or older, to match JupyterLab's dependencies ([#1195](https://github.com/mwouts/jupytext/issues/1195))
 

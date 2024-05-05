@@ -24,7 +24,7 @@ jobs:
 
             Also, the version of Jupytext developed in this PR can be installed with `pip`:
             ```
-            pip install git+${{ github.event.pull_request.head.repo.clone_url }}@${{ github.event.pull_request.head.ref }}
+            HATCH_BUILD_HOOKS_ENABLE=true pip install git+${{ github.event.pull_request.head.repo.clone_url }}@${{ github.event.pull_request.head.ref }}
             ```
             (this requires `nodejs`, see more at [Developing Jupytext](https://jupytext.readthedocs.io/en/latest/developing.html))
           comment_tag: binder_link
