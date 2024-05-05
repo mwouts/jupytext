@@ -65,7 +65,7 @@ jobs:
       - name: Build package
         run: |
           python -m pip install wheel build
-          python -m build
+          HATCH_BUILD_HOOKS_ENABLE=true python -m build
 
       - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1

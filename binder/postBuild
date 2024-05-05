@@ -4,7 +4,7 @@ set -e
 # Install from sources
 # NB: If you want to use Jupytext on your binder, don't install it from source,
 # just add "jupytext" to your "binder/requirements.txt" instead.
-pip install .
+HATCH_BUILD_HOOKS_ENABLE=true pip install .
 
 mkdir -p ${HOME}/.jupyter/labconfig
 cp binder/labconfig/* ${HOME}/.jupyter/labconfig
