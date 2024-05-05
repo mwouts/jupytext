@@ -1,3 +1,9 @@
+# 1.4.3 (2024-05-05)
+
+- JupyterLab's dependency `ejs` was updated from 3.1.9 to 3.1.10 ([#1231](https://github.com/mwouts/jupytext/issues/1231))
+- JupyterLab's dependency `follow-redirects` was updated from 1.15.4 to 1.15.6 ([#1218](https://github.com/mwouts/jupytext/issues/1218))
+- JupyterLab's dependency `ip` was updated from 2.0.0 to 2.0.1 ([#1216](https://github.com/mwouts/jupytext/issues/1216))
+
 # 1.4.2 (2024-01-13)
 
 - Fixed an issue about unpairing notebooks from the Jupytext Menu ([#1197](https://github.com/mwouts/jupytext/issues/1197))
