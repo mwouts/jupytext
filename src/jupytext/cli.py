@@ -858,9 +858,18 @@ def jupytext_single_file(nb_file, args, log):
                 f"[jupytext] Setting the timestamp of {shlex.quote(path)} equal to that of {shlex.quote(nb_file)}"
             )
             os.utime(path, (os.stat(path).st_atime, os.stat(nb_file).st_mtime))
-        elif not modified and not path.endswith(".ipynb"):
-            log(f"[jupytext] Updating the timestamp of {shlex.quote(path)}")
-            os.utime(path, None)
+        elif not modified:
+            if path.endswith(".ipynb"):
+                # No need to update the timestamp of ipynb files
+                log(f"[jupytext] Unchanged {shlex.quote(path)}")
+            elif args.sync:
+                # if the content is unchanged (and matches ipynb), we don't need
+                # to update the timestamp as the contents manager will not throw in
+                # that case (see the try/catch on read_pair(... must_match=True))
+                log(f"[jupytext] Unchanged {shlex.quote(path)}")
+            else:
+                log(f"[jupytext] Updating the timestamp of {shlex.quote(path)}")
+                os.utime(path, None)
 
         if args.pre_commit:
             system("git", "add", path)

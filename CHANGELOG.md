@@ -12,6 +12,7 @@ Jupytext ChangeLog
 - Temporary text notebooks for the `--pipe` or `--check` commands are now created in the notebook directory ([#1206](https://github.com/mwouts/jupytext/issues/1206))
 - Jupytext uses the standard library `tomllib` in Python 3.11, or `tomli` in Python 3.10 or older, to match JupyterLab's dependencies ([#1195](https://github.com/mwouts/jupytext/issues/1195))
 - The dependencies of the JupyterLab extension were updated ([#1216](https://github.com/mwouts/jupytext/issues/1216), [#1218](https://github.com/mwouts/jupytext/issues/1218), [#1231](https://github.com/mwouts/jupytext/issues/1231))
+- `jupytext --sync` will not update the timestamp of text notebooks if their content is unchanged ([#1215](https://github.com/mwouts/jupytext/issues/1215))
 
 
 **Fixed**
