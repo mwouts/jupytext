@@ -1262,7 +1262,7 @@ def test_jupytext_to_ipynb_does_not_update_timestamp_if_not_paired(
     assert "Updating the timestamp" not in capture.out
 
 
-@pytest.mark.parametrize("formats", ["ipynb,py", "py:percent", "py", None])
+@pytest.mark.parametrize("formats", ["ipynb,py", "py:percent", "py:light", None])
 def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, formats):
     # Write a text notebook
     nb = python_notebook
@@ -1302,7 +1302,7 @@ def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, forma
     os.utime(test_py, (src_timestamp, src_timestamp))
 
     # Then we can't open paired notebooks
-    if formats == "ipynb,py":
+    if formats == "ipynb,py:percent":
         from tornado.web import HTTPError
 
         with pytest.raises(HTTPError, match="is more recent than test.py"):
