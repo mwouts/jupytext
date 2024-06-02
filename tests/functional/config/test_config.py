@@ -158,6 +158,15 @@ formats = "ipynb,py:percent"
 """,
             "notebooks///ipynb,scripts///py:percent",
         ),
+        (
+            """# Pair local notebooks to scripts in 'notebooks_py' and md files in 'notebooks_md'
+[formats]
+"" = "ipynb"
+"notebooks_py" = "py:percent"
+"notebooks_md" = "md:myst"
+""",
+            "ipynb,notebooks_py///py:percent,notebooks_md///md:myst",
+        ),
     ],
 )
 def test_jupytext_formats(tmpdir, content_toml, formats_short_form):
