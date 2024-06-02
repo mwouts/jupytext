@@ -6,9 +6,11 @@ Jupytext ChangeLog
 
 **Fixed**
 - We have fixed a typo when `build_jupytext_contents_manager_class` can't be imported ([#1162](https://github.com/mwouts/jupytext/issues/1162))
+- Some dependencies of the JupyterLab extensions were updated ([#1243](https://github.com/mwouts/jupytext/issues/1243), [#1245](https://github.com/mwouts/jupytext/issues/1245))
 
 **Added**
 - Added support for Lua notebooks ([#1252](https://github.com/mwouts/jupytext/pull/1252)) - thanks to [erentar](https://github.com/erentar) for this contribution
+- Empty prefixes are now allowed in Jupytext format when specified as a dictionary ([#1144](https://github.com/mwouts/jupytext/issues/1144))
 
 
 1.16.2 (2024-05-05)

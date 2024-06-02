@@ -398,7 +398,9 @@ def load_jupytext_configuration_file(config_file, stream=None):
     # formats can be a dict prefix => format
     if isinstance(config.formats, dict):
         config.formats = [
-            (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt
+            fmt
+            if not prefix
+            else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt
             for prefix, fmt in config.formats.items()
         ]
     config.formats = short_form_multiple_formats(config.formats)
