@@ -6,7 +6,7 @@
 [![Documentation Status](https://readthedocs.org/projects/jupytext/badge/?version=latest)](https://jupytext.readthedocs.io/en/latest/?badge=latest)
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=main)](https://codecov.io/gh/mwouts/jupytext/branch/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![GitHub language count](https://img.shields.io/github/languages/count/mwouts/jupytext)](docs/languages.md)
+[![GitHub language count](https://img.shields.io/github/languages/count/mwouts/jupytext)](./languages.md)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/jupytext.svg)](https://anaconda.org/conda-forge/jupytext)
 [![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
@@ -24,7 +24,7 @@ Jupyter Notebookがプレーンテキストドキュメントだったらいい�
 
 ## テキストノートブック
 
-`py:percent` [フォーマット](docs/formats-scripts.md#the-percent-format)でエンコードされたPythonノートブックは、`.py`拡張子を持ち、以下のようになります。
+`py:percent` [フォーマット](./formats-scripts.md#the-percent-format)でエンコードされたPythonノートブックは、`.py`拡張子を持ち、以下のようになります。
 
 ```
 # %% [markdown]
@@ -37,9 +37,9 @@ def f(x):
 
 ノートブックの入力（とオプションでメタデータ）のみが含まれます。テキストノートブックはバージョン管理に適しています。IDEで編集やリファクタリングも可能です。上記の`.py`ノートブックは通常のPythonファイルです。
 
-コードを主に含むノートブックには`percent`フォーマットをお勧めします。`percent`フォーマットは、Julia、Python、Rなど多くの[言語](docs/languages.md)で利用可能です。
+コードを主に含むノートブックには`percent`フォーマットをお勧めします。`percent`フォーマットは、Julia、Python、Rなど多くの[言語](./languages.md)で利用可能です。
 
-ノートブックがドキュメント指向の場合は、[Markdownベースのフォーマット](docs/formats-markdown.md)（`.md`拡張子のテキストノートブック）の方が適切かもしれません。ノートブックの用途に応じて、Jupyter Bookとの相互運用性に優れたMyst Markdownフォーマット、Quarto Markdown、さらにはPandoc Markdownを選ぶのも良いでしょう。
+ノートブックがドキュメント指向の場合は、[Markdownベースのフォーマット](./formats-markdown.md)（`.md`拡張子のテキストノートブック）の方が適切かもしれません。ノートブックの用途に応じて、Jupyter Bookとの相互運用性に優れたMyst Markdownフォーマット、Quarto Markdown、さらにはPandoc Markdownを選ぶのも良いでしょう。
 
 ## インストール
 
@@ -59,7 +59,7 @@ JupyterのPython環境にJupytextをインストールします。以下のど�
 
 `.py`や`.md`拡張子のテキストノートブックはバージョン管理に適しています。IDEで簡単に編集や作成ができます。Jupyter Labで右クリックするとノートブックとして開いて実行できます。ただし、テキストノートブックにはノートブックの入力のみが保存されるため、ノートブックを閉じるとノートブックの出力は失われます。
 
-テキストノートブックの便利な代替手段は、[ペアノートブック](docs/paired-notebooks.md)です。これは、`.ipynb`と`.py`のように、同じノートブックを異なるフォーマットで含む2つのファイルのセットです。
+テキストノートブックの便利な代替手段は、[ペアノートブック](./paired-notebooks.md)です。これは、`.ipynb`と`.py`のように、同じノートブックを異なるフォーマットで含む2つのファイルのセットです。
 
 ペアノートブックの`.py`バージョンを編集し、Jupyterで _reload notebook from disk_ を選択することで、編集内容をJupyterに反映させることができます。`.ipynb`ファイルが存在する場合、出力はそこから再読み込みされます。次にJupyterでノートブックを保存すると、`.ipynb`バージョンが更新または再作成されます。
 
@@ -67,7 +67,7 @@ Jupyter Labでノートブックをペアリングするには、コマンドパ
 
 ![](https://github.com/mwouts/jupytext/blob/64b4be818508760116f91bf156342cb4cf724d93/docs/images/pair_commands.png?raw=true)
 
-特定のディレクトリ内のすべてのノートブックをペアリングするには、以下の内容で[設定ファイル](docs/config.md)を作成します。
+特定のディレクトリ内のすべてのノートブックをペアリングするには、以下の内容で[設定ファイル](./config.md)を作成します。
 
 ```
 # jupytext.toml ノートブックディレクトリのルートに配置
@@ -76,7 +76,7 @@ formats = "ipynb,py:percent"
 
 ## コマンドライン
 
-Jupytextは[コマンドライン](docs/using-cli.md)でも利用可能です。以下のことができます。
+Jupytextは[コマンドライン](./using-cli.md)でも利用可能です。以下のことができます。
 
 - `jupytext --set-formats ipynb,py:percent notebook.ipynb`でノートブックをペアリングする
 - `jupytext --sync notebook.py`でペアファイルを同期する（入力は最新のペアファイルから読み込まれる）
@@ -88,7 +88,7 @@ Jupytextは[コマンドライン](docs/using-cli.md)でも利用可能です。
 ### バージョン管理下のノートブック
 
 手順は以下の通りです。
-- Jupyterで`.ipynb`ノートブックを開き、Jupyter Labの _pair_ コマンドまたはグローバルな[設定ファイル](docs/config.md)を使用して、`.py`ノートブックに[ペアリング](docs/paired-notebooks.md)します
+- Jupyterで`.ipynb`ノートブックを開き、Jupyter Labの _pair_ コマンドまたはグローバルな[設定ファイル](./config.md)を使用して、`.py`ノートブックに[ペアリング](./paired-notebooks.md)します
 - ノートブックを保存すると、`.py`ノートブックが作成されます
 - この`.py`ノートブックをバージョン管理に追加します
 
@@ -107,7 +107,7 @@ Gitを通じたJupyter Notebookでのコラボレーションが、テキスト�
 
 ### IDEでのノートブックの編集やリファクタリング
 
-ノートブックを`.py`ファイルと[ペアリング](docs/paired-notebooks.md)すると、IDEでノートブックの`.py`表現を簡単に編集したりリファクタリングしたりできます。
+ノートブックを`.py`ファイルと[ペアリング](./paired-notebooks.md)すると、IDEでノートブックの`.py`表現を簡単に編集したりリファクタリングしたりできます。
 
 `.py`ノートブックの編集が終わったら、Jupyterでノートブックを _reload_ するだけで、最新の編集内容がそこに反映されます。
 
@@ -117,6 +117,6 @@ Gitを通じたJupyter Notebookでのコラボレーションが、テキスト�
 
 [ドキュメント](https://jupytext.readthedocs.io)でJupytextについてさらに詳しく読むことができます。
 
-Jupytextを初めて使う場合は、[FAQ](docs/faq.md)または[チュートリアル](docs/tutorials.md)から始めるのが良いかもしれません。
+Jupytextを初めて使う場合は、[FAQ](./faq.md)または[チュートリアル](./tutorials.md)から始めるのが良いかもしれません。
 
 Jupytextの短い紹介動画もあります。[![](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48)
