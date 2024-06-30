@@ -1,3 +1,4 @@
+import contextlib
 import itertools
 import os.path
 import re
@@ -47,8 +48,13 @@ def cwd_tmpdir(tmpdir):
 @pytest.fixture()
 def cwd_tmp_path(tmp_path):
     # Run the whole test from inside tmp_path
-    with tmp_path.cwd():
-        yield tmp_path
+    if sys.version_info < (3, 11):
+        with tmp_path.cwd():
+            yield tmp_path
+    else:
+        # https://github.com/mwouts/jupytext/issues/1242
+        with contextlib.chdir(tmp_path):
+            yield tmp_path
 
 
 @pytest.fixture

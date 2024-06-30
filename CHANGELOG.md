@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.16.3-dev (2024-07-??)
+-------------------
+
+**Added**
+Jupytext is now tested with Python 3.13-dev on the CI ([#1242](https://github.com/mwouts/jupytext/issues/1242))
+
+
 1.16.2 (2024-05-05)
 -------------------
 
