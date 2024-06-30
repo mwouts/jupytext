@@ -15,6 +15,7 @@ Jupytext works with notebooks in any of the following languages:
 - Java
 - Javascript
 - Julia
+- Lua
 - Matlab
 - OCaml
 - Octave

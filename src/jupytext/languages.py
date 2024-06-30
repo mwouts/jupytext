@@ -91,6 +91,7 @@ _SCRIPT_EXTENSIONS = {
         "comment_suffix": "*/",
     },
     ".xsh": {"language": "xonsh", "comment": "#"},
+    ".lua": {"language": "lua", "comment": "--"},
 }
 
 _COMMENT_CHARS = [
