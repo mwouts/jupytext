@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.16.3-dev (2024-07-??)
+-------------------
+
+**Fixed**
+- We have fixed a typo when `build_jupytext_contents_manager_class` can't be imported ([#1162](https://github.com/mwouts/jupytext/issues/1162))
+
+
 1.16.2 (2024-05-05)
 -------------------
 

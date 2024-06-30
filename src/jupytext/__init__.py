@@ -8,7 +8,7 @@ from .version import __version__
 try:
     from .contentsmanager import build_jupytext_contents_manager_class
 except ImportError as err:
-    build_jupytext_contents_manager = reraise(err)
+    build_jupytext_contents_manager_class = reraise(err)
 
 try:
     from .contentsmanager import TextFileContentsManager
