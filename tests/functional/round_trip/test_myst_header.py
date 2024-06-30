@@ -1,8 +1,11 @@
+import pytest
+
 from jupytext import reads, writes
 from jupytext.compare import compare
 from jupytext.config import load_jupytext_configuration_file
 
 
+@pytest.mark.requires_myst
 def test_myst_header_is_stable_1247_using_inline_filter(
     md="""---
 jupytext:
@@ -29,6 +32,7 @@ settings:
     compare(md2, md)
 
 
+@pytest.mark.requires_myst
 def test_myst_header_is_stable_1247_using_config(
     jupytext_toml_content="""notebook_metadata_filter = "-jupytext.text_representation.jupytext_version,settings,mystnb"
 """,
