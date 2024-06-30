@@ -21,6 +21,32 @@ func main() {
 fmt.Printf("Hello World!")
 ```
 
+<!-- #region magic_args="--who=world can pass flags to main func" -->
+<!-- #endregion -->
+
+```go
+import (
+    "flag"
+    "fmt"
+)
+
+var flagWho = flag.String("who", "", "Your name!")
+
+%% --who=world
+fmt.Printf("Hello %s!\n", *flagWho)
+```
+
+%args also can pass flags
+
+```go
+%args --who=Wally
+
+func main() {
+    flag.Parse()
+    fmt.Printf("Where is %s?", *flagWho)
+}
+```
+
 ```go
 import "github.com/janpfeifer/gonb/gonbui"
 

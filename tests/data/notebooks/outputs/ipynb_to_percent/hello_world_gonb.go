@@ -21,6 +21,30 @@ func main() {
 // %%
 fmt.Printf("Hello World!")
 
+// %% [markdown] magic_args="--who=world can pass flags to main func"
+
+// %%
+import (
+    "flag"
+    "fmt"
+)
+
+var flagWho = flag.String("who", "", "Your name!")
+
+%% --who=world
+fmt.Printf("Hello %s!\n", *flagWho)
+
+// %% [markdown]
+// %args also can pass flags
+
+// %%
+// %args --who=Wally
+
+func main() {
+    flag.Parse()
+    fmt.Printf("Where is %s?", *flagWho)
+}
+
 // %%
 import "github.com/janpfeifer/gonb/gonbui"
 

@@ -22,6 +22,31 @@ func main() {
 fmt.Printf("Hello World!")
 ```
 
+%% --who=world can pass flags to main func
+
+```{code-cell}
+import (
+    "flag"
+    "fmt"
+)
+
+var flagWho = flag.String("who", "", "Your name!")
+
+%% --who=world
+fmt.Printf("Hello %s!\n", *flagWho)
+```
+
+%args also can pass flags
+
+```{code-cell}
+%args --who=Wally
+
+func main() {
+    flag.Parse()
+    fmt.Printf("Where is %s?", *flagWho)
+}
+```
+
 ```{code-cell}
 import "github.com/janpfeifer/gonb/gonbui"
 
