@@ -215,6 +215,8 @@ def cell_language(source, default_language, custom_cell_magics):
                     return lang, ""
         elif line.startswith("%%"):
             magic = line[2:]
+            if default_language == "go" and magic.strip() == "":
+                return None, None
             if " " in magic:
                 lang, magic_args = magic.split(" ", 1)
             else:
