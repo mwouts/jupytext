@@ -7,6 +7,9 @@ Jupytext ChangeLog
 **Fixed**
 - We have fixed a typo when `build_jupytext_contents_manager_class` can't be imported ([#1162](https://github.com/mwouts/jupytext/issues/1162))
 
+**Added**
+- Added support for Lua notebooks ([#1252](https://github.com/mwouts/jupytext/pull/1252)) - thanks to [erentar](https://github.com/erentar) for this contribution
+
 
 1.16.2 (2024-05-05)
 -------------------
