@@ -125,6 +125,16 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             nbk = model["content"]
             try:
                 config = self.get_config(path)
+
+                if any(path.startswith(ignored_path) for ignored_path in config.ignored_paths):
+                    # Remove Jupytext metadata (if any)
+                    try:
+                        del model["content"]["metadata"]["jupytext"]
+                    except KeyError:
+                        pass
+
+                    return self.super.save(model, path)
+
                 jupytext_formats = notebook_formats(nbk, config, path)
                 self.update_paired_notebooks(path, jupytext_formats)
 
