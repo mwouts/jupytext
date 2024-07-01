@@ -13,33 +13,33 @@ def get_comment(ext):
 # A magic expression is a line or cell or metakernel magic (#94, #61) escaped zero, or multiple times
 _MAGIC_RE = {
     _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
-        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z]".format(get_comment(ext))
+        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z]+".format(get_comment(ext))
     )
     for ext in _SCRIPT_EXTENSIONS
 }
 _MAGIC_FORCE_ESC_RE = {
     _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
-        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*escape".format(get_comment(ext))
+        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z]+(.*){0}\s*escape".format(get_comment(ext))
     )
     for ext in _SCRIPT_EXTENSIONS
 }
 _MAGIC_NOT_ESC_RE = {
     _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
-        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z](.*){0}\s*noescape".format(get_comment(ext))
+        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z]+(.*){0}\s*noescape".format(get_comment(ext))
     )
     for ext in _SCRIPT_EXTENSIONS
 }
 _LINE_CONTINUATION_RE = re.compile(r".*\\\s*$")
 
 # Rust magics start with single ':' #351
-_MAGIC_RE["rust"] = re.compile(r"^(// |//)*:[a-zA-Z]")
-_MAGIC_FORCE_ESC_RE["rust"] = re.compile(r"^(// |//)*:[a-zA-Z](.*)//\s*escape")
-_MAGIC_FORCE_ESC_RE["rust"] = re.compile(r"^(// |//)*:[a-zA-Z](.*)//\s*noescape")
+_MAGIC_RE["rust"] = re.compile(r"^(// |//)*:[a-zA-Z]+")
+_MAGIC_FORCE_ESC_RE["rust"] = re.compile(r"^(// |//)*:[a-zA-Z]+(.*)//\s*escape")
+_MAGIC_FORCE_ESC_RE["rust"] = re.compile(r"^(// |//)*:[a-zA-Z]+(.*)//\s*noescape")
 
 # C# magics start with '#!'
-_MAGIC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z]")
-_MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*escape")
-_MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*noescape")
+_MAGIC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z]+")
+_MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z]+(.*)//\s*escape")
+_MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z]+(.*)//\s*noescape")
 
 # Commands starting with a question or exclamation mark have to be escaped
 _PYTHON_HELP_OR_BASH_CMD = re.compile(r"^\s*(# |#)*\s*(\?|!)\s*[A-Za-z\.\~\$\\\/\{\}]")

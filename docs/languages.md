@@ -9,6 +9,7 @@ Jupytext works with notebooks in any of the following languages:
 - Coconut
 - F#
 - Gnuplot
+- Go
 - Groovy
 - Haskell
 - IDL
