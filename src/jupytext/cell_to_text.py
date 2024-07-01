@@ -487,6 +487,12 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
 
     def cell_to_text(self):
         """Return the text representation for the cell"""
+        if self.default_language == "go" and self.language == "go":
+            self.source = [
+                re.sub(r"^([/\s]*)(%%$|%%\s+.*$)", r"\1// gonb:\2", line)
+                for line in self.source
+            ]
+
         active = is_active(
             self.ext, self.metadata, same_language(self.language, self.default_language)
         )

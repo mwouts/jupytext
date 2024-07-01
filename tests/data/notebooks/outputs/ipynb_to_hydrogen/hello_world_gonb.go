@@ -19,11 +19,11 @@ func main() {
 }
 
 // %%
-%%
+// gonb:%%
 fmt.Printf("Hello World!")
 
 // %% [markdown]
-// %% --who=world can pass flags to main func
+// // gonb:%% --who=world can pass flags to main func
 
 // %%
 import (
@@ -33,7 +33,7 @@ import (
 
 var flagWho = flag.String("who", "", "Your name!")
 
-%% --who=world
+// gonb:%% --who=world
 fmt.Printf("Hello %s!\n", *flagWho)
 
 // %% [markdown]
@@ -50,11 +50,11 @@ func main() {
 // %%
 import "github.com/janpfeifer/gonb/gonbui"
 
-%%
+// gonb:%%
 gonbui.DisplayHtml(`<span style="background:pink; color:#111; border-radius: 3px; border: 3px solid orange; font-size: 18px;">I 🧡 GoNB!</span>`)
 
 // %%
-%%
+// gonb:%%
 gonbui.DisplayMarkdown("#### Objective\n\n1. Have fun coding **Go**;\n1. Profit...\n"+
                        `$$f(x) = \int_{-\infty}^{\infty} e^{-x^2} dx$$`)
 
@@ -62,5 +62,5 @@ gonbui.DisplayMarkdown("#### Objective\n\n1. Have fun coding **Go**;\n1. Profit.
 func init_a() {
     fmt.Println("init_a")
 }
-%%
+// gonb:%%
 fmt.Println("main")

@@ -1,4 +1,5 @@
 """Determine notebook or cell language"""
+import re
 
 # Jupyter magic commands that are also languages
 _JUPYTER_LANGUAGES = [
@@ -111,6 +112,7 @@ _JUPYTER_LANGUAGES = (
 _JUPYTER_LANGUAGES_LOWER_AND_UPPER = _JUPYTER_LANGUAGES.union(
     {str.upper(lang) for lang in _JUPYTER_LANGUAGES}
 )
+_GO_DOUBLE_PERCENT_COMMAND = re.compile(r"^(%%|%%\s+.*)$")
 
 
 def default_language_from_metadata_and_ext(metadata, ext, pop_main_language=False):
@@ -207,6 +209,8 @@ def cell_language(source, default_language, custom_cell_magics):
     """Return cell language and language options, if any"""
     if source:
         line = source[0]
+        if default_language == "go" and _GO_DOUBLE_PERCENT_COMMAND.match(line):
+            return None, None
         if default_language == "csharp":
             if line.startswith("#!"):
                 lang = line[2:].strip()
@@ -215,8 +219,6 @@ def cell_language(source, default_language, custom_cell_magics):
                     return lang, ""
         elif line.startswith("%%"):
             magic = line[2:]
-            if default_language == "go" and magic.strip() == "":
-                return None, None
             if " " in magic:
                 lang, magic_args = magic.split(" ", 1)
             else:

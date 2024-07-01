@@ -15,9 +15,10 @@ func main() {
     fmt.Printf("Hello World!")
 }
 
+%%
 fmt.Printf("Hello World!")
 
-// + [markdown] magic_args="--who=world can pass flags to main func"
+// %% --who=world can pass flags to main func
 
 // +
 import (
@@ -48,6 +49,7 @@ import "github.com/janpfeifer/gonb/gonbui"
 gonbui.DisplayHtml(`<span style="background:pink; color:#111; border-radius: 3px; border: 3px solid orange; font-size: 18px;">I 🧡 GoNB!</span>`)
 // -
 
+%%
 gonbui.DisplayMarkdown("#### Objective\n\n1. Have fun coding **Go**;\n1. Profit...\n"+
                        `$$f(x) = \int_{-\infty}^{\infty} e^{-x^2} dx$$`)
 

@@ -565,8 +565,9 @@ def test_read_simple_gonb_cell_with_double_percent(
 //     language: go
 //     name: gonb
 // ---
+
 // %%
-%%
+// gonb:%%
 fmt.Printf("Hello World!")
 """,
 ):
@@ -591,8 +592,9 @@ def test_write_simple_gonb_cell_with_double_percent(
 //     language: go
 //     name: gonb
 // ---
+
 // %%
-%%
+// gonb:%%
 fmt.Printf("Hello World!")
 """,
 ):

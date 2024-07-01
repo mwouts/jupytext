@@ -18,11 +18,11 @@ func main() {
 ```
 
 ```go
+%%
 fmt.Printf("Hello World!")
 ```
 
-<!-- #region magic_args="--who=world can pass flags to main func" -->
-<!-- #endregion -->
+%% --who=world can pass flags to main func
 
 ```go
 import (
@@ -55,6 +55,7 @@ gonbui.DisplayHtml(`<span style="background:pink; color:#111; border-radius: 3px
 ```
 
 ```go
+%%
 gonbui.DisplayMarkdown("#### Objective\n\n1. Have fun coding **Go**;\n1. Profit...\n"+
                        `$$f(x) = \int_{-\infty}^{\infty} e^{-x^2} dx$$`)
 ```
