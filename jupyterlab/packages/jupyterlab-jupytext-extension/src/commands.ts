@@ -68,9 +68,9 @@ function getSelectedFormats(notebookTracker: INotebookTracker): Array<string> {
   if (languageInfo && languageInfo.file_extension) {
     const scriptExt = languageInfo.file_extension.substring(1);
     formats = formats.map((format) => {
-      // By default use light format
+      // By default use percent format
       if (format === scriptExt) {
-        return 'auto:light';
+        return 'auto:percent';
       }
       // Replace language specific extension with auto
       return format.replace(`${scriptExt}:`, 'auto:');
@@ -102,8 +102,8 @@ function getSelectedFormats(notebookTracker: INotebookTracker): Array<string> {
       'jupytext'
     ) as IJupytextSection;
     const formatName = jupytext
-      ? jupytext?.text_representation?.formatName || 'light'
-      : 'light';
+      ? jupytext?.text_representation?.formatName || 'percent'
+      : 'percent';
     formats.push(`auto:${formatName}`);
   }
   return formats;

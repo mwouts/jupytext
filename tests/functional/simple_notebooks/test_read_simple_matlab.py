@@ -10,7 +10,7 @@ def test_hide_code_tag(
         metadata={"jupytext": {"main_language": "matlab"}},
         cells=[new_code_cell("1 + 1", metadata={"tags": ["hide_code"]})],
     ),
-    text="""% + tags=["hide_code"]
+    text="""% %% tags=["hide_code"]
 1 + 1
 """,
 ):

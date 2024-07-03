@@ -30,6 +30,7 @@ from .header import (
     metadata_and_cell_to_header,
 )
 from .languages import (
+    _SCRIPT_EXTENSIONS,
     default_language_from_metadata_and_ext,
     set_main_and_cell_language,
 )
@@ -486,6 +487,11 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, config=None, **kwargs):
 
     if not format_name:
         format_name = format_name_for_ext(metadata, ext, explicit_default=False)
+
+    # Since Jupytext==1.17, the default format for
+    # writing a notebook to a script is the percent format
+    if not format_name and "cell_markers" not in fmt and ext in _SCRIPT_EXTENSIONS:
+        format_name = "percent"
 
     if format_name:
         fmt["format_name"] = format_name
