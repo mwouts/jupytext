@@ -76,6 +76,7 @@ test-external = [
   "pre-commit",
   # Interaction with other contents managers
   # Starting with jupyter-fs==1.0.0, there is SyncMetaManager available
+  # Bump to 1.0.1 once it is released which has some important bugfixes
   "jupyter-fs==1.0.0"
 ]
 # Coverage requirements
