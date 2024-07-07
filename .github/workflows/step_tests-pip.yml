@@ -80,16 +80,22 @@ jobs:
           # install it
           sudo apt install ./*.deb
 
+      - name: Test with pytest
+        continue-on-error: ${{ matrix.experimental }}
+        run: pytest -n logical --cov --cov-report=xml
+
       - name: Test lab extension
         run: |
+          # Uninstall jupyter-fs as it overrides the original browser-test.js to
+          # check its own functionality (https://github.com/jpmorganchase/jupyter-fs/blob/main/jupyterfs/browser-test.js)
+          # So uninstall jupyter-fs before running browser check
+          #
+          pip uninstall jupyter-fs -y
+
           # Check extension
           jupyter labextension list
           jupyter labextension list 2>&1 | grep -ie "jupyterlab-jupytext.*OK"
           python -m jupyterlab.browser_check
-
-      - name: Test with pytest
-        continue-on-error: ${{ matrix.experimental }}
-        run: pytest -n logical --cov --cov-report=xml
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
