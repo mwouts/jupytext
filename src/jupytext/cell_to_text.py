@@ -135,6 +135,13 @@ class BaseCellExporter:
         if self.cell_type != "code" and not self.metadata and self.use_triple_quotes():
             self.metadata["cell_type"] = self.cell_type
 
+        # Go notebooks have '%%' or '%% -' magic commands that need to be escaped
+        if self.default_language == "go" and self.language == "go":
+            self.source = [
+                re.sub(r"^(//\s*)*(%%\s*$|%%\s+-.*$)", r"\1//gonb:\2", line)
+                for line in self.source
+            ]
+
         if self.is_code():
             return self.code_to_text()
 
@@ -487,6 +494,13 @@ class DoublePercentCellExporter(BaseCellExporter):  # pylint: disable=W0223
 
     def cell_to_text(self):
         """Return the text representation for the cell"""
+        # Go notebooks have '%%' or '%% -' magic commands that need to be escaped
+        if self.default_language == "go" and self.language == "go":
+            self.source = [
+                re.sub(r"^(//\s*)*(%%\s*$|%%\s+-.*$)", r"\1//gonb:\2", line)
+                for line in self.source
+            ]
+
         active = is_active(
             self.ext, self.metadata, same_language(self.language, self.default_language)
         )

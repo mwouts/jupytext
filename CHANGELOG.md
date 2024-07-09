@@ -8,9 +8,16 @@ Jupytext ChangeLog
 - We have fixed a typo when `build_jupytext_contents_manager_class` can't be imported ([#1162](https://github.com/mwouts/jupytext/issues/1162))
 - We use `inspect` to determine whether the current contents manager derives from `AsyncContentsManager` (which is not
 supported by Jupytext at the moment). This fixes a compatibility issue with `jupyter-fs==1.0.0` ([#1239](https://github.com/mwouts/jupytext/issues/1239)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR!
+- Some dependencies of the JupyterLab extensions were updated ([#1243](https://github.com/mwouts/jupytext/issues/1243), [#1245](https://github.com/mwouts/jupytext/issues/1245))
 
 **Added**
-- Added support for Lua notebooks ([#1252](https://github.com/mwouts/jupytext/pull/1252)) - thanks to [erentar](https://github.com/erentar) for this contribution
+- Lua notebooks are now supported ([#1252](https://github.com/mwouts/jupytext/pull/1252)) - thanks to [erentar](https://github.com/erentar) for this contribution
+- Go notebooks are supported too ([#1244](https://github.com/mwouts/jupytext/issues/1244))! Many thanks to [Jan Pfeifer](https://github.com/janpfeifer), author of [GoNB](https://github.com/janpfeifer/gonb), and to [HaveF](https://github.com/HaveF) for their help on this topic.
+- Empty prefixes are now allowed in Jupytext format when specified as a dictionary ([#1144](https://github.com/mwouts/jupytext/issues/1144))
+
+**Changed**
+- We've had to deactivate the tests on the Quarto format in the CI as the Quarto round trip
+might now add a Markdown cell to the notebook ([#1255](https://github.com/mwouts/jupytext/issues/1255))
 
 
 1.16.2 (2024-05-05)

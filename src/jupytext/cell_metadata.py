@@ -257,7 +257,7 @@ def parse_rmd_options(line):
 
 def rmd_options_to_metadata(options, use_runtools=False):
     """Parse rmd options and return a metadata dictionary"""
-    options = re.split(r"\s|,", options, 1)
+    options = re.split(r"\s|,", options, maxsplit=1)
     # Special case Wolfram Language, which sadly has a space in the language
     # name.
     if options[0:2] == ["wolfram", "language"]:

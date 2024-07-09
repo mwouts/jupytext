@@ -41,6 +41,10 @@ _MAGIC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z]")
 _MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*escape")
 _MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*noescape")
 
+# Go magics might start with % or ! or !*
+# (in addition, Go NB might use %% or %% -, see "_GO_DOUBLE_PERCENT_COMMAND")
+_MAGIC_RE["go"] = re.compile(r"^(// |//)*(!|!\*|%|%%|%%%)[a-zA-Z]")
+
 # Commands starting with a question or exclamation mark have to be escaped
 _PYTHON_HELP_OR_BASH_CMD = re.compile(r"^\s*(# |#)*\s*(\?|!)\s*[A-Za-z\.\~\$\\\/\{\}]")
 
