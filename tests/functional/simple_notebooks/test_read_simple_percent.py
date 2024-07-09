@@ -555,3 +555,54 @@ if __name__ == '__main__':
     compare_notebooks(nb_actual, nb_expected)
     text_actual = jupytext.writes(nb_actual, fmt="py:percent")
     compare(text_actual, text)
+
+
+@pytest.mark.parametrize("space_in_gonb", [False, True])
+def test_read_simple_gonb_cell_with_double_percent(
+    space_in_gonb,
+    go_percent="""// ---
+// jupyter:
+//   kernelspec:
+//     display_name: Go (gonb)
+//     language: go
+//     name: gonb
+// ---
+
+// %%
+//gonb:%%
+fmt.Printf("Hello World!")
+""",
+):
+    """The cell marker should have the same indentation as the first code line. See issue #562"""
+    if space_in_gonb:
+        go_percent = go_percent.replace("//gonb:%%", "// gonb:%%")
+    nb = jupytext.reads(go_percent, fmt="go:percent")
+    assert len(nb.cells) == 1
+    (cell,) = nb.cells
+    assert cell.cell_type == "code", cell.cell_type
+    assert (
+        cell.source
+        == """%%
+fmt.Printf("Hello World!")"""
+    )
+
+
+def test_write_simple_gonb_cell_with_double_percent(
+    no_jupytext_version_number,
+    go_percent="""// ---
+// jupyter:
+//   kernelspec:
+//     display_name: Go (gonb)
+//     language: go
+//     name: gonb
+// ---
+
+// %%
+//gonb:%%
+fmt.Printf("Hello World!")
+""",
+):
+    """The cell marker should have the same indentation as the first code line. See issue #562"""
+    nb = jupytext.reads(go_percent, fmt="go:percent")
+    go = jupytext.writes(nb, fmt="go:percent")
+    compare(go, go_percent)
