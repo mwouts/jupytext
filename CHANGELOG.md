@@ -13,6 +13,10 @@ Jupytext ChangeLog
 - Go notebooks are supported too ([#1244](https://github.com/mwouts/jupytext/issues/1244))! Many thanks to [Jan Pfeifer](https://github.com/janpfeifer), author of [GoNB](https://github.com/janpfeifer/gonb), and to [HaveF](https://github.com/HaveF) for their help on this topic.
 - Empty prefixes are now allowed in Jupytext format when specified as a dictionary ([#1144](https://github.com/mwouts/jupytext/issues/1144))
 
+**Changed**
+- We've had to deactivate the tests on the Quarto format in the CI as the Quarto round trip
+might now add a Markdown cell to the notebook ([#1255](https://github.com/mwouts/jupytext/issues/1255))
+
 
 1.16.2 (2024-05-05)
 -------------------
