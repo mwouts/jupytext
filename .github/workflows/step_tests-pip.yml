@@ -40,8 +40,10 @@ jobs:
             no_markdown-it-py: true
           - python-version: "3.x"
             no_kernel: true
-          - python-version: "3.x"
-            quarto: true
+          # TODO: Quarto 1.5.54 introduces a new markdown cell at the
+          # top of the notebook, see #1255
+          # - python-version: "3.x"
+          #  quarto: true
 
     steps:
       - name: Checkout
