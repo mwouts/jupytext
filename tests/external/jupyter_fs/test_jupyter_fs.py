@@ -9,11 +9,11 @@ from jupytext.compare import compare_cells, notebook_model
 
 def fs_meta_manager(tmpdir):
     try:
-        from jupyterfs.metamanager import MetaManager
+        from jupyterfs.metamanager import SyncMetaManager
     except ImportError:
         pytest.skip("jupyterfs is not available")
 
-    cm_class = jupytext.build_jupytext_contents_manager_class(MetaManager)
+    cm_class = jupytext.build_jupytext_contents_manager_class(SyncMetaManager)
     logger = logging.getLogger("jupyter-fs")
     cm = cm_class(parent=None, log=logger)
     cm.initResource(

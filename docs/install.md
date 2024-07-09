@@ -32,6 +32,17 @@ If you don't have the notebook icon on text documents after a fresh restart of y
 jupyter serverextension enable jupytext
 ```
 
+When [`jupyter-fs>=1.0.0`](https://github.com/jpmorganchase/jupyter-fs) is being used along with `jupytext`, use `SyncMetaManager` as the contents manager for `jupyter-fs` as `jupytext` do not support async contents manager which is used in default `MetaManager` of `jupyter-fs`. The `jupyter-fs` config must be as follows:
+
+```json
+{
+  "ServerApp": {
+    "contents_manager_class": "jupyterfs.metamanager.SyncMetaManager",
+  }
+}
+```
+so that `jupytext` will create its own contents manager derived from `SyncMetaManager`.
+
 ## Jupytext commands in JupyterLab
 
 Jupytext comes with a frontend extension for JupyterLab which provides pairing commands (accessible with View / Activate Command Palette, or Ctrl+Shift+C):

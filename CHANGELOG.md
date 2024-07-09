@@ -6,6 +6,8 @@ Jupytext ChangeLog
 
 **Fixed**
 - We have fixed a typo when `build_jupytext_contents_manager_class` can't be imported ([#1162](https://github.com/mwouts/jupytext/issues/1162))
+- We use `inspect` to determine whether the current contents manager derives from `AsyncContentsManager` (which is not
+supported by Jupytext at the moment). This fixes a compatibility issue with `jupyter-fs==1.0.0` ([#1239](https://github.com/mwouts/jupytext/issues/1239)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR!
 - Some dependencies of the JupyterLab extensions were updated ([#1243](https://github.com/mwouts/jupytext/issues/1243), [#1245](https://github.com/mwouts/jupytext/issues/1245))
 
 **Added**
