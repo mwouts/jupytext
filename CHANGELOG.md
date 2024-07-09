@@ -1,13 +1,15 @@
 Jupytext ChangeLog
 ==================
 
-1.16.3-dev (2024-07-??)
+1.16.3 (2024-07-09)
 -------------------
 
 **Fixed**
-- We have fixed a typo when `build_jupytext_contents_manager_class` can't be imported ([#1162](https://github.com/mwouts/jupytext/issues/1162))
 - We use `inspect` to determine whether the current contents manager derives from `AsyncContentsManager` (which is not
 supported by Jupytext at the moment). This fixes a compatibility issue with `jupyter-fs==1.0.0` ([#1239](https://github.com/mwouts/jupytext/issues/1239)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR!
+- We have fixed a typo when `build_jupytext_contents_manager_class` can't be imported ([#1162](https://github.com/mwouts/jupytext/issues/1162))
+- A Python 3.13 deprecation warning was fixed [#1241](https://github.com/mwouts/jupytext/pull/1241) - thanks to [Jerry James](https://github.com/jamesjer)
+- We have fixed a typo when `build_jupytext_contents_manager_class` can't be imported ([#1162](https://github.com/mwouts/jupytext/issues/1162))
 - Some dependencies of the JupyterLab extensions were updated ([#1243](https://github.com/mwouts/jupytext/issues/1243), [#1245](https://github.com/mwouts/jupytext/issues/1245))
 
 **Added**
