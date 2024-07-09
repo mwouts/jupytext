@@ -555,6 +555,11 @@ class ScriptCellReader(BaseCellReader):  # pylint: disable=W0223
                 else:
                     lines = uncomment(lines)
 
+        if self.default_language == "go" and self.language is None:
+            lines = [
+                re.sub(r"^((//\s*)*)(//\s*gonb:%%)", r"\1%%", line) for line in lines
+            ]
+
         if self.cell_type == "code":
             return unescape_code_start(
                 lines, self.ext, self.language or self.default_language

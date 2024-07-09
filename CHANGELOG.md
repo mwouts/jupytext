@@ -9,7 +9,8 @@ Jupytext ChangeLog
 - Some dependencies of the JupyterLab extensions were updated ([#1243](https://github.com/mwouts/jupytext/issues/1243), [#1245](https://github.com/mwouts/jupytext/issues/1245))
 
 **Added**
-- Added support for Lua notebooks ([#1252](https://github.com/mwouts/jupytext/pull/1252)) - thanks to [erentar](https://github.com/erentar) for this contribution
+- Lua notebooks are now supported ([#1252](https://github.com/mwouts/jupytext/pull/1252)) - thanks to [erentar](https://github.com/erentar) for this contribution
+- Go notebooks are supported too ([#1244](https://github.com/mwouts/jupytext/issues/1244))! Many thanks to [Jan Pfeifer](https://github.com/janpfeifer), author of [GoNB](https://github.com/janpfeifer/gonb), and to [HaveF](https://github.com/HaveF) for their help on this topic.
 - Empty prefixes are now allowed in Jupytext format when specified as a dictionary ([#1144](https://github.com/mwouts/jupytext/issues/1144))
 
 
