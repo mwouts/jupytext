@@ -24,6 +24,12 @@ jobs:
       - name: Install from source
         run: HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e '.[test-ui]'
 
+      - name: Uninstall jupyter-fs
+        run: |
+          # Uninstall jupyter-fs as it overrides the original browser-test.js to
+          # check its own functionality (https://github.com/jpmorganchase/jupyter-fs/blob/main/jupyterfs/browser-test.js)
+          pip uninstall jupyter-fs -y
+
       - name: Install galata
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
         env:
