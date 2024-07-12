@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.16.4 (2024-07-12)
+-------------------
+
+**Fixed**
+- We use `asyncio.iscoroutinefunction` to determine whether the current contents manager is sync or async ([#1260](https://github.com/mwouts/jupytext/issues/1260))
+
+
 1.16.3 (2024-07-09)
 -------------------
 
