@@ -1,8 +1,6 @@
 """Jupyter server and lab extension entry points"""
 
-import inspect
-
-import jupyter_server
+import asyncio
 
 from jupytext.reraise import reraise
 
@@ -24,28 +22,20 @@ def load_jupyter_server_extension(app):  # pragma: no cover
     # The server extension call is too late!
     # The contents manager was set at NotebookApp.init_configurables
 
-    # Get a list of all base classes and check if they contain AsyncContentsManager
+    # If possible, we derive a Jupytext CM from the current CM
     base_class = app.contents_manager_class
-    parent_classes = inspect.getmro(base_class)
-    for parent_class in parent_classes:
-        if (
-            parent_class
-            == jupyter_server.services.contents.manager.AsyncContentsManager
-        ):
-            app.log.warning(
-                "[Jupytext Server Extension] Async contents managers like {} "
-                "are not supported at the moment "
-                "(https://github.com/mwouts/jupytext/issues/1020). "
-                "We will derive a contents manager from LargeFileManager instead.".format(
-                    parent_class.__name__
-                )
-            )
-            from jupyter_server.services.contents.largefilemanager import (  # noqa
-                LargeFileManager,
-            )
+    if asyncio.iscoroutinefunction(base_class.get):
+        app.log.warning(
+            "[Jupytext Server Extension] Async contents managers like {base_class.__name__} "
+            "are not supported at the moment "
+            "(https://github.com/mwouts/jupytext/issues/1020). "
+            "We will derive a contents manager from LargeFileManager instead."
+        )
+        from jupyter_server.services.contents.largefilemanager import (  # noqa
+            LargeFileManager,
+        )
 
-            base_class = LargeFileManager
-            break
+        base_class = LargeFileManager
 
     app.log.info(
         "[Jupytext Server Extension] Deriving a JupytextContentsManager "
