@@ -33,6 +33,6 @@ module.exports = {
   },
   // Switch to 'always' to keep raw assets for all tests
   preserveOutput: 'failures-only', // Breaks HTML report if use.video == 'on'
-  // Try one retry as some tests are flaky
-  // retries: process.env.CI ? 1 : 0,
+  // Try 3 retries as some tests are flaky
+  retries: process.env.CI ? 3 : 0,
 };
