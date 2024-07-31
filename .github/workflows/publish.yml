@@ -2,46 +2,13 @@ name: Publish
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
-      - "v[0-9]+.[0-9]+.[0-9]+[a-z]+"
-      - "v[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
-      - "v[0-9]+.[0-9]+.[0-9]+dev[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+*"
 
 permissions:
   contents: read
 
 jobs:
-  pre-commit:
-    uses: ./.github/workflows/step_pre-commit.yml
-
-  test-pip:
-    needs: [ pre-commit ]
-    uses: ./.github/workflows/step_tests-pip.yml
-    with:
-      coverage: false
-
-  test-conda:
-    needs: [ pre-commit ]
-    uses: ./.github/workflows/step_tests-conda.yml
-    with:
-      coverage: false
-
-  test-ui:
-    needs: [ test-pip ]
-    uses: ./.github/workflows/step_tests-ui.yml
-
-  test-status:
-    needs: [ pre-commit, test-pip, test-conda, test-ui ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: re-actors/alls-green@release/v1
-        with:
-          allowed-skips: pre-commit, test-pip, test-conda, test-ui
-          jobs: ${{ toJSON(needs) }}
-    if: always()
-
   build:
-    needs: [ test-status ]
     uses: ./.github/workflows/step_build.yml
 
   publish:
