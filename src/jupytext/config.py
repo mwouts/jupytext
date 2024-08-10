@@ -122,6 +122,12 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
+    cell_id_to_title = Bool(
+        False,
+        help="Map the cell id to a cell title in text formats",
+        config=True,
+    )
+
     split_at_heading = Bool(
         False,
         help="Split markdown cells on headings (Markdown and R Markdown formats only)",

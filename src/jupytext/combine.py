@@ -98,6 +98,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
 
         # Cell text is taken from the source notebook
         cell.source = source_cell.source
+        cell.id = source_cell.id
 
         # We also restore the cell metadata that has been filtered
         cell.metadata = restore_filtered_metadata(
