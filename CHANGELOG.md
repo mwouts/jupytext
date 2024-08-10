@@ -8,6 +8,7 @@ Jupytext ChangeLog
 - The `rst2md` tests have been fixed by requiring `sphinx<8` ([#1266](https://github.com/mwouts/jupytext/issues/1266))
 
 **Added**
+- The Jupytext configuration has a new option `cell_id_to_title` that maps the cell id to a cell title ([#1263](https://github.com/mwouts/jupytext/issues/1263))
 - Jupytext is now tested with Python 3.13 ([#1242](https://github.com/mwouts/jupytext/issues/1242)). Thanks to [Jerry James](https://github.com/jamesjer) for the suggested fixes!
 
 

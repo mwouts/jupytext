@@ -175,6 +175,11 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 filtered_cells.append(cell)
             cells = filtered_cells
 
+        if self.config.cell_id_to_title:
+            for cell in cells:
+                if "title" in cell.metadata:
+                    cell.id = cell.metadata.pop("title").replace(" ", "_")
+
         return new_notebook(cells=cells, metadata=metadata)
 
     def filter_notebook(self, nb, metadata, preserve_cell_ids=False):
@@ -283,6 +288,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         split_at_heading = self.fmt.get("split_at_heading", False)
 
         for cell in nb.cells:
+            if self.config.cell_id_to_title and hasattr(cell, "id"):
+                cell.metadata = {"title": cell.id, **cell.metadata}
+
             if looking_for_first_markdown_cell and cell.cell_type == "markdown":
                 cell.metadata.setdefault("cell_marker", '"""')
                 looking_for_first_markdown_cell = False
