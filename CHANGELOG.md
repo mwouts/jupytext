@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.16.5-dev
+----------
+
+**Fixed**
+- The `rst2md` tests have been fixed by requiring `sphinx<8` ([#1266](https://github.com/mwouts/jupytext/issues/1266))
+
+
 1.16.4 (2024-07-12)
 -------------------
 
