@@ -1851,3 +1851,33 @@ def test_move_paired_notebook_to_subdir_1059(tmp_path, python_notebook):
     model = cm.get("scripts/subdir/my_notebook.py")
     nb = model["content"]
     compare_notebooks(nb, python_notebook, fmt="py:percent")
+
+
+def test_hash_changes_if_paired_file_is_edited(tmp_path, python_notebook):
+    # 1. write py ipynb
+    cm = jupytext.TextFileContentsManager()
+    cm.formats = "ipynb,py"
+    cm.root_dir = str(tmp_path)
+
+    # save ipynb
+    nb = python_notebook
+    nb_name = "notebook.ipynb"
+    cm.save(model=notebook_model(nb), path=nb_name)
+    org_model = cm.get(nb_name, require_hash=True)
+
+    py_file = tmp_path / "notebook.py"
+
+    text = py_file.read_text()
+    assert "# %% [markdown]" in text.splitlines(), text
+
+    # modify the timestamp of the paired file
+    time.sleep(0.5)
+    py_file.write_text(text)
+    model = cm.get(nb_name, require_hash=True)
+    assert model["hash"] == org_model["hash"]
+
+    # modify the paired file
+    py_file.write_text(text + "\n# %%\n1 + 1\n")
+
+    new_model = cm.get(nb_name, require_hash=True)
+    assert new_model["hash"] != org_model["hash"]
