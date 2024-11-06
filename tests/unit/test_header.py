@@ -131,13 +131,19 @@ def test_multiline_metadata(
             "multiline": """A multiline string
 
 with a blank line""",
-            "jupytext": {"notebook_metadata_filter": "all"},
+            "jupytext": {
+                "notebook_metadata_filter": "all",
+                "text_representation": {"extension": ".md", "format_name": "markdown"},
+            },
         }
     ),
     markdown="""---
 jupyter:
   jupytext:
     notebook_metadata_filter: all
+    text_representation:
+      extension: .md
+      format_name: markdown
   multiline: 'A multiline string
 
 

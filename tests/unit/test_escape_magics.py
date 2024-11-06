@@ -238,7 +238,7 @@ def g(x):
         ]
     )
 
-    text = jupytext.writes(nb, "py")
+    text = jupytext.writes(nb, "py:light")
     compare(
         text,
         """# +
@@ -263,7 +263,7 @@ def test_configure_magic(no_jupytext_version_number):
         ]
     )
 
-    text = jupytext.writes(nb, "py")
+    text = jupytext.writes(nb, "py:light")
     compare(
         text,
         """# %%configure -f \\
