@@ -837,9 +837,11 @@ def jupytext_single_file(nb_file, args, log):
             else:
                 message = "[jupytext] Writing {path}{format}{action}".format(
                     path=shlex.quote(path),
-                    format=" in format " + short_form_one_format(fmt)
-                    if fmt and "format_name" in fmt
-                    else "",
+                    format=(
+                        " in format " + short_form_one_format(fmt)
+                        if fmt and "format_name" in fmt
+                        else ""
+                    ),
                     action=action,
                 )
             if diff is not None:
@@ -1057,7 +1059,9 @@ def git_timestamp(path):
 
     # Return the commit timestamp
     try:
-        git_ts_str = system("git", "log", "-1", "--pretty=%ct", path).strip()
+        git_ts_str = system(
+            "git", "log", "-1", "--pretty=%ct", "--no-show-signature", path
+        ).strip()
     except SystemExit as err:
         if err.code == 128:
             # git not initialized
