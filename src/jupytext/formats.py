@@ -418,10 +418,14 @@ def check_file_version(notebook, source_path, outputs_path):
     if not insert_or_test_version_number():
         return
 
-    _, ext = os.path.splitext(source_path)
-    assert not ext.endswith(".ipynb"), "source_path={} should be a text file".format(
-        source_path
-    )
+    if source_path == "-":
+        # https://github.com/mwouts/jupytext/issues/1282
+        ext = notebook.metadata["jupytext"]["text_representation"]["extension"]
+    else:
+        _, ext = os.path.splitext(source_path)
+        assert not ext.endswith(
+            ".ipynb"
+        ), "source_path={} should be a text file".format(source_path)
 
     version = (
         notebook.metadata.get("jupytext", {})
