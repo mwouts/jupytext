@@ -1057,7 +1057,9 @@ def git_timestamp(path):
 
     # Return the commit timestamp
     try:
-        git_ts_str = system("git", "log", "-1", "--pretty=%ct", path).strip()
+        git_ts_str = system(
+            "git", "log", "-1", "--pretty=%ct", "--no-show-signature", path
+        ).strip()
     except SystemExit as err:
         if err.code == 128:
             # git not initialized
