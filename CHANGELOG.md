@@ -1,10 +1,11 @@
 Jupytext ChangeLog
 ==================
 
-1.16.5-dev
-----------
+1.16.5 (2024-12-08)
+-------------------
 
 **Fixed**
+- We have fixed the notebook corruption issue when using Jupytext with Jupyter-Collaboration ([#1124](https://github.com/mwouts/jupytext/issues/1124), [jupyter-collaboration #214](https://github.com/jupyterlab/jupyter-collaboration/issues/214))
 - The `rst2md` tests have been fixed by requiring `sphinx<8` ([#1266](https://github.com/mwouts/jupytext/issues/1266))
 
 **Added**
