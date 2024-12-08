@@ -299,7 +299,11 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
                 self.log.info(f"Reading SOURCE from {alt_path}")
                 text = self.super.get(
-                    alt_path, content=True, type="file", format=format
+                    alt_path,
+                    content=True,
+                    type="file",
+                    # Don't use the parent format, see https://github.com/mwouts/jupytext/issues/1124
+                    format=None,
                 )["content"]
                 return reads(text, fmt=alt_fmt, config=config)
 
