@@ -1,5 +1,6 @@
 """ContentsManager that allows to open Rmd, py, R and ipynb files as notebooks
 """
+import inspect
 import itertools
 import os
 
@@ -184,7 +185,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 self.log.error("Error while saving file: %s %s", path, e, exc_info=True)
                 raise HTTPError(500, f"Unexpected error while saving file: {path} {e}")
 
-        def get(
+        def _get_with_no_require_hash_argument(
             self,
             path,
             content=True,
@@ -192,9 +193,31 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             format=None,
             load_alternative_format=True,
         ):
+            return self._get_with_require_hash_argument(
+                path,
+                content=content,
+                type=type,
+                format=format,
+                require_hash=False,
+                load_alternative_format=load_alternative_format,
+            )
+
+        def _get_with_require_hash_argument(
+            self,
+            path,
+            content=True,
+            type=None,
+            format=None,
+            require_hash=False,
+            load_alternative_format=True,
+        ):
             """Takes a path for an entity and returns its model"""
             path = path.strip("/")
             ext = os.path.splitext(path)[1]
+
+            super_kwargs = {"content": content, "type": type, "format": format}
+            if require_hash:
+                super_kwargs["require_hash"] = require_hash
 
             # Not a notebook?
             if (
@@ -202,17 +225,20 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 or self.dir_exists(path)
                 or (type is not None and type != "notebook")
             ):
-                return self.super.get(path, content, type, format)
+                return self.super.get(path, **super_kwargs)
 
             config = self.get_config(path, use_cache=content is False)
             if ext not in self.all_nb_extensions(config):
-                return self.super.get(path, content, type, format)
+                return self.super.get(path, **super_kwargs)
 
             fmt = preferred_format(ext, config.preferred_jupytext_formats_read)
             if ext == ".ipynb":
-                model = self.super.get(path, content, type="notebook", format=format)
+                super_kwargs["type"] = "notebook"
+                model = self.super.get(path, **super_kwargs)
             else:
-                model = self.super.get(path, content, type="file", format="text")
+                super_kwargs["type"] = "file"
+                super_kwargs["format"] = "text"
+                model = self.super.get(path, **super_kwargs)
                 model["type"] = "notebook"
                 if content:
                     # We may need to update these keys, inherited from text files formats
@@ -313,6 +339,21 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             # Modification time of a paired notebook is the timestamp of inputs #118 #978
             model["last_modified"] = inputs.timestamp
+
+            if require_hash:
+                if inputs.path is None or outputs.path is None:
+                    return model
+                model_other = self.super.get(
+                    inputs.path if path == outputs.path else outputs.path,
+                    require_hash=True,
+                )
+                # The hash of a paired file is the concatenation of
+                # the hashes of the input and output files
+                if path == outputs.path:
+                    model["hash"] = model_other["hash"] + model["hash"]
+                else:
+                    model["hash"] = model["hash"] + model_other["hash"]
+                return model
 
             if not content:
                 return model
@@ -611,6 +652,15 @@ to your jupytext.toml file
             if isinstance(self.notebook_extensions, str):
                 self.notebook_extensions = self.notebook_extensions.split(",")
             return self
+
+    if "require_hash" in inspect.signature(base_contents_manager_class.get).parameters:
+        JupytextContentsManager.get = (
+            JupytextContentsManager._get_with_require_hash_argument
+        )
+    else:
+        JupytextContentsManager.get = (
+            JupytextContentsManager._get_with_no_require_hash_argument
+        )
 
     return JupytextContentsManager
 
