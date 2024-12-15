@@ -38,7 +38,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Test folder within your repository
-          test_folder: playwright-tests
+          test_folder: ../playwright-tests
 
           # Optional npm scripts (the default values are displayed)
           # Script to start the server or 'null' if Playwright is taking care of it
