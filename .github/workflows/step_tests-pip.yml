@@ -106,6 +106,9 @@ jobs:
           jupyter labextension list
           jupyter labextension list 2>&1 | grep -ie "jupyterlab-jupytext.*OK"
 
+          # Ensure locale LANG is set. See https://github.com/jupyterlab/jupyterlab/issues/17079
+          export LANG="en_US.utf8"
+
           python -m jupyterlab.browser_check
 
       - name: Upload coverage
