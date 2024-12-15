@@ -1,3 +1,7 @@
+# 1.4.3+dev
+
+Some dependencies of the JupyterLab extensions were updated ([#1272](https://github.com/mwouts/jupytext/issues/1272), [#1273](https://github.com/mwouts/jupytext/issues/1273), [#1280](https://github.com/mwouts/jupytext/issues/1280), [#1285](https://github.com/mwouts/jupytext/issues/1285), [#1290](https://github.com/mwouts/jupytext/issues/1290))
+
 # 1.4.3 (2024-05-05)
 
 - JupyterLab's dependency `ejs` was updated from 3.1.9 to 3.1.10 ([#1231](https://github.com/mwouts/jupytext/issues/1231))
