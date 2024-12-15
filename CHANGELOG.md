@@ -5,7 +5,7 @@ Jupytext ChangeLog
 -------------------
 
 **Fixed**
-- We have fixed a notebook corruption issue when using Jupytext with Jupyter-Collaboration ([#1124](https://github.com/mwouts/jupytext/issues/1124), [jupyter-collaboration 214](https://github.com/mwouts/jupytext/issues/214)).
+- We have fixed a notebook corruption issue when using Jupytext with Jupyter-Collaboration ([#1124](https://github.com/mwouts/jupytext/issues/1124), [jupyter-collaboration 214](https://github.com/jupyterlab/jupyter-collaboration/issues/214)).
 - We have added the `require_hash` argument on the Jupytext contents manager. The hash of a paired file is the concatenation of the hash of the text file and the hash for the `.ipynb` file ([#1165](https://github.com/mwouts/jupytext/issues/1165))
 - The `rst2md` tests have been fixed by requiring `sphinx<8` ([#1266](https://github.com/mwouts/jupytext/issues/1266))
 - Some dependencies of the JupyterLab extensions were updated ([#1272](https://github.com/mwouts/jupytext/issues/1272), [#1273](https://github.com/mwouts/jupytext/issues/1273), [#1280](https://github.com/mwouts/jupytext/issues/1280), [#1285](https://github.com/mwouts/jupytext/issues/1285), [#1290](https://github.com/mwouts/jupytext/issues/1290))
