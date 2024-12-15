@@ -62,6 +62,9 @@ jobs:
           jupyterlab
           ${{ format('markdown-it-py{0}', matrix.markdown-it-py) }}
 
+      - name: List the versions of the Jupyter components
+        run: jupyter --version
+
       - name: Install a Jupyter Kernel
         if: ${{ !matrix.no_kernel }}
         run: python -m ipykernel install --name python_kernel --user
