@@ -6,6 +6,7 @@ Jupytext ChangeLog
 
 **Fixed**
 - The `rst2md` tests have been fixed by requiring `sphinx<8` ([#1266](https://github.com/mwouts/jupytext/issues/1266))
+- Some dependencies of the JupyterLab extensions were updated ([#1272](https://github.com/mwouts/jupytext/issues/1272), [#1273](https://github.com/mwouts/jupytext/issues/1273), [#1280](https://github.com/mwouts/jupytext/issues/1280), [#1285](https://github.com/mwouts/jupytext/issues/1285), [#1290](https://github.com/mwouts/jupytext/issues/1290))
 
 **Added**
 - Jupytext is now tested with Python 3.13 ([#1242](https://github.com/mwouts/jupytext/issues/1242)). Thanks to [Jerry James](https://github.com/jamesjer) for the suggested fixes!
