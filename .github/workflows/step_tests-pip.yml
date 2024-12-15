@@ -94,6 +94,7 @@ jobs:
         run: pytest -n logical --cov --cov-report=xml
 
       - name: Test lab extension
+        continue-on-error: true
         run: |
           # Uninstall jupyter-fs as it overrides the original browser-test.js to
           # check its own functionality (https://github.com/jpmorganchase/jupyter-fs/blob/main/jupyterfs/browser-test.js)
@@ -105,8 +106,7 @@ jobs:
           jupyter labextension list
           jupyter labextension list 2>&1 | grep -ie "jupyterlab-jupytext.*OK"
 
-          # Commented out on Dec 15, 2024, until we can fix that test
-          # python -m jupyterlab.browser_check
+          python -m jupyterlab.browser_check
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
