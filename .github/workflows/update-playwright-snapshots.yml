@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: React to the triggering comment
         run: |
-          hub api repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions --raw-field 'content=+1'
+          gh api repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions --raw-field 'content=+1'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -25,9 +25,7 @@ jobs:
 
       - name: Checkout the branch from the PR that triggered the job
         run: |
-          # PR branch remote must be checked out using https URL
-          git config --global hub.protocol https
-          hub pr checkout ${{ github.event.issue.number }}
+          gh pr checkout ${{ github.event.issue.number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -40,7 +38,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Test folder within your repository
-          test_folder: playwright-tests
+          test_folder: ../playwright-tests
 
           # Optional npm scripts (the default values are displayed)
           # Script to start the server or 'null' if Playwright is taking care of it
