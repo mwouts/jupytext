@@ -1189,7 +1189,7 @@ def pipe_notebook(
     command = shlex.split(command)
     if "{}" in command:
         if prefix is not None:
-            prefix = prefix + (" " if " " in prefix else "_")
+            prefix = prefix + (" " if " " in prefix else "-")
         tmp_file_args = dict(
             mode="w+",
             encoding="utf8",
