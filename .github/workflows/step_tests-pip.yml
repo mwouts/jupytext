@@ -94,7 +94,6 @@ jobs:
         run: pytest -n logical --cov --cov-report=xml
 
       - name: Test lab extension
-        continue-on-error: true
         run: |
           # Uninstall jupyter-fs as it overrides the original browser-test.js to
           # check its own functionality (https://github.com/jpmorganchase/jupyter-fs/blob/main/jupyterfs/browser-test.js)
