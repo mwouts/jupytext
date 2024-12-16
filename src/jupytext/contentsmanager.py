@@ -341,19 +341,22 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             model["last_modified"] = inputs.timestamp
 
             if require_hash:
-                if inputs.path is None or outputs.path is None:
-                    return model
-                model_other = self.super.get(
-                    inputs.path if path == outputs.path else outputs.path,
-                    require_hash=True,
-                )
-                # The hash of a paired file is the concatenation of
-                # the hashes of the input and output files
-                if path == outputs.path:
-                    model["hash"] = model_other["hash"] + model["hash"]
-                else:
-                    model["hash"] = model["hash"] + model_other["hash"]
-                return model
+                if (
+                    inputs.path is not None
+                    and outputs.path is not None
+                    and inputs.path != outputs.path
+                ):
+                    model_other = self.super.get(
+                        inputs.path if path == outputs.path else outputs.path,
+                        content=False,
+                        require_hash=True,
+                    )
+                    # The hash of a paired file is the concatenation of
+                    # the hashes of the input and output files
+                    if path == outputs.path:
+                        model["hash"] = model_other["hash"] + model["hash"]
+                    else:
+                        model["hash"] = model["hash"] + model_other["hash"]
 
             if not content:
                 return model
