@@ -1,6 +1,16 @@
 Jupytext ChangeLog
 ==================
 
+1.16.6 (2024-12-16)
+-------------------
+
+**Fixed**
+- We fixed a "File Changed" warning when saving notebooks ([#1301](https://github.com/mwouts/jupytext/issues/1301))
+
+**Changed**
+- The original file name is easier to infer from the tmp file name in pre-commit hooks ([#1289](https://github.com/mwouts/jupytext/issues/1289)) - thanks to [Lunin Leonid](https://github.com/lrlunin) for making this change.
+
+
 1.16.5 (2024-12-15)
 -------------------
 
