@@ -43,8 +43,6 @@ jobs:
         run: jlpm playwright install chromium
 
       - name: Integration tests
-        # https://github.com/mwouts/jupytext/issues/1294
-        if: false
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
         run: jlpm playwright test
 
