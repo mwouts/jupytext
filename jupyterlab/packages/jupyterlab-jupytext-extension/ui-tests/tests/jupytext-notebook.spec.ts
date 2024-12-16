@@ -85,7 +85,7 @@ test.describe('Jupytext Create Text Notebooks from Menu Tests', () => {
 
       const select = await page.$('.jp-Dialog-body >> select');
       // Select appropriate kernel
-      let option: any
+      let option: any;
       if (paths.extension === '.sh') {
         option = await select!.$('option:has-text("Bash")');
       } else {
