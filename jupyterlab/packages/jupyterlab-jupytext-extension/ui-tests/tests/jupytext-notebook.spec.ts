@@ -49,7 +49,7 @@ const pairMenuPaths = pairTests.map((format) => {
 });
 
 // Toggle metadata
-const toggleMetadataPath = 'Jupytext>Include Metadata';
+const toggleMetadataPath = 'File>Jupytext>Include Metadata';
 
 // Name of notebook file
 const fileName = 'notebook.ipynb';
@@ -66,7 +66,7 @@ async function populateNotebook(extension, page) {
   await page.notebook.runCell(1, true);
   // For bash, use shell code
   if (extension === '.sh') {
-    await page.notebook.addCell('code', 'echo $HOME');
+    await page.notebook.addCell('code', 'echo "This is Bash Kernel"');
   } else {
     await page.notebook.addCell('code', '2 ** 3');
   }
@@ -82,22 +82,28 @@ test.describe('Jupytext Create Text Notebooks from Menu Tests', () => {
 
       // Wait for the kernel dialog and accept it
       await page.waitForSelector('.jp-Dialog');
-      // For bash kernel, select appropriate kernel
+
+      const select = await page.$('.jp-Dialog-body >> select');
+      // Select appropriate kernel
+      let option: any
       if (paths.extension === '.sh') {
-        const select = await page.$('.jp-Dialog-body >> select');
-        const option = await select!.$('option:has-text("Bash")');
-        await select!.selectOption(option);
+        option = await select!.$('option:has-text("Bash")');
+      } else {
+        option = await select!.$('option:has-text("Python")');
       }
+      await select!.selectOption(option);
       await page.click('.jp-Dialog .jp-mod-accept');
 
       // Populate page
       await populateNotebook(paths.extension, page);
+
       // Toggle Include Metadata. It is enabled by default.
       // It is to avoid having Jupytext version in metadata in snapshot
       // If we include it, for every version bump we need to update snapshots as
       // version changes which will fail UI tests. Just do not include metadata
       // which will ensure smooth version bumping
       await page.menu.clickMenuItem(toggleMetadataPath);
+
       // Save notebook
       await page.notebook.save();
 
@@ -114,7 +120,7 @@ test.describe('Jupytext Create Text Notebooks from Menu Tests', () => {
 test.describe('Jupytext Pair Python Notebooks from Menu Tests', () => {
   // Before each test start a new notebook and add some cell data
   test.beforeEach(async ({ page }) => {
-    await page.notebook.createNew(fileName);
+    await page.notebook.createNew(fileName, { kernel: 'python3' });
     await populateNotebook('.py', page);
   });
 
@@ -122,14 +128,17 @@ test.describe('Jupytext Pair Python Notebooks from Menu Tests', () => {
     test(`Open menu item ${paths.menuPath}`, async ({ page }) => {
       // Click pairing command
       await page.menu.clickMenuItem(paths.menuPath);
+
       // Toggle Include Metadata. It is enabled by default.
       // It is to avoid having Jupytext version in metadata in snapshot
       // If we include it, for every version bump we need to update snapshots as
       // version changes which will fail UI tests. Just do not include metadata
       // which will ensure smooth version bumping
       await page.menu.clickMenuItem(toggleMetadataPath);
+
       // Wait until we save notebook. Once we save it, paired file appears
       await page.notebook.save();
+
       // Try to open paired file
       await page.filebrowser.open(fileName.replace('.ipynb', paths.extension));
 
