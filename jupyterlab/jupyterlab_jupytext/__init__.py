@@ -26,7 +26,7 @@ def load_jupyter_server_extension(app):  # pragma: no cover
     base_class = app.contents_manager_class
     if asyncio.iscoroutinefunction(base_class.get):
         app.log.warning(
-            "[Jupytext Server Extension] Async contents managers like {base_class.__name__} "
+            f"[Jupytext Server Extension] Async contents managers like {base_class.__name__} "
             "are not supported at the moment "
             "(https://github.com/mwouts/jupytext/issues/1020). "
             "We will derive a contents manager from LargeFileManager instead."
