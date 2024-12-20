@@ -10562,11 +10562,11 @@ __metadata:
   linkType: hard
 
 "systeminformation@npm:^5.8.6":
-  version: 5.22.8
-  resolution: "systeminformation@npm:5.22.8"
+  version: 5.23.14
+  resolution: "systeminformation@npm:5.23.14"
   bin:
     systeminformation: lib/cli.js
-  checksum: 8/5bfafe40be521e1b30f4ec346abd2b3efd9ea2c6fafff0aa3f88662ca738c6f4f3bfc665c4245f39080403af6a03bdc1342500288e075419379b90a5a9c1840b
+  checksum: 10c0/6e7a6692c0b2ddfb347b14f376856d6993fd7598e037de8016cfe48d9a33783742ee628e627b75b4c19bacdd4d08fbb0af3c106d54c90add171e56ad749dbfed
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
