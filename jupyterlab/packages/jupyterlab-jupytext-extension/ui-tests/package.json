@@ -9,7 +9,7 @@
         "test:update": "jlpm playwright test --update-snapshots"
     },
     "devDependencies": {
-        "@jupyterlab/galata": "^5.0.0",
-        "@playwright/test": "^1.32.0"
+        "@jupyterlab/galata": "^5.3.3",
+        "@playwright/test": "^1.48.0"
     }
 }
