@@ -1,4 +1,7 @@
+import os
+
 import pytest
+import yaml
 from git.exc import HookExecutionError
 from pre_commit.main import main as pre_commit
 
@@ -12,24 +15,21 @@ def test_pre_commit_hook_sync_nbstripout(
     tmp_repo,
     jupytext_repo_root,
     jupytext_repo_rev,
+    jupytext_pre_commit_config,
     notebook_with_outputs,
 ):
     """Here we sync the ipynb notebook with a Markdown file and also apply nbstripout."""
-    pre_commit_config_yaml = f"""
-repos:
-- repo: {jupytext_repo_root}
-  rev: {jupytext_repo_rev}
-  hooks:
-  - id: jupytext
-    args: [--sync]
+    jupytext_pre_commit_config["repos"][0]["hooks"][0]["args"] = ["--sync"]
+    jupytext_pre_commit_config["repos"].append(
+        {
+            "repo": "https://github.com/kynan/nbstripout",
+            "rev": "0.5.0",
+            "hooks": [{"id": "nbstripout"}],
+        }
+    )
 
-- repo: https://github.com/kynan/nbstripout
-  rev: 0.5.0
-  hooks:
-  - id: nbstripout
-"""
-
-    tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
+    with open(os.path.join(tmpdir, ".pre-commit-config.yaml"), "w") as file:
+        yaml.dump(jupytext_pre_commit_config, file)
 
     tmp_repo.git.add(".pre-commit-config.yaml")
     pre_commit(["install", "--install-hooks", "-f"])
