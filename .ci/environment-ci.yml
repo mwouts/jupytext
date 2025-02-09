@@ -10,6 +10,6 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - jupyterlab
+  - jupyterlab>=4.3.3
   - nbformat>=5.1.2
   - pandoc>=3.0
