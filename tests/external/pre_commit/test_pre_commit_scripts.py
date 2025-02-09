@@ -237,7 +237,40 @@ def test_pre_commit_hook_sync_black_flake8(tmpdir, python_notebook):
         assert fp.read().splitlines()[-1] == "1 + 1"
 
     nb = new_notebook(
-        cells=[new_code_cell(source='"""trailing   \nwhitespace"""')], metadata=metadata
+        cells=[new_code_cell(source='"""trailing   \nwhitespace"""    ')],
+        metadata=metadata,
+    )
+    write(nb, tmp_ipynb)
+    git("add", "notebook.ipynb")
+    git("status")
+    with open(tmp_py) as fp:
+        assert fp.read().splitlines()[-1] == "1 + 1"
+
+
+@pytest.mark.requires_flake8
+def test_pre_commit_hook_sync_flake8(tmpdir, python_notebook):
+    """This test was extracted from test_pre_commit_hook_sync_black_flake8 to make sure that the
+    pre-commit stops the commit when flake8 fails"""
+    metadata = python_notebook.metadata
+
+    git = git_in_tmpdir(tmpdir)
+    hook = str(tmpdir.join(".git/hooks/pre-commit"))
+    with open(hook, "w") as fp:
+        fp.write(
+            "#!/bin/sh\n"
+            "# Pair ipynb notebooks to a python file, and run flake8\n"
+            "# Note: this hook only acts on ipynb files. When pulling, run 'jupytext --sync' to "
+            "update the ipynb file.\n"
+            "jupytext --pre-commit --from ipynb --set-formats ipynb,py --check flake8\n"
+        )
+
+    st = os.stat(hook)
+    os.chmod(hook, st.st_mode | stat.S_IEXEC)
+
+    tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
+    nb = new_notebook(
+        cells=[new_code_cell(source='"""trailing   \nwhitespace"""    ')],
+        metadata=metadata,
     )
     write(nb, tmp_ipynb)
     git("add", "notebook.ipynb")
