@@ -1,8 +1,11 @@
 Jupytext ChangeLog
 ==================
 
-1.16.7-dev
+1.16.7 (2025-02-09)
 -------------------
+
+**Added**
+- Logtalk notebooks are now supported ([#1308](https://github.com/mwouts/jupytext/pull/1308)) - thanks to [Paulo Moura](https://github.com/pmoura) for this contribution
 
 **Fixed**
 We have updated the dependencies of the JupyterLab extension to address [security issues](https://github.com/mwouts/jupytext/security/dependabot).
