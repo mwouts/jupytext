@@ -10,7 +10,7 @@
 % # An implementation of the Ackermann function
 
 % %% vscode={"languageId": "logtalk"}
-% %%load ack.lgt
+%%load ack.lgt
 
 :- object(ack).
 
