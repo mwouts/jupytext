@@ -1,6 +1,13 @@
 # 1.4.3+dev
 
-Some dependencies of the JupyterLab extensions were updated ([#1272](https://github.com/mwouts/jupytext/issues/1272), [#1273](https://github.com/mwouts/jupytext/issues/1273), [#1280](https://github.com/mwouts/jupytext/issues/1280), [#1285](https://github.com/mwouts/jupytext/issues/1285), [#1290](https://github.com/mwouts/jupytext/issues/1290))
+The dependencies of the JupyterLab extension were updated to address [security issues](https://github.com/mwouts/jupytext/security/dependabot):
+
+- [#1272](https://github.com/mwouts/jupytext/issues/1272)
+- [#1273](https://github.com/mwouts/jupytext/issues/1273)
+- [#1280](https://github.com/mwouts/jupytext/issues/1280)
+- [#1285](https://github.com/mwouts/jupytext/issues/1285)
+- [#1290](https://github.com/mwouts/jupytext/issues/1290)
+- [#1304](https://github.com/mwouts/jupytext/pull/1304)
 
 # 1.4.3 (2024-05-05)
 

@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.16.7-dev
+-------------------
+
+**Fixed**
+We have updated the dependencies of the JupyterLab extension to address [security issues](https://github.com/mwouts/jupytext/security/dependabot).
+
+
 1.16.6 (2024-12-16)
 -------------------
 
