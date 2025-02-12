@@ -496,10 +496,10 @@ def test_outdated_text_notebook_diff_is_shown(tmpdir, python_notebook):
         """Differences (jupytext --diff notebook.py notebook.ipynb) are:
 --- notebook.py
 +++ notebook.ipynb
-@@ -12,5 +12,5 @@
- #     name: python_kernel
+@@ -13,5 +13,5 @@
  # ---
 
+ # %%%% [markdown]
 -# Text version 1.0
 +# Text version 2.0
 
@@ -1374,7 +1374,7 @@ def test_vim_folding_markers(tmpdir):
 
     # Default Vim folding markers
     cm.cell_markers = "{{{,}}}"
-    cm.formats = "ipynb,py"
+    cm.formats = "ipynb,py:light"
 
     nb = new_notebook(
         cells=[
@@ -1430,7 +1430,7 @@ def test_vscode_pycharm_folding_markers(tmpdir):
 
     # Default VScode/PyCharm folding markers
     cm.cell_markers = "region,endregion"
-    cm.formats = "ipynb,py"
+    cm.formats = "ipynb,py:light"
 
     nb = new_notebook(
         cells=[
