@@ -172,6 +172,9 @@ npm = ["jlpm"]
 source_dir = "jupyterlab/packages"
 build_dir = "jupyterlab/jupyterlab_jupytext/labextension"
 
+[tool.hatch.build.hooks.custom]
+path = "tools/absolute_links_in_readme.py"
+
 [tool.check-wheel-contents]
 ignore = ["W002"]
 
