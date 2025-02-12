@@ -39,3 +39,4 @@ node_modules
 
 # Ignore jupyter-releaser related stuff
 .jupyter_releaser_checkout
+.SourceSageAssets
