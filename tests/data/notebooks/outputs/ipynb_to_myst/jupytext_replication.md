@@ -3,6 +3,13 @@ kernelspec:
   display_name: SoS
   language: sos
   name: sos
+language_info:
+  codemirror_mode: sos
+  file_extension: .sos
+  mimetype: text/x-sos
+  name: sos
+  nbconvert_exporter: sos_notebook.converter.SoS_Exporter
+  pygments_lexer: sos
 ---
 
 +++ {"Collapsed": "false", "kernel": "SoS"}

@@ -3,6 +3,13 @@ kernelspec:
   display_name: Xonsh
   language: xonsh
   name: xonsh
+language_info:
+  codemirror_mode: shell
+  file_extension: .xsh
+  mimetype: text/x-sh
+  name: xonsh
+  pygments_lexer: xonsh
+  version: 0.14.4
 ---
 
 ```{code-cell} xonsh

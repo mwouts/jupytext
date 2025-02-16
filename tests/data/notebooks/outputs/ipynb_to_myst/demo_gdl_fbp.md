@@ -3,6 +3,11 @@ kernelspec:
   display_name: IDL [conda env:gdl] *
   language: IDL
   name: conda-env-gdl-idl
+language_info:
+  codemirror_mode: idl
+  file_extension: .pro
+  mimetype: text/x-idl
+  name: idl
 ---
 
 ## GDL demo notebook

@@ -9,6 +9,7 @@ from jupytext.paired_paths import full_path
 
 from .cell_metadata import _IGNORE_CELL_METADATA
 from .combine import combine_inputs_with_outputs
+from .config import JupytextConfiguration
 from .formats import check_auto_ext, long_form_one_format
 from .header import _DEFAULT_NOTEBOOK_METADATA
 from .jupytext import read, reads, write, writes
@@ -394,12 +395,16 @@ def test_round_trip_conversion(
 
 
 # The functions below are used in the Jupytext text collection
-def create_mirror_file_if_missing(mirror_file, notebook, fmt):
+def create_mirror_file_if_missing(
+    mirror_file, notebook, fmt, config=JupytextConfiguration()
+):
     if not os.path.isfile(mirror_file):
-        write(notebook, mirror_file, fmt=fmt)
+        write(notebook, mirror_file, fmt=fmt, config=config)
 
 
-def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook=False):
+def assert_conversion_same_as_mirror(
+    nb_file, fmt, mirror_name, compare_notebook=False, config=None
+):
     """This function is used in the tests"""
     dirname, basename = os.path.split(nb_file)
     file_name, org_ext = os.path.splitext(basename)
@@ -414,25 +419,25 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
     # it's better not to have Jupytext metadata in test notebooks:
     if fmt == "ipynb" and "jupytext" in notebook.metadata:  # pragma: no cover
         notebook.metadata.pop("jupytext")
-        write(nb_file, fmt=fmt)
+        write(nb_file, fmt=fmt, config=config)
 
-    create_mirror_file_if_missing(mirror_file, notebook, fmt)
+    create_mirror_file_if_missing(mirror_file, notebook, fmt, config=config)
 
     # Compare the text representation of the two notebooks
     if compare_notebook:
         # Read and convert the mirror file to the latest nbformat version if necessary
-        nb_mirror = read(mirror_file, as_version=notebook.nbformat)
+        nb_mirror = read(mirror_file, as_version=notebook.nbformat, config=config)
         nb_mirror.nbformat_minor = notebook.nbformat_minor
         compare_notebooks(nb_mirror, notebook)
         return
     elif ext == ".ipynb":
-        notebook = read(mirror_file)
+        notebook = read(mirror_file, config=config)
         fmt.update({"extension": org_ext})
-        actual = writes(notebook, fmt)
+        actual = writes(notebook, fmt, config=config)
         with open(nb_file, encoding="utf-8") as fp:
             expected = fp.read()
     else:
-        actual = writes(notebook, fmt)
+        actual = writes(notebook, fmt, config=config)
         with open(mirror_file, encoding="utf-8") as fp:
             expected = fp.read()
 
@@ -442,8 +447,8 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
 
     # Compare the two notebooks
     if ext != ".ipynb":
-        notebook = read(nb_file)
-        nb_mirror = read(mirror_file, fmt=fmt)
+        notebook = read(nb_file, config=config)
+        nb_mirror = read(mirror_file, fmt=fmt, config=config)
 
         if fmt.get("format_name") == "sphinx":
             nb_mirror.cells = nb_mirror.cells[1:]
