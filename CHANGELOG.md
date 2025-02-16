@@ -6,6 +6,7 @@ Jupytext ChangeLog
 
 **Changed**
 - We have updated the JupyterLab extension dependencies ([#1300](https://github.com/mwouts/jupytext/pull/1300)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR!
+- The language lexer (e.g. `ipython3`) for `md:myst` files is now only included when `language_info` is added to `notebook_metadata_filter`.
 
 
 1.16.7 (2025-02-09)

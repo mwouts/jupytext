@@ -3,6 +3,12 @@ kernelspec:
   display_name: Stata
   language: stata
   name: stata
+language_info:
+  codemirror_mode: stata
+  file_extension: .do
+  mimetype: text/x-stata
+  name: stata
+  version: '15.1'
 ---
 
 ```{code-cell}

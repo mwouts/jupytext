@@ -5,6 +5,14 @@ kernelspec:
   display_name: OCaml default
   language: OCaml
   name: ocaml-jupyter
+language_info:
+  codemirror_mode: text/x-ocaml
+  file_extension: .ml
+  mimetype: text/x-ocaml
+  name: OCaml
+  nbconverter_exporter: null
+  pygments_lexer: OCaml
+  version: 4.12.0
 ---
 
 # Example of an OCaml notebook

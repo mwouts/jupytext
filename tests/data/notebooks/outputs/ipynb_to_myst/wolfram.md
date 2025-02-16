@@ -3,6 +3,13 @@ kernelspec:
   display_name: Wolfram Language 13.1
   language: Wolfram Language
   name: wolframlanguage13.1
+language_info:
+  codemirror_mode: mathematica
+  file_extension: .wolfram
+  mimetype: application/vnd.wolfram.m
+  name: Wolfram Language
+  pygments_lexer: mathematica
+  version: '12.0'
 ---
 
 **Note:** The `language_info` `file_extension` in this notebook should be `.m`, but it was deliberately changed to `.wolfram` to avoid conflicts with Matlab which is using the same extension.

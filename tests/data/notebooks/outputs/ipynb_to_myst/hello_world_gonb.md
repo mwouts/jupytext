@@ -3,6 +3,14 @@ kernelspec:
   display_name: Go (gonb)
   language: go
   name: gonb
+language_info:
+  codemirror_mode: ''
+  file_extension: .go
+  mimetype: ''
+  name: go
+  nbconvert_exporter: ''
+  pygments_lexer: ''
+  version: go1.21.6
 ---
 
 A notebook that use [GoNB](https://github.com/janpfeifer/gonb)

@@ -3,6 +3,18 @@ kernelspec:
   display_name: Octave
   language: octave
   name: octave
+language_info:
+  file_extension: .m
+  help_links:
+  - text: GNU Octave
+    url: https://www.gnu.org/software/octave/support.html
+  - text: Octave Kernel
+    url: https://github.com/Calysto/octave_kernel
+  - text: MetaKernel Magics
+    url: https://github.com/calysto/metakernel/blob/master/metakernel/magics/README.md
+  mimetype: text/x-octave
+  name: octave
+  version: 4.2.2
 ---
 
 A markdown cell

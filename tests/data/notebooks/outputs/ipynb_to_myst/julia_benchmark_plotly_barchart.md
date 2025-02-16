@@ -3,6 +3,11 @@ kernelspec:
   display_name: Julia 1.1.1
   language: julia
   name: julia-1.1
+language_info:
+  file_extension: .jl
+  mimetype: application/julia
+  name: julia
+  version: 1.1.1
 ---
 
 ```{code-cell}

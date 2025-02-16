@@ -3,6 +3,14 @@ kernelspec:
   display_name: PowerShell
   language: PowerShell
   name: powershell
+language_info:
+  codemirror_mode: powershell
+  file_extension: .ps1
+  mimetype: text/powershell
+  name: PowerShell
+  nbconvert_exporter: null
+  pygments_lexer: powershell
+  version: '5.0'
 ---
 
 This is an extract from

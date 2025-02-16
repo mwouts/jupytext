@@ -3,6 +3,11 @@ kernelspec:
   display_name: Lua
   language: lua
   name: lua
+language_info:
+  file_extension: .lua
+  mimetype: text/x-lua
+  name: lua
+  version: '5.4'
 ---
 
 Source: https://www.lua.org/pil/19.3.html

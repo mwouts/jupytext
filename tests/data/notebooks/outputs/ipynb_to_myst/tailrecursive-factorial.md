@@ -6,6 +6,13 @@ kernelspec:
   display_name: Groovy
   language: groovy
   name: groovy
+language_info:
+  codemirror_mode: groovy
+  file_extension: .groovy
+  mimetype: ''
+  name: Groovy
+  nbconverter_exporter: ''
+  version: 2.5.6
 ---
 
 # TailRecursive annotation

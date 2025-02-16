@@ -3,6 +3,11 @@ kernelspec:
   display_name: Tcl
   language: tcl
   name: tcljupyter
+language_info:
+  file_extension: .tcl
+  mimetype: txt/x-tcl
+  name: tcl
+  version: 8.6.11
 ---
 
 # Assign Values

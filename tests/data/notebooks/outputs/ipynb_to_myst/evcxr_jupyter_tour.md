@@ -3,6 +3,13 @@ kernelspec:
   display_name: Rust
   language: rust
   name: rust
+language_info:
+  codemirror_mode: rust
+  file_extension: .rs
+  mimetype: text/rust
+  name: Rust
+  pygment_lexer: rust
+  version: ''
 ---
 
 # Tour of the EvCxR Jupyter Kernel
