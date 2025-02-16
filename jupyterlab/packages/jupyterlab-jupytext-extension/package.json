@@ -81,7 +81,7 @@
     "@lumino/coreutils": "^2.2.0",
     "@lumino/disposable": "^2.1.3",
     "buffer": "^6.0.3",
-    "jupyterlab-rise": "^0.42.0"
+    "jupyterlab-rise": "^0.43.1"
   },
   "devDependencies": {
     "@jupyterlab/builder": "^4.3.3",
