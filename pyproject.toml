@@ -50,6 +50,7 @@ Documentation = "https://jupytext.readthedocs.io"
 # Test related dependencies
 test = [
   "pytest",
+  "pytest-asyncio",
   "pytest-xdist",
   "pytest-randomly"
 ]
