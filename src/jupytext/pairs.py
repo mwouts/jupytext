@@ -56,6 +56,7 @@ def write_pair(path, formats, write_one_file):
 
     return return_value
 
+
 async def write_pair_async(path, formats, write_one_file):
     """
     Call the function 'write_one_file' on each of the paired path/formats
@@ -171,6 +172,7 @@ def read_pair(inputs, outputs, read_one_file, must_match=False):
     )
 
     return notebook
+
 
 async def read_pair_async(inputs, outputs, read_one_file, must_match=False):
     """Read a notebook given its inputs and outputs path and formats"""

@@ -52,10 +52,13 @@ from .pairs import (
     write_pair_async,
 )
 
+
 def build_jupytext_async_contents_manager_class(base_contents_manager_class):
     """Derives a TextFileContentsManager class from the given base class"""
 
-    class JupytextAsyncContentsManager(base_contents_manager_class, JupytextConfiguration):
+    class JupytextAsyncContentsManager(
+        base_contents_manager_class, JupytextConfiguration
+    ):
         """
         A FileContentsManager Class that reads and stores notebooks to classical
         Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd), Julia (.jl),
@@ -120,10 +123,6 @@ def build_jupytext_async_contents_manager_class(base_contents_manager_class):
                     await self.create_prefix_dir(parent_dir, fmt)
                     self.log.info("Creating directory %s", parent_dir)
                     await self.super.save(dict(type="directory"), parent_dir)
-                    #-----------------------------------TRY------------
-                    obj = AsyncLargeFileManager()
-                    obj.dir_exists
-
 
         async def save(self, model, path=""):
             """Save the file model and return the model with no content."""
@@ -327,18 +326,22 @@ def build_jupytext_async_contents_manager_class(base_contents_manager_class):
                     return model["content"]
                 if alt_path.endswith(".ipynb"):
                     self.log.info(f"Reading OUTPUTS from {alt_path}")
-                    return (await self.super.get(
-                        alt_path, content=True, type="notebook", format=format
-                    ))["content"]
+                    return (
+                        await self.super.get(
+                            alt_path, content=True, type="notebook", format=format
+                        )
+                    )["content"]
 
                 self.log.info(f"Reading SOURCE from {alt_path}")
-                text = (await self.super.get(
-                    alt_path,
-                    content=True,
-                    type="file",
-                    # Don't use the parent format, see https://github.com/mwouts/jupytext/issues/1124
-                    format=None,
-                ))["content"]
+                text = (
+                    await self.super.get(
+                        alt_path,
+                        content=True,
+                        type="file",
+                        # Don't use the parent format, see https://github.com/mwouts/jupytext/issues/1124
+                        format=None,
+                    )
+                )["content"]
                 return reads(text, fmt=alt_fmt, config=config)
 
             timestamps = {
@@ -347,7 +350,11 @@ def build_jupytext_async_contents_manager_class(base_contents_manager_class):
             }
 
             inputs, outputs = latest_inputs_and_outputs(
-                path, fmt, formats, lambda alt_path: timestamps[alt_path], contents_manager_mode=True
+                path,
+                fmt,
+                formats,
+                lambda alt_path: timestamps[alt_path],
+                contents_manager_mode=True,
             )
 
             # Modification time of a paired notebook is the timestamp of inputs #118 #978
@@ -434,7 +441,9 @@ to your jupytext.toml file
                 model["content"] = content
             else:
                 try:
-                    model["content"] = await read_pair_async(inputs, outputs, read_one_file)
+                    model["content"] = await read_pair_async(
+                        inputs, outputs, read_one_file
+                    )
                 except HTTPError:
                     raise
                 except Exception as err:
@@ -685,7 +694,9 @@ try:
     # The LargeFileManager is taken by default from jupyter_server if available
     from jupyter_server.services.contents.largefilemanager import AsyncLargeFileManager
 
-    AsyncTextFileContentsManager = build_jupytext_async_contents_manager_class(AsyncLargeFileManager)
+    AsyncTextFileContentsManager = build_jupytext_async_contents_manager_class(
+        AsyncLargeFileManager
+    )
 except ImportError:
     # If we can't find jupyter_server then we take it from notebook
     try:
