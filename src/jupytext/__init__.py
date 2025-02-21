@@ -16,7 +16,7 @@ except ImportError as err:
     TextFileContentsManager = reraise(err)
 
 try:
-    from .async_contentsmanager import AsyncTextFileContentsManager
+    from .contentsmanager import AsyncTextFileContentsManager
 except ImportError as err:
     AsyncTextFileContentsManager = reraise(err)
 
