@@ -206,6 +206,7 @@ markers = [
     "requires_ir_kernel",
     "skip_on_windows",
     "pre_commit",
+    "asyncio"
 ]
 filterwarnings = [
     # Uncomment this "error" to turn all unfiltered warnings into errors
