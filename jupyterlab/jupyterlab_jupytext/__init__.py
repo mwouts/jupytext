@@ -1,11 +1,6 @@
 """Jupyter server and lab extension entry points"""
 
-from jupytext.reraise import reraise
-
-try:
-    from jupytext.contentsmanager import build_jupytext_contents_manager_class
-except ImportError as err:
-    build_jupytext_contents_manager = reraise(err)
+from jupytext.contentsmanager import build_jupytext_contents_manager_class
 
 
 def load_jupyter_server_extension(app):  # pragma: no cover

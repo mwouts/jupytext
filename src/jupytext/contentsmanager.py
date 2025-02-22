@@ -13,14 +13,9 @@ from collections import namedtuple
 from datetime import timedelta
 
 import nbformat
-from jupyter_core.utils import ensure_async
+from jupyter_server.services.contents.largefilemanager import AsyncLargeFileManager
+from jupyter_server.utils import ensure_async
 from tornado.web import HTTPError
-
-# import notebook.transutils before notebook.services.contents.filemanager #75
-try:
-    import notebook.transutils  # noqa
-except ImportError:
-    pass
 
 from .config import (
     JUPYTEXT_CONFIG_FILES,
@@ -50,7 +45,10 @@ from .pairs import PairedFilesDiffer, latest_inputs_and_outputs, read_pair, writ
 
 
 def build_jupytext_contents_manager_class(base_contents_manager_class):
-    """Derives a TextFileContentsManager class from the given base class"""
+    """
+    Derives an (async) TextFileContentsManager class from the given base class.
+    The base class can either be sync or async.
+    """
 
     class JupytextContentsManager(base_contents_manager_class, JupytextConfiguration):
         """
@@ -710,45 +708,4 @@ to your jupytext.toml file
     return JupytextContentsManager
 
 
-try:
-    # The LargeFileManager is taken by default from jupyter_server if available
-    from jupyter_server.services.contents.largefilemanager import LargeFileManager
-
-    TextFileContentsManager = build_jupytext_contents_manager_class(LargeFileManager)
-except ImportError:
-    # If we can't find jupyter_server then we take it from notebook
-    try:
-        from notebook.services.contents.largefilemanager import LargeFileManager
-
-        TextFileContentsManager = build_jupytext_contents_manager_class(
-            LargeFileManager
-        )
-    except ImportError:
-        # Older versions of notebook do not have the LargeFileManager #217
-        from notebook.services.contents.filemanager import FileContentsManager
-
-        TextFileContentsManager = build_jupytext_contents_manager_class(
-            FileContentsManager
-        )
-try:
-    # The AsyncLargeFileManager is taken by default from jupyter_server if available
-    from jupyter_server.services.contents.largefilemanager import AsyncLargeFileManager
-
-    AsyncTextFileContentsManager = build_jupytext_contents_manager_class(
-        AsyncLargeFileManager
-    )
-except ImportError:
-    # If we can't find jupyter_server then we take it from notebook
-    try:
-        from notebook.services.contents.largefilemanager import AsyncLargeFileManager
-
-        AsyncTextFileContentsManager = build_jupytext_contents_manager_class(
-            AsyncLargeFileManager
-        )
-    except ImportError:
-        # Older versions of notebook do not have the AsyncLargeFileManager #217
-        from notebook.services.contents.filemanager import AsyncFileContentsManager
-
-        AsyncTextFileContentsManager = build_jupytext_contents_manager_class(
-            AsyncFileContentsManager
-        )
+TextFileContentsManager = build_jupytext_contents_manager_class(AsyncLargeFileManager)
