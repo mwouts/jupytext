@@ -16,7 +16,10 @@ from tornado.web import HTTPError
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
 from jupytext.compare import compare, compare_notebooks, notebook_model
-from jupytext.contentsmanager import build_jupytext_contents_manager_class
+from jupytext.contentsmanager import (
+    build_async_jupytext_contents_manager_class,
+    build_jupytext_contents_manager_class,
+)
 from jupytext.formats import auto_ext_from_metadata, read_format_from_metadata
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.jupytext import read, write, writes
@@ -28,12 +31,12 @@ def cm(request):
     if request.param == "sync":
         return build_jupytext_contents_manager_class(LargeFileManager)()
     else:
-        return build_jupytext_contents_manager_class(AsyncLargeFileManager)()
+        return build_async_jupytext_contents_manager_class(AsyncLargeFileManager)()
 
 
 def test_create_contentsmanager():
     build_jupytext_contents_manager_class(LargeFileManager)()
-    build_jupytext_contents_manager_class(AsyncLargeFileManager)()
+    build_async_jupytext_contents_manager_class(AsyncLargeFileManager)()
 
 
 @pytest.mark.asyncio

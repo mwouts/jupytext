@@ -1,5 +1,7 @@
-"""Async ContentsManager that allows to open Rmd, py, R and ipynb files as notebooks
 """
+A ContentsManager that allows to open Rmd, py, R and ipynb files as notebooks
+"""
+import asyncio
 import inspect
 import itertools
 import os
@@ -44,13 +46,15 @@ from .paired_paths import (
 from .pairs import PairedFilesDiffer, latest_inputs_and_outputs, read_pair, write_pair
 
 
-def build_jupytext_contents_manager_class(base_contents_manager_class):
+def build_async_jupytext_contents_manager_class(base_contents_manager_class):
     """
-    Derives an (async) TextFileContentsManager class from the given base class.
+    Derives an async TextFileContentsManager class from the given base class.
     The base class can either be sync or async.
     """
 
-    class JupytextContentsManager(base_contents_manager_class, JupytextConfiguration):
+    class AsyncJupytextContentsManager(
+        base_contents_manager_class, JupytextConfiguration
+    ):
         """
         A FileContentsManager Class that reads and stores notebooks to classical
         Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd), Julia (.jl),
@@ -697,15 +701,59 @@ to your jupytext.toml file
             return self
 
     if "require_hash" in inspect.signature(base_contents_manager_class.get).parameters:
-        JupytextContentsManager.get = (
-            JupytextContentsManager._get_with_require_hash_argument
+        AsyncJupytextContentsManager.get = (
+            AsyncJupytextContentsManager._get_with_require_hash_argument
         )
     else:
-        JupytextContentsManager.get = (
-            JupytextContentsManager._get_with_no_require_hash_argument
+        AsyncJupytextContentsManager.get = (
+            AsyncJupytextContentsManager._get_with_no_require_hash_argument
         )
 
-    return JupytextContentsManager
+    return AsyncJupytextContentsManager
 
 
+def build_jupytext_contents_manager_class(base_contents_manager_class):
+    """
+    Derives an sync TextFileContentsManager class from the given base class.
+    The base class can either be sync or async.
+    """
+
+    AsyncJupytextContentsManager = build_async_jupytext_contents_manager_class(
+        base_contents_manager_class
+    )
+
+    class SyncJupytextContentsManager(AsyncJupytextContentsManager):
+        pass
+
+    for method_name in dir(AsyncJupytextContentsManager):
+        if method_name.startswith("_"):
+            continue
+        async_method = getattr(AsyncJupytextContentsManager, method_name)
+        if inspect.iscoroutinefunction(async_method):
+            async_method_name = "_async_" + method_name
+            original_signature = inspect.signature(async_method)
+            setattr(SyncJupytextContentsManager, async_method_name, async_method)
+
+            def get_sync_method(async_method_name, original_signature):
+                def sync_method(self, *args, **kwargs):
+                    loop = asyncio.get_event_loop()
+                    return loop.run_until_complete(
+                        getattr(self, async_method_name)(*args, **kwargs)
+                    )
+
+                sync_method.__signature__ = original_signature
+                return sync_method
+
+            setattr(
+                SyncJupytextContentsManager,
+                method_name,
+                get_sync_method(async_method_name, original_signature),
+            )
+
+    return SyncJupytextContentsManager
+
+
+AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
+    AsyncLargeFileManager
+)
 TextFileContentsManager = build_jupytext_contents_manager_class(AsyncLargeFileManager)
