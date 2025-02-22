@@ -33,6 +33,7 @@ classifiers = [
 ]
 dependencies = [
     "nbformat",
+    "jupyter_server",
     "mdit-py-plugins",
     "markdown-it-py>=1.0",
     "packaging",
