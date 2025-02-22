@@ -6,13 +6,13 @@ import pytest
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
 from jupytext.compare import compare
-from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.formats import (
     long_form_multiple_formats,
     long_form_one_format,
     short_form_multiple_formats,
 )
 from jupytext.paired_paths import InconsistentPath, base_path, full_path, paired_paths
+from jupytext.sync_contentsmanager import TextFileContentsManager
 
 
 def test_simple_pair():

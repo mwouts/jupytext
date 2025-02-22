@@ -7,7 +7,7 @@ from tornado.web import HTTPError
 
 import jupytext
 from jupytext.compare import compare_notebooks, notebook_model
-from jupytext.contentsmanager import TextFileContentsManager
+from jupytext.sync_contentsmanager import TextFileContentsManager
 
 
 def test_rmd_is_ok(ipynb_file, tmpdir):

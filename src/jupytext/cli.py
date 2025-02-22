@@ -36,7 +36,8 @@ from .paired_paths import (
     full_path,
     paired_paths,
 )
-from .pairs import latest_inputs_and_outputs, read_pair, write_pair
+from .pairs import latest_inputs_and_outputs
+from .sync_pairs import read_pair, write_pair
 from .version import __version__
 
 

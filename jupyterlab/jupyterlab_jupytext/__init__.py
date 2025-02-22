@@ -1,6 +1,9 @@
 """Jupyter server and lab extension entry points"""
 
-from jupytext.contentsmanager import build_jupytext_contents_manager_class
+import asyncio
+
+from jupytext.async_contentsmanager import build_async_jupytext_contents_manager_class
+from jupytext.sync_contentsmanager import build_sync_jupytext_contents_manager_class
 
 
 def load_jupyter_server_extension(app):  # pragma: no cover
@@ -17,11 +20,22 @@ def load_jupyter_server_extension(app):  # pragma: no cover
 
     base_class = app.contents_manager_class
 
+    asynchronous = asyncio.iscoroutinefunction(base_class.get)
     app.log.info(
-        "[Jupytext Server Extension] Deriving a JupytextContentsManager "
-        "from {}".format(base_class.__name__)
+        "[Jupytext Server Extension] Deriving "
+        + ("an Async" if asynchronous else "a ")
+        + "TextFileContentsManager from "
+        + base_class.__name__
     )
-    app.contents_manager_class = build_jupytext_contents_manager_class(base_class)
+
+    if asyncio.iscoroutinefunction(base_class.get):
+        app.contents_manager_class = build_async_jupytext_contents_manager_class(
+            base_class
+        )
+    else:
+        app.contents_manager_class = build_sync_jupytext_contents_manager_class(
+            base_class
+        )
 
     try:
         # And rerun selected init steps from https://github.com/jupyter/notebook/blob/

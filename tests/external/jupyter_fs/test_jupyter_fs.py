@@ -13,7 +13,7 @@ def fs_meta_manager(tmpdir):
     except ImportError:
         pytest.skip("jupyterfs is not available")
 
-    cm_class = jupytext.build_jupytext_contents_manager_class(SyncMetaManager)
+    cm_class = jupytext.build_sync_jupytext_contents_manager_class(SyncMetaManager)
     logger = logging.getLogger("jupyter-fs")
     cm = cm_class(parent=None, log=logger)
     cm.initResource(

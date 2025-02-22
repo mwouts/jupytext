@@ -5,7 +5,7 @@ import pytest
 from nbformat.v4.nbbase import new_code_cell, new_output
 
 from jupytext.compare import compare_notebooks
-from jupytext.contentsmanager import TextFileContentsManager
+from jupytext.sync_contentsmanager import TextFileContentsManager
 
 
 def test_py_notebooks_are_trusted(python_file):

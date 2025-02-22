@@ -1288,7 +1288,7 @@ def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, forma
     assert src_timestamp - 1e-6 <= dest_timestamp <= src_timestamp
 
     # Make sure that we can open the file in Jupyter
-    from jupytext.contentsmanager import TextFileContentsManager
+    from jupytext.sync_contentsmanager import TextFileContentsManager
 
     cm = TextFileContentsManager()
     cm.outdated_text_notebook_margin = 0.001

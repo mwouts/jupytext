@@ -47,7 +47,7 @@ def test_config_file_is_called_just_once(tmpdir, n=2):
     mock_config = mock.MagicMock(return_value=None)
 
     with mock.patch(
-        "jupytext.contentsmanager.load_jupytext_configuration_file", mock_config
+        "jupytext.sync_contentsmanager.load_jupytext_configuration_file", mock_config
     ):
         for i in range(n):
             cm.get(f"notebook{i}.ipynb", content=False)
