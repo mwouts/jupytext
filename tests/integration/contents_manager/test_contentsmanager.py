@@ -5,10 +5,6 @@ import shutil
 import time
 
 import pytest
-from jupyter_server.services.contents.largefilemanager import (
-    AsyncLargeFileManager,
-    LargeFileManager,
-)
 from jupyter_server.utils import ensure_async
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 from tornado.web import HTTPError
@@ -16,7 +12,6 @@ from tornado.web import HTTPError
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
 from jupytext.compare import compare, compare_notebooks, notebook_model
-from jupytext.contentsmanager import build_jupytext_contents_manager_class
 from jupytext.formats import auto_ext_from_metadata, read_format_from_metadata
 from jupytext.header import header_to_metadata_and_cell
 from jupytext.jupytext import read, write, writes
@@ -26,14 +21,14 @@ from jupytext.kernels import kernelspec_from_language
 @pytest.fixture(params=["sync", "async"])
 def cm(request):
     if request.param == "sync":
-        return build_jupytext_contents_manager_class(LargeFileManager)()
+        return jupytext.TextFileContentsManager()
     else:
-        return build_jupytext_contents_manager_class(AsyncLargeFileManager)()
+        return jupytext.AsyncTextFileContentsManager()
 
 
 def test_create_contentsmanager():
-    build_jupytext_contents_manager_class(LargeFileManager)()
-    build_jupytext_contents_manager_class(AsyncLargeFileManager)()
+    jupytext.TextFileContentsManager()
+    jupytext.AsyncTextFileContentsManager()
 
 
 @pytest.mark.asyncio
