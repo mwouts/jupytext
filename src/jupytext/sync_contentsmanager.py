@@ -303,6 +303,9 @@ def build_sync_jupytext_contents_manager_class(base_contents_manager_class):
                         err,
                         exc_info=True,
                     )
+                    raise HTTPError(
+                        500, f"Unable to read paired notebook: {path} {err}"
+                    )
             else:
                 if path in self.paired_notebooks:
                     fmt, formats = self.paired_notebooks.get(path)
