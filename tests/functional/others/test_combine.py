@@ -1,5 +1,7 @@
 from copy import deepcopy
 
+import pytest
+from jupyter_server.utils import ensure_async
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 
 import jupytext
@@ -39,7 +41,8 @@ def test_combine():
     assert nb_source.cells[5].outputs == ["5"]
 
 
-def test_read_text_and_combine_with_outputs(tmpdir):
+@pytest.mark.asyncio
+async def test_read_text_and_combine_with_outputs(tmpdir, cm):
     tmp_ipynb = "notebook.ipynb"
     tmp_script = "notebook.py"
 
@@ -111,11 +114,10 @@ def test_read_text_and_combine_with_outputs(tmpdir):
         )
 
     # create contents manager
-    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
     # load notebook from script
-    model = cm.get(tmp_script)
+    model = await ensure_async(cm.get(tmp_script))
     nb = model["content"]
 
     assert nb.cells[0]["source"] == "1+1"

@@ -1,16 +1,19 @@
-import jupytext
+import pytest
+from jupyter_server.utils import ensure_async
 
 
-def test_remove_encoding_907(tmp_path, python_notebook):
+@pytest.mark.asyncio
+async def test_remove_encoding_907(tmp_path, python_notebook, cm):
     # Pair all notebooks to py:percent files
     (tmp_path / "jupytext.toml").write_text('formats="ipynb,py:percent"')
 
     # Create a contents manager
-    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmp_path)
 
     # Save the notebook in Jupyter
-    cm.save(dict(type="notebook", content=python_notebook), path="nb.ipynb")
+    await ensure_async(
+        cm.save(dict(type="notebook", content=python_notebook), path="nb.ipynb")
+    )
 
     # No encoding is present in the py file
     py = (tmp_path / "nb.py").read_text()
@@ -21,11 +24,11 @@ def test_remove_encoding_907(tmp_path, python_notebook):
     (tmp_path / "nb.py").write_text(py)
 
     # Reload the notebook
-    nb = cm.get("nb.ipynb")["content"]
+    nb = (await ensure_async(cm.get("nb.ipynb")))["content"]
     assert "encoding" in nb.metadata["jupytext"]
 
     # Save the notebook
-    cm.save(dict(type="notebook", content=nb), path="nb.ipynb")
+    await ensure_async(cm.save(dict(type="notebook", content=nb), path="nb.ipynb"))
 
     # The encoding is still present in the py file
     py = (tmp_path / "nb.py").read_text()
@@ -36,7 +39,7 @@ def test_remove_encoding_907(tmp_path, python_notebook):
     (tmp_path / "nb.py").write_text(py)
 
     # Reload the notebook - the encoding is not there anymore
-    nb = cm.get("nb.ipynb")["content"]
+    nb = (await ensure_async(cm.get("nb.ipynb")))["content"]
     assert "encoding" not in nb.metadata["jupytext"]
 
     # Save the notebook - the encoding is not there anymore

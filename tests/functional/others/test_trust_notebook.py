@@ -127,7 +127,7 @@ async def test_text_notebooks_can_be_trusted(
     cm.root_dir = str(tmpdir)
     model = await ensure_async(cm.get(file))
     model["type"] == "notebook"
-    cm.save(model, file)
+    await ensure_async(cm.save(model, file))
 
     # Unsign notebook
     nb = model["content"]
@@ -137,7 +137,7 @@ async def test_text_notebooks_can_be_trusted(
     cm.notary.unsign(nb)
 
     # Trust and reload
-    cm.trust_notebook(file)
+    await ensure_async(cm.trust_notebook(file))
 
     model = await ensure_async(cm.get(file))
     for cell in model["content"].cells:

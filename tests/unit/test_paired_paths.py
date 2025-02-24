@@ -12,7 +12,6 @@ from jupytext.formats import (
     short_form_multiple_formats,
 )
 from jupytext.paired_paths import InconsistentPath, base_path, full_path, paired_paths
-from jupytext.sync_contentsmanager import TextFileContentsManager
 
 
 def test_simple_pair():
@@ -237,8 +236,8 @@ def test_duplicated_paths():
         paired_paths("notebook.ipynb", "ipynb", formats)
 
 
-def test_cm_paired_paths():
-    cm = TextFileContentsManager()
+@pytest.mark.asyncio
+async def test_cm_paired_paths(cm):
     cm.paired_notebooks = dict()
 
     three = "ipynb,py,md"
