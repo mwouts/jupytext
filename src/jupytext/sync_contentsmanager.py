@@ -124,7 +124,7 @@ def build_sync_jupytext_contents_manager_class(base_contents_manager_class):
                 if not self.dir_exists(parent_dir):
                     self.create_prefix_dir(parent_dir, fmt)
                     self.log.info("Creating directory %s", parent_dir)
-                    (self.super.save(dict(type="directory"), parent_dir))
+                    self.super.save(dict(type="directory"), parent_dir)
 
         def save(self, model, path=""):
             """Save the file model and return the model with no content."""
@@ -329,23 +329,19 @@ def build_sync_jupytext_contents_manager_class(base_contents_manager_class):
                 if alt_path.endswith(".ipynb"):
                     self.log.info(f"Reading OUTPUTS from {alt_path}")
                     return (
-                        (
-                            self.super.get(
-                                alt_path, content=True, type="notebook", format=format
-                            )
+                        self.super.get(
+                            alt_path, content=True, type="notebook", format=format
                         )
                     )["content"]
 
                 self.log.info(f"Reading SOURCE from {alt_path}")
                 text = (
-                    (
-                        self.super.get(
-                            alt_path,
-                            content=True,
-                            type="file",
-                            # Don't use the parent format, see https://github.com/mwouts/jupytext/issues/1124
-                            format=None,
-                        )
+                    self.super.get(
+                        alt_path,
+                        content=True,
+                        type="file",
+                        # Don't use the parent format, see https://github.com/mwouts/jupytext/issues/1124
+                        format=None,
                     )
                 )["content"]
                 return reads(text, fmt=alt_fmt, config=config)
@@ -562,7 +558,7 @@ to your jupytext.toml file
                 new_alt_path = full_path(new_base, alt_fmt)
                 if self.exists(old_alt_path):
                     self.create_prefix_dir(new_alt_path, alt_fmt)
-                    (self.super.rename_file(old_alt_path, new_alt_path))
+                    self.super.rename_file(old_alt_path, new_alt_path)
 
             self.drop_paired_notebook(old_path)
             self.update_paired_notebooks(new_path, formats)

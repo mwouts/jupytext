@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 import pytest
@@ -15,11 +14,7 @@ def generate_async_code_from_sync_code(async_code: str) -> str:
     sync_code = async_code.replace("async def", "def")
 
     # Don't await
-    sync_code = re.sub(r"await ensure_async\((.*)\)", r"\1", sync_code)
-    sync_code = sync_code.replace("await ensure_async(", "(")
-
-    # Remove unused import
-    sync_code = sync_code.replace("from jupyter_server.utils import ensure_async\n", "")
+    sync_code = sync_code.replace("await ", "")
 
     # Rename the contents manager
     sync_code = sync_code.replace("AsyncLargeFileManager", "LargeFileManager")

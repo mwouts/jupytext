@@ -1,5 +1,3 @@
-from jupyter_server.utils import ensure_async
-
 import jupytext
 
 from .combine import combine_inputs_with_outputs
@@ -12,12 +10,12 @@ from .pairs import PairedFilesDiffer
 async def read_pair(inputs, outputs, read_one_file, must_match=False):
     """Read a notebook given its inputs and outputs path and formats"""
     if not outputs.path or outputs.path == inputs.path:
-        return await ensure_async(read_one_file(inputs.path, inputs.fmt))
+        return await read_one_file(inputs.path, inputs.fmt)
 
-    notebook = await ensure_async(read_one_file(inputs.path, inputs.fmt))
+    notebook = await read_one_file(inputs.path, inputs.fmt)
     check_file_version(notebook, inputs.path, outputs.path)
 
-    notebook_with_outputs = await ensure_async(read_one_file(outputs.path, outputs.fmt))
+    notebook_with_outputs = await read_one_file(outputs.path, outputs.fmt)
 
     if must_match:
         in_text = jupytext.writes(notebook, inputs.fmt)
@@ -48,7 +46,7 @@ async def write_pair(path, formats, write_one_file):
             continue
 
         alt_path = full_path(base, fmt)
-        value = await ensure_async(write_one_file(alt_path, fmt))
+        value = await write_one_file(alt_path, fmt)
         if alt_path == path:
             return_value = value
 
@@ -59,7 +57,7 @@ async def write_pair(path, formats, write_one_file):
             continue
 
         alt_path = full_path(base, fmt)
-        value = await ensure_async(write_one_file(alt_path, fmt))
+        value = await write_one_file(alt_path, fmt)
         if alt_path == path:
             return_value = value
 
