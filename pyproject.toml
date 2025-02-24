@@ -57,6 +57,7 @@ test = [
 ]
 test-functional = [
   "jupytext[test]",
+  "black",
 ]
 test-integration = [
   "jupytext[test-functional]",
