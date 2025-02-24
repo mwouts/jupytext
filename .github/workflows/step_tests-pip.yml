@@ -21,7 +21,7 @@ jobs:
       ${{ matrix.no_kernel && '(No kernel)' }}
       ${{ matrix.markdown-it-py && format('(markdown-it-py {0})', matrix.markdown-it-py) }}
       ${{ matrix.no_markdown-it-py && '(No markdown-it-py)'}}
-      ${{ matrix.jupyter_server && '(Jupyer-server {0})'}}
+      ${{ matrix.jupyter_server && '(Jupyter-server {0})'}}
     runs-on: ubuntu-latest
 
     strategy:
