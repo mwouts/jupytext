@@ -32,6 +32,14 @@ SAMPLE_NOTEBOOK_PATH = Path(__file__).parent / "data" / "notebooks" / "inputs"
 ROOT_PATH = Path(__file__).parent.parent
 
 
+@pytest.fixture(params=["sync", "async"])
+def cm(request):
+    if request.param == "sync":
+        return jupytext.TextFileContentsManager()
+    else:
+        return jupytext.AsyncTextFileContentsManager()
+
+
 @pytest.fixture
 def no_jupytext_version_number():
     with mock.patch("jupytext.header.INSERT_AND_CHECK_VERSION_NUMBER", False):

@@ -18,14 +18,6 @@ from jupytext.jupytext import read, write, writes
 from jupytext.kernels import kernelspec_from_language
 
 
-@pytest.fixture(params=["sync", "async"])
-def cm(request):
-    if request.param == "sync":
-        return jupytext.TextFileContentsManager()
-    else:
-        return jupytext.AsyncTextFileContentsManager()
-
-
 def test_create_contentsmanager():
     jupytext.TextFileContentsManager()
     jupytext.AsyncTextFileContentsManager()
