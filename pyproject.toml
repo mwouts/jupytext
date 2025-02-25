@@ -74,7 +74,7 @@ test-external = [
   "flake8",
   # Sphinx gallery
   "sphinx<8", # Issue 1266
-  "sphinx-gallery<0.8",
+  "sphinx-gallery>=0.8",
   # Pre-commit tests
   "gitpython",
   "pre-commit",
