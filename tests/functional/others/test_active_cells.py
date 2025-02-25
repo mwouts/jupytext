@@ -36,7 +36,7 @@ jupyter:
 }
 
 ACTIVE_ALL = {
-    ".py": """# + active="ipynb,py,R,Rmd"
+    ".py": """# %% active="ipynb,py,R,Rmd"
 # This cell is active in all extensions
 """,
     ".Rmd": """```{python active="ipynb,py,R,Rmd"}
@@ -47,7 +47,7 @@ ACTIVE_ALL = {
 # This cell is active in all extensions
 ```
 """,
-    ".R": """# + active="ipynb,py,R,Rmd"
+    ".R": """# %% active="ipynb,py,R,Rmd"
 # This cell is active in all extensions
 """,
     ".ipynb": {
@@ -75,7 +75,7 @@ def test_active_all(ext, no_jupytext_version_number):
 
 
 ACTIVE_IPYNB = {
-    ".py": """# + active="ipynb"
+    ".py": """# %% active="ipynb"
 # # This cell is active only in ipynb
 # %matplotlib inline
 """,
@@ -89,7 +89,7 @@ ACTIVE_IPYNB = {
 %matplotlib inline
 ```
 """,
-    ".R": """# + active="ipynb"
+    ".R": """# %% active="ipynb"
 # # This cell is active only in ipynb
 # %matplotlib inline
 """,
@@ -109,7 +109,7 @@ def test_active_ipynb(ext, no_jupytext_version_number):
 
 
 ACTIVE_IPYNB_RMD_USING_TAG = {
-    ".py": """# + tags=["active-ipynb-Rmd"]
+    ".py": """# %% tags=["active-ipynb-Rmd"]
 # # This cell is active only in ipynb and Rmd
 # %matplotlib inline
 """,
@@ -123,7 +123,7 @@ ACTIVE_IPYNB_RMD_USING_TAG = {
 %matplotlib inline
 ```
 """,
-    ".R": """# + tags=["active-ipynb-Rmd"]
+    ".R": """# %% tags=["active-ipynb-Rmd"]
 # # This cell is active only in ipynb and Rmd
 # %matplotlib inline
 """,
@@ -166,7 +166,7 @@ def test_active_ipynb_rspin(no_jupytext_version_number):
 
 
 ACTIVE_PY_IPYNB = {
-    ".py": """# + active="ipynb,py"
+    ".py": """# %% active="ipynb,py"
 # This cell is active in py and ipynb extensions
 """,
     ".Rmd": """```{python active="ipynb,py", eval=FALSE}
@@ -177,7 +177,7 @@ ACTIVE_PY_IPYNB = {
 # This cell is active in py and ipynb extensions
 ```
 """,
-    ".R": """# + active="ipynb,py"
+    ".R": """# %% active="ipynb,py"
 # # This cell is active in py and ipynb extensions
 """,
     ".ipynb": {
@@ -196,14 +196,14 @@ def test_active_py_ipynb(ext, no_jupytext_version_number):
 
 
 ACTIVE_PY_R_IPYNB = {
-    ".py": """# + active="ipynb,py,R"
+    ".py": """# %% active="ipynb,py,R"
 # This cell is active in py, R and ipynb extensions
 """,
     ".Rmd": """```{python active="ipynb,py,R", eval=FALSE}
 # This cell is active in py, R and ipynb extensions
 ```
 """,
-    ".R": """# + active="ipynb,py,R"
+    ".R": """# %% active="ipynb,py,R"
 # This cell is active in py, R and ipynb extensions
 """,
     ".ipynb": {
@@ -222,14 +222,14 @@ def test_active_py_r_ipynb(ext, no_jupytext_version_number):
 
 
 ACTIVE_RMD = {
-    ".py": """# + active="Rmd"
+    ".py": """# %% active="Rmd"
 # # This cell is active in Rmd only
 """,
     ".Rmd": """```{python active="Rmd"}
 # This cell is active in Rmd only
 ```
 """,
-    ".R": """# + active="Rmd"
+    ".R": """# %% active="Rmd"
 # # This cell is active in Rmd only
 """,
     ".ipynb": {
@@ -246,14 +246,14 @@ def test_active_rmd(ext, no_jupytext_version_number):
 
 
 ACTIVE_NOT_INCLUDE_RMD = {
-    ".py": """# + tags=["remove_cell"] active="Rmd"
+    ".py": """# %% tags=["remove_cell"] active="Rmd"
 # # This cell is active in Rmd only
 """,
     ".Rmd": """```{python include=FALSE, active="Rmd"}
 # This cell is active in Rmd only
 ```
 """,
-    ".R": """# + tags=["remove_cell"] active="Rmd"
+    ".R": """# %% tags=["remove_cell"] active="Rmd"
 # # This cell is active in Rmd only
 """,
     ".ipynb": {
@@ -357,7 +357,7 @@ print('should only be displayed in py file')
 """,
 ):
     """Example adapted from https://github.com/mwouts/jupytext/issues/477"""
-    nb = jupytext.reads(text, "py")
+    nb = jupytext.reads(text, "py:light")
     assert nb.cells[0].cell_type == "raw"
     assert nb.cells[1].cell_type == "raw"
     assert nb.cells[2].cell_type == "code"

@@ -163,7 +163,7 @@ export async function getAvailableCreateTextNotebookCommands(
       fileTypes.map((fileType: IFileTypeData) => {
         // If format is auto, we need to add all currently available kernels
         // For instance if there are Python and R kernels available, format
-        // auto:light will be replaced by py:light and R:light
+        // auto:percent will be replaced by py:percent and R:percent
         if (format.startsWith('auto')) {
           const formatType = format.split(':')[1];
           let mapIndex = 0;
