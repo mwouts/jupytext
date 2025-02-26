@@ -320,7 +320,12 @@ def build_sync_jupytext_contents_manager_class(base_contents_manager_class):
                     model["content"]["metadata"]["jupytext"] = jupytext_metadata
 
             def get_timestamp(alt_path):
-                if not self.exists(alt_path):
+                # self.exists is not async for AsyncLargeManager,
+                # but MetaManager from fs_manager has an async version
+                exists = self.exists(alt_path)
+                if inspect.isawaitable(exists):
+                    exists = exists
+                if not exists:
                     return None
                 if alt_path == path:
                     return model["last_modified"]

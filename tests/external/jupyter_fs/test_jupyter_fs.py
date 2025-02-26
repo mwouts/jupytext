@@ -1,19 +1,25 @@
 import logging
 
 import pytest
+from jupyter_server.utils import ensure_async
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 
 import jupytext
 from jupytext.compare import compare_cells, notebook_model
 
 
-def fs_meta_manager(tmpdir):
+@pytest.fixture(params=["sync", "async"])
+def cm_from_fs_meta_manager(tmpdir, request):
     try:
-        from jupyterfs.metamanager import SyncMetaManager
+        from jupyterfs.metamanager import MetaManager, SyncMetaManager
     except ImportError:
         pytest.skip("jupyterfs is not available")
 
-    cm_class = jupytext.build_sync_jupytext_contents_manager_class(SyncMetaManager)
+    if request.param == "sync":
+        cm_class = jupytext.build_sync_jupytext_contents_manager_class(SyncMetaManager)
+    else:
+        cm_class = jupytext.build_async_jupytext_contents_manager_class(MetaManager)
+
     logger = logging.getLogger("jupyter-fs")
     cm = cm_class(parent=None, log=logger)
     cm.initResource(
@@ -24,24 +30,27 @@ def fs_meta_manager(tmpdir):
     return cm
 
 
-def test_jupytext_jupyter_fs_metamanager(tmpdir):
+@pytest.mark.asyncio
+async def test_jupytext_jupyter_fs_metamanager(cm_from_fs_meta_manager):
     """Test the basic get/save functions of Jupytext with a fs manager
     https://github.com/mwouts/jupytext/issues/618"""
-    cm = fs_meta_manager(tmpdir)
+    cm = cm_from_fs_meta_manager
     # the hash that corresponds to the osfs
     osfs = [h for h in cm._managers if h != ""][0]
 
     # save a few files
     text = "some text\n"
-    cm.save(dict(type="file", content=text, format="text"), path=osfs + ":text.md")
+    await ensure_async(
+        cm.save(dict(type="file", content=text, format="text"), path=osfs + ":text.md")
+    )
     nb = new_notebook(
         cells=[new_markdown_cell("A markdown cell"), new_code_cell("1 + 1")]
     )
-    cm.save(notebook_model(nb), osfs + ":notebook.ipynb")
-    cm.save(notebook_model(nb), osfs + ":text_notebook.md")
+    await ensure_async(cm.save(notebook_model(nb), osfs + ":notebook.ipynb"))
+    await ensure_async(cm.save(notebook_model(nb), osfs + ":text_notebook.md"))
 
     # list the directory
-    directory = cm.get(osfs + ":/")
+    directory = await ensure_async(cm.get(osfs + ":/"))
     assert {file["name"] for file in directory["content"]} == {
         "text.md",
         "text_notebook.md",
@@ -49,11 +58,11 @@ def test_jupytext_jupyter_fs_metamanager(tmpdir):
     }
 
     # get the files
-    model = cm.get(osfs + ":/text.md", type="file")
+    model = await ensure_async(cm.get(osfs + ":/text.md", type="file"))
     assert model["type"] == "file"
     assert model["content"] == text
 
-    model = cm.get(osfs + ":text.md", type="notebook")
+    model = await ensure_async(cm.get(osfs + ":text.md", type="notebook"))
     assert model["type"] == "notebook"
     # We only compare the cells, as kernelspecs are added to the notebook metadata
     compare_cells(
@@ -61,7 +70,7 @@ def test_jupytext_jupyter_fs_metamanager(tmpdir):
     )
 
     for nb_file in ["notebook.ipynb", "text_notebook.md"]:
-        model = cm.get(osfs + ":" + nb_file)
+        model = await ensure_async(cm.get(osfs + ":" + nb_file))
         assert model["type"] == "notebook"
         actual_cells = model["content"].cells
 
@@ -71,22 +80,27 @@ def test_jupytext_jupyter_fs_metamanager(tmpdir):
         compare_cells(actual_cells, nb.cells, compare_ids=False)
 
 
-def test_config_jupytext_jupyter_fs_meta_manager(tmpdir):
+@pytest.mark.asyncio
+async def test_config_jupytext_jupyter_fs_meta_manager(tmpdir, cm_from_fs_meta_manager):
     """Test the configuration of Jupytext with a fs manager"""
     tmpdir.join("jupytext.toml").write('formats = "ipynb,py"')
-    cm = fs_meta_manager(tmpdir)
+    cm = cm_from_fs_meta_manager
     # the hash that corresponds to the osfs
     osfs = [h for h in cm._managers if h != ""][0]
 
     # save a few files
     nb = new_notebook()
-    cm.save(dict(type="file", content="text", format="text"), path=osfs + ":text.md")
-    cm.save(notebook_model(nb), osfs + ":script.py")
-    cm.save(notebook_model(nb), osfs + ":text_notebook.md")
-    cm.save(notebook_model(nb), osfs + ":notebook.ipynb")
+    await ensure_async(
+        cm.save(
+            dict(type="file", content="text", format="text"), path=osfs + ":text.md"
+        )
+    )
+    await ensure_async(cm.save(notebook_model(nb), osfs + ":script.py"))
+    await ensure_async(cm.save(notebook_model(nb), osfs + ":text_notebook.md"))
+    await ensure_async(cm.save(notebook_model(nb), osfs + ":notebook.ipynb"))
 
     # list the directory
-    directory = cm.get(osfs + ":/")
+    directory = await ensure_async(cm.get(osfs + ":/"))
     assert {file["name"] for file in directory["content"]} == {
         "jupytext.toml",
         "text.md",
