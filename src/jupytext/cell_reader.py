@@ -1,31 +1,18 @@
 """Read notebook cells from their text representation"""
 
 import re
-import warnings
+from collections import defaultdict
 from copy import copy
+from itertools import count
 
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_raw_cell
-from packaging.version import parse
 
 from .doxygen import doxygen_to_markdown
 from .languages import _SCRIPT_EXTENSIONS
 
 # Sphinx Gallery is an optional dependency. And we intercept the SyntaxError for #301
 try:
-    from sphinx_gallery import __version__ as sg_version
-
-    if parse(sg_version) <= parse("0.7.0"):
-        from sphinx_gallery.notebook import rst2md
-    else:
-        warnings.warn(
-            f"Sphinx Gallery in version {sg_version} is not supported by Jupytext. "
-            f"Please use sphinx-gallery<=0.7.0 instead. "
-            f"If that is an issue, feel free to report it "
-            f"at https://github.com/mwouts/jupytext/issues, or even better, "
-            f"prepare a PR to handle the new signature of "
-            f"sphinx_gallery.notebook.rst2md."
-        )
-        rst2md = None
+    from sphinx_gallery.notebook import rst2md
 except (ImportError, SyntaxError):  # pragma: no cover
     rst2md = None
 
@@ -1031,7 +1018,12 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):  # pylint: disable=W0223
                 source = uncomment(source, self.comment)
             if self.rst2md:
                 if rst2md:
-                    source = rst2md("\n".join(source)).splitlines()
+                    gallery_conf = {"notebook_images": False}
+                    heading_level_counter = count(start=1)
+                    heading_levels = defaultdict(lambda: next(heading_level_counter))
+                    source = rst2md(
+                        "\n".join(source), gallery_conf, "", heading_levels
+                    ).splitlines()
                 else:
                     raise ImportError(
                         "Could not import rst2md from sphinx_gallery.notebook"
