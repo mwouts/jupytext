@@ -2,8 +2,19 @@
 
 import asyncio
 
-from jupytext.async_contentsmanager import build_async_jupytext_contents_manager_class
-from jupytext.sync_contentsmanager import build_sync_jupytext_contents_manager_class
+from jupytext.reraise import reraise
+
+try:
+    from jupytext.async_contentsmanager import (
+        build_async_jupytext_contents_manager_class,
+    )
+except ImportError as err:
+    build_async_jupytext_contents_manager_class = reraise(err)
+
+try:
+    from jupytext.sync_contentsmanager import build_sync_jupytext_contents_manager_class
+except ImportError as err:
+    build_sync_jupytext_contents_manager_class = reraise(err)
 
 
 def load_jupyter_server_extension(app):  # pragma: no cover

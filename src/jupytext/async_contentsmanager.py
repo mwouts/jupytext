@@ -15,8 +15,13 @@ from collections import namedtuple
 from datetime import timedelta
 
 import nbformat
-from jupyter_server.services.contents.largefilemanager import AsyncLargeFileManager
 from tornado.web import HTTPError
+
+# import notebook.transutils before notebook.services.contents.filemanager #75
+try:
+    import notebook.transutils  # noqa
+except ImportError:
+    pass
 
 from .async_pairs import read_pair, write_pair
 from .config import (
@@ -692,6 +697,25 @@ to your jupytext.toml file
     return AsyncJupytextContentsManager
 
 
-AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
-    AsyncLargeFileManager
-)
+try:
+    # The AsyncLargeFileManager is taken by default from jupyter_server if available
+    from jupyter_server.services.contents.largefilemanager import AsyncLargeFileManager
+
+    AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
+        AsyncLargeFileManager
+    )
+except ImportError:
+    # If we can't find jupyter_server then we take it from notebook
+    try:
+        from notebook.services.contents.largefilemanager import AsyncLargeFileManager
+
+        AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
+            AsyncLargeFileManager
+        )
+    except ImportError:
+        # Older versions of notebook do not have the LargeFileManager #217
+        from notebook.services.contents.filemanager import FileContentsManager
+
+        AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
+            FileContentsManager
+        )
