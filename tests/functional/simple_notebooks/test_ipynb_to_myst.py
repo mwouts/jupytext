@@ -3,6 +3,7 @@ import unittest.mock as mock
 from textwrap import dedent
 
 import pytest
+from jupyter_server.utils import ensure_async
 from nbformat.v4.nbbase import new_notebook
 from tornado.web import HTTPError
 
@@ -166,8 +167,9 @@ def test_meaningfull_error_write_myst_missing(tmpdir):
         jupytext_cli([str(nb_file), "--to", "md:myst"])
 
 
+@pytest.mark.asyncio
 @pytest.mark.requires_no_myst
-def test_meaningfull_error_open_myst_missing(tmpdir):
+async def test_meaningfull_error_open_myst_missing(tmpdir, cm):
     md_file = tmpdir.join("notebook.md")
     md_file.write(
         """---
@@ -188,17 +190,17 @@ kernelspec:
     with pytest.raises(ImportError, match=PLEASE_INSTALL_MYST):
         jupytext_cli([str(md_file), "--to", "ipynb"])
 
-    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
     with pytest.raises(HTTPError, match=PLEASE_INSTALL_MYST):
-        cm.get("notebook.md")
+        await ensure_async(cm.get("notebook.md"))
 
 
+@pytest.mark.asyncio
 @pytest.mark.requires_myst
 @pytest.mark.parametrize("language_info", ["none", "std", "no_pygments_lexer"])
-def test_myst_representation_same_cli_or_contents_manager(
-    tmpdir, cwd_tmpdir, notebook_with_outputs, language_info
+async def test_myst_representation_same_cli_or_contents_manager(
+    tmpdir, cwd_tmpdir, cm, notebook_with_outputs, language_info
 ):
     """This test gives some information on #759. As of Jupytext 1.11.1, in the MyST Markdown format,
     the code cells have an ipython3 lexer when the notebook "language_info" metadata has "ipython3"
@@ -240,11 +242,12 @@ def test_myst_representation_same_cli_or_contents_manager(
     compare(text_cli, text_api)
 
     # Or with the contents manager
-    cm = jupytext.TextFileContentsManager()
     cm.formats = "ipynb,md:myst"
     cm.root_dir = str(tmpdir.mkdir("contents_manager"))
 
-    cm.save(model=dict(content=nb, type="notebook"), path="notebook.ipynb")
+    await ensure_async(
+        cm.save(model=dict(content=nb, type="notebook"), path="notebook.ipynb")
+    )
     text_cm = tmpdir.join("contents_manager").join("notebook.md").read()
 
     compare(text_cm, text_api)

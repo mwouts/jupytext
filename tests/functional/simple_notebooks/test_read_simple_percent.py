@@ -1,6 +1,7 @@
 import os
 
 import pytest
+from jupyter_server.utils import ensure_async
 from nbformat.v4.nbbase import (
     new_code_cell,
     new_markdown_cell,
@@ -335,11 +336,11 @@ some text, and a fake cell marker
     compare(py, text)
 
 
-def test_cell_markers_option_in_contents_manager(tmpdir):
+@pytest.mark.asyncio
+async def test_cell_markers_option_in_contents_manager(tmpdir, cm):
     tmp_ipynb = tmpdir / "notebook.ipynb"
     tmp_py = tmpdir / "notebook.py"
 
-    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
 
     nb = new_notebook(
@@ -352,7 +353,7 @@ def test_cell_markers_option_in_contents_manager(tmpdir):
             }
         },
     )
-    cm.save(model=notebook_model(nb), path="notebook.ipynb")
+    await ensure_async(cm.save(model=notebook_model(nb), path="notebook.ipynb"))
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
@@ -378,15 +379,15 @@ cell
     compare_notebooks(nb, nb2)
 
 
-def test_cell_markers_in_config(tmpdir, python_notebook):
+@pytest.mark.asyncio
+async def test_cell_markers_in_config(tmpdir, python_notebook, cm):
     (tmpdir / "jupytext.toml").write('''cell_markers = '"""'\n''')
 
-    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     nb = python_notebook
     nb.metadata["jupytext"] = {"formats": "ipynb,py:percent"}
 
-    cm.save(model=notebook_model(nb), path="notebook.ipynb")
+    await ensure_async(cm.save(model=notebook_model(nb), path="notebook.ipynb"))
 
     text = (tmpdir / "notebook.py").read()
     assert (
@@ -402,11 +403,11 @@ A short notebook
     compare_notebooks(nb, nb2)
 
 
-def test_cell_markers_in_contents_manager(tmpdir):
+@pytest.mark.asyncio
+async def test_cell_markers_in_contents_manager(tmpdir, cm):
     tmp_ipynb = tmpdir / "notebook.ipynb"
     tmp_py = tmpdir / "notebook.py"
 
-    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     cm.cell_markers = "'''"
 
@@ -419,7 +420,7 @@ def test_cell_markers_in_contents_manager(tmpdir):
             }
         },
     )
-    cm.save(model=notebook_model(nb), path="notebook.ipynb")
+    await ensure_async(cm.save(model=notebook_model(nb), path="notebook.ipynb"))
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)
@@ -445,11 +446,13 @@ cell
     compare_notebooks(nb, nb2)
 
 
-def test_cell_markers_in_contents_manager_does_not_impact_light_format(tmpdir):
+@pytest.mark.asyncio
+async def test_cell_markers_in_contents_manager_does_not_impact_light_format(
+    tmpdir, cm
+):
     tmp_ipynb = tmpdir / "notebook.ipynb"
     tmp_py = tmpdir / "notebook.py"
 
-    cm = jupytext.TextFileContentsManager()
     cm.root_dir = str(tmpdir)
     cm.cell_markers = "'''"
 
@@ -460,7 +463,7 @@ def test_cell_markers_in_contents_manager_does_not_impact_light_format(tmpdir):
         },
     )
     with pytest.warns(UserWarning, match="Ignored cell markers"):
-        cm.save(model=notebook_model(nb), path="notebook.ipynb")
+        await ensure_async(cm.save(model=notebook_model(nb), path="notebook.ipynb"))
 
     assert os.path.isfile(tmp_ipynb)
     assert os.path.isfile(tmp_py)

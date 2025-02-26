@@ -5,9 +5,16 @@ import asyncio
 from jupytext.reraise import reraise
 
 try:
-    from jupytext.contentsmanager import build_jupytext_contents_manager_class
+    from jupytext.async_contentsmanager import (
+        build_async_jupytext_contents_manager_class,
+    )
 except ImportError as err:
-    build_jupytext_contents_manager = reraise(err)
+    build_async_jupytext_contents_manager_class = reraise(err)
+
+try:
+    from jupytext.sync_contentsmanager import build_sync_jupytext_contents_manager_class
+except ImportError as err:
+    build_sync_jupytext_contents_manager_class = reraise(err)
 
 
 def load_jupyter_server_extension(app):  # pragma: no cover
@@ -22,26 +29,24 @@ def load_jupyter_server_extension(app):  # pragma: no cover
     # The server extension call is too late!
     # The contents manager was set at NotebookApp.init_configurables
 
-    # If possible, we derive a Jupytext CM from the current CM
     base_class = app.contents_manager_class
-    if asyncio.iscoroutinefunction(base_class.get):
-        app.log.warning(
-            f"[Jupytext Server Extension] Async contents managers like {base_class.__name__} "
-            "are not supported at the moment "
-            "(https://github.com/mwouts/jupytext/issues/1020). "
-            "We will derive a contents manager from LargeFileManager instead."
-        )
-        from jupyter_server.services.contents.largefilemanager import (  # noqa
-            LargeFileManager,
-        )
 
-        base_class = LargeFileManager
-
+    asynchronous = asyncio.iscoroutinefunction(base_class.get)
     app.log.info(
-        "[Jupytext Server Extension] Deriving a JupytextContentsManager "
-        "from {}".format(base_class.__name__)
+        "[Jupytext Server Extension] Deriving "
+        + ("an Async" if asynchronous else "a ")
+        + "TextFileContentsManager from "
+        + base_class.__name__
     )
-    app.contents_manager_class = build_jupytext_contents_manager_class(base_class)
+
+    if asyncio.iscoroutinefunction(base_class.get):
+        app.contents_manager_class = build_async_jupytext_contents_manager_class(
+            base_class
+        )
+    else:
+        app.contents_manager_class = build_sync_jupytext_contents_manager_class(
+            base_class
+        )
 
     try:
         # And rerun selected init steps from https://github.com/jupyter/notebook/blob/

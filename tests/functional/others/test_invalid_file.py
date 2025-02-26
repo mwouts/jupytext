@@ -3,9 +3,10 @@
 from pathlib import Path
 
 import pytest
+from jupyter_server.utils import ensure_async
 from tornado.web import HTTPError
 
-from jupytext import TextFileContentsManager, read
+from jupytext import read
 from jupytext.cli import jupytext as jupytext_cli
 
 
@@ -26,9 +27,9 @@ def test_convert_invalid_md_file_fails(invalid_md_file):
         jupytext_cli(["--to", "ipynb", str(invalid_md_file)])
 
 
-def test_open_invalid_md_file_fails(invalid_md_file, tmp_path):
-    cm = TextFileContentsManager()
+@pytest.mark.asyncio
+async def test_open_invalid_md_file_fails(invalid_md_file, tmp_path, cm):
     cm.root_dir = str(invalid_md_file.parent)
 
     with pytest.raises(HTTPError, match="invalid_file_896.md is not UTF-8 encoded"):
-        cm.get(invalid_md_file.name)
+        await ensure_async(cm.get(invalid_md_file.name))

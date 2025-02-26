@@ -5,6 +5,7 @@ Jupytext ChangeLog
 ----------
 
 **Changed**
+- Jupytext's default contents manager is now derived from the asynchronous AsyncLargeFileManager. Thanks to [Darshan Poudel](https://github.com/Darshan808) for making this finally happen ([#1328](https://github.com/mwouts/jupytext/pull/1328))!
 - We have updated the JupyterLab extension dependencies ([#1300](https://github.com/mwouts/jupytext/pull/1300)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR!
 
 

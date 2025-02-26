@@ -6,14 +6,24 @@ from .reraise import reraise
 from .version import __version__
 
 try:
-    from .contentsmanager import build_jupytext_contents_manager_class
+    from .sync_contentsmanager import build_sync_jupytext_contents_manager_class
 except ImportError as err:
-    build_jupytext_contents_manager_class = reraise(err)
+    build_sync_jupytext_contents_manager_class = reraise(err)
 
 try:
-    from .contentsmanager import TextFileContentsManager
+    from .sync_contentsmanager import TextFileContentsManager
 except ImportError as err:
     TextFileContentsManager = reraise(err)
+
+try:
+    from .async_contentsmanager import build_async_jupytext_contents_manager_class
+except ImportError as err:
+    build_async_jupytext_contents_manager_class = reraise(err)
+
+try:
+    from .async_contentsmanager import AsyncTextFileContentsManager
+except ImportError as err:
+    AsyncTextFileContentsManager = reraise(err)
 
 __all__ = [
     "read",
@@ -24,6 +34,8 @@ __all__ = [
     "guess_format",
     "get_format_implementation",
     "TextFileContentsManager",
-    "build_jupytext_contents_manager_class",
+    "AsyncTextFileContentsManager",
+    "build_sync_jupytext_contents_manager_class",
+    "build_async_jupytext_contents_manager_class",
     "__version__",
 ]

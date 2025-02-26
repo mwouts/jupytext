@@ -9,11 +9,14 @@
 
 # NB: In this config we exclude the example and tests notebooks
 # from the code hooks (black, flake8, etc) as we want to keep
-# the text representation of the test notebooks unchanged
+# the text representation of the test notebooks unchanged, plus
+# the (sync) contentsmanager.py which is generated from the async one.
 exclude: >
     (?x)^(
       demo/.*|
       tests/data/notebooks/.*|
+      src/jupytext/sync_pairs.py|
+      src/jupytext/sync_contentsmanager.py|
     )$
 repos:
 

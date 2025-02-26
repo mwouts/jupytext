@@ -1,4 +1,6 @@
-"""ContentsManager that allows to open Rmd, py, R and ipynb files as notebooks
+"""
+This module exposes the AsyncTextFileContentsManager that allows to open
+text files as notebooks
 """
 import inspect
 import itertools
@@ -21,6 +23,7 @@ try:
 except ImportError:
     pass
 
+from .async_pairs import read_pair, write_pair
 from .config import (
     JUPYTEXT_CONFIG_FILES,
     PYPROJECT_FILE,
@@ -45,13 +48,18 @@ from .paired_paths import (
     full_path,
     paired_paths,
 )
-from .pairs import PairedFilesDiffer, latest_inputs_and_outputs, read_pair, write_pair
+from .pairs import PairedFilesDiffer, latest_inputs_and_outputs
 
 
-def build_jupytext_contents_manager_class(base_contents_manager_class):
-    """Derives a TextFileContentsManager class from the given base class"""
+def build_async_jupytext_contents_manager_class(base_contents_manager_class):
+    """
+    Derives an asynchronous TextFileContentsManager class from the given base class,
+    which is supposed to be asynchronous too.
+    """
 
-    class JupytextContentsManager(base_contents_manager_class, JupytextConfiguration):
+    class AsyncJupytextContentsManager(
+        base_contents_manager_class, JupytextConfiguration
+    ):
         """
         A FileContentsManager Class that reads and stores notebooks to classical
         Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd), Julia (.jl),
@@ -108,28 +116,28 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     short_formats,
                 )
 
-        def create_prefix_dir(self, path, fmt):
+        async def create_prefix_dir(self, path, fmt):
             """Create the prefix dir, if missing"""
             if "prefix" in fmt and "/" in path:
                 parent_dir = self.get_parent_dir(path)
-                if not self.dir_exists(parent_dir):
-                    self.create_prefix_dir(parent_dir, fmt)
+                if not await self.dir_exists(parent_dir):
+                    await self.create_prefix_dir(parent_dir, fmt)
                     self.log.info("Creating directory %s", parent_dir)
-                    self.super.save(dict(type="directory"), parent_dir)
+                    await self.super.save(dict(type="directory"), parent_dir)
 
-        def save(self, model, path=""):
+        async def save(self, model, path=""):
             """Save the file model and return the model with no content."""
             if model["type"] != "notebook":
-                return self.super.save(model, path)
+                return await self.super.save(model, path)
 
             path = path.strip("/")
             nbk = model["content"]
             try:
-                config = self.get_config(path)
+                config = await self.get_config(path)
                 jupytext_formats = notebook_formats(nbk, config, path)
                 self.update_paired_notebooks(path, jupytext_formats)
 
-                def save_one_file(path, fmt):
+                async def save_one_file(path, fmt):
                     if "format_name" in fmt and fmt["extension"] not in [
                         ".md",
                         ".markdown",
@@ -144,9 +152,9 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     else:
                         self.log.info("Saving %s", os.path.basename(path))
 
-                    self.create_prefix_dir(path, fmt)
+                    await self.create_prefix_dir(path, fmt)
                     if fmt["extension"] == ".ipynb":
-                        return self.super.save(
+                        return await self.super.save(
                             dict(
                                 type="notebook",
                                 content=drop_text_representation_metadata(
@@ -177,15 +185,15 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                         ),
                     )
 
-                    return self.super.save(text_model, path)
+                    return await self.super.save(text_model, path)
 
-                return write_pair(path, jupytext_formats, save_one_file)
+                return await write_pair(path, jupytext_formats, save_one_file)
 
             except Exception as e:
                 self.log.error("Error while saving file: %s %s", path, e, exc_info=True)
                 raise HTTPError(500, f"Unexpected error while saving file: {path} {e}")
 
-        def _get_with_no_require_hash_argument(
+        async def _get_with_no_require_hash_argument(
             self,
             path,
             content=True,
@@ -193,7 +201,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
             format=None,
             load_alternative_format=True,
         ):
-            return self._get_with_require_hash_argument(
+            return await self._get_with_require_hash_argument(
                 path,
                 content=content,
                 type=type,
@@ -202,7 +210,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 load_alternative_format=load_alternative_format,
             )
 
-        def _get_with_require_hash_argument(
+        async def _get_with_require_hash_argument(
             self,
             path,
             content=True,
@@ -221,24 +229,24 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
 
             # Not a notebook?
             if (
-                not self.file_exists(path)
-                or self.dir_exists(path)
+                not await self.file_exists(path)
+                or await self.dir_exists(path)
                 or (type is not None and type != "notebook")
             ):
-                return self.super.get(path, **super_kwargs)
+                return await self.super.get(path, **super_kwargs)
 
-            config = self.get_config(path, use_cache=content is False)
+            config = await self.get_config(path, use_cache=content is False)
             if ext not in self.all_nb_extensions(config):
-                return self.super.get(path, **super_kwargs)
+                return await self.super.get(path, **super_kwargs)
 
             fmt = preferred_format(ext, config.preferred_jupytext_formats_read)
             if ext == ".ipynb":
                 super_kwargs["type"] = "notebook"
-                model = self.super.get(path, **super_kwargs)
+                model = await self.super.get(path, **super_kwargs)
             else:
                 super_kwargs["type"] = "file"
                 super_kwargs["format"] = "text"
-                model = self.super.get(path, **super_kwargs)
+                model = await self.super.get(path, **super_kwargs)
                 model["type"] = "notebook"
                 if content:
                     # We may need to update these keys, inherited from text files formats
@@ -294,6 +302,9 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                         err,
                         exc_info=True,
                     )
+                    raise HTTPError(
+                        500, f"Unable to read paired notebook: {path} {err}"
+                    )
             else:
                 if path in self.paired_notebooks:
                     fmt, formats = self.paired_notebooks.get(path)
@@ -307,34 +318,52 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                 if jupytext_metadata:
                     model["content"]["metadata"]["jupytext"] = jupytext_metadata
 
-            def get_timestamp(alt_path):
-                if not self.exists(alt_path):
+            async def get_timestamp(alt_path):
+                # self.exists is not async for AsyncLargeManager,
+                # but MetaManager from fs_manager has an async version
+                exists = self.exists(alt_path)
+                if inspect.isawaitable(exists):
+                    exists = await exists
+                if not exists:
                     return None
                 if alt_path == path:
                     return model["last_modified"]
-                return self.super.get(alt_path, content=False)["last_modified"]
+                return (await self.super.get(alt_path, content=False))["last_modified"]
 
-            def read_one_file(alt_path, alt_fmt):
+            async def read_one_file(alt_path, alt_fmt):
                 if alt_path == path:
                     return model["content"]
                 if alt_path.endswith(".ipynb"):
                     self.log.info(f"Reading OUTPUTS from {alt_path}")
-                    return self.super.get(
-                        alt_path, content=True, type="notebook", format=format
+                    return (
+                        await self.super.get(
+                            alt_path, content=True, type="notebook", format=format
+                        )
                     )["content"]
 
                 self.log.info(f"Reading SOURCE from {alt_path}")
-                text = self.super.get(
-                    alt_path,
-                    content=True,
-                    type="file",
-                    # Don't use the parent format, see https://github.com/mwouts/jupytext/issues/1124
-                    format=None,
+                text = (
+                    await self.super.get(
+                        alt_path,
+                        content=True,
+                        type="file",
+                        # Don't use the parent format, see https://github.com/mwouts/jupytext/issues/1124
+                        format=None,
+                    )
                 )["content"]
                 return reads(text, fmt=alt_fmt, config=config)
 
+            timestamps = {
+                alt_path: await get_timestamp(alt_path)
+                for alt_path, alt_fmt in paired_paths(path, fmt, formats)
+            }
+
             inputs, outputs = latest_inputs_and_outputs(
-                path, fmt, formats, get_timestamp, contents_manager_mode=True
+                path,
+                fmt,
+                formats,
+                lambda alt_path: timestamps[alt_path],
+                contents_manager_mode=True,
             )
 
             # Modification time of a paired notebook is the timestamp of inputs #118 #978
@@ -346,7 +375,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     and outputs.path is not None
                     and inputs.path != outputs.path
                 ):
-                    model_other = self.super.get(
+                    model_other = await self.super.get(
                         inputs.path if path == outputs.path else outputs.path,
                         content=False,
                         require_hash=True,
@@ -383,7 +412,7 @@ def build_jupytext_contents_manager_class(base_contents_manager_class):
                     self.log.warning(ts_mismatch)
 
                     try:
-                        content = read_pair(
+                        content = await read_pair(
                             inputs, outputs, read_one_file, must_match=True
                         )
                         self.log.warning(
@@ -421,7 +450,7 @@ to your jupytext.toml file
                 model["content"] = content
             else:
                 try:
-                    model["content"] = read_pair(inputs, outputs, read_one_file)
+                    model["content"] = await read_pair(inputs, outputs, read_one_file)
                 except HTTPError:
                     raise
                 except Exception as err:
@@ -435,14 +464,14 @@ to your jupytext.toml file
 
             return model
 
-        def new_untitled(self, path="", type="", ext=""):
+        async def new_untitled(self, path="", type="", ext=""):
             """Create a new untitled file or directory in path
 
             We override the base function because that one does not take the 'ext' argument
             into account when type=="notebook". See https://github.com/mwouts/jupytext/issues/443
             """
             if type != "notebook" and ext != ".ipynb":
-                return self.super.new_untitled(path, type, ext)
+                return await self.super.new_untitled(path, type, ext)
 
             ext = ext or ".ipynb"
             if ":" in ext:
@@ -451,11 +480,11 @@ to your jupytext.toml file
                 format_name = ""
 
             path = path.strip("/")
-            if not self.dir_exists(path):
+            if not await self.dir_exists(path):
                 raise HTTPError(404, "No such directory: %s" % path)
 
             untitled = self.untitled_notebook
-            config = self.get_config(path)
+            config = await self.get_config(path)
             name = self.increment_notebook_filename(config, untitled + ext, path)
             path = f"{path}/{name}"
 
@@ -466,7 +495,7 @@ to your jupytext.toml file
                     metadata={"jupytext": {"formats": ext + ":" + format_name}}
                 )
 
-            return self.new(model, path)
+            return await self.new(model, path)
 
         def increment_notebook_filename(self, config, filename, path=""):
             """Increment a notebook filename until it is unique, regardless of extension"""
@@ -489,29 +518,29 @@ to your jupytext.toml file
                     break
             return name
 
-        def trust_notebook(self, path):
+        async def trust_notebook(self, path):
             """Trust the current notebook"""
             if path.endswith(".ipynb") or path not in self.paired_notebooks:
-                self.super.trust_notebook(path)
+                await self.super.trust_notebook(path)
                 return
 
             fmt, formats = self.paired_notebooks[path]
             for alt_path, alt_fmt in paired_paths(path, fmt, formats):
                 if alt_fmt["extension"] == ".ipynb":
-                    self.super.trust_notebook(alt_path)
+                    await self.super.trust_notebook(alt_path)
 
-        def rename_file(self, old_path, new_path):
+        async def rename_file(self, old_path, new_path):
             """Rename the current notebook, as well as its alternative representations"""
             if old_path not in self.paired_notebooks:
                 try:
                     # we do not know yet if this is a paired notebook (#190)
                     # -> to get this information we open the notebook
-                    self.get(old_path, content=True)
+                    await self.get(old_path, content=True)
                 except Exception:
                     pass
 
             if old_path not in self.paired_notebooks:
-                self.super.rename_file(old_path, new_path)
+                await self.super.rename_file(old_path, new_path)
                 return
 
             fmt, formats = self.paired_notebooks.get(old_path)
@@ -535,8 +564,8 @@ to your jupytext.toml file
             for old_alt_path, alt_fmt in old_alt_paths:
                 new_alt_path = full_path(new_base, alt_fmt)
                 if self.exists(old_alt_path):
-                    self.create_prefix_dir(new_alt_path, alt_fmt)
-                    self.super.rename_file(old_alt_path, new_alt_path)
+                    await self.create_prefix_dir(new_alt_path, alt_fmt)
+                    await self.super.rename_file(old_alt_path, new_alt_path)
 
             self.drop_paired_notebook(old_path)
             self.update_paired_notebooks(new_path, formats)
@@ -552,11 +581,11 @@ to your jupytext.toml file
                 return path.rsplit(":", 1)[0] + ":"
             return ""
 
-        def get_config_file(self, directory):
+        async def get_config_file(self, directory):
             """Return the jupytext configuration file, if any"""
             for jupytext_config_file in JUPYTEXT_CONFIG_FILES:
                 path = directory + "/" + jupytext_config_file
-                if self.file_exists(path):
+                if await self.file_exists(path):
                     if not self.allow_hidden and jupytext_config_file.startswith("."):
                         self.log.warning(
                             f"Ignoring config file {path} (see Jupytext issue #964)"
@@ -565,8 +594,8 @@ to your jupytext.toml file
                     return path
 
             pyproject_path = directory + "/" + PYPROJECT_FILE
-            if self.file_exists(pyproject_path):
-                model = self.get(pyproject_path, type="file")
+            if await self.file_exists(pyproject_path):
+                model = await self.get(pyproject_path, type="file")
                 try:
                     doc = tomllib.loads(model["content"])
                 except tomllib.TOMLDecodeError as e:
@@ -579,9 +608,9 @@ to your jupytext.toml file
                 return None
 
             parent_dir = self.get_parent_dir(directory)
-            return self.get_config_file(parent_dir)
+            return await self.get_config_file(parent_dir)
 
-        def load_config_file(
+        async def load_config_file(
             self, config_file, *, prev_config_file, prev_config, is_os_path=False
         ):
             """Load the configuration file"""
@@ -594,7 +623,7 @@ to your jupytext.toml file
             config_content = None
             if not is_os_path:
                 try:
-                    model = self.super.get(config_file, content=True, type="file")
+                    model = await self.super.get(config_file, content=True, type="file")
                     config_content = model["content"]
                 except HTTPError:
                     pass
@@ -615,7 +644,7 @@ to your jupytext.toml file
                 )
             return config
 
-        def get_config(self, path, use_cache=False):
+        async def get_config(self, path, use_cache=False):
             """Return the Jupytext configuration for the given path"""
             parent_dir = self.get_parent_dir(path)
 
@@ -624,16 +653,16 @@ to your jupytext.toml file
             # to a different directory.
             if not use_cache or parent_dir != self.cached_config.path:
                 try:
-                    config_file = self.get_config_file(parent_dir)
+                    config_file = await self.get_config_file(parent_dir)
                     if config_file:
-                        self.cached_config.config = self.load_config_file(
+                        self.cached_config.config = await self.load_config_file(
                             config_file,
                             prev_config_file=self.cached_config.config_file,
                             prev_config=self.cached_config.config,
                         )
                     else:
                         config_file = find_global_jupytext_configuration_file()
-                        self.cached_config.config = self.load_config_file(
+                        self.cached_config.config = await self.load_config_file(
                             config_file,
                             prev_config_file=self.cached_config.config_file,
                             prev_config=self.cached_config.config,
@@ -657,34 +686,36 @@ to your jupytext.toml file
             return self
 
     if "require_hash" in inspect.signature(base_contents_manager_class.get).parameters:
-        JupytextContentsManager.get = (
-            JupytextContentsManager._get_with_require_hash_argument
+        AsyncJupytextContentsManager.get = (
+            AsyncJupytextContentsManager._get_with_require_hash_argument
         )
     else:
-        JupytextContentsManager.get = (
-            JupytextContentsManager._get_with_no_require_hash_argument
+        AsyncJupytextContentsManager.get = (
+            AsyncJupytextContentsManager._get_with_no_require_hash_argument
         )
 
-    return JupytextContentsManager
+    return AsyncJupytextContentsManager
 
 
 try:
-    # The LargeFileManager is taken by default from jupyter_server if available
-    from jupyter_server.services.contents.largefilemanager import LargeFileManager
+    # The AsyncLargeFileManager is taken by default from jupyter_server if available
+    from jupyter_server.services.contents.largefilemanager import AsyncLargeFileManager
 
-    TextFileContentsManager = build_jupytext_contents_manager_class(LargeFileManager)
+    AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
+        AsyncLargeFileManager
+    )
 except ImportError:
     # If we can't find jupyter_server then we take it from notebook
     try:
-        from notebook.services.contents.largefilemanager import LargeFileManager
+        from notebook.services.contents.largefilemanager import AsyncLargeFileManager
 
-        TextFileContentsManager = build_jupytext_contents_manager_class(
-            LargeFileManager
+        AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
+            AsyncLargeFileManager
         )
     except ImportError:
         # Older versions of notebook do not have the LargeFileManager #217
         from notebook.services.contents.filemanager import FileContentsManager
 
-        TextFileContentsManager = build_jupytext_contents_manager_class(
+        AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
             FileContentsManager
         )

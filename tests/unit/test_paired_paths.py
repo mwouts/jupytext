@@ -6,7 +6,6 @@ import pytest
 import jupytext
 from jupytext.cli import jupytext as jupytext_cli
 from jupytext.compare import compare
-from jupytext.contentsmanager import TextFileContentsManager
 from jupytext.formats import (
     long_form_multiple_formats,
     long_form_one_format,
@@ -237,8 +236,8 @@ def test_duplicated_paths():
         paired_paths("notebook.ipynb", "ipynb", formats)
 
 
-def test_cm_paired_paths():
-    cm = TextFileContentsManager()
+@pytest.mark.asyncio
+async def test_cm_paired_paths(cm):
     cm.paired_notebooks = dict()
 
     three = "ipynb,py,md"

@@ -1,4 +1,5 @@
 import pytest
+from jupyter_server.utils import ensure_async
 from nbformat.v4.nbbase import new_code_cell, new_notebook
 
 import jupytext
@@ -141,21 +142,21 @@ def test_magics_are_not_commented(fmt):
     compare_notebooks(nb2, nb)
 
 
-def test_force_comment_using_contents_manager(tmpdir):
+@pytest.mark.asyncio
+async def test_force_comment_using_contents_manager(tmpdir, cm):
     tmp_py = "notebook.py"
 
-    cm = jupytext.TextFileContentsManager()
     cm.preferred_jupytext_formats_save = "py:percent"
     cm.root_dir = str(tmpdir)
 
     nb = new_notebook(cells=[new_code_cell("%pylab inline")])
 
-    cm.save(model=notebook_model(nb), path=tmp_py)
+    await ensure_async(cm.save(model=notebook_model(nb), path=tmp_py))
     with open(str(tmpdir.join(tmp_py))) as stream:
         assert "# %pylab inline" in stream.read().splitlines()
 
     cm.comment_magics = False
-    cm.save(model=notebook_model(nb), path=tmp_py)
+    await ensure_async(cm.save(model=notebook_model(nb), path=tmp_py))
     with open(str(tmpdir.join(tmp_py))) as stream:
         assert "%pylab inline" in stream.read().splitlines()
 
