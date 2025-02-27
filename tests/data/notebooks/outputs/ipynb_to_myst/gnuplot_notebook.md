@@ -3,6 +3,14 @@ kernelspec:
   display_name: gnuplot
   language: gnuplot
   name: gnuplot
+language_info:
+  codemirror_mode: Octave
+  file_extension: .gp
+  help_links:
+  - text: MetaKernel Magics
+    url: https://metakernel.readthedocs.io/en/latest/source/README.html
+  mimetype: text/x-gnuplot
+  name: gnuplot
 ---
 
 # Sample gnuplot notebook

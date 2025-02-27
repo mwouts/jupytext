@@ -3,6 +3,11 @@ kernelspec:
   display_name: Logtalk
   language: logtalk
   name: logtalk_kernel
+language_info:
+  codemirror_mode: logtalk
+  file_extension: .lgt
+  mimetype: text/x-logtalk
+  name: Logtalk
 ---
 
 # An implementation of the Ackermann function

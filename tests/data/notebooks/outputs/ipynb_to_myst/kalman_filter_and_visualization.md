@@ -3,6 +3,11 @@ kernelspec:
   display_name: Q 3.5
   language: q
   name: qpk
+language_info:
+  file_extension: .q
+  mimetype: text/x-q
+  name: q
+  version: 3.6.0
 ---
 
 ```{code-cell}

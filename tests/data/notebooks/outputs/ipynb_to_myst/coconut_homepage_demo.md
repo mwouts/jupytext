@@ -3,6 +3,15 @@ kernelspec:
   display_name: Coconut
   language: coconut
   name: coconut
+language_info:
+  codemirror_mode:
+    name: python
+    version: 3
+  file_extension: .coco
+  mimetype: text/x-python3
+  name: coconut
+  pygments_lexer: coconut
+  version: 1.4.3-post_dev25
 ---
 
 Taken from [coconut-lang.org](coconut-lang.org)

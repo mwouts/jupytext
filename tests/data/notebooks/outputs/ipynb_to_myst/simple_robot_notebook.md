@@ -3,6 +3,12 @@ kernelspec:
   display_name: Robot Framework
   language: robotframework
   name: robotkernel
+language_info:
+  codemirror_mode: robotframework
+  file_extension: .robot
+  mimetype: text/plain
+  name: robotframework
+  pygments_lexer: robotframework
 ---
 
 ```{code-cell} robotframework

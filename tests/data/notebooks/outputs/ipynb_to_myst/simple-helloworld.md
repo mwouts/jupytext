@@ -6,6 +6,13 @@ kernelspec:
   display_name: Java
   language: java
   name: java
+language_info:
+  codemirror_mode: text/x-java
+  file_extension: .java
+  mimetype: ''
+  name: Java
+  nbconverter_exporter: ''
+  version: 1.8.0_121
 ---
 
 Let's define some class.

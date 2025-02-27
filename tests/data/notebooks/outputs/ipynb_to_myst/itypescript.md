@@ -3,6 +3,11 @@ kernelspec:
   display_name: Typescript 3.5
   language: typescript
   name: typescript
+language_info:
+  file_extension: .ts
+  mimetype: application/x-typescript
+  name: typescript
+  version: 3.5.1
 ---
 
 ```{code-cell}

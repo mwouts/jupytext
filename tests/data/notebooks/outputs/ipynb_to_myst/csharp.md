@@ -3,6 +3,12 @@ kernelspec:
   display_name: .NET (C#)
   language: C#
   name: .net-csharp
+language_info:
+  file_extension: .cs
+  mimetype: text/x-csharp
+  name: C#
+  pygments_lexer: csharp
+  version: '8.0'
 ---
 
 We start with...

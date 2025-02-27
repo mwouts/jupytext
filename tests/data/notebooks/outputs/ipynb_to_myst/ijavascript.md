@@ -3,6 +3,11 @@ kernelspec:
   display_name: Javascript (Node.js)
   language: javascript
   name: javascript
+language_info:
+  file_extension: .js
+  mimetype: application/javascript
+  name: javascript
+  version: 11.14.0
 ---
 
 ## A notebook that uses IJavascript kernel

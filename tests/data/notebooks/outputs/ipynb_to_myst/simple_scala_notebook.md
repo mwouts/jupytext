@@ -3,6 +3,13 @@ kernelspec:
   display_name: Apache Toree - Scala
   language: scala
   name: apache_toree_scala
+language_info:
+  codemirror_mode: text/x-scala
+  file_extension: .scala
+  mimetype: text/x-scala
+  name: scala
+  pygments_lexer: scala
+  version: 2.11.12
 ---
 
 ```{code-cell} scala

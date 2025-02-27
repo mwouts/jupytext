@@ -3,6 +3,11 @@ kernelspec:
   display_name: SAS
   language: sas
   name: sas
+language_info:
+  codemirror_mode: sas
+  file_extension: .sas
+  mimetype: text/x-sas
+  name: sas
 ---
 
 # SAS Notebooks with jupytext

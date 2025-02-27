@@ -15,6 +15,7 @@ from jupytext.compare import (
     compare_notebooks,
     create_mirror_file_if_missing,
 )
+from jupytext.config import JupytextConfiguration
 from jupytext.formats import auto_ext_from_metadata
 from jupytext.languages import _SCRIPT_EXTENSIONS
 
@@ -59,7 +60,12 @@ def test_ipynb_to_myst(ipynb_file, no_jupytext_version_number):
         r".*(html-demo|julia_functional_geometry|xcpp_by_quantstack).*", ipynb_file
     ):
         pytest.skip()
-    assert_conversion_same_as_mirror(ipynb_file, "md:myst", "ipynb_to_myst")
+    assert_conversion_same_as_mirror(
+        ipynb_file,
+        "md:myst",
+        "ipynb_to_myst",
+        config=JupytextConfiguration(notebook_metadata_filter="language_info"),
+    )
 
 
 """---------------------------------------------------------------------------------
