@@ -23,11 +23,14 @@ from .formats import (
     update_jupytext_formats_metadata,
 )
 from .header import (
+    _JUPYTER_METADATA_NAMESPACE,
     encoding_and_executable,
     header_to_metadata_and_cell,
     insert_jupytext_info_and_filter_metadata,
     insert_or_test_version_number,
     metadata_and_cell_to_header,
+    metadata_and_cell_to_metadata,
+    metadata_to_metadata_and_cell,
 )
 from .languages import (
     _SCRIPT_EXTENSIONS,
@@ -101,7 +104,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             return qmd_to_notebook(s)
 
         if self.fmt.get("format_name") == MYST_FORMAT_NAME:
-            return myst_to_notebook(s)
+            nb = myst_to_notebook(s)
+            return self.split_frontmatter(nb)
 
         lines = s.splitlines()
 
@@ -239,11 +243,10 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             default_lexer_from_jupytext_metadata = metadata.get("jupytext", {}).pop(
                 "default_lexer", None
             )
-            return notebook_to_myst(
-                self.filter_notebook(nb, metadata),
-                default_lexer=default_lexer_from_language_info
-                or default_lexer_from_jupytext_metadata,
-            )
+            nb = self.filter_notebook(nb, metadata)
+            nb = self.merge_frontmatter(nb)
+            return notebook_to_myst(nb, default_lexer=default_lexer_from_language_info
+                or default_lexer_from_jupytext_metadata)
 
         # Copy the notebook, in order to be sure we do not modify the original notebook
         nb = NotebookNode(
@@ -352,6 +355,23 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         header.extend([""] * header_lines_to_next_cell)
 
         return "\n".join(header + lines)
+
+    def split_frontmatter(self, nb):
+        """Use during self.reads to separate notebook metadata from other frontmatter."""
+        unsupported_keys = set()
+        metadata = nb.metadata.pop(_JUPYTER_METADATA_NAMESPACE, {})
+        metadata.setdefault("jupytext", nb.metadata.get("jupytext", {}))
+        self.update_fmt_with_notebook_options(deepcopy(metadata), read=True)
+        nb = metadata_to_metadata_and_cell(nb, metadata, self.fmt, unsupported_keys)
+        _warn_on_unsupported_keys(unsupported_keys)
+        return nb
+
+    def merge_frontmatter(self, nb):
+        """Use during self.writes to rewrite notebook metadata as frontmatter content."""
+        unsupported_keys = set()
+        nb = metadata_and_cell_to_metadata(nb, self.fmt, unsupported_keys)
+        _warn_on_unsupported_keys(unsupported_keys)
+        return nb
 
 
 def reads(text, fmt=None, as_version=nbformat.NO_CONVERT, config=None, **kwargs):

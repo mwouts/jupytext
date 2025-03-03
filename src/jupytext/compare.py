@@ -427,7 +427,14 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
         return
     elif ext == ".ipynb":
         notebook = read(mirror_file)
-        fmt.update({"extension": org_ext})
+        mirror_file_fmts = notebook.metadata.get("jupytext", {}).get("formats")
+        if mirror_file_fmts is not None:
+            for fmt in mirror_file_fmts.split(","):
+                fmt = long_form_one_format(fmt)
+                if fmt["extension"] == org_ext:
+                    continue
+        else:
+            fmt.update({"extension": org_ext})
         actual = writes(notebook, fmt)
         with open(nb_file, encoding="utf-8") as fp:
             expected = fp.read()

@@ -17,6 +17,8 @@ _DEFAULT_NOTEBOOK_METADATA = ",".join(
         "tocdepth",
     ]
 )
+_JUPYTER_METADATA_NAMESPACE = "jupyter"
+_DEFAULT_ROOT_LEVEL_METADATA = "-all"
 
 
 def metadata_filter_as_dict(metadata_config):
@@ -128,7 +130,9 @@ def update_metadata_filters(metadata, jupyter_md, cell_metadata):
             )
 
 
-def filter_metadata(metadata, user_filter, default_filter="", unsupported_keys=None):
+def filter_metadata(
+    metadata, user_filter, default_filter="", unsupported_keys=None, **kwargs
+):
     """Filter the cell or notebook metadata, according to the user preference"""
     default_filter = metadata_filter_as_dict(default_filter) or {}
     user_filter = metadata_filter_as_dict(user_filter) or {}
@@ -147,27 +151,40 @@ def filter_metadata(metadata, user_filter, default_filter="", unsupported_keys=N
     if default_exclude == "all":
         if user_include == "all":
             return subset_metadata(
-                metadata, exclude=user_exclude, unsupported_keys=unsupported_keys
+                metadata,
+                exclude=user_exclude,
+                unsupported_keys=unsupported_keys,
+                **kwargs,
             )
         if user_exclude == "all":
             return subset_metadata(
-                metadata, keep_only=user_include, unsupported_keys=unsupported_keys
+                metadata,
+                keep_only=user_include,
+                unsupported_keys=unsupported_keys,
+                **kwargs,
             )
         return subset_metadata(
             metadata,
             keep_only=set(user_include).union(default_include),
             exclude=user_exclude,
             unsupported_keys=unsupported_keys,
+            **kwargs,
         )
 
     # cell default filter = all metadata but removed ones
     if user_include == "all":
         return subset_metadata(
-            metadata, exclude=user_exclude, unsupported_keys=unsupported_keys
+            metadata,
+            exclude=user_exclude,
+            unsupported_keys=unsupported_keys,
+            **kwargs,
         )
     if user_exclude == "all":
         return subset_metadata(
-            metadata, keep_only=user_include, unsupported_keys=unsupported_keys
+            metadata,
+            keep_only=user_include,
+            unsupported_keys=unsupported_keys,
+            **kwargs,
         )
     # Do not serialize empty tags
     if "tags" in metadata and not metadata["tags"]:
@@ -177,6 +194,7 @@ def filter_metadata(metadata, user_filter, default_filter="", unsupported_keys=N
         metadata,
         exclude=set(user_exclude).union(set(default_exclude).difference(user_include)),
         unsupported_keys=unsupported_keys,
+        **kwargs,
     )
 
 
@@ -197,24 +215,36 @@ def suppress_unsupported_keys(metadata, unsupported_keys=None):
         for key in metadata:
             if not is_valid_metadata_key(key):
                 unsupported_keys.add(key)
-    return {key: value for key, value in metadata.items() if is_valid_metadata_key(key)}
+    return [key for key in metadata if is_valid_metadata_key(key)]
 
 
-def subset_metadata(metadata, keep_only=None, exclude=None, unsupported_keys=None):
+def subset_metadata(
+    metadata, keep_only=None, exclude=None, unsupported_keys=None, remove=False
+):
     """Filter the metadata"""
-    metadata = suppress_unsupported_keys(metadata, unsupported_keys=unsupported_keys)
+    supported_keys = suppress_unsupported_keys(
+        metadata, unsupported_keys=unsupported_keys
+    )
     if keep_only is not None:
-        filtered_metadata = {key: metadata[key] for key in metadata if key in keep_only}
+        keys = [key for key in supported_keys if key in keep_only]
+        if remove:
+            filtered_metadata = {key: metadata.pop(key) for key in keys}
+        else:
+            filtered_metadata = {key: metadata[key] for key in keys}
         sub_keep_only = second_level(keep_only)
-        for key in sub_keep_only:
-            if key in metadata:
-                filtered_metadata[key] = subset_metadata(
-                    metadata[key],
-                    keep_only=sub_keep_only[key],
-                    unsupported_keys=unsupported_keys,
-                )
+        keys = [key for key in supported_keys if key in sub_keep_only]
+        for key in keys:
+            filtered_metadata[key] = subset_metadata(
+                metadata[key],
+                keep_only=sub_keep_only[key],
+                unsupported_keys=unsupported_keys,
+                remove=remove,
+            )
     else:
-        filtered_metadata = copy(metadata)
+        if remove:
+            filtered_metadata = {key: metadata.pop(key) for key in supported_keys}
+        else:
+            filtered_metadata = {key: metadata[key] for key in supported_keys}
 
     if exclude is not None:
         for key in exclude:
