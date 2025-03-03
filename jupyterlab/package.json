@@ -26,7 +26,7 @@
         "watch": "lerna run --parallel watch"
     },
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^5.55.0",
+        "@typescript-eslint/eslint-plugin": "^8.25.0",
         "@typescript-eslint/parser": "^5.55.0",
         "eslint": "^8.36.0",
         "eslint-config-prettier": "^8.7.0",
