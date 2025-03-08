@@ -89,6 +89,19 @@ def test_md_to_ipynb(md_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(md_file, "ipynb", "md_to_ipynb")
 
 
+@pytest.mark.requires_myst
+def test_myst_file_has_myst_format(myst_file):
+    with open(myst_file) as f:
+        text = f.read()
+    fmt = jupytext.guess_format(text, ".md")
+    assert fmt == ("myst", {})
+
+
+@pytest.mark.requires_myst
+def test_myst_to_ipynb(myst_file, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(myst_file, "ipynb:myst", "myst_to_ipynb")
+
+
 """---------------------------------------------------------------------------------
 
 Part III: More specific round trip tests

@@ -321,6 +321,11 @@ def md_file(request):
     return request.param
 
 
+@pytest.fixture(params=list_notebooks("myst"), ids=notebook_id_func)
+def myst_file(request):
+    return request.param
+
+
 @pytest.fixture(
     params=list_notebooks(
         "ipynb", skip="(functional|Notebook with|flavors|invalid|305)"
