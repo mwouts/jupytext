@@ -7,6 +7,7 @@ Jupytext ChangeLog
 **Changed**
 - Jupytext's default contents manager is now derived from the asynchronous AsyncLargeFileManager. Thanks to [Darshan Poudel](https://github.com/Darshan808) for making this finally happen ([#1328](https://github.com/mwouts/jupytext/pull/1328))!
 - The [percent format](https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-percent-format) is now the default at the command line. If you run `jupytext --to py notebook.ipynb` you now get a `py:percent` script (use `--to py:light` for the light format) [#1201](https://github.com/mwouts/jupytext/pull/1201)
+- We have added and fixed round trip tests on MyST Markdown notebooks ([#759](https://github.com/mwouts/jupytext/issues/759), [#789](https://github.com/mwouts/jupytext/issues/789), [#1317](https://github.com/mwouts/jupytext/issues/1317))
 - The `rst2md` conversion now works with `sphinx-gallery>=0.8`. Thanks to [Thomas J. Fan](https://github.com/thomasjpfan) for fixing this! ([#1334](https://github.com/mwouts/jupytext/pull/1334))
 - We have updated the JupyterLab extension dependencies ([#1300](https://github.com/mwouts/jupytext/pull/1300)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR!
 
