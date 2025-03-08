@@ -233,12 +233,14 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         if self.fmt.get(
             "format_name"
         ) == MYST_FORMAT_NAME or self.ext in myst_extensions(no_md=True):
-            pygments_lexer = metadata.get("language_info", {}).get(
+            default_lexer = metadata.get("language_info", {}).get(
                 "pygments_lexer", None
             )
+            if default_lexer is None:
+                default_lexer = metadata.get("jupytext", {}).get("default_lexer", None)
             return notebook_to_myst(
                 self.filter_notebook(nb, metadata),
-                default_lexer=pygments_lexer,
+                default_lexer=default_lexer,
             )
 
         # Copy the notebook, in order to be sure we do not modify the original notebook
