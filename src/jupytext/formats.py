@@ -308,7 +308,11 @@ def guess_format(text, ext):
     if "text_representation" in metadata.get("jupytext", {}):
         return format_name_for_ext(metadata, ext), {}
 
-    if is_myst_available() and ext in myst_extensions() and matches_mystnb(text, ext):
+    if (
+        is_myst_available()
+        and ext in myst_extensions()
+        and matches_mystnb(text, ext, requires_meta=False)
+    ):
         return MYST_FORMAT_NAME, {}
 
     lines = text.splitlines()
