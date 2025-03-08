@@ -1365,3 +1365,40 @@ def test_set_formats_does_not_override_existing_ipynb(
         compare_ids=compare_ids,
         compare_outputs=compare_outputs,
     )
+
+
+@pytest.mark.requires_myst
+@pytest.mark.parametrize(
+    "header",
+    [
+        "",
+        """---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: ipython3
+  language: python
+  name: ipython3
+---
+
+""",
+    ],
+)
+def test_lexer_is_preserved_in_round_trips(
+    tmp_path,
+    no_jupytext_version_number,
+    header,
+    text="""```{code-cell} ipython3
+1 + 1
+```
+""",
+):
+    text = header + text
+    tmp_md = tmp_path / "notebook.md"
+    tmp_md.write_text(text)
+
+    jupytext(["--to", "myst", str(tmp_md)])
+
+    assert tmp_md.read_text() == text
