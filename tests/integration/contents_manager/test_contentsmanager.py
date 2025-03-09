@@ -107,6 +107,7 @@ async def test_load_save_rename(ipynb_py_R_jl_file, cm, tmpdir):
 
     cm.formats = "ipynb,Rmd"
     cm.root_dir = str(tmpdir)
+    cm.delete_to_trash = False
 
     # open ipynb, save Rmd, reopen
     nb = jupytext.read(ipynb_py_R_jl_file)
