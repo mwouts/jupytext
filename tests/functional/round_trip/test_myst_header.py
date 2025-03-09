@@ -11,6 +11,10 @@ from jupytext.myst import dump_yaml_blocks
 @pytest.mark.requires_myst
 def test_myst_header_is_stable_1247_using_inline_filter(
     md="""---
+mystnb:
+  execution_mode: 'off'
+settings:
+  output_matplotlib_strings: remove
 jupytext:
   formats: md:myst
   notebook_metadata_filter: -jupytext.text_representation.jupytext_version,settings,mystnb
@@ -22,10 +26,6 @@ kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
   name: python3
-mystnb:
-  execution_mode: 'off'
-settings:
-  output_matplotlib_strings: remove
 ---
 """,
 ):
@@ -40,6 +40,10 @@ def test_myst_header_is_stable_1247_using_config(
     jupytext_toml_content="""notebook_metadata_filter = "-jupytext.text_representation.jupytext_version,settings,mystnb"
 """,
     md="""---
+mystnb:
+  execution_mode: 'off'
+settings:
+  output_matplotlib_strings: remove
 jupytext:
   formats: md:myst
   text_representation:
@@ -50,10 +54,6 @@ kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
   name: python3
-mystnb:
-  execution_mode: 'off'
-settings:
-  output_matplotlib_strings: remove
 ---
 """,
 ):
