@@ -9,13 +9,25 @@ updates:
     directory: "jupyterlab" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      top-level-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "jupyterlab/packages/jupyterlab-jupytext-extension" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      jupytext-extension-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      jupytext-extension-ui-tests-dependencies:
+        patterns:
+          - "*"
