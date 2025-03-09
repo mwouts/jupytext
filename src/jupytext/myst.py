@@ -20,6 +20,7 @@ try:
 except ImportError:
     MarkdownIt = None
 
+MYST_FRONTMATER_FIELD = "jupyter"
 MYST_FORMAT_NAME = "myst"
 CODE_DIRECTIVE = "{code-cell}"
 RAW_DIRECTIVE = "{raw-cell}"
@@ -99,15 +100,17 @@ def matches_mystnb(
             pass
         else:
             try:
-                if (
-                    metadata.get("jupytext", {})
+                format_name = (
+                    metadata.get(MYST_FRONTMATER_FIELD, {})
+                    .get("jupytext", {})
                     .get("text_representation", {})
                     .get("format_name", "")
-                    == MYST_FORMAT_NAME
-                ):
-                    return True
+                )
             except AttributeError:
                 pass
+            else:
+                if format_name == MYST_FORMAT_NAME:
+                    return True
 
     # is there at least on fenced code block with a code/raw directive language
     for token in tokens:
@@ -155,7 +158,7 @@ def dump_yaml_blocks(data, compact=True):
         tags: [hide-output, show-input]
         ---
     """
-    string = yaml.dump(data, Dumper=CompactDumper)
+    string = yaml.dump(data, Dumper=CompactDumper, sort_keys=False)
     lines = string.splitlines()
     if compact and all(line and line[0].isalpha() for line in lines):
         return "\n".join([f":{line}" for line in lines]) + "\n\n"
@@ -289,11 +292,16 @@ def myst_to_notebook(
         except (yaml.parser.ParserError, yaml.scanner.ScannerError) as error:
             raise MystMetadataParsingError(f"Notebook metadata: {error}")
 
-    # create an empty notebook
+    # create an empty notebook, extracting ipynb metadata from metadata_nb
     nbf_version = nbf.v4
-    kwargs = {"metadata": nbf.from_dict(metadata_nb)}
+    kwargs = {"metadata": nbf.from_dict(metadata_nb.pop(MYST_FRONTMATER_FIELD, {}))}
     notebook = nbf_version.new_notebook(**kwargs)
     source_map = []  # this is a list of the starting line number for each cell
+
+    # add remaining frontmatter as yaml block in first cell
+    if metadata_nb:
+        metadata_nb = dump_yaml_blocks(metadata_nb, compact=False)
+        notebook.cells.append(nbf_version.new_markdown_cell(source=metadata_nb.strip()))
 
     def _flush_markdown(start_line, token, md_metadata):
         """When we find a cell we check if there is preceding text.o"""
@@ -375,8 +383,22 @@ def notebook_to_myst(
     if pygments_lexer is None:
         pygments_lexer = default_lexer
 
+    # update nb_metadata with yaml block in first cell
+    # TODO(itcarroll): config to move kernelspec
+    frontmatter = {}
+    if nb.cells[0].source.startswith("---"):
+        try:
+            frontmatter = yaml.safe_load(nb.cells[0].source[4:-4])
+        except (yaml.parser.ParserError, yaml.scanner.ScannerError) as error:
+            raise MystMetadataParsingError(f"MyST frontmatter: {error}")
+        else:
+            nb.cells.pop(0)
+
     if nb_metadata:
-        string += dump_yaml_blocks(nb_metadata, compact=False)
+        frontmatter[MYST_FRONTMATER_FIELD] = nb_metadata
+
+    if frontmatter:
+        string += dump_yaml_blocks(frontmatter, compact=False)
 
     last_cell_md = False
     for i, cell in enumerate(nb.cells):
