@@ -26,18 +26,18 @@
         "watch": "lerna run --parallel watch"
     },
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^5.55.0",
-        "@typescript-eslint/parser": "^5.55.0",
-        "eslint": "^8.36.0",
-        "eslint-config-prettier": "^8.7.0",
-        "eslint-plugin-prettier": "^4.2.1",
-        "lerna": "^6.6.0",
-        "prettier": "^2.8.7",
-        "stylelint": "^14.9.1",
+        "@typescript-eslint/eslint-plugin": "^8.26.0",
+        "@typescript-eslint/parser": "^8.26.0",
+        "eslint": "^9.22.0",
+        "eslint-config-prettier": "^10.1.1",
+        "eslint-plugin-prettier": "^5.2.3",
+        "lerna": "^8.2.1",
+        "prettier": "^3.5.3",
+        "stylelint": "^16.15.0",
         "stylelint-config-prettier": "^9.0.4",
-        "stylelint-config-recommended": "^8.0.0",
-        "stylelint-config-standard": "^26.0.0",
-        "stylelint-prettier": "^2.0.0"
+        "stylelint-config-recommended": "^15.0.0",
+        "stylelint-config-standard": "^37.0.0",
+        "stylelint-prettier": "^5.0.3"
     },
     "styleModule": "packages/*/style/index.js",
     "eslintIgnore": [
