@@ -56,7 +56,7 @@ foo
 def test_triple_backticks_in_code_cell_myst(
     no_jupytext_version_number,
     nb=new_notebook(
-        metadata={"main_language": "python"},
+        metadata={"jupytext": {"default_lexer": "ipython3"}},
         cells=[
             new_code_cell(
                 '''a = """
@@ -69,10 +69,10 @@ foo
     ),
     text='''---
 jupytext:
-  main_language: python
+  default_lexer: ipython3
 ---
 
-````{code-cell}
+````{code-cell} ipython3
 a = """
 ```
 foo
