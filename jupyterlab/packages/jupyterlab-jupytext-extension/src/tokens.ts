@@ -326,7 +326,7 @@ export const JUPYTEXT_CREATE_TEXT_NOTEBOOK_FILETYPE_DATA = new Map<
  * Supported Jupytext format extensions bar custom and none
  */
 export const JUPYTEXT_FORMATS = Array.from(
-  JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA.keys()
+  JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA.keys(),
 )
   .map((format) => {
     return format;
@@ -341,9 +341,9 @@ export const JUPYTEXT_FORMATS = Array.from(
 export const TEXT_NOTEBOOKS_LAUNCHER_ICONS = JUPYTEXT_FORMATS.filter(
   (format) => {
     return !['ipynb', 'auto:nomarker', 'qmd', 'custom', 'none'].includes(
-      format
+      format,
     );
-  }
+  },
 );
 
 /**

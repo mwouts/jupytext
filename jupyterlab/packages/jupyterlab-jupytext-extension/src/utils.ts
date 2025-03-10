@@ -30,7 +30,7 @@ import {
  * Get kernel icon SVG string
  */
 async function getKernelIconBase64String(
-  kernelIconUrl: string
+  kernelIconUrl: string,
 ): Promise<string> {
   // Seems like URL prefix is already included in kernelIconUrl. We need to strip
   // it off as baseUrl will already has url prefix.
@@ -58,12 +58,12 @@ function base64ToSvgStr(width: number, imageBase64: string): string {
  * Get kernel Icon
  */
 async function getKernelIcon(
-  specModel: KernelSpec.ISpecModel
+  specModel: KernelSpec.ISpecModel,
 ): Promise<LabIcon> {
   // First check for logo-svg
   if (specModel.resources['logo-svg']) {
     const svgStr = await getKernelIconBase64String(
-      specModel.resources['logo-svg']
+      specModel.resources['logo-svg'],
     );
     return new LabIcon({
       name: `${NS}:icon:${specModel.name}`,
@@ -73,7 +73,7 @@ async function getKernelIcon(
   // Else check if 64x64 kernel icon is available
   if (specModel.resources['logo-64x64']) {
     const iconBase64String = await getKernelIconBase64String(
-      specModel.resources['logo-64x64']
+      specModel.resources['logo-64x64'],
     );
     return new LabIcon({
       name: `${NS}:icon:${specModel.name}`,
@@ -83,7 +83,7 @@ async function getKernelIcon(
   // Finally check for 32x32 kernel icon
   if (specModel.resources['logo-32x32']) {
     const iconBase64String = await getKernelIconBase64String(
-      specModel.resources['logo-32x32']
+      specModel.resources['logo-32x32'],
     );
     return new LabIcon({
       name: `${NS}:icon:${specModel.name}`,
@@ -102,7 +102,7 @@ async function getKernelIcon(
  */
 export async function getAvailableKernelLanguages(
   languages: IEditorLanguageRegistry,
-  serviceManager: ServiceManager.IManager
+  serviceManager: ServiceManager.IManager,
 ): Promise<Map<string, IFileTypeData[]>> {
   const specsManager = serviceManager.kernelspecs;
   await specsManager.ready;
@@ -150,7 +150,7 @@ export async function getAvailableKernelLanguages(
  */
 export async function getAvailableCreateTextNotebookCommands(
   includeFormats: string[],
-  availableKernelLanguages: Map<string, IFileTypeData[]>
+  availableKernelLanguages: Map<string, IFileTypeData[]>,
 ): Promise<Map<string, IFileTypeData[]>> {
   const numKernels = availableKernelLanguages.size;
 
@@ -194,7 +194,7 @@ export async function getAvailableCreateTextNotebookCommands(
                   includeFormats.push(updatedKernelLanguageFileType.fileExt);
                 }
               });
-            }
+            },
           );
         } else {
           if (createTextNotebookCommands.get(format) === undefined) {
@@ -203,7 +203,7 @@ export async function getAvailableCreateTextNotebookCommands(
           createTextNotebookCommands.get(format).push(fileType);
         }
       });
-    }
+    },
   );
   return createTextNotebookCommands;
 }
@@ -216,7 +216,7 @@ export const createNewTextNotebook = async (
   kernelId: string,
   kernelName: string,
   format: string,
-  commands: CommandRegistry
+  commands: CommandRegistry,
 ) => {
   const model = await commands.execute(CommandIDs.newUntitled, {
     path: cwd,

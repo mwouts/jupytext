@@ -14,7 +14,7 @@ test.describe('Jupytext Menu Tests', () => {
 
       const imageName = `opened-jupytext-menu-${menuPath.replace(
         />/g,
-        '-'
+        '-',
       )}.png`;
       // const menu = await page.menu.getOpenMenu();
       expect(await page!.screenshot()).toMatchSnapshot(imageName.toLowerCase());
