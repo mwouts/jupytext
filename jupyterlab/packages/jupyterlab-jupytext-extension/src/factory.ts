@@ -68,6 +68,12 @@ export function createFactory(
   });
   docRegistry.addWidgetFactory(factory);
 
+  // Add the widget extensions of the 'Notebook' factory to the 'Jupytext Notebook'
+  // factory.
+  for (const extension of docRegistry.widgetExtensions('Notebook')) {
+    docRegistry.addWidgetExtension(FACTORY, extension);
+  }
+
   // Register widget created with the new factory in the notebook tracker
   // This is required to activate notebook commands (and therefore shortcuts)
   let id = 0; // The ID counter for notebook panels.
