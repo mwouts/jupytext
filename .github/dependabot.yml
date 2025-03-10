@@ -5,14 +5,19 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "jupyterlab" # Location of package manifests
-    schedule:
-      interval: "weekly"
-    groups:
-      top-level-dependencies:
-        patterns:
-          - "*"
+  # Let's not bother about bumping top level dependencies as they are mostly
+  # developmental packages like linters. We can bump them manually
+  # when we make changes to extension packages to be consistent with JupyterLab.
+  # Importantly, these packages will not and should not effect the working of the
+  # extension, so lets try to keep maintenance low by ignoring this.
+  # - package-ecosystem: "npm" # See documentation for possible values
+  #   directory: "jupyterlab" # Location of package manifests
+  #   schedule:
+  #     interval: "weekly"
+  #   groups:
+  #     top-level-dependencies:
+  #       patterns:
+  #         - "*"
 
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "jupyterlab/packages/jupyterlab-jupytext-extension" # Location of package manifests

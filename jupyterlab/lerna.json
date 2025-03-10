@@ -1,7 +1,5 @@
 {
-  "lerna": "3.10.7",
-  "npmClient": "jlpm",
-  "useWorkspaces": true,
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "version": "independent",
-  "packages": ["packages/*"]
+  "npmClient": "yarn"
 }

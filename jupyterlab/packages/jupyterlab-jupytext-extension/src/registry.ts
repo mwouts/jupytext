@@ -9,7 +9,7 @@ import { IFileTypeData } from './tokens';
 export function registerFileTypes(
   availableKernelLanguages: Map<string, IFileTypeData[]>,
   docRegistry: DocumentRegistry,
-  trans: TranslationBundle
+  trans: TranslationBundle,
 ) {
   // Add kernel file types to registry
   availableKernelLanguages.forEach(
@@ -21,14 +21,14 @@ export function registerFileTypes(
             name: kernelLanguage,
             contentType: 'file',
             displayName: trans.__(
-              kernelFileType.paletteLabel.split('New')[1].trim()
+              kernelFileType.paletteLabel.split('New')[1].trim(),
             ),
             extensions: [`.${kernelFileType.fileExt}`],
             icon: kernelFileType.kernelIcon || kernelIcon,
           });
         });
       }
-    }
+    },
   );
 
   // Add markdown file types to registry
@@ -40,7 +40,7 @@ export function registerFileTypes(
       extensions: ['.myst', '.mystnb', '.mnb'],
       icon: markdownIcon,
     },
-    ['Notebook']
+    ['Notebook'],
   );
 
   docRegistry.addFileType(
@@ -52,7 +52,7 @@ export function registerFileTypes(
       extensions: ['.Rmd'],
       icon: markdownIcon,
     },
-    ['Notebook']
+    ['Notebook'],
   );
 
   docRegistry.addFileType(
@@ -63,6 +63,6 @@ export function registerFileTypes(
       extensions: ['.qmd'],
       icon: markdownIcon,
     },
-    ['Notebook']
+    ['Notebook'],
   );
 }
