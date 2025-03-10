@@ -277,7 +277,7 @@ def read_metadata(text, ext):
     if ext in [".r", ".R"] and not metadata:
         metadata, _, _, _ = header_to_metadata_and_cell(lines, "#'", "", ext)
 
-    # MyST has the metadata at the root level
+    # metadata in MyST format may be at root level (i.e. not caught above)
     if not metadata and ext in myst_extensions() and text.startswith("---"):
         for header in yaml.safe_load_all(text):
             if not isinstance(header, dict):
@@ -286,7 +286,7 @@ def read_metadata(text, ext):
                 header.get("jupytext", {})
                 .get("text_representation", {})
                 .get("format_name")
-                == "myst"
+                == MYST_FORMAT_NAME
             ):
                 return header
             return metadata
@@ -531,7 +531,7 @@ def rearrange_jupytext_metadata(metadata):
         if key in metadata:
             metadata[key.replace("nbrmd", "jupytext")] = metadata.pop(key)
 
-    jupytext_metadata = metadata.pop("jupytext", {})
+    jupytext_metadata = metadata.get("jupytext", {})
 
     if "jupytext_formats" in metadata:
         jupytext_metadata["formats"] = metadata.pop("jupytext_formats")
@@ -730,6 +730,7 @@ _BINARY_FORMAT_OPTIONS = [
 ]
 _VALID_FORMAT_OPTIONS = _BINARY_FORMAT_OPTIONS + [
     "notebook_metadata_filter",
+    "root_level_metadata_filter",
     "cell_metadata_filter",
     "cell_markers",
     "custom_cell_magics",

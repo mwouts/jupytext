@@ -105,6 +105,12 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
+    root_level_metadata_filter = Unicode(
+        help="Notebook metadata that should be promoted to the root level in the text representations. "
+        "Examples: 'all', '-all', 'kernelspec,jupytext'",
+        config=True,
+    )
+
     cell_metadata_filter = Unicode(
         help="Cell metadata that should be saved in the text representations. "
         "Examples: 'all', 'hide_input,hide_output'",
@@ -202,6 +208,10 @@ class JupytextConfiguration(Configurable):
             )
             format_options.setdefault(
                 "cell_metadata_filter", self.default_cell_metadata_filter
+            )
+        if self.root_level_metadata_filter:
+            format_options.setdefault(
+                "root_level_metadata_filter", self.root_level_metadata_filter
             )
         if self.cell_metadata_filter:
             format_options.setdefault("cell_metadata_filter", self.cell_metadata_filter)
