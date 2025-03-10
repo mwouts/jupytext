@@ -366,26 +366,32 @@ const extension: JupyterFrontEndPlugin<void> = {
     registerFileTypes(availableKernelLanguages, docRegistry, trans);
 
     // Get all kernel file types to add to Jupytext factory
-    const kernelLanguageNames = [];
+    const kernelLanguageNames: string[] = [];
     for (const kernelLanguage of availableKernelLanguages.keys()) {
       kernelLanguageNames.push(kernelLanguage);
     }
 
-    // Create a factory for Jupytext
-    createFactory(
-      kernelLanguageNames,
-      toolbarRegistry,
-      settingRegistry,
-      docRegistry,
-      notebookTracker,
-      notebookFactory,
-      contentFactory,
-      editorServices,
-      rendermime,
-      translator,
-      trans,
-      riseFactory,
-    );
+    // Ensure the cell toolbar extension is activated before creating the factory,
+    // to add this extension to the new factory.
+    await app
+      .activatePlugin('@jupyterlab/cell-toolbar-extension:plugin')
+      .then(() => {
+        // Create a factory for Jupytext
+        createFactory(
+          kernelLanguageNames,
+          toolbarRegistry,
+          settingRegistry,
+          docRegistry,
+          notebookTracker,
+          notebookFactory,
+          contentFactory,
+          editorServices,
+          rendermime,
+          translator,
+          trans,
+          riseFactory,
+        );
+      });
 
     // Register all the commands that create text notebooks with different formats
     // Nicked from notebook-extension package in JupyterLab
