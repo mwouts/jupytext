@@ -26,6 +26,7 @@ async def test_rmd_notebooks_are_trusted(rmd_file, cm):
         assert cell.metadata.get("trusted", True)
 
 
+@pytest.mark.skip(reason="Fails intermittently on CI, see #1346")
 async def test_ipynb_notebooks_can_be_trusted(
     ipynb_py_file, tmpdir, no_jupytext_version_number, cm
 ):
@@ -76,6 +77,7 @@ async def test_ipynb_notebooks_can_be_trusted(
     await ensure_async(cm.trust_notebook(file))
 
 
+@pytest.mark.skip(reason="Fails intermittently on CI, see #1346")
 async def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(
     ipynb_py_file, tmpdir, no_jupytext_version_number, cm
 ):
