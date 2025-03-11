@@ -1,3 +1,4 @@
+import asyncio
 import os
 import shutil
 
@@ -26,8 +27,9 @@ async def test_rmd_notebooks_are_trusted(rmd_file, cm):
         assert cell.metadata.get("trusted", True)
 
 
+@pytest.mark.parametrize("sleep", [0.0, 0.5])
 async def test_ipynb_notebooks_can_be_trusted(
-    ipynb_py_file, tmpdir, no_jupytext_version_number, cm
+    ipynb_py_file, tmpdir, no_jupytext_version_number, cm, sleep
 ):
     if "hash sign" in ipynb_py_file:
         pytest.skip()
@@ -49,6 +51,10 @@ async def test_ipynb_notebooks_can_be_trusted(
 
     cm.notary.unsign(nb)
 
+    if sleep:
+        await asyncio.sleep(sleep)
+
+    # Reload and make sure it is not trusted
     model = await ensure_async(cm.get(file))
     for cell in model["content"].cells:
         assert (
