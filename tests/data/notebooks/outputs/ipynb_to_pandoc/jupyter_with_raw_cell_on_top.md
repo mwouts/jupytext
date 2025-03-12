@@ -11,13 +11,13 @@ jupyter:
 ::: {.cell .raw}
 ```{=ipynb}
 ---
-title: "Quick test"
+title: Quick test
 output:
   ioslides_presentation:
     widescreen: true
     smaller: true
 editor_options:
-     chunk_output_type console
+  chunk_output_type: console
 ---
 ```
 :::

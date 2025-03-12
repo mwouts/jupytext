@@ -13,7 +13,13 @@ from .languages import (
     comment_lines,
     default_language_from_metadata_and_ext,
 )
-from .metadata_filter import _DEFAULT_NOTEBOOK_METADATA, filter_metadata
+from .metadata_filter import (
+    _DEFAULT_NOTEBOOK_METADATA,
+    _DEFAULT_ROOT_LEVEL_METADATA,
+    _JUPYTER_METADATA_NAMESPACE,
+    filter_metadata,
+)
+from .myst import MYST_FORMAT_NAME
 from .pep8 import pep8_lines_between_cells
 from .version import __version__
 
@@ -156,7 +162,7 @@ def metadata_and_cell_to_header(
     )
 
 
-def recursive_update(target, update):
+def recursive_update(target, update, overwrite=True):
     """Update recursively a (nested) dictionary with the content of another.
     Inspired from https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
     """
@@ -165,9 +171,15 @@ def recursive_update(target, update):
         if value is None:
             del target[key]
         elif isinstance(value, dict):
-            target[key] = recursive_update(target.get(key, {}), value)
-        else:
+            target[key] = recursive_update(
+                target.get(key, {}),
+                value,
+                overwrite=overwrite,
+            )
+        elif overwrite:
             target[key] = value
+        else:
+            target.setdefault(key, value)
     return target
 
 
@@ -285,3 +297,64 @@ def header_to_metadata_and_cell(
         return metadata, jupyter, cell, i + 1
 
     return metadata, False, None, start
+
+
+def default_root_level_metadata_filter(fmt):
+    """Return defaults for settings that promote or demote root level metadata."""
+    if fmt and fmt.get("format_name") == MYST_FORMAT_NAME:
+        from .myst import _DEFAULT_ROOT_LEVEL_METADATA as default_filter
+    else:
+        default_filter = _DEFAULT_ROOT_LEVEL_METADATA
+    return default_filter
+
+
+def metadata_to_metadata_and_cell(nb, metadata, fmt, unsupported_keys=None):
+    # stash notebook metadata, including keys promoted to the root level
+    metadata.update(
+        filter_metadata(
+            nb.metadata,
+            fmt.get("root_level_metadata_filter", ""),
+            default_root_level_metadata_filter(fmt),
+            unsupported_keys=unsupported_keys,
+            remove=True,
+        )
+    )
+    # move remaining metadata (i.e. frontmatter) to the first notebook cell
+    if nb.metadata and fmt.get("root_level_metadata_as_raw_cell", True):
+        frontmatter = yaml.safe_dump(nb.metadata, sort_keys=False)
+        nb.cells.insert(0, new_raw_cell("---\n" + frontmatter + "---"))
+    # attach the stashed metadata to notebook
+    nb.metadata = metadata
+    return nb
+
+
+def metadata_and_cell_to_metadata(nb, fmt, unsupported_keys=None):
+    # new metadata from filtered nb.metadata
+    metadata = filter_metadata(
+        nb.metadata,
+        fmt.get("root_level_metadata_filter", ""),
+        default_root_level_metadata_filter(fmt),
+        unsupported_keys=unsupported_keys,
+        remove=True,
+    )
+    # remaining nb.metadata moved under namespace key for jupyter metadata
+    if nb.metadata:
+        metadata[_JUPYTER_METADATA_NAMESPACE] = nb.metadata
+    nb.metadata = metadata
+    # move first cell frontmatter to the root level of nb.metadata (overwrites)
+    if nb.cells and fmt.get("root_level_metadata_as_raw_cell", True):
+        cell = nb.cells[0]
+        if cell.cell_type == "raw":
+            lines = cell.source.strip("\n\t ").splitlines()
+            if (
+                len(lines) >= 2
+                and _HEADER_RE.match(lines[0])
+                and _HEADER_RE.match(lines[-1])
+            ):
+                nb.cells = nb.cells[1:]
+                frontmatter = next(yaml.safe_load_all(cell.source))
+                nb.metadata = recursive_update(
+                    frontmatter, nb.metadata, overwrite=False
+                )
+
+    return nb
