@@ -4,7 +4,7 @@
     "description": "Basic Integration Tests",
     "private": true,
     "scripts": {
-        "start": "jupyter lab --config jupyter_server_test_config.py",
+        "start": "python -m bash_kernel.install && jupyter lab --allow-root --config jupyter_server_test_config.py",
         "test": "jlpm playwright test",
         "test:update": "jlpm playwright test --update-snapshots"
     },
