@@ -670,6 +670,7 @@ def jupytext_single_file(nb_file, args, log):
             notebook,
             cmd,
             args.pipe_fmt,
+            quiet=args.quiet,
             prefix=prefix,
             directory=directory,
             warn_only=args.warn_only,
@@ -682,6 +683,7 @@ def jupytext_single_file(nb_file, args, log):
             cmd,
             args.pipe_fmt,
             update=False,
+            quiet=args.quiet,
             prefix=prefix,
             directory=directory,
             warn_only=args.warn_only,
@@ -1139,10 +1141,11 @@ def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commi
     return notebook, inputs.path, outputs.path
 
 
-def exec_command(command, input=None, capture=False, warn_only=False):
+def exec_command(command, input=None, capture=False, warn_only=False, quiet=False):
     """Execute the desired command, and pipe the given input into it"""
     assert isinstance(command, list)
-    sys.stdout.write("[jupytext] Executing {}\n".format(" ".join(command)))
+    if not quiet:
+        sys.stdout.write("[jupytext] Executing {}\n".format(" ".join(command)))
     process = subprocess.Popen(
         command,
         **(
@@ -1152,7 +1155,7 @@ def exec_command(command, input=None, capture=False, warn_only=False):
         ),
     )
     out, err = process.communicate(input=input)
-    if out and not capture:
+    if out and not capture and not quiet:
         sys.stdout.write(out.decode("utf-8"))
     if err:
         sys.stderr.write(err.decode("utf-8"))
@@ -1176,6 +1179,7 @@ def pipe_notebook(
     command,
     fmt="py:percent",
     update=True,
+    quiet=False,
     prefix=None,
     directory=None,
     warn_only=False,
@@ -1218,6 +1222,7 @@ def pipe_notebook(
             exec_command(
                 [cmd if cmd != "{}" else tmp.name for cmd in command],
                 capture=update,
+                quiet=quiet,
                 warn_only=warn_only,
             )
 
@@ -1229,7 +1234,11 @@ def pipe_notebook(
             os.remove(tmp.name)
     else:
         cmd_output = exec_command(
-            command, text.encode("utf-8"), capture=update, warn_only=warn_only
+            command,
+            text.encode("utf-8"),
+            capture=update,
+            warn_only=warn_only,
+            quiet=quiet,
         )
 
         if not update:
