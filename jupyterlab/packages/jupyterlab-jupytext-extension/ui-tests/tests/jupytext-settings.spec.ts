@@ -17,12 +17,12 @@ test('Open the settings editor with a Jupytext query', async ({ page }) => {
   const pluginList = page.locator('.jp-PluginList');
 
   expect(await pluginList.screenshot()).toMatchSnapshot(
-    'jupytext-settings-plugin-list.png'
+    'jupytext-settings-plugin-list.png',
   );
 
   const settingsPanel = page.locator('.jp-SettingsPanel');
 
   expect(await settingsPanel.screenshot()).toMatchSnapshot(
-    'jupytext-settings-panel.png'
+    'jupytext-settings-panel.png',
   );
 });

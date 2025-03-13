@@ -61,7 +61,7 @@ async function populateNotebook(extension, page) {
   await page.notebook.setCell(0, 'raw', 'Just a raw cell');
   await page.notebook.addCell(
     'markdown',
-    '## This is **bold** and *italic* [link to jupyter.org!](http://jupyter.org)'
+    '## This is **bold** and *italic* [link to jupyter.org!](http://jupyter.org)',
   );
   await page.notebook.runCell(1, true);
   // For bash, use shell code
@@ -144,7 +144,7 @@ test.describe('Jupytext Pair Python Notebooks from Menu Tests', () => {
 
       const imageName = `paired-jupytext-${paths.menuPath.replace(
         />/g,
-        '-'
+        '-',
       )}.png`;
       expect(await page.screenshot()).toMatchSnapshot(imageName.toLowerCase());
     });

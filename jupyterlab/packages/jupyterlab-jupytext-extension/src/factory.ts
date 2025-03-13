@@ -35,7 +35,7 @@ export function createFactory(
   rendermime: IRenderMimeRegistry,
   translator: ITranslator,
   trans: TranslationBundle,
-  riseFactory: IRisePreviewFactory | null
+  riseFactory: IRisePreviewFactory | null,
 ) {
   const allFileTypes = FILE_TYPES.concat(kernelFileTypeNames);
   // primarily this block is copied/pasted from jlab4 code and specifically
@@ -47,7 +47,7 @@ export function createFactory(
     settingRegistry,
     'Notebook',
     '@jupyterlab/notebook-extension:panel',
-    translator
+    translator,
   );
   // Duplicate notebook factory to apply it on Jupytext notebooks
   // Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
