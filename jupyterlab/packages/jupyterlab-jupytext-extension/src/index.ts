@@ -148,6 +148,16 @@ const extension: JupyterFrontEndPlugin<void> = {
       submenu: jupytextCreateMenu,
     });
 
+    // Add create text notebook submenu to context menu
+    // Rank 53 as 52 is used for classic notebook
+    // https://github.com/jupyterlab/jupyterlab/blob/4d34bbbea2afc7385169d92bf7bc0c9e0face3a9/packages/notebook-extension/schema/tracker.json#L363-L369
+    app.contextMenu.addItem({
+      submenu: jupytextCreateMenu,
+      type: 'submenu',
+      selector: '.jp-DirListing-content',
+      rank: 53,
+    });
+
     // Initialise Jupytext menu and add it to main menu
     const jupytextMenu = new Menu({ commands: app.commands });
     mainmenu.fileMenu.addItem({
