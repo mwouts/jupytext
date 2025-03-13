@@ -1402,3 +1402,16 @@ def test_lexer_is_preserved_in_round_trips(
     jupytext(["--to", "myst", str(tmp_md)])
 
     assert tmp_md.read_text() == text
+
+
+@pytest.mark.requires_black
+def test_pipe_with_quiet_does_not_print(tmp_path, capsys):
+    tmp_py = tmp_path / "nb.py"
+    tmp_py.write_text("# %%\n1+1\n")
+
+    jupytext(["--quiet", "--pipe", "black", str(tmp_py)])
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == ""
+
+    assert tmp_py.read_text() == "# %%\n1 + 1\n"
