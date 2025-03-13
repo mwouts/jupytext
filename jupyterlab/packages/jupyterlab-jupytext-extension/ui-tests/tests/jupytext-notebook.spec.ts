@@ -94,6 +94,11 @@ test.describe('Jupytext Create Text Notebooks from Menu Tests', () => {
       await select!.selectOption(option);
       await page.click('.jp-Dialog .jp-mod-accept');
 
+      const firstCell = await page.notebook.getCellLocator(0);
+      await firstCell?.hover();
+
+      await expect(firstCell!.locator('.jp-cell-toolbar')).toHaveCount(1);
+
       // Populate page
       await populateNotebook(paths.extension, page);
 
