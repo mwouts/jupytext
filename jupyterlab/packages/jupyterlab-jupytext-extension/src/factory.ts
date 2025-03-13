@@ -19,10 +19,11 @@ import { IEditorServices } from '@jupyterlab/codeeditor';
 
 import { ITranslator, TranslationBundle } from '@jupyterlab/translation';
 
+import { IDisposable } from '@lumino/disposable';
+
 import { IRisePreviewFactory } from 'jupyterlab-rise';
 
 import { FACTORY, FILE_TYPES } from './tokens';
-import { IDisposable } from '@lumino/disposable';
 
 export function createFactory(
   kernelFileTypeNames: string[],
