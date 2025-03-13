@@ -278,6 +278,7 @@ def myst_to_notebook(
     tokens = get_parser().parse(text + "\n")
     lines = text.splitlines()
     md_start_line = 0
+    default_lexer = None
 
     # get the document metadata
     metadata_nb = {}
@@ -320,6 +321,16 @@ def myst_to_notebook(
         if token.type == "fence" and token.info.startswith(code_directive):
             _flush_markdown(md_start_line, token, md_metadata)
             options, body_lines = read_fenced_cell(token, len(notebook.cells), "Code")
+            assert token.info.startswith(code_directive)
+            lexer = token.info[len(code_directive) :].strip()
+            if lexer:
+                if not default_lexer:
+                    default_lexer = lexer
+                elif lexer != default_lexer:
+                    warnings.warn(
+                        f"All code cells in a MyST notebook must have the same language: {lexer}!={default_lexer}"
+                    )
+
             meta = nbf.from_dict(options)
             source_map.append(token.map[0] + 1)
             notebook.cells.append(
@@ -348,6 +359,14 @@ def myst_to_notebook(
 
     if add_source_map:
         notebook.metadata["source_map"] = source_map
+
+    if "language_info" not in notebook.metadata and default_lexer:
+        has_metadata = bool(notebook.metadata)
+        jupytext_metadata = notebook.metadata.setdefault("jupytext", {})
+        jupytext_metadata["default_lexer"] = default_lexer
+        if not has_metadata:
+            jupytext_metadata["notebook_metadata_filter"] = "-all"
+
     return notebook
 
 
@@ -414,5 +433,10 @@ def notebook_to_myst(
 
         else:
             raise NotImplementedError(f"cell {i}, type: {cell.cell_type}")
+
+    if not nb_metadata:
+        # remove initial blank line
+        assert string.startswith("\n")
+        string = string[1:]
 
     return string.rstrip() + "\n"
