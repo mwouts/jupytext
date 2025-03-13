@@ -22,6 +22,7 @@ import { ITranslator, TranslationBundle } from '@jupyterlab/translation';
 import { IRisePreviewFactory } from 'jupyterlab-rise';
 
 import { FACTORY, FILE_TYPES } from './tokens';
+import { IDisposable } from '@lumino/disposable';
 
 export function createFactory(
   kernelFileTypeNames: string[],
@@ -68,11 +69,24 @@ export function createFactory(
   });
   docRegistry.addWidgetFactory(factory);
 
-  // Add the widget extensions of the 'Notebook' factory to the 'Jupytext Notebook'
-  // factory.
-  for (const extension of docRegistry.widgetExtensions('Notebook')) {
-    docRegistry.addWidgetExtension(FACTORY, extension);
-  }
+  // The list of extensions in the Jupytext Notebook factory.
+  const factoryExtensions: IDisposable[] = [];
+  const updateWidgetExtensions = () => {
+    // Dispose of all existing extensions.
+    factoryExtensions.forEach((extension) => extension.dispose());
+    // Add all the widgets extensions in the Notebook factory.
+    for (const extension of docRegistry.widgetExtensions('Notebook')) {
+      docRegistry.addWidgetExtension(FACTORY, extension);
+    }
+  };
+
+  // Listen for changes in Notebook factory extensions.
+  docRegistry.changed.connect((_, change) => {
+    if (change.type === 'widgetExtension' && change.name === 'Notebook') {
+      updateWidgetExtensions();
+    }
+  });
+  updateWidgetExtensions();
 
   // Register widget created with the new factory in the notebook tracker
   // This is required to activate notebook commands (and therefore shortcuts)
