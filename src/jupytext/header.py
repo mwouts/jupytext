@@ -1,6 +1,7 @@
 """Parse header of text notebooks
 """
 
+import logging
 import re
 
 import nbformat
@@ -351,10 +352,13 @@ def metadata_and_cell_to_metadata(nb, fmt, unsupported_keys=None):
                 and _HEADER_RE.match(lines[0])
                 and _HEADER_RE.match(lines[-1])
             ):
-                nb.cells = nb.cells[1:]
-                frontmatter = next(yaml.safe_load_all(cell.source))
-                nb.metadata = recursive_update(
-                    frontmatter, nb.metadata, overwrite=False
-                )
-
+                try:
+                    frontmatter = next(yaml.safe_load_all(cell.source))
+                except (yaml.parser.ParserError, yaml.scanner.ScannerError):
+                    logging.warning("[jupytext] failed to parse YAML in raw cell")
+                else:
+                    nb.cells = nb.cells[1:]
+                    nb.metadata = recursive_update(
+                        frontmatter, nb.metadata, overwrite=False
+                    )
     return nb
