@@ -245,8 +245,11 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             )
             nb = self.filter_notebook(nb, metadata)
             nb = self.merge_frontmatter(nb)
-            return notebook_to_myst(nb, default_lexer=default_lexer_from_language_info
-                or default_lexer_from_jupytext_metadata)
+            return notebook_to_myst(
+                nb,
+                default_lexer=default_lexer_from_language_info
+                or default_lexer_from_jupytext_metadata,
+            )
 
         # Copy the notebook, in order to be sure we do not modify the original notebook
         nb = NotebookNode(
