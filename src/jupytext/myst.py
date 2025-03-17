@@ -11,6 +11,7 @@ import nbformat as nbf
 import yaml
 
 from .cell_to_text import three_backticks_or_more
+from .metadata_filter import _JUPYTER_METADATA_NAMESPACE
 
 try:
     from markdown_it import MarkdownIt
@@ -23,6 +24,7 @@ except ImportError:
 MYST_FORMAT_NAME = "myst"
 CODE_DIRECTIVE = "{code-cell}"
 RAW_DIRECTIVE = "{raw-cell}"
+_DEFAULT_ROOT_LEVEL_METADATA = "kernelspec,jupytext,kernel_info"
 
 
 def is_myst_available():
@@ -99,15 +101,17 @@ def matches_mystnb(
             pass
         else:
             try:
-                if (
-                    metadata.get("jupytext", {})
+                format_name = (
+                    metadata.get(_JUPYTER_METADATA_NAMESPACE, metadata)
+                    .get("jupytext", {})
                     .get("text_representation", {})
-                    .get("format_name", "")
-                    == MYST_FORMAT_NAME
-                ):
-                    return True
+                    .get("format_name")
+                )
             except AttributeError:
                 pass
+            else:
+                if format_name == MYST_FORMAT_NAME:
+                    return True
 
     # is there at least on fenced code block with a code/raw directive language
     for token in tokens:
@@ -155,7 +159,7 @@ def dump_yaml_blocks(data, compact=True):
         tags: [hide-output, show-input]
         ---
     """
-    string = yaml.dump(data, Dumper=CompactDumper)
+    string = yaml.dump(data, Dumper=CompactDumper, sort_keys=False)
     lines = string.splitlines()
     if compact and all(line and line[0].isalpha() for line in lines):
         return "\n".join([f":{line}" for line in lines]) + "\n\n"

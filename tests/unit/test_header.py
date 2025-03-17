@@ -6,6 +6,7 @@ from jupytext.formats import get_format_implementation
 from jupytext.header import (
     header_to_metadata_and_cell,
     metadata_and_cell_to_header,
+    recursive_update,
     uncomment_line,
 )
 
@@ -195,3 +196,14 @@ jupyter:
 
 -->""",
     )
+
+
+def test_recusive_update():
+    assert recursive_update({0: {1: 2}}, {0: {1: 3}, 4: 5}) == {0: {1: 3}, 4: 5}
+    assert recursive_update({0: {1: 2}}, {0: {1: 3}, 4: 5}, overwrite=False) == {
+        0: {1: 2},
+        4: 5,
+    }
+    # the value of `None`` is a special case
+    assert recursive_update({0: 1}, {0: None}) == {}
+    assert recursive_update({0: 1}, {0: None}, overwrite=False) == {}
