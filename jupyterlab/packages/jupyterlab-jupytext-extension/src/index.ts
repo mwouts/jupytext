@@ -376,7 +376,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     registerFileTypes(availableKernelLanguages, docRegistry, trans);
 
     // Get all kernel file types to add to Jupytext factory
-    const kernelLanguageNames = [];
+    const kernelLanguageNames: string[] = [];
     for (const kernelLanguage of availableKernelLanguages.keys()) {
       kernelLanguageNames.push(kernelLanguage);
     }
