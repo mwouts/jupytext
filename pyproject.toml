@@ -9,7 +9,7 @@ license = { file = "LICENSE" }
 authors = [
     { name = "Marc Wouts", email = "marc.wouts@gmail.com" },
 ]
-readme = "README.md"
+readme = "dist/README_with_absolute_links.md"
 requires-python = ">=3.8"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -106,6 +106,9 @@ docs = [
 [project.scripts]
 "jupytext" = "jupytext.cli:jupytext"
 "jupytext-config" = "jupytext_config.__main__:main"
+
+[tool.hatch.metadata.hooks.custom]
+path = "tools/absolute_links_in_readme.py"
 
 [tool.hatch.version]
 # Read version string from version.py and use it for the package
