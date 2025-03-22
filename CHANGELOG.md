@@ -1,7 +1,7 @@
 Jupytext ChangeLog
 ==================
 
-1.17.0-dev
+1.17.0rc1
 ----------
 
 **Changed**

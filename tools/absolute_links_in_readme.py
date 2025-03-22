@@ -10,7 +10,7 @@ class AbsoluteLinksInReadme(MetadataHookInterface):
     def update(self, metadata):
         """Process README.md when metadata is being prepared."""
         readme_src_path = Path("README.md")
-        readme_output_path = Path("dist/README_with_absolute_links.md")
+        readme_output_path = Path("build/README_with_absolute_links.md")
         base_url = "https://github.com/mwouts/jupytext/blob/main/"
 
         # Ensure the dist directory exists
@@ -36,5 +36,6 @@ class AbsoluteLinksInReadme(MetadataHookInterface):
         new_content = pattern.sub(replace_link, content)
 
         # Write the processed content to the output file
+        output_path.parent.mkdir(exist_ok=True)
         output_path.write_text(new_content, encoding="utf-8")
         print(f"Generated {output_path} with absolute links")

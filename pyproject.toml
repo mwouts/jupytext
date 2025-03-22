@@ -9,7 +9,7 @@ license = { file = "LICENSE" }
 authors = [
     { name = "Marc Wouts", email = "marc.wouts@gmail.com" },
 ]
-readme = "dist/README_with_absolute_links.md"
+readme = "build/README_with_absolute_links.md"
 requires-python = ">=3.8"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
