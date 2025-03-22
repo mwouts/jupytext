@@ -11,9 +11,14 @@ Jupytext ChangeLog
 - The `rst2md` conversion now works with `sphinx-gallery>=0.8`. Thanks to [Thomas J. Fan](https://github.com/thomasjpfan) for fixing this! ([#1334](https://github.com/mwouts/jupytext/pull/1334))
 - We have updated the JupyterLab extension dependencies ([#1300](https://github.com/mwouts/jupytext/pull/1300), [#1355](https://github.com/mwouts/jupytext/pull/1355), [#1360](https://github.com/mwouts/jupytext/pull/1360)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for these PRs!
 
+**Added**
+- The context menu has a "New Text Notebook" entry. Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR ([#1365](https://github.com/mwouts/jupytext/pull/1365))!
+
 **Fixed**
 - We have added and fixed round trip tests on MyST Markdown notebooks ([#759](https://github.com/mwouts/jupytext/issues/759), [#789](https://github.com/mwouts/jupytext/issues/789), [#1267](https://github.com/mwouts/jupytext/issues/1267), [#1317](https://github.com/mwouts/jupytext/issues/1317))
 - The `--quiet` option now works with the `--pipe` mode of Jupytext CLI ([#1305](https://github.com/mwouts/jupytext/issues/1305))
+- Jupytext is now compatible with the cell toolbar extension - thanks to [Nicolas Brichet](https://github.com/brichet) for the fix! ([#1358](https://github.com/mwouts/jupytext/pull/1358))
+- The project description on PyPI now uses absolute links ([#1287](https://github.com/mwouts/jupytext/issues/1287))
 
 
 1.16.7 (2025-02-09)
