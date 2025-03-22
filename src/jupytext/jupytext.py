@@ -243,13 +243,12 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             default_lexer_from_jupytext_metadata = metadata.get("jupytext", {}).pop(
                 "default_lexer", None
             )
+            default_lexer = (
+                default_lexer_from_language_info or default_lexer_from_jupytext_metadata
+            )
             nb = self.filter_notebook(nb, metadata)
             nb = self.merge_frontmatter(nb)
-            return notebook_to_myst(
-                nb,
-                default_lexer=default_lexer_from_language_info
-                or default_lexer_from_jupytext_metadata,
-            )
+            return notebook_to_myst(nb, default_lexer=default_lexer)
 
         # Copy the notebook, in order to be sure we do not modify the original notebook
         nb = NotebookNode(
@@ -363,7 +362,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         """Use during self.reads to separate notebook metadata from other frontmatter."""
         unsupported_keys = set()
         metadata = nb.metadata.pop(_JUPYTER_METADATA_NAMESPACE, {})
-        metadata.setdefault("jupytext", nb.metadata.get("jupytext", {}))
+        metadata.setdefault("jupytext", {}).update(nb.metadata.get("jupytext", {}))
         self.update_fmt_with_notebook_options(deepcopy(metadata), read=True)
         nb = metadata_to_metadata_and_cell(nb, metadata, self.fmt, unsupported_keys)
         _warn_on_unsupported_keys(unsupported_keys)
