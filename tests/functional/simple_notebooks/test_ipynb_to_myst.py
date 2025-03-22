@@ -103,6 +103,18 @@ def test_matches_mystnb():
     text = dedent(
         """\
         ---
+        jupyter:
+            jupytext:
+                text_representation:
+                    format_name: myst
+                    extension: .md
+        ---
+        """
+    )
+    assert matches_mystnb(text) is True
+    text = dedent(
+        """\
+        ---
         jupytext:
             text_representation:
                 format_name: myst
