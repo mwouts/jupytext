@@ -24,7 +24,7 @@ except ImportError:
 MYST_FORMAT_NAME = "myst"
 CODE_DIRECTIVE = "{code-cell}"
 RAW_DIRECTIVE = "{raw-cell}"
-_DEFAULT_ROOT_LEVEL_METADATA = "kernelspec,jupytext,kernel_info"
+_DEFAULT_ROOT_LEVEL_METADATA = "all"
 
 
 def is_myst_available():

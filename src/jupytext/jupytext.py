@@ -362,8 +362,15 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         """Use during self.reads to separate notebook metadata from other frontmatter."""
         unsupported_keys = set()
         metadata = nb.metadata.pop(_JUPYTER_METADATA_NAMESPACE, {})
-        metadata.setdefault("jupytext", {}).update(nb.metadata.get("jupytext", {}))
-        self.update_fmt_with_notebook_options(deepcopy(metadata), read=True)
+        self.update_fmt_with_notebook_options(
+            {
+                "jupytext": {
+                    **metadata.get("jupytext", {}),
+                    **nb.metadata.get("jupytext", {}),
+                },
+            },
+            read=True,
+        )
         nb = metadata_to_metadata_and_cell(nb, metadata, self.fmt, unsupported_keys)
         _warn_on_unsupported_keys(unsupported_keys)
         return nb

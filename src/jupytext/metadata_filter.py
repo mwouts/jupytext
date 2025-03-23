@@ -226,11 +226,8 @@ def subset_metadata(
         metadata, unsupported_keys=unsupported_keys
     )
     if keep_only is not None:
-        keys = [key for key in supported_keys if key in keep_only]
-        if remove:
-            filtered_metadata = {key: metadata.pop(key) for key in keys}
-        else:
-            filtered_metadata = {key: metadata[key] for key in keys}
+        include = [key for key in supported_keys if key in keep_only]
+        filtered_metadata = {key: metadata[key] for key in include}
         sub_keep_only = second_level(keep_only)
         keys = [key for key in supported_keys if key in sub_keep_only]
         for key in keys:
@@ -241,10 +238,8 @@ def subset_metadata(
                 remove=remove,
             )
     else:
-        if remove:
-            filtered_metadata = {key: metadata.pop(key) for key in supported_keys}
-        else:
-            filtered_metadata = {key: metadata[key] for key in supported_keys}
+        include = supported_keys
+        filtered_metadata = {key: metadata[key] for key in supported_keys}
 
     if exclude is not None:
         for key in exclude:
@@ -257,7 +252,12 @@ def subset_metadata(
                     filtered_metadata[key],
                     exclude=sub_exclude[key],
                     unsupported_keys=unsupported_keys,
+                    remove=remove,
                 )
+
+    if remove:
+        for key in set(include).difference(exclude or {}):
+            metadata.pop(key, None)
 
     return filtered_metadata
 
