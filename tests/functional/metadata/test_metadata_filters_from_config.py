@@ -1,4 +1,5 @@
 import nbformat
+import pytest
 import yaml
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 
@@ -49,6 +50,7 @@ cell_metadata_filter = "-all"
     compare_notebooks(nb2, nb)
 
 
+@pytest.mark.requires_myst
 def test_root_level_metadata_filters_from_config(tmpdir):
     cfg_file = tmpdir.join("jupytext.toml")
     nb_file = tmpdir.join("notebook.ipynb")
