@@ -176,8 +176,6 @@ def test_default_config_has_priority_over_current_metadata(
 @pytest.mark.requires_myst
 def test_metadata_filter_in_notebook_757():
     md = """---
-nbhosting:
-  title: 'Exercice: Taylor'
 jupytext:
   cell_metadata_filter: all,-hidden,-heading_collapsed
   notebook_metadata_filter: all,-language_info,-toc,-jupytext.text_representation.jupytext_version,-jupytext.text_representation.format_version
@@ -188,6 +186,8 @@ kernelspec:
   display_name: Python 3
   language: python
   name: python3
+nbhosting:
+  title: 'Exercice: Taylor'
 ---
 
 ```python

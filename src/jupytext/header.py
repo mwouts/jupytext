@@ -311,14 +311,15 @@ def default_root_level_metadata_filter(fmt):
 
 def metadata_to_metadata_and_cell(nb, metadata, fmt, unsupported_keys=None):
     # stash notebook metadata, including keys promoted to the root level
-    metadata.update(
+    metadata = recursive_update(
+        metadata,
         filter_metadata(
             nb.metadata,
             fmt.get("root_level_metadata_filter", ""),
             default_root_level_metadata_filter(fmt),
             unsupported_keys=unsupported_keys,
             remove=True,
-        )
+        ),
     )
     # move remaining metadata (i.e. frontmatter) to the first notebook cell
     if nb.metadata and fmt.get("root_level_metadata_as_raw_cell", True):
@@ -341,7 +342,6 @@ def metadata_and_cell_to_metadata(nb, fmt, unsupported_keys=None):
     # remaining nb.metadata moved under namespace key for jupyter metadata
     if nb.metadata:
         metadata[_JUPYTER_METADATA_NAMESPACE] = nb.metadata
-    nb.metadata = metadata
     # move first cell frontmatter to the root level of nb.metadata (overwrites)
     if nb.cells and fmt.get("root_level_metadata_as_raw_cell", True):
         cell = nb.cells[0]
@@ -358,7 +358,13 @@ def metadata_and_cell_to_metadata(nb, fmt, unsupported_keys=None):
                     logging.warning("[jupytext] failed to parse YAML in raw cell")
                 else:
                     nb.cells = nb.cells[1:]
-                    nb.metadata = recursive_update(
-                        frontmatter, nb.metadata, overwrite=False
-                    )
+                    if (
+                        "root_level_metadata_filter" not in fmt
+                        and default_root_level_metadata_filter(fmt) == "all"
+                    ):
+                        metadata.setdefault("jupytext", {})[
+                            "root_level_metadata_filter"
+                        ] = "-" + ",-".join(frontmatter)
+                    metadata = recursive_update(frontmatter, metadata, overwrite=False)
+    nb.metadata = metadata
     return nb

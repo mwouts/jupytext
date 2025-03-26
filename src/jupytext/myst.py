@@ -24,7 +24,7 @@ except ImportError:
 MYST_FORMAT_NAME = "myst"
 CODE_DIRECTIVE = "{code-cell}"
 RAW_DIRECTIVE = "{raw-cell}"
-_DEFAULT_ROOT_LEVEL_METADATA = "kernelspec,jupytext,kernel_info"
+_DEFAULT_ROOT_LEVEL_METADATA = "all"
 
 
 def is_myst_available():
@@ -366,7 +366,8 @@ def myst_to_notebook(
 
     if "language_info" not in notebook.metadata and default_lexer:
         has_metadata = bool(notebook.metadata)
-        jupytext_metadata = notebook.metadata.setdefault("jupytext", {})
+        jupyter_metadata = notebook.metadata.setdefault(_JUPYTER_METADATA_NAMESPACE, {})
+        jupytext_metadata = jupyter_metadata.setdefault("jupytext", {})
         jupytext_metadata["default_lexer"] = default_lexer
         if not has_metadata:
             jupytext_metadata["notebook_metadata_filter"] = "-all"
