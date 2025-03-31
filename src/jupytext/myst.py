@@ -9,6 +9,7 @@ from textwrap import dedent
 
 import nbformat as nbf
 import yaml
+from yaml.representer import SafeRepresenter
 
 from .cell_to_text import three_backticks_or_more
 from .metadata_filter import _JUPYTER_METADATA_NAMESPACE
@@ -25,6 +26,8 @@ MYST_FORMAT_NAME = "myst"
 CODE_DIRECTIVE = "{code-cell}"
 RAW_DIRECTIVE = "{raw-cell}"
 _DEFAULT_ROOT_LEVEL_METADATA = "all"
+
+SafeRepresenter.add_representer(nbf.NotebookNode, SafeRepresenter.represent_dict)
 
 
 def is_myst_available():
@@ -164,13 +167,6 @@ def dump_yaml_blocks(data, compact=True):
     if compact and all(line and line[0].isalpha() for line in lines):
         return "\n".join([f":{line}" for line in lines]) + "\n\n"
     return f"---\n{string}---\n"
-
-
-def from_nbnode(value):
-    """Recursively convert NotebookNode to dict."""
-    if isinstance(value, nbf.NotebookNode):
-        return {k: from_nbnode(v) for k, v in value.items()}
-    return value
 
 
 class MystMetadataParsingError(Exception):
@@ -392,7 +388,7 @@ def notebook_to_myst(
     raise_if_myst_is_not_available()
     string = ""
 
-    nb_metadata = from_nbnode(nb.metadata)
+    nb_metadata = nb.metadata
 
     # we add the pygments lexer as a directive argument, for use by syntax highlighters
     pygments_lexer = nb_metadata.get("language_info", {}).get("pygments_lexer", None)
@@ -405,7 +401,7 @@ def notebook_to_myst(
     last_cell_md = False
     for i, cell in enumerate(nb.cells):
         if cell.cell_type == "markdown":
-            metadata = from_nbnode(cell.metadata)
+            metadata = cell.metadata
             if metadata or last_cell_md:
                 if metadata:
                     string += f"\n+++ {json.dumps(metadata)}\n"
@@ -425,7 +421,7 @@ def notebook_to_myst(
             if pygments_lexer and cell.cell_type == "code":
                 string += f" {pygments_lexer}"
             string += "\n"
-            metadata = from_nbnode(cell.metadata)
+            metadata = cell.metadata
             if metadata:
                 string += dump_yaml_blocks(metadata)
             elif cell.source.startswith("---") or cell.source.startswith(":"):
