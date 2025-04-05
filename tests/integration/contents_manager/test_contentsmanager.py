@@ -1877,3 +1877,81 @@ async def test_hash_changes_if_paired_file_is_edited(tmp_path, cm, python_notebo
     # the hash is for the pair (inputs first)
     model_from_py_file = await ensure_async(cm.get("notebook.py", require_hash=True))
     assert model_from_py_file["hash"] == new_model["hash"]
+
+
+@pytest.mark.requires_myst
+async def test_metadata_stays_in_order_1368(
+    tmp_path,
+    cm,
+    md="""---
+jupytext:
+  formats: md:myst
+  notebook_metadata_filter: -jupytext.text_representation.jupytext_version
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+kernelspec:
+  display_name: itables
+  language: python
+  name: itables
+---
+
+A markdown cell
+""",
+):
+    cm.root_dir = str(tmp_path)
+
+    (tmp_path / "nb.md").write_text(md)
+
+    model = await ensure_async(cm.get(path="nb.md"))
+    assert list(model["content"]["metadata"].keys()) == [
+        "jupytext",
+        "kernelspec",
+    ], "order must be preserved"
+
+    cm.save(model=model, path="nb.md")
+    compare((tmp_path / "nb.md").read_text(), md)
+
+
+@pytest.mark.requires_myst
+async def test_jupytext_orders_root_metadata(
+    tmp_path,
+    cm,
+    md="""---
+title: Quick test
+jupytext:
+  formats: md:myst
+  notebook_metadata_filter: -jupytext.text_representation.jupytext_version
+  root_level_metadata_filter: -title
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+kernelspec:
+  display_name: itables
+  language: python
+  name: itables
+---
+
+A markdown cell
+""",
+):
+    cm.root_dir = str(tmp_path)
+
+    (tmp_path / "nb.md").write_text(md)
+
+    model = await ensure_async(cm.get(path="nb.md"))
+    assert list(model["content"]["metadata"].keys()) == [
+        "jupytext",
+        "kernelspec",
+    ], "order must be preserved"
+
+    # simulate jupyter changing the order of the metadata
+    model["content"]["metadata"]["jupytext"] = model["content"]["metadata"].pop(
+        "jupytext"
+    )
+    assert list(model["content"]["metadata"].keys()) == ["kernelspec", "jupytext"]
+
+    cm.save(model=model, path="nb.md")
+    compare((tmp_path / "nb.md").read_text(), md)
