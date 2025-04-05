@@ -188,6 +188,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         metadata = insert_jupytext_info_and_filter_metadata(
             metadata, self.fmt, self.implementation, unsupported_keys=unsupported_keys
         )
+        # We sort the notebook metadata for consistency with v1.16
+        metadata = dict(sorted(metadata.items()))
 
         cells = []
         for cell in nb.cells:
