@@ -1,4 +1,8 @@
-# 1.4.3+dev
+# 1.4.4 (2025-04-05)
+
+The context menu has a "New Text Notebook" entry. Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR ([#1365](https://github.com/mwouts/jupytext/pull/1365))!
+
+We have updated the JupyterLab extension dependencies ([#1300](https://github.com/mwouts/jupytext/pull/1300), [#1355](https://github.com/mwouts/jupytext/pull/1355), [#1360](https://github.com/mwouts/jupytext/pull/1360)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for these PRs!
 
 The dependencies of the JupyterLab extension were updated to address [security issues](https://github.com/mwouts/jupytext/security/dependabot):
 
