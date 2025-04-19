@@ -1,8 +1,10 @@
+import builtins
 import inspect
 import os
 import re
 import shutil
 import time
+from unittest import mock
 
 import pytest
 from jupyter_server.utils import ensure_async
@@ -1955,3 +1957,41 @@ A markdown cell
 
     cm.save(model=model, path="nb.md")
     compare((tmp_path / "nb.md").read_text(), md)
+
+
+async def test_rename_does_not_open_file_issue_1376(cm, tmp_path, size_mb=8):
+    """
+    In this test we make sure that renaming a file does not open that file
+    """
+
+    original_name = "large.file"
+    new_name = "renamed_large.file"
+
+    # create a large file
+    one_mb = 1024 * 1024
+    with open(tmp_path / original_name, "wb") as fp:
+        for i in range(8):
+            fp.write(os.urandom(one_mb))
+
+    cm.root_dir = str(tmp_path)
+
+    # Patch open to detect if the file is being opened
+    original_open = builtins.open
+
+    def make_sure_open_is_not_called(file_name, *args, **kwargs):
+        if str(file_name).startswith(str(tmp_path)):
+            raise RuntimeError(
+                f"open was called with the following arguments: {file_name}, {args}, {kwargs}"
+            )
+        return original_open(file_name, *args, **kwargs)
+
+    with mock.patch.object(builtins, "open", make_sure_open_is_not_called):
+        # The file is not opened if we call rename_file or get(..., content=False)
+        await ensure_async(cm.rename_file(original_name, new_name))
+        model = await ensure_async(cm.get(new_name, content=False))
+
+        # But is it indeed opened if we call get
+        with pytest.raises(RuntimeError, match="open was called"):
+            await ensure_async(cm.get(new_name))
+
+    assert model["size"] == size_mb * one_mb
