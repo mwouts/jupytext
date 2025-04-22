@@ -140,6 +140,19 @@ def build_sync_jupytext_contents_manager_class(base_contents_manager_class):
             nbk = model["content"]
             try:
                 config = self.get_config(path)
+
+                # If the path is in the ignored paths, remove Jupytext metadata (if any)
+                if any(
+                    path.startswith(ignored_path)
+                    for ignored_path in config.ignored_paths
+                ):
+                    try:
+                        del model["content"]["metadata"]["jupytext"]
+                    except KeyError:
+                        pass
+
+                    return self.super.save(model, path)
+
                 jupytext_formats = notebook_formats(nbk, config, path)
                 self.update_paired_notebooks(path, jupytext_formats)
 
@@ -560,6 +573,15 @@ to your jupytext.toml file
                     pass
 
             if old_path not in self.paired_notebooks:
+                self.super.rename_file(old_path, new_path)
+                return
+
+            # If the destination path is in the ignored paths, drop the paired notebook
+            if any(
+                new_path.startswith(ignored_path)
+                for ignored_path in self.get_config(new_path).ignored_paths
+            ):
+                self.drop_paired_notebook(old_path)
                 self.super.rename_file(old_path, new_path)
                 return
 

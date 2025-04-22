@@ -1839,6 +1839,45 @@ async def test_move_paired_notebook_to_subdir_1059(tmp_path, cm, python_notebook
     compare_notebooks(nb, python_notebook, fmt="py:percent")
 
 
+async def test_move_paired_notebook_to_external_dir_1199(tmp_path, cm, python_notebook):
+    (tmp_path / "jupytext.toml").write_text(
+        'formats = "notebooks///ipynb,scripts///py:percent"\nignored_paths = ["external"]\n'
+    )
+    cm.root_dir = str(tmp_path)
+
+    # create paired notebook
+    (tmp_path / "notebooks").mkdir()
+    await ensure_async(
+        cm.save(
+            notebook_model(python_notebook),
+            path="notebooks/my_notebook.ipynb",
+        )
+    )
+    assert (tmp_path / "notebooks" / "my_notebook.ipynb").exists()
+    assert (tmp_path / "scripts" / "my_notebook.py").exists()
+
+    # create external directory
+    (tmp_path / "external").mkdir()
+
+    assert (tmp_path / "external").exists()
+    assert not (tmp_path / "external" / "my_notebook.ipynb").exists()
+    assert not (tmp_path / "external" / "my_notebook.py").exists()
+
+    # move notebook to external directory
+    await ensure_async(
+        cm.rename_file(
+            "notebooks/my_notebook.ipynb",
+            "external/my_notebook.ipynb",
+        )
+    )
+
+    assert not (tmp_path / "notebooks" / "my_notebook.ipynb").exists()
+    assert (tmp_path / "scripts" / "my_notebook.py").exists()
+
+    assert (tmp_path / "external" / "my_notebook.ipynb").exists()
+    assert not (tmp_path / "external" / "my_notebook.py").exists()
+
+
 async def test_hash_changes_if_paired_file_is_edited(tmp_path, cm, python_notebook):
     # 1. write py ipynb
 
