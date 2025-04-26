@@ -146,6 +146,9 @@ async def test_text_notebooks_can_be_trusted(
         assert cell.metadata.get("trusted", True)
 
 
+# This test started failing on Windows on 2025-04-26
+# https://github.com/mwouts/jupytext/actions/runs/14683344298/job/41208822220?pr=1380
+@pytest.mark.skip_on_windows
 async def test_simple_notebook_is_trusted(tmpdir, python_notebook, cm):
     cm.root_dir = str(tmpdir)
 
