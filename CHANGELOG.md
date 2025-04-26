@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.17.1 (2025-04-26)
+-------------------
+
+**Fixed**
+- Renaming files other than notebooks will not load their content ([#1376](https://github.com/mwouts/jupytext/issues/1376))
+
+
 1.17.0 (2025-04-05)
 -------------------
 

@@ -530,11 +530,25 @@ to your jupytext.toml file
                     await self.super.trust_notebook(alt_path)
 
         async def rename_file(self, old_path, new_path):
-            """Rename the current notebook, as well as its alternative representations"""
+            """
+            Rename the current file. If the file is a notebook,
+            we rename the paired files as well
+            """
+
+            # If the file is not a notebook, we call the parent rename_file method
+            ext = os.path.splitext(old_path)[1]
+            config = await self.get_config(old_path, use_cache=True)
+            if ext not in self.all_nb_extensions(config):
+                await self.super.rename_file(old_path, new_path)
+                return
+
             if old_path not in self.paired_notebooks:
                 try:
                     # we do not know yet if this is a paired notebook (#190)
                     # -> to get this information we open the notebook
+                    self.log.info(
+                        "Opening %s to check if it is a paired notebook", old_path
+                    )
                     await self.get(old_path, content=True)
                 except Exception:
                     pass
