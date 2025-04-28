@@ -1,4 +1,7 @@
+import os
+
 import pytest
+import yaml
 from git.exc import HookExecutionError
 from nbformat.v4.nbbase import new_markdown_cell, new_notebook
 from pre_commit.main import main as pre_commit
@@ -9,25 +12,31 @@ from jupytext.compare import compare_cells
 
 
 def test_pre_commit_hook_ipynb_to_py(
-    tmpdir, cwd_tmpdir, tmp_repo, jupytext_repo_root, jupytext_repo_rev
+    tmpdir,
+    cwd_tmpdir,
+    tmp_repo,
+    jupytext_repo_root,
+    jupytext_repo_rev,
+    jupytext_pre_commit_config,
 ):
     """Here we document and test the expected behavior of the pre-commit hook in the
     directional (--to) mode. Note that here, the ipynb file is always the source for
     updates - i.e. changes on the .py file will not trigger the hook.
     """
     # set up the tmpdir repo with pre-commit
-    pre_commit_config_yaml = f"""
-repos:
-- repo: {jupytext_repo_root}
-  rev: {jupytext_repo_rev}
-  hooks:
-  - id: jupytext
-    args: [--from, ipynb, --to, "py:percent"]
-"""
+    # Add args as if we will add in actual .pre-commit-config.yaml file
+    jupytext_pre_commit_config["repos"][0]["hooks"][0]["args"] = [
+        "--from",
+        "ipynb",
+        "--to",
+        "py:percent",
+    ]
+    with open(os.path.join(tmpdir, ".pre-commit-config.yaml"), "w") as file:
+        yaml.dump(jupytext_pre_commit_config, file)
 
-    tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
+    #     tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
     tmp_repo.git.add(".pre-commit-config.yaml")
-    pre_commit(["install", "--install-hooks"])
+    pre_commit(["install", "--install-hooks", "-f"])
 
     # write test notebook and output file
     nb = new_notebook(cells=[new_markdown_cell("A short notebook")])
