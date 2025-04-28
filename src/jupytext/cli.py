@@ -486,8 +486,7 @@ def jupytext(args=None):
     for pattern in args.notebooks:
         if "*" in pattern or "?" in pattern:
             # Exclude the .jupytext.py configuration file
-            # On Windows, wildcards expand with backslash as directory separator.
-            notebooks.extend(path.replace("\\", "/") for path in glob.glob(pattern, recursive=True))
+            notebooks.extend(glob.glob(pattern, recursive=True))
         else:
             notebooks.append(pattern)
 
