@@ -185,6 +185,12 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
+    ignored_paths = Union(
+        [List(Unicode()), Unicode()],
+        help="A list of paths that should be ignored when saving notebooks",
+        config=True,
+    )
+
     def set_default_format_options(self, format_options, read=False):
         """Set default format option"""
         if self.default_notebook_metadata_filter:
@@ -416,6 +422,8 @@ def load_jupytext_configuration_file(config_file, stream=None):
     config.formats = short_form_multiple_formats(config.formats)
     if isinstance(config.notebook_extensions, str):
         config.notebook_extensions = config.notebook_extensions.split(",")
+    if isinstance(config.ignored_paths, str):
+        config.ignored_paths = config.ignored_paths.split(",")
     return config
 
 
