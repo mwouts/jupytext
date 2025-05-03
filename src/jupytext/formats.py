@@ -814,6 +814,11 @@ def auto_ext_from_metadata(metadata):
     if auto_ext == ".resource":
         return ".robot"
 
+    # Handle ROOT C++ notebooks
+    # https://tinyurl.com/root-cpp-notebook-doc
+    if auto_ext == ".C":
+        return ".cpp"
+
     return auto_ext
 
 
