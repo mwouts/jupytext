@@ -21,13 +21,13 @@ jobs:
       ${{ matrix.no_kernel && '(No kernel)' }}
       ${{ matrix.markdown-it-py && format('(markdown-it-py {0})', matrix.markdown-it-py) }}
       ${{ matrix.no_markdown-it-py && '(No markdown-it-py)'}}
-      ${{ matrix.jupyter_server && '(Jupyter-server {0})'}}
+      ${{ matrix.jupyter_server && format('(Jupyter-server {0})', matrix.jupyter_server) }}
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13"]
         experimental: [false]
         include:
           # Test with jupyter-server=2.10 that does not have the 'require_hash' argument

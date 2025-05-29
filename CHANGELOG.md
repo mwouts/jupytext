@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.17.2-dev (2025-05-??)
+-------------------
+
+**Changed**
+- We have removed Python 3.8 from the list of supported Python version, and from the CI, as it has reached its EOL
+
+
 1.17.1 (2025-04-26)
 -------------------
 
