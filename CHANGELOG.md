@@ -4,6 +4,9 @@ Jupytext ChangeLog
 1.17.2-dev (2025-05-??)
 -------------------
 
+**Fixed**
+- The `--set-formats` argument takes precedence over pre-existing pairing information in the notebook ([#1386](https://github.com/mwouts/jupytext/issues/1386))
+
 **Changed**
 - We have removed Python 3.8 from the list of supported Python version, and from the CI, as it has reached its EOL
 

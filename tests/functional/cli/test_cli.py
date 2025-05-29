@@ -1415,3 +1415,41 @@ def test_pipe_with_quiet_does_not_print(tmp_path, capsys):
     assert captured.err == ""
 
     assert tmp_py.read_text() == "# %%\n1 + 1\n"
+
+
+def test_update_formats_1386(python_notebook, tmp_path, capsys):
+    """
+    Test that we can change the formats in an already paired notebook
+    """
+    tmp_py = tmp_path / "notebook.py"
+    tmp_md = tmp_path / "notebook.md"
+    tmp_ipynb = tmp_path / "notebook.ipynb"
+    write(python_notebook, tmp_py, fmt="py:percent")
+
+    formats = "py:percent,md"
+    jupytext([str(tmp_py), "--set-formats", formats])
+
+    # We need to update all the files, not only their timestamps
+    capture = capsys.readouterr()
+    assert "Updating the timestamp" not in capture.out
+
+    # Each paired file should have the new formats
+    assert read(tmp_py)["metadata"]["jupytext"]["formats"] == formats
+    assert read(tmp_md)["metadata"]["jupytext"]["formats"] == formats
+
+    # The issue occurred when the py file was older than the md file
+    current_time = time.time()
+    os.utime(tmp_py, (current_time - 1, current_time - 1))
+    os.utime(tmp_md, (current_time, current_time))
+
+    formats = "ipynb,py:percent,md"
+    jupytext([str(tmp_py), "--set-formats", formats])
+
+    # We need to update all the files, not only their timestamps
+    capture = capsys.readouterr()
+    assert "Updating the timestamp" not in capture.out
+
+    # And each paired file should have the new formats
+    assert read(tmp_py)["metadata"]["jupytext"]["formats"] == formats
+    assert read(tmp_md)["metadata"]["jupytext"]["formats"] == formats
+    assert read(tmp_ipynb)["metadata"]["jupytext"]["formats"] == formats

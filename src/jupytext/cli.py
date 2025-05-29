@@ -622,6 +622,30 @@ def jupytext_single_file(nb_file, args, log):
         ):
             notebook.metadata.get("jupytext", {}).pop("notebook_metadata_filter")
 
+    # Read paired notebooks
+    nb_files = [nb_file, nb_dest]
+    if args.sync:
+        # If we are also setting the formats, we take the information
+        # from the --set-formats option
+        if args.set_formats is not None:
+            formats = long_form_multiple_formats(args.set_formats)
+        else:
+            formats = notebook_formats(
+                notebook, config, nb_file, fallback_on_current_fmt=False
+            )
+        set_prefix_and_suffix(fmt, formats, nb_file)
+        try:
+            notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(
+                notebook, fmt, config, formats, nb_file, log, args.pre_commit_mode
+            )
+            nb_files = [inputs_nb_file, outputs_nb_file]
+        except NotAPairedNotebook as err:
+            sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
+            return 0
+        except InconsistentVersions as err:
+            sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
+            return 1
+
     # Update the metadata
     if args.update_metadata:
         log(
@@ -637,25 +661,6 @@ def jupytext_single_file(nb_file, args, log):
             notebook.metadata["jupytext"].pop("main_language")
 
         recursive_update(notebook.metadata, args.update_metadata)
-
-    # Read paired notebooks
-    nb_files = [nb_file, nb_dest]
-    if args.sync:
-        formats = notebook_formats(
-            notebook, config, nb_file, fallback_on_current_fmt=False
-        )
-        set_prefix_and_suffix(fmt, formats, nb_file)
-        try:
-            notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(
-                notebook, fmt, config, formats, nb_file, log, args.pre_commit_mode
-            )
-            nb_files = [inputs_nb_file, outputs_nb_file]
-        except NotAPairedNotebook as err:
-            sys.stderr.write("[jupytext] Warning: " + str(err) + "\n")
-            return 0
-        except InconsistentVersions as err:
-            sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
-            return 1
 
     # II. ### Apply commands onto the notebook ###
     # Pipe the notebook into the desired commands
