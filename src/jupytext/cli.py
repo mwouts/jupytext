@@ -614,14 +614,6 @@ def jupytext_single_file(nb_file, args, log):
         log("[jupytext] Setting kernel {}".format(kernelspec.get("name")))
         args.update_metadata["kernelspec"] = kernelspec
 
-    # Are we updating a text file that has a metadata filter? #212
-    if args.update_metadata or args.format_options:
-        if (
-            notebook.metadata.get("jupytext", {}).get("notebook_metadata_filter")
-            == "-all"
-        ):
-            notebook.metadata.get("jupytext", {}).pop("notebook_metadata_filter")
-
     # Read paired notebooks
     nb_files = [nb_file, nb_dest]
     if args.sync:
@@ -645,6 +637,14 @@ def jupytext_single_file(nb_file, args, log):
         except InconsistentVersions as err:
             sys.stderr.write("[jupytext] Error: " + str(err) + "\n")
             return 1
+
+    # Are we updating a text file that has a metadata filter? #212
+    if args.update_metadata or args.format_options:
+        if (
+            notebook.metadata.get("jupytext", {}).get("notebook_metadata_filter")
+            == "-all"
+        ):
+            notebook.metadata.get("jupytext", {}).pop("notebook_metadata_filter")
 
     # Update the metadata
     if args.update_metadata:
