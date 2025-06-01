@@ -11,7 +11,7 @@ Jupytext ChangeLog
 - We have removed Python 3.8 from the list of supported Python version, and from the CI, as it has reached its EOL
 
 **Added**
-- ROOT-flavored C++ notebooks can be paired to `.cpp` files - thanks to [Steven Gardiner](https://github.com/sjgardiner) for this contribution [([#1384](https://github.com/mwouts/jupytext/issues/1384))(https://github.com/mwouts/jupytext/pull/1384)]
+- ROOT-flavored C++ notebooks can be paired to `.cpp` files - thanks to [Steven Gardiner](https://github.com/sjgardiner) for this contribution ([#1384](https://github.com/mwouts/jupytext/pull/1384))
 
 
 1.17.1 (2025-04-26)
