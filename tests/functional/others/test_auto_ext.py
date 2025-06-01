@@ -33,6 +33,7 @@ def test_auto_from_kernelspecs_works(ipynb_file):
     elif expected_ext == ".fs":
         expected_ext = ".fsx"
     elif expected_ext == ".C":
+        # ROOT-flavored C++ notebooks have a .C extension in the language_info, see PR #1384
         expected_ext = ".cpp"
     auto_ext = auto_ext_from_metadata(nb.metadata)
     if auto_ext == ".sage":
