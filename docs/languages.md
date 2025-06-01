@@ -4,7 +4,7 @@ Jupytext works with notebooks in any of the following languages:
 
 - Bash
 - C#
-- C++
+- C++ (using either the xeus-cling or the ROOT kernel)
 - Clojure
 - Coconut
 - F#

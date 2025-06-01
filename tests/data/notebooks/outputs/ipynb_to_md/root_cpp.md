@@ -1,0 +1,21 @@
+---
+jupyter:
+  kernelspec:
+    display_name: ROOT C++
+    language: c++
+    name: root
+---
+
+```c++
+#include <iostream>
+#include <string>
+```
+
+```c++
+int k = 4;
+std::string foo = "This string says \"foo\"";
+```
+
+```c++
+std::cout << "k = " << k << '\n' << foo << '\n';
+```
