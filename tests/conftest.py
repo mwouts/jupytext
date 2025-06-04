@@ -7,6 +7,7 @@ import unittest.mock as mock
 from pathlib import Path
 
 import pytest
+import yaml
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
 from nbformat.v4 import nbbase
 from nbformat.v4.nbbase import (
@@ -75,6 +76,38 @@ def jupytext_repo_root():
 def jupytext_repo_rev(jupytext_repo_root):
     """The local revision of this repo, to use in .pre-commit-config.yaml in tests"""
     return system("git", "rev-parse", "HEAD", cwd=jupytext_repo_root).strip()
+
+
+@pytest.fixture
+def jupytext_pre_commit_config(jupytext_repo_root):
+    """The local revision of this repo, to use in .pre-commit-config.yaml in tests"""
+    # Read pre-commit-hooks.yaml file
+    #
+    # Setting language to system will ensure that pre-commit assumes that we
+    # provision correct environment. This is the case when we run unit tests as we
+    # make a developmental install of jupytext before running unit tests. So there is
+    # an "test" environment that is provisioned and we use this current environment
+    # to run pre-commit tests.
+    #
+    # When there are additional_dependencies, we override this in individual test to
+    # python so that pre-commit will create an environment and install those
+    # additional dependencies in that environment.
+    #
+    # This strategy will enable us to directly test the pre-commit hook config with
+    # current version of jupytext. It also avoid re-installing jupytext in pre-commit
+    # config and thus tests run faster.
+    with open(os.path.join(jupytext_repo_root, ".pre-commit-hooks.yaml")) as file:
+        pre_commit_hooks = yaml.safe_load(file)
+    pre_commit_hooks[0]["language"] = "system"
+    pre_commit_config = {
+        "repos": [
+            {
+                "repo": "local",
+                "hooks": pre_commit_hooks,
+            }
+        ]
+    }
+    return pre_commit_config
 
 
 @pytest.fixture()
