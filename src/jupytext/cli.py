@@ -19,6 +19,7 @@ from .formats import (
     _BINARY_FORMAT_OPTIONS,
     _VALID_FORMAT_OPTIONS,
     JUPYTEXT_FORMATS,
+    NOTEBOOK_EXTENSIONS,
     check_auto_ext,
     check_file_version,
     long_form_multiple_formats,
@@ -94,20 +95,23 @@ def parse_jupytext_args(args=None):
         "file extension and content when missing.",
     )
     # Destination format & act on metadata
+
+    selected_file_extensions = ["md", "Rmd", "jl", "py", "R"]
     parser.add_argument(
         "--to",
         dest="output_format",
         help=(
             "The destination format: 'ipynb', 'markdown' or 'script', or a file extension: "
-            "'md', 'Rmd', 'jl', 'py', 'R', ..., 'auto' (script extension matching the notebook language), "
+            "'{}', ... or 'auto' (script extension matching the notebook language), "
             "or a combination of an extension and a format name, e.g. {} ".format(
+                "', '".join(selected_file_extensions),
                 ", ".join(
                     {
                         f"md:{fmt.format_name}"
                         for fmt in JUPYTEXT_FORMATS
                         if fmt.extension == ".md"
                     }
-                )
+                ),
             )
             + " or {}. ".format(
                 ", ".join(
@@ -125,7 +129,15 @@ def parse_jupytext_args(args=None):
             "notebooks and text documents in a roundtrip. Use the "
             "--test and and --test-strict commands to test the roundtrip on your files. "
             "Read more about the available formats at "
-            "https://jupytext.readthedocs.io/en/latest/formats.html"
+            "https://jupytext.readthedocs.io/en/latest/formats.html. "
+            "NB: in addition to the extensions listed above, you can also use these: '{}'".format(
+                "', '".join(
+                    sorted(
+                        set(ext.removeprefix(".") for ext in NOTEBOOK_EXTENSIONS)
+                        - set(selected_file_extensions + ["auto", "ipynb"])
+                    )
+                )
+            )
         ),
     )
 

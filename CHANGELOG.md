@@ -1,6 +1,14 @@
 Jupytext ChangeLog
 ==================
 
+1.17.3 (2025-06-10)
+-------------------
+
+**Added**
+- All the extensions supported by Jupytext now appear in the `--to` paragraph
+of `jupytext --help` ([#433](https://github.com/mwouts/jupytext/issues/433))
+
+
 1.17.2 (2025-06-01)
 -------------------
 
