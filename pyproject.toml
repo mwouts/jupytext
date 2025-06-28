@@ -78,7 +78,7 @@ test-external = [
   "gitpython",
   "pre-commit",
   # Interaction with other contents managers
-  "jupyter-fs>=1.0"
+  "jupyter-fs[fs]>=1.0"  # 1398
 ]
 # Coverage requirements
 test-cov = [
