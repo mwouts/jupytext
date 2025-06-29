@@ -1877,6 +1877,9 @@ async def test_move_paired_notebook_to_external_dir_1199(tmp_path, cm, python_no
     assert (tmp_path / "external" / "my_notebook.ipynb").exists()
     assert not (tmp_path / "external" / "my_notebook.py").exists()
 
+    nb = (await ensure_async(cm.get("external/my_notebook.ipynb")))["content"]
+    assert "jupytext" not in nb["metadata"]
+
 
 async def test_hash_changes_if_paired_file_is_edited(tmp_path, cm, python_notebook):
     # 1. write py ipynb

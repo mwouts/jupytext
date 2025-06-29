@@ -134,19 +134,6 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
             nbk = model["content"]
             try:
                 config = await self.get_config(path)
-
-                # If the path is in the ignored paths, remove Jupytext metadata (if any)
-                if any(
-                    path.startswith(ignored_path)
-                    for ignored_path in config.ignored_paths
-                ):
-                    try:
-                        del model["content"]["metadata"]["jupytext"]
-                    except KeyError:
-                        pass
-
-                    return await self.super.save(model, path)
-
                 jupytext_formats = notebook_formats(nbk, config, path)
                 self.update_paired_notebooks(path, jupytext_formats)
 
