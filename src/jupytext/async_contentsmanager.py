@@ -134,6 +134,19 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
             nbk = model["content"]
             try:
                 config = await self.get_config(path)
+
+                # If the path is in the ignored paths, remove Jupytext metadata (if any)
+                if any(
+                    path.startswith(ignored_path)
+                    for ignored_path in config.ignored_paths
+                ):
+                    try:
+                        del model["content"]["metadata"]["jupytext"]
+                    except KeyError:
+                        pass
+
+                    return await self.super.save(model, path)
+
                 jupytext_formats = notebook_formats(nbk, config, path)
                 self.update_paired_notebooks(path, jupytext_formats)
 
@@ -554,6 +567,17 @@ to your jupytext.toml file
                     pass
 
             if old_path not in self.paired_notebooks:
+                await self.super.rename_file(old_path, new_path)
+                return
+
+            # If the destination path is in the ignored paths, drop the paired notebook
+            config = await self.get_config(new_path)
+
+            if any(
+                new_path.startswith(ignored_path)
+                for ignored_path in config.ignored_paths
+            ):
+                self.drop_paired_notebook(old_path)
                 await self.super.rename_file(old_path, new_path)
                 return
 
