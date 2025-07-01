@@ -54,7 +54,7 @@ def raise_if_quarto_is_not_available(min_version=QUARTO_MIN_VERSION):
     if parse(version) < parse(min_version):
         raise QuartoError(
             f"The Quarto Markdown format requires 'quarto>={min_version}', "
-            f"but quarto version {version} was not found"
+            f"but quarto version {version} was found"
         )
 
     return version
