@@ -8,6 +8,7 @@ import tempfile
 from nbformat import reads as ipynb_reads
 from nbformat import writes as ipynb_writes
 from packaging.version import parse
+import platform
 
 QUARTO_MIN_VERSION = "0.2.134"
 
@@ -23,7 +24,13 @@ def quarto(args, filein=None):
     if filein:
         cmd.append(filein)
 
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    use_shell = False
+    if platform.system() == 'Windows':
+        # on windows quarto is packaged as quarto.cmd, which isn't aliased to
+        # quarto without shell processing
+        # fixes bug 1406
+        use_shell = True
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=use_shell)
     out, err = proc.communicate()
     if proc.returncode:
         raise QuartoError(
