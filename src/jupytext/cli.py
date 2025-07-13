@@ -1103,7 +1103,7 @@ def git_timestamp(path):
 def get_timestamp(path):
     if not os.path.isfile(path):
         return None
-    return os.lstat(path).st_mtime
+    return os.stat(path).st_mtime
 
 
 def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commit_mode):
