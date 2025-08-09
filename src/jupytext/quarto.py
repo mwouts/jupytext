@@ -1,7 +1,9 @@
 """Jupyter notebook to Quarto Markdown and back, using 'quarto convert'"""
 
 import os
+import shutil
 import subprocess
+import sys
 import tempfile
 
 # Copy nbformat reads and writes to avoid them being patched in the contents manager!!
@@ -18,7 +20,14 @@ class QuartoError(OSError):
 
 def quarto(args, filein=None):
     """Execute quarto with the given arguments"""
-    cmd = ["quarto"] + args.split()
+    executable = shutil.which("quarto")
+    if not executable and sys.platform.startswith("win"):
+        # On Windows, try quarto.cmd, see #1406
+        executable = shutil.which("quarto.cmd")
+    if not executable:
+        raise QuartoError("Could not find 'quarto' executable")
+
+    cmd = [executable] + args.split()
 
     if filein:
         cmd.append(filein)
