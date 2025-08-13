@@ -1,6 +1,7 @@
 """`jupytext` as a command line tool"""
 
 import argparse
+import datetime
 import glob
 import json
 import os
@@ -11,6 +12,7 @@ import sys
 import warnings
 from copy import copy
 from tempfile import NamedTemporaryFile
+from typing import Callable
 
 from .combine import combine_inputs_with_outputs
 from .compare import NotebookDifference, compare, test_round_trip_conversion
@@ -174,6 +176,17 @@ def parse_jupytext_args(args=None):
         "the given notebook. Input cells are taken from the file that "
         "was last modified, and outputs are read from the ipynb file, "
         "if present.",
+        action="store_true",
+    )
+    action.add_argument(
+        "--propagate-changes",
+        help="Propagate the changes on the notebook passed as argument, "
+        "to the paired files for that notebook. It is assumed that the "
+        "argument is the most recent version among the paired files. "
+        "If that is not the case, the paired files will not be overwritten "
+        "and instead the content of the notebook will be saved to a file with "
+        "the same name as the paired file, with the content timestamp "
+        "as an additional suffix.",
         action="store_true",
     )
     action.add_argument(
@@ -378,6 +391,24 @@ def jupytext(args=None):
     if not args.notebooks:
         if not args.pre_commit:
             args.notebooks = ["-"]
+
+    if args.propagate_changes:
+        assert (
+            not args.output_format
+            and not args.output
+            and not args.sync
+            and not args.pipe
+            and not args.diff
+            and not args.check
+            and not args.update_metadata
+            and not args.format_options
+            and not args.set_kernel
+            and not args.execute
+        )
+        exit_code = 0
+        for nb_file in args.notebooks:
+            exit_code += propagate_changes(nb_file, log)
+        return exit_code
 
     if args.set_formats is not None:
         # Replace empty string with None
@@ -1310,3 +1341,123 @@ def code_cells_have_changed(notebook, nb_files):
             return True
 
     return False
+
+
+def propagate_changes(
+    updated_notebook_path: str,
+    log: Callable[[str], None] = lambda s: sys.stderr.write(s + "\n"),
+) -> int:
+    """This function updates the files paired with {updated_notebook_path} with
+    the content of {updated_notebook_path}. It is assumed that {updated_notebook_path}
+    contains the most recent version of the notebook, among the various paired files.
+
+    If some of the paired files are more recent than {updated_notebook_path},
+    they will be left unchanged and additional files will
+    be generated from the content of {updated_notebook_path} with
+    a prefix equal to the last modification time of that notebook."""
+
+    nb_mtime = os.stat(updated_notebook_path).st_mtime
+    nb_mtime_iso = datetime.datetime.fromtimestamp(nb_mtime).isoformat()
+
+    log(f"[jupytext] Loading config for {updated_notebook_path}")
+    config = load_jupytext_config(updated_notebook_path)
+
+    log(
+        f"[jupytext] Loading notebook from {updated_notebook_path} (last modified at {nb_mtime_iso})"
+    )
+    notebook = read(updated_notebook_path, config=config)
+    jupytext_metadata = notebook.metadata.get("jupytext", {})
+    formats = jupytext_metadata.get("formats", None)
+
+    if formats:
+        log(
+            f"[jupytext] Notebook pairing information for {updated_notebook_path} is {formats=}"
+        )
+    else:
+        formats = notebook_formats(
+            notebook, config, updated_notebook_path, fallback_on_current_fmt=False
+        )
+        log(
+            f"[jupytext] Configuration information for {updated_notebook_path} is {formats=}"
+        )
+
+    if not formats:
+        log(f"[jupytext] {updated_notebook_path} is not a paired notebook, exiting")
+        return 0
+
+    conflicting_file_count = 0
+    base_path, base_fmt = find_base_path_and_format(
+        updated_notebook_path, long_form_multiple_formats(formats)
+    )
+    for paired_path, fmt in paired_paths(
+        updated_notebook_path, formats=formats, fmt=base_fmt
+    ):
+        if os.path.exists(paired_path) and os.path.samefile(
+            paired_path, updated_notebook_path
+        ):
+            continue
+
+        if (
+            base_fmt["extension"] != ".ipynb"
+            and os.path.exists(paired_path)
+            and fmt["extension"] == ".ipynb"
+        ):
+            paired_path_mtime = os.stat(paired_path).st_mtime
+            paired_path_mtime_iso = datetime.datetime.fromtimestamp(
+                paired_path_mtime
+            ).isoformat()
+            log(
+                f"[jupytext] Loading notebook outputs from {paired_path} (last modified at {paired_path_mtime_iso})"
+            )
+            outdated_notebook_with_outputs = read(paired_path, fmt=fmt, config=config)
+            updated_notebook_with_outputs = combine_inputs_with_outputs(
+                notebook, outdated_notebook_with_outputs
+            )
+        else:
+            updated_notebook_with_outputs = notebook
+
+        if not os.path.exists(paired_path):
+            log(f"[jupytext] Writing notebook to {paired_path} (creating new file)")
+            write(updated_notebook_with_outputs, paired_path, fmt=fmt, config=config)
+        else:
+            # Check again for modifications
+            paired_path_mtime = os.stat(paired_path).st_mtime
+            paired_path_mtime_iso = datetime.datetime.fromtimestamp(
+                paired_path_mtime
+            ).isoformat()
+
+            if paired_path_mtime <= nb_mtime:
+                log(
+                    f"[jupytext] Writing notebook to {paired_path} (previously last modified at {paired_path_mtime_iso})"
+                )
+                write(
+                    updated_notebook_with_outputs, paired_path, fmt=fmt, config=config
+                )
+                if fmt["extension"] == ".ipynb":
+                    # .ipynb files can't be more recent that paired text files
+                    # otherwise Jupytext in Jupyter will refuse to open them.
+                    os.utime(
+                        paired_path,
+                        (
+                            os.stat(paired_path).st_atime,
+                            os.stat(updated_notebook_path).st_mtime,
+                        ),
+                    )
+            else:
+                base, ext = os.path.splitext(paired_path)
+                paired_path_with_explicit_inputs_time = (
+                    f"{base}_{nb_mtime_iso.replace(':', '-')}{ext}"
+                )
+                sys.stderr.write(
+                    f"[jupytext] Error: can't overwrite {paired_path} last modified at {paired_path_mtime_iso} "
+                    f"with inputs from {nb_mtime_iso}. Saving notebook to {paired_path_with_explicit_inputs_time} instead.\n"
+                )
+                write(
+                    updated_notebook_with_outputs,
+                    paired_path_with_explicit_inputs_time,
+                    fmt=fmt,
+                    config=config,
+                )
+                conflicting_file_count += 1
+
+    return conflicting_file_count

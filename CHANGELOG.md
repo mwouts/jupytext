@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.18.0-dev (???)
+-------------------
+
+**Added**
+- The Jupytext CLI has a new argument `--propagate-changes` to propagate changes from one notebook to its paired files. The argument must be the most recently updated file among the set of paired files (otherwise, Jupytext will save the conflicting content to new files that use the timestamp of the source update as a suffix in their name) ([#1411](https://github.com/mwouts/jupytext/issues/1411), [VSCode Jupytext-Sync #12](https://github.com/caenrigen/vscode-jupytext-sync/issues/12))
+
+
 1.17.3-dev (???)
 -------------------
 
