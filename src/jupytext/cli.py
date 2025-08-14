@@ -1,7 +1,9 @@
 """`jupytext` as a command line tool"""
 
 import argparse
+from datetime import datetime
 import glob
+import io
 import json
 import os
 import re
@@ -11,6 +13,7 @@ import sys
 import warnings
 from copy import copy
 from tempfile import NamedTemporaryFile
+from typing import Callable
 
 from .combine import combine_inputs_with_outputs
 from .compare import NotebookDifference, compare, test_round_trip_conversion
@@ -164,6 +167,16 @@ def parse_jupytext_args(args=None):
         "the given notebook. Input cells are taken from the file that "
         "was last modified, and outputs are read from the ipynb file, "
         "if present.",
+        action="store_true",
+    )
+    action.add_argument(
+        "--careful-sync",
+        help="Synchronize the content of the paired representations of "
+        "the given notebook. Input cells are taken from the file that "
+        "was last modified, and outputs are read from the ipynb file, "
+        "if present. Extra care is taken to work in the presence of "
+        "concurrency, for example editor writes that occur while "
+        "the synchronization is in progress.",
         action="store_true",
     )
     action.add_argument(
@@ -358,6 +371,11 @@ def jupytext(args=None):
         log("[jupytext] Notebooks in git index are:")
         for nb_file in args.notebooks:
             log(nb_file)
+
+    if args.careful_sync:
+        exit_code = 0
+        for nb_file in args.notebooks:
+            exit_code += careful_sync(nb_file, args, log)
 
     # Read notebook from stdin
     if not args.notebooks:
@@ -1215,3 +1233,153 @@ def code_cells_have_changed(notebook, nb_files):
             return True
 
     return False
+
+
+def read_contents_and_timestamp(path: str) -> tuple[str, float]:
+    """Read the contents of a file and return its content and timestamp.
+
+    Carry out this operation as atomically as possible.
+    """
+    # get a file descriptor for the file
+    fd = os.open(path, os.O_RDONLY)
+    # now if the file is deleted or renamed we'll still see it; if the actual contents are changed we're out of luck
+    # get the mtime from the file descriptor
+    mtime = os.fstat(fd).st_mtime
+    # read the contents of the file
+    with os.fdopen(fd, "r") as f:
+        content = f.read()
+    return content, mtime
+
+
+def write_if_unchanged_since(path: str, content: str, original_timestamp: float, target_timestamp: float) -> bool:
+    """Write contents to the file if the timestamp hasn't changed.
+
+    This write is done as atomically as possible.
+    """
+    dir_name = os.path.dirname(path)
+    with NamedTemporaryFile(
+        dir=dir_name, prefix=os.path.basename(path), mode="w", delete=True, delete_on_close=False
+    ) as temp_file:
+        temp_path = temp_file.name
+        temp_file.write(content)
+        temp_file.close()
+        os.utime(temp_path, (target_timestamp, target_timestamp))
+        # check whether the target has been updated *after* we're done the potentially slow write
+        try:
+            mtime = os.stat(path).st_mtime
+        except FileNotFoundError:
+            mtime = None
+        if mtime is None or mtime <= original_timestamp:
+            # check-then-replace is not atomic, but replace is and both it and the check are fast
+            # regardless of file size
+            os.replace(temp_path, path)
+            return True
+        else:
+            return False
+
+
+def careful_sync(
+    base_notebook_path: str,
+    log: Callable[[str], None] = lambda s: sys.stderr.write(s + "\n"),
+):
+    log(f"[jupytext] Loading config for {base_notebook_path}")
+    config = load_jupytext_config(base_notebook_path)
+
+    base_content, base_timestamp = read_contents_and_timestamp(base_notebook_path)
+    log(
+        f"[jupytext] Loaded notebook from {base_notebook_path} (last modified at {datetime.fromtimestamp(base_timestamp).isoformat()})"
+    )
+
+    # FIXME: could provide extension here to help format guessing
+    base_notebook = reads(base_content, config=config)
+    del base_content
+    jupytext_metadata = base_notebook.metadata.get("jupytext", {})
+    formats = jupytext_metadata.get("formats", None)
+
+    if formats:
+        log(f"[jupytext] Notebook pairing information for {base_notebook_path} is {formats=}")
+    else:
+        formats = notebook_formats(base_notebook, config, base_notebook_path, fallback_on_current_fmt=False)
+        log(f"[jupytext] Configuration information for {base_notebook_path} is {formats=}")
+
+    if not formats:
+        log(f"[jupytext] {base_notebook_path} is not a paired notebook, exiting")
+        return 0
+
+    base_path, base_fmt = find_base_path_and_format(base_notebook_path, long_form_multiple_formats(formats))
+    paired_path_info = {}
+    for paired_path, fmt in paired_paths(base_notebook_path, formats=formats, fmt=base_fmt):
+        if paired_path == base_notebook_path:
+            paired_path_info[paired_path] = dict(notebook=base_notebook, timestamp=base_timestamp, fmt=fmt)
+            continue
+
+        try:
+            paired_content, paired_timestamp = read_contents_and_timestamp(paired_path)
+            log(
+                f"[jupytext] Loaded paired file from {paired_path} (last modified at {datetime.fromtimestamp(paired_timestamp).isoformat()})"
+            )
+            paired_notebook = reads(paired_content, fmt=fmt, config=config)
+            paired_path_info[paired_path] = dict(
+                notebook=paired_notebook,
+                timestamp=paired_timestamp,
+                fmt=fmt,
+            )
+        except FileNotFoundError:
+            log(f"[jupytext] Paired file {paired_path} does not exist, will be created")
+            paired_path_info[paired_path] = dict(
+                notebook=None,
+                timestamp=0,
+                fmt=fmt,
+            )
+
+    assert base_notebook_path in paired_path_info, "The original filename must be one of the paired paths"
+
+    # if more than one timestamp is equal, and one of them is the base notebook, we take the base notebook as source
+    source_path = base_notebook_path
+    source_timestamp = base_timestamp
+    for paired_path, info in paired_path_info.items():
+        if info["timestamp"] > source_timestamp:
+            source_path = paired_path
+            source_timestamp = info["timestamp"]
+    log(
+        f"[jupytext] The source for the conversion is {source_path} (last modified at {datetime.fromtimestamp(source_timestamp).isoformat()})"
+    )
+    source_info = paired_path_info.pop(source_path)
+
+    failures = False
+    for paired_path, paired_info in paired_path_info.items():
+        if paired_info["timestamp"] == source_timestamp:
+            log(f"[jupytext] {paired_path} is up to date, skipping")
+            continue
+        if (
+            source_info["fmt"]["extension"] != ".ipynb"
+            and paired_info["fmt"]["extension"] == ".ipynb"
+            and os.path.exists(paired_path)
+        ):
+            log(
+                f"[jupytext] The paired notebook {paired_path} is an ipynb file, "
+                f"we will update it with the contents of the source notebook {source_path}"
+            )
+            log(f"{combine_inputs_with_outputs=}")
+            result_notebook = combine_inputs_with_outputs(
+                source_info["notebook"], paired_info["notebook"], fmt=paired_info["fmt"]
+            )
+        else:
+            result_notebook = source_info["notebook"]
+
+        result_content = writes(result_notebook, fmt=paired_info["fmt"], config=config)
+        log(f"[jupytext] Trying to write {paired_path} in format {short_form_one_format(paired_info['fmt'])}")
+        if not write_if_unchanged_since(
+            paired_path,
+            result_content,
+            original_timestamp=paired_info["timestamp"],
+            target_timestamp=source_timestamp,
+        ):
+            log(f"[jupytext] Update to {paired_path} failed, file has been modified since last read")
+            failures = True
+
+    if failures:
+        log("[jupytext] Error: some paired notebooks were not updated. Please check the output above for more information.")
+        return 1
+    log("[jupytext] All paired notebooks updated successfully")
+    return 0

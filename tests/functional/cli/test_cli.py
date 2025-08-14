@@ -15,7 +15,7 @@ from jupyter_server.utils import ensure_async
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 
 from jupytext import __version__, read, reads, write, writes
-from jupytext.cli import jupytext, parse_jupytext_args, str2bool, system
+from jupytext.cli import jupytext, parse_jupytext_args, str2bool, system, careful_sync
 from jupytext.compare import compare, compare_notebooks
 from jupytext.formats import JupytextFormatError, long_form_one_format
 from jupytext.myst import is_myst_available
