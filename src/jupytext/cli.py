@@ -1436,16 +1436,20 @@ def propagate_changes(
                 write(
                     updated_notebook_with_outputs, paired_path, fmt=fmt, config=config
                 )
-                if fmt["extension"] == ".ipynb":
-                    # .ipynb files can't be more recent that paired text files
-                    # otherwise Jupytext in Jupyter will refuse to open them.
-                    os.utime(
-                        paired_path,
-                        (
-                            os.stat(paired_path).st_atime,
-                            os.stat(updated_notebook_path).st_mtime,
-                        ),
-                    )
+                # We set the timestamp on the paired files to that of the source file
+                # for two reasons:
+                # 1. ipynb files can't be more recent that paired text files
+                # otherwise Jupytext in Jupyter will refuse to open them.
+                # 2. by doing so we make it clear that the content in all the paired
+                # files is consistent, cf.
+                # https://github.com/caenrigen/vscode-jupytext-sync/issues/12#issuecomment-3188684769
+                os.utime(
+                    paired_path,
+                    (
+                        os.stat(paired_path).st_atime,
+                        os.stat(updated_notebook_path).st_mtime,
+                    ),
+                )
             else:
                 base, ext = os.path.splitext(paired_path)
                 paired_path_with_explicit_inputs_time = (
