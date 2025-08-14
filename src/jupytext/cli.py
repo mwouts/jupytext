@@ -1040,8 +1040,11 @@ def is_untracked(filepath):
 
 def print_paired_paths(nb_file, fmt):
     """Display the paired paths for this notebook"""
-    notebook = read(nb_file, fmt=fmt)
+    config = load_jupytext_config(nb_file)
+    notebook = read(nb_file, fmt=fmt, config=config)
     formats = notebook.metadata.get("jupytext", {}).get("formats")
+    if not formats:
+        formats = notebook_formats(notebook, config, nb_file)
     if formats:
         for path, _ in paired_paths(nb_file, fmt, formats):
             if path != nb_file:
