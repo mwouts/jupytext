@@ -1451,10 +1451,11 @@ def propagate_changes(
                     ),
                 )
             else:
+                # The destination file is more recent than the current source. We cannot proceed
+                # with the update so we make a backup of the dismissed content
                 base, ext = os.path.splitext(paired_path)
-                paired_path_with_explicit_inputs_time = (
-                    f"{base}_{nb_mtime_iso.replace(':', '-')}{ext}"
-                )
+                conversion = f"{base_fmt['extension'][1:]}_to_{fmt['extension'][1:]}"
+                paired_path_with_explicit_inputs_time = f"{base}_sync_conflict_{conversion}_{nb_mtime_iso.replace(':', '-')}{ext}"
                 sys.stderr.write(
                     f"[jupytext] Error: can't overwrite {paired_path} last modified at {paired_path_mtime_iso} "
                     f"with inputs from {nb_mtime_iso}. Saving notebook to {paired_path_with_explicit_inputs_time} instead.\n"
