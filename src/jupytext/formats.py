@@ -849,3 +849,20 @@ def formats_with_support_for_cell_metadata():
             continue
         if fmt.format_name not in ["sphinx", "nomarker", "spin", "quarto"]:
             yield f"{fmt.extension[1:]}:{fmt.format_name}"
+
+
+def get_formats_from_notebook_metadata(notebook):
+    """
+    Get the pairing information from the notebook metadata.
+
+    Parameters
+    ----------
+    notebook : nbformat.NotebookNode
+        The notebook object whose metadata will be inspected.
+
+    Returns
+    -------
+    formats : None or str
+        The value of the 'formats' field in the 'jupytext' metadata, which can be None or a string.
+    """
+    return notebook.metadata.get("jupytext", {}).get("formats")
