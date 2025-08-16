@@ -1487,3 +1487,56 @@ def test_paired_paths_from_config(tmp_path, python_notebook, capsys):
         str(tmp_path / "notebook.py"),
         str(tmp_path / "notebook.md"),
     ], paired_paths
+
+
+@pytest.mark.parametrize("with_config", [False, True])
+def test_sync_keeps_simple_python_file_unchanged(tmp_path, with_config: bool):
+    """Test that jupytext --sync on a simple Python file leaves it unchanged,
+    even if a Jupytext configuration has formats=ipynb,py:percent
+    """
+    # Create a simple Python file without jupytext metadata
+    if with_config:
+        config_file = tmp_path / "jupytext.toml"
+        config_file.write_text('formats = "ipynb,py:percent"')
+
+    py_file = tmp_path / "simple.py"
+    py_content = '''#!/usr/bin/env python3
+"""A simple Python script"""
+
+def hello():
+    print("Hello, world!")
+
+if __name__ == "__main__":
+    hello()
+'''
+    py_file.write_text(py_content)
+
+    # Record original timestamp and content
+    original_mtime = py_file.stat().st_mtime
+    original_content = py_file.read_text()
+
+    # Wait a bit to ensure timestamp would change if file was modified
+    time.sleep(0.1)
+
+    # Run jupytext --sync on the file
+    jupytext(["--sync", str(py_file)])
+
+    # Verify file is unchanged
+    final_mtime = py_file.stat().st_mtime
+    final_content = py_file.read_text()
+
+    assert final_mtime == original_mtime, "File timestamp should be unchanged"
+    assert final_content == original_content, "File content should be unchanged"
+
+    # Verify no additional files were created
+    files_in_dir = list(tmp_path.iterdir())
+    if with_config:
+        assert (
+            len(files_in_dir) == 2
+        ), f"Expected only 2 files, found: {[f.name for f in files_in_dir]}"
+        assert set(files_in_dir) == {py_file, config_file}
+    else:
+        assert (
+            len(files_in_dir) == 1
+        ), f"Expected only 1 file, found: {[f.name for f in files_in_dir]}"
+        assert files_in_dir[0] == py_file
