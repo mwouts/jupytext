@@ -1955,3 +1955,54 @@ A markdown cell
 
     cm.save(model=model, path="nb.md")
     compare((tmp_path / "nb.md").read_text(), md)
+
+
+@pytest.mark.parametrize("with_config", [False, True])
+async def test_load_save_keeps_simple_python_file_unchanged(
+    tmp_path, cm, with_config: bool
+):
+    """Test that jupytext --sync on a simple Python file leaves it unchanged,
+    even if a Jupytext configuration has formats=ipynb,py:percent
+    """
+    cm.root_dir = str(tmp_path)
+
+    if with_config:
+        config_file = tmp_path / "jupytext.toml"
+        config_file.write_text('formats = "ipynb,py:percent"')
+
+    # Create a simple Python file without jupytext metadata
+    py_file = tmp_path / "simple.py"
+    py_content = '''#!/usr/bin/env python3
+"""A simple Python script"""
+
+def hello():
+    print("Hello, world!")
+
+if __name__ == "__main__":
+    hello()
+'''
+    py_file.write_text(py_content)
+
+    # Record original content
+    original_content = py_file.read_text()
+
+    # Open and save the file using our contents manager
+    model = await ensure_async(cm.get(path="simple.py"))
+    await ensure_async(cm.save(model=model, path="simple.py"))
+
+    # Verify file is unchanged
+    final_content = py_file.read_text()
+    assert final_content == original_content, "File content should be unchanged"
+
+    # Verify no additional files were created
+    files_in_dir = list(tmp_path.iterdir())
+    if with_config:
+        assert (
+            len(files_in_dir) == 2
+        ), f"Expected only 2 files, found: {[f.name for f in files_in_dir]}"
+        assert set(files_in_dir) == {py_file, config_file}
+    else:
+        assert (
+            len(files_in_dir) == 1
+        ), f"Expected only 1 file, found: {[f.name for f in files_in_dir]}"
+        assert files_in_dir[0] == py_file

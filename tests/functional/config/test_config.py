@@ -5,7 +5,9 @@ import pytest
 from jupytext.config import (
     find_jupytext_configuration_file,
     load_jupytext_configuration_file,
+    notebook_formats,
 )
+from jupytext.jupytext import load_jupytext_config, read
 
 
 def test_find_jupytext_configuration_file(tmpdir):
@@ -200,3 +202,17 @@ def test_deprecated_options_cause_warning(tmpdir, option_name):
     with pytest.warns(FutureWarning, match=f"use '{option_name}'"):
         config.set_default_format_options(fmt)
         assert fmt[option_name] == "value"
+
+
+def test_simple_py_file_is_not_paired(tmp_path):
+    py_file = tmp_path / "simple.py"
+    py_file.write_text('print("Hello, world!")')
+
+    config_file = tmp_path / "jupytext.toml"
+    config_file.write_text('formats = "ipynb,py:percent"')
+
+    notebook = read(str(py_file))
+    config_file = load_jupytext_config(str(config_file))
+
+    formats = notebook_formats(notebook, config_file, str(py_file))
+    assert formats == [{"extension": ".py", "format_name": "light"}], formats
