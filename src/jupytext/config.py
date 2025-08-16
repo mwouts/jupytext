@@ -17,6 +17,7 @@ from traitlets.traitlets import TraitError
 
 from .formats import (
     NOTEBOOK_EXTENSIONS,
+    get_formats_from_notebook_metadata,
     long_form_multiple_formats,
     long_form_one_format,
     short_form_multiple_formats,
@@ -485,3 +486,31 @@ def notebook_formats(nbk, config, path, fallback_on_current_fmt=True):
         ]
 
     return formats
+
+
+def get_formats_from_notebook_and_config(notebook, config, nb_file):
+    """
+    Get the notebook formats from notebook metadata or config.
+
+    Notebook metadata takes precedence over config. If the notebook metadata contains pairing information,
+    it is used; otherwise, the configuration is used as a fallback.
+
+    Parameters
+    ----------
+    notebook : dict
+        The notebook object (as a dictionary).
+    config : JupytextConfiguration or None
+        The Jupytext configuration object.
+    nb_file : str
+        The path to the notebook file.
+
+    Returns
+    -------
+    list
+        A list of format dictionaries describing the notebook's paired formats.
+    """
+    formats = get_formats_from_notebook_metadata(notebook)
+    if formats:
+        return long_form_multiple_formats(formats)
+    else:
+        return notebook_formats(notebook, config, nb_file)

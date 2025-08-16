@@ -7,11 +7,14 @@ Jupytext ChangeLog
 **Added**
 - All the extensions supported by Jupytext now appear in the `--to` paragraph
 of `jupytext --help` ([#433](https://github.com/mwouts/jupytext/issues/433))
+- We have added a new function `get_formats_from_notebook_path` that returns the list of paired
+formats for a given notebook ([#1419](https://github.com/mwouts/jupytext/issues/1419))
 
 **Fixed**
 - The test against `jupyter-fs` now installs its `fs` extra dependency ([#1398](https://github.com/mwouts/jupytext/issues/1398))
 - The `jupytext --sync` command now works correctly with symbolic links. Thanks to [mccullerlp](https://github.com/mccullerlp) for reporting ([#1407](https://github.com/mwouts/jupytext/issues/1407)) and addressing ([#1408](https://github.com/mwouts/jupytext/pull/1408)) the problem!
 - Jupytext will look for `quarto.cmd` on Windows. Thanks to [mccullerlp](https://github.com/mccullerlp) for documenting the issue ([#1406](https://github.com/mwouts/jupytext/issues/1406), [#1409](https://github.com/mwouts/jupytext/pull/1409)).
+- We have corrected the `jupytext --paired-paths` command, it will now take the Jupytext configuration file, if any, into account ([#1419](https://github.com/mwouts/jupytext/issues/1419))
 
 
 1.17.2 (2025-06-01)

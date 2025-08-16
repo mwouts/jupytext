@@ -27,7 +27,14 @@ from .formats import (
     short_form_one_format,
 )
 from .header import recursive_update
-from .jupytext import create_prefix_dir, read, reads, write, writes
+from .jupytext import (
+    create_prefix_dir,
+    get_formats_from_notebook_path,
+    read,
+    reads,
+    write,
+    writes,
+)
 from .kernels import find_kernel_specs, get_kernel_spec, kernelspec_from_language
 from .languages import _SCRIPT_EXTENSIONS
 from .paired_paths import (
@@ -1009,8 +1016,7 @@ def is_untracked(filepath):
 
 def print_paired_paths(nb_file, fmt):
     """Display the paired paths for this notebook"""
-    notebook = read(nb_file, fmt=fmt)
-    formats = notebook.metadata.get("jupytext", {}).get("formats")
+    formats = get_formats_from_notebook_path(nb_file, fmt)
     if formats:
         for path, _ in paired_paths(nb_file, fmt, formats):
             if path != nb_file:
