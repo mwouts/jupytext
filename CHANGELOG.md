@@ -9,7 +9,7 @@ Jupytext ChangeLog
 of `jupytext --help` ([#433](https://github.com/mwouts/jupytext/issues/433))
 
 **Fixed**
-- The text against `jupyter-fs` now install its `fs` extra dependency ([#1398](https://github.com/mwouts/jupytext/issues/1398))
+- The test against `jupyter-fs` now installs its `fs` extra dependency ([#1398](https://github.com/mwouts/jupytext/issues/1398))
 - The `jupytext --sync` command now works correctly with symbolic links. Thanks to [mccullerlp](https://github.com/mccullerlp) for reporting ([#1407](https://github.com/mwouts/jupytext/issues/1407)) and addressing ([#1408](https://github.com/mwouts/jupytext/pull/1408)) the problem!
 - Jupytext will look for `quarto.cmd` on Windows. Thanks to [mccullerlp](https://github.com/mccullerlp) for documenting the issue ([#1406](https://github.com/mwouts/jupytext/issues/1406), [#1409](https://github.com/mwouts/jupytext/pull/1409)).
 
