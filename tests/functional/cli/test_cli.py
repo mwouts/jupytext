@@ -1453,3 +1453,37 @@ def test_update_formats_1386(python_notebook, tmp_path, capsys):
     assert read(tmp_py)["metadata"]["jupytext"]["formats"] == formats
     assert read(tmp_md)["metadata"]["jupytext"]["formats"] == formats
     assert read(tmp_ipynb)["metadata"]["jupytext"]["formats"] == formats
+
+
+def test_paired_paths_from_notebook_metadata(tmp_path, python_notebook, capsys):
+    ipynb_notebook_path = tmp_path / "notebook.ipynb"
+    python_notebook.metadata["jupytext"] = {"formats": "ipynb,py:percent,md"}
+    write(python_notebook, ipynb_notebook_path)
+
+    jupytext([str(ipynb_notebook_path), "--paired-paths"])
+
+    capture = capsys.readouterr()
+
+    paired_paths = capture.out.strip().split("\n")
+
+    assert paired_paths == [
+        str(tmp_path / "notebook.py"),
+        str(tmp_path / "notebook.md"),
+    ], paired_paths
+
+
+def test_paired_paths_from_config(tmp_path, python_notebook, capsys):
+    ipynb_notebook_path = tmp_path / "notebook.ipynb"
+    write(python_notebook, ipynb_notebook_path)
+    (tmp_path / "jupytext.toml").write_text('''formats="ipynb,py:percent,md"''')
+
+    jupytext([str(ipynb_notebook_path), "--paired-paths"])
+
+    capture = capsys.readouterr()
+
+    paired_paths = capture.out.strip().split("\n")
+
+    assert paired_paths == [
+        str(tmp_path / "notebook.py"),
+        str(tmp_path / "notebook.md"),
+    ], paired_paths
