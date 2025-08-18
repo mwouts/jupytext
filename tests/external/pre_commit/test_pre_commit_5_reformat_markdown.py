@@ -1,4 +1,7 @@
+import os
+
 import pytest
+import yaml
 from git.exc import HookExecutionError
 from nbformat.v4.nbbase import new_code_cell, new_markdown_cell, new_notebook
 from pre_commit.main import main as pre_commit
@@ -13,6 +16,7 @@ def test_pre_commit_hook_sync_reformat_code_and_markdown(
     tmp_repo,
     jupytext_repo_root,
     jupytext_repo_rev,
+    jupytext_pre_commit_config,
     notebook_with_outputs,
 ):
     """Here we sync the ipynb notebook with a py:percent file and also apply black and pandoc to reformat both
@@ -22,27 +26,48 @@ def test_pre_commit_hook_sync_reformat_code_and_markdown(
     ipynb files. Consequently we pin the version of nbformat to 5.0.8 in all the environments below (and you
     will have to do the same on the environment in which you edit the notebooks).
     """
-    pre_commit_config_yaml = f"""
-repos:
-- repo: {jupytext_repo_root}
-  rev: {jupytext_repo_rev}
-  hooks:
-  - id: jupytext
-    args: [--sync, --pipe-fmt, ipynb, --pipe, 'pandoc --from ipynb --to ipynb --markdown-headings=atx', --show-changes]
-    additional_dependencies:
-    - nbformat==5.0.8  # because pandoc 2.11.4 does not preserve yet the new cell ids
-  - id: jupytext
-    args: [--sync, --pipe, black, --show-changes]
-    additional_dependencies:
-    - black==22.3.0  # Matches black hook below
-    - nbformat==5.0.8  # for compatibility with the pandoc hook above
+    jupytext_pre_commit_config["repos"][0]["hooks"][0]["args"] = [
+        "--sync",
+        "--pipe-fmt",
+        "ipynb",
+        "--pipe",
+        "pandoc",
+        "--from",
+        "ipynb",
+        "--to",
+        "ipynb",
+        "--markdown-headings=atx",
+        "--show-changes",
+    ]
+    jupytext_pre_commit_config["repos"][0]["hooks"][0]["additional_dependencies"] = [
+        "nbconvert==5.0.8"
+    ]
+    jupytext_pre_commit_config["repos"][0]["hooks"].append(
+        jupytext_pre_commit_config["repos"][0]["hooks"][0]
+    )
+    jupytext_pre_commit_config["repos"][0]["hooks"][1]["args"] = [
+        "--sync",
+        "--pipe",
+        "black",
+        "--show-changes",
+    ]
+    jupytext_pre_commit_config["repos"][0]["hooks"][1]["additional_dependencies"] = [
+        "black==22.3.0",  # Matches black hook below
+        "nbformat==5.0.8",  # for compatibility with the pandoc hook above
+    ]
+    # Use python as language as we will need to install additional dependencies
+    jupytext_pre_commit_config["repos"][0]["hooks"][0]["language"] = "python"
+    jupytext_pre_commit_config["repos"][0]["hooks"][1]["language"] = "python"
+    jupytext_pre_commit_config["repos"].append(
+        {
+            "repo": "https://github.com/psf/black",
+            "rev": "22.3.0",
+            "hooks": [{"id": "black"}],
+        }
+    )
 
-- repo: https://github.com/psf/black
-  rev: 22.3.0
-  hooks:
-  - id: black
-"""
-    tmpdir.join(".pre-commit-config.yaml").write(pre_commit_config_yaml)
+    with open(os.path.join(tmpdir, ".pre-commit-config.yaml"), "w") as file:
+        yaml.dump(jupytext_pre_commit_config, file)
 
     tmp_repo.git.add(".pre-commit-config.yaml")
     pre_commit(["install", "--install-hooks", "-f"])
