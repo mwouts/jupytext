@@ -17,6 +17,35 @@ class InconsistentPath(ValueError):
     information it contains"""
 
 
+class InconsistentSuffix(InconsistentPath):
+    """An exception raised when the suffix of a notebook is not consistent with the suffix specification
+    of a Jupytext format"""
+
+
+class InconsistentPrefix(InconsistentPath):
+    """An exception raised when the prefix of a notebook is not consistent with the prefix specification
+    of a Jupytext format"""
+
+
+class InconsistentPrefixDirectory(InconsistentPath):
+    """An exception raised when the directory prefix of a notebook is not consistent with the directory prefix specification
+    of a Jupytext format"""
+
+
+class InconsistentPrefixRoot(InconsistentPath):
+    """An exception raised when the root prefix of a notebook is not consistent with the root prefix specification
+    of a Jupytext format"""
+
+
+class NonNotebookExtension(InconsistentPath):
+    """An exception raised when a notebook path does not have a notebook extension"""
+
+
+class InconsistentExtension(InconsistentPath):
+    """An exception raised when the extension of a notebook is not consistent with the extension specification
+    of a Jupytext format"""
+
+
 def split(path, sep):
     if sep not in path:
         return "", path
@@ -37,6 +66,23 @@ def separator(path):
     return "/"
 
 
+def get_prefix_root_prefix_dir_prefix_file_name(prefix: str) -> tuple[str, str, str]:
+    if "//" in prefix:
+        prefix_root, prefix = prefix.rsplit("//", 1)
+    else:
+        prefix_root = ""
+    prefix_dir, prefix_file_name = split(prefix, "/")
+    return prefix_root, prefix_dir, prefix_file_name
+
+
+def get_prefix(prefix_root: str, prefix_dir: str, prefix_file_name: str) -> str:
+    if prefix_root:
+        return f"{prefix_root}//{prefix_dir}/{prefix_file_name}"
+    if not prefix_dir and not prefix_file_name:
+        return ""
+    return f"{prefix_dir}/{prefix_file_name}"
+
+
 def base_path(main_path, fmt, formats=None):
     """Given a path and options for a format (ext, suffix, prefix), return the corresponding base path"""
     fmt = long_form_one_format(fmt)
@@ -45,14 +91,14 @@ def base_path(main_path, fmt, formats=None):
     if "extension" not in fmt:
         fmt["extension"] = ext
         if ext not in NOTEBOOK_EXTENSIONS:
-            raise InconsistentPath(
+            raise NonNotebookExtension(
                 "'{}' is not a notebook. Supported extensions are '{}'.".format(
                     main_path, "', '".join(NOTEBOOK_EXTENSIONS)
                 )
             )
 
     if ext != fmt["extension"]:
-        raise InconsistentPath(
+        raise InconsistentExtension(
             "Notebook path '{}' was expected to have extension '{}'".format(
                 main_path, fmt["extension"]
             )
@@ -80,7 +126,7 @@ def base_path(main_path, fmt, formats=None):
 
     if suffix:
         if not base.endswith(suffix):
-            raise InconsistentPath(
+            raise InconsistentSuffix(
                 "Notebook name '{}' was expected to end with suffix '{}'".format(
                     base, suffix
                 )
@@ -90,13 +136,13 @@ def base_path(main_path, fmt, formats=None):
     if not prefix:
         return base
 
-    if "//" in prefix:
-        prefix_root, prefix = prefix.rsplit("//", 1)
-    else:
-        prefix_root = ""
+    (
+        prefix_root,
+        prefix_dir,
+        prefix_file_name,
+    ) = get_prefix_root_prefix_dir_prefix_file_name(prefix)
     sep = separator(base)
     notebook_dir, notebook_file_name = split(base, sep)
-    prefix_dir, prefix_file_name = split(prefix, "/")
 
     base_dir = None
     config_file = find_jupytext_configuration_file(notebook_dir)
@@ -108,7 +154,7 @@ def base_path(main_path, fmt, formats=None):
 
     if prefix_file_name:
         if not notebook_file_name.startswith(prefix_file_name):
-            raise InconsistentPath(
+            raise InconsistentPrefix(
                 "Notebook name '{}' was expected to start with prefix '{}'".format(
                     notebook_file_name, prefix_file_name
                 )
@@ -123,7 +169,7 @@ def base_path(main_path, fmt, formats=None):
             parent_prefix_dir, expected_folder = split(parent_prefix_dir, "/")
             if expected_folder == "..":
                 if not actual_folders:
-                    raise InconsistentPath(
+                    raise InconsistentPrefixDirectory(
                         "Notebook directory '{}' does not match prefix '{}'".format(
                             notebook_dir, prefix_dir
                         )
@@ -136,7 +182,7 @@ def base_path(main_path, fmt, formats=None):
                 actual_folders.append(actual_folder)
 
                 if actual_folder != expected_folder:
-                    raise InconsistentPath(
+                    raise InconsistentPrefixDirectory(
                         "Notebook directory '{}' does not match prefix '{}'".format(
                             notebook_dir, prefix_dir
                         )
@@ -147,7 +193,7 @@ def base_path(main_path, fmt, formats=None):
         long_prefix_root = sep + prefix_root + sep
         long_notebook_dir = sep + notebook_dir + sep
         if long_prefix_root not in long_notebook_dir:
-            raise InconsistentPath(
+            raise InconsistentPrefixRoot(
                 "Notebook directory '{}' does not match prefix root '{}'".format(
                     notebook_dir, prefix_root
                 )
@@ -167,6 +213,48 @@ def base_path(main_path, fmt, formats=None):
         return notebook_file_name
 
     return notebook_dir + sep + notebook_file_name
+
+
+def base_path_and_adjusted_fmt(
+    path: str, fmt: dict[str, str]
+) -> tuple[str, dict[str, str]]:
+    """Return the base path and possibly adjusted Jupytext format
+    that matches the current path"""
+    assert isinstance(fmt, dict), "fmt must be a dictionary"
+    fmt = dict(fmt)  # make a copy
+    prefix = fmt.get("prefix", "")
+    (
+        prefix_root,
+        prefix_dir,
+        prefix_file_name,
+    ) = get_prefix_root_prefix_dir_prefix_file_name(prefix)
+
+    try:
+        return base_path(path, fmt), fmt
+    except InconsistentSuffix:
+        del fmt["suffix"]
+        return base_path(path, fmt), fmt
+    except InconsistentPrefixRoot:
+        if not prefix_root:
+            raise
+        fmt["prefix"] = get_prefix("", prefix_dir, prefix_file_name)
+        if not fmt["prefix"]:
+            del fmt["prefix"]
+        return base_path(path, fmt), fmt
+    except InconsistentPrefix:
+        if not prefix_file_name:
+            raise
+        fmt["prefix"] = get_prefix(prefix_root, prefix_dir, "")
+        if not fmt["prefix"]:
+            del fmt["prefix"]
+        return base_path(path, fmt), fmt
+    except InconsistentPrefixDirectory:
+        if not prefix_dir:
+            raise
+        fmt["prefix"] = get_prefix(prefix_root, "", prefix_file_name)
+        if not fmt["prefix"]:
+            del fmt["prefix"]
+        return base_path(path, fmt), fmt
 
 
 def full_path(base, fmt):
@@ -228,7 +316,9 @@ def full_path(base, fmt):
     return full + ext
 
 
-def find_base_path_and_format(main_path, formats):
+def find_base_path_and_format(
+    main_path, formats: list[dict[str, str]]
+) -> tuple[str, dict[str, str]]:
     """Return the base path and the format corresponding to the given path"""
     for fmt in formats:
         try:
@@ -236,12 +326,11 @@ def find_base_path_and_format(main_path, formats):
         except InconsistentPath:
             continue
 
+    ext = os.path.splitext(main_path)[1][1:]
     raise InconsistentPath(
-        "Path '{}' matches none of the export formats. "
-        "Please make sure that jupytext.formats covers the current file "
-        "(e.g. add '{}' to the export formats)".format(
-            main_path, os.path.splitext(main_path)[1][1:]
-        )
+        f"Path '{main_path}' matches none of the export formats: {formats}. "
+        f"Please make sure that jupytext.formats covers the current file "
+        f"(e.g. add '{ext}' to the export formats)."
     )
 
 

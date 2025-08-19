@@ -12,6 +12,7 @@ formats for a given notebook ([#1419](https://github.com/mwouts/jupytext/issues/
 
 **Fixed**
 - We have fixed `jupytext --sync`, and the contents manager, to make sure that a simple `.py` file (not in the percent format) will not be treated as a paired file when the Jupytext configuration contains `formats="ipynb,py:percent"` ([#1418](https://github.com/mwouts/jupytext/issues/1418))
+- A notebook can be moved in Jupyter even if that makes it unpaired ([#1414](https://github.com/mwouts/jupytext/issues/1414))
 - The test against `jupyter-fs` now installs its `fs` extra dependency ([#1398](https://github.com/mwouts/jupytext/issues/1398))
 - The `jupytext --sync` command now works correctly with symbolic links. Thanks to [mccullerlp](https://github.com/mccullerlp) for reporting ([#1407](https://github.com/mwouts/jupytext/issues/1407)) and addressing ([#1408](https://github.com/mwouts/jupytext/pull/1408)) the problem!
 - Jupytext will look for `quarto.cmd` on Windows. Thanks to [mccullerlp](https://github.com/mccullerlp) for documenting the issue ([#1406](https://github.com/mwouts/jupytext/issues/1406), [#1409](https://github.com/mwouts/jupytext/pull/1409)).
