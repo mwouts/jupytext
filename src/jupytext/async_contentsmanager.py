@@ -44,6 +44,7 @@ from .kernels import set_kernelspec_from_language
 from .paired_paths import (
     InconsistentPath,
     base_path,
+    base_path_and_adjusted_fmt,
     find_base_path_and_format,
     full_path,
     paired_paths,
@@ -135,6 +136,9 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
             try:
                 config = await self.get_config(path)
                 jupytext_formats = notebook_formats(nbk, config, path)
+                _, jupytext_formats = self._drop_formats_if_they_dont_match_path(
+                    path, None, jupytext_formats
+                )
                 self.update_paired_notebooks(path, jupytext_formats)
 
                 async def save_one_file(path, fmt):
@@ -290,6 +294,9 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
 
             # Compute paired notebooks from formats
             alt_paths = [(path, fmt)]
+            fmt, formats = self._drop_formats_if_they_dont_match_path(
+                path, fmt, formats
+            )
             if formats:
                 try:
                     _, fmt = find_base_path_and_format(path, formats)
@@ -558,6 +565,9 @@ to your jupytext.toml file
                 return
 
             fmt, formats = self.paired_notebooks.get(old_path)
+            fmt, formats = self._drop_formats_if_they_dont_match_path(
+                new_path, fmt, formats
+            )
             old_alt_paths = paired_paths(old_path, fmt, formats)
 
             # Is the new file name consistent with suffix?
@@ -698,6 +708,34 @@ to your jupytext.toml file
             if isinstance(self.notebook_extensions, str):
                 self.notebook_extensions = self.notebook_extensions.split(",")
             return self
+
+        def _drop_formats_if_they_dont_match_path(self, path, fmt, formats):
+            if formats is None:
+                return fmt, formats
+            list_of_formats = long_form_multiple_formats(formats)
+            try:
+                _, _ = find_base_path_and_format(path, list_of_formats)
+            except InconsistentPath:
+                for fmt in list_of_formats:
+                    try:
+                        _, adjusted_format = base_path_and_adjusted_fmt(path, fmt)
+                    except InconsistentPath:
+                        continue
+                    else:
+                        self.log.warning(
+                            "Notebook %s matches none of the expected formats. "
+                            'Ignoring formats="%s" and using formats="%s" instead.',
+                            path,
+                            short_form_multiple_formats(formats),
+                            short_form_one_format(adjusted_format),
+                        )
+                        new_formats = [adjusted_format]
+                        if isinstance(formats, list):
+                            return adjusted_format, new_formats
+                        return short_form_one_format(
+                            adjusted_format
+                        ), short_form_multiple_formats(new_formats)
+            return fmt, formats
 
     if "require_hash" in inspect.signature(base_contents_manager_class.get).parameters:
         AsyncJupytextContentsManager.get = (

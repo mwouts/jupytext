@@ -11,7 +11,13 @@ from jupytext.formats import (
     long_form_one_format,
     short_form_multiple_formats,
 )
-from jupytext.paired_paths import InconsistentPath, base_path, full_path, paired_paths
+from jupytext.paired_paths import (
+    InconsistentPath,
+    base_path,
+    base_path_and_adjusted_fmt,
+    full_path,
+    paired_paths,
+)
 
 
 def test_simple_pair():
@@ -311,3 +317,31 @@ def test_paired_notebook_ipynb_root_scripts_in_folder_806(
         ]
     )
     assert test_ipynb.exists()
+
+
+@pytest.mark.parametrize(
+    "path, input_fmt, adjusted_fmt",
+    [
+        (
+            "scripts/test.py",
+            {"extension": ".py", "format_name": "percent", "prefix": "scripts//"},
+            {"extension": ".py", "format_name": "percent", "prefix": "scripts//"},
+        ),
+        (
+            "test.py",
+            {"extension": ".py", "format_name": "percent", "prefix": "scripts//"},
+            {
+                "extension": ".py",
+                "format_name": "percent",
+            },
+        ),
+        (
+            "test.py",
+            {"extension": ".py", "format_name": "percent", "prefix": "prefix_"},
+            {"extension": ".py", "format_name": "percent"},
+        ),
+    ],
+)
+def test_paired_paths_and_adjusted_fmt(path, input_fmt, adjusted_fmt):
+    base_path, actual_adjusted_fmt = base_path_and_adjusted_fmt(path, input_fmt)
+    assert actual_adjusted_fmt == adjusted_fmt
