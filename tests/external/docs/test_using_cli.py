@@ -13,9 +13,7 @@ doc_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs")
 @pytest.mark.requires_user_kernel_python3
 @pytest.mark.requires_black
 @pytest.mark.requires_myst
-@pytest.mark.skipif(
-    not os.path.isdir(doc_path), reason="Documentation folder is missing"
-)
+@pytest.mark.skipif(not os.path.isdir(doc_path), reason="Documentation folder is missing")
 def test_jupytext_commands_in_the_documentation_work(tmpdir):
     # Read the documentation as a bash notebook
     using_cli = os.path.join(doc_path, "using-cli.md")
@@ -23,9 +21,7 @@ def test_jupytext_commands_in_the_documentation_work(tmpdir):
     using_cli_nb = jupytext.read(using_cli)
 
     # Run the commands in tmpdir on a sample notebook
-    jupytext.write(
-        new_notebook(cells=[new_code_cell("1+1")]), str(tmpdir.join("notebook.ipynb"))
-    )
+    jupytext.write(new_notebook(cells=[new_code_cell("1+1")]), str(tmpdir.join("notebook.ipynb")))
     os.chdir(str(tmpdir))
 
     cmd_tested = 0

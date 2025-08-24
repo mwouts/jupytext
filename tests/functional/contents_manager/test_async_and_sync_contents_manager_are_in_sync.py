@@ -18,12 +18,8 @@ def generate_sync_code_from_async_code(async_code: str) -> str:
 
     # Rename the contents manager
     sync_code = sync_code.replace("AsyncLargeFileManager", "LargeFileManager")
-    sync_code = sync_code.replace(
-        "AsyncJupytextContentsManager", "SyncJupytextContentsManager"
-    )
-    sync_code = sync_code.replace(
-        "AsyncTextFileContentsManager", "TextFileContentsManager"
-    )
+    sync_code = sync_code.replace("AsyncJupytextContentsManager", "SyncJupytextContentsManager")
+    sync_code = sync_code.replace("AsyncTextFileContentsManager", "TextFileContentsManager")
     sync_code = sync_code.replace("asynchronous", "synchronous")
     sync_code = sync_code.replace("async_", "sync_")
 

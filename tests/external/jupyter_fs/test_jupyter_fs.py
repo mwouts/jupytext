@@ -40,12 +40,8 @@ async def test_jupytext_jupyter_fs_metamanager(cm_from_fs_meta_manager):
 
     # save a few files
     text = "some text\n"
-    await ensure_async(
-        cm.save(dict(type="file", content=text, format="text"), path=osfs + ":text.md")
-    )
-    nb = new_notebook(
-        cells=[new_markdown_cell("A markdown cell"), new_code_cell("1 + 1")]
-    )
+    await ensure_async(cm.save(dict(type="file", content=text, format="text"), path=osfs + ":text.md"))
+    nb = new_notebook(cells=[new_markdown_cell("A markdown cell"), new_code_cell("1 + 1")])
     await ensure_async(cm.save(notebook_model(nb), osfs + ":notebook.ipynb"))
     await ensure_async(cm.save(notebook_model(nb), osfs + ":text_notebook.md"))
 
@@ -65,9 +61,7 @@ async def test_jupytext_jupyter_fs_metamanager(cm_from_fs_meta_manager):
     model = await ensure_async(cm.get(osfs + ":text.md", type="notebook"))
     assert model["type"] == "notebook"
     # We only compare the cells, as kernelspecs are added to the notebook metadata
-    compare_cells(
-        model["content"].cells, [new_markdown_cell(text.strip())], compare_ids=False
-    )
+    compare_cells(model["content"].cells, [new_markdown_cell(text.strip())], compare_ids=False)
 
     for nb_file in ["notebook.ipynb", "text_notebook.md"]:
         model = await ensure_async(cm.get(osfs + ":" + nb_file))
@@ -90,11 +84,7 @@ async def test_config_jupytext_jupyter_fs_meta_manager(tmpdir, cm_from_fs_meta_m
 
     # save a few files
     nb = new_notebook()
-    await ensure_async(
-        cm.save(
-            dict(type="file", content="text", format="text"), path=osfs + ":text.md"
-        )
-    )
+    await ensure_async(cm.save(dict(type="file", content="text", format="text"), path=osfs + ":text.md"))
     await ensure_async(cm.save(notebook_model(nb), osfs + ":script.py"))
     await ensure_async(cm.save(notebook_model(nb), osfs + ":text_notebook.md"))
     await ensure_async(cm.save(notebook_model(nb), osfs + ":notebook.ipynb"))

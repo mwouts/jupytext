@@ -4,6 +4,7 @@
 opens the server to the world and provide access to JupyterLab
 JavaScript objects through the global window variable.
 """
+
 from jupyterlab.galata import configure_jupyter_server
 
 configure_jupyter_server(c)  # noqa: F821

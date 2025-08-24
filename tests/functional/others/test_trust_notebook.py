@@ -27,9 +27,7 @@ async def test_rmd_notebooks_are_trusted(rmd_file, cm):
 
 
 @pytest.mark.skip(reason="Fails intermittently on CI, see #1346")
-async def test_ipynb_notebooks_can_be_trusted(
-    ipynb_py_file, tmpdir, no_jupytext_version_number, cm
-):
+async def test_ipynb_notebooks_can_be_trusted(ipynb_py_file, tmpdir, no_jupytext_version_number, cm):
     if "hash sign" in ipynb_py_file:
         pytest.skip()
     root, file = os.path.split(ipynb_py_file)
@@ -52,11 +50,7 @@ async def test_ipynb_notebooks_can_be_trusted(
 
     model = await ensure_async(cm.get(file))
     for cell in model["content"].cells:
-        assert (
-            "trusted" not in cell.metadata
-            or not cell.metadata["trusted"]
-            or not cell.outputs
-        )
+        assert "trusted" not in cell.metadata or not cell.metadata["trusted"] or not cell.outputs
 
     # Trust and reload
     await ensure_async(cm.trust_notebook(py_file))
@@ -78,9 +72,7 @@ async def test_ipynb_notebooks_can_be_trusted(
 
 
 @pytest.mark.skip(reason="Fails intermittently on CI, see #1346")
-async def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(
-    ipynb_py_file, tmpdir, no_jupytext_version_number, cm
-):
+async def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(ipynb_py_file, tmpdir, no_jupytext_version_number, cm):
     if "hash sign" in ipynb_py_file:
         pytest.skip()
     root, file = os.path.split(ipynb_py_file)
@@ -119,9 +111,7 @@ async def test_ipynb_notebooks_can_be_trusted_even_with_metadata_filter(
     compare_notebooks(nb2["content"], model["content"])
 
 
-async def test_text_notebooks_can_be_trusted(
-    percent_file, tmpdir, no_jupytext_version_number, cm
-):
+async def test_text_notebooks_can_be_trusted(percent_file, tmpdir, no_jupytext_version_number, cm):
     root, file = os.path.split(percent_file)
     py_file = str(tmpdir.join(file))
     shutil.copy(percent_file, py_file)
@@ -207,18 +197,14 @@ init_notebook_mode(all_interactive=True)
 
 
 @pytest.mark.requires_myst
-async def test_paired_notebook_with_outputs_is_not_trusted_941(
-    tmp_path, python_notebook, cm
-):
+async def test_paired_notebook_with_outputs_is_not_trusted_941(tmp_path, python_notebook, cm):
     cm.root_dir = str(tmp_path)
 
     nb = python_notebook
     nb.cells.append(new_code_cell(source="1+1", outputs=[new_output("execute_result")]))
     nb.metadata["jupytext"] = {"formats": "ipynb,md:myst"}
     cm.notary.unsign(nb)
-    await ensure_async(
-        cm.save(model=dict(type="notebook", content=nb), path="test.ipynb")
-    )
+    await ensure_async(cm.save(model=dict(type="notebook", content=nb), path="test.ipynb"))
 
     nb = (await ensure_async(cm.get("test.md")))["content"]
     assert not cm.notary.check_cells(nb)

@@ -69,9 +69,7 @@ repos:
 explicit paragraph breaks (two spaces at the end of a line).
 
 And a VERY long line.
-""".replace(
-                    "VERY ", "very " * 51
-                )
+""".replace("VERY ", "very " * 51)
             ),
         ],
         metadata=notebook_with_outputs.metadata,

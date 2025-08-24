@@ -36,8 +36,6 @@ pd.Series([4,5,6])
 """
 
     nb_org = reads(text_org, fmt="py:percent")
-    nb_pipe = pipe_notebook(
-        nb_org, 'isort - --treat-comment-as-code "# %%" --float-to-top'
-    )
+    nb_pipe = pipe_notebook(nb_org, 'isort - --treat-comment-as-code "# %%" --float-to-top')
     text_actual = writes(nb_pipe, "py:percent")
     compare(text_actual, text_target)

@@ -30,9 +30,7 @@ def test_replace_issue_numbers_with_links(input, output):
     assert replace_issue_number_with_links(input) == output
 
 
-@pytest.mark.skipif(
-    sys.version_info < (3, 5), reason="'PosixPath' object has no attribute 'read_text'"
-)
+@pytest.mark.skipif(sys.version_info < (3, 5), reason="'PosixPath' object has no attribute 'read_text'")
 def test_update_changelog():
     changelog_file = Path(__file__).parent.parent.parent.parent / "CHANGELOG.md"
     cur_text = changelog_file.read_text()

@@ -70,9 +70,7 @@ def test_preferred_jupytext_formats_save(tmpdir):
     tmp_ipynb = tmpdir.join("notebook.ipynb")
     tmp_jl = tmpdir.join("notebook.jl")
 
-    nb = new_notebook(
-        cells=[new_code_cell("1 + 1")], metadata={"jupytext": {"formats": "ipynb,jl"}}
-    )
+    nb = new_notebook(cells=[new_code_cell("1 + 1")], metadata={"jupytext": {"formats": "ipynb,jl"}})
 
     write(nb, str(tmp_ipynb))
     jupytext([str(tmp_ipynb), "--sync"])
@@ -116,9 +114,7 @@ def test_hide_notebook_metadata(tmpdir, no_jupytext_version_number):
     tmp_ipynb = tmpdir.join("notebook.ipynb")
     tmp_md = tmpdir.join("notebook.md")
 
-    nb = new_notebook(
-        cells=[new_code_cell("1 + 1")], metadata={"jupytext": {"formats": "ipynb,md"}}
-    )
+    nb = new_notebook(cells=[new_code_cell("1 + 1")], metadata={"jupytext": {"formats": "ipynb,md"}})
 
     write(nb, str(tmp_ipynb))
     jupytext([str(tmp_ipynb), "--sync"])
@@ -161,9 +157,7 @@ notebook_metadata_filter: "jupytext"
     assert tmpdir.join("notebooks").join("test.ipynb").exists()
 
 
-def test_sync_config_does_not_create_formats_metadata(
-    tmpdir, cwd_tmpdir, python_notebook
-):
+def test_sync_config_does_not_create_formats_metadata(tmpdir, cwd_tmpdir, python_notebook):
     tmpdir.join("jupytext.yml").write(
         """formats: "ipynb,py:percent"
 """

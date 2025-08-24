@@ -1,5 +1,5 @@
-"""Combine source and outputs from two notebooks
-"""
+"""Combine source and outputs from two notebooks"""
+
 import re
 from copy import copy
 
@@ -37,10 +37,10 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     """Return a notebook that combines the text and metadata from the first notebook,
     with the outputs and metadata of the second notebook."""
     # nbformat version number taken from the notebook with outputs
-    assert (
-        nb_outputs.nbformat == nb_source.nbformat
-    ), "The notebook with outputs is in format {}.{}, please upgrade it to {}.x".format(
-        nb_outputs.nbformat, nb_outputs.nbformat_minor, nb_source.nbformat
+    assert nb_outputs.nbformat == nb_source.nbformat, (
+        "The notebook with outputs is in format {}.{}, please upgrade it to {}.x".format(
+            nb_outputs.nbformat, nb_outputs.nbformat_minor, nb_source.nbformat
+        )
     )
     nb_source.nbformat_minor = nb_outputs.nbformat_minor
 
@@ -49,9 +49,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     ext = fmt.get("extension") or text_repr.get("extension")
     format_name = fmt.get("format_name") or text_repr.get("format_name")
 
-    notebook_metadata_filter = nb_source.metadata.get("jupytext", {}).get(
-        "notebook_metadata_filter"
-    )
+    notebook_metadata_filter = nb_source.metadata.get("jupytext", {}).get("notebook_metadata_filter")
     if notebook_metadata_filter == "-all":
         nb_metadata = nb_outputs.metadata
 
@@ -63,9 +61,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
             _DEFAULT_NOTEBOOK_METADATA,
         )
 
-    source_is_md_version_one = (
-        ext in [".md", ".markdown", ".Rmd"] and text_repr.get("format_version") == "1.0"
-    )
+    source_is_md_version_one = ext in [".md", ".markdown", ".Rmd"] and text_repr.get("format_version") == "1.0"
     if nb_metadata.get("jupytext", {}).get("formats") or ext in [
         ".md",
         ".markdown",
@@ -79,9 +75,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     if format_name in ["nomarker", "sphinx"] or source_is_md_version_one:
         cell_metadata_filter = "-all"
     else:
-        cell_metadata_filter = nb_metadata.get("jupytext", {}).get(
-            "cell_metadata_filter"
-        )
+        cell_metadata_filter = nb_metadata.get("jupytext", {}).get("cell_metadata_filter")
 
     outputs_map = map_outputs_to_inputs(nb_source.cells, nb_outputs.cells)
 
@@ -104,9 +98,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
             source_cell.metadata,
             output_cell.metadata,
             # The 'spin' format does not allow metadata on non-code cells
-            "-all"
-            if format_name == "spin" and source_cell.cell_type != "code"
-            else cell_metadata_filter,
+            ("-all" if format_name == "spin" and source_cell.cell_type != "code" else cell_metadata_filter),
             _IGNORE_CELL_METADATA,
         )
 
@@ -134,13 +126,9 @@ def map_outputs_to_inputs(cells_inputs, cells_outputs):
     first_unmatched_output_per_cell_type = {}
     for i in range(n_in):
         cell_input = cells_inputs[i]
-        for j in range(
-            first_unmatched_output_per_cell_type.get(cell_input.cell_type, 0), n_out
-        ):
+        for j in range(first_unmatched_output_per_cell_type.get(cell_input.cell_type, 0), n_out):
             cell_output = cells_outputs[j]
-            if cell_input.cell_type == cell_output.cell_type and same_content(
-                cell_input.source, cell_output.source
-            ):
+            if cell_input.cell_type == cell_output.cell_type and same_content(cell_input.source, cell_output.source):
                 outputs_map[i] = j
                 first_unmatched_output_per_cell_type[cell_input.cell_type] = j + 1
                 break
@@ -181,10 +169,7 @@ def map_outputs_to_inputs(cells_inputs, cells_outputs):
 
         cell_input = cells_inputs[i]
         cell_output = cells_outputs[j]
-        if (
-            cell_input.cell_type == cell_output.cell_type
-            and cell_input.source.strip() != ""
-        ):
+        if cell_input.cell_type == cell_output.cell_type and cell_input.source.strip() != "":
             outputs_map[i] = j
             unused_ouputs.remove(j)
             prev_j = j

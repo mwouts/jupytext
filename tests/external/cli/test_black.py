@@ -59,9 +59,7 @@ def test_pipe_into_black():
     nb_dest = new_notebook(cells=[new_code_cell("1 + 1", id="cell-id")])
 
     nb_pipe = pipe_notebook(nb_org, "black")
-    compare_notebooks(
-        nb_pipe, nb_dest, allow_expected_differences=False, compare_ids=True
-    )
+    compare_notebooks(nb_pipe, nb_dest, allow_expected_differences=False, compare_ids=True)
 
 
 @pytest.mark.requires_autopep8
@@ -70,9 +68,7 @@ def test_pipe_into_autopep8():
     nb_dest = new_notebook(cells=[new_code_cell("1 + 1", id="cell-id")])
 
     nb_pipe = pipe_notebook(nb_org, "autopep8 -")
-    compare_notebooks(
-        nb_pipe, nb_dest, allow_expected_differences=False, compare_ids=True
-    )
+    compare_notebooks(nb_pipe, nb_dest, allow_expected_differences=False, compare_ids=True)
 
 
 @pytest.mark.requires_flake8
@@ -93,12 +89,8 @@ def test_apply_black_through_jupytext(tmpdir, python_notebook):
     # Load real notebook metadata to get the 'auto' extension in --pipe-fmt to work
     metadata = python_notebook.metadata
 
-    nb_org = new_notebook(
-        cells=[new_code_cell("1        +1", id="cell-id")], metadata=metadata
-    )
-    nb_black = new_notebook(
-        cells=[new_code_cell("1 + 1", id="cell-id")], metadata=metadata
-    )
+    nb_org = new_notebook(cells=[new_code_cell("1        +1", id="cell-id")], metadata=metadata)
+    nb_black = new_notebook(cells=[new_code_cell("1 + 1", id="cell-id")], metadata=metadata)
 
     tmp_ipynb = str(tmpdir.mkdir("notebook_folder").join("notebook.ipynb"))
     tmp_py = str(tmpdir.mkdir("script_folder").join("notebook.py"))
@@ -146,12 +138,8 @@ def test_apply_black_and_sync_on_paired_notebook(tmpdir, cwd_tmpdir, python_note
     metadata["jupytext"] = {"formats": "ipynb,py"}
     assert "language_info" in metadata
 
-    nb_org = new_notebook(
-        cells=[new_code_cell("1        +1", id="cell-id")], metadata=metadata
-    )
-    nb_black = new_notebook(
-        cells=[new_code_cell("1 + 1", id="cell-id")], metadata=metadata
-    )
+    nb_org = new_notebook(cells=[new_code_cell("1        +1", id="cell-id")], metadata=metadata)
+    nb_black = new_notebook(cells=[new_code_cell("1 + 1", id="cell-id")], metadata=metadata)
 
     # Black in place
     write(nb_org, "notebook.ipynb")
@@ -164,9 +152,7 @@ def test_apply_black_and_sync_on_paired_notebook(tmpdir, cwd_tmpdir, python_note
     nb_now = read("notebook.py")
     nb_now.metadata["jupytext"].pop("text_representation")
     nb_black.metadata = {
-        key: nb_black.metadata[key]
-        for key in nb_black.metadata
-        if key in _DEFAULT_NOTEBOOK_METADATA.split(",")
+        key: nb_black.metadata[key] for key in nb_black.metadata if key in _DEFAULT_NOTEBOOK_METADATA.split(",")
     }
     compare_notebooks(nb_now, nb_black)
 
@@ -257,9 +243,7 @@ func()""",
     "code,black_should_fail",
     [("myvar = %dont_format_me", False), ("incomplete_instruction = (...", True)],
 )
-def test_pipe_black_uses_warn_only_781(
-    tmpdir, cwd_tmpdir, code, black_should_fail, python_notebook, capsys
-):
+def test_pipe_black_uses_warn_only_781(tmpdir, cwd_tmpdir, code, black_should_fail, python_notebook, capsys):
     nb = python_notebook
     nb.cells.append(new_code_cell(code))
     write(nb, "notebook.ipynb")

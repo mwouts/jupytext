@@ -12,9 +12,7 @@ from tornado.web import HTTPError
 import jupytext
 from jupytext.compare import compare_cells, notebook_model
 
-SAMPLE_NOTEBOOK = new_notebook(
-    cells=[new_markdown_cell("A Markdown cell"), new_code_cell("# A code cell\n1 + 1")]
-)
+SAMPLE_NOTEBOOK = new_notebook(cells=[new_markdown_cell("A Markdown cell"), new_code_cell("# A code cell\n1 + 1")])
 
 pytestmark = pytest.mark.asyncio
 
@@ -31,9 +29,7 @@ async def test_local_config_overrides_cm_config(tmpdir, cm):
     assert os.path.isfile(str(tmpdir.join("notebook.ipynb")))
     assert os.path.isfile(str(tmpdir.join("notebook.py")))
 
-    await ensure_async(
-        cm.save(notebook_model(SAMPLE_NOTEBOOK), "nested/notebook.ipynb")
-    )
+    await ensure_async(cm.save(notebook_model(SAMPLE_NOTEBOOK), "nested/notebook.ipynb"))
     assert os.path.isfile(str(nested.join("notebook.ipynb")))
     assert not os.path.isfile(str(nested.join("notebook.py")))
 
@@ -48,9 +44,7 @@ async def test_config_file_is_called_just_once(tmpdir, cm, n=2):
 
     mock_config = mock.MagicMock(return_value=None)
 
-    with mock.patch(
-        "jupytext.sync_contentsmanager.load_jupytext_configuration_file", mock_config
-    ):
+    with mock.patch("jupytext.sync_contentsmanager.load_jupytext_configuration_file", mock_config):
         with mock.patch(
             "jupytext.async_contentsmanager.load_jupytext_configuration_file",
             mock_config,
@@ -100,9 +94,7 @@ async def test_incorrect_config_message(tmpdir, cfg_file, cfg_text, cm):
     tmpdir.join(cfg_file).write(cfg_text)
     tmpdir.join("empty.ipynb").write("{}")
 
-    expected_message = "The Jupytext configuration file .*{} is incorrect".format(
-        cfg_file
-    )
+    expected_message = "The Jupytext configuration file .*{} is incorrect".format(cfg_file)
 
     with pytest.raises(HTTPError, match=expected_message):
         await ensure_async(cm.get("empty.ipynb", type="notebook", content=False))
@@ -127,10 +119,7 @@ async def test_global_config_file(tmpdir, cm):
         nb = new_notebook(cells=[new_code_cell("1+1")])
         model = notebook_model(nb)
         await ensure_async(cm.save(model, "notebook.ipynb"))
-        assert {
-            model["path"]
-            for model in (await ensure_async(cm.get("/", content=True)))["content"]
-        } == {
+        assert {model["path"] for model in (await ensure_async(cm.get("/", content=True)))["content"]} == {
             "notebook.ipynb",
             "notebook.Rmd",
         }
@@ -157,14 +146,10 @@ async def test_paired_files_and_symbolic_links(tmpdir, cm):
     jupyter_dir.join("link_to_scripts").mksymlinkto(actual_scripts)
 
     # Pair the notebooks in the linked folders
-    jupyter_dir.join("jupytext.toml").write(
-        'formats = "link_to_notebooks///ipynb,link_to_scripts///py:percent"'
-    )
+    jupyter_dir.join("jupytext.toml").write('formats = "link_to_notebooks///ipynb,link_to_scripts///py:percent"')
 
     # Save a notebook
-    await ensure_async(
-        cm.save(notebook_model(SAMPLE_NOTEBOOK), "link_to_notebooks/notebook.ipynb")
-    )
+    await ensure_async(cm.save(notebook_model(SAMPLE_NOTEBOOK), "link_to_notebooks/notebook.ipynb"))
 
     # This creates two files in the destinations folders
     assert actual_notebooks.join("notebook.ipynb").isfile()
@@ -174,9 +159,7 @@ async def test_paired_files_and_symbolic_links(tmpdir, cm):
     await ensure_async(cm.get("link_to_scripts/notebook.py"))
 
     # Update the text version
-    jupyter_dir.join("link_to_scripts").join("notebook.py").write_text(
-        "# %%\n3 + 3\n", encoding="utf-8"
-    )
+    jupyter_dir.join("link_to_scripts").join("notebook.py").write_text("# %%\n3 + 3\n", encoding="utf-8")
 
     # Reload and make sure that we get the updated notebook
     model = await ensure_async(cm.get("link_to_notebooks/notebook.ipynb"))
@@ -184,9 +167,7 @@ async def test_paired_files_and_symbolic_links(tmpdir, cm):
     compare_cells(nb.cells, [new_code_cell("3 + 3")], compare_ids=False)
 
 
-async def test_metadata_filter_from_config_has_precedence_over_notebook_metadata(
-    tmpdir, cwd_tmpdir, cm, python_notebook
-):
+async def test_metadata_filter_from_config_has_precedence_over_notebook_metadata(tmpdir, cwd_tmpdir, cm, python_notebook):
     python_notebook.metadata["jupytext"] = {"notebook_metadata_filter": "-all"}
     tmpdir.join("jupytext.toml").write('notebook_metadata_filter = "all"')
 
@@ -198,9 +179,7 @@ async def test_metadata_filter_from_config_has_precedence_over_notebook_metadata
     assert "notebook_metadata_filter: all" in py
 
 
-async def test_test_no_text_representation_metadata_in_ipynb_900(
-    tmpdir, python_notebook, cm
-):
+async def test_test_no_text_representation_metadata_in_ipynb_900(tmpdir, python_notebook, cm):
     tmpdir.join("jupytext.toml").write('formats = "ipynb,py:percent"\n')
 
     # create a test notebook and save it in Jupyter

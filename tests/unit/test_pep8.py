@@ -190,9 +190,7 @@ def test_no_metadata_when_py_is_pep8(py_file):
         if "title" in cell.metadata:
             cell.metadata.pop("title")  # pragma: no cover
         if i == 0 and not cell.source:
-            assert cell.metadata == {
-                "lines_to_next_cell": 0
-            }, py_file  # pragma: no cover
+            assert cell.metadata == {"lines_to_next_cell": 0}, py_file  # pragma: no cover
         else:
             assert not cell.metadata, (py_file, cell.source)
 
@@ -206,8 +204,6 @@ def test_notebook_ends_with_exactly_one_empty_line_682():
         See that the generated python code file has two empty lines at the end.
 
     I would expect there to just be one new line."""
-    nb = new_notebook(
-        cells=[new_code_cell("1+1")], metadata={"jupytext": {"main_language": "python"}}
-    )
+    nb = new_notebook(cells=[new_code_cell("1+1")], metadata={"jupytext": {"main_language": "python"}})
     py = writes(nb, "py:percent")
     assert py.endswith("1+1\n")

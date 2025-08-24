@@ -22,15 +22,11 @@ from jupytext.cell_to_text import RMarkdownCellExporter
     ],
 )
 def test_paragraph_is_fully_commented(lines):
-    assert paragraph_is_fully_commented(
-        lines.splitlines(), comment="#", main_language="python"
-    )
+    assert paragraph_is_fully_commented(lines.splitlines(), comment="#", main_language="python")
 
 
 def test_paragraph_is_not_fully_commented(lines="# text\nnot fully commented out"):
-    assert not paragraph_is_fully_commented(
-        lines.splitlines(), comment="#", main_language="python"
-    )
+    assert not paragraph_is_fully_commented(lines.splitlines(), comment="#", main_language="python")
 
 
 def test_uncomment():

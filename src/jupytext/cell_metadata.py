@@ -86,23 +86,14 @@ def metadata_to_rmd_options(language, metadata, use_runtools=False):
         del metadata["name"]
     if use_runtools:
         for rmd_option, jupyter_options in _RMARKDOWN_TO_RUNTOOLS_OPTION_MAP:
-            if all(
-                [
-                    metadata.get(opt_name) == opt_value
-                    for opt_name, opt_value in jupyter_options
-                ]
-            ):
-                options += " {}={},".format(
-                    rmd_option[0], "FALSE" if rmd_option[1] is False else rmd_option[1]
-                )
+            if all([metadata.get(opt_name) == opt_value for opt_name, opt_value in jupyter_options]):
+                options += " {}={},".format(rmd_option[0], "FALSE" if rmd_option[1] is False else rmd_option[1])
                 for opt_name, _ in jupyter_options:
                     metadata.pop(opt_name)
     else:
         for rmd_option, tag in _RMARKDOWN_TO_JUPYTER_BOOK_MAP:
             if tag in metadata.get("tags", []):
-                options += " {}={},".format(
-                    rmd_option[0], "FALSE" if rmd_option[1] is False else rmd_option[1]
-                )
+                options += " {}={},".format(rmd_option[0], "FALSE" if rmd_option[1] is False else rmd_option[1])
                 metadata["tags"] = [i for i in metadata["tags"] if i != tag]
                 if not metadata["tags"]:
                     metadata.pop("tags")
@@ -179,28 +170,19 @@ class ParsingContext:
         elif char == ")":
             self.parenthesis_count -= 1
             if self.parenthesis_count < 0:
-                raise RMarkdownOptionParsingError(
-                    'Option line "{}" has too many '
-                    "closing parentheses".format(self.line)
-                )
+                raise RMarkdownOptionParsingError('Option line "{}" has too many closing parentheses'.format(self.line))
         elif char == "{":
             self.curly_bracket_count += 1
         elif char == "}":
             self.curly_bracket_count -= 1
             if self.curly_bracket_count < 0:
-                raise RMarkdownOptionParsingError(
-                    'Option line "{}" has too many '
-                    "closing curly brackets".format(self.line)
-                )
+                raise RMarkdownOptionParsingError('Option line "{}" has too many closing curly brackets'.format(self.line))
         elif char == "[":
             self.square_bracket_count += 1
         elif char == "]":
             self.square_bracket_count -= 1
             if self.square_bracket_count < 0:
-                raise RMarkdownOptionParsingError(
-                    'Option line "{}" has too many '
-                    "closing square brackets".format(self.line)
-                )
+                raise RMarkdownOptionParsingError('Option line "{}" has too many closing square brackets'.format(self.line))
         elif char == "'" and prev_char != "\\" and not self.in_double_quote:
             self.in_single_quote = not self.in_single_quote
         elif char == '"' and prev_char != "\\" and not self.in_single_quote:
@@ -227,8 +209,7 @@ def parse_rmd_options(line):
                 if name != "" or value != "":
                     if result and name == "":
                         raise RMarkdownOptionParsingError(
-                            'Option line "{}" has no name for '
-                            "option value {}".format(line, value)
+                            'Option line "{}" has no name for option value {}'.format(line, value)
                         )
                     result.append((name.strip(), value.strip()))
                     name = ""
@@ -248,9 +229,7 @@ def parse_rmd_options(line):
         prev_char = char
 
     if not parsing_context.in_global_expression():
-        raise RMarkdownOptionParsingError(
-            f'Option line "{line}" is not properly terminated'
-        )
+        raise RMarkdownOptionParsingError(f'Option line "{line}" is not properly terminated')
 
     return result
 
@@ -278,9 +257,7 @@ def rmd_options_to_metadata(options, use_runtools=False):
         if i == 0 and name == "":
             metadata["name"] = value
             continue
-        if update_metadata_from_rmd_options(
-            name, value, metadata, use_runtools=use_runtools
-        ):
+        if update_metadata_from_rmd_options(name, value, metadata, use_runtools=use_runtools):
             continue
         try:
             metadata[name] = _py_logical_values(value)
@@ -302,9 +279,7 @@ def try_eval_metadata(metadata, name):
     value = metadata[name]
     if not isinstance(value, str):
         return
-    if (value.startswith('"') and value.endswith('"')) or (
-        value.startswith("'") and value.endswith("'")
-    ):
+    if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
         metadata[name] = value[1:-1]
         return
     if value.startswith("c(") and value.endswith(")"):
@@ -339,9 +314,7 @@ def metadata_to_double_percent_options(metadata, plain_json):
     if "cell_depth" in metadata:
         text.insert(0, "%" * metadata.pop("cell_depth"))
     if "cell_type" in metadata:
-        text.append(
-            "[{}]".format(metadata.pop("region_name", metadata.pop("cell_type")))
-        )
+        text.append("[{}]".format(metadata.pop("region_name", metadata.pop("cell_type"))))
     return metadata_to_text(" ".join(text), metadata, plain_json=plain_json)
 
 
@@ -405,9 +378,7 @@ def parse_key_equal_value(text):
             continue
 
         # Combine with remaining metadata
-        metadata = (
-            parse_key_equal_value(text[:prev_whitespace]) if prev_whitespace > 0 else {}
-        )
+        metadata = parse_key_equal_value(text[:prev_whitespace]) if prev_whitespace > 0 else {}
 
         # Append our value
         metadata[key] = value
@@ -500,16 +471,10 @@ def metadata_to_text(language_or_title, metadata=None, plain_json=False):
     if metadata is None:
         metadata, language_or_title = language_or_title, metadata
 
-    metadata = {
-        key: metadata[key] for key in metadata if key not in _JUPYTEXT_CELL_METADATA
-    }
+    metadata = {key: metadata[key] for key in metadata if key not in _JUPYTEXT_CELL_METADATA}
     text = [language_or_title] if language_or_title else []
     if language_or_title is None:
-        if (
-            "title" in metadata
-            and "{" not in metadata["title"]
-            and "=" not in metadata["title"]
-        ):
+        if "title" in metadata and "{" not in metadata["title"] and "=" not in metadata["title"]:
             text.append(metadata.pop("title"))
 
     if plain_json:

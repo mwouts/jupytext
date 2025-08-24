@@ -127,21 +127,15 @@ def test_raise_on_different_cell_type(raise_on_first_difference):
     ref = new_notebook(cells=[new_markdown_cell("Cell one"), new_code_cell("Cell two")])
     test = new_notebook(cells=[new_markdown_cell("Cell one"), new_raw_cell("Cell two")])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(
-            test, ref, "md", raise_on_first_difference=raise_on_first_difference
-        )
+        compare_notebooks(test, ref, "md", raise_on_first_difference=raise_on_first_difference)
 
 
 @pytest.mark.parametrize("raise_on_first_difference", [True, False])
 def test_raise_on_different_cell_content(raise_on_first_difference):
     ref = new_notebook(cells=[new_markdown_cell("Cell one"), new_code_cell("Cell two")])
-    test = new_notebook(
-        cells=[new_markdown_cell("Cell one"), new_code_cell("Modified cell two")]
-    )
+    test = new_notebook(cells=[new_markdown_cell("Cell one"), new_code_cell("Modified cell two")])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(
-            test, ref, "md", raise_on_first_difference=raise_on_first_difference
-        )
+        compare_notebooks(test, ref, "md", raise_on_first_difference=raise_on_first_difference)
 
 
 def test_raise_on_incomplete_markdown_cell():
@@ -153,9 +147,7 @@ def test_raise_on_incomplete_markdown_cell():
 
 def test_does_raise_on_split_markdown_cell():
     ref = new_notebook(cells=[new_markdown_cell("Cell one\n\n\nsecond line")])
-    test = new_notebook(
-        cells=[new_markdown_cell("Cell one"), new_markdown_cell("second line")]
-    )
+    test = new_notebook(cells=[new_markdown_cell("Cell one"), new_markdown_cell("second line")])
     with pytest.raises(NotebookDifference):
         compare_notebooks(test, ref, "md")
 
@@ -172,14 +164,10 @@ def test_raise_on_different_cell_count(raise_on_first_difference):
     ref = new_notebook(cells=[new_code_cell("1")])
     test = new_notebook(cells=[new_code_cell("1"), new_code_cell("2")])
     with pytest.raises(NotebookDifference):
-        compare_notebooks(
-            test, ref, "py:light", raise_on_first_difference=raise_on_first_difference
-        )
+        compare_notebooks(test, ref, "py:light", raise_on_first_difference=raise_on_first_difference)
 
     with pytest.raises(NotebookDifference):
-        compare_notebooks(
-            ref, test, "py:light", raise_on_first_difference=raise_on_first_difference
-        )
+        compare_notebooks(ref, test, "py:light", raise_on_first_difference=raise_on_first_difference)
 
 
 def test_does_not_raise_on_blank_line_removed():
@@ -309,6 +297,4 @@ def test_notebook_metadata_differ():
 
 def test_cell_ids_differ():
     with pytest.raises(NotebookDifference, match="'id-one' != 'id-two'"):
-        compare_cells(
-            [new_code_cell("1", id="id-one")], [new_code_cell("1", id="id-two")]
-        )
+        compare_cells([new_code_cell("1", id="id-one")], [new_code_cell("1", id="id-two")])

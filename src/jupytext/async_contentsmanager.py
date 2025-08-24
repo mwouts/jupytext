@@ -2,6 +2,7 @@
 This module exposes the AsyncTextFileContentsManager that allows to open
 text files as notebooks
 """
+
 import inspect
 import itertools
 import os
@@ -58,9 +59,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
     which is supposed to be asynchronous too.
     """
 
-    class AsyncJupytextContentsManager(
-        base_contents_manager_class, JupytextConfiguration
-    ):
+    class AsyncJupytextContentsManager(base_contents_manager_class, JupytextConfiguration):
         """
         A FileContentsManager Class that reads and stores notebooks to classical
         Jupyter notebooks (.ipynb), R Markdown notebooks (.Rmd), Julia (.jl),
@@ -79,10 +78,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
 
         def all_nb_extensions(self, config):
             """All extensions that should be classified as notebooks"""
-            return [
-                ext if ext.startswith(".") else "." + ext
-                for ext in config.notebook_extensions
-            ]
+            return [ext if ext.startswith(".") else "." + ext for ext in config.notebook_extensions]
 
         def drop_paired_notebook(self, path):
             """Remove the current notebook from the list of paired notebooks"""
@@ -136,9 +132,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
             try:
                 config = await self.get_config(path)
                 jupytext_formats = notebook_formats(nbk, config, path)
-                _, jupytext_formats = self._drop_formats_if_they_dont_match_path(
-                    path, None, jupytext_formats
-                )
+                _, jupytext_formats = self._drop_formats_if_they_dont_match_path(path, None, jupytext_formats)
                 self.update_paired_notebooks(path, jupytext_formats)
 
                 async def save_one_file(path, fmt):
@@ -161,32 +155,21 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
                         return await self.super.save(
                             dict(
                                 type="notebook",
-                                content=drop_text_representation_metadata(
-                                    model["content"]
-                                ),
+                                content=drop_text_representation_metadata(model["content"]),
                             ),
                             path,
                         )
 
-                    if (
-                        model["content"]["metadata"]
-                        .get("jupytext", {})
-                        .get("notebook_metadata_filter")
-                        == "-all"
-                    ):
+                    if model["content"]["metadata"].get("jupytext", {}).get("notebook_metadata_filter") == "-all":
                         self.log.warning(
                             "Stripping metadata from {} as 'Include Metadata' is off "
-                            "(toggle 'Include Metadata' in the Jupytext Menu or Commands if desired)".format(
-                                path
-                            )
+                            "(toggle 'Include Metadata' in the Jupytext Menu or Commands if desired)".format(path)
                         )
 
                     text_model = dict(
                         type="file",
                         format="text",
-                        content=writes(
-                            nbformat.from_dict(model["content"]), fmt=fmt, config=config
-                        ),
+                        content=writes(nbformat.from_dict(model["content"]), fmt=fmt, config=config),
                     )
 
                     return await self.super.save(text_model, path)
@@ -232,11 +215,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
                 super_kwargs["require_hash"] = require_hash
 
             # Not a notebook?
-            if (
-                not await self.file_exists(path)
-                or await self.dir_exists(path)
-                or (type is not None and type != "notebook")
-            ):
+            if not await self.file_exists(path) or await self.dir_exists(path) or (type is not None and type != "notebook"):
                 return await self.super.get(path, **super_kwargs)
 
             config = await self.get_config(path, use_cache=content is False)
@@ -258,9 +237,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
                     model["format"] = "json"
                     model["mimetype"] = None
                     try:
-                        model["content"] = reads(
-                            model["content"], fmt=fmt, config=config
-                        )
+                        model["content"] = reads(model["content"], fmt=fmt, config=config)
                         # mark all code cells from text notebooks as 'trusted'
                         # as they don't have any outputs, cf. #941
                         for cell in model["content"].cells:
@@ -268,9 +245,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
                                 cell["metadata"]["trusted"] = True
 
                     except Exception as err:
-                        self.log.error(
-                            "Error while reading file: %s %s", path, err, exc_info=True
-                        )
+                        self.log.error("Error while reading file: %s %s", path, err, exc_info=True)
                         raise HTTPError(500, str(err))
 
             if not load_alternative_format:
@@ -279,12 +254,8 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
             # We will now read a second file if this is a paired notebooks.
             if content:
                 nbk = model["content"]
-                formats = nbk.metadata.get("jupytext", {}).get(
-                    "formats"
-                ) or config.default_formats(path)
-                formats = long_form_multiple_formats(
-                    formats, nbk.metadata, auto_ext_requires_language_info=False
-                )
+                formats = nbk.metadata.get("jupytext", {}).get("formats") or config.default_formats(path)
+                formats = long_form_multiple_formats(formats, nbk.metadata, auto_ext_requires_language_info=False)
             else:
                 if path not in self.paired_notebooks:
                     return model
@@ -294,9 +265,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
 
             # Compute paired notebooks from formats
             alt_paths = [(path, fmt)]
-            fmt, formats = self._drop_formats_if_they_dont_match_path(
-                path, fmt, formats
-            )
+            fmt, formats = self._drop_formats_if_they_dont_match_path(path, fmt, formats)
             if formats:
                 try:
                     _, fmt = find_base_path_and_format(path, formats)
@@ -309,9 +278,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
                         err,
                         exc_info=True,
                     )
-                    raise HTTPError(
-                        500, f"Unable to read paired notebook: {path} {err}"
-                    )
+                    raise HTTPError(500, f"Unable to read paired notebook: {path} {err}")
             else:
                 if path in self.paired_notebooks:
                     fmt, formats = self.paired_notebooks.get(path)
@@ -342,11 +309,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
                     return model["content"]
                 if alt_path.endswith(".ipynb"):
                     self.log.info(f"Reading OUTPUTS from {alt_path}")
-                    return (
-                        await self.super.get(
-                            alt_path, content=True, type="notebook", format=format
-                        )
-                    )["content"]
+                    return (await self.super.get(alt_path, content=True, type="notebook", format=format))["content"]
 
                 self.log.info(f"Reading SOURCE from {alt_path}")
                 text = (
@@ -360,10 +323,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
                 )["content"]
                 return reads(text, fmt=alt_fmt, config=config)
 
-            timestamps = {
-                alt_path: await get_timestamp(alt_path)
-                for alt_path, alt_fmt in paired_paths(path, fmt, formats)
-            }
+            timestamps = {alt_path: await get_timestamp(alt_path) for alt_path, alt_fmt in paired_paths(path, fmt, formats)}
 
             inputs, outputs = latest_inputs_and_outputs(
                 path,
@@ -377,11 +337,7 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
             model["last_modified"] = inputs.timestamp
 
             if require_hash:
-                if (
-                    inputs.path is not None
-                    and outputs.path is not None
-                    and inputs.path != outputs.path
-                ):
+                if inputs.path is not None and outputs.path is not None and inputs.path != outputs.path:
                     model_other = await self.super.get(
                         inputs.path if path == outputs.path else outputs.path,
                         content=False,
@@ -401,15 +357,11 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
             # with an outdated text file
             content = None
             try:
-                if (
-                    outputs.timestamp
-                    and outputs.timestamp
-                    > inputs.timestamp
-                    + timedelta(seconds=config.outdated_text_notebook_margin)
+                if outputs.timestamp and outputs.timestamp > inputs.timestamp + timedelta(
+                    seconds=config.outdated_text_notebook_margin
                 ):
                     ts_mismatch = (
-                        "{out} (last modified {out_last}) is more recent than "
-                        "{src} (last modified {src_last})".format(
+                        "{out} (last modified {out_last}) is more recent than {src} (last modified {src_last})".format(
                             src=inputs.path,
                             src_last=inputs.timestamp,
                             out=outputs.path,
@@ -419,12 +371,9 @@ def build_async_jupytext_contents_manager_class(base_contents_manager_class):
                     self.log.warning(ts_mismatch)
 
                     try:
-                        content = await read_pair(
-                            inputs, outputs, read_one_file, must_match=True
-                        )
+                        content = await read_pair(inputs, outputs, read_one_file, must_match=True)
                         self.log.warning(
-                            "The inputs in {src} and {out} are identical, "
-                            "so the mismatch in timestamps was ignored".format(
+                            "The inputs in {src} and {out} are identical, so the mismatch in timestamps was ignored".format(
                                 src=inputs.path, out=outputs.path
                             )
                         )
@@ -461,9 +410,7 @@ to your jupytext.toml file
                 except HTTPError:
                     raise
                 except Exception as err:
-                    self.log.error(
-                        "Error while reading file: %s %s", path, err, exc_info=True
-                    )
+                    self.log.error("Error while reading file: %s %s", path, err, exc_info=True)
                     raise HTTPError(500, str(err))
 
             if not outputs.timestamp:
@@ -498,9 +445,7 @@ to your jupytext.toml file
             model = {"type": "notebook"}
             if format_name:
                 model["format"] = "json"
-                model["content"] = nbformat.v4.nbbase.new_notebook(
-                    metadata={"jupytext": {"formats": ext + ":" + format_name}}
-                )
+                model["content"] = nbformat.v4.nbbase.new_notebook(metadata={"jupytext": {"formats": ext + ":" + format_name}})
 
             return await self.new(model, path)
 
@@ -518,10 +463,7 @@ to your jupytext.toml file
                     insert_i = ""
                 basename_i = basename + insert_i
                 name = basename_i + ext
-                if not any(
-                    self.exists(f"{path}/{basename_i}{nb_ext}")
-                    for nb_ext in config.notebook_extensions
-                ):
+                if not any(self.exists(f"{path}/{basename_i}{nb_ext}") for nb_ext in config.notebook_extensions):
                     break
             return name
 
@@ -553,9 +495,7 @@ to your jupytext.toml file
                 try:
                     # we do not know yet if this is a paired notebook (#190)
                     # -> to get this information we open the notebook
-                    self.log.info(
-                        "Opening %s to check if it is a paired notebook", old_path
-                    )
+                    self.log.info("Opening %s to check if it is a paired notebook", old_path)
                     await self.get(old_path, content=True)
                 except Exception:
                     pass
@@ -565,9 +505,7 @@ to your jupytext.toml file
                 return
 
             fmt, formats = self.paired_notebooks.get(old_path)
-            fmt, formats = self._drop_formats_if_they_dont_match_path(
-                new_path, fmt, formats
-            )
+            fmt, formats = self._drop_formats_if_they_dont_match_path(new_path, fmt, formats)
             old_alt_paths = paired_paths(old_path, fmt, formats)
 
             # Is the new file name consistent with suffix?
@@ -611,9 +549,7 @@ to your jupytext.toml file
                 path = directory + "/" + jupytext_config_file
                 if await self.file_exists(path):
                     if not self.allow_hidden and jupytext_config_file.startswith("."):
-                        self.log.warning(
-                            f"Ignoring config file {path} (see Jupytext issue #964)"
-                        )
+                        self.log.warning(f"Ignoring config file {path} (see Jupytext issue #964)")
                         continue
                     return path
 
@@ -634,9 +570,7 @@ to your jupytext.toml file
             parent_dir = self.get_parent_dir(directory)
             return await self.get_config_file(parent_dir)
 
-        async def load_config_file(
-            self, config_file, *, prev_config_file, prev_config, is_os_path=False
-        ):
+        async def load_config_file(self, config_file, *, prev_config_file, prev_config, is_os_path=False):
             """Load the configuration file"""
             if config_file is None:
                 return None
@@ -663,9 +597,7 @@ to your jupytext.toml file
                 else:
                     log_level = "none"
             if log_level != "none":
-                getattr(self.log, log_level)(
-                    "Loaded Jupytext configuration file at %s", config_file
-                )
+                getattr(self.log, log_level)("Loaded Jupytext configuration file at %s", config_file)
             return config
 
         async def get_config(self, path, use_cache=False):
@@ -732,19 +664,13 @@ to your jupytext.toml file
                         new_formats = [adjusted_format]
                         if isinstance(formats, list):
                             return adjusted_format, new_formats
-                        return short_form_one_format(
-                            adjusted_format
-                        ), short_form_multiple_formats(new_formats)
+                        return short_form_one_format(adjusted_format), short_form_multiple_formats(new_formats)
             return fmt, formats
 
     if "require_hash" in inspect.signature(base_contents_manager_class.get).parameters:
-        AsyncJupytextContentsManager.get = (
-            AsyncJupytextContentsManager._get_with_require_hash_argument
-        )
+        AsyncJupytextContentsManager.get = AsyncJupytextContentsManager._get_with_require_hash_argument
     else:
-        AsyncJupytextContentsManager.get = (
-            AsyncJupytextContentsManager._get_with_no_require_hash_argument
-        )
+        AsyncJupytextContentsManager.get = AsyncJupytextContentsManager._get_with_no_require_hash_argument
 
     return AsyncJupytextContentsManager
 
@@ -753,21 +679,15 @@ try:
     # The AsyncLargeFileManager is taken by default from jupyter_server if available
     from jupyter_server.services.contents.largefilemanager import AsyncLargeFileManager
 
-    AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
-        AsyncLargeFileManager
-    )
+    AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(AsyncLargeFileManager)
 except ImportError:
     # If we can't find jupyter_server then we take it from notebook
     try:
         from notebook.services.contents.largefilemanager import AsyncLargeFileManager
 
-        AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
-            AsyncLargeFileManager
-        )
+        AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(AsyncLargeFileManager)
     except ImportError:
         # Older versions of notebook do not have the LargeFileManager #217
         from notebook.services.contents.filemanager import FileContentsManager
 
-        AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(
-            FileContentsManager
-        )
+        AsyncTextFileContentsManager = build_async_jupytext_contents_manager_class(FileContentsManager)

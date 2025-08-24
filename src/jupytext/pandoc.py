@@ -30,18 +30,14 @@ def pandoc(args, filein=None, fileout=None):
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     out, err = proc.communicate()
     if proc.returncode:
-        raise PandocError(
-            f"pandoc exited with return code {proc.returncode}\n{str(err)}"
-        )
+        raise PandocError(f"pandoc exited with return code {proc.returncode}\n{str(err)}")
     return out.decode("utf-8")
 
 
 def is_pandoc_available(min_version="2.7.2", max_version=None):
     """Is Pandoc>=2.7.2 available?"""
     try:
-        raise_if_pandoc_is_not_available(
-            min_version=min_version, max_version=max_version
-        )
+        raise_if_pandoc_is_not_available(min_version=min_version, max_version=max_version)
         return True
     except PandocError:
         return False
@@ -51,21 +47,16 @@ def raise_if_pandoc_is_not_available(min_version="2.7.2", max_version=None):
     """Raise with an informative error message if pandoc is not available"""
     version = pandoc_version()
     if version == "N/A":
-        raise PandocError(
-            f"The Pandoc Markdown format requires 'pandoc>={min_version}', "
-            "but pandoc was not found"
-        )
+        raise PandocError(f"The Pandoc Markdown format requires 'pandoc>={min_version}', but pandoc was not found")
 
     if parse(version) < parse(min_version):
         raise PandocError(
-            f"The Pandoc Markdown format requires 'pandoc>={min_version}', "
-            f"but pandoc version {version} was found"
+            f"The Pandoc Markdown format requires 'pandoc>={min_version}', but pandoc version {version} was found"
         )
 
     if max_version and parse(version) > parse(max_version):
         raise PandocError(
-            f"The Pandoc Markdown format requires 'pandoc<={max_version}', "
-            f"but pandoc version {version} was found"
+            f"The Pandoc Markdown format requires 'pandoc<={max_version}', but pandoc version {version} was found"
         )
 
     return version

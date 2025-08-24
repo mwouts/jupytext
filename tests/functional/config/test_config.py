@@ -19,32 +19,20 @@ def test_find_jupytext_configuration_file(tmpdir):
     # Configuration file in the parent directory
     root_config = tmpdir.join("jupytext.yml")
     root_config.write("\n")
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(tmpdir)), str(root_config)
-    )
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(nested)), str(root_config)
-    )
+    assert os.path.samefile(find_jupytext_configuration_file(str(tmpdir)), str(root_config))
+    assert os.path.samefile(find_jupytext_configuration_file(str(nested)), str(root_config))
 
     # Local pyproject file
     pyproject_config = nested.join("pyproject.toml")
     pyproject_config.write("[tool.jupytext]\n")
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(tmpdir)), str(root_config)
-    )
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(nested)), str(pyproject_config)
-    )
+    assert os.path.samefile(find_jupytext_configuration_file(str(tmpdir)), str(root_config))
+    assert os.path.samefile(find_jupytext_configuration_file(str(nested)), str(pyproject_config))
 
     # Local configuration file
     local_config = nested.join(".jupytext")
     local_config.write("\n")
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(tmpdir)), str(root_config)
-    )
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(nested)), str(local_config)
-    )
+    assert os.path.samefile(find_jupytext_configuration_file(str(tmpdir)), str(root_config))
+    assert os.path.samefile(find_jupytext_configuration_file(str(nested)), str(local_config))
 
 
 def test_jupytext_py_is_not_a_configuration_file(tmpdir):
@@ -179,9 +167,7 @@ def test_jupytext_formats(tmpdir, content_toml, formats_short_form):
     assert config.formats == formats_short_form
 
 
-def test_deprecated_formats_cause_warning(
-    tmpdir, content_toml="default_jupytext_formats = 'ipynb,md'"
-):
+def test_deprecated_formats_cause_warning(tmpdir, content_toml="default_jupytext_formats = 'ipynb,md'"):
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write(content_toml)
 

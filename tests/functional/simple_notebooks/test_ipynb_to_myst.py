@@ -211,9 +211,7 @@ kernelspec:
 @pytest.mark.asyncio
 @pytest.mark.requires_myst
 @pytest.mark.parametrize("language_info", ["none", "std", "no_pygments_lexer"])
-async def test_myst_representation_same_cli_or_contents_manager(
-    tmpdir, cwd_tmpdir, cm, notebook_with_outputs, language_info
-):
+async def test_myst_representation_same_cli_or_contents_manager(tmpdir, cwd_tmpdir, cm, notebook_with_outputs, language_info):
     """This test gives some information on #759. As of Jupytext 1.11.1, in the MyST Markdown format,
     the code cells have an ipython3 lexer when the notebook "language_info" metadata has "ipython3"
     as the pygments_lexer. This information comes from the kernel and ATM it is not clear how the user
@@ -237,9 +235,7 @@ async def test_myst_representation_same_cli_or_contents_manager(
     text_api = jupytext.writes(nb, fmt="md:myst")
 
     # How do code cells look like?
-    code_cells = {
-        line for line in text_api.splitlines() if line.startswith("```{code-cell")
-    }
+    code_cells = {line for line in text_api.splitlines() if line.startswith("```{code-cell")}
 
     if language_info == "std":
         assert code_cells == {"```{code-cell} ipython3"}
@@ -257,9 +253,7 @@ async def test_myst_representation_same_cli_or_contents_manager(
     cm.formats = "ipynb,md:myst"
     cm.root_dir = str(tmpdir.mkdir("contents_manager"))
 
-    await ensure_async(
-        cm.save(model=dict(content=nb, type="notebook"), path="notebook.ipynb")
-    )
+    await ensure_async(cm.save(model=dict(content=nb, type="notebook"), path="notebook.ipynb"))
     text_cm = tmpdir.join("contents_manager").join("notebook.md").read()
 
     compare(text_cm, text_api)
