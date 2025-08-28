@@ -1,7 +1,7 @@
 Jupytext ChangeLog
 ==================
 
-1.17.3-dev (???)
+1.17.3 (2025-08-28)
 -------------------
 
 **Added**
@@ -11,7 +11,7 @@ of `jupytext --help` ([#433](https://github.com/mwouts/jupytext/issues/433))
 formats for a given notebook ([#1419](https://github.com/mwouts/jupytext/issues/1419))
 
 **Fixed**
-- We have fixed `jupytext --sync`, and the contents manager, to make sure that a simple `.py` file (not in the percent format) will not be treated as a paired file when the Jupytext configuration contains `formats="ipynb,py:percent"` ([#1418](https://github.com/mwouts/jupytext/issues/1418))
+- We have fixed `jupytext --sync`, and the contents manager, to make sure that a simple `.py` file (not in the percent format) will not be treated as a paired file when the Jupytext configuration file has `formats="ipynb,py:percent"` ([#1418](https://github.com/mwouts/jupytext/issues/1418))
 - A notebook can be moved in Jupyter even if that makes it unpaired ([#1414](https://github.com/mwouts/jupytext/issues/1414))
 - The test against `jupyter-fs` now installs its `fs` extra dependency ([#1398](https://github.com/mwouts/jupytext/issues/1398))
 - The `jupytext --sync` command now works correctly with symbolic links. Thanks to [mccullerlp](https://github.com/mccullerlp) for reporting ([#1407](https://github.com/mwouts/jupytext/issues/1407)) and addressing ([#1408](https://github.com/mwouts/jupytext/pull/1408)) the problem!

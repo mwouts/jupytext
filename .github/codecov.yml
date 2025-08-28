@@ -9,7 +9,7 @@ coverage:
       source:
         paths:
           - "src/jupytext/"
-        target: 96.5%
+        target: 96%
         threshold: 0.2%
       tests:
         paths:
