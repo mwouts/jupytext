@@ -180,7 +180,7 @@ def strip_blank_lines(text):
 def read_fenced_cell(token, cell_index, cell_type):
     """Parse (and validate) the full directive text."""
     content = token.content
-    error_msg = "{} cell {} at line {} could not be read: ".format(cell_type, cell_index, token.map[0] + 1)
+    error_msg = f"{cell_type} cell {cell_index} at line {token.map[0] + 1} could not be read: "
 
     body_lines, options = parse_directive_options(content, error_msg)
 
@@ -233,11 +233,9 @@ def read_cell_metadata(token, cell_index):
         try:
             metadata = json.loads(token.content.strip())
         except Exception as err:
-            raise MystMetadataParsingError(
-                "Markdown cell {} at line {} could not be read: {}".format(cell_index, token.map[0] + 1, err)
-            )
+            raise MystMetadataParsingError(f"Markdown cell {cell_index} at line {token.map[0] + 1} could not be read: {err}")
         if not isinstance(metadata, dict):
-            raise MystMetadataParsingError("Markdown cell {} at line {} is not a dict".format(cell_index, token.map[0] + 1))
+            raise MystMetadataParsingError(f"Markdown cell {cell_index} at line {token.map[0] + 1} is not a dict")
 
     return metadata
 

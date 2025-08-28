@@ -94,7 +94,7 @@ async def test_incorrect_config_message(tmpdir, cfg_file, cfg_text, cm):
     tmpdir.join(cfg_file).write(cfg_text)
     tmpdir.join("empty.ipynb").write("{}")
 
-    expected_message = "The Jupytext configuration file .*{} is incorrect".format(cfg_file)
+    expected_message = f"The Jupytext configuration file .*{cfg_file} is incorrect"
 
     with pytest.raises(HTTPError, match=expected_message):
         await ensure_async(cm.get("empty.ipynb", type="notebook", content=False))

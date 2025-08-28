@@ -190,9 +190,7 @@ def compare_cells(
             test_cell = next(test_cell_iter)
         except StopIteration:
             if raise_on_first_difference:
-                raise NotebookDifference(
-                    "No cell corresponding to {} cell #{}:\n{}".format(ref_cell.cell_type, i, ref_cell.source)
-                )
+                raise NotebookDifference(f"No cell corresponding to {ref_cell.cell_type} cell #{i}:\n{ref_cell.source}")
             modified_cells.update(range(i, len(expected_cells) + 1))
             break
 
@@ -252,9 +250,7 @@ def compare_cells(
                 try:
                     compare("\n".join(test_lines), "\n".join(ref_lines))
                 except AssertionError as error:
-                    raise NotebookDifference(
-                        "Cell content differ on {} cell #{}: {}".format(test_cell.cell_type, i, str(error))
-                    )
+                    raise NotebookDifference(f"Cell content differ on {test_cell.cell_type} cell #{i}: {str(error)}")
             else:
                 modified_cells.add(i)
 
@@ -263,7 +259,7 @@ def compare_cells(
             if ref_cell.source != test_cell.source:
                 if raise_on_first_difference:
                     diff = compare(test_cell.source, ref_cell.source, return_diff=True)
-                    raise NotebookDifference("Cell content differ on {} cell #{}: {}".format(test_cell.cell_type, i, diff))
+                    raise NotebookDifference(f"Cell content differ on {test_cell.cell_type} cell #{i}: {diff}")
                 modified_cells.add(i)
 
         if not compare_outputs:
@@ -298,7 +294,7 @@ def compare_cells(
         try:
             test_cell = next(test_cell_iter)
             if raise_on_first_difference:
-                raise NotebookDifference("Additional {} cell: {}".format(test_cell.cell_type, test_cell.source))
+                raise NotebookDifference(f"Additional {test_cell.cell_type} cell: {test_cell.source}")
             remaining_cell_count += 1
         except StopIteration:
             break

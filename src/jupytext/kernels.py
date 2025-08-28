@@ -40,7 +40,7 @@ def kernelspec_from_language(language):
                     "display_name": kernel_specs.display_name,
                 }
         raise ValueError(
-            "No kernel found that matches the current python executable {}\n".format(sys.executable)
+            f"No kernel found that matches the current python executable {sys.executable}\n"
             + "Install one with 'python -m ipykernel install --name kernel_name [--user]'"
         )
 

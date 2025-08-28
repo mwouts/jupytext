@@ -118,7 +118,7 @@ def base_path(main_path, fmt, formats=None):
 
     if suffix:
         if not base.endswith(suffix):
-            raise InconsistentSuffix("Notebook name '{}' was expected to end with suffix '{}'".format(base, suffix))
+            raise InconsistentSuffix(f"Notebook name '{base}' was expected to end with suffix '{suffix}'")
         base = base[: -len(suffix)]
 
     if not prefix:
@@ -143,7 +143,7 @@ def base_path(main_path, fmt, formats=None):
     if prefix_file_name:
         if not notebook_file_name.startswith(prefix_file_name):
             raise InconsistentPrefix(
-                "Notebook name '{}' was expected to start with prefix '{}'".format(notebook_file_name, prefix_file_name)
+                f"Notebook name '{notebook_file_name}' was expected to start with prefix '{prefix_file_name}'"
             )
         notebook_file_name = notebook_file_name[len(prefix_file_name) :]
 
@@ -156,7 +156,7 @@ def base_path(main_path, fmt, formats=None):
             if expected_folder == "..":
                 if not actual_folders:
                     raise InconsistentPrefixDirectory(
-                        "Notebook directory '{}' does not match prefix '{}'".format(notebook_dir, prefix_dir)
+                        f"Notebook directory '{notebook_dir}' does not match prefix '{prefix_dir}'"
                     )
                 parent_notebook_dir = join(parent_notebook_dir, actual_folders.pop(), sep)
             else:
@@ -165,7 +165,7 @@ def base_path(main_path, fmt, formats=None):
 
                 if actual_folder != expected_folder:
                     raise InconsistentPrefixDirectory(
-                        "Notebook directory '{}' does not match prefix '{}'".format(notebook_dir, prefix_dir)
+                        f"Notebook directory '{notebook_dir}' does not match prefix '{prefix_dir}'"
                     )
         notebook_dir = parent_notebook_dir
 
@@ -173,9 +173,7 @@ def base_path(main_path, fmt, formats=None):
         long_prefix_root = sep + prefix_root + sep
         long_notebook_dir = sep + notebook_dir + sep
         if long_prefix_root not in long_notebook_dir:
-            raise InconsistentPrefixRoot(
-                "Notebook directory '{}' does not match prefix root '{}'".format(notebook_dir, prefix_root)
-            )
+            raise InconsistentPrefixRoot(f"Notebook directory '{notebook_dir}' does not match prefix root '{prefix_root}'")
         left, right = long_notebook_dir.rsplit(long_prefix_root, 1)
         notebook_dir = left + sep + "//" + right
 

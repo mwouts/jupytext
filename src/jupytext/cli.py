@@ -124,7 +124,7 @@ def parse_jupytext_args(args=None):
             "NB: in addition to the extensions listed above, you can also use these: '{}'".format(
                 "', '".join(
                     sorted(
-                        set(ext.removeprefix(".") for ext in NOTEBOOK_EXTENSIONS)
+                        {ext.removeprefix(".") for ext in NOTEBOOK_EXTENSIONS}
                         - set(selected_file_extensions + ["auto", "ipynb"])
                     )
                 )
@@ -578,7 +578,7 @@ def jupytext_single_file(nb_file, args, log):
             try:
                 kernelspec = get_kernel_spec(set_kernel)
             except KeyError as err:
-                raise KeyError("Please choose a kernel name among {}".format(find_kernel_specs().keys())) from err
+                raise KeyError(f"Please choose a kernel name among {find_kernel_specs().keys()}") from err
 
             kernelspec = {
                 "name": args.set_kernel,
@@ -618,7 +618,7 @@ def jupytext_single_file(nb_file, args, log):
 
     # Update the metadata
     if args.update_metadata:
-        log("[jupytext] Updating notebook metadata with '{}'".format(json.dumps(args.update_metadata)))
+        log(f"[jupytext] Updating notebook metadata with '{json.dumps(args.update_metadata)}'")
 
         if "kernelspec" in args.update_metadata and "main_language" in notebook.metadata.get("jupytext", {}):
             notebook.metadata["jupytext"].pop("main_language")
@@ -959,7 +959,7 @@ def set_format_options(fmt, format_options):
         try:
             key, value = opt.split("=")
         except ValueError as err:
-            raise ValueError("Format options are expected to be of the form key=value, not '{}'".format(opt)) from err
+            raise ValueError(f"Format options are expected to be of the form key=value, not '{opt}'") from err
 
         if key not in _VALID_FORMAT_OPTIONS:
             raise ValueError(

@@ -170,19 +170,19 @@ class ParsingContext:
         elif char == ")":
             self.parenthesis_count -= 1
             if self.parenthesis_count < 0:
-                raise RMarkdownOptionParsingError('Option line "{}" has too many closing parentheses'.format(self.line))
+                raise RMarkdownOptionParsingError(f'Option line "{self.line}" has too many closing parentheses')
         elif char == "{":
             self.curly_bracket_count += 1
         elif char == "}":
             self.curly_bracket_count -= 1
             if self.curly_bracket_count < 0:
-                raise RMarkdownOptionParsingError('Option line "{}" has too many closing curly brackets'.format(self.line))
+                raise RMarkdownOptionParsingError(f'Option line "{self.line}" has too many closing curly brackets')
         elif char == "[":
             self.square_bracket_count += 1
         elif char == "]":
             self.square_bracket_count -= 1
             if self.square_bracket_count < 0:
-                raise RMarkdownOptionParsingError('Option line "{}" has too many closing square brackets'.format(self.line))
+                raise RMarkdownOptionParsingError(f'Option line "{self.line}" has too many closing square brackets')
         elif char == "'" and prev_char != "\\" and not self.in_double_quote:
             self.in_single_quote = not self.in_single_quote
         elif char == '"' and prev_char != "\\" and not self.in_single_quote:
@@ -208,9 +208,7 @@ def parse_rmd_options(line):
             if char == ",":
                 if name != "" or value != "":
                     if result and name == "":
-                        raise RMarkdownOptionParsingError(
-                            'Option line "{}" has no name for option value {}'.format(line, value)
-                        )
+                        raise RMarkdownOptionParsingError(f'Option line "{line}" has no name for option value {value}')
                     result.append((name.strip(), value.strip()))
                     name = ""
                     value = ""

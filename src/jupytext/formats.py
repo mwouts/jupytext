@@ -409,7 +409,7 @@ def check_file_version(notebook, source_path, outputs_path):
         ext = notebook.metadata["jupytext"]["text_representation"]["extension"]
     else:
         _, ext = os.path.splitext(source_path)
-        assert not ext.endswith(".ipynb"), "source_path={} should be a text file".format(source_path)
+        assert not ext.endswith(".ipynb"), f"source_path={source_path} should be a text file"
 
     version = notebook.metadata.get("jupytext", {}).get("text_representation", {}).get("format_version")
     format_name = format_name_for_ext(notebook.metadata, ext)
@@ -711,7 +711,7 @@ def validate_one_format(jupytext_format: dict[str, str]) -> dict[str, str]:
         value = jupytext_format[key]
         if key in _BINARY_FORMAT_OPTIONS:
             if not isinstance(value, bool):
-                raise JupytextFormatError("Format option '{}' should be a bool, not '{}'".format(key, str(value)))
+                raise JupytextFormatError(f"Format option '{key}' should be a bool, not '{str(value)}'")
 
     if "extension" not in jupytext_format:
         raise JupytextFormatError("Missing format extension")

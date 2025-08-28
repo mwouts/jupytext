@@ -732,9 +732,7 @@ class DoublePercentScriptCellReader(LightScriptCellReader):
         self.comment = script["comment"]
         self.comment_suffix = script.get("comment_suffix", "")
         self.start_code_re = re.compile(rf"^\s*{re.escape(self.comment)}\s*%%(%*)\s(.*)$")
-        self.alternative_start_code_re = re.compile(
-            r"^\s*{}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$".format(re.escape(self.comment))
-        )
+        self.alternative_start_code_re = re.compile(rf"^\s*{re.escape(self.comment)}\s*(%%|<codecell>|In\[[0-9 ]*\]:?)\s*$")
         self.explicit_soc = True
 
     def metadata_and_language_from_option_line(self, line):

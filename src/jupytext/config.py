@@ -357,9 +357,7 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
 
         return PyFileConfigLoader(jupytext_config_file).load_config()
     except (ValueError, NameError) as err:
-        raise JupytextConfigurationError(
-            "The Jupytext configuration file {} is incorrect: {}".format(jupytext_config_file, err)
-        )
+        raise JupytextConfigurationError(f"The Jupytext configuration file {jupytext_config_file} is incorrect: {err}")
 
 
 def load_jupytext_configuration_file(config_file, stream=None):
@@ -396,7 +394,7 @@ def validate_jupytext_configuration_file(config_file, config_dict):
     try:
         config = JupytextConfiguration(**config_dict)
     except TraitError as err:
-        raise JupytextConfigurationError("The Jupytext configuration file {} is incorrect: {}".format(config_file, err))
+        raise JupytextConfigurationError(f"The Jupytext configuration file {config_file} is incorrect: {err}")
     invalid_options = set(config_dict).difference(dir(JupytextConfiguration()))
     if any(invalid_options):
         raise JupytextConfigurationError(
