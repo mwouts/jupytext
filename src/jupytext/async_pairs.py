@@ -24,9 +24,7 @@ async def read_pair(inputs, outputs, read_one_file, must_match=False):
         if diff:
             raise PairedFilesDiffer(diff)
 
-    notebook = combine_inputs_with_outputs(
-        notebook, notebook_with_outputs, fmt=inputs.fmt
-    )
+    notebook = combine_inputs_with_outputs(notebook, notebook_with_outputs, fmt=inputs.fmt)
 
     return notebook
 

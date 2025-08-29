@@ -22,11 +22,7 @@ def test_markdown_jupytext_nbconvert_is_identity(md_file):
     # Our expectations
     md_expected = md_org.splitlines()
     # #region and #endregion comments are removed
-    md_expected = [
-        line
-        for line in md_expected
-        if line not in ["<!-- #region -->", "<!-- #endregion -->"]
-    ]
+    md_expected = [line for line in md_expected if line not in ["<!-- #region -->", "<!-- #endregion -->"]]
     # language is not inserted by nbconvert
     md_expected = ["```" if line.startswith("```") else line for line in md_expected]
     # nbconvert inserts no empty line after the YAML header (which is in a Raw cell)
@@ -69,15 +65,11 @@ def test_jupytext_markdown_similar_to_nbconvert(ipynb_py_R_jl_file):
         md_jupytext = raw_cell.source + "\n\n" + md_jupytext
 
     # region comments are not in nbconvert
-    md_jupytext = md_jupytext.replace("<!-- #region -->\n", "").replace(
-        "<!-- #endregion -->\n", ""
-    )
+    md_jupytext = md_jupytext.replace("<!-- #region -->\n", "").replace("<!-- #endregion -->\n", "")
 
     # Jupytext uses HTML comments to keep track of raw cells
     md_jupytext = (
-        md_jupytext.replace("\n<!-- #raw -->\n", "")
-        .replace("<!-- #raw -->\n", "")
-        .replace("\n<!-- #endraw -->\n", "")
+        md_jupytext.replace("\n<!-- #raw -->\n", "").replace("<!-- #raw -->\n", "").replace("\n<!-- #endraw -->\n", "")
     )
 
     # nbconvert file may start with an empty line

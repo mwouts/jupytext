@@ -189,7 +189,7 @@ exclude = [
 ]
 # Seems like W503 is not implemented in ruff
 # ref: https://github.com/astral-sh/ruff/issues/4125
-ignore = [
+lint.ignore = [
     "E203", "E231",
 ]
 

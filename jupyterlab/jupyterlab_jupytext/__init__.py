@@ -40,13 +40,9 @@ def load_jupyter_server_extension(app):  # pragma: no cover
     )
 
     if asyncio.iscoroutinefunction(base_class.get):
-        app.contents_manager_class = build_async_jupytext_contents_manager_class(
-            base_class
-        )
+        app.contents_manager_class = build_async_jupytext_contents_manager_class(base_class)
     else:
-        app.contents_manager_class = build_sync_jupytext_contents_manager_class(
-            base_class
-        )
+        app.contents_manager_class = build_sync_jupytext_contents_manager_class(base_class)
 
     try:
         # And rerun selected init steps from https://github.com/jupyter/notebook/blob/

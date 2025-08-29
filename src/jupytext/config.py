@@ -1,4 +1,5 @@
 """Find and read Jupytext configuration files"""
+
 import json
 import os
 
@@ -36,17 +37,11 @@ JUPYTEXT_CONFIG_FILES = [
     "jupytext.json",
 ]
 
-JUPYTEXT_CONFIG_FILES.extend(
-    ["." + filename for filename in JUPYTEXT_CONFIG_FILES] + [".jupytext.py"]
-)
+JUPYTEXT_CONFIG_FILES.extend(["." + filename for filename in JUPYTEXT_CONFIG_FILES] + [".jupytext.py"])
 
 PYPROJECT_FILE = "pyproject.toml"
 
-JUPYTEXT_CEILING_DIRECTORIES = [
-    path
-    for path in os.environ.get("JUPYTEXT_CEILING_DIRECTORIES", "").split(":")
-    if path
-]
+JUPYTEXT_CEILING_DIRECTORIES = [path for path in os.environ.get("JUPYTEXT_CEILING_DIRECTORIES", "").split(":") if path]
 
 
 class JupytextConfiguration(Configurable):
@@ -62,9 +57,7 @@ class JupytextConfiguration(Configurable):
         "hydrogen/spyder/vscode compatible scripts",
         config=True,
     )
-    default_jupytext_formats = Unicode(
-        help="Deprecated. Use 'formats' instead", config=True
-    )
+    default_jupytext_formats = Unicode(help="Deprecated. Use 'formats' instead", config=True)
 
     preferred_jupytext_formats_save = Unicode(
         help="Preferred format when saving notebooks as text, per extension. "
@@ -87,9 +80,7 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
-    default_notebook_metadata_filter = Unicode(
-        "", help="Deprecated. Use 'notebook_metadata_filter' instead", config=True
-    )
+    default_notebook_metadata_filter = Unicode("", help="Deprecated. Use 'notebook_metadata_filter' instead", config=True)
 
     hide_notebook_metadata = Enum(
         values=[True, False],
@@ -113,14 +104,11 @@ class JupytextConfiguration(Configurable):
     )
 
     cell_metadata_filter = Unicode(
-        help="Cell metadata that should be saved in the text representations. "
-        "Examples: 'all', 'hide_input,hide_output'",
+        help="Cell metadata that should be saved in the text representations. Examples: 'all', 'hide_input,hide_output'",
         config=True,
     )
 
-    default_cell_metadata_filter = Unicode(
-        "", help="Deprecated. Use 'cell_metadata_filter' instead", config=True
-    )
+    default_cell_metadata_filter = Unicode("", help="Deprecated. Use 'cell_metadata_filter' instead", config=True)
 
     comment_magics = Enum(
         values=[True, False],
@@ -143,8 +131,7 @@ class JupytextConfiguration(Configurable):
 
     doxygen_equation_markers = Bool(
         False,
-        help="Should equation markers use the DOxygen format? "
-        "(see https://github.com/mwouts/jupytext/issues/517)",
+        help="Should equation markers use the DOxygen format? (see https://github.com/mwouts/jupytext/issues/517)",
         config=True,
     )
 
@@ -169,9 +156,7 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
-    default_cell_markers = Unicode(
-        help="Deprecated. Use 'cell_markers' instead", config=True
-    )
+    default_cell_markers = Unicode(help="Deprecated. Use 'cell_markers' instead", config=True)
 
     notebook_extensions = Union(
         [List(Unicode(), NOTEBOOK_EXTENSIONS), Unicode()],
@@ -190,53 +175,36 @@ class JupytextConfiguration(Configurable):
         """Set default format option"""
         if self.default_notebook_metadata_filter:
             warnings.warn(
-                "The option 'default_notebook_metadata_filter' is deprecated. "
-                "Please use 'notebook_metadata_filter' instead.",
+                "The option 'default_notebook_metadata_filter' is deprecated. Please use 'notebook_metadata_filter' instead.",
                 FutureWarning,
             )
-            format_options.setdefault(
-                "notebook_metadata_filter", self.default_notebook_metadata_filter
-            )
+            format_options.setdefault("notebook_metadata_filter", self.default_notebook_metadata_filter)
         if self.notebook_metadata_filter:
-            format_options.setdefault(
-                "notebook_metadata_filter", self.notebook_metadata_filter
-            )
+            format_options.setdefault("notebook_metadata_filter", self.notebook_metadata_filter)
         if self.default_cell_metadata_filter:
             warnings.warn(
-                "The option 'default_cell_metadata_filter' is deprecated. "
-                "Please use 'cell_metadata_filter' instead.",
+                "The option 'default_cell_metadata_filter' is deprecated. Please use 'cell_metadata_filter' instead.",
                 FutureWarning,
             )
-            format_options.setdefault(
-                "cell_metadata_filter", self.default_cell_metadata_filter
-            )
+            format_options.setdefault("cell_metadata_filter", self.default_cell_metadata_filter)
         if self.root_level_metadata_filter:
-            format_options.setdefault(
-                "root_level_metadata_filter", self.root_level_metadata_filter
-            )
+            format_options.setdefault("root_level_metadata_filter", self.root_level_metadata_filter)
         if self.cell_metadata_filter:
             format_options.setdefault("cell_metadata_filter", self.cell_metadata_filter)
         if self.hide_notebook_metadata is not None:
-            format_options.setdefault(
-                "hide_notebook_metadata", self.hide_notebook_metadata
-            )
+            format_options.setdefault("hide_notebook_metadata", self.hide_notebook_metadata)
         if self.root_level_metadata_as_raw_cell is False:
-            format_options.setdefault(
-                "root_level_metadata_as_raw_cell", self.root_level_metadata_as_raw_cell
-            )
+            format_options.setdefault("root_level_metadata_as_raw_cell", self.root_level_metadata_as_raw_cell)
         if self.comment_magics is not None:
             format_options.setdefault("comment_magics", self.comment_magics)
         if self.split_at_heading:
             format_options.setdefault("split_at_heading", self.split_at_heading)
         if self.doxygen_equation_markers:
-            format_options.setdefault(
-                "doxygen_equation_markers", self.doxygen_equation_markers
-            )
+            format_options.setdefault("doxygen_equation_markers", self.doxygen_equation_markers)
         if not read:
             if self.default_cell_markers:
                 warnings.warn(
-                    "The option 'default_cell_markers' is deprecated. "
-                    "Please use 'cell_markers' instead.",
+                    "The option 'default_cell_markers' is deprecated. Please use 'cell_markers' instead.",
                     FutureWarning,
                 )
                 format_options.setdefault("cell_markers", self.default_cell_markers)
@@ -253,8 +221,7 @@ class JupytextConfiguration(Configurable):
 
         if self.default_jupytext_formats:
             warnings.warn(
-                "The option 'default_jupytext_formats' is deprecated. "
-                "Please use 'formats' instead.",
+                "The option 'default_jupytext_formats' is deprecated. Please use 'formats' instead.",
                 FutureWarning,
             )
 
@@ -288,14 +255,11 @@ def preferred_format(incomplete_format, preferred_formats):
                 incomplete_format["extension"] == fmt["extension"]
                 or (
                     fmt["extension"] == ".auto"
-                    and incomplete_format["extension"]
-                    not in [".md", ".markdown", ".Rmd", ".ipynb"]
+                    and incomplete_format["extension"] not in [".md", ".markdown", ".Rmd", ".ipynb"]
                 )
             )
-            and incomplete_format.get("suffix")
-            == fmt.get("suffix", incomplete_format.get("suffix"))
-            and incomplete_format.get("prefix")
-            == fmt.get("prefix", incomplete_format.get("prefix"))
+            and incomplete_format.get("suffix") == fmt.get("suffix", incomplete_format.get("suffix"))
+            and incomplete_format.get("prefix") == fmt.get("prefix", incomplete_format.get("prefix"))
         ):
             fmt.update(incomplete_format)
             return fmt
@@ -375,9 +339,7 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
     """Read a Jupytext config file, and return a dict"""
     if not jupytext_config_file.endswith(".py") and stream is None:
         with open(jupytext_config_file, encoding="utf-8") as stream:
-            return parse_jupytext_configuration_file(
-                jupytext_config_file, stream.read()
-            )
+            return parse_jupytext_configuration_file(jupytext_config_file, stream.read())
 
     try:
         if jupytext_config_file.endswith((".toml", "jupytext")):
@@ -395,11 +357,7 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
 
         return PyFileConfigLoader(jupytext_config_file).load_config()
     except (ValueError, NameError) as err:
-        raise JupytextConfigurationError(
-            "The Jupytext configuration file {} is incorrect: {}".format(
-                jupytext_config_file, err
-            )
-        )
+        raise JupytextConfigurationError(f"The Jupytext configuration file {jupytext_config_file} is incorrect: {err}")
 
 
 def load_jupytext_configuration_file(config_file, stream=None):
@@ -409,9 +367,7 @@ def load_jupytext_configuration_file(config_file, stream=None):
     # formats can be a dict prefix => format
     if isinstance(config.formats, dict):
         config.formats = [
-            fmt
-            if not prefix
-            else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt
+            (fmt if not prefix else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt)
             for prefix, fmt in config.formats.items()
         ]
     config.formats = short_form_multiple_formats(config.formats)
@@ -438,11 +394,7 @@ def validate_jupytext_configuration_file(config_file, config_dict):
     try:
         config = JupytextConfiguration(**config_dict)
     except TraitError as err:
-        raise JupytextConfigurationError(
-            "The Jupytext configuration file {} is incorrect: {}".format(
-                config_file, err
-            )
-        )
+        raise JupytextConfigurationError(f"The Jupytext configuration file {config_file} is incorrect: {err}")
     invalid_options = set(config_dict).difference(dir(JupytextConfiguration()))
     if any(invalid_options):
         raise JupytextConfigurationError(
@@ -460,13 +412,9 @@ def notebook_formats(nbk, config, path, fallback_on_current_fmt=True):
     formats = jupytext_metadata.get("formats") or metadata.get("jupytext_formats")
 
     if formats:
-        formats = long_form_multiple_formats(
-            formats, metadata, auto_ext_requires_language_info=False
-        )
+        formats = long_form_multiple_formats(formats, metadata, auto_ext_requires_language_info=False)
     elif config:
-        current_format = jupytext_metadata.get(
-            "text_representation", {"extension": os.path.splitext(path)[1]}
-        )
+        current_format = jupytext_metadata.get("text_representation", {"extension": os.path.splitext(path)[1]})
         default_formats = long_form_multiple_formats(
             config.default_formats(path),
             metadata,
@@ -498,9 +446,7 @@ def notebook_formats(nbk, config, path, fallback_on_current_fmt=True):
 
     # Set preferred formats if no format name has been given yet
     if config:
-        formats = [
-            preferred_format(f, config.preferred_jupytext_formats_save) for f in formats
-        ]
+        formats = [preferred_format(f, config.preferred_jupytext_formats_save) for f in formats]
 
     return formats
 

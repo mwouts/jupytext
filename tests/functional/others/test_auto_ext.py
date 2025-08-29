@@ -37,9 +37,7 @@ def test_auto_from_kernelspecs_works(ipynb_file):
         expected_ext = ".cpp"
     auto_ext = auto_ext_from_metadata(nb.metadata)
     if auto_ext == ".sage":
-        pytest.skip(
-            "Sage notebooks have Python in their language_info metadata, see #727"
-        )
+        pytest.skip("Sage notebooks have Python in their language_info metadata, see #727")
     assert auto_ext == expected_ext
 
 

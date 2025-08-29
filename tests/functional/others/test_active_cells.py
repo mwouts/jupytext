@@ -95,7 +95,7 @@ ACTIVE_IPYNB = {
 """,
     ".ipynb": {
         "cell_type": "code",
-        "source": "# This cell is active only in ipynb\n" "%matplotlib inline",
+        "source": "# This cell is active only in ipynb\n%matplotlib inline",
         "metadata": {"active": "ipynb"},
         "execution_count": None,
         "outputs": [],
@@ -129,7 +129,7 @@ ACTIVE_IPYNB_RMD_USING_TAG = {
 """,
     ".ipynb": {
         "cell_type": "code",
-        "source": "# This cell is active only in ipynb and Rmd\n" "%matplotlib inline",
+        "source": "# This cell is active only in ipynb and Rmd\n%matplotlib inline",
         "metadata": {"tags": ["active-ipynb-Rmd"]},
         "execution_count": None,
         "outputs": [],
@@ -149,7 +149,7 @@ ACTIVE_IPYNB_RSPIN = {
 """,
     ".ipynb": {
         "cell_type": "code",
-        "source": "# This cell is active only in ipynb\n" "1 + 1",
+        "source": "# This cell is active only in ipynb\n1 + 1",
         "metadata": {"active": "ipynb"},
         "execution_count": None,
         "outputs": [],
@@ -182,7 +182,7 @@ ACTIVE_PY_IPYNB = {
 """,
     ".ipynb": {
         "cell_type": "code",
-        "source": "# This cell is active in py and " "ipynb extensions",
+        "source": "# This cell is active in py and ipynb extensions",
         "metadata": {"active": "ipynb,py"},
         "execution_count": None,
         "outputs": [],
@@ -208,7 +208,7 @@ ACTIVE_PY_R_IPYNB = {
 """,
     ".ipynb": {
         "cell_type": "code",
-        "source": "# This cell is active in py, R and " "ipynb extensions",
+        "source": "# This cell is active in py, R and ipynb extensions",
         "metadata": {"active": "ipynb,py,R"},
         "execution_count": None,
         "outputs": [],

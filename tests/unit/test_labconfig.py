@@ -38,9 +38,7 @@ def test_read_config(settings_file, sample_viewer_config):
     assert labconfig.config == sample_viewer_config
 
 
-def test_set_unset_default_viewers(
-    settings_file, sample_viewer_config, sample_empty_viewer_config
-):
+def test_set_unset_default_viewers(settings_file, sample_viewer_config, sample_empty_viewer_config):
     labconfig = LabConfig(settings_file=settings_file)
     labconfig.set_default_viewers()
     assert labconfig.config == sample_viewer_config

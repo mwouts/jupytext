@@ -12,9 +12,7 @@ Console.WriteLine("Hello World!");
     md = """```{lang}
 {source}
 ```
-""".format(
-        lang=lang, source=source
-    )
+""".format(lang=lang, source=source)
     nb = jupytext.reads(md, "md")
     assert nb.metadata["jupytext"]["main_language"] == "csharp"
     assert len(nb.cells) == 1
@@ -35,9 +33,7 @@ def test_csharp_magics(no_jupytext_version_number, lang):
 #!html
 <b>Hello!</b>
 ```
-""".format(
-        lang=lang
-    )
+""".format(lang=lang)
     nb = jupytext.reads(md, "md")
     nb.metadata["jupytext"].pop("notebook_metadata_filter")
     nb.metadata["jupytext"].pop("cell_metadata_filter")

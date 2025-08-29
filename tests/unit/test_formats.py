@@ -205,22 +205,15 @@ def test_decompress_formats():
         {"extension": ".ipynb"},
         {"extension": ".py", "format_name": "light"},
     ]
-    assert long_form_multiple_formats(".pct.py:percent") == [
-        {"extension": ".py", "suffix": ".pct", "format_name": "percent"}
-    ]
+    assert long_form_multiple_formats(".pct.py:percent") == [{"extension": ".py", "suffix": ".pct", "format_name": "percent"}]
 
 
 def test_compress_formats():
     assert short_form_multiple_formats([{"extension": ".ipynb"}]) == "ipynb"
     assert short_form_multiple_formats("ipynb") == "ipynb"
+    assert short_form_multiple_formats([{"extension": ".ipynb"}, {"extension": ".md"}]) == "ipynb,md"
     assert (
-        short_form_multiple_formats([{"extension": ".ipynb"}, {"extension": ".md"}])
-        == "ipynb,md"
-    )
-    assert (
-        short_form_multiple_formats(
-            [{"extension": ".ipynb"}, {"extension": ".py", "format_name": "light"}]
-        )
+        short_form_multiple_formats([{"extension": ".ipynb"}, {"extension": ".py", "format_name": "light"}])
         == "ipynb,py:light"
     )
     assert (
@@ -233,12 +226,7 @@ def test_compress_formats():
         )
         == "ipynb,py:light,md"
     )
-    assert (
-        short_form_multiple_formats(
-            [{"extension": ".py", "suffix": ".pct", "format_name": "percent"}]
-        )
-        == ".pct.py:percent"
-    )
+    assert short_form_multiple_formats([{"extension": ".py", "suffix": ".pct", "format_name": "percent"}]) == ".pct.py:percent"
 
 
 def test_rearrange_jupytext_metadata():
@@ -418,9 +406,7 @@ formats = "notebooks///ipynb,scripts///py:percent"
         ),
     ],
 )
-async def test_configuration_examples_from_documentation(
-    config_file, config_contents, python_notebook, tmp_path, cm
-):
+async def test_configuration_examples_from_documentation(config_file, config_contents, python_notebook, tmp_path, cm):
     """Here we make sure that the config examples from
     https://jupytext.readthedocs.io/en/latest/config.html#configuring-paired-notebooks-globally
     just work
@@ -430,9 +416,7 @@ async def test_configuration_examples_from_documentation(
 
     # Save the notebook
     (tmp_path / "notebooks").mkdir()
-    await ensure_async(
-        cm.save(dict(type="notebook", content=python_notebook), "notebooks/nb.ipynb")
-    )
+    await ensure_async(cm.save(dict(type="notebook", content=python_notebook), "notebooks/nb.ipynb"))
 
     # Make sure that ipynb and text version are created
     assert (tmp_path / "notebooks" / "nb.ipynb").is_file()

@@ -15,9 +15,7 @@ def notebook_with_tags(python_notebook):
     return nb
 
 
-@pytest.mark.parametrize(
-    "fmt", ["py:percent", "py:light", "md:markdown", "md:myst", "Rmd:rmarkdown"]
-)
+@pytest.mark.parametrize("fmt", ["py:percent", "py:light", "md:markdown", "md:myst", "Rmd:rmarkdown"])
 def test_main_formats_support_cell_metadata(fmt):
     if fmt == "md:myst" and not is_myst_available():
         pytest.skip("myst is not available")

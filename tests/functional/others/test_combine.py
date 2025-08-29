@@ -194,13 +194,9 @@ def test_combine_split():
 
 
 def test_combine_refactor():
-    nb_source = new_notebook(
-        cells=[new_code_cell("a=1"), new_code_cell("a+1"), new_code_cell("a+2")]
-    )
+    nb_source = new_notebook(cells=[new_code_cell("a=1"), new_code_cell("a+1"), new_code_cell("a+2")])
 
-    nb_outputs = new_notebook(
-        cells=[new_code_cell("b=1"), new_code_cell("b+1"), new_code_cell("b+2")]
-    )
+    nb_outputs = new_notebook(cells=[new_code_cell("b=1"), new_code_cell("b+1"), new_code_cell("b+2")])
 
     nb_outputs.cells[1].outputs = ["2"]
     nb_outputs.cells[2].outputs = ["3"]
@@ -213,9 +209,7 @@ def test_combine_refactor():
 
 
 def test_combine_attachments():
-    nb_source = new_notebook(
-        cells=[new_markdown_cell("![image.png](attachment:image.png)")]
-    )
+    nb_source = new_notebook(cells=[new_markdown_cell("![image.png](attachment:image.png)")])
 
     nb_outputs = new_notebook(
         cells=[

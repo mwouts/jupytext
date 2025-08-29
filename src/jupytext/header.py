@@ -1,5 +1,4 @@
-"""Parse header of text notebooks
-"""
+"""Parse header of text notebooks"""
 
 import logging
 import re
@@ -80,9 +79,7 @@ def encoding_and_executable(notebook, metadata, ext):
     return lines
 
 
-def insert_jupytext_info_and_filter_metadata(
-    metadata, fmt, text_format, unsupported_keys
-):
+def insert_jupytext_info_and_filter_metadata(metadata, fmt, text_format, unsupported_keys):
     """Update the notebook metadata to include Jupytext information, and filter
     the notebook metadata according to the default or user filter"""
     if insert_or_test_version_number():
@@ -105,9 +102,7 @@ def insert_jupytext_info_and_filter_metadata(
     )
 
 
-def metadata_and_cell_to_header(
-    notebook, metadata, text_format, fmt, unsupported_keys=None
-):
+def metadata_and_cell_to_header(notebook, metadata, text_format, fmt, unsupported_keys=None):
     """
     Return the text header corresponding to a notebook, and remove the
     first cell of the notebook if it contained the header
@@ -120,41 +115,28 @@ def metadata_and_cell_to_header(
     root_level_metadata_as_raw_cell = fmt.get("root_level_metadata_as_raw_cell", True)
 
     if not root_level_metadata_as_raw_cell:
-        root_level_metadata = metadata.get("jupytext", {}).pop(
-            "root_level_metadata", {}
-        )
+        root_level_metadata = metadata.get("jupytext", {}).pop("root_level_metadata", {})
     elif notebook.cells:
         cell = notebook.cells[0]
         if cell.cell_type == "raw":
             lines = cell.source.strip("\n\t ").splitlines()
-            if (
-                len(lines) >= 2
-                and _HEADER_RE.match(lines[0])
-                and _HEADER_RE.match(lines[-1])
-            ):
+            if len(lines) >= 2 and _HEADER_RE.match(lines[0]) and _HEADER_RE.match(lines[-1]):
                 header = lines[1:-1]
                 lines_to_next_cell = cell.metadata.get("lines_to_next_cell")
                 notebook.cells = notebook.cells[1:]
 
-    metadata = insert_jupytext_info_and_filter_metadata(
-        metadata, fmt, text_format, unsupported_keys
-    )
+    metadata = insert_jupytext_info_and_filter_metadata(metadata, fmt, text_format, unsupported_keys)
 
     if metadata:
         root_level_metadata["jupyter"] = metadata
 
     if root_level_metadata:
-        header.extend(
-            yaml.safe_dump(root_level_metadata, default_flow_style=False).splitlines()
-        )
+        header.extend(yaml.safe_dump(root_level_metadata, default_flow_style=False).splitlines())
 
     if header:
         header = ["---"] + header + ["---"]
 
-        if (
-            fmt.get("hide_notebook_metadata", False)
-            and text_format.format_name == "markdown"
-        ):
+        if fmt.get("hide_notebook_metadata", False) and text_format.format_name == "markdown":
             header = ["<!--", ""] + header + ["", "-->"]
 
     return (
@@ -184,9 +166,7 @@ def recursive_update(target, update, overwrite=True):
     return target
 
 
-def header_to_metadata_and_cell(
-    lines, header_prefix, header_suffix, ext=None, root_level_metadata_as_raw_cell=True
-):
+def header_to_metadata_and_cell(lines, header_prefix, header_suffix, ext=None, root_level_metadata_as_raw_cell=True):
     """
     Return the metadata, a boolean to indicate if a jupyter section was found,
     the first cell of notebook if some metadata is found outside
@@ -206,9 +186,7 @@ def header_to_metadata_and_cell(
 
     comment = "#" if header_prefix == "#'" else header_prefix
 
-    encoding_re = re.compile(
-        rf"^[ \t\f]*{re.escape(comment)}.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)"
-    )
+    encoding_re = re.compile(rf"^[ \t\f]*{re.escape(comment)}.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)")
 
     for i, line in enumerate(lines):
         if i == 0 and line.startswith("#!"):
@@ -281,17 +259,16 @@ def header_to_metadata_and_cell(
             if root_level_metadata_as_raw_cell:
                 cell = new_raw_cell(
                     source="\n".join(["---"] + header + ["---"]),
-                    metadata={}
-                    if lines_to_next_cell
-                    == pep8_lines_between_cells(["---"], lines[i + 1 :], ext)
-                    else {"lines_to_next_cell": lines_to_next_cell},
+                    metadata=(
+                        {}
+                        if lines_to_next_cell == pep8_lines_between_cells(["---"], lines[i + 1 :], ext)
+                        else {"lines_to_next_cell": lines_to_next_cell}
+                    ),
                 )
             else:
                 cell = None
                 root_level_metadata = yaml.safe_load("\n".join(header))
-                metadata.setdefault("jupytext", {})[
-                    "root_level_metadata"
-                ] = root_level_metadata
+                metadata.setdefault("jupytext", {})["root_level_metadata"] = root_level_metadata
         else:
             cell = None
 
@@ -347,24 +324,15 @@ def metadata_and_cell_to_metadata(nb, fmt, unsupported_keys=None):
         cell = nb.cells[0]
         if cell.cell_type == "raw":
             lines = cell.source.strip("\n\t ").splitlines()
-            if (
-                len(lines) >= 2
-                and _HEADER_RE.match(lines[0])
-                and _HEADER_RE.match(lines[-1])
-            ):
+            if len(lines) >= 2 and _HEADER_RE.match(lines[0]) and _HEADER_RE.match(lines[-1]):
                 try:
                     frontmatter = next(yaml.safe_load_all(cell.source))
                 except (yaml.parser.ParserError, yaml.scanner.ScannerError):
                     logging.warning("[jupytext] failed to parse YAML in raw cell")
                 else:
                     nb.cells = nb.cells[1:]
-                    if (
-                        "root_level_metadata_filter" not in fmt
-                        and default_root_level_metadata_filter(fmt) == "all"
-                    ):
-                        metadata.setdefault("jupytext", {})[
-                            "root_level_metadata_filter"
-                        ] = "-" + ",-".join(frontmatter)
+                    if "root_level_metadata_filter" not in fmt and default_root_level_metadata_filter(fmt) == "all":
+                        metadata.setdefault("jupytext", {})["root_level_metadata_filter"] = "-" + ",-".join(frontmatter)
                     metadata = recursive_update(frontmatter, metadata, overwrite=False)
     nb.metadata = metadata
     return nb

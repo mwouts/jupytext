@@ -39,17 +39,13 @@ class LabConfig:
         return self
 
     def get_viewers(self):
-        return self.config.setdefault(
-            "@jupyterlab/docmanager-extension:plugin", {}
-        ).setdefault("defaultViewers", {})
+        return self.config.setdefault("@jupyterlab/docmanager-extension:plugin", {}).setdefault("defaultViewers", {})
 
     def list_default_viewer(self):
         """
         list the current labconfig settings
         """
-        self.logger.debug(
-            f"Current @jupyterlab/docmanager-extension:plugin in {self.settings_file}"
-        )
+        self.logger.debug(f"Current @jupyterlab/docmanager-extension:plugin in {self.settings_file}")
         for key, value in self.get_viewers().items():
             print(f"{key}: {value}")
 

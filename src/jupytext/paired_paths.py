@@ -92,16 +92,12 @@ def base_path(main_path, fmt, formats=None):
         fmt["extension"] = ext
         if ext not in NOTEBOOK_EXTENSIONS:
             raise NonNotebookExtension(
-                "'{}' is not a notebook. Supported extensions are '{}'.".format(
-                    main_path, "', '".join(NOTEBOOK_EXTENSIONS)
-                )
+                "'{}' is not a notebook. Supported extensions are '{}'.".format(main_path, "', '".join(NOTEBOOK_EXTENSIONS))
             )
 
     if ext != fmt["extension"]:
         raise InconsistentExtension(
-            "Notebook path '{}' was expected to have extension '{}'".format(
-                main_path, fmt["extension"]
-            )
+            "Notebook path '{}' was expected to have extension '{}'".format(main_path, fmt["extension"])
         )
 
     # Is there a format that matches the main path?
@@ -111,11 +107,7 @@ def base_path(main_path, fmt, formats=None):
     for f in formats:
         if f["extension"] != fmt["extension"]:
             continue
-        if (
-            "format_name" in fmt
-            and "format_name" in f
-            and f["format_name"] != fmt["format_name"]
-        ):
+        if "format_name" in fmt and "format_name" in f and f["format_name"] != fmt["format_name"]:
             continue
         # extend 'fmt' with the format information (prefix, suffix) from f
         fmt = {key: fmt.get(key, value) for key, value in f.items()}
@@ -126,11 +118,7 @@ def base_path(main_path, fmt, formats=None):
 
     if suffix:
         if not base.endswith(suffix):
-            raise InconsistentSuffix(
-                "Notebook name '{}' was expected to end with suffix '{}'".format(
-                    base, suffix
-                )
-            )
+            raise InconsistentSuffix(f"Notebook name '{base}' was expected to end with suffix '{suffix}'")
         base = base[: -len(suffix)]
 
     if not prefix:
@@ -155,9 +143,7 @@ def base_path(main_path, fmt, formats=None):
     if prefix_file_name:
         if not notebook_file_name.startswith(prefix_file_name):
             raise InconsistentPrefix(
-                "Notebook name '{}' was expected to start with prefix '{}'".format(
-                    notebook_file_name, prefix_file_name
-                )
+                f"Notebook name '{notebook_file_name}' was expected to start with prefix '{prefix_file_name}'"
             )
         notebook_file_name = notebook_file_name[len(prefix_file_name) :]
 
@@ -170,22 +156,16 @@ def base_path(main_path, fmt, formats=None):
             if expected_folder == "..":
                 if not actual_folders:
                     raise InconsistentPrefixDirectory(
-                        "Notebook directory '{}' does not match prefix '{}'".format(
-                            notebook_dir, prefix_dir
-                        )
+                        f"Notebook directory '{notebook_dir}' does not match prefix '{prefix_dir}'"
                     )
-                parent_notebook_dir = join(
-                    parent_notebook_dir, actual_folders.pop(), sep
-                )
+                parent_notebook_dir = join(parent_notebook_dir, actual_folders.pop(), sep)
             else:
                 parent_notebook_dir, actual_folder = split(parent_notebook_dir, sep)
                 actual_folders.append(actual_folder)
 
                 if actual_folder != expected_folder:
                     raise InconsistentPrefixDirectory(
-                        "Notebook directory '{}' does not match prefix '{}'".format(
-                            notebook_dir, prefix_dir
-                        )
+                        f"Notebook directory '{notebook_dir}' does not match prefix '{prefix_dir}'"
                     )
         notebook_dir = parent_notebook_dir
 
@@ -193,11 +173,7 @@ def base_path(main_path, fmt, formats=None):
         long_prefix_root = sep + prefix_root + sep
         long_notebook_dir = sep + notebook_dir + sep
         if long_prefix_root not in long_notebook_dir:
-            raise InconsistentPrefixRoot(
-                "Notebook directory '{}' does not match prefix root '{}'".format(
-                    notebook_dir, prefix_root
-                )
-            )
+            raise InconsistentPrefixRoot(f"Notebook directory '{notebook_dir}' does not match prefix root '{prefix_root}'")
         left, right = long_notebook_dir.rsplit(long_prefix_root, 1)
         notebook_dir = left + sep + "//" + right
 
@@ -215,9 +191,7 @@ def base_path(main_path, fmt, formats=None):
     return notebook_dir + sep + notebook_file_name
 
 
-def base_path_and_adjusted_fmt(
-    path: str, fmt: dict[str, str]
-) -> tuple[str, dict[str, str]]:
+def base_path_and_adjusted_fmt(path: str, fmt: dict[str, str]) -> tuple[str, dict[str, str]]:
     """Return the base path and possibly adjusted Jupytext format
     that matches the current path"""
     assert isinstance(fmt, dict), "fmt must be a dictionary"
@@ -279,9 +253,7 @@ def full_path(base, fmt):
         if (prefix_root != "") != ("//" in base):
             raise InconsistentPath(
                 "Notebook base name '{}' is not compatible with fmt={}. Make sure you use prefix roots "
-                "in either none, or all of the paired formats".format(
-                    base, short_form_one_format(fmt)
-                )
+                "in either none, or all of the paired formats".format(base, short_form_one_format(fmt))
             )
         if prefix_root:
             left, right = base.rsplit("//", 1)
@@ -316,9 +288,7 @@ def full_path(base, fmt):
     return full + ext
 
 
-def find_base_path_and_format(
-    main_path, formats: list[dict[str, str]]
-) -> tuple[str, dict[str, str]]:
+def find_base_path_and_format(main_path, formats: list[dict[str, str]]) -> tuple[str, dict[str, str]]:
     """Return the base path and the format corresponding to the given path"""
     for fmt in formats:
         try:
@@ -357,8 +327,6 @@ def paired_paths(main_path, fmt, formats):
         )
 
     if len(paths) > len(set(paths)):
-        raise InconsistentPath(
-            "Duplicate paired paths for this notebook. Please fix jupytext.formats."
-        )
+        raise InconsistentPath("Duplicate paired paths for this notebook. Please fix jupytext.formats.")
 
     return list(zip(paths, formats))

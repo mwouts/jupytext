@@ -82,7 +82,5 @@ def test_meaningfull_error_when_pandoc_is_missing(tmpdir):
     nb_file = tmpdir.join("notebook.ipynb")
     jupytext.write(new_notebook(), str(nb_file))
 
-    with pytest.raises(
-        PandocError, match="The Pandoc Markdown format requires 'pandoc>=2.7.2'"
-    ):
+    with pytest.raises(PandocError, match="The Pandoc Markdown format requires 'pandoc>=2.7.2'"):
         jupytext_cli([str(nb_file), "--to", "md:pandoc"])
