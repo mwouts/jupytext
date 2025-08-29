@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.18.0 (unreleased)
+-------------------
+
+**Changed**
+- We have updated the pre-commit hooks. The code is now formatted using `ruff format`, and updated for Python 3.9+ using https://github.com/asottile/pyupgrade ([#1423](https://github.com/mwouts/jupytext/issues/1423))
+
+
 1.17.3 (2025-08-28)
 -------------------
 
