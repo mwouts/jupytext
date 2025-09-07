@@ -203,6 +203,7 @@ markers = [
     "requires_myst",
     "requires_no_myst",
     "requires_quarto",
+    "requires_marimo",
     "requires_pandoc",
     "requires_no_pandoc",
     "requires_sphinx_gallery",
@@ -253,6 +254,7 @@ filterwarnings = [
     "ignore:unclosed database in <sqlite3.Connection:ResourceWarning",
     "ignore:Exception ignored:pytest.PytestUnraisableExceptionWarning",
 ]
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 omit = [

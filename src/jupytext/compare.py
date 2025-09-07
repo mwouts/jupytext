@@ -139,16 +139,17 @@ def compare_notebooks(
 
     # Compare notebook metadata
     modified_metadata = False
-    try:
-        ignore_display_name = fmt.get("extension") == ".qmd" and allow_expected_differences
-        compare(
-            filtered_notebook_metadata(notebook_actual, ignore_display_name),
-            filtered_notebook_metadata(notebook_expected, ignore_display_name),
-        )
-    except AssertionError as error:
-        if raise_on_first_difference:
-            raise NotebookDifference(f"Notebook metadata differ: {str(error)}")
-        modified_metadata = True
+    if fmt.get("format_name") != "marimo":
+        try:
+            ignore_display_name = fmt.get("extension") == ".qmd" and allow_expected_differences
+            compare(
+                filtered_notebook_metadata(notebook_actual, ignore_display_name),
+                filtered_notebook_metadata(notebook_expected, ignore_display_name),
+            )
+        except AssertionError as error:
+            if raise_on_first_difference:
+                raise NotebookDifference(f"Notebook metadata differ: {str(error)}")
+            modified_metadata = True
 
     error = []
     if modified_cells:
