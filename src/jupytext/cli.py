@@ -775,6 +775,9 @@ def jupytext_single_file(nb_file, args, log):
         force_update_timestamp=False,
     ):
         """Write the notebook only if it has changed"""
+        # Used in tests only
+        if _callback_on_lazy_write is not None:
+            _callback_on_lazy_write(path)
         if path == "-":
             timestamp_checker.check_all_timestamps()
             write(notebook, "-", fmt=fmt)
@@ -1120,6 +1123,11 @@ class TimestampChecker:
     def check_all_timestamps(self):
         for path in self._timestamps:
             self.check_timestamp(path)
+
+
+# If not none, this function is called with the path of each file
+# that Jupytext CLI considers to write back (to be used in tests)
+_callback_on_lazy_write = None
 
 
 def load_paired_notebook(
