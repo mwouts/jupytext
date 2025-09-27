@@ -411,7 +411,7 @@ async def test_outdated_text_notebook(python_notebook, cm, tmpdir):
         await ensure_async(cm.get("notebook.py"))
 
     # 6. test OK with
-    cm.outdated_text_notebook_margin = 1.0
+    cm.outdated_text_notebook_margin = 5.0
     await ensure_async(cm.get("notebook.py"))
 
     # 7. test OK with
