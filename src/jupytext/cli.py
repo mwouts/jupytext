@@ -198,6 +198,12 @@ def parse_jupytext_args(args=None):
         action="store_true",
     )
     parser.add_argument(
+        "--check-source-is-newer",
+        help="Check that the file given as argument is the most recent of all paired files, and "
+        "if applicable, checks that it is newer than the destination file.",
+        action="store_true",
+    )
+    parser.add_argument(
         "--warn-only",
         "-w",
         action="store_true",
@@ -479,7 +485,7 @@ def jupytext(args=None):
         else:
             notebooks.append(pattern)
 
-    # Count how many file have round-trip issues when testing
+    # Count how many files have round-trip issues when testing
     exit_code = 0
     for nb_file in notebooks:
         if not args.warn_only:
@@ -890,6 +896,12 @@ def jupytext_single_file(nb_file, args, log):
         return {"modified": modified}
 
     if nb_dest:
+        if args.check_source_is_newer:
+            ts_src = timestamp_checker.check_file_is_newest(nb_file)
+            ts_dest = timestamp_checker.get_and_check_timestamp(nb_dest)
+            if ts_dest is not None and ts_dest > ts_src:
+                raise ValueError(f"Source {nb_file} is older than destination {nb_dest}")
+
         if nb_dest == nb_file and not dest_fmt:
             dest_fmt = fmt
 
@@ -944,6 +956,8 @@ def jupytext_single_file(nb_file, args, log):
 
     # c. Synchronize paired notebooks
     elif args.sync:
+        if args.check_source_is_newer:
+            timestamp_checker.check_file_is_newest(nb_file)
         write_pair(nb_file, formats, lazy_write)
 
     return untracked_files
@@ -1123,6 +1137,18 @@ class TimestampChecker:
     def check_all_timestamps(self):
         for path in self._timestamps:
             self.check_timestamp(path)
+
+    def check_file_is_newest(self, path: str) -> Optional[float]:
+        """Check that the given file is the most recent among all files whose timestamp
+        was recorded by this TimestampChecker. Return its timestamp."""
+        ts = self._timestamps[path]
+        assert ts is not None, f"The timestamp of {shlex.quote(path)} was not previously recorded"
+        for p, p_ts in self._timestamps.items():
+            if p == path or p_ts is None:
+                continue
+            if p_ts > ts:
+                raise ValueError(f"Source {shlex.quote(path)} is older than paired file {shlex.quote(p)}")
+        return ts
 
 
 # If not none, this function is called with the path of each file
