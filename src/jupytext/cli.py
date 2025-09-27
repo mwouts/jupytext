@@ -848,8 +848,9 @@ def jupytext_single_file(nb_file, args, log):
         # the text file to make sure they remain more recent than the ipynb file, for compatibility with the
         # Jupytext contents manager for Jupyter
         if args.use_source_timestamp:
-            log(f"[jupytext] Setting the timestamp of {shlex.quote(path)} equal to that of {shlex.quote(nb_file)}")
-            os.utime(tmp_path, (os.stat(nb_file).st_atime, os.stat(nb_file).st_mtime))
+            if tmp_path != nb_file:
+                log(f"[jupytext] Setting the timestamp of {shlex.quote(path)} equal to that of {shlex.quote(nb_file)}")
+                os.utime(tmp_path, (os.stat(nb_file).st_atime, os.stat(nb_file).st_mtime))
         elif not modified:
             if path.endswith(".ipynb"):
                 # No need to update the timestamp of ipynb files
