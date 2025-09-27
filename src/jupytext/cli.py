@@ -11,6 +11,7 @@ import sys
 import warnings
 from copy import copy
 from tempfile import NamedTemporaryFile
+from typing import Optional
 
 from .combine import combine_inputs_with_outputs
 from .compare import NotebookDifference, compare, test_round_trip_conversion
@@ -497,7 +498,7 @@ def jupytext_single_file(nb_file, args, log):
     if nb_file == "-" and args.sync:
         msg = "Missing notebook path."
         if args.set_formats is not None and os.path.isfile(args.set_formats):
-            msg += f" Maybe you mean 'jupytext --sync {args.set_formats}' ?"
+            msg += f" Did you mean 'jupytext --sync {args.set_formats}' ?"
         raise ValueError(msg)
 
     nb_dest = None
@@ -546,6 +547,8 @@ def jupytext_single_file(nb_file, args, log):
         )
     )
 
+    timestamp_checker = TimestampChecker(pre_commit_mode=args.pre_commit_mode)
+    timestamp_checker.get_and_check_timestamp(nb_file)
     notebook = read(nb_file, fmt=fmt, config=config)
     if "extension" in fmt and "format_name" not in fmt:
         text_representation = notebook.metadata.get("jupytext", {}).get("text_representation", {})
@@ -601,7 +604,7 @@ def jupytext_single_file(nb_file, args, log):
         set_prefix_and_suffix(fmt, formats, nb_file)
         try:
             notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(
-                notebook, fmt, config, formats, nb_file, log, args.pre_commit_mode
+                notebook, fmt, config, formats, nb_file, log, args.pre_commit_mode, timestamp_checker
             )
             nb_files = [inputs_nb_file, outputs_nb_file]
         except NotAPairedNotebook as err:
@@ -727,8 +730,13 @@ def jupytext_single_file(nb_file, args, log):
 
             # Round trip from a text file
             else:
+                # We read the original text from disk a second time
                 with open(nb_file, encoding="utf-8") as fp:
                     org_text = fp.read()
+
+                # We also make sure that the text file
+                # has not changed since we first read it!
+                timestamp_checker.check_timestamp(nb_file)
 
                 # If the destination is not ipynb, we convert to/back that format
                 if dest_fmt["extension"] != ".ipynb":
@@ -768,6 +776,7 @@ def jupytext_single_file(nb_file, args, log):
     ):
         """Write the notebook only if it has changed"""
         if path == "-":
+            timestamp_checker.check_all_timestamps()
             write(notebook, "-", fmt=fmt)
             return
 
@@ -786,8 +795,15 @@ def jupytext_single_file(nb_file, args, log):
                 modified = True
                 diff = "(file did not exist)"
             else:
+                # We load the current file from disk
+                # NB: in the --to mode, it might be the first
+                # time we actually read this file
+                timestamp_checker.get_and_check_timestamp(path)
                 with open(path, encoding="utf-8") as fp:
                     current_content = fp.read()
+
+                timestamp_checker.check_timestamp(path)
+
                 modified = new_content != current_content
                 if modified and args.show_changes:
                     diff = compare(
@@ -798,30 +814,33 @@ def jupytext_single_file(nb_file, args, log):
                         return_diff=True,
                     )
 
+        tmp_path = path
         if modified:
             # The text representation of the notebook has changed, we write it on disk
-            if action is None:
-                message = f"[jupytext] Updating {shlex.quote(path)}"
-            else:
-                message = "[jupytext] Writing {path}{format}{action}".format(
-                    path=shlex.quote(path),
-                    format=(" in format " + short_form_one_format(fmt) if fmt and "format_name" in fmt else ""),
-                    action=action,
-                )
-            if args.show_changes:
-                message += " with this change:\n" + diff
-
-            log(message)
             create_prefix_dir(path, fmt)
-            with open(path, "w", encoding="utf-8") as fp:
+            # Create a temporary file in the same directory as path. Later on we will move
+            # that temporary file back to path (os.replace is atomic on most OS)
+            name, ext = os.path.splitext(path)
+            tmp_path = name + f"_tmp_jupytext_{os.getpid()}" + ext
+            with open(tmp_path, "w", encoding="utf-8") as fp:
                 fp.write(new_content)
 
-        # Otherwise, we only update the timestamp of the text file to make sure
-        # they remain more recent than the ipynb file, for compatibility with the
+        # We check that none of the input files changed while we were
+        # doing our processing. If they did, we abort as we would
+        # otherwise overwrite the modifications.
+        try:
+            timestamp_checker.check_all_timestamps()
+        except SynchronousModificationError:
+            if modified:
+                os.remove(tmp_path)
+            raise
+
+        # When the content is unchanged, we still need to update the timestamp of
+        # the text file to make sure they remain more recent than the ipynb file, for compatibility with the
         # Jupytext contents manager for Jupyter
         if args.use_source_timestamp:
             log(f"[jupytext] Setting the timestamp of {shlex.quote(path)} equal to that of {shlex.quote(nb_file)}")
-            os.utime(path, (os.stat(path).st_atime, os.stat(nb_file).st_mtime))
+            os.utime(tmp_path, (os.stat(nb_file).st_atime, os.stat(nb_file).st_mtime))
         elif not modified:
             if path.endswith(".ipynb"):
                 # No need to update the timestamp of ipynb files
@@ -834,6 +853,25 @@ def jupytext_single_file(nb_file, args, log):
             else:
                 log(f"[jupytext] Updating the timestamp of {shlex.quote(path)}")
                 os.utime(path, None)
+
+        if modified:
+            if action is None:
+                message = f"[jupytext] Updating {shlex.quote(path)}"
+            else:
+                message = "[jupytext] Writing {path}{format}{action}".format(
+                    path=shlex.quote(path),
+                    format=(" in format " + short_form_one_format(fmt) if fmt and "format_name" in fmt else ""),
+                    action=action,
+                )
+            if args.show_changes:
+                message += " with this change:\n" + diff
+
+            log(message)
+            os.replace(tmp_path, path)
+
+        # If we changed the file timestamp, we update our checker accordingly
+        if modified or args.use_source_timestamp or force_update_timestamp:
+            timestamp_checker.update_timestamp(path)
 
         if args.pre_commit:
             system("git", "add", path)
@@ -1023,13 +1061,70 @@ def git_timestamp(path):
     return get_timestamp(path)
 
 
-def get_timestamp(path):
+def get_timestamp(path: str) -> Optional[float]:
     if not os.path.isfile(path):
         return None
     return os.stat(path).st_mtime
 
 
-def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commit_mode):
+class SynchronousModificationError(OSError):
+    """An error raised when a file was modified while Jupytext was running"""
+
+
+class TimestampChecker:
+    """
+    This class keeps track of the timestamps of files that have been used by Jupytext
+    when loading a paired notebook. Either the timestamp of each file was consulted to
+    identify the most recent input file, or its content was read.
+    """
+
+    def __init__(self, pre_commit_mode: bool = False):
+        self.pre_commit_mode = pre_commit_mode
+        self._timestamps: dict[str, Optional[float]] = {}
+
+    def get_and_check_timestamp(self, path: str) -> Optional[float]:
+        if path in self._timestamps:
+            ts = self.check_timestamp(path)
+        else:
+            ts = get_timestamp(path)
+            self._timestamps[path] = ts
+
+        if self.pre_commit_mode:
+            return git_timestamp(path)
+
+        return ts
+
+    def check_timestamp(self, path: str) -> Optional[float]:
+        if path not in self._timestamps:
+            raise ValueError(
+                f"The timestamp of {shlex.quote(path)} was not previously recorded. So far Jupytext has only recorded timestamps for {', '.join(shlex.quote(p) for p in self._timestamps)}"
+            )
+
+        ts = get_timestamp(path)
+        old_ts = self._timestamps[path]
+        if old_ts is None and ts is not None:
+            raise SynchronousModificationError(f"The file {shlex.quote(path)} was created while Jupytext was running")
+        if old_ts is not None and ts is None:
+            raise SynchronousModificationError(f"The file {shlex.quote(path)} was deleted while Jupytext was running")
+        if ts != old_ts:
+            raise SynchronousModificationError(f"The file {shlex.quote(path)} was modified while Jupytext was running")
+
+        return ts
+
+    def update_timestamp(self, path: str):
+        ts = get_timestamp(path)
+        if ts is None:
+            raise FileNotFoundError(f"The file {shlex.quote(path)} does not exist")
+        self._timestamps[path] = ts
+
+    def check_all_timestamps(self):
+        for path in self._timestamps:
+            self.check_timestamp(path)
+
+
+def load_paired_notebook(
+    notebook, fmt, config, formats, nb_file, log, pre_commit_mode: bool, timestamp_checker: TimestampChecker
+):
     """Update the notebook with the inputs and outputs of the most recent paired files"""
     if not formats:
         raise NotAPairedNotebook(f"{shlex.quote(nb_file)} is not a paired notebook")
@@ -1043,6 +1138,7 @@ def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commi
             return notebook
 
         log(f"[jupytext] Loading {shlex.quote(path)}")
+        timestamp_checker.get_and_check_timestamp(path)
         return read(path, fmt=fmt, config=config)
 
     if pre_commit_mode and file_in_git_index(nb_file):
@@ -1054,9 +1150,11 @@ def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commi
 
         if len(nb_files_in_git_index) > 1:
             path0, fmt0 = nb_files_in_git_index[0]
+            timestamp_checker.get_and_check_timestamp(path0)
             with open(path0, encoding="utf-8") as fp:
                 text0 = fp.read()
             for alt_path, alt_fmt in nb_files_in_git_index[1:]:
+                timestamp_checker.get_and_check_timestamp(alt_path)
                 nb = read(alt_path, fmt=alt_fmt, config=config)
                 alt_text = writes(nb, fmt=fmt0, config=config)
                 if alt_text != text0:
@@ -1069,7 +1167,7 @@ def load_paired_notebook(notebook, fmt, config, formats, nb_file, log, pre_commi
                         f"    git reset {shlex.quote(path0)} && git checkout -- {shlex.quote(path0)}\n"
                     )
 
-    inputs, outputs = latest_inputs_and_outputs(nb_file, fmt, formats, git_timestamp if pre_commit_mode else get_timestamp)
+    inputs, outputs = latest_inputs_and_outputs(nb_file, fmt, formats, timestamp_checker.get_and_check_timestamp)
     notebook = read_pair(inputs, outputs, read_one_file)
 
     return notebook, inputs.path, outputs.path
