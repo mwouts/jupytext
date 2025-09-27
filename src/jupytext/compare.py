@@ -201,9 +201,9 @@ def compare_cells(
         if ref_cell.cell_type != test_cell.cell_type:
             if raise_on_first_difference:
                 raise NotebookDifference(
-                    "Unexpected cell type '{}' for {} cell #{}:\n{}".format(
-                        test_cell.cell_type, ref_cell.cell_type, i, ref_cell.source
-                    )
+                    f"When comparing cell #{i}: "
+                    f"expecting a {ref_cell.cell_type} cell, but got a {test_cell.cell_type} cell.\n"
+                    f"Expected content:\n{ref_cell.source}\nActual content:\n{test_cell.source}"
                 )
             modified_cells.add(i)
 
