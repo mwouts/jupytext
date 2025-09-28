@@ -7,7 +7,7 @@ import pytest
 
 def replace_issue_number_with_links(text):
     return re.sub(
-        r"([^\[])#([0-9]+)",
+        r"([^\[-])#([0-9]+)",
         r"\1[#\2](https://github.com/mwouts/jupytext/issues/\2)",
         text,
     )
@@ -23,6 +23,10 @@ def replace_issue_number_with_links(text):
         (
             "Multiline\ntext (#123)",
             "Multiline\ntext ([#123](https://github.com/mwouts/jupytext/issues/123))",
+        ),
+        (
+            "(#123) and [Another-project-#535](https://custom_url)",
+            "([#123](https://github.com/mwouts/jupytext/issues/123)) and [Another-project-#535](https://custom_url)",
         ),
     ],
 )
