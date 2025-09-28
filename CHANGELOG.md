@@ -7,6 +7,9 @@ Jupytext ChangeLog
 **Changed**
 - We have updated the pre-commit hooks. The code is now formatted using `ruff format`, and updated for Python 3.9+ using https://github.com/asottile/pyupgrade ([#1423](https://github.com/mwouts/jupytext/issues/1423))
 
+**Fixed**
+- We don't import `notebook` when `jupyter_server` is available ([#1436](https://github.com/mwouts/jupytext/issues/1436))
+
 
 1.17.3 (2025-08-28)
 -------------------

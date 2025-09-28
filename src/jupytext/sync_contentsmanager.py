@@ -24,12 +24,6 @@ from datetime import timedelta
 import nbformat
 from tornado.web import HTTPError
 
-# import notebook.transutils before notebook.services.contents.filemanager #75
-try:
-    import notebook.transutils  # noqa
-except ImportError:
-    pass
-
 from .sync_pairs import read_pair, write_pair
 from .config import (
     JUPYTEXT_CONFIG_FILES,
@@ -760,7 +754,13 @@ try:
         LargeFileManager
     )
 except ImportError:
-    # If we can't find jupyter_server then we take it from notebook
+    # If we can't find jupyter_server then we take the file manager from notebook
+    # import notebook.transutils needs to happen before notebook.services.contents.filemanager, see #75
+    try:
+        import notebook.transutils  # noqa
+    except ImportError:
+        pass
+
     try:
         from notebook.services.contents.largefilemanager import LargeFileManager
 
