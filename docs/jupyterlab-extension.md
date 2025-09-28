@@ -29,6 +29,6 @@ Following screenshot shows the `New Text Notebook` submenu available in `File` m
 
 Similarly, to pair existing notebooks, users can go to `Jupytext` menu on main menu as shown below:
 
-![](../jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests/tests/jupytext-menu.spec.ts-snapshots/opened-jupytext-menu-jupytext-pair-notebook-jupytext-linux.png)
+![](../jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests/tests/jupytext-menu.spec.ts-snapshots/opened-jupytext-menu-file-jupytext-jupytext-linux.png)
 
 All the options are greyed out in the above screenshot as there is no notebook widget currently active. Once the user opens a new notebook, the options will become available.
