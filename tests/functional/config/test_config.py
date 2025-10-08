@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+from contextlib import contextmanager
 
 import pytest
 
@@ -8,6 +10,46 @@ from jupytext.config import (
     notebook_formats,
 )
 from jupytext.jupytext import load_jupytext_config, read
+
+
+@contextmanager
+def change_dir(path):
+    """Context manager to temporarily change directory."""
+    old_cwd = os.getcwd()
+    try:
+        os.chdir(path)
+        yield
+    finally:
+        os.chdir(old_cwd)
+
+
+@pytest.fixture
+def temp_folder_tree(tmp_path):
+    """
+    Fixture that creates a temporary folder tree.
+    tmp_path is a pytest built-in fixture that auto-cleans up.
+    """
+    # Create folder structure
+    (tmp_path / "subdir").mkdir()
+
+    # Create some files
+    (tmp_path / "jupytext.toml").write_text("")
+    (tmp_path / "subdir" / "notebook.ipynb").write_text("")
+
+    return tmp_path
+
+
+def test_issue_1440(temp_folder_tree):
+    """Test that jupytext finds the config file even in parent of cwd"""
+    notebook = Path("notebook.ipynb")
+    notebook_str = str(notebook)
+    expected_toml = str(temp_folder_tree / "jupytext.toml")
+    with change_dir(temp_folder_tree / "subdir"):
+        assert notebook.exists()
+        config_file_from_path = find_jupytext_configuration_file(notebook)
+        assert config_file_from_path == expected_toml
+        config_file_from_str = find_jupytext_configuration_file(notebook_str)
+        assert config_file_from_str == expected_toml
 
 
 def test_find_jupytext_configuration_file(tmpdir):
