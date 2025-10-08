@@ -116,7 +116,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     defaultBrowser: IDefaultFileBrowser | null,
     translator: ITranslator | null,
     palette: ICommandPalette | null,
-    riseFactory: IRisePreviewFactory | null
+    riseFactory: IRisePreviewFactory | null,
   ) => {
     console.log('JupyterLab extension jupytext is activating...');
     const trans = (translator ?? nullTranslator).load('jupytext');
@@ -146,6 +146,16 @@ const extension: JupyterFrontEndPlugin<void> = {
       rank: 0.97,
       type: 'submenu',
       submenu: jupytextCreateMenu,
+    });
+
+    // Add create text notebook submenu to context menu
+    // Rank 53 as 52 is used for classic notebook
+    // https://github.com/jupyterlab/jupyterlab/blob/4d34bbbea2afc7385169d92bf7bc0c9e0face3a9/packages/notebook-extension/schema/tracker.json#L363-L369
+    app.contextMenu.addItem({
+      submenu: jupytextCreateMenu,
+      type: 'submenu',
+      selector: '.jp-DirListing-content',
+      rank: 53,
     });
 
     // Initialise Jupytext menu and add it to main menu
@@ -198,13 +208,13 @@ const extension: JupyterFrontEndPlugin<void> = {
                 command,
                 format,
                 notebookTracker,
-                trans
+                trans,
               );
             },
           });
 
           console.debug(
-            'Registering pairing command=' + command + ' with rank=' + rank
+            'Registering pairing command=' + command + ' with rank=' + rank,
           );
           palette?.addItem({
             command,
@@ -221,7 +231,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           }
           rank += 1;
         });
-      }
+      },
     );
 
     // Add separators in jupytext pair menu
@@ -352,21 +362,21 @@ const extension: JupyterFrontEndPlugin<void> = {
     // Get a map of available kernel languages in current widget
     const availableKernelLanguages = await getAvailableKernelLanguages(
       languages,
-      serviceManager
+      serviceManager,
     );
 
     // Get a map of all create text notebook commands
     const createTextNotebookCommands =
       await getAvailableCreateTextNotebookCommands(
         includeFormats,
-        availableKernelLanguages
+        availableKernelLanguages,
       );
 
     // Register Jupytext text notebooks file types
     registerFileTypes(availableKernelLanguages, docRegistry, trans);
 
     // Get all kernel file types to add to Jupytext factory
-    const kernelLanguageNames = [];
+    const kernelLanguageNames: string[] = [];
     for (const kernelLanguage of availableKernelLanguages.keys()) {
       kernelLanguageNames.push(kernelLanguage);
     }
@@ -384,7 +394,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       rendermime,
       translator,
       trans,
-      riseFactory
+      riseFactory,
     );
 
     // Register all the commands that create text notebooks with different formats
@@ -431,7 +441,7 @@ const extension: JupyterFrontEndPlugin<void> = {
               kernelId,
               kernelName,
               format,
-              commands
+              commands,
             );
           },
         });
@@ -440,7 +450,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           'Registering create new text notebook command=' +
             command +
             ' with rank=' +
-            rank
+            rank,
         );
         palette?.addItem({
           command,
@@ -487,10 +497,10 @@ const extension: JupyterFrontEndPlugin<void> = {
                   kernelIconUrl,
                   metadata: {
                     kernel: JSONExt.deepCopy(
-                      specs.kernelspecs[fileType.kernelName]?.metadata || {}
+                      specs.kernelspecs[fileType.kernelName]?.metadata || {},
                     ) as ReadonlyJSONValue,
                   },
-                })
+                }),
               );
             };
             onSpecsChanged();

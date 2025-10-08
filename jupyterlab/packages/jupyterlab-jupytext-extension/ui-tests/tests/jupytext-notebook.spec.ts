@@ -61,7 +61,7 @@ async function populateNotebook(extension, page) {
   await page.notebook.setCell(0, 'raw', 'Just a raw cell');
   await page.notebook.addCell(
     'markdown',
-    '## This is **bold** and *italic* [link to jupyter.org!](http://jupyter.org)'
+    '## This is **bold** and *italic* [link to jupyter.org!](http://jupyter.org)',
   );
   await page.notebook.runCell(1, true);
   // For bash, use shell code
@@ -93,6 +93,11 @@ test.describe('Jupytext Create Text Notebooks from Menu Tests', () => {
       }
       await select!.selectOption(option);
       await page.click('.jp-Dialog .jp-mod-accept');
+
+      const firstCell = await page.notebook.getCellLocator(0);
+      await firstCell?.hover();
+
+      await expect(firstCell!.locator('.jp-cell-toolbar')).toHaveCount(1);
 
       // Populate page
       await populateNotebook(paths.extension, page);
@@ -144,7 +149,7 @@ test.describe('Jupytext Pair Python Notebooks from Menu Tests', () => {
 
       const imageName = `paired-jupytext-${paths.menuPath.replace(
         />/g,
-        '-'
+        '-',
       )}.png`;
       expect(await page.screenshot()).toMatchSnapshot(imageName.toLowerCase());
     });

@@ -43,7 +43,7 @@ def test_pre_commit_hook(tmpdir):
     git = git_in_tmpdir(tmpdir)
     hook = str(tmpdir.join(".git/hooks/pre-commit"))
     with open(hook, "w") as fp:
-        fp.write("#!/bin/sh\n" "jupytext --to py:light --pre-commit\n")
+        fp.write("#!/bin/sh\njupytext --to py:percent --pre-commit\n")
 
     st = os.stat(hook)
     os.chmod(hook, st.st_mode | stat.S_IEXEC)
@@ -66,7 +66,7 @@ def test_sync_with_pre_commit_hook(tmpdir):
     git = git_in_tmpdir(tmpdir)
     hook = str(tmpdir.join(".git/hooks/pre-commit"))
     with open(hook, "w") as fp:
-        fp.write("#!/bin/sh\n" "jupytext --sync --pre-commit\n")
+        fp.write("#!/bin/sh\njupytext --sync --pre-commit\n")
 
     st = os.stat(hook)
     os.chmod(hook, st.st_mode | stat.S_IEXEC)
@@ -127,9 +127,7 @@ def test_sync_with_pre_commit_hook(tmpdir):
     assert "notebook.md" in git("ls-tree", "-r", "main", "--name-only")
 
     nb = read(tmp_ipynb)
-    compare_cells(
-        nb.cells, [new_markdown_cell("Notebook was edited")], compare_ids=False
-    )
+    compare_cells(nb.cells, [new_markdown_cell("Notebook was edited")], compare_ids=False)
 
     # create and commit a jpg file
     tmp_jpg = str(tmpdir.join("image.jpg"))
@@ -147,9 +145,7 @@ def test_pre_commit_hook_in_subfolder(tmpdir):
     git = git_in_tmpdir(tmpdir)
     hook = str(tmpdir.join(".git/hooks/pre-commit"))
     with open(hook, "w") as fp:
-        fp.write(
-            "#!/bin/sh\n" "jupytext --from ipynb --to python//py:light --pre-commit\n"
-        )
+        fp.write("#!/bin/sh\njupytext --from ipynb --to python//py:percent --pre-commit\n")
 
     st = os.stat(hook)
     os.chmod(hook, st.st_mode | stat.S_IEXEC)
@@ -177,9 +173,7 @@ def test_pre_commit_hook_py_to_ipynb_and_md(tmpdir):
     hook = str(tmpdir.join(".git/hooks/pre-commit"))
     with open(hook, "w") as fp:
         fp.write(
-            "#!/bin/sh\n"
-            "jupytext --from py:light --to ipynb --pre-commit\n"
-            "jupytext --from py:light --to md --pre-commit\n"
+            "#!/bin/sh\njupytext --from py:percent --to ipynb --pre-commit\njupytext --from py:percent --to md --pre-commit\n"
         )
 
     st = os.stat(hook)
@@ -333,7 +327,7 @@ def test_pre_commit_hook_with_subfolders_issue_506(tmpdir):
     git = git_in_tmpdir(tmpdir)
     hook = str(tmpdir.join(".git/hooks/pre-commit"))
     with open(hook, "w") as fp:
-        fp.write("#!/bin/sh\n" "jupytext --sync --pre-commit\n")
+        fp.write("#!/bin/sh\njupytext --sync --pre-commit\n")
 
     st = os.stat(hook)
     os.chmod(hook, st.st_mode | stat.S_IEXEC)

@@ -1,4 +1,5 @@
 """Determine notebook or cell language"""
+
 import re
 
 # Jupyter magic commands that are also languages
@@ -99,21 +100,12 @@ _SCRIPT_EXTENSIONS = {
 }
 
 _COMMENT_CHARS = [
-    _SCRIPT_EXTENSIONS[ext]["comment"]
-    for ext in _SCRIPT_EXTENSIONS
-    if _SCRIPT_EXTENSIONS[ext]["comment"] != "#"
+    _SCRIPT_EXTENSIONS[ext]["comment"] for ext in _SCRIPT_EXTENSIONS if _SCRIPT_EXTENSIONS[ext]["comment"] != "#"
 ]
 
-_COMMENT = {
-    _SCRIPT_EXTENSIONS[ext]["language"]: _SCRIPT_EXTENSIONS[ext]["comment"]
-    for ext in _SCRIPT_EXTENSIONS
-}
-_JUPYTER_LANGUAGES = (
-    set(_JUPYTER_LANGUAGES).union(_COMMENT.keys()).union(["c#", "f#", "cs", "fs"])
-)
-_JUPYTER_LANGUAGES_LOWER_AND_UPPER = _JUPYTER_LANGUAGES.union(
-    {str.upper(lang) for lang in _JUPYTER_LANGUAGES}
-)
+_COMMENT = {_SCRIPT_EXTENSIONS[ext]["language"]: _SCRIPT_EXTENSIONS[ext]["comment"] for ext in _SCRIPT_EXTENSIONS}
+_JUPYTER_LANGUAGES = set(_JUPYTER_LANGUAGES).union(_COMMENT.keys()).union(["c#", "f#", "cs", "fs"])
+_JUPYTER_LANGUAGES_LOWER_AND_UPPER = _JUPYTER_LANGUAGES.union({str.upper(lang) for lang in _JUPYTER_LANGUAGES})
 _GO_DOUBLE_PERCENT_COMMAND = re.compile(r"^(%%\s*|%%\s+-.*)$")
 
 
@@ -122,16 +114,10 @@ def default_language_from_metadata_and_ext(metadata, ext, pop_main_language=Fals
     default_from_ext = _SCRIPT_EXTENSIONS.get(ext, {}).get("language")
 
     main_language = metadata.get("jupytext", {}).get("main_language")
-    default_language = (
-        metadata.get("kernelspec", {}).get("language") or default_from_ext
-    )
+    default_language = metadata.get("kernelspec", {}).get("language") or default_from_ext
     language = main_language or default_language
 
-    if (
-        main_language is not None
-        and main_language == default_language
-        and pop_main_language
-    ):
+    if main_language is not None and main_language == default_language and pop_main_language:
         metadata["jupytext"].pop("main_language")
 
     if language is None or language in ["R", "sas"]:
@@ -200,9 +186,7 @@ def set_main_and_cell_language(metadata, cells, ext, custom_cell_magics):
                 magic = "%%" if main_language != "csharp" else "#!"
                 if "magic_args" in cell["metadata"]:
                     magic_args = cell["metadata"].pop("magic_args")
-                    cell["source"] = (
-                        f"{magic}{language} {magic_args}\n" + cell["source"]
-                    )
+                    cell["source"] = f"{magic}{language} {magic_args}\n" + cell["source"]
                 else:
                     cell["source"] = f"{magic}{language}\n" + cell["source"]
 
@@ -240,7 +224,4 @@ def comment_lines(lines, prefix, suffix=""):
         return lines
     if not suffix:
         return [prefix + " " + line if line else prefix for line in lines]
-    return [
-        prefix + " " + line + " " + suffix if line else prefix + " " + suffix
-        for line in lines
-    ]
+    return [prefix + " " + line + " " + suffix if line else prefix + " " + suffix for line in lines]

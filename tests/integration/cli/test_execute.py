@@ -128,9 +128,7 @@ a + 1
 
     import nbconvert
 
-    with pytest.raises(
-        nbconvert.preprocessors.execute.CellExecutionError, match="is not defined"
-    ):
+    with pytest.raises(nbconvert.preprocessors.execute.CellExecutionError, match="is not defined"):
         jupytext(args=[tmp_md, "--execute"])
 
 

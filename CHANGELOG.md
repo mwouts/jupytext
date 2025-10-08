@@ -1,13 +1,73 @@
 Jupytext ChangeLog
 ==================
 
-1.17.0-dev
-----------
+1.18.0 (unreleased)
+-------------------
+
+**Changed**
+- We have updated the pre-commit hooks. The code is now formatted using `ruff format`, and updated for Python 3.9+ using https://github.com/asottile/pyupgrade ([#1423](https://github.com/mwouts/jupytext/issues/1423))
+
+**Fixed**
+- We don't import `notebook` when `jupyter_server` is available ([#1436](https://github.com/mwouts/jupytext/issues/1436))
+
+
+1.17.3 (2025-08-28)
+-------------------
+
+**Added**
+- All the extensions supported by Jupytext now appear in the `--to` paragraph
+of `jupytext --help` ([#433](https://github.com/mwouts/jupytext/issues/433))
+- We have added a new function `get_formats_from_notebook_path` that returns the list of paired
+formats for a given notebook ([#1419](https://github.com/mwouts/jupytext/issues/1419))
+
+**Fixed**
+- We have fixed `jupytext --sync`, and the contents manager, to make sure that a simple `.py` file (not in the percent format) will not be treated as a paired file when the Jupytext configuration file has `formats="ipynb,py:percent"` ([#1418](https://github.com/mwouts/jupytext/issues/1418))
+- A notebook can be moved in Jupyter even if that makes it unpaired ([#1414](https://github.com/mwouts/jupytext/issues/1414))
+- The test against `jupyter-fs` now installs its `fs` extra dependency ([#1398](https://github.com/mwouts/jupytext/issues/1398))
+- The `jupytext --sync` command now works correctly with symbolic links. Thanks to [mccullerlp](https://github.com/mccullerlp) for reporting ([#1407](https://github.com/mwouts/jupytext/issues/1407)) and addressing ([#1408](https://github.com/mwouts/jupytext/pull/1408)) the problem!
+- Jupytext will look for `quarto.cmd` on Windows. Thanks to [mccullerlp](https://github.com/mccullerlp) for documenting the issue ([#1406](https://github.com/mwouts/jupytext/issues/1406), [#1409](https://github.com/mwouts/jupytext/pull/1409)).
+- We have corrected the `jupytext --paired-paths` command: it will now take the Jupytext configuration file, if any, into account ([#1419](https://github.com/mwouts/jupytext/issues/1419))
+
+
+1.17.2 (2025-06-01)
+-------------------
+
+**Fixed**
+- The `--set-formats` argument takes precedence over pre-existing pairing information in the notebook ([#1386](https://github.com/mwouts/jupytext/issues/1386))
+
+**Changed**
+- We have removed Python 3.8 from the list of supported Python version, and from the CI, as it has reached its EOL
+
+**Added**
+- ROOT-flavored C++ notebooks can be paired to `.cpp` files - thanks to [Steven Gardiner](https://github.com/sjgardiner) for this contribution ([#1384](https://github.com/mwouts/jupytext/pull/1384))
+
+
+1.17.1 (2025-04-26)
+-------------------
+
+**Fixed**
+- Renaming files other than notebooks will not load their content ([#1376](https://github.com/mwouts/jupytext/issues/1376))
+
+
+1.17.0 (2025-04-05)
+-------------------
+
+**Added**
+- The MyST frontmatter found in MyST Markdown notebooks can be mapped to a YAML header at the top of the Jupyter notebook. This way MyST notebooks in either the `md:myst` or `ipynb` format can be used with MyST. Thanks to [Ian Carroll](https://github.com/itcarroll) for proposing and implementing this change ([#1314](https://github.com/mwouts/jupytext/issues/1314))
+- The context menu has a "New Text Notebook" entry. Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR ([#1365](https://github.com/mwouts/jupytext/pull/1365))!
+
 
 **Changed**
 - Jupytext's default contents manager is now derived from the asynchronous AsyncLargeFileManager. Thanks to [Darshan Poudel](https://github.com/Darshan808) for making this finally happen ([#1328](https://github.com/mwouts/jupytext/pull/1328))!
+- The [percent format](https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-percent-format) is now the default format for scripts. If you run `jupytext --to py notebook.ipynb` you now get a `py:percent` script (use `--to py:light` for the light format) [#1201](https://github.com/mwouts/jupytext/pull/1201)
 - The `rst2md` conversion now works with `sphinx-gallery>=0.8`. Thanks to [Thomas J. Fan](https://github.com/thomasjpfan) for fixing this! ([#1334](https://github.com/mwouts/jupytext/pull/1334))
-- We have updated the JupyterLab extension dependencies ([#1300](https://github.com/mwouts/jupytext/pull/1300)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR!
+- We have updated the JupyterLab extension dependencies ([#1300](https://github.com/mwouts/jupytext/pull/1300), [#1355](https://github.com/mwouts/jupytext/pull/1355), [#1360](https://github.com/mwouts/jupytext/pull/1360)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for these PRs!
+
+**Fixed**
+- We have added and fixed round trip tests on MyST Markdown notebooks ([#759](https://github.com/mwouts/jupytext/issues/759), [#789](https://github.com/mwouts/jupytext/issues/789), [#1267](https://github.com/mwouts/jupytext/issues/1267), [#1317](https://github.com/mwouts/jupytext/issues/1317))
+- The `--quiet` option now works with the `--pipe` mode of Jupytext CLI ([#1305](https://github.com/mwouts/jupytext/issues/1305))
+- Jupytext is now compatible with the cell toolbar extension - thanks to [Nicolas Brichet](https://github.com/brichet) for the fix! ([#1358](https://github.com/mwouts/jupytext/pull/1358))
+- The project description on PyPI now uses absolute links ([#1287](https://github.com/mwouts/jupytext/issues/1287))
 
 
 1.16.7 (2025-02-09)

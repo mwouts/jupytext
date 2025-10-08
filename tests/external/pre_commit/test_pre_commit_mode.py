@@ -39,9 +39,7 @@ def test_ignore_unmatched_ignores(tmpdir, cwd_tmpdir):
     tmpdir.join(file).write("Hello\n")
 
     # Run jupytext
-    status = jupytext(
-        ["--from", "ipynb", "--to", "py:light", "--pre-commit-mode", file]
-    )
+    status = jupytext(["--from", "ipynb", "--to", "py:percent", "--pre-commit-mode", file])
 
     assert status == 0
     assert not tmpdir.join("test.py").exists()
@@ -89,9 +87,7 @@ def test_alert_untracked_alerts_for_modified(tmpdir, cwd_tmpdir, tmp_repo, capsy
     tmp_repo.git.add("test.py")
 
     # Run jupytext
-    status = jupytext(
-        ["--from", "ipynb", "--to", "py:light", "--pre-commit-mode", "test.ipynb"]
-    )
+    status = jupytext(["--from", "ipynb", "--to", "py:percent", "--pre-commit-mode", "test.ipynb"])
 
     assert status == 1
     out = capsys.readouterr()
@@ -154,9 +150,7 @@ formats = "ipynb,py:percent"
     tmp_repo.git.add(".")
 
     capsys.readouterr()
-    exit_code = jupytext(
-        ["--pre-commit-mode", "--sync", "test.ipynb", "--show-changes"]
-    )
+    exit_code = jupytext(["--pre-commit-mode", "--sync", "test.ipynb", "--show-changes"])
 
     out, err = capsys.readouterr()
     assert not err, err
@@ -180,11 +174,7 @@ def test_git_timestamp(tmpdir, cwd_tmpdir, tmp_repo):
     tmp_repo.index.commit("Add file_1 and file_2")
     assert get_timestamp("file_1") < get_timestamp("file_2")
     assert git_timestamp("file_1") == git_timestamp("file_2") < float("inf")
-    assert (
-        git_timestamp("file_1")
-        < get_timestamp("file_1") + 1
-        < git_timestamp("file_1") + 2
-    )
+    assert git_timestamp("file_1") < get_timestamp("file_1") + 1 < git_timestamp("file_1") + 2
 
     # Git timestamps have a resolution of 1 sec, so if we want to see
     # different git timestamps between file_1 and file_2 we need this:
@@ -212,9 +202,7 @@ def test_git_timestamp(tmpdir, cwd_tmpdir, tmp_repo):
     assert git_timestamp("file_3") == get_timestamp("file_3")
 
 
-@pytest.mark.parametrize(
-    "commit_order", [["test.py", "test.ipynb"], ["test.ipynb", "test.py"]]
-)
+@pytest.mark.parametrize("commit_order", [["test.py", "test.ipynb"], ["test.ipynb", "test.py"]])
 @pytest.mark.parametrize("sync_file", ["test.py", "test.ipynb"])
 def test_sync_pre_commit_mode_respects_commit_order_780(
     tmpdir,

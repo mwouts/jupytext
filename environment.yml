@@ -2,7 +2,7 @@ name: jupytext-dev
 channels:
   - conda-forge
 dependencies:
-  - python>=3.8
+  - python>=3.9
   - jupyterlab>=4.0.0
   - nbformat>=5.1.2
   - pre-commit

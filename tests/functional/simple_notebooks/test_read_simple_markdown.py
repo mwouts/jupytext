@@ -60,7 +60,7 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
         nb.cells,
         [
             new_raw_cell("---\ntitle: Simple file\n---"),
-            new_code_cell("import numpy as np\n" "x = np.arange(0, 2*math.pi, eps)"),
+            new_code_cell("import numpy as np\nx = np.arange(0, 2*math.pi, eps)"),
             new_code_cell("x = np.arange(0,1,eps)\ny = np.abs(x)-.5"),
             new_markdown_cell(
                 """This is
@@ -81,7 +81,7 @@ And the same markdown cell continues"""
             ),
             new_raw_cell("this is a raw cell"),
             new_code_cell("%%R\nls()"),
-            new_code_cell("%%R\ncat(stringi::" "stri_rand_lipsum(3), sep='\n\n')"),
+            new_code_cell("%%R\ncat(stringi::stri_rand_lipsum(3), sep='\n\n')"),
         ],
         compare_ids=False,
     )
@@ -238,9 +238,7 @@ A paragraph
 
 # H1 Header
 """,
-    nb_expected=new_notebook(
-        cells=[new_markdown_cell("A paragraph"), new_markdown_cell("# H1 Header")]
-    ),
+    nb_expected=new_notebook(cells=[new_markdown_cell("A paragraph"), new_markdown_cell("# H1 Header")]),
 ):
     nb = jupytext.reads(markdown, ".md")
     compare_notebooks(nb, nb_expected)
@@ -381,11 +379,7 @@ markdown cell
     nb = jupytext.reads(markdown, "md")
     compare_cells(
         nb.cells,
-        [
-            new_markdown_cell(
-                source="A long\n\n\nmarkdown cell", metadata={"key": "value"}
-            )
-        ],
+        [new_markdown_cell(source="A long\n\n\nmarkdown cell", metadata={"key": "value"})],
         compare_ids=False,
     )
     markdown2 = jupytext.writes(nb, "md")
@@ -404,11 +398,7 @@ markdown cell
     nb = jupytext.reads(markdown, "md")
     compare_cells(
         nb.cells,
-        [
-            new_markdown_cell(
-                source="A long\n\n\nmarkdown cell", metadata={"key": "value"}
-            )
-        ],
+        [new_markdown_cell(source="A long\n\n\nmarkdown cell", metadata={"key": "value"})],
         compare_ids=False,
     )
     markdown2 = jupytext.writes(nb, "md")
@@ -605,13 +595,7 @@ def test_inactive_cell(
 # This becomes a raw cell in Jupyter
 ```
 """,
-    expected=new_notebook(
-        cells=[
-            new_raw_cell(
-                "# This becomes a raw cell in Jupyter", metadata={"active": "md"}
-            )
-        ]
-    ),
+    expected=new_notebook(cells=[new_raw_cell("# This becomes a raw cell in Jupyter", metadata={"active": "md"})]),
 ):
     nb = jupytext.reads(text, "md")
     compare_notebooks(nb, expected)
@@ -624,13 +608,7 @@ def test_inactive_cell_using_tag(
 # This becomes a raw cell in Jupyter
 ```
 """,
-    expected=new_notebook(
-        cells=[
-            new_raw_cell(
-                "# This becomes a raw cell in Jupyter", metadata={"tags": ["active-md"]}
-            )
-        ]
-    ),
+    expected=new_notebook(cells=[new_raw_cell("# This becomes a raw cell in Jupyter", metadata={"tags": ["active-md"]})]),
 ):
     nb = jupytext.reads(text, "md")
     compare_notebooks(nb, expected)
@@ -726,7 +704,7 @@ def test_two_markdown_cell_with_code_works(
 ```"""
             ),
         ]
-    )
+    ),
 ):
     text = jupytext.writes(nb, "md")
     nb2 = jupytext.reads(text, "md")
@@ -747,7 +725,7 @@ def test_two_markdown_cell_with_no_language_code_works(
 ```"""
             ),
         ]
-    )
+    ),
 ):
     text = jupytext.writes(nb, "md")
     nb2 = jupytext.reads(text, "md")

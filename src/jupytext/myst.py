@@ -2,6 +2,7 @@
 This module contains round-trip conversion between
 myst formatted text documents and notebooks.
 """
+
 import json
 import re
 import warnings
@@ -9,8 +10,10 @@ from textwrap import dedent
 
 import nbformat as nbf
 import yaml
+from yaml.representer import SafeRepresenter
 
 from .cell_to_text import three_backticks_or_more
+from .metadata_filter import _JUPYTER_METADATA_NAMESPACE
 
 try:
     from markdown_it import MarkdownIt
@@ -23,6 +26,9 @@ except ImportError:
 MYST_FORMAT_NAME = "myst"
 CODE_DIRECTIVE = "{code-cell}"
 RAW_DIRECTIVE = "{raw-cell}"
+_DEFAULT_ROOT_LEVEL_METADATA = "all"
+
+SafeRepresenter.add_representer(nbf.NotebookNode, SafeRepresenter.represent_dict)
 
 
 def is_myst_available():
@@ -32,9 +38,7 @@ def is_myst_available():
 
 def raise_if_myst_is_not_available():
     if not is_myst_available():
-        raise ImportError(
-            "The MyST Markdown format requires python >= 3.6 and markdown-it-py~=1.0"
-        )
+        raise ImportError("The MyST Markdown format requires python >= 3.6 and markdown-it-py~=1.0")
 
 
 def myst_version():
@@ -99,22 +103,21 @@ def matches_mystnb(
             pass
         else:
             try:
-                if (
-                    metadata.get("jupytext", {})
+                format_name = (
+                    metadata.get(_JUPYTER_METADATA_NAMESPACE, metadata)
+                    .get("jupytext", {})
                     .get("text_representation", {})
-                    .get("format_name", "")
-                    == MYST_FORMAT_NAME
-                ):
-                    return True
+                    .get("format_name")
+                )
             except AttributeError:
                 pass
+            else:
+                if format_name == MYST_FORMAT_NAME:
+                    return True
 
     # is there at least on fenced code block with a code/raw directive language
     for token in tokens:
-        if token.type == "fence" and (
-            token.info.startswith(code_directive)
-            or token.info.startswith(raw_directive)
-        ):
+        if token.type == "fence" and (token.info.startswith(code_directive) or token.info.startswith(raw_directive)):
             return True
 
     return False
@@ -155,18 +158,11 @@ def dump_yaml_blocks(data, compact=True):
         tags: [hide-output, show-input]
         ---
     """
-    string = yaml.dump(data, Dumper=CompactDumper)
+    string = yaml.dump(data, Dumper=CompactDumper, sort_keys=False)
     lines = string.splitlines()
     if compact and all(line and line[0].isalpha() for line in lines):
         return "\n".join([f":{line}" for line in lines]) + "\n\n"
     return f"---\n{string}---\n"
-
-
-def from_nbnode(value):
-    """Recursively convert NotebookNode to dict."""
-    if isinstance(value, nbf.NotebookNode):
-        return {k: from_nbnode(v) for k, v in value.items()}
-    return value
 
 
 class MystMetadataParsingError(Exception):
@@ -184,9 +180,7 @@ def strip_blank_lines(text):
 def read_fenced_cell(token, cell_index, cell_type):
     """Parse (and validate) the full directive text."""
     content = token.content
-    error_msg = "{} cell {} at line {} could not be read: ".format(
-        cell_type, cell_index, token.map[0] + 1
-    )
+    error_msg = f"{cell_type} cell {cell_index} at line {token.map[0] + 1} could not be read: "
 
     body_lines, options = parse_directive_options(content, error_msg)
 
@@ -239,17 +233,9 @@ def read_cell_metadata(token, cell_index):
         try:
             metadata = json.loads(token.content.strip())
         except Exception as err:
-            raise MystMetadataParsingError(
-                "Markdown cell {} at line {} could not be read: {}".format(
-                    cell_index, token.map[0] + 1, err
-                )
-            )
+            raise MystMetadataParsingError(f"Markdown cell {cell_index} at line {token.map[0] + 1} could not be read: {err}")
         if not isinstance(metadata, dict):
-            raise MystMetadataParsingError(
-                "Markdown cell {} at line {} is not a dict".format(
-                    cell_index, token.map[0] + 1
-                )
-            )
+            raise MystMetadataParsingError(f"Markdown cell {cell_index} at line {token.map[0] + 1} is not a dict")
 
     return metadata
 
@@ -278,6 +264,7 @@ def myst_to_notebook(
     tokens = get_parser().parse(text + "\n")
     lines = text.splitlines()
     md_start_line = 0
+    default_lexer = None
 
     # get the document metadata
     metadata_nb = {}
@@ -302,9 +289,7 @@ def myst_to_notebook(
         meta = nbf.from_dict(md_metadata)
         if md_source:
             source_map.append(start_line)
-            notebook.cells.append(
-                nbf_version.new_markdown_cell(source=md_source, metadata=meta)
-            )
+            notebook.cells.append(nbf_version.new_markdown_cell(source=md_source, metadata=meta))
 
     # iterate through the tokens to identify notebook cells
     nesting_level = 0
@@ -320,11 +305,17 @@ def myst_to_notebook(
         if token.type == "fence" and token.info.startswith(code_directive):
             _flush_markdown(md_start_line, token, md_metadata)
             options, body_lines = read_fenced_cell(token, len(notebook.cells), "Code")
+            assert token.info.startswith(code_directive)
+            lexer = token.info[len(code_directive) :].strip()
+            if lexer:
+                if not default_lexer:
+                    default_lexer = lexer
+                elif lexer != default_lexer:
+                    warnings.warn(f"All code cells in a MyST notebook must have the same language: {lexer}!={default_lexer}")
+
             meta = nbf.from_dict(options)
             source_map.append(token.map[0] + 1)
-            notebook.cells.append(
-                nbf_version.new_code_cell(source="\n".join(body_lines), metadata=meta)
-            )
+            notebook.cells.append(nbf_version.new_code_cell(source="\n".join(body_lines), metadata=meta))
             md_metadata = {}
             md_start_line = token.map[1]
 
@@ -333,9 +324,7 @@ def myst_to_notebook(
             options, body_lines = read_fenced_cell(token, len(notebook.cells), "Raw")
             meta = nbf.from_dict(options)
             source_map.append(token.map[0] + 1)
-            notebook.cells.append(
-                nbf_version.new_raw_cell(source="\n".join(body_lines), metadata=meta)
-            )
+            notebook.cells.append(nbf_version.new_raw_cell(source="\n".join(body_lines), metadata=meta))
             md_metadata = {}
             md_start_line = token.map[1]
 
@@ -348,6 +337,15 @@ def myst_to_notebook(
 
     if add_source_map:
         notebook.metadata["source_map"] = source_map
+
+    if "language_info" not in notebook.metadata and default_lexer:
+        has_metadata = bool(notebook.metadata)
+        jupyter_metadata = notebook.metadata.setdefault(_JUPYTER_METADATA_NAMESPACE, {})
+        jupytext_metadata = jupyter_metadata.setdefault("jupytext", {})
+        jupytext_metadata["default_lexer"] = default_lexer
+        if not has_metadata:
+            jupytext_metadata["notebook_metadata_filter"] = "-all"
+
     return notebook
 
 
@@ -368,7 +366,7 @@ def notebook_to_myst(
     raise_if_myst_is_not_available()
     string = ""
 
-    nb_metadata = from_nbnode(nb.metadata)
+    nb_metadata = nb.metadata
 
     # we add the pygments lexer as a directive argument, for use by syntax highlighters
     pygments_lexer = nb_metadata.get("language_info", {}).get("pygments_lexer", None)
@@ -381,7 +379,7 @@ def notebook_to_myst(
     last_cell_md = False
     for i, cell in enumerate(nb.cells):
         if cell.cell_type == "markdown":
-            metadata = from_nbnode(cell.metadata)
+            metadata = cell.metadata
             if metadata or last_cell_md:
                 if metadata:
                     string += f"\n+++ {json.dumps(metadata)}\n"
@@ -401,7 +399,7 @@ def notebook_to_myst(
             if pygments_lexer and cell.cell_type == "code":
                 string += f" {pygments_lexer}"
             string += "\n"
-            metadata = from_nbnode(cell.metadata)
+            metadata = cell.metadata
             if metadata:
                 string += dump_yaml_blocks(metadata)
             elif cell.source.startswith("---") or cell.source.startswith(":"):
@@ -414,5 +412,10 @@ def notebook_to_myst(
 
         else:
             raise NotImplementedError(f"cell {i}, type: {cell.cell_type}")
+
+    if not nb_metadata:
+        # remove initial blank line
+        assert string.startswith("\n")
+        string = string[1:]
 
     return string.rstrip() + "\n"

@@ -5,7 +5,9 @@ import pytest
 from jupytext.config import (
     find_jupytext_configuration_file,
     load_jupytext_configuration_file,
+    notebook_formats,
 )
+from jupytext.jupytext import load_jupytext_config, read
 
 
 def test_find_jupytext_configuration_file(tmpdir):
@@ -17,32 +19,20 @@ def test_find_jupytext_configuration_file(tmpdir):
     # Configuration file in the parent directory
     root_config = tmpdir.join("jupytext.yml")
     root_config.write("\n")
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(tmpdir)), str(root_config)
-    )
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(nested)), str(root_config)
-    )
+    assert os.path.samefile(find_jupytext_configuration_file(str(tmpdir)), str(root_config))
+    assert os.path.samefile(find_jupytext_configuration_file(str(nested)), str(root_config))
 
     # Local pyproject file
     pyproject_config = nested.join("pyproject.toml")
     pyproject_config.write("[tool.jupytext]\n")
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(tmpdir)), str(root_config)
-    )
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(nested)), str(pyproject_config)
-    )
+    assert os.path.samefile(find_jupytext_configuration_file(str(tmpdir)), str(root_config))
+    assert os.path.samefile(find_jupytext_configuration_file(str(nested)), str(pyproject_config))
 
     # Local configuration file
     local_config = nested.join(".jupytext")
     local_config.write("\n")
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(tmpdir)), str(root_config)
-    )
-    assert os.path.samefile(
-        find_jupytext_configuration_file(str(nested)), str(local_config)
-    )
+    assert os.path.samefile(find_jupytext_configuration_file(str(tmpdir)), str(root_config))
+    assert os.path.samefile(find_jupytext_configuration_file(str(nested)), str(local_config))
 
 
 def test_jupytext_py_is_not_a_configuration_file(tmpdir):
@@ -177,9 +167,7 @@ def test_jupytext_formats(tmpdir, content_toml, formats_short_form):
     assert config.formats == formats_short_form
 
 
-def test_deprecated_formats_cause_warning(
-    tmpdir, content_toml="default_jupytext_formats = 'ipynb,md'"
-):
+def test_deprecated_formats_cause_warning(tmpdir, content_toml="default_jupytext_formats = 'ipynb,md'"):
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write(content_toml)
 
@@ -200,3 +188,17 @@ def test_deprecated_options_cause_warning(tmpdir, option_name):
     with pytest.warns(FutureWarning, match=f"use '{option_name}'"):
         config.set_default_format_options(fmt)
         assert fmt[option_name] == "value"
+
+
+def test_simple_py_file_is_not_paired(tmp_path):
+    py_file = tmp_path / "simple.py"
+    py_file.write_text('print("Hello, world!")')
+
+    config_file = tmp_path / "jupytext.toml"
+    config_file.write_text('formats = "ipynb,py:percent"')
+
+    notebook = read(str(py_file))
+    config_file = load_jupytext_config(str(config_file))
+
+    formats = notebook_formats(notebook, config_file, str(py_file))
+    assert formats == [{"extension": ".py", "format_name": "light"}], formats

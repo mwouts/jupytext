@@ -11,9 +11,7 @@ async def test_remove_encoding_907(tmp_path, python_notebook, cm):
     cm.root_dir = str(tmp_path)
 
     # Save the notebook in Jupyter
-    await ensure_async(
-        cm.save(dict(type="notebook", content=python_notebook), path="nb.ipynb")
-    )
+    await ensure_async(cm.save(dict(type="notebook", content=python_notebook), path="nb.ipynb"))
 
     # No encoding is present in the py file
     py = (tmp_path / "nb.py").read_text()

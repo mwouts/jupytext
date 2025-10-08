@@ -6,6 +6,7 @@ from jupytext.formats import get_format_implementation
 from jupytext.header import (
     header_to_metadata_and_cell,
     metadata_and_cell_to_header,
+    recursive_update,
     uncomment_line,
 )
 
@@ -83,9 +84,7 @@ title: Sample header
 
 def test_metadata_and_cell_to_header(no_jupytext_version_number):
     metadata = {"jupytext": {"mainlanguage": "python"}}
-    nb = new_notebook(
-        metadata=metadata, cells=[new_raw_cell(source="---\ntitle: Sample header\n---")]
-    )
+    nb = new_notebook(metadata=metadata, cells=[new_raw_cell(source="---\ntitle: Sample header\n---")])
     header, lines_to_next_cell = metadata_and_cell_to_header(
         nb, metadata, get_format_implementation(".md"), {"extension": ".md"}
     )
@@ -104,9 +103,7 @@ jupyter:
 
 def test_metadata_and_cell_to_header2(no_jupytext_version_number):
     nb = new_notebook(cells=[new_markdown_cell(source="Some markdown\ntext")])
-    header, lines_to_next_cell = metadata_and_cell_to_header(
-        nb, {}, get_format_implementation(".md"), {"extension": ".md"}
-    )
+    header, lines_to_next_cell = metadata_and_cell_to_header(nb, {}, get_format_implementation(".md"), {"extension": ".md"})
     assert header == []
     assert len(nb.cells) == 1
     assert lines_to_next_cell is None
@@ -131,13 +128,19 @@ def test_multiline_metadata(
             "multiline": """A multiline string
 
 with a blank line""",
-            "jupytext": {"notebook_metadata_filter": "all"},
+            "jupytext": {
+                "notebook_metadata_filter": "all",
+                "text_representation": {"extension": ".md", "format_name": "markdown"},
+            },
         }
     ),
     markdown="""---
 jupyter:
   jupytext:
     notebook_metadata_filter: all
+    text_representation:
+      extension: .md
+      format_name: markdown
   multiline: 'A multiline string
 
 
@@ -189,3 +192,14 @@ jupyter:
 
 -->""",
     )
+
+
+def test_recusive_update():
+    assert recursive_update({0: {1: 2}}, {0: {1: 3}, 4: 5}) == {0: {1: 3}, 4: 5}
+    assert recursive_update({0: {1: 2}}, {0: {1: 3}, 4: 5}, overwrite=False) == {
+        0: {1: 2},
+        4: 5,
+    }
+    # the value of `None`` is a special case
+    assert recursive_update({0: 1}, {0: None}) == {}
+    assert recursive_update({0: 1}, {0: None}, overwrite=False) == {}

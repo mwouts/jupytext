@@ -148,17 +148,11 @@ def list_notebooks(path="ipynb", skip=""):
 
     if path == "ipynb_all":
         return itertools.chain(
-            *(
-                list_notebooks(folder.name, skip=skip)
-                for folder in nb_path.iterdir()
-                if folder.name.startswith("ipynb_")
-            )
+            *(list_notebooks(folder.name, skip=skip) for folder in nb_path.iterdir() if folder.name.startswith("ipynb_"))
         )
 
     if path == "all":
-        return itertools.chain(
-            *(list_notebooks(folder.name, skip=skip) for folder in nb_path.iterdir())
-        )
+        return itertools.chain(*(list_notebooks(folder.name, skip=skip) for folder in nb_path.iterdir()))
 
     if path.startswith("."):
         nb_path = Path(__file__).parent / ".." / path
@@ -167,11 +161,7 @@ def list_notebooks(path="ipynb", skip=""):
 
     if skip:
         skip_re = re.compile(".*" + skip + ".*")
-        return [
-            str(nb_file)
-            for nb_file in nb_path.iterdir()
-            if nb_file.is_file() and not skip_re.match(nb_file.name)
-        ]
+        return [str(nb_file) for nb_file in nb_path.iterdir() if nb_file.is_file() and not skip_re.match(nb_file.name)]
 
     return [str(nb_file) for nb_file in nb_path.iterdir() if nb_file.is_file()]
 
@@ -212,16 +202,12 @@ def ipynb_py_R_jl_ext(ipynb_py_R_jl_file):
     raise RuntimeError(f"language not found for {ipynb_py_R_jl_file}")
 
 
-@pytest.fixture(
-    params=list_notebooks("ipynb") + list_notebooks("Rmd"), ids=notebook_id_func
-)
+@pytest.fixture(params=list_notebooks("ipynb") + list_notebooks("Rmd"), ids=notebook_id_func)
 def ipynb_or_rmd_file(request):
     return request.param
 
 
-@pytest.fixture(
-    params=list_notebooks("ipynb_py") + list_notebooks("ipynb_R"), ids=notebook_id_func
-)
+@pytest.fixture(params=list_notebooks("ipynb_py") + list_notebooks("ipynb_R"), ids=notebook_id_func)
 def ipynb_py_R_file(request):
     return request.param
 
@@ -256,9 +242,7 @@ def ipynb_cpp_file(request):
     return request.param
 
 
-@pytest.fixture(
-    params=list_notebooks("ipynb_all", skip="many hash"), ids=notebook_id_func
-)
+@pytest.fixture(params=list_notebooks("ipynb_all", skip="many hash"), ids=notebook_id_func)
 def ipynb_to_light(request):
     return request.param
 
@@ -270,9 +254,7 @@ def ipynb_to_myst(request):
 
 @pytest.fixture(
     params=[
-        py_file
-        for py_file in list_notebooks("./src/jupytext")
-        if py_file.endswith(".py") and "folding_markers" not in py_file
+        py_file for py_file in list_notebooks("./src/jupytext") if py_file.endswith(".py") and "folding_markers" not in py_file
     ],
     ids=notebook_id_func,
 )
@@ -281,10 +263,7 @@ def py_file(request):
 
 
 @pytest.fixture(
-    params=list_notebooks("julia")
-    + list_notebooks("python")
-    + list_notebooks("R")
-    + list_notebooks("ps1"),
+    params=list_notebooks("julia") + list_notebooks("python") + list_notebooks("R") + list_notebooks("ps1"),
     ids=notebook_id_func,
 )
 def script_to_ipynb(request):
@@ -321,10 +300,13 @@ def md_file(request):
     return request.param
 
 
+@pytest.fixture(params=list_notebooks("myst"), ids=notebook_id_func)
+def myst_file(request):
+    return request.param
+
+
 @pytest.fixture(
-    params=list_notebooks(
-        "ipynb", skip="(functional|Notebook with|flavors|invalid|305)"
-    ),
+    params=list_notebooks("ipynb", skip="(functional|Notebook with|flavors|invalid|305)"),
     ids=notebook_id_func,
 )
 def ipynb_to_pandoc(request):
@@ -391,15 +373,11 @@ def pytest_runtest_setup(item):
             if is_pandoc_available():
                 pytest.skip("Pandoc is installed")
         if mark.name == "requires_ir_kernel":
-            if not any(
-                get_kernel_spec(name).language == "R" for name in find_kernel_specs()
-            ):
+            if not any(get_kernel_spec(name).language == "R" for name in find_kernel_specs()):
                 pytest.skip("irkernel is not installed")
         if mark.name == "requires_user_kernel_python3":
             if "python_kernel" not in find_kernel_specs():
-                pytest.skip(
-                    "Please run 'python -m ipykernel install --name python_kernel --user'"
-                )
+                pytest.skip("Please run 'python -m ipykernel install --name python_kernel --user'")
         if mark.name == "requires_myst":
             if not is_myst_available():
                 pytest.skip("myst_parser not found")
@@ -411,9 +389,7 @@ def pytest_runtest_setup(item):
                 pytest.skip("Issue 489")
         if mark.name == "pre_commit":
             if sys.platform.startswith("win"):
-                pytest.skip(
-                    "OSError: [WinError 193] %1 is not a valid Win32 application"
-                )
+                pytest.skip("OSError: [WinError 193] %1 is not a valid Win32 application")
             if not (Path(__file__).parent.parent / ".git").is_dir():
                 pytest.skip("Jupytext folder is not a git repository #814")
 

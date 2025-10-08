@@ -20,9 +20,7 @@ def test_check_notebooks_left_or_right_black(python_notebook, tmpdir, cwd_tmpdir
 
 
 @pytest.mark.requires_black
-def test_check_notebooks_left_or_right_not_black(
-    non_black_notebook, tmpdir, cwd_tmpdir
-):
+def test_check_notebooks_left_or_right_not_black(non_black_notebook, tmpdir, cwd_tmpdir):
     write(non_black_notebook, str(tmpdir / "nb1.ipynb"))
     write(non_black_notebook, str(tmpdir / "nb2.ipynb"))
 

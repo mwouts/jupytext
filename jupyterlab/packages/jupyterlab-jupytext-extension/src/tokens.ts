@@ -85,17 +85,6 @@ export const JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA = new Map<
     ],
   ],
   [
-    'auto:light',
-    [
-      {
-        fileExt: 'auto:light',
-        paletteLabel: 'Pair with light script',
-        caption: 'Pair Notebook with Light Format',
-        iconName: 'ui-components:text-editor',
-      },
-    ],
-  ],
-  [
     'auto:percent',
     [
       {
@@ -107,12 +96,12 @@ export const JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA = new Map<
     ],
   ],
   [
-    'auto:hydrogen',
+    'auto:light',
     [
       {
-        fileExt: 'auto:hydrogen',
-        paletteLabel: 'Pair with hydrogen script',
-        caption: 'Pair Notebook with Hydrogen Format',
+        fileExt: 'auto:light',
+        paletteLabel: 'Pair with light script',
+        caption: 'Pair Notebook with Light Format',
         iconName: 'ui-components:text-editor',
       },
     ],
@@ -251,17 +240,6 @@ export const JUPYTEXT_CREATE_TEXT_NOTEBOOK_FILETYPE_DATA = new Map<
   IFileTypeData[]
 >([
   [
-    'auto:light',
-    [
-      {
-        fileExt: 'auto:light',
-        paletteLabel: 'Light Format',
-        caption: 'Light Format',
-        launcherLabel: 'Light Format',
-      },
-    ],
-  ],
-  [
     'auto:percent',
     [
       {
@@ -273,13 +251,13 @@ export const JUPYTEXT_CREATE_TEXT_NOTEBOOK_FILETYPE_DATA = new Map<
     ],
   ],
   [
-    'auto:hydrogen',
+    'auto:light',
     [
       {
-        fileExt: 'auto:hydrogen',
-        paletteLabel: 'Hydrogen Format',
-        caption: 'Hydrogen Format',
-        launcherLabel: 'Hydrogen Format',
+        fileExt: 'auto:light',
+        paletteLabel: 'Light Format',
+        caption: 'Light Format',
+        launcherLabel: 'Light Format',
       },
     ],
   ],
@@ -348,7 +326,7 @@ export const JUPYTEXT_CREATE_TEXT_NOTEBOOK_FILETYPE_DATA = new Map<
  * Supported Jupytext format extensions bar custom and none
  */
 export const JUPYTEXT_FORMATS = Array.from(
-  JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA.keys()
+  JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA.keys(),
 )
   .map((format) => {
     return format;
@@ -362,15 +340,10 @@ export const JUPYTEXT_FORMATS = Array.from(
  */
 export const TEXT_NOTEBOOKS_LAUNCHER_ICONS = JUPYTEXT_FORMATS.filter(
   (format) => {
-    return ![
-      'ipynb',
-      'auto:hydrogen',
-      'auto:nomarker',
-      'qmd',
-      'custom',
-      'none',
-    ].includes(format);
-  }
+    return !['ipynb', 'auto:nomarker', 'qmd', 'custom', 'none'].includes(
+      format,
+    );
+  },
 );
 
 /**

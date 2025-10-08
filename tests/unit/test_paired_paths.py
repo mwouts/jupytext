@@ -11,7 +11,13 @@ from jupytext.formats import (
     long_form_one_format,
     short_form_multiple_formats,
 )
-from jupytext.paired_paths import InconsistentPath, base_path, full_path, paired_paths
+from jupytext.paired_paths import (
+    InconsistentPath,
+    base_path,
+    base_path_and_adjusted_fmt,
+    full_path,
+    paired_paths,
+)
 
 
 def test_simple_pair():
@@ -21,9 +27,7 @@ def test_simple_pair():
         paired_paths("notebook.ipynb", "ipynb", formats),
         list(zip(expected_paths, formats)),
     )
-    compare(
-        paired_paths("notebook.py", "py", formats), list(zip(expected_paths, formats))
-    )
+    compare(paired_paths("notebook.py", "py", formats), list(zip(expected_paths, formats)))
 
 
 def test_base_path():
@@ -51,10 +55,7 @@ def test_base_path_in_tree_from_root():
 
 def test_base_path_in_tree_from_non_root():
     fmt = long_form_one_format("scripts///py")
-    assert (
-        base_path("/parent_folder/scripts/subfolder/test.py", fmt=fmt)
-        == "/parent_folder///subfolder/test"
-    )
+    assert base_path("/parent_folder/scripts/subfolder/test.py", fmt=fmt) == "/parent_folder///subfolder/test"
 
 
 def test_base_path_in_tree_from_non_root_no_subfolder():
@@ -79,20 +80,14 @@ def test_full_path_in_tree_from_root_no_subfolder():
 
 def test_full_path_in_tree_from_non_root():
     fmt = long_form_one_format("notebooks///ipynb")
-    assert (
-        full_path("/parent_folder///subfolder/test", fmt=fmt)
-        == "/parent_folder/notebooks/subfolder/test.ipynb"
-    )
+    assert full_path("/parent_folder///subfolder/test", fmt=fmt) == "/parent_folder/notebooks/subfolder/test.ipynb"
 
 
 def test_paired_paths_windows():
     nb_file = "C:\\Users\\notebooks\\notebooks\\subfolder\\nb.ipynb"
     formats = "notebooks///ipynb,scripts///py"
     with mock.patch("os.path.sep", "\\"):
-        assert (
-            base_path(nb_file, "notebooks///ipynb")
-            == "C:\\Users\\notebooks\\//subfolder\\nb"
-        )
+        assert base_path(nb_file, "notebooks///ipynb") == "C:\\Users\\notebooks\\//subfolder\\nb"
         paired_paths(nb_file, "notebooks///ipynb", formats)
 
 
@@ -106,14 +101,10 @@ def test_paired_paths_windows_no_subfolder():
 
 @pytest.mark.parametrize("os_path_sep", ["\\", "/"])
 def test_paired_path_dotdot_564(os_path_sep):
-    main_path = os_path_sep.join(
-        ["examples", "tutorials", "colabs", "rigid_object_tutorial.ipynb"]
-    )
+    main_path = os_path_sep.join(["examples", "tutorials", "colabs", "rigid_object_tutorial.ipynb"])
     formats = "../nb_python//py:percent,../colabs//ipynb"
     with mock.patch("os.path.sep", os_path_sep):
-        assert base_path(
-            main_path, None, long_form_multiple_formats(formats)
-        ) == os_path_sep.join(
+        assert base_path(main_path, None, long_form_multiple_formats(formats)) == os_path_sep.join(
             ["examples", "tutorials", "colabs", "rigid_object_tutorial"]
         )
         paired_paths(main_path, "ipynb", formats)
@@ -131,15 +122,14 @@ def test_path_in_tree_limited_to_config_dir(tmpdir):
     # Notebook in nested 'notebook' dir is paired
     notebook_in_nb_dir = nb_dir.join("subfolder").join("nb.ipynb")
 
-    assert {
-        path for (path, _) in paired_paths(str(notebook_in_nb_dir), fmt, formats)
-    } == {str(notebook_in_nb_dir), str(src_dir.join("subfolder").join("nb.py"))}
+    assert {path for (path, _) in paired_paths(str(notebook_in_nb_dir), fmt, formats)} == {
+        str(notebook_in_nb_dir),
+        str(src_dir.join("subfolder").join("nb.py")),
+    }
 
     # Notebook in base 'notebook' dir is paired if no config file is found
     notebook_in_other_dir = other_dir.mkdir("subfolder").join("nb.ipynb")
-    assert {
-        path for (path, _) in paired_paths(str(notebook_in_other_dir), fmt, formats)
-    } == {
+    assert {path for (path, _) in paired_paths(str(notebook_in_other_dir), fmt, formats)} == {
         str(notebook_in_other_dir),
         str(tmpdir.join("scripts").join("other").join("subfolder").join("nb.py")),
     }
@@ -148,9 +138,10 @@ def test_path_in_tree_limited_to_config_dir(tmpdir):
     root_nb_dir.join("jupytext.toml").write("\n")
 
     # Notebook in nested 'notebook' dir is still paired
-    assert {
-        path for (path, _) in paired_paths(str(notebook_in_nb_dir), fmt, formats)
-    } == {str(notebook_in_nb_dir), str(src_dir.join("subfolder").join("nb.py"))}
+    assert {path for (path, _) in paired_paths(str(notebook_in_nb_dir), fmt, formats)} == {
+        str(notebook_in_nb_dir),
+        str(src_dir.join("subfolder").join("nb.py")),
+    }
 
     # But the notebook in base 'notebook' dir is not paired any more
     alert = (
@@ -206,9 +197,7 @@ def test_prefix_and_suffix():
 
     # Not the expected suffix
     with pytest.raises(InconsistentPath):
-        paired_paths(
-            "parent/script_folder/NOTEBOOK_NAME_in_LIGHT_format.py", formats[2], formats
-        )
+        paired_paths("parent/script_folder/NOTEBOOK_NAME_in_LIGHT_format.py", formats[2], formats)
 
     # Not the expected extension
     with pytest.raises(InconsistentPath):
@@ -242,9 +231,7 @@ async def test_cm_paired_paths(cm):
 
     three = "ipynb,py,md"
     cm.update_paired_notebooks("nb.ipynb", three)
-    assert cm.paired_notebooks == {
-        "nb." + fmt: (fmt, three) for fmt in three.split(",")
-    }
+    assert cm.paired_notebooks == {"nb." + fmt: (fmt, three) for fmt in three.split(",")}
 
     two = "ipynb,Rmd"
     cm.update_paired_notebooks("nb.ipynb", two)
@@ -276,9 +263,7 @@ def test_paired_path_with_prefix(
     ]
 
 
-def test_paired_notebook_ipynb_root_scripts_in_folder_806(
-    tmpdir, cwd_tmpdir, python_notebook
-):
+def test_paired_notebook_ipynb_root_scripts_in_folder_806(tmpdir, cwd_tmpdir, python_notebook):
     """In this test we pair a notebook with a script in a subfolder, and then do some
     natural operations like delete/recreate one of the paired files"""
     # Save sample notebook
@@ -311,3 +296,31 @@ def test_paired_notebook_ipynb_root_scripts_in_folder_806(
         ]
     )
     assert test_ipynb.exists()
+
+
+@pytest.mark.parametrize(
+    "path, input_fmt, adjusted_fmt",
+    [
+        (
+            "scripts/test.py",
+            {"extension": ".py", "format_name": "percent", "prefix": "scripts//"},
+            {"extension": ".py", "format_name": "percent", "prefix": "scripts//"},
+        ),
+        (
+            "test.py",
+            {"extension": ".py", "format_name": "percent", "prefix": "scripts//"},
+            {
+                "extension": ".py",
+                "format_name": "percent",
+            },
+        ),
+        (
+            "test.py",
+            {"extension": ".py", "format_name": "percent", "prefix": "prefix_"},
+            {"extension": ".py", "format_name": "percent"},
+        ),
+    ],
+)
+def test_paired_paths_and_adjusted_fmt(path, input_fmt, adjusted_fmt):
+    base_path, actual_adjusted_fmt = base_path_and_adjusted_fmt(path, input_fmt)
+    assert actual_adjusted_fmt == adjusted_fmt

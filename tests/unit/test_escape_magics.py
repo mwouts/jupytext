@@ -94,11 +94,7 @@ def test_magics_are_commented(fmt):
         metadata={
             "jupytext": {
                 "comment_magics": True,
-                "main_language": "R"
-                if fmt == "R"
-                else "scheme"
-                if fmt.startswith("ss")
-                else "python",
+                "main_language": ("R" if fmt == "R" else "scheme" if fmt.startswith("ss") else "python"),
             }
         },
     )
@@ -123,11 +119,7 @@ def test_magics_are_not_commented(fmt):
         metadata={
             "jupytext": {
                 "comment_magics": False,
-                "main_language": "R"
-                if fmt == "R"
-                else "scheme"
-                if fmt.startswith("ss")
-                else "python",
+                "main_language": ("R" if fmt == "R" else "scheme" if fmt.startswith("ss") else "python"),
             }
         },
     )
@@ -206,9 +198,7 @@ def test_do_not_comment_python_cmds(not_magic_cmd):
     assert uncomment_magic([not_magic_cmd]) == [not_magic_cmd]
 
 
-@pytest.mark.parametrize(
-    "magic_cmd", ["ls", "!ls", "ls -al", "!whoami", "# ls", "# mv a b"]
-)
+@pytest.mark.parametrize("magic_cmd", ["ls", "!ls", "ls -al", "!whoami", "# ls", "# mv a b"])
 def test_do_not_comment_bash_commands_in_R(magic_cmd):
     assert comment_magic([magic_cmd], language="R") == [magic_cmd]
     assert uncomment_magic([magic_cmd], language="R") == [magic_cmd]
@@ -239,7 +229,7 @@ def g(x):
         ]
     )
 
-    text = jupytext.writes(nb, "py")
+    text = jupytext.writes(nb, "py:light")
     compare(
         text,
         """# +
@@ -264,7 +254,7 @@ def test_configure_magic(no_jupytext_version_number):
         ]
     )
 
-    text = jupytext.writes(nb, "py")
+    text = jupytext.writes(nb, "py:light")
     compare(
         text,
         """# %%configure -f \\

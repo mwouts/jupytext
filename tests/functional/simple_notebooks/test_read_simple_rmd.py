@@ -45,15 +45,13 @@ cat(stringi::stri_rand_lipsum(3), sep='\n\n')
         [
             new_raw_cell("---\ntitle: Simple file\n---"),
             new_code_cell(
-                "import numpy as np\n" "x = np.arange(0, 2*math.pi, eps)",
+                "import numpy as np\nx = np.arange(0, 2*math.pi, eps)",
                 metadata={"echo": True},
             ),
-            new_code_cell(
-                "x = np.arange(0,1,eps)\ny = np.abs(x)-.5", metadata={"echo": True}
-            ),
+            new_code_cell("x = np.arange(0,1,eps)\ny = np.abs(x)-.5", metadata={"echo": True}),
             new_code_cell("%%R\nls()"),
             new_code_cell(
-                "%%R -i x\ncat(stringi::" "stri_rand_lipsum(3), sep='\n\n')",
+                "%%R -i x\ncat(stringi::stri_rand_lipsum(3), sep='\n\n')",
                 metadata={"results": "asis"},
             ),
         ],
@@ -96,7 +94,7 @@ def test_two_markdown_cell_with_code_works(
 ```"""
             ),
         ]
-    )
+    ),
 ):
     text = jupytext.writes(nb, "Rmd")
     nb2 = jupytext.reads(text, "Rmd")
@@ -164,11 +162,7 @@ title: R Markdown notebook title
     rmd_file = tmpdir.join("notebook.Rmd")
     cfg_file = tmpdir.join("jupytext.toml")
 
-    cfg_file.write(
-        "root_level_metadata_as_raw_cell = {}".format(
-            "true" if root_level_metadata_as_raw_cell else "false"
-        )
-    )
+    cfg_file.write("root_level_metadata_as_raw_cell = {}".format("true" if root_level_metadata_as_raw_cell else "false"))
     rmd_file.write(rmd)
 
     jupytext_cli([str(rmd_file), "--to", "ipynb"])
@@ -201,9 +195,7 @@ title: R Markdown notebook title
     compare(rmd_file.read(), rmd)
 
 
-def test_pair_rmd_file_with_cell_tags_and_options(
-    tmpdir, cwd_tmpdir, no_jupytext_version_number
-):
+def test_pair_rmd_file_with_cell_tags_and_options(tmpdir, cwd_tmpdir, no_jupytext_version_number):
     rmd = """```{r plot_1, dpi=72}
 plot(3:30)
 ```

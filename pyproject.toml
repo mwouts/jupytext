@@ -9,8 +9,8 @@ license = { file = "LICENSE" }
 authors = [
     { name = "Marc Wouts", email = "marc.wouts@gmail.com" },
 ]
-readme = "README.md"
-requires-python = ">=3.8"
+readme = "build/README_with_absolute_links.md"
+requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
@@ -24,7 +24,6 @@ classifiers = [
     "Topic :: Text Processing :: Markup",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -79,7 +78,7 @@ test-external = [
   "gitpython",
   "pre-commit",
   # Interaction with other contents managers
-  "jupyter-fs>=1.0"
+  "jupyter-fs[fs]>=1.0"  # 1398
 ]
 # Coverage requirements
 test-cov = [
@@ -88,8 +87,9 @@ test-cov = [
 ]
 # Galata test env
 # Install a non python kernel to ensure extension is working as expected
+# Kernel spec is installed before running UI tests
 test-ui = [
-    "calysto-bash",
+    "bash_kernel",
 ]
 dev = [
     "jupytext[test-cov,test-external]",
@@ -105,6 +105,9 @@ docs = [
 [project.scripts]
 "jupytext" = "jupytext.cli:jupytext"
 "jupytext-config" = "jupytext_config.__main__:main"
+
+[tool.hatch.metadata.hooks.custom]
+path = "tools/absolute_links_in_readme.py"
 
 [tool.hatch.version]
 # Read version string from version.py and use it for the package
@@ -186,7 +189,7 @@ exclude = [
 ]
 # Seems like W503 is not implemented in ruff
 # ref: https://github.com/astral-sh/ruff/issues/4125
-ignore = [
+lint.ignore = [
     "E203", "E231",
 ]
 
@@ -246,6 +249,9 @@ filterwarnings = [
     "ignore:the imp module is deprecated in favour of importlib:DeprecationWarning",
     "ignore:Code cell is missing an id field:FutureWarning",
     "ignore:There is no current event loop:DeprecationWarning",
+    # Intermittent in tests/functional/cli/test_cli.py::test_format_prefix_suffix #1357
+    "ignore:unclosed database in <sqlite3.Connection:ResourceWarning",
+    "ignore:Exception ignored:pytest.PytestUnraisableExceptionWarning",
 ]
 
 [tool.coverage.run]

@@ -31,10 +31,7 @@ def h(y):
     assert nb.cells[0].cell_type == "raw"
     assert nb.cells[0].source == "---\ntitle: Simple file\n---"
     assert nb.cells[1].cell_type == "markdown"
-    assert (
-        nb.cells[1].source == "Here we have some text\n"
-        "And below we have some python code"
-    )
+    assert nb.cells[1].source == "Here we have some text\nAnd below we have some python code"
     assert nb.cells[2].cell_type == "code"
     compare(
         nb.cells[2].source,
@@ -76,14 +73,11 @@ def h(y):
     assert nb.cells[0].cell_type == "raw"
     assert nb.cells[0].source == "---\ntitle: Less simple file\n---"
     assert nb.cells[1].cell_type == "markdown"
-    assert (
-        nb.cells[1].source == "Here we have some text\n"
-        "And below we have some python code"
-    )
+    assert nb.cells[1].source == "Here we have some text\nAnd below we have some python code"
     assert nb.cells[2].cell_type == "code"
     compare(
         nb.cells[2].source,
-        "# This is a comment about function f\n" "def f(x):\n" "    return x+1",
+        "# This is a comment about function f\ndef f(x):\n    return x+1",
     )
     assert nb.cells[3].cell_type == "code"
     compare(nb.cells[3].source, """# And a comment on h\ndef h(y):\n    return y-1""")
@@ -171,14 +165,9 @@ def f(x):
     assert nb.cells[0].cell_type == "raw"
     assert nb.cells[0].source == "---\ntitle: Non-pep8 file\n---"
     assert nb.cells[1].cell_type == "markdown"
-    assert (
-        nb.cells[1].source == "This file is non-pep8 as "
-        "the function below has\n"
-        "two consecutive blank lines "
-        "in its body"
-    )
+    assert nb.cells[1].source == "This file is non-pep8 as the function below has\ntwo consecutive blank lines in its body"
     assert nb.cells[2].cell_type == "code"
-    compare(nb.cells[2].source, "def f(x):\n\n\n" "    return x+1")
+    compare(nb.cells[2].source, "def f(x):\n\n\n    return x+1")
 
     pynb2 = jupytext.writes(nb, "py")
     compare(pynb2, pynb)
@@ -200,10 +189,7 @@ a + 2
 
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == "raw"
-    assert (
-        nb.cells[0].source == "---\ntitle: cell with two "
-        "consecutive blank lines\n---"
-    )
+    assert nb.cells[0].source == "---\ntitle: cell with two consecutive blank lines\n---"
     assert nb.cells[1].cell_type == "code"
     assert nb.cells[1].source == "a = 1\n\n\na + 2"
 
@@ -505,7 +491,7 @@ def test_isolated_cell_with_magic(
 
     assert len(nb.cells) == 6
     assert nb.cells[0].cell_type == "raw"
-    assert nb.cells[0].source == "---\ntitle: cell with isolated jupyter " "magic\n---"
+    assert nb.cells[0].source == "---\ntitle: cell with isolated jupyter magic\n---"
     assert nb.cells[1].cell_type == "code"
     assert nb.cells[2].cell_type == "markdown"
     assert nb.cells[3].cell_type == "code"
@@ -539,12 +525,8 @@ def test_ipython_help_are_commented_297(
 """,
     nb=new_notebook(
         cells=[
-            new_markdown_cell(
-                "This is a markdown cell\nthat ends with a question: float?"
-            ),
-            new_markdown_cell(
-                "The next cell is also a markdown cell,\nbecause it has no code marker:"
-            ),
+            new_markdown_cell("This is a markdown cell\nthat ends with a question: float?"),
+            new_markdown_cell("The next cell is also a markdown cell,\nbecause it has no code marker:"),
             new_markdown_cell("float?"),
             new_code_cell("float?"),
             new_code_cell("float??"),
@@ -848,9 +830,9 @@ def test_notebook_no_line_to_next_cell(
             new_markdown_cell("Markdown cell #2"),
             new_code_cell("%lprun -f ..."),
             new_markdown_cell("Markdown cell #3"),
-            new_code_cell("# And a function!\n" "def f(x):\n" "    return 5"),
+            new_code_cell("# And a function!\ndef f(x):\n    return 5"),
         ]
-    )
+    ),
 ):
     script = jupytext.writes(nb, "py")
     nb2 = jupytext.reads(script, "py")
@@ -978,18 +960,15 @@ Jupyter.utils.load_extensions('jupytext')"""
 
 
 def test_raw_with_metadata(
-    no_jupytext_version_number,
     text="""# + key="value" active=""
 # Raw cell
 # # Commented line
 """,
-    notebook=new_notebook(
-        cells=[new_raw_cell("Raw cell\n# Commented line", metadata={"key": "value"})]
-    ),
+    notebook=new_notebook(cells=[new_raw_cell("Raw cell\n# Commented line", metadata={"key": "value"})]),
 ):
     nb2 = jupytext.reads(text, "py")
     compare_notebooks(nb2, notebook)
-    text2 = jupytext.writes(notebook, "py")
+    text2 = jupytext.writes(nb2, "py")
     compare(text2, text)
 
 
@@ -999,26 +978,21 @@ def test_raw_with_metadata_2(
 # Raw cell
 # # Commented line
 """,
-    notebook=new_notebook(
-        cells=[new_raw_cell("Raw cell\n# Commented line", metadata={"key": "value"})]
-    ),
+    notebook=new_notebook(cells=[new_raw_cell("Raw cell\n# Commented line", metadata={"key": "value"})]),
 ):
     nb2 = jupytext.reads(text, "py")
     compare_notebooks(nb2, notebook)
 
 
 def test_markdown_with_metadata(
-    no_jupytext_version_number,
     text="""# + [markdown] key="value"
 # Markdown cell
 """,
-    notebook=new_notebook(
-        cells=[new_markdown_cell("Markdown cell", metadata={"key": "value"})]
-    ),
+    notebook=new_notebook(cells=[new_markdown_cell("Markdown cell", metadata={"key": "value"})]),
 ):
     nb2 = jupytext.reads(text, "py")
     compare_notebooks(nb2, notebook)
-    text2 = jupytext.writes(notebook, "py")
+    text2 = jupytext.writes(nb2, "py")
     compare(text2, text)
 
 
@@ -1106,9 +1080,7 @@ interpreter = 'python'
     ref=new_notebook(
         cells=[
             new_raw_cell("interpreter = 'python'", metadata={"tags": ["active-py"]}),
-            new_code_cell(
-                "interpreter = 'ipython'", metadata={"tags": ["active-ipynb"]}
-            ),
+            new_code_cell("interpreter = 'ipython'", metadata={"tags": ["active-ipynb"]}),
         ]
     ),
 ):
@@ -1139,15 +1111,13 @@ except:
 """,
 ):
     """Reproduces https://github.com/mwouts/jupytext/issues/437"""
-    py = jupytext.writes(nb, "py")
+    py = jupytext.writes(nb, "py:light")
     compare(py, text)
     nb2 = jupytext.reads(py, "py")
     compare_notebooks(nb2, nb)
 
 
-def test_two_raw_cells_are_preserved(
-    nb=new_notebook(cells=[new_raw_cell("---\nX\n---"), new_raw_cell("Y")])
-):
+def test_two_raw_cells_are_preserved(nb=new_notebook(cells=[new_raw_cell("---\nX\n---"), new_raw_cell("Y")])):
     """Test the pattern described at https://github.com/mwouts/jupytext/issues/466"""
     py = jupytext.writes(nb, "py")
     nb2 = jupytext.reads(py, "py")

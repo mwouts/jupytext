@@ -234,9 +234,7 @@ JUPYTEXT_FORMATS = (
     ]
 )
 
-NOTEBOOK_EXTENSIONS = list(
-    dict.fromkeys([".ipynb"] + [fmt.extension for fmt in JUPYTEXT_FORMATS])
-)
+NOTEBOOK_EXTENSIONS = list(dict.fromkeys([".ipynb"] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
 EXTENSION_PREFIXES = [".lgt", ".spx", ".pct", ".hyd", ".nb"]
 
 
@@ -254,8 +252,7 @@ def get_format_implementation(ext, format_name=None):
 
     if formats_for_extension:
         raise JupytextFormatError(
-            "Format '{}' is not associated to extension '{}'. "
-            "Please choose one of: {}.".format(
+            "Format '{}' is not associated to extension '{}'. Please choose one of: {}.".format(
                 format_name, ext, ", ".join(formats_for_extension)
             )
         )
@@ -277,17 +274,12 @@ def read_metadata(text, ext):
     if ext in [".r", ".R"] and not metadata:
         metadata, _, _, _ = header_to_metadata_and_cell(lines, "#'", "", ext)
 
-    # MyST has the metadata at the root level
+    # metadata in MyST format may be at root level (i.e. not caught above)
     if not metadata and ext in myst_extensions() and text.startswith("---"):
         for header in yaml.safe_load_all(text):
             if not isinstance(header, dict):
                 continue
-            if (
-                header.get("jupytext", {})
-                .get("text_representation", {})
-                .get("format_name")
-                == "myst"
-            ):
+            if header.get("jupytext", {}).get("text_representation", {}).get("format_name") == MYST_FORMAT_NAME:
                 return header
             return metadata
 
@@ -308,7 +300,7 @@ def guess_format(text, ext):
     if "text_representation" in metadata.get("jupytext", {}):
         return format_name_for_ext(metadata, ext), {}
 
-    if is_myst_available() and ext in myst_extensions() and matches_mystnb(text, ext):
+    if is_myst_available() and ext in myst_extensions() and matches_mystnb(text, ext, requires_meta=False):
         return MYST_FORMAT_NAME, {}
 
     lines = text.splitlines()
@@ -340,11 +332,7 @@ def guess_format(text, ext):
                 continue
 
             # Don't count escaped Jupyter magics (no space between %% and command) as cells
-            if (
-                double_percent_re.match(line)
-                or double_percent_and_space_re.match(line)
-                or nbconvert_script_re.match(line)
-            ):
+            if double_percent_re.match(line) or double_percent_and_space_re.match(line) or nbconvert_script_re.match(line):
                 double_percent_count += 1
 
             if not line.startswith(unescaped_comment) and is_magic(line, language):
@@ -399,9 +387,7 @@ def divine_format(text):
     lines = text.splitlines()
     for comment in ["", "#"] + _COMMENT_CHARS:
         metadata, _, _, _ = header_to_metadata_and_cell(lines, comment, "")
-        ext = (
-            metadata.get("jupytext", {}).get("text_representation", {}).get("extension")
-        )
+        ext = metadata.get("jupytext", {}).get("text_representation", {}).get("extension")
         if ext:
             return ext[1:] + ":" + guess_format(text, ext)[0]
 
@@ -423,15 +409,9 @@ def check_file_version(notebook, source_path, outputs_path):
         ext = notebook.metadata["jupytext"]["text_representation"]["extension"]
     else:
         _, ext = os.path.splitext(source_path)
-        assert not ext.endswith(
-            ".ipynb"
-        ), "source_path={} should be a text file".format(source_path)
+        assert not ext.endswith(".ipynb"), f"source_path={source_path} should be a text file"
 
-    version = (
-        notebook.metadata.get("jupytext", {})
-        .get("text_representation", {})
-        .get("format_version")
-    )
+    version = notebook.metadata.get("jupytext", {}).get("text_representation", {}).get("format_version")
     format_name = format_name_for_ext(notebook.metadata, ext)
 
     fmt = get_format_implementation(ext, format_name)
@@ -450,9 +430,7 @@ def check_file_version(notebook, source_path, outputs_path):
         return
 
     jupytext_version_in_file = (
-        notebook.metadata.get("jupytext", {})
-        .get("text_representation", {})
-        .get("jupytext_version", "N/A")
+        notebook.metadata.get("jupytext", {}).get("text_representation", {}).get("jupytext_version", "N/A")
     )
 
     raise JupytextFormatError(
@@ -507,9 +485,7 @@ def identical_format_path(fmt1, fmt2):
 def update_jupytext_formats_metadata(metadata, new_format):
     """Update the jupytext_format metadata in the Jupyter notebook"""
     new_format = long_form_one_format(new_format)
-    formats = long_form_multiple_formats(
-        metadata.get("jupytext", {}).get("formats", "")
-    )
+    formats = long_form_multiple_formats(metadata.get("jupytext", {}).get("formats", ""))
     if not formats:
         return
 
@@ -518,9 +494,7 @@ def update_jupytext_formats_metadata(metadata, new_format):
             fmt["format_name"] = new_format.get("format_name")
             break
 
-    metadata.setdefault("jupytext", {})["formats"] = short_form_multiple_formats(
-        formats
-    )
+    metadata.setdefault("jupytext", {})["formats"] = short_form_multiple_formats(formats)
 
 
 def rearrange_jupytext_metadata(metadata):
@@ -531,14 +505,12 @@ def rearrange_jupytext_metadata(metadata):
         if key in metadata:
             metadata[key.replace("nbrmd", "jupytext")] = metadata.pop(key)
 
-    jupytext_metadata = metadata.pop("jupytext", {})
+    jupytext_metadata = metadata.get("jupytext", {})
 
     if "jupytext_formats" in metadata:
         jupytext_metadata["formats"] = metadata.pop("jupytext_formats")
     if "jupytext_format_version" in metadata:
-        jupytext_metadata["text_representation"] = {
-            "format_version": metadata.pop("jupytext_format_version")
-        }
+        jupytext_metadata["text_representation"] = {"format_version": metadata.pop("jupytext_format_version")}
     if "main_language" in metadata:
         jupytext_metadata["main_language"] = metadata.pop("main_language")
     for entry in ["encoding", "executable"]:
@@ -553,35 +525,23 @@ def rearrange_jupytext_metadata(metadata):
 
     for filter_level in ["notebook_metadata_filter", "cell_metadata_filter"]:
         if filter_level in jupytext_metadata:
-            jupytext_metadata[filter_level] = metadata_filter_as_string(
-                jupytext_metadata[filter_level]
-            )
+            jupytext_metadata[filter_level] = metadata_filter_as_string(jupytext_metadata[filter_level])
 
-    if (
-        jupytext_metadata.get("text_representation", {})
-        .get("jupytext_version", "")
-        .startswith("0.")
-    ):
+    if jupytext_metadata.get("text_representation", {}).get("jupytext_version", "").startswith("0."):
         formats = jupytext_metadata.get("formats")
         if formats:
-            jupytext_metadata["formats"] = ",".join(
-                ["." + fmt if fmt.rfind(".") > 0 else fmt for fmt in formats.split(",")]
-            )
+            jupytext_metadata["formats"] = ",".join(["." + fmt if fmt.rfind(".") > 0 else fmt for fmt in formats.split(",")])
 
     # auto to actual extension
     formats = jupytext_metadata.get("formats")
     if formats:
-        jupytext_metadata["formats"] = short_form_multiple_formats(
-            long_form_multiple_formats(formats, metadata)
-        )
+        jupytext_metadata["formats"] = short_form_multiple_formats(long_form_multiple_formats(formats, metadata))
 
     if jupytext_metadata:
         metadata["jupytext"] = jupytext_metadata
 
 
-def long_form_one_format(
-    jupytext_format, metadata=None, update=None, auto_ext_requires_language_info=True
-):
+def long_form_one_format(jupytext_format, metadata=None, update=None, auto_ext_requires_language_info=True):
     """Parse 'sfx.py:percent' into {'suffix':'sfx', 'extension':'py', 'format_name':'percent'}"""
     if isinstance(jupytext_format, dict):
         if update:
@@ -617,11 +577,7 @@ def long_form_one_format(
                 DeprecationWarning,
             )
             fmt["format_name"] = "nomarker"
-    elif (
-        not jupytext_format
-        or "." in jupytext_format
-        or ("." + jupytext_format) in NOTEBOOK_EXTENSIONS + [".auto"]
-    ):
+    elif not jupytext_format or "." in jupytext_format or ("." + jupytext_format) in NOTEBOOK_EXTENSIONS + [".auto"]:
         ext = jupytext_format
     elif jupytext_format in _VALID_FORMAT_NAMES:
         fmt["format_name"] = jupytext_format
@@ -646,8 +602,7 @@ def long_form_one_format(
         if not ext:
             if auto_ext_requires_language_info:
                 raise JupytextFormatError(
-                    "No language information in this notebook. Please replace 'auto' with "
-                    "an actual script extension."
+                    "No language information in this notebook. Please replace 'auto' with an actual script extension."
                 )
             ext = ".auto"
 
@@ -658,8 +613,8 @@ def long_form_one_format(
 
 
 def long_form_multiple_formats(
-    jupytext_formats, metadata=None, auto_ext_requires_language_info=True
-):
+    jupytext_formats: str, metadata=None, auto_ext_requires_language_info=True
+) -> list[dict[str, str]]:
     """Convert a concise encoding of jupytext.formats to a list of formats, encoded as dictionaries"""
     if not jupytext_formats:
         return []
@@ -677,14 +632,12 @@ def long_form_multiple_formats(
     ]
 
     if not auto_ext_requires_language_info:
-        jupytext_formats = [
-            fmt for fmt in jupytext_formats if fmt["extension"] != ".auto"
-        ]
+        jupytext_formats = [fmt for fmt in jupytext_formats if fmt["extension"] != ".auto"]
 
     return jupytext_formats
 
 
-def short_form_one_format(jupytext_format):
+def short_form_one_format(jupytext_format: dict[str, str]) -> str:
     """Represent one jupytext format as a string"""
     if not isinstance(jupytext_format, dict):
         return jupytext_format
@@ -708,7 +661,7 @@ def short_form_one_format(jupytext_format):
     return fmt
 
 
-def short_form_multiple_formats(jupytext_formats):
+def short_form_multiple_formats(jupytext_formats: list[dict[str, str]]) -> str:
     """Convert jupytext formats, represented as a list of dictionaries, to a comma separated list"""
     if not isinstance(jupytext_formats, list):
         return jupytext_formats
@@ -730,6 +683,7 @@ _BINARY_FORMAT_OPTIONS = [
 ]
 _VALID_FORMAT_OPTIONS = _BINARY_FORMAT_OPTIONS + [
     "notebook_metadata_filter",
+    "root_level_metadata_filter",
     "cell_metadata_filter",
     "cell_markers",
     "custom_cell_magics",
@@ -737,15 +691,12 @@ _VALID_FORMAT_OPTIONS = _BINARY_FORMAT_OPTIONS + [
 _VALID_FORMAT_NAMES = {fmt.format_name for fmt in JUPYTEXT_FORMATS}
 
 
-def validate_one_format(jupytext_format):
+def validate_one_format(jupytext_format: dict[str, str]) -> dict[str, str]:
     """Validate extension and options for the given format"""
     if not isinstance(jupytext_format, dict):
         raise JupytextFormatError("Jupytext format should be a dictionary")
 
-    if (
-        "format_name" in jupytext_format
-        and jupytext_format["format_name"] not in _VALID_FORMAT_NAMES
-    ):
+    if "format_name" in jupytext_format and jupytext_format["format_name"] not in _VALID_FORMAT_NAMES:
         raise JupytextFormatError(
             "{} is not a valid format name. Please choose one of {}".format(
                 jupytext_format.get("format_name"), ", ".join(_VALID_FORMAT_NAMES)
@@ -755,18 +706,12 @@ def validate_one_format(jupytext_format):
     for key in jupytext_format:
         if key not in _VALID_FORMAT_INFO + _VALID_FORMAT_OPTIONS:
             raise JupytextFormatError(
-                "Unknown format option '{}' - should be one of '{}'".format(
-                    key, "', '".join(_VALID_FORMAT_OPTIONS)
-                )
+                "Unknown format option '{}' - should be one of '{}'".format(key, "', '".join(_VALID_FORMAT_OPTIONS))
             )
         value = jupytext_format[key]
         if key in _BINARY_FORMAT_OPTIONS:
             if not isinstance(value, bool):
-                raise JupytextFormatError(
-                    "Format option '{}' should be a bool, not '{}'".format(
-                        key, str(value)
-                    )
-                )
+                raise JupytextFormatError(f"Format option '{key}' should be a bool, not '{str(value)}'")
 
     if "extension" not in jupytext_format:
         raise JupytextFormatError("Missing format extension")
@@ -791,9 +736,7 @@ def auto_ext_from_metadata(metadata):
         auto_ext = ".sage"
 
     if auto_ext is None:
-        language = metadata.get("kernelspec", {}).get("language") or metadata.get(
-            "jupytext", {}
-        ).get("main_language")
+        language = metadata.get("kernelspec", {}).get("language") or metadata.get("jupytext", {}).get("main_language")
         if language:
             for ext in _SCRIPT_EXTENSIONS:
                 if same_language(language, _SCRIPT_EXTENSIONS[ext]["language"]):
@@ -808,6 +751,11 @@ def auto_ext_from_metadata(metadata):
 
     if auto_ext == ".resource":
         return ".robot"
+
+    # Handle ROOT C++ notebooks
+    # https://tinyurl.com/root-cpp-notebook-doc
+    if auto_ext == ".C":
+        return ".cpp"
 
     return auto_ext
 
@@ -839,3 +787,20 @@ def formats_with_support_for_cell_metadata():
             continue
         if fmt.format_name not in ["sphinx", "nomarker", "spin", "quarto"]:
             yield f"{fmt.extension[1:]}:{fmt.format_name}"
+
+
+def get_formats_from_notebook_metadata(notebook):
+    """
+    Get the pairing information from the notebook metadata.
+
+    Parameters
+    ----------
+    notebook : nbformat.NotebookNode
+        The notebook object whose metadata will be inspected.
+
+    Returns
+    -------
+    formats : None or str
+        The value of the 'formats' field in the 'jupytext' metadata, which can be None or a string.
+    """
+    return notebook.metadata.get("jupytext", {}).get("formats")

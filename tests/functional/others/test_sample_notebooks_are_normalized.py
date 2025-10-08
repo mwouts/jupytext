@@ -1,11 +1,17 @@
 import nbformat
 import pytest
+from packaging import version
 
 import jupytext
 
 
-@pytest.mark.skipif(nbformat.__version__ <= "5.7", reason="normalize is not available")
+@pytest.mark.skipif(
+    version.parse(nbformat.__version__) <= version.parse("5.7"),
+    reason="normalize is not available",
+)
 def test_sample_notebooks_are_normalized(any_nb_file):
+    if "myst/" in any_nb_file and not jupytext.myst.is_myst_available():
+        pytest.skip("myst_parser not found")
     nb = jupytext.read(any_nb_file)
 
     changes, normalized_nb = nbformat.validator.normalize(nb)

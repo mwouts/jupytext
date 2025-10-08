@@ -36,45 +36,33 @@ def test_string_to_dict_conversion(metadata_filter_string, metadata_filter_dict)
 def test_metadata_filter_as_dict():
     assert metadata_filter_as_dict(True) == metadata_filter_as_dict("all")
     assert metadata_filter_as_dict(False) == metadata_filter_as_dict("-all")
-    assert metadata_filter_as_dict({"excluded": "all"}) == metadata_filter_as_dict(
-        "-all"
-    )
+    assert metadata_filter_as_dict({"excluded": "all"}) == metadata_filter_as_dict("-all")
 
 
 def test_metadata_filter_default():
-    assert filter_metadata(
-        to_dict(["technical", "user", "preserve"]), None, "-technical"
-    ) == to_dict(["user", "preserve"])
-    assert filter_metadata(
-        to_dict(["technical", "user", "preserve"]), None, "preserve,-all"
-    ) == to_dict(["preserve"])
+    assert filter_metadata(to_dict(["technical", "user", "preserve"]), None, "-technical") == to_dict(["user", "preserve"])
+    assert filter_metadata(to_dict(["technical", "user", "preserve"]), None, "preserve,-all") == to_dict(["preserve"])
 
 
 def test_metadata_filter_user_plus_default():
-    assert filter_metadata(
-        to_dict(["technical", "user", "preserve"]), "-user", "-technical"
-    ) == to_dict(["preserve"])
-    assert filter_metadata(
-        to_dict(["technical", "user", "preserve"]), "all,-user", "-technical"
-    ) == to_dict(["preserve", "technical"])
-    assert filter_metadata(
-        to_dict(["technical", "user", "preserve"]), "user", "preserve,-all"
-    ) == to_dict(["user", "preserve"])
+    assert filter_metadata(to_dict(["technical", "user", "preserve"]), "-user", "-technical") == to_dict(["preserve"])
+    assert filter_metadata(to_dict(["technical", "user", "preserve"]), "all,-user", "-technical") == to_dict(
+        ["preserve", "technical"]
+    )
+    assert filter_metadata(to_dict(["technical", "user", "preserve"]), "user", "preserve,-all") == to_dict(
+        ["user", "preserve"]
+    )
 
 
 def test_metadata_filter_user_overrides_default():
-    assert filter_metadata(
-        to_dict(["technical", "user", "preserve"]), "all,-user", "-technical"
-    ) == to_dict(["technical", "preserve"])
-    assert filter_metadata(
-        to_dict(["technical", "user", "preserve"]), "user,-all", "preserve"
-    ) == to_dict(["user"])
+    assert filter_metadata(to_dict(["technical", "user", "preserve"]), "all,-user", "-technical") == to_dict(
+        ["technical", "preserve"]
+    )
+    assert filter_metadata(to_dict(["technical", "user", "preserve"]), "user,-all", "preserve") == to_dict(["user"])
 
 
 def test_negative_cell_metadata_filter():
-    assert filter_metadata(to_dict(["exectime"]), "-linesto", "-exectime") == to_dict(
-        []
-    )
+    assert filter_metadata(to_dict(["exectime"]), "-linesto", "-exectime") == to_dict([])
 
 
 def test_cell_metadata_filter_is_updated():

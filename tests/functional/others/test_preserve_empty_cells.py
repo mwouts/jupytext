@@ -9,9 +9,7 @@ from jupytext.compare import compare, compare_notebooks
 def test_file_with_blank_lines(blank_lines):
     py_script = """# Markdown cell{0}
 # Another one{0}
-""".format(
-        "\n".join([""] * blank_lines)
-    )
+""".format("\n".join([""] * blank_lines))
 
     notebook = jupytext.reads(py_script, "py")
     py_script2 = jupytext.writes(notebook, "py")

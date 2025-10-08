@@ -1,8 +1,11 @@
 import pytest
+from nbformat.v4.nbbase import new_notebook, new_raw_cell
 
 from jupytext import reads, writes
-from jupytext.compare import compare
+from jupytext.compare import compare, compare_notebooks
 from jupytext.config import load_jupytext_configuration_file
+from jupytext.header import _JUPYTER_METADATA_NAMESPACE
+from jupytext.myst import dump_yaml_blocks
 
 
 @pytest.mark.requires_myst
@@ -60,3 +63,49 @@ settings:
     md2 = writes(nb, fmt="md", config=config)
 
     compare(md2, md)
+
+
+@pytest.mark.requires_myst
+def test_myst_frontmatter_metadata_combo(no_jupytext_version_number):
+    # ---
+    # foo: bar
+    # jupyter: <- subkeys become notebook metadata
+    #   lorem: ipsum
+    # ---
+    frontmatter = {"foo": "bar"}
+    metadata = {"lorem": "ipsum"}
+    md = dump_yaml_blocks(
+        {**frontmatter, _JUPYTER_METADATA_NAMESPACE: metadata},
+        compact=False,
+    )
+    config = load_jupytext_configuration_file(
+        "jupytext.toml",
+        "\n".join(
+            (
+                'notebook_metadata_filter = "all,-jupytext"',
+                'root_level_metadata_filter = "-all"',
+            )
+        ),
+    )
+    actual_nb = reads(md, fmt="md:myst", config=config)
+    expected_nb = new_notebook(
+        metadata=metadata,
+        cells=[
+            new_raw_cell(dump_yaml_blocks(frontmatter, compact=False).strip()),
+        ],
+    )
+    compare_notebooks(actual_nb, expected_nb)
+    # {
+    #   "cells": [
+    #     {
+    #        "cell_type": "raw",
+    #        "source": "---\nfoo: bar\n---",  <- merge with metadata in frontmatter
+    #        ...
+    #     }
+    #   ],
+    #   "metadata": {"foo": "baz"},
+    #   ...
+    # }
+    actual_md = writes(actual_nb, fmt="md:myst", config=config)
+    expected_md = md
+    compare(actual_md, expected_md)

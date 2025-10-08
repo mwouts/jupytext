@@ -19,6 +19,8 @@ import { IEditorServices } from '@jupyterlab/codeeditor';
 
 import { ITranslator, TranslationBundle } from '@jupyterlab/translation';
 
+import { IDisposable } from '@lumino/disposable';
+
 import { IRisePreviewFactory } from 'jupyterlab-rise';
 
 import { FACTORY, FILE_TYPES } from './tokens';
@@ -35,7 +37,7 @@ export function createFactory(
   rendermime: IRenderMimeRegistry,
   translator: ITranslator,
   trans: TranslationBundle,
-  riseFactory: IRisePreviewFactory | null
+  riseFactory: IRisePreviewFactory | null,
 ) {
   const allFileTypes = FILE_TYPES.concat(kernelFileTypeNames);
   // primarily this block is copied/pasted from jlab4 code and specifically
@@ -47,7 +49,7 @@ export function createFactory(
     settingRegistry,
     'Notebook',
     '@jupyterlab/notebook-extension:panel',
-    translator
+    translator,
   );
   // Duplicate notebook factory to apply it on Jupytext notebooks
   // Mirror: https://github.com/jupyterlab/jupyterlab/blob/8a8c3752564f37493d4eb6b4c59008027fa83880/packages/notebook-extension/src/index.ts#L860
@@ -67,6 +69,25 @@ export function createFactory(
     translator,
   });
   docRegistry.addWidgetFactory(factory);
+
+  // The list of extensions in the Jupytext Notebook factory.
+  const factoryExtensions: IDisposable[] = [];
+  const updateWidgetExtensions = () => {
+    // Dispose of all existing extensions.
+    factoryExtensions.forEach((extension) => extension.dispose());
+    // Add all the widgets extensions in the Notebook factory.
+    for (const extension of docRegistry.widgetExtensions('Notebook')) {
+      docRegistry.addWidgetExtension(FACTORY, extension);
+    }
+  };
+
+  // Listen for changes in Notebook factory extensions.
+  docRegistry.changed.connect((_, change) => {
+    if (change.type === 'widgetExtension' && change.name === 'Notebook') {
+      updateWidgetExtensions();
+    }
+  });
+  updateWidgetExtensions();
 
   // Register widget created with the new factory in the notebook tracker
   // This is required to activate notebook commands (and therefore shortcuts)

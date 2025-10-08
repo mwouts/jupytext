@@ -16,7 +16,7 @@ import {
  * Get Jupytext format of current widget if it is a text notebook
  */
 function getWidgetJupytextFormats(
-  notebookTracker: INotebookTracker
+  notebookTracker: INotebookTracker,
 ): Array<string> {
   const model = notebookTracker.currentWidget.context.model;
 
@@ -43,7 +43,7 @@ function getNotebookFileExtension(notebookTracker: INotebookTracker): string {
   }
 
   notebookFileExtension = LANGUAGE_INDEPENDENT_NOTEBOOK_EXTENSIONS.includes(
-    notebookFileExtension
+    notebookFileExtension,
   )
     ? notebookFileExtension
     : 'auto';
@@ -63,14 +63,14 @@ function getSelectedFormats(notebookTracker: INotebookTracker): Array<string> {
   const model = notebookTracker.currentWidget.context.model;
 
   const languageInfo = (model as any).getMetadata(
-    'language_info'
+    'language_info',
   ) as nbformat.ILanguageInfoMetadata;
   if (languageInfo && languageInfo.file_extension) {
     const scriptExt = languageInfo.file_extension.substring(1);
     formats = formats.map((format) => {
-      // By default use light format
+      // By default use percent format
       if (format === scriptExt) {
-        return 'auto:light';
+        return 'auto:percent';
       }
       // Replace language specific extension with auto
       return format.replace(`${scriptExt}:`, 'auto:');
@@ -99,11 +99,11 @@ function getSelectedFormats(notebookTracker: INotebookTracker): Array<string> {
   } else {
     const model = notebookTracker.currentWidget.context.model;
     const jupytext: IJupytextSection = (model as any).getMetadata(
-      'jupytext'
+      'jupytext',
     ) as IJupytextSection;
     const formatName = jupytext
-      ? jupytext?.text_representation?.formatName || 'light'
-      : 'light';
+      ? jupytext?.text_representation?.formatName || 'percent'
+      : 'percent';
     formats.push(`auto:${formatName}`);
   }
   return formats;
@@ -114,7 +114,7 @@ function getSelectedFormats(notebookTracker: INotebookTracker): Array<string> {
  */
 export function isPairCommandToggled(
   format: string,
-  notebookTracker: INotebookTracker
+  notebookTracker: INotebookTracker,
 ): boolean {
   if (!notebookTracker.currentWidget) {
     return false;
@@ -139,7 +139,7 @@ export function isPairCommandToggled(
  */
 export function isPairCommandEnabled(
   format: string,
-  notebookTracker: INotebookTracker
+  notebookTracker: INotebookTracker,
 ): boolean {
   if (!notebookTracker.currentWidget) {
     return false;
@@ -168,7 +168,7 @@ export function executePairCommand(
   command: string,
   format: string,
   notebookTracker: INotebookTracker,
-  trans: TranslationBundle
+  trans: TranslationBundle,
 ): void {
   if (!notebookTracker.currentWidget) {
     return;
@@ -187,8 +187,8 @@ export function executePairCommand(
     showErrorMessage(
       trans.__('Error'),
       trans.__(
-        'Please edit the notebook metadata directly if you wish a custom configuration.'
-      )
+        'Please edit the notebook metadata directly if you wish a custom configuration.',
+      ),
     );
     return;
   }
@@ -274,7 +274,7 @@ export function executePairCommand(
  * Toggle metadata command
  */
 export function isMetadataCommandToggled(
-  notebookTracker: INotebookTracker
+  notebookTracker: INotebookTracker,
 ): boolean {
   if (!notebookTracker.currentWidget) {
     return false;
@@ -300,7 +300,7 @@ export function isMetadataCommandToggled(
  * Enable metadata command
  */
 export function isMetadataCommandEnabled(
-  notebookTracker: INotebookTracker
+  notebookTracker: INotebookTracker,
 ): boolean {
   if (!notebookTracker.currentWidget) {
     return false;
@@ -330,7 +330,7 @@ export function isMetadataCommandEnabled(
  * Execute metadata command
  */
 export function executeMetadataCommand(
-  notebookTracker: INotebookTracker
+  notebookTracker: INotebookTracker,
 ): void {
   console.debug('Jupytext: toggling YAML header');
   if (!notebookTracker.currentWidget) {

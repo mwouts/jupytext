@@ -1,4 +1,4 @@
-""" Main for Jupytext
+"""Main for Jupytext
 
 Call with (e.g.)::
 
