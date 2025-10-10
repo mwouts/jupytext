@@ -59,7 +59,7 @@ _IGNORE_CELL_METADATA = ",".join(
 
 # In R Markdown we might have options without a value
 _IS_IDENTIFIER = re.compile(r"^[a-zA-Z_\.]+[a-zA-Z0-9_\.]*$")
-_IS_VALID_METADATA_KEY = re.compile(r"^[a-zA-Z0-9_\.-]+$")
+_IS_VALID_METADATA_KEY = re.compile(r"^[a-zA-Z0-9_\.@/-]+$")
 
 
 class RLogicalValueError(Exception):
