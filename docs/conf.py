@@ -17,7 +17,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "Jupytext"
-copyright = "2018-2023, The Jupytext Team"
+copyright = "2018-2025, The Jupytext Team"
 author = "The Jupytext Team"
 
 # -- General configuration ---------------------------------------------------
