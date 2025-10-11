@@ -96,7 +96,7 @@ In this case, a manual action is requested. Remove the paired `.md` or `.py` fil
 
 Jupytext is compatible with JupyterHub (execute `pip install jupytext --user` to install it in user mode) and with Binder (add `jupytext` to the project requirements).
 
-If you use another editor than Jupyter Lab, you probably can't get Jupytext there. However, you can still use Jupytext at the command line to manually sync the two representations of the notebook:
+If you use another editor than JupyterLab, you probably can't get Jupytext there. However, you can still use Jupytext at the command line to manually sync the two representations of the notebook:
 ```shell
 jupytext --set-formats ipynb,py:light notebook.ipynb   # Pair a notebook to a light script
 jupytext --sync notebook.ipynb                         # Sync the two representations
