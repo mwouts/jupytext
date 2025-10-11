@@ -267,7 +267,9 @@ def test_format_groups(tmpdir):
 
     # Format groups should be parsed and processed
     assert "tutorials" in config.format_groups
-    assert config.format_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
+    assert (
+        config.format_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
+    )
 
     # Test that default_formats returns the correct formats based on path
     # Regular notebook should use main formats
@@ -276,7 +278,10 @@ def test_format_groups(tmpdir):
 
     # Tutorial notebook should use group formats
     tutorial_notebook = str(tmpdir.join("notebooks/tutorials/getting_started.ipynb"))
-    assert config.default_formats(tutorial_notebook) == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
+    assert (
+        config.default_formats(tutorial_notebook)
+        == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
+    )
 
 
 def test_format_groups_multiple_groups(tmpdir):
