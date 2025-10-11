@@ -10,9 +10,9 @@
 install.md
 text-notebooks.md
 paired-notebooks.md
-jupyter-collaboration.md
 jupyterlab-extension.md
 vs-code.md
+jupyter-collaboration.md
 config.md
 advanced-options.md
 formats-scripts.md

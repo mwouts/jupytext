@@ -279,3 +279,27 @@ become a code cell
     assert nb.cells[1].source == "6"
     rmd2 = jupytext.writes(nb, fmt="Rmd")
     compare(rmd2, rmd)
+
+
+def test_non_language_code_fence():
+    """
+    This test reproduces the example from issue #1429
+    """
+    rmd = """# A title
+
+```{index} equations
+```
+
+Some text.
+
+```{python}
+a = 10
+```
+"""
+    nb = jupytext.reads(rmd, fmt="Rmd")
+    assert len(nb.cells) == 2, nb.cells
+    assert nb.cells[0].cell_type == "markdown"
+    assert nb.cells[1].cell_type == "code"
+    assert nb.cells[1].source == "a = 10"
+    rmd2 = jupytext.writes(nb, fmt="Rmd")
+    compare(rmd2, rmd)
