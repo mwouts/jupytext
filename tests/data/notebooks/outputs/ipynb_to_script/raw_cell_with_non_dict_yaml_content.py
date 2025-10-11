@@ -6,3 +6,5 @@
 #     language: python
 #     name: python3
 # ---
+
+print("Hello, World!")

@@ -6,3 +6,7 @@ jupyter:
     language: python
     name: python3
 ---
+
+```python
+print("Hello, World!")
+```

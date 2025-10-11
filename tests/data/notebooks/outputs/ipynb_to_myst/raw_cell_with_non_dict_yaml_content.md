@@ -11,3 +11,7 @@ kernelspec:
 Content.
 ---
 ```
+
+```{code-cell}
+print("Hello, World!")
+```

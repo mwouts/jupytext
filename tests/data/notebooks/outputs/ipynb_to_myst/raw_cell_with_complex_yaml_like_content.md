@@ -17,3 +17,7 @@ It also includes blank lines.
 
 ---
 ```
+
+```{code-cell}
+print("Hello, World!")
+```
