@@ -330,9 +330,12 @@ def metadata_and_cell_to_metadata(nb, fmt, unsupported_keys=None):
                 except (yaml.parser.ParserError, yaml.scanner.ScannerError):
                     logging.warning("[jupytext] failed to parse YAML in raw cell")
                 else:
-                    nb.cells = nb.cells[1:]
-                    if "root_level_metadata_filter" not in fmt and default_root_level_metadata_filter(fmt) == "all":
-                        metadata.setdefault("jupytext", {})["root_level_metadata_filter"] = "-" + ",-".join(frontmatter)
-                    metadata = recursive_update(frontmatter, metadata, overwrite=False)
+                    if not isinstance(frontmatter, dict):
+                        logging.warning("[jupytext] YAML header in raw cell is not a dictionary")
+                    else:
+                        nb.cells = nb.cells[1:]
+                        if "root_level_metadata_filter" not in fmt and default_root_level_metadata_filter(fmt) == "all":
+                            metadata.setdefault("jupytext", {})["root_level_metadata_filter"] = "-" + ",-".join(frontmatter)
+                        metadata = recursive_update(frontmatter, metadata, overwrite=False)
     nb.metadata = metadata
     return nb
