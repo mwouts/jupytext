@@ -61,7 +61,7 @@ class JupytextConfiguration(Configurable):
     default_jupytext_formats = Unicode(help="Deprecated. Use 'formats' instead", config=True)
 
     pairing_groups = Dict(
-        help="Format groups for subset-specific pairing. "
+        help="Pairing groups for subset-specific pairing. "
         "Each group maps prefixes to formats for specific notebook subsets. "
         "Example: {'tutorials': {'notebooks/tutorials/': 'ipynb', 'docs/tutorials/': 'md'}}",
         config=True,
@@ -233,7 +233,7 @@ class JupytextConfiguration(Configurable):
                 FutureWarning,
             )
 
-        # First check if path matches any format group
+        # First check if path matches any pairing group
         if self.pairing_groups:
             for group_name, group_formats in self.pairing_groups.items():
                 for fmt in long_form_multiple_formats(group_formats):

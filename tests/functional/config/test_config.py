@@ -247,7 +247,7 @@ def test_simple_py_file_is_not_paired(tmp_path):
 
 
 def test_pairing_groups(tmpdir):
-    """Test format groups for subset-specific pairing"""
+    """Test pairing groups for subset-specific pairing"""
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write("""
 [formats]
@@ -265,7 +265,7 @@ def test_pairing_groups(tmpdir):
     # Main formats should be parsed correctly
     assert config.formats == "notebooks///ipynb,scripts///py:percent"
 
-    # Format groups should be parsed and processed
+    # Pairing groups should be parsed and processed
     assert "tutorials" in config.pairing_groups
     assert (
         config.pairing_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
@@ -285,7 +285,7 @@ def test_pairing_groups(tmpdir):
 
 
 def test_pairing_groups_multiple_groups(tmpdir):
-    """Test multiple format groups"""
+    """Test multiple pairing groups"""
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write("""
 [formats]
@@ -320,7 +320,7 @@ def test_pairing_groups_multiple_groups(tmpdir):
 
 
 def test_pairing_groups_without_main_formats(tmpdir):
-    """Test format groups can work without main formats"""
+    """Test pairing groups can work without main formats"""
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write("""
 [pairing_groups.tutorials]
@@ -343,7 +343,7 @@ def test_pairing_groups_without_main_formats(tmpdir):
 
 
 def test_pairing_groups_yaml(tmpdir):
-    """Test format groups with YAML config"""
+    """Test pairing groups with YAML config"""
     jupytext_yml = tmpdir.join("jupytext.yml")
     jupytext_yml.write("""
 formats:
@@ -360,13 +360,13 @@ pairing_groups:
     # Main formats should be parsed correctly
     assert config.formats == "notebooks///ipynb,scripts///py:percent"
 
-    # Format groups should be parsed
+    # Pairing groups should be parsed
     assert "tutorials" in config.pairing_groups
     assert config.pairing_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md"
 
 
 def test_pairing_groups_json(tmpdir):
-    """Test format groups with JSON config"""
+    """Test pairing groups with JSON config"""
     jupytext_json = tmpdir.join("jupytext.json")
     jupytext_json.write("""{
   "formats": {
@@ -387,6 +387,6 @@ def test_pairing_groups_json(tmpdir):
     # Main formats should be parsed correctly
     assert config.formats == "notebooks///ipynb,scripts///py:percent"
 
-    # Format groups should be parsed
+    # Pairing groups should be parsed
     assert "tutorials" in config.pairing_groups
     assert config.pairing_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md"

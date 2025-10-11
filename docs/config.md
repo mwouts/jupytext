@@ -39,9 +39,9 @@ or this `pyproject.toml` configuration:
 
 The `notebook/` prefix above is matched with the top-most parent folder of the matching name, not above the Jupytext configuration file.
 
-## Format groups for subset-specific pairing
+## Pairing groups for subset-specific pairing
 
-Format groups allow you to define different pairing configurations for specific subsets of notebooks. This is useful when you want to apply different pairing rules to notebooks in different locations, such as generating documentation markdown files only for tutorial notebooks.
+Pairing groups allow you to define different pairing configurations for specific subsets of notebooks. This is useful when you want to apply different pairing rules to notebooks in different locations, such as generating documentation markdown files only for tutorial notebooks.
 
 Here's an example that pairs all notebooks to Python scripts, but also pairs tutorial notebooks to markdown documentation files:
 
@@ -82,7 +82,7 @@ You can define multiple groups for different subsets:
 "docs/examples/" = "md:myst"
 ```
 
-The most specific matching group is used. If a notebook path matches a format group, that group's formats are used; otherwise, the main formats are used.
+The first pairing group that matches the notebook path is used. If a notebook path does not match any pairing group, the main formats are used.
 
 In `pyproject.toml`, the configuration would be:
 ```toml
