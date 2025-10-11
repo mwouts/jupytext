@@ -1,10 +1,10 @@
 # Jupyter Collaboration
 
-[Jupyter Collaboration](https://github.com/jupyterlab/jupyter-collaboration) is an official Jupyter extension that enables real-time collaboration in Jupyter Lab.
+[Jupyter Collaboration](https://github.com/jupyterlab/jupyter-collaboration) is an official Jupyter extension that enables real-time collaboration in JupyterLab.
 
 ## Autoreload Feature
 
-Beyond its collaboration features, Jupyter Collaboration also provides automatic file reloading. When the extension is installed, Jupyter Lab auto-reloads any file that gets modified on disk. This way, you can edit your notebook and text files outside of Jupyter, and the changes appear in Jupyter automatically without having to manually reload the document.
+Beyond its collaboration features, Jupyter Collaboration also provides automatic file reloading. When the extension is installed, JupyterLab auto-reloads any file that gets modified on disk. This way, you can edit your notebook and text files outside of Jupyter, and the changes appear in Jupyter automatically without having to manually reload the document.
 
 Note that Jupyter Collaboration also comes with an auto-save feature. By [default](https://github.com/jupyterlab/jupyter-collaboration/blob/67453e04dad30978d42fdef07040ae94cabe2bf0/projects/jupyter-server-ydoc/jupyter_server_ydoc/app.py#L45-L84), notebooks and text documents are saved one second after your last change.
 

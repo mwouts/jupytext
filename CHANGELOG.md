@@ -192,14 +192,14 @@ might now add a Markdown cell to the notebook ([#1255](https://github.com/mwouts
 -------------------
 
 **Added**
-- The Jupyter Lab extension is now compatible with the [JupyterLab RISE](https://github.com/jupyterlab-contrib/rise) extension. Many thanks to [Frédéric Collonval](https://github.com/fcollonval) for his PR ([#1126](https://github.com/mwouts/jupytext/pull/1126))!
+- The JupyterLab extension is now compatible with the [JupyterLab RISE](https://github.com/jupyterlab-contrib/rise) extension. Many thanks to [Frédéric Collonval](https://github.com/fcollonval) for his PR ([#1126](https://github.com/mwouts/jupytext/pull/1126))!
 
 
 1.15.1 (2023-08-26)
 -------------------
 
 **Added**
-- We have added a new command line interface `jupytext-config` that you can use to set Jupytext as the default viewer for text notebooks in Jupyter Lab and Jupyter Notebook 7. Thanks to [Thierry Parmentelat](https://github.com/parmentelat) for this contribution! ([#1094](https://github.com/mwouts/jupytext/pull/1094))
+- We have added a new command line interface `jupytext-config` that you can use to set Jupytext as the default viewer for text notebooks in JupyterLab and Jupyter Notebook 7. Thanks to [Thierry Parmentelat](https://github.com/parmentelat) for this contribution! ([#1094](https://github.com/mwouts/jupytext/pull/1094))
 
 
 1.15.0 (2023-07-30)
@@ -392,7 +392,7 @@ a configuration file ([#967](https://github.com/mwouts/jupytext/issues/967))
 -------------------
 
 **Changed**
-- The extension for Jupyter Lab benefited from a series of improvements contributed by [Frédéric Collonval](https://github.com/fcollonval):
+- The extension for JupyterLab benefited from a series of improvements contributed by [Frédéric Collonval](https://github.com/fcollonval):
   - A new "Jupytext Notebook" factory offers the option to open text notebooks directly with the notebook view ([#803](https://github.com/mwouts/jupytext/issues/803)). To use it, follow the instructions in the [documentation](https://github.com/mwouts/jupytext/blob/main/docs/index.md#Install).
   - The ICommandPalette is optional, for compatibility with RISE within JupyterLab [RISE[#605](https://github.com/mwouts/jupytext/issues/605)](https://github.com/damianavila/RISE/pull/605)
   - Added support for translation
@@ -567,7 +567,7 @@ a configuration file ([#967](https://github.com/mwouts/jupytext/issues/967))
 ------------------
 
 **Changed**
-- The Jupytext extension for JupyterLab is compatible with Jupyter Lab 3.0, thanks to Martin Renou's awesome contribution ([#683](https://github.com/mwouts/jupytext/pull/683)).
+- The Jupytext extension for JupyterLab is compatible with JupyterLab 3.0, thanks to Martin Renou's awesome contribution ([#683](https://github.com/mwouts/jupytext/pull/683)).
 
 
 1.8.2 (2021-01-04)
@@ -809,7 +809,7 @@ See also [What's new in Jupytext 1.3?](https://gist.github.com/mwouts/724efe5e00
 **Added**
 
 - Pairing a notebook to both `.md` and `.py` is now supported. Input cells are loaded from the most recent text representation ([#290](https://github.com/mwouts/jupytext/issues/290))
-- Both the Jupyter Notebook and the Jupyter Lab extension for Jupytext were updated ([#290](https://github.com/mwouts/jupytext/issues/290))
+- Both the Jupyter Notebook and the JupyterLab extension for Jupytext were updated ([#290](https://github.com/mwouts/jupytext/issues/290))
 - Raw cells are now encoded using HTML comments (`<!-- #raw -->` and `<!-- #endraw -->`) in Markdown files ([#321](https://github.com/mwouts/jupytext/issues/321))
 - Markdown cells can be delimited with any of `<!-- #region -->`,  `<!-- #markdown -->` or `<!-- #md -->` ([#344](https://github.com/mwouts/jupytext/issues/344))
 - Code blocks from Markdown files, when they don't have an explicit language, appear in Markdown cells in Jupyter ([#321](https://github.com/mwouts/jupytext/issues/321))
@@ -1058,7 +1058,7 @@ with `jupyter labextension install jupyterlab-jupytext@0.19` ([#276](https://git
 **Fixed**
 
 - `notebook_metadata_filter = "all"` now works ([#196](https://github.com/mwouts/jupytext/issues/196))
-- Default pairing in subfolders fixed in Jupyter Lab ([#180](https://github.com/mwouts/jupytext/issues/180))
+- Default pairing in subfolders fixed in JupyterLab ([#180](https://github.com/mwouts/jupytext/issues/180))
 
 
 1.0.2 (2019-02-27)

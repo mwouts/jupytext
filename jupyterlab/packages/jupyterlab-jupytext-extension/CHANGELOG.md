@@ -47,7 +47,7 @@ The dependencies of the JupyterLab extension were updated to address [security i
 # 1.3.10 (2023-10-22)
 
 - The server extension for `jupytext` has been moved from core Jupytext to the (Python) `jupyterlab-jupytext` extension.
-- The Jupyter Lab extension is now compatible with the [JupyterLab RISE](https://github.com/jupyterlab-contrib/rise) extension. Many thanks to [Frédéric Collonval](https://github.com/fcollonval) for his PR ([#1126](https://github.com/mwouts/jupytext/pull/1126))!
+- The JupyterLab extension is now compatible with the [JupyterLab RISE](https://github.com/jupyterlab-contrib/rise) extension. Many thanks to [Frédéric Collonval](https://github.com/fcollonval) for his PR ([#1126](https://github.com/mwouts/jupytext/pull/1126))!
 - This version of the JupyterLab extension is compatible with JupyterLab 4.x. Many thanks to [Thierry Parmentelat](https://github.com/parmentelat) for his PRs! ([#1092](https://github.com/mwouts/jupytext/pull/1092), [#1109](https://github.com/mwouts/jupytext/pull/1109))
 
 # 1.3.9 (2022-06-02)
@@ -61,7 +61,7 @@ The dependencies of the JupyterLab extension were updated to address [security i
 
 # 1.3.7 (2021-11-30)
 
-The extension for Jupyter Lab benefited from a series of improvements contributed by [Frédéric Collonval](https://github.com/fcollonval):
+The extension for JupyterLab benefited from a series of improvements contributed by [Frédéric Collonval](https://github.com/fcollonval):
 
 - A new "Jupytext Notebook" factory offers the option to open text notebooks directly with the notebook view (#803). To use it, follow the instructions in the [documentation](https://github.com/mwouts/jupytext/blob/main/docs/index.md#Install).
 - The ICommandPalette is optional, for compatibility with RISE within JupyterLab [RISE#605](https://github.com/damianavila/RISE/pull/605)
