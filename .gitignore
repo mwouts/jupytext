@@ -1,19 +1,11 @@
 .build
 .cache
-.coverage
-.pytest_cache
 .eggs
 .tox
+
 build
 /dist
-venv
-jupytext.egg-info
-future
-*.pyc
-gits*
-.ipynb_checkpoints
 docs/_build
-jupytext/labextension
 
 # Will be created by postBuild
 demo/get_started.ipynb
@@ -28,7 +20,14 @@ demo/get_started.ipynb
 .vscode/*
 !.vscode/*.template
 
+# Notebooks
+*.pyc
+.ipynb_checkpoints
+.jupyter_ystore.db*
+
 # Test related files
+.coverage
+.pytest_cache
 *.coverage*
 *.xml
 .ruff_cache

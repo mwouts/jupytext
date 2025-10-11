@@ -61,6 +61,8 @@ A convenient alternative to text notebooks are [paired notebooks](docs/paired-no
 
 You can edit the `.py` version of the paired notebook, and get the edits back in Jupyter by selecting _reload notebook from disk_. The outputs will be reloaded from the `.ipynb` file, if it exists. The `.ipynb` version will be updated or recreated the next time you save the notebook in Jupyter.
 
+💡 **Tip:** You can automate the notebook reloading by installing the [Jupyter Collaboration](docs/jupyter-collaboration.md) extension.
+
 To pair a notebook in Jupyter Lab, use the command `Pair Notebook with percent Script` from the Command Palette:
 
 ![](https://github.com/mwouts/jupytext/blob/64b4be818508760116f91bf156342cb4cf724d93/docs/images/pair_commands.png?raw=true)
@@ -109,7 +111,7 @@ Once your notebook is [paired](docs/paired-notebooks.md) with a `.py` file, you 
 
 Once you are done editing the `.py` notebook, you will just have to _reload_ the notebook in Jupyter to get the latest edits there.
 
-Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the paired `.py` file. There is no obligation to do so; however, if you don't, you should be prepared to read carefully the pop-up messages. If Jupyter tries to save the notebook while the paired `.py` file has also been edited on disk since the last reload, a conflict will be detected and you will be asked to decide which version of the notebook (in memory or on disk) is the appropriate one.
+Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the paired `.py` file. There is no obligation to do so; however, if you don't, you should be prepared to read carefully the pop-up messages. If Jupyter tries to save the notebook while the paired `.py` file has also been edited on disk since the last reload, a conflict will be detected and you will be asked to decide which version of the notebook (in memory or on disk) is the appropriate one. Alternatively, the [Jupyter Collaboration](docs/jupyter-collaboration.md) extension provides an autoreload feature which simplifies this.
 
 ## More resources
 
