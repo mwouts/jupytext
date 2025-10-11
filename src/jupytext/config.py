@@ -59,6 +59,13 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
     default_jupytext_formats = Unicode(help="Deprecated. Use 'formats' instead", config=True)
+    
+    format_groups = Dict(
+        help="Format groups for subset-specific pairing. "
+        "Each group maps prefixes to formats for specific notebook subsets. "
+        "Example: {'tutorials': {'notebooks/tutorials/': 'ipynb', 'docs/tutorials/': 'md'}}",
+        config=True,
+    )
 
     preferred_jupytext_formats_save = Unicode(
         help="Preferred format when saving notebooks as text, per extension. "
@@ -226,6 +233,17 @@ class JupytextConfiguration(Configurable):
                 FutureWarning,
             )
 
+        # First check if path matches any format group
+        if self.format_groups:
+            for group_name, group_formats in self.format_groups.items():
+                for fmt in long_form_multiple_formats(group_formats):
+                    try:
+                        base_path(path, fmt)
+                        return group_formats
+                    except InconsistentPath:
+                        continue
+
+        # Fall back to main formats
         formats = self.formats or self.default_jupytext_formats
         for fmt in long_form_multiple_formats(formats):
             try:
@@ -349,9 +367,18 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
         if jupytext_config_file.endswith((".toml", "jupytext")):
             doc = tomllib.loads(stream)
             if jupytext_config_file.endswith(PYPROJECT_FILE):
-                return doc["tool"]["jupytext"]
+                config = doc["tool"]["jupytext"]
             else:
-                return doc
+                config = doc
+            
+            # Extract format groups from nested structure
+            if "formats" in config and isinstance(config["formats"], dict):
+                if "group" in config["formats"]:
+                    # Extract the groups and remove from formats dict
+                    format_groups = config["formats"].pop("group")
+                    config["format_groups"] = format_groups
+            
+            return config
 
         if jupytext_config_file.endswith((".yml", ".yaml")):
             return yaml.safe_load(stream)
@@ -375,6 +402,22 @@ def load_jupytext_configuration_file(config_file, stream=None):
             for prefix, fmt in config.formats.items()
         ]
     config.formats = short_form_multiple_formats(config.formats)
+    
+    # Process format_groups - convert dict of dicts to dict of format strings
+    if config.format_groups:
+        processed_groups = {}
+        for group_name, group_formats in config.format_groups.items():
+            if isinstance(group_formats, dict):
+                # Convert prefix => format dict to format string
+                group_format_list = [
+                    (fmt if not prefix else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt)
+                    for prefix, fmt in group_formats.items()
+                ]
+                processed_groups[group_name] = short_form_multiple_formats(group_format_list)
+            else:
+                processed_groups[group_name] = group_formats
+        config.format_groups = processed_groups
+    
     if isinstance(config.notebook_extensions, str):
         config.notebook_extensions = config.notebook_extensions.split(",")
     return config

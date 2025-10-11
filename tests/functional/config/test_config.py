@@ -244,3 +244,94 @@ def test_simple_py_file_is_not_paired(tmp_path):
 
     formats = notebook_formats(notebook, config_file, str(py_file))
     assert formats == [{"extension": ".py", "format_name": "light"}], formats
+
+
+def test_format_groups(tmpdir):
+    """Test format groups for subset-specific pairing"""
+    jupytext_toml = tmpdir.join("jupytext.toml")
+    jupytext_toml.write("""
+[formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+
+[formats.group.tutorials]
+"notebooks/tutorials/" = "ipynb"
+"docs/tutorials/" = "md"
+"scripts/tutorials/" = "py:percent"
+""")
+
+    config = load_jupytext_configuration_file(str(jupytext_toml))
+    
+    # Main formats should be parsed correctly
+    assert config.formats == "notebooks///ipynb,scripts///py:percent"
+    
+    # Format groups should be parsed and processed
+    assert "tutorials" in config.format_groups
+    assert config.format_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
+    
+    # Test that default_formats returns the correct formats based on path
+    # Regular notebook should use main formats
+    regular_notebook = str(tmpdir.join("notebooks/hello.ipynb"))
+    assert config.default_formats(regular_notebook) == "notebooks///ipynb,scripts///py:percent"
+    
+    # Tutorial notebook should use group formats
+    tutorial_notebook = str(tmpdir.join("notebooks/tutorials/getting_started.ipynb"))
+    assert config.default_formats(tutorial_notebook) == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
+
+
+def test_format_groups_multiple_groups(tmpdir):
+    """Test multiple format groups"""
+    jupytext_toml = tmpdir.join("jupytext.toml")
+    jupytext_toml.write("""
+[formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+
+[formats.group.tutorials]
+"notebooks/tutorials/" = "ipynb"
+"docs/tutorials/" = "md"
+
+[formats.group.examples]
+"notebooks/examples/" = "ipynb"
+"docs/examples/" = "md:myst"
+""")
+
+    config = load_jupytext_configuration_file(str(jupytext_toml))
+    
+    # Check both groups exist
+    assert "tutorials" in config.format_groups
+    assert "examples" in config.format_groups
+    
+    # Test that the correct group is selected based on path
+    tutorial_notebook = str(tmpdir.join("notebooks/tutorials/intro.ipynb"))
+    assert config.default_formats(tutorial_notebook) == "notebooks/tutorials///ipynb,docs/tutorials///md"
+    
+    example_notebook = str(tmpdir.join("notebooks/examples/demo.ipynb"))
+    assert config.default_formats(example_notebook) == "notebooks/examples///ipynb,docs/examples///md:myst"
+    
+    # Regular notebook should still use main formats
+    regular_notebook = str(tmpdir.join("notebooks/regular.ipynb"))
+    assert config.default_formats(regular_notebook) == "notebooks///ipynb,scripts///py:percent"
+
+
+def test_format_groups_without_main_formats(tmpdir):
+    """Test format groups can work without main formats"""
+    jupytext_toml = tmpdir.join("jupytext.toml")
+    jupytext_toml.write("""
+[formats.group.tutorials]
+"notebooks/tutorials/" = "ipynb"
+"docs/tutorials/" = "md"
+""")
+
+    config = load_jupytext_configuration_file(str(jupytext_toml))
+    
+    # No main formats
+    assert config.formats == ""
+    
+    # But group formats should work
+    tutorial_notebook = str(tmpdir.join("notebooks/tutorials/getting_started.ipynb"))
+    assert config.default_formats(tutorial_notebook) == "notebooks/tutorials///ipynb,docs/tutorials///md"
+    
+    # Non-matching notebook should return None
+    other_notebook = str(tmpdir.join("notebooks/other.ipynb"))
+    assert config.default_formats(other_notebook) is None
