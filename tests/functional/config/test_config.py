@@ -335,3 +335,53 @@ def test_format_groups_without_main_formats(tmpdir):
     # Non-matching notebook should return None
     other_notebook = str(tmpdir.join("notebooks/other.ipynb"))
     assert config.default_formats(other_notebook) is None
+
+
+def test_format_groups_yaml(tmpdir):
+    """Test format groups with YAML config"""
+    jupytext_yml = tmpdir.join("jupytext.yml")
+    jupytext_yml.write("""
+formats:
+  notebooks/: ipynb
+  scripts/: py:percent
+  group:
+    tutorials:
+      notebooks/tutorials/: ipynb
+      docs/tutorials/: md
+""")
+
+    config = load_jupytext_configuration_file(str(jupytext_yml))
+    
+    # Main formats should be parsed correctly
+    assert config.formats == "notebooks///ipynb,scripts///py:percent"
+    
+    # Format groups should be parsed
+    assert "tutorials" in config.format_groups
+    assert config.format_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md"
+
+
+def test_format_groups_json(tmpdir):
+    """Test format groups with JSON config"""
+    jupytext_json = tmpdir.join("jupytext.json")
+    jupytext_json.write("""{
+  "formats": {
+    "notebooks/": "ipynb",
+    "scripts/": "py:percent",
+    "group": {
+      "tutorials": {
+        "notebooks/tutorials/": "ipynb",
+        "docs/tutorials/": "md"
+      }
+    }
+  }
+}
+""")
+
+    config = load_jupytext_configuration_file(str(jupytext_json))
+    
+    # Main formats should be parsed correctly
+    assert config.formats == "notebooks///ipynb,scripts///py:percent"
+    
+    # Format groups should be parsed
+    assert "tutorials" in config.format_groups
+    assert config.format_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md"

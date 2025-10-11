@@ -95,6 +95,34 @@ In `pyproject.toml`, the configuration would be:
 "docs/tutorials/" = "md"
 ```
 
+Format groups also work with YAML and JSON configuration files:
+
+```yaml
+# jupytext.yml
+formats:
+  notebooks/: ipynb
+  scripts/: py:percent
+  group:
+    tutorials:
+      notebooks/tutorials/: ipynb
+      docs/tutorials/: md
+```
+
+```json
+{
+  "formats": {
+    "notebooks/": "ipynb",
+    "scripts/": "py:percent",
+    "group": {
+      "tutorials": {
+        "notebooks/tutorials/": "ipynb",
+        "docs/tutorials/": "md"
+      }
+    }
+  }
+}
+```
+
 ## Global pairing vs individual pairing
 
 Alternatively, notebooks can be paired individually using either the Jupytext commands in JupyterLab, or the command line interface:

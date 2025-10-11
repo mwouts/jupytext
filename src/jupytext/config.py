@@ -370,23 +370,22 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
                 config = doc["tool"]["jupytext"]
             else:
                 config = doc
-            
-            # Extract format groups from nested structure
-            if "formats" in config and isinstance(config["formats"], dict):
-                if "group" in config["formats"]:
-                    # Extract the groups and remove from formats dict
-                    format_groups = config["formats"].pop("group")
-                    config["format_groups"] = format_groups
-            
-            return config
-
-        if jupytext_config_file.endswith((".yml", ".yaml")):
-            return yaml.safe_load(stream)
-
-        if jupytext_config_file.endswith(".json"):
-            return json.loads(stream)
-
-        return PyFileConfigLoader(jupytext_config_file).load_config()
+        elif jupytext_config_file.endswith((".yml", ".yaml")):
+            config = yaml.safe_load(stream)
+        elif jupytext_config_file.endswith(".json"):
+            config = json.loads(stream)
+        else:
+            # Python config file
+            return PyFileConfigLoader(jupytext_config_file).load_config()
+        
+        # Extract format groups from nested structure (works for TOML, YAML, JSON)
+        if "formats" in config and isinstance(config["formats"], dict):
+            if "group" in config["formats"]:
+                # Extract the groups and remove from formats dict
+                format_groups = config["formats"].pop("group")
+                config["format_groups"] = format_groups
+        
+        return config
     except (ValueError, NameError) as err:
         raise JupytextConfigurationError(f"The Jupytext configuration file {jupytext_config_file} is incorrect: {err}")
 
