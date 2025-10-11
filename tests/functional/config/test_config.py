@@ -349,10 +349,10 @@ def test_pairing_groups_yaml(tmpdir):
 formats:
   notebooks/: ipynb
   scripts/: py:percent
-  group:
-    tutorials:
-      notebooks/tutorials/: ipynb
-      docs/tutorials/: md
+pairing_groups:
+  tutorials:
+    notebooks/tutorials/: ipynb
+    docs/tutorials/: md
 """)
 
     config = load_jupytext_configuration_file(str(jupytext_yml))
@@ -371,12 +371,12 @@ def test_pairing_groups_json(tmpdir):
     jupytext_json.write("""{
   "formats": {
     "notebooks/": "ipynb",
-    "scripts/": "py:percent",
-    "group": {
-      "tutorials": {
-        "notebooks/tutorials/": "ipynb",
-        "docs/tutorials/": "md"
-      }
+    "scripts/": "py:percent"
+  },
+  "pairing_groups": {
+    "tutorials": {
+      "notebooks/tutorials/": "ipynb",
+      "docs/tutorials/": "md"
     }
   }
 }
