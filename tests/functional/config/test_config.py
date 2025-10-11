@@ -246,7 +246,7 @@ def test_simple_py_file_is_not_paired(tmp_path):
     assert formats == [{"extension": ".py", "format_name": "light"}], formats
 
 
-def test_format_groups(tmpdir):
+def test_pairing_groups(tmpdir):
     """Test format groups for subset-specific pairing"""
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write("""
@@ -254,7 +254,7 @@ def test_format_groups(tmpdir):
 "notebooks/" = "ipynb"
 "scripts/" = "py:percent"
 
-[formats.group.tutorials]
+[pairing_groups.tutorials]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 "scripts/tutorials/" = "py:percent"
@@ -266,9 +266,9 @@ def test_format_groups(tmpdir):
     assert config.formats == "notebooks///ipynb,scripts///py:percent"
 
     # Format groups should be parsed and processed
-    assert "tutorials" in config.format_groups
+    assert "tutorials" in config.pairing_groups
     assert (
-        config.format_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
+        config.pairing_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
     )
 
     # Test that default_formats returns the correct formats based on path
@@ -284,7 +284,7 @@ def test_format_groups(tmpdir):
     )
 
 
-def test_format_groups_multiple_groups(tmpdir):
+def test_pairing_groups_multiple_groups(tmpdir):
     """Test multiple format groups"""
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write("""
@@ -292,11 +292,11 @@ def test_format_groups_multiple_groups(tmpdir):
 "notebooks/" = "ipynb"
 "scripts/" = "py:percent"
 
-[formats.group.tutorials]
+[pairing_groups.tutorials]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 
-[formats.group.examples]
+[pairing_groups.examples]
 "notebooks/examples/" = "ipynb"
 "docs/examples/" = "md:myst"
 """)
@@ -304,8 +304,8 @@ def test_format_groups_multiple_groups(tmpdir):
     config = load_jupytext_configuration_file(str(jupytext_toml))
 
     # Check both groups exist
-    assert "tutorials" in config.format_groups
-    assert "examples" in config.format_groups
+    assert "tutorials" in config.pairing_groups
+    assert "examples" in config.pairing_groups
 
     # Test that the correct group is selected based on path
     tutorial_notebook = str(tmpdir.join("notebooks/tutorials/intro.ipynb"))
@@ -319,11 +319,11 @@ def test_format_groups_multiple_groups(tmpdir):
     assert config.default_formats(regular_notebook) == "notebooks///ipynb,scripts///py:percent"
 
 
-def test_format_groups_without_main_formats(tmpdir):
+def test_pairing_groups_without_main_formats(tmpdir):
     """Test format groups can work without main formats"""
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write("""
-[formats.group.tutorials]
+[pairing_groups.tutorials]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 """)
@@ -342,7 +342,7 @@ def test_format_groups_without_main_formats(tmpdir):
     assert config.default_formats(other_notebook) is None
 
 
-def test_format_groups_yaml(tmpdir):
+def test_pairing_groups_yaml(tmpdir):
     """Test format groups with YAML config"""
     jupytext_yml = tmpdir.join("jupytext.yml")
     jupytext_yml.write("""
@@ -361,11 +361,11 @@ formats:
     assert config.formats == "notebooks///ipynb,scripts///py:percent"
 
     # Format groups should be parsed
-    assert "tutorials" in config.format_groups
-    assert config.format_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md"
+    assert "tutorials" in config.pairing_groups
+    assert config.pairing_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md"
 
 
-def test_format_groups_json(tmpdir):
+def test_pairing_groups_json(tmpdir):
     """Test format groups with JSON config"""
     jupytext_json = tmpdir.join("jupytext.json")
     jupytext_json.write("""{
@@ -388,5 +388,5 @@ def test_format_groups_json(tmpdir):
     assert config.formats == "notebooks///ipynb,scripts///py:percent"
 
     # Format groups should be parsed
-    assert "tutorials" in config.format_groups
-    assert config.format_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md"
+    assert "tutorials" in config.pairing_groups
+    assert config.pairing_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md"

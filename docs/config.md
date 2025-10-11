@@ -54,7 +54,7 @@ Here's an example that pairs all notebooks to Python scripts, but also pairs tut
 "scripts/" = "py:percent"
 
 # Tutorial notebooks get additional pairing to markdown docs
-[formats.group.tutorials]
+[pairing_groups.tutorials]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 "scripts/tutorials/" = "py:percent"
@@ -73,11 +73,11 @@ You can define multiple groups for different subsets:
 "notebooks/" = "ipynb"
 "scripts/" = "py:percent"
 
-[formats.group.tutorials]
+[pairing_groups.tutorials]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 
-[formats.group.examples]
+[pairing_groups.examples]
 "notebooks/examples/" = "ipynb"
 "docs/examples/" = "md:myst"
 ```
@@ -90,7 +90,7 @@ In `pyproject.toml`, the configuration would be:
 "notebooks/" = "ipynb"
 "scripts/" = "py:percent"
 
-[tool.jupytext.formats.group.tutorials]
+[tool.jupytext.pairing_groups.tutorials]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 ```
