@@ -59,7 +59,7 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
     default_jupytext_formats = Unicode(help="Deprecated. Use 'formats' instead", config=True)
-    
+
     format_groups = Dict(
         help="Format groups for subset-specific pairing. "
         "Each group maps prefixes to formats for specific notebook subsets. "
@@ -376,15 +376,15 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
             config = json.loads(stream)
         else:
             # Python config file
-            return PyFileConfigLoader(jupytext_config_file).load_config()
-        
+            config = PyFileConfigLoader(jupytext_config_file).load_config()
+
         # Extract format groups from nested structure (works for TOML, YAML, JSON)
         if "formats" in config and isinstance(config["formats"], dict):
             if "group" in config["formats"]:
                 # Extract the groups and remove from formats dict
                 format_groups = config["formats"].pop("group")
                 config["format_groups"] = format_groups
-        
+
         return config
     except (ValueError, NameError) as err:
         raise JupytextConfigurationError(f"The Jupytext configuration file {jupytext_config_file} is incorrect: {err}")
@@ -401,7 +401,7 @@ def load_jupytext_configuration_file(config_file, stream=None):
             for prefix, fmt in config.formats.items()
         ]
     config.formats = short_form_multiple_formats(config.formats)
-    
+
     # Process format_groups - convert dict of dicts to dict of format strings
     if config.format_groups:
         processed_groups = {}
@@ -416,7 +416,7 @@ def load_jupytext_configuration_file(config_file, stream=None):
             else:
                 processed_groups[group_name] = group_formats
         config.format_groups = processed_groups
-    
+
     if isinstance(config.notebook_extensions, str):
         config.notebook_extensions = config.notebook_extensions.split(",")
     return config
