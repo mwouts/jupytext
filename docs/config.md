@@ -39,6 +39,62 @@ or this `pyproject.toml` configuration:
 
 The `notebook/` prefix above is matched with the top-most parent folder of the matching name, not above the Jupytext configuration file.
 
+## Format groups for subset-specific pairing
+
+Format groups allow you to define different pairing configurations for specific subsets of notebooks. This is useful when you want to apply different pairing rules to notebooks in different locations, such as generating documentation markdown files only for tutorial notebooks.
+
+Here's an example that pairs all notebooks to Python scripts, but also pairs tutorial notebooks to markdown documentation files:
+
+```toml
+# jupytext.toml
+
+# Main pairing: all notebooks are paired with Python scripts
+[formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+
+# Tutorial notebooks get additional pairing to markdown docs
+[formats.group.tutorials]
+"notebooks/tutorials/" = "ipynb"
+"docs/tutorials/" = "md"
+"scripts/tutorials/" = "py:percent"
+```
+
+With this configuration:
+- Regular notebooks like `notebooks/hello.ipynb` are paired with `scripts/hello.py`
+- Tutorial notebooks like `notebooks/tutorials/getting_started.ipynb` are paired with:
+  - `docs/tutorials/getting_started.md`
+  - `scripts/tutorials/getting_started.py`
+
+You can define multiple groups for different subsets:
+
+```toml
+[formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+
+[formats.group.tutorials]
+"notebooks/tutorials/" = "ipynb"
+"docs/tutorials/" = "md"
+
+[formats.group.examples]
+"notebooks/examples/" = "ipynb"
+"docs/examples/" = "md:myst"
+```
+
+The most specific matching group is used. If a notebook path matches a format group, that group's formats are used; otherwise, the main formats are used.
+
+In `pyproject.toml`, the configuration would be:
+```toml
+[tool.jupytext.formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+
+[tool.jupytext.formats.group.tutorials]
+"notebooks/tutorials/" = "ipynb"
+"docs/tutorials/" = "md"
+```
+
 ## Global pairing vs individual pairing
 
 Alternatively, notebooks can be paired individually using either the Jupytext commands in JupyterLab, or the command line interface:
