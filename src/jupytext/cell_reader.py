@@ -395,14 +395,10 @@ class MarkdownCellReader(BaseCellReader):
                     return i, i, False
 
                 if self.start_code_re.match(line):
-                    if line.startswith("```{bibliography}"):
-                        in_explicit_code_block = True
-                        prev_blank = 0
-                        continue
-
+                    language, metadata = self.options_to_metadata(self.start_code_re.findall(line)[0])
                     # Cells with a .noeval attribute are markdown cells #347
-                    _, metadata = self.options_to_metadata(self.start_code_re.findall(line)[0])
-                    if metadata.get(".noeval", "") is None:
+                    # R Markdown notebooks can have bibliography and index blocks, cf #1161 and #1429
+                    if language not in _JUPYTER_LANGUAGES_LOWER_AND_UPPER or metadata.get(".noeval", "") is None:
                         in_explicit_code_block = True
                         prev_blank = 0
                         continue
@@ -410,6 +406,11 @@ class MarkdownCellReader(BaseCellReader):
                     if i > 1 and prev_blank:
                         return i - 1, i, False
                     return i, i, False
+                elif line.startswith("```{"):
+                    # These are non-code blocks but we still need to look for their end
+                    in_explicit_code_block = True
+                    prev_blank = 0
+                    continue
 
                 if self.non_jupyter_code_re.match(line):
                     if prev_blank >= 2:
