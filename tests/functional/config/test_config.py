@@ -234,10 +234,10 @@ def test_simple_py_file_is_not_paired(tmp_path):
     assert formats == [{"extension": ".py", "format_name": "light"}], formats
 
 
-def test_pairing_groups(tmpdir):
+def test_pairing_groups(tmp_path):
     """Test list-based formats for subset-specific pairing"""
-    jupytext_toml = tmpdir.join("jupytext.toml")
-    jupytext_toml.write("""
+    jupytext_toml = tmp_path / "jupytext.toml"
+    jupytext_toml.write_text("""
 [[formats]]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
@@ -257,21 +257,21 @@ def test_pairing_groups(tmpdir):
 
     # Test that default_formats returns the correct formats based on path
     # Tutorial notebook should match first format (tutorials)
-    tutorial_notebook = str(tmpdir.join("notebooks/tutorials/getting_started.ipynb"))
+    tutorial_notebook = str(tmp_path / "notebooks" / "tutorials" / "getting_started.ipynb")
     assert (
         config.default_formats(tutorial_notebook)
         == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
     )
 
     # Regular notebook should match second format (main)
-    regular_notebook = str(tmpdir.join("notebooks/hello.ipynb"))
+    regular_notebook = str(tmp_path / "notebooks" / "hello.ipynb")
     assert config.default_formats(regular_notebook) == "notebooks///ipynb,scripts///py:percent"
 
 
-def test_pairing_groups_multiple_groups(tmpdir):
+def test_pairing_groups_multiple_groups(tmp_path):
     """Test multiple format sets with list-based formats"""
-    jupytext_toml = tmpdir.join("jupytext.toml")
-    jupytext_toml.write("""
+    jupytext_toml = tmp_path / "jupytext.toml"
+    jupytext_toml.write_text("""
 [[formats]]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
@@ -292,21 +292,21 @@ def test_pairing_groups_multiple_groups(tmpdir):
     assert len(config.formats) == 3
 
     # Test that the correct format is selected based on path (first match wins)
-    tutorial_notebook = str(tmpdir.join("notebooks/tutorials/intro.ipynb"))
+    tutorial_notebook = str(tmp_path / "notebooks" / "tutorials" / "intro.ipynb")
     assert config.default_formats(tutorial_notebook) == "notebooks/tutorials///ipynb,docs/tutorials///md"
 
-    example_notebook = str(tmpdir.join("notebooks/examples/demo.ipynb"))
+    example_notebook = str(tmp_path / "notebooks" / "examples" / "demo.ipynb")
     assert config.default_formats(example_notebook) == "notebooks/examples///ipynb,docs/examples///md:myst"
 
     # Regular notebook should use the last (default) format
-    regular_notebook = str(tmpdir.join("notebooks/regular.ipynb"))
+    regular_notebook = str(tmp_path / "notebooks" / "regular.ipynb")
     assert config.default_formats(regular_notebook) == "notebooks///ipynb,scripts///py:percent"
 
 
-def test_formats_list_without_default(tmpdir):
+def test_formats_list_without_default(tmp_path):
     """Test list-based formats without a default catchall"""
-    jupytext_toml = tmpdir.join("jupytext.toml")
-    jupytext_toml.write("""
+    jupytext_toml = tmp_path / "jupytext.toml"
+    jupytext_toml.write_text("""
 [[formats]]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
@@ -319,18 +319,18 @@ def test_formats_list_without_default(tmpdir):
     assert len(config.formats) == 1
 
     # Matching notebook should work
-    tutorial_notebook = str(tmpdir.join("notebooks/tutorials/getting_started.ipynb"))
+    tutorial_notebook = str(tmp_path / "notebooks" / "tutorials" / "getting_started.ipynb")
     assert config.default_formats(tutorial_notebook) == "notebooks/tutorials///ipynb,docs/tutorials///md"
 
     # Non-matching notebook should return None
-    other_notebook = str(tmpdir.join("notebooks/other.ipynb"))
+    other_notebook = str(tmp_path / "notebooks" / "other.ipynb")
     assert config.default_formats(other_notebook) is None
 
 
-def test_formats_list_yaml(tmpdir):
+def test_formats_list_yaml(tmp_path):
     """Test list-based formats with YAML config"""
-    jupytext_yml = tmpdir.join("jupytext.yml")
-    jupytext_yml.write("""
+    jupytext_yml = tmp_path / "jupytext.yml"
+    jupytext_yml.write_text("""
 formats:
   - notebooks/tutorials/: ipynb
     docs/tutorials/: md
@@ -345,10 +345,10 @@ formats:
     assert len(config.formats) == 2
 
 
-def test_formats_list_json(tmpdir):
+def test_formats_list_json(tmp_path):
     """Test list-based formats with JSON config"""
-    jupytext_json = tmpdir.join("jupytext.json")
-    jupytext_json.write("""{
+    jupytext_json = tmp_path / "jupytext.json"
+    jupytext_json.write_text("""{
   "formats": [
     {
       "notebooks/tutorials/": "ipynb",
@@ -369,10 +369,10 @@ def test_formats_list_json(tmpdir):
     assert len(config.formats) == 2
 
 
-def test_formats_semicolon_separated(tmpdir):
+def test_formats_semicolon_separated(tmp_path):
     """Test semicolon-separated format strings"""
-    jupytext_toml = tmpdir.join("jupytext.toml")
-    jupytext_toml.write("""
+    jupytext_toml = tmp_path / "jupytext.toml"
+    jupytext_toml.write_text("""
 formats = "notebooks///ipynb,scripts///py:percent;ipynb,py:percent"
 """)
 
@@ -385,17 +385,17 @@ formats = "notebooks///ipynb,scripts///py:percent;ipynb,py:percent"
     assert config.formats[1] == "ipynb,py:percent"
 
     # Test that the correct format is selected based on path
-    notebook_in_notebooks = str(tmpdir.join("notebooks/test.ipynb"))
+    notebook_in_notebooks = str(tmp_path / "notebooks" / "test.ipynb")
     assert config.default_formats(notebook_in_notebooks) == "notebooks///ipynb,scripts///py:percent"
 
-    notebook_elsewhere = str(tmpdir.join("test.ipynb"))
+    notebook_elsewhere = str(tmp_path / "test.ipynb")
     assert config.default_formats(notebook_elsewhere) == "ipynb,py:percent"
 
 
-def test_formats_toml_list_of_strings(tmpdir):
+def test_formats_toml_list_of_strings(tmp_path):
     """Test TOML list with string format specifications"""
-    jupytext_toml = tmpdir.join("jupytext.toml")
-    jupytext_toml.write("""
+    jupytext_toml = tmp_path / "jupytext.toml"
+    jupytext_toml.write_text("""
 formats = [
     "notebooks///ipynb,scripts///py:percent",
     "ipynb,py:percent"
@@ -411,8 +411,8 @@ formats = [
     assert config.formats[1] == "ipynb,py:percent"
 
     # Test that the correct format is selected based on path
-    notebook_in_notebooks = str(tmpdir.join("notebooks/test.ipynb"))
+    notebook_in_notebooks = str(tmp_path / "notebooks" / "test.ipynb")
     assert config.default_formats(notebook_in_notebooks) == "notebooks///ipynb,scripts///py:percent"
 
-    notebook_elsewhere = str(tmpdir.join("test.ipynb"))
+    notebook_elsewhere = str(tmp_path / "test.ipynb")
     assert config.default_formats(notebook_elsewhere) == "ipynb,py:percent"
