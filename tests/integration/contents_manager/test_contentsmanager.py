@@ -1934,7 +1934,7 @@ A markdown cell
         "kernelspec",
     ], "order must be preserved"
 
-    cm.save(model=model, path="nb.md")
+    await ensure_async(cm.save(model=model, path="nb.md"))
     compare((tmp_path / "nb.md").read_text(), md)
 
 
@@ -1975,7 +1975,7 @@ A markdown cell
     model["content"]["metadata"]["jupytext"] = model["content"]["metadata"].pop("jupytext")
     assert list(model["content"]["metadata"].keys()) == ["kernelspec", "jupytext"]
 
-    cm.save(model=model, path="nb.md")
+    await ensure_async(cm.save(model=model, path="nb.md"))
     compare((tmp_path / "nb.md").read_text(), md)
 
 
