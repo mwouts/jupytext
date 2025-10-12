@@ -43,7 +43,7 @@ The `notebook/` prefix above is matched with the top-most parent folder of the m
 
 You can define different pairing configurations for specific subsets of notebooks by using a list of format dictionaries. This is useful when you want to apply different pairing rules to notebooks in different locations, such as generating documentation markdown files only for tutorial notebooks.
 
-The `formats` option can be a list of format dictionaries, where the first matching format is used for each notebook.
+Since Jupytext v1.18.0, the `formats` option can be a list of format dictionaries, where the first matching format is used for each notebook.
 
 Here's an example that pairs tutorial notebooks to markdown documentation files, and all other notebooks to Python scripts:
 
