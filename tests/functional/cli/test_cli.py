@@ -1485,3 +1485,34 @@ if __name__ == "__main__":
     else:
         assert len(files_in_dir) == 1, f"Expected only 1 file, found: {[f.name for f in files_in_dir]}"
         assert files_in_dir[0] == py_file
+
+
+def test_set_formats_pairing_in_subfolders(tmp_path, python_notebook):
+    """Test that jupytext --set-formats works with subfolders, including on Windows (#1028)"""
+
+    ipynb_notebook_dir = tmp_path / "notebooks" / "subfolder"
+    ipynb_notebook_dir.mkdir(parents=True)
+    ipynb_notebook_path = ipynb_notebook_dir / "notebook.ipynb"
+
+    write(python_notebook, ipynb_notebook_path)
+
+    jupytext([str(ipynb_notebook_path), "--set-formats", "notebooks///ipynb,scripts///py:percent"])
+
+    assert (tmp_path / "scripts" / "subfolder" / "notebook.py").exists()
+
+
+def test_sync_in_subfolders(tmp_path, python_notebook):
+    """Test that jupytext --sync works with subfolders, including on Windows (#1028)"""
+    ipynb_notebook_dir = tmp_path / "notebooks" / "subfolder"
+    ipynb_notebook_dir.mkdir(parents=True)
+    ipynb_notebook_path = ipynb_notebook_dir / "notebook.ipynb"
+    write(python_notebook, ipynb_notebook_path)
+
+    (tmp_path / "jupytext.toml").write_text("""[formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+""")
+
+    jupytext([str(ipynb_notebook_path), "--sync"])
+
+    assert (tmp_path / "scripts" / "subfolder" / "notebook.py").exists()
