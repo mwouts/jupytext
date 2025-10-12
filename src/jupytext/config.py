@@ -228,11 +228,12 @@ class JupytextConfiguration(Configurable):
             )
 
         formats = self.formats or self.default_jupytext_formats
-
+        
+        # Ensure formats is a list (handle deprecated default_jupytext_formats which could be a string)
         if not isinstance(formats, list):
-            formats = [formats]
+            formats = [formats] if formats else []
 
-        # If formats is a list (of strings or dicts), find the first match
+        # formats is a list of paired formats - find the first match
         for paired_formats in formats:
             # Check if one of the paired format matches the current path
             for fmt in long_form_multiple_formats(paired_formats):
