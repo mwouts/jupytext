@@ -61,7 +61,15 @@ def join(left, right, sep):
 
 def separator(path):
     """Return the local path separator (always / in the contents manager)"""
-    if os.path.sep == "\\" and "\\" in path:
+    # On Windows, determine the appropriate separator
+    if os.path.sep == "\\":
+        # If path contains \, definitely use Windows separator
+        if "\\" in path:
+            return "\\"
+        # If path contains / but not \, it's probably a format string or contents manager path
+        if "/" in path:
+            return "/"
+        # Path has no separators (e.g., bare filename) - use OS separator
         return "\\"
     return "/"
 
