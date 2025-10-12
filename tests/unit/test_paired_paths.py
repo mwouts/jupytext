@@ -100,12 +100,12 @@ def test_paired_paths_windows_no_subfolder():
 
 
 def test_paired_paths_windows_relative():
-    """Test Windows pairing with relative paths and 2-slash format (issue reported in GitHub)"""
+    """Test Windows pairing with relative paths and backslash as path separator, issue #1028"""
     nb_file = "notebooks\\example.ipynb"
-    formats = "notebooks//ipynb,scripts//py:percent"
+    formats = "notebooks///ipynb,scripts///py:percent"
     with mock.patch("os.path.sep", "\\"):
         # Should not raise InconsistentPath
-        paths = paired_paths(nb_file, "notebooks//ipynb", formats)
+        paths = paired_paths(nb_file, "notebooks///ipynb", formats)
         # Verify the notebook path is in the paired paths
         path_list = [p[0] for p in paths]
         assert nb_file in path_list, f"Expected {nb_file} to be in paired paths {path_list}"
