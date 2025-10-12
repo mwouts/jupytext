@@ -170,7 +170,7 @@ def base_path(main_path, fmt, formats=None):
         notebook_dir = parent_notebook_dir
 
     if prefix_root:
-        long_prefix_root = sep + prefix_root + sep
+        long_prefix_root = sep + prefix_root.replace("/", sep) + sep
         long_notebook_dir = sep + notebook_dir + sep
         if long_prefix_root not in long_notebook_dir:
             raise InconsistentPrefixRoot(f"Notebook directory '{notebook_dir}' does not match prefix root '{prefix_root}'")

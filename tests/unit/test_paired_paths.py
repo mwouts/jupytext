@@ -339,3 +339,12 @@ def test_paired_notebook_ipynb_root_scripts_in_folder_806(tmpdir, cwd_tmpdir, py
 def test_paired_paths_and_adjusted_fmt(path, input_fmt, adjusted_fmt):
     base_path, actual_adjusted_fmt = base_path_and_adjusted_fmt(path, input_fmt)
     assert actual_adjusted_fmt == adjusted_fmt
+
+
+@pytest.mark.parametrize("os_sep", ["\\", "/"])
+def test_base_path_os_sep(os_sep):
+    fmt = "notebooks/tutorials///ipynb"
+    root = ("" if os_sep == "/" else "C:") + os_sep
+    path = root + os_sep.join(["notebooks", "tutorials", "subfolder", "notebook.ipynb"])
+    with mock.patch("os.path.sep", os_sep):
+        assert base_path(path, fmt) == root + os_sep.join(["//subfolder", "notebook"])

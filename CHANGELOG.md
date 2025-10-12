@@ -9,6 +9,7 @@ Jupytext ChangeLog
 - The documentation has a chapter on the [Jupytext Sync](https://jupytext.readthedocs.io/en/latest/vs-code.html) extension for VS Code ([#1395](https://github.com/mwouts/jupytext/issues/1395))
 - We have added a section on [Jupyter Collaboration](https://jupytext.readthedocs.io/en/latest/jupyter-collaboration.html) which also provides a very useful autoreload functionality ([#406](https://github.com/mwouts/jupytext/issues/406), [#1401](https://github.com/mwouts/jupytext/issues/1401))
 - We have added more tests do document the complex pairing formats, which also work on Windows ([#1028](https://github.com/mwouts/jupytext/issues/1028))
+- Pairing into nested folders has been fixed on Windows ([#1028](https://github.com/mwouts/jupytext/issues/1028))
 - Pairing groups allow you to define different pairing configurations for specific subsets of notebooks. The `formats` configuration option now supports a list of format dictionaries for first-match pairing. Use `[[formats]]` sections in your TOML configuration to define multiple format specifications, where the first matching format is used. This allows applying different pairing rules to notebooks in different locations, such as generating documentation markdown files only for tutorial notebooks ([#1383](https://github.com/mwouts/jupytext/issues/1383))
 
 **Fixed**
