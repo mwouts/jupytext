@@ -8,6 +8,7 @@ Jupytext ChangeLog
 - We have added a new option `--check-source-is-newer` to the Jupytext CLI. Use this option if you want to make sure that the file passed as argument to Jupytext is the newest of all paired files, and/or newer than the destination file.
 - The documentation has a chapter on the [Jupytext Sync](https://jupytext.readthedocs.io/en/latest/vs-code.html) extension for VS Code ([#1395](https://github.com/mwouts/jupytext/issues/1395))
 - We have added a section on [Jupyter Collaboration](https://jupytext.readthedocs.io/en/latest/jupyter-collaboration.html) which also provides a very useful autoreload functionality ([#406](https://github.com/mwouts/jupytext/issues/406), [#1401](https://github.com/mwouts/jupytext/issues/1401))
+- We have added more tests do document the complex pairing formats, which also work on Windows ([#1028](https://github.com/mwouts/jupytext/issues/1028))
 
 **Fixed**
 - The Jupytext CLI now detects if a file it has read or consulted has been modified while it was processing it. That can happen in the context of the [Jupytext Sync](https://marketplace.visualstudio.com/items?itemName=caenrigen.jupytext-sync) extension for VS Code ([#1411](https://github.com/mwouts/jupytext/issues/1411), [vscode-jupytext-sync-#12](https://github.com/caenrigen/vscode-jupytext-sync/issues/12)). When such a synchronous modification is detected, Jupytext now raises an error. Many thanks to [Anne Archibald](https://github.com/aarchiba) for reporting the issue and preparing an inspiring PR ([#1417](https://github.com/mwouts/jupytext/pull/1417)).
@@ -15,7 +16,6 @@ Jupytext ChangeLog
 - Jupytext now support more characters in the cell metadata keys, to improve compatibility with `jupyterlab-slideshow` ([#1441](https://github.com/mwouts/jupytext/issues/1441)). Thanks to [Nicolas Thierry](https://github.com/nthiery) for this fix.
 - The function `find_jupytext_configuration_file` now works with relative directories ([#1440](https://github.com/mwouts/jupytext/issues/1440)). This fix was contributed by [Thierry Parmentelat](https://github.com/parmentelat).
 - We have fixed a parsing error for R Markdown files ([#1429](https://github.com/mwouts/jupytext/issues/1429))
-- Complex pairing formats are now supported on Windows ([#1028](https://github.com/mwouts/jupytext/issues/1028))
 
 **Changed**
 - We have updated the pre-commit hooks. The code is now formatted using `ruff format`, and updated for Python 3.9+ using https://github.com/asottile/pyupgrade ([#1423](https://github.com/mwouts/jupytext/issues/1423))
