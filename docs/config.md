@@ -89,6 +89,25 @@ You can define multiple format specifications for different subsets:
 
 The first format specification that matches the notebook path is used. It's recommended to put more specific paths first and the default/catch-all formats last.
 
+### Alternative syntaxes
+
+You can also use a semicolon-separated string for a more compact notation:
+
+```toml
+# jupytext.toml
+formats = "notebooks///ipynb,scripts///py:percent;ipynb,py:percent"
+```
+
+Or a TOML list with string format specifications:
+
+```toml
+# jupytext.toml
+formats = [
+    "notebooks///ipynb,scripts///py:percent",
+    "ipynb,py:percent"
+]
+```
+
 In `pyproject.toml`, the configuration would be:
 ```toml
 [[tool.jupytext.formats]]
@@ -99,6 +118,7 @@ In `pyproject.toml`, the configuration would be:
 "notebooks/" = "ipynb"
 "scripts/" = "py:percent"
 ```
+
 
 ## Global pairing vs individual pairing
 

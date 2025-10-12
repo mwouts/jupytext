@@ -380,3 +380,53 @@ def test_formats_list_json(tmpdir):
     # Formats should be a list
     assert isinstance(config.formats, list)
     assert len(config.formats) == 2
+
+
+def test_formats_semicolon_separated(tmpdir):
+    """Test semicolon-separated format strings"""
+    jupytext_toml = tmpdir.join("jupytext.toml")
+    jupytext_toml.write("""
+formats = "notebooks///ipynb,scripts///py:percent;ipynb,py:percent"
+""")
+
+    config = load_jupytext_configuration_file(str(jupytext_toml))
+
+    # Formats should be split into a list
+    assert isinstance(config.formats, list)
+    assert len(config.formats) == 2
+    assert config.formats[0] == "notebooks///ipynb,scripts///py:percent"
+    assert config.formats[1] == "ipynb,py:percent"
+
+    # Test that the correct format is selected based on path
+    notebook_in_notebooks = str(tmpdir.join("notebooks/test.ipynb"))
+    assert config.default_formats(notebook_in_notebooks) == "notebooks///ipynb,scripts///py:percent"
+
+    notebook_elsewhere = str(tmpdir.join("test.ipynb"))
+    assert config.default_formats(notebook_elsewhere) == "ipynb,py:percent"
+
+
+def test_formats_toml_list_of_strings(tmpdir):
+    """Test TOML list with string format specifications"""
+    jupytext_toml = tmpdir.join("jupytext.toml")
+    jupytext_toml.write("""
+formats = [
+    "notebooks///ipynb,scripts///py:percent",
+    "ipynb,py:percent"
+]
+""")
+
+    config = load_jupytext_configuration_file(str(jupytext_toml))
+
+    # Formats should be a list
+    assert isinstance(config.formats, list)
+    assert len(config.formats) == 2
+    assert config.formats[0] == "notebooks///ipynb,scripts///py:percent"
+    assert config.formats[1] == "ipynb,py:percent"
+
+    # Test that the correct format is selected based on path
+    notebook_in_notebooks = str(tmpdir.join("notebooks/test.ipynb"))
+    assert config.default_formats(notebook_in_notebooks) == "notebooks///ipynb,scripts///py:percent"
+
+    notebook_elsewhere = str(tmpdir.join("test.ipynb"))
+    assert config.default_formats(notebook_elsewhere) == "ipynb,py:percent"
+

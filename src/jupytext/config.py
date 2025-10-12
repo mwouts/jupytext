@@ -229,28 +229,19 @@ class JupytextConfiguration(Configurable):
 
         formats = self.formats or self.default_jupytext_formats
         
-        # If formats is a list of format dictionaries, find the first match
-        if isinstance(formats, list) and formats and isinstance(formats[0], dict):
-            for format_dict in formats:
-                # Convert dict to format string
-                format_list = []
-                for prefix, fmt in format_dict.items():
-                    if prefix:  # Non-empty prefix
-                        format_list.append((prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt)
-                    else:  # Empty prefix - just use the format string as-is
-                        format_list.append(fmt)
-                format_str = short_form_multiple_formats(format_list)
-                
+        # If formats is a list (of strings or dicts), find the first match
+        if isinstance(formats, list):
+            for format_item in formats:
                 # Check if this format matches the path
-                for fmt in long_form_multiple_formats(format_str):
+                for fmt in long_form_multiple_formats(format_item):
                     try:
                         base_path(path, fmt)
-                        return format_str
+                        return format_item
                     except InconsistentPath:
                         continue
             return None
         
-        # Original behavior for string/dict formats
+        # Original behavior for string formats
         for fmt in long_form_multiple_formats(formats):
             try:
                 base_path(path, fmt)
@@ -394,24 +385,53 @@ def load_jupytext_configuration_file(config_file, stream=None):
     config_dict = parse_jupytext_configuration_file(config_file, stream)
     config = validate_jupytext_configuration_file(config_file, config_dict)
     
-    # formats can be:
-    # 1. A dict prefix => format (single format set)
-    # 2. A list of dicts (multiple format sets with first-match)
-    # 3. A string or list of strings (simple formats)
-    
-    if isinstance(config.formats, list) and config.formats and isinstance(config.formats[0], dict):
-        # List of dicts - keep as is, will be processed in default_formats
-        pass
+    # Process formats - can be string, dict, or list
+    if isinstance(config.formats, str):
+        # Split on semicolon for multiple format groups
+        if ";" in config.formats:
+            config.formats = config.formats.split(";")
+        else:
+            config.formats = short_form_multiple_formats(config.formats)
     elif isinstance(config.formats, dict):
-        # Single dict - convert to format string
-        config.formats = [
-            (fmt if not prefix else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt)
-            for prefix, fmt in config.formats.items()
-        ]
-        config.formats = short_form_multiple_formats(config.formats)
+        # Single dict - wrap in list for uniform processing
+        config.formats = [config.formats]
+    elif isinstance(config.formats, list):
+        # Already a list - validate and process
+        pass
+    elif config.formats is None or config.formats == "":
+        # Empty formats - leave as is
+        pass
     else:
-        # String or list of strings
-        config.formats = short_form_multiple_formats(config.formats)
+        raise JupytextConfigurationError(
+            f"Invalid type for 'formats' in {config_file}: {type(config.formats).__name__}. "
+            "Expected str, dict, or list."
+        )
+    
+    # Convert list elements: dicts to format strings
+    if isinstance(config.formats, list):
+        processed_formats = []
+        for fmt in config.formats:
+            if isinstance(fmt, dict):
+                # Convert dict to format string
+                format_list = [
+                    (f if not prefix else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + f)
+                    for prefix, f in fmt.items()
+                ]
+                processed_formats.append(short_form_multiple_formats(format_list))
+            elif isinstance(fmt, str):
+                # String format - use as is
+                processed_formats.append(fmt)
+            else:
+                raise JupytextConfigurationError(
+                    f"Invalid format element in {config_file}: {type(fmt).__name__}. "
+                    "Expected str or dict."
+                )
+        
+        # If single element list, unwrap to string for backward compatibility
+        if len(processed_formats) == 1:
+            config.formats = processed_formats[0]
+        else:
+            config.formats = processed_formats
 
     if isinstance(config.notebook_extensions, str):
         config.notebook_extensions = config.notebook_extensions.split(",")
