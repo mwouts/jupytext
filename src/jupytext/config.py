@@ -227,14 +227,8 @@ class JupytextConfiguration(Configurable):
                 FutureWarning,
             )
 
-        formats = self.formats or self.default_jupytext_formats
-
-        # Convert formats to a list, if needed
-        if not isinstance(formats, list):
-            formats = [formats] if formats else []
-
         # formats is a list of paired formats - find the first match
-        for paired_formats in formats:
+        for paired_formats in normalize_formats(self.formats or self.default_jupytext_formats):
             # Check if one of the paired format matches the current path
             for fmt in long_form_multiple_formats(paired_formats):
                 try:
@@ -372,12 +366,8 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
         raise JupytextConfigurationError(f"The Jupytext configuration file {jupytext_config_file} is incorrect: {err}")
 
 
-def load_jupytext_configuration_file(config_file, stream=None):
-    """Read and validate a Jupytext configuration file, and return a JupytextConfiguration object"""
-    config_dict = parse_jupytext_configuration_file(config_file, stream)
-    config = validate_jupytext_configuration_file(config_file, config_dict)
-
-    formats = config.formats or config.default_jupytext_formats
+def normalize_formats(formats) -> list[str]:
+    """Normalize the formats option into a list of string-encoded paired formats"""
     # Process formats - can be string, dict, or list
     if isinstance(formats, str):
         # Split on semicolon for multiple format groups
@@ -389,7 +379,7 @@ def load_jupytext_configuration_file(config_file, stream=None):
         formats = []
     elif not isinstance(formats, list):
         raise JupytextConfigurationError(
-            f"Invalid type for 'formats' in {config_file}: {type(formats).__name__}. Expected str, dict, list of str or dict."
+            f"Invalid type for 'formats': {type(formats).__name__}. Expected str, dict, list of str or dict."
         )
 
     # Each group of paired formats can be a string or a dict
@@ -407,10 +397,17 @@ def load_jupytext_configuration_file(config_file, stream=None):
             string_encoded_pairing_formats.append(short_form_multiple_formats(paired_formats))
         else:
             raise JupytextConfigurationError(
-                f"Invalid paired formats in {config_file}: {paired_formats} "
-                f"Expected str or dict, got {type(paired_formats).__name__}."
+                f"Invalid paired formats: {paired_formats}. Expected str or dict, got {type(paired_formats).__name__}."
             )
-    config.formats = string_encoded_pairing_formats
+
+    return string_encoded_pairing_formats
+
+
+def load_jupytext_configuration_file(config_file, stream=None):
+    """Read and validate a Jupytext configuration file, and return a JupytextConfiguration object"""
+    config_dict = parse_jupytext_configuration_file(config_file, stream)
+    config = validate_jupytext_configuration_file(config_file, config_dict)
+    config.formats = normalize_formats(config.formats or config.default_jupytext_formats)
 
     if isinstance(config.notebook_extensions, str):
         config.notebook_extensions = config.notebook_extensions.split(",")
