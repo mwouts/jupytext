@@ -2035,7 +2035,7 @@ async def test_pairing_groups_in_contents_manager(tmp_path, cm, python_notebook)
 "notebooks/tutorials/" = "ipynb"
 "docs/" = "md"
 
-# Main pairing: all other notebooks are paired with Python scripts  
+# Main pairing: all other notebooks are paired with Python scripts
 [[formats]]
 "" = "ipynb,py:percent"
 """

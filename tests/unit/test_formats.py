@@ -380,12 +380,6 @@ formats = "ipynb,py:percent"
 """,
         ),
         (
-            "jupytext.toml",
-            """# Always pair ipynb notebooks to py:percent files
-formats = ["ipynb", "py:percent"]
-""",
-        ),
-        (
             "pyproject.toml",
             """[tool.jupytext]
 formats = "ipynb,py:percent"

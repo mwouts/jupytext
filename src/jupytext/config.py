@@ -228,27 +228,19 @@ class JupytextConfiguration(Configurable):
             )
 
         formats = self.formats or self.default_jupytext_formats
-        
-        # If formats is a list (of strings or dicts), find the first match
-        if isinstance(formats, list):
-            for format_item in formats:
-                # Check if this format matches the path
-                for fmt in long_form_multiple_formats(format_item):
-                    try:
-                        base_path(path, fmt)
-                        return format_item
-                    except InconsistentPath:
-                        continue
-            return None
-        
-        # Original behavior for string formats
-        for fmt in long_form_multiple_formats(formats):
-            try:
-                base_path(path, fmt)
-                return formats
-            except InconsistentPath:
-                continue
 
+        if not isinstance(formats, list):
+            formats = [formats]
+
+        # If formats is a list (of strings or dicts), find the first match
+        for paired_formats in formats:
+            # Check if one of the paired format matches the current path
+            for fmt in long_form_multiple_formats(paired_formats):
+                try:
+                    base_path(path, fmt)
+                    return paired_formats
+                except InconsistentPath:
+                    continue
         return None
 
     def __eq__(self, other):
@@ -364,18 +356,17 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
         if jupytext_config_file.endswith((".toml", "jupytext")):
             doc = tomllib.loads(stream)
             if jupytext_config_file.endswith(PYPROJECT_FILE):
-                config = doc["tool"]["jupytext"]
+                return doc["tool"]["jupytext"]
             else:
-                config = doc
-        elif jupytext_config_file.endswith((".yml", ".yaml")):
-            config = yaml.safe_load(stream)
-        elif jupytext_config_file.endswith(".json"):
-            config = json.loads(stream)
-        else:
-            # Python config file
-            config = PyFileConfigLoader(jupytext_config_file).load_config()
+                return doc
 
-        return config
+        if jupytext_config_file.endswith((".yml", ".yaml")):
+            return yaml.safe_load(stream)
+
+        if jupytext_config_file.endswith(".json"):
+            return json.loads(stream)
+
+        return PyFileConfigLoader(jupytext_config_file).load_config()
     except (ValueError, NameError) as err:
         raise JupytextConfigurationError(f"The Jupytext configuration file {jupytext_config_file} is incorrect: {err}")
 
@@ -384,54 +375,41 @@ def load_jupytext_configuration_file(config_file, stream=None):
     """Read and validate a Jupytext configuration file, and return a JupytextConfiguration object"""
     config_dict = parse_jupytext_configuration_file(config_file, stream)
     config = validate_jupytext_configuration_file(config_file, config_dict)
-    
+
+    formats = config.formats or config.default_jupytext_formats
     # Process formats - can be string, dict, or list
-    if isinstance(config.formats, str):
+    if isinstance(formats, str):
         # Split on semicolon for multiple format groups
-        if ";" in config.formats:
-            config.formats = config.formats.split(";")
-        else:
-            config.formats = short_form_multiple_formats(config.formats)
-    elif isinstance(config.formats, dict):
+        formats = formats.split(";")
+    elif isinstance(formats, dict):
         # Single dict - wrap in list for uniform processing
-        config.formats = [config.formats]
-    elif isinstance(config.formats, list):
-        # Already a list - validate and process
-        pass
-    elif config.formats is None or config.formats == "":
-        # Empty formats - leave as is
-        pass
-    else:
+        formats = [formats]
+    elif formats is None:
+        formats = []
+    elif not isinstance(formats, list):
         raise JupytextConfigurationError(
-            f"Invalid type for 'formats' in {config_file}: {type(config.formats).__name__}. "
-            "Expected str, dict, or list."
+            f"Invalid type for 'formats' in {config_file}: {type(formats).__name__}. Expected str, dict, list of str or dict."
         )
-    
-    # Convert list elements: dicts to format strings
-    if isinstance(config.formats, list):
-        processed_formats = []
-        for fmt in config.formats:
-            if isinstance(fmt, dict):
-                # Convert dict to format string
-                format_list = [
-                    (f if not prefix else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + f)
-                    for prefix, f in fmt.items()
-                ]
-                processed_formats.append(short_form_multiple_formats(format_list))
-            elif isinstance(fmt, str):
-                # String format - use as is
-                processed_formats.append(fmt)
-            else:
-                raise JupytextConfigurationError(
-                    f"Invalid format element in {config_file}: {type(fmt).__name__}. "
-                    "Expected str or dict."
-                )
-        
-        # If single element list, unwrap to string for backward compatibility
-        if len(processed_formats) == 1:
-            config.formats = processed_formats[0]
+
+    # Each group of paired formats can be a string or a dict
+    string_encoded_pairing_formats = []
+
+    for paired_formats in formats:
+        if isinstance(paired_formats, str):
+            string_encoded_pairing_formats.append(paired_formats)
+        elif isinstance(paired_formats, dict):
+            # Convert dict to format string
+            paired_formats = [
+                (f if not prefix else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + f)
+                for prefix, f in paired_formats.items()
+            ]
+            string_encoded_pairing_formats.append(short_form_multiple_formats(paired_formats))
         else:
-            config.formats = processed_formats
+            raise JupytextConfigurationError(
+                f"Invalid paired formats in {config_file}: {paired_formats} "
+                f"Expected str or dict, got {type(paired_formats).__name__}."
+            )
+    config.formats = string_encoded_pairing_formats
 
     if isinstance(config.notebook_extensions, str):
         config.notebook_extensions = config.notebook_extensions.split(",")

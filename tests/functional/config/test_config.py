@@ -142,7 +142,7 @@ c.cell_metadata_filter = "all"
         )
 
     config = load_jupytext_configuration_file(str(full_config_path))
-    assert config.formats == "ipynb,py:percent"
+    assert config.formats == ["ipynb,py:percent"]
     assert config.notebook_metadata_filter == "all"
     assert config.cell_metadata_filter == "all"
 
@@ -153,18 +153,6 @@ c.cell_metadata_filter = "all"
         (
             """# always pair ipynb notebooks to py:percent files
 formats = "ipynb,py:percent"
-""",
-            "ipynb,py:percent",
-        ),
-        (
-            """# always pair ipynb notebooks to py:percent files
-formats = ['ipynb', 'py:percent']
-""",
-            "ipynb,py:percent",
-        ),
-        (
-            """# always pair ipynb notebooks to py:percent files
-formats = ["ipynb", "py:percent"]
 """,
             "ipynb,py:percent",
         ),
@@ -206,7 +194,7 @@ def test_jupytext_formats(tmpdir, content_toml, formats_short_form):
     jupytext_toml.write(content_toml)
 
     config = load_jupytext_configuration_file(str(jupytext_toml))
-    assert config.formats == formats_short_form
+    assert config.formats == [formats_short_form]
 
 
 def test_deprecated_formats_cause_warning(tmpdir, content_toml="default_jupytext_formats = 'ipynb,md'"):
@@ -262,10 +250,10 @@ def test_pairing_groups(tmpdir):
 
     config = load_jupytext_configuration_file(str(jupytext_toml))
 
-    # Formats should be a list of dicts
+    # Formats should be a list of str
     assert isinstance(config.formats, list)
     assert len(config.formats) == 2
-    assert isinstance(config.formats[0], dict)
+    assert all(isinstance(f, str) for f in config.formats)
 
     # Test that default_formats returns the correct formats based on path
     # Tutorial notebook should match first format (tutorials)
@@ -278,7 +266,6 @@ def test_pairing_groups(tmpdir):
     # Regular notebook should match second format (main)
     regular_notebook = str(tmpdir.join("notebooks/hello.ipynb"))
     assert config.default_formats(regular_notebook) == "notebooks///ipynb,scripts///py:percent"
-
 
 
 def test_pairing_groups_multiple_groups(tmpdir):
@@ -429,4 +416,3 @@ formats = [
 
     notebook_elsewhere = str(tmpdir.join("test.ipynb"))
     assert config.default_formats(notebook_elsewhere) == "ipynb,py:percent"
-
