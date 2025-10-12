@@ -247,93 +247,91 @@ def test_simple_py_file_is_not_paired(tmp_path):
 
 
 def test_pairing_groups(tmpdir):
-    """Test pairing groups for subset-specific pairing"""
+    """Test list-based formats for subset-specific pairing"""
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write("""
-[formats]
-"notebooks/" = "ipynb"
-"scripts/" = "py:percent"
-
-[pairing_groups.tutorials]
+[[formats]]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 "scripts/tutorials/" = "py:percent"
+
+[[formats]]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
 """)
 
     config = load_jupytext_configuration_file(str(jupytext_toml))
 
-    # Main formats should be parsed correctly
-    assert config.formats == "notebooks///ipynb,scripts///py:percent"
-
-    # Pairing groups should be parsed and processed
-    assert "tutorials" in config.pairing_groups
-    assert (
-        config.pairing_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
-    )
+    # Formats should be a list of dicts
+    assert isinstance(config.formats, list)
+    assert len(config.formats) == 2
+    assert isinstance(config.formats[0], dict)
 
     # Test that default_formats returns the correct formats based on path
-    # Regular notebook should use main formats
-    regular_notebook = str(tmpdir.join("notebooks/hello.ipynb"))
-    assert config.default_formats(regular_notebook) == "notebooks///ipynb,scripts///py:percent"
-
-    # Tutorial notebook should use group formats
+    # Tutorial notebook should match first format (tutorials)
     tutorial_notebook = str(tmpdir.join("notebooks/tutorials/getting_started.ipynb"))
     assert (
         config.default_formats(tutorial_notebook)
         == "notebooks/tutorials///ipynb,docs/tutorials///md,scripts/tutorials///py:percent"
     )
 
+    # Regular notebook should match second format (main)
+    regular_notebook = str(tmpdir.join("notebooks/hello.ipynb"))
+    assert config.default_formats(regular_notebook) == "notebooks///ipynb,scripts///py:percent"
+
+
 
 def test_pairing_groups_multiple_groups(tmpdir):
-    """Test multiple pairing groups"""
+    """Test multiple format sets with list-based formats"""
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write("""
-[formats]
-"notebooks/" = "ipynb"
-"scripts/" = "py:percent"
-
-[pairing_groups.tutorials]
+[[formats]]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 
-[pairing_groups.examples]
+[[formats]]
 "notebooks/examples/" = "ipynb"
 "docs/examples/" = "md:myst"
+
+[[formats]]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
 """)
 
     config = load_jupytext_configuration_file(str(jupytext_toml))
 
-    # Check both groups exist
-    assert "tutorials" in config.pairing_groups
-    assert "examples" in config.pairing_groups
+    # Check formats is a list of dicts
+    assert isinstance(config.formats, list)
+    assert len(config.formats) == 3
 
-    # Test that the correct group is selected based on path
+    # Test that the correct format is selected based on path (first match wins)
     tutorial_notebook = str(tmpdir.join("notebooks/tutorials/intro.ipynb"))
     assert config.default_formats(tutorial_notebook) == "notebooks/tutorials///ipynb,docs/tutorials///md"
 
     example_notebook = str(tmpdir.join("notebooks/examples/demo.ipynb"))
     assert config.default_formats(example_notebook) == "notebooks/examples///ipynb,docs/examples///md:myst"
 
-    # Regular notebook should still use main formats
+    # Regular notebook should use the last (default) format
     regular_notebook = str(tmpdir.join("notebooks/regular.ipynb"))
     assert config.default_formats(regular_notebook) == "notebooks///ipynb,scripts///py:percent"
 
 
-def test_pairing_groups_without_main_formats(tmpdir):
-    """Test pairing groups can work without main formats"""
+def test_formats_list_without_default(tmpdir):
+    """Test list-based formats without a default catchall"""
     jupytext_toml = tmpdir.join("jupytext.toml")
     jupytext_toml.write("""
-[pairing_groups.tutorials]
+[[formats]]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 """)
 
     config = load_jupytext_configuration_file(str(jupytext_toml))
 
-    # No main formats
-    assert config.formats == ""
+    # Formats should be a list
+    assert isinstance(config.formats, list)
+    assert len(config.formats) == 1
 
-    # But group formats should work
+    # Matching notebook should work
     tutorial_notebook = str(tmpdir.join("notebooks/tutorials/getting_started.ipynb"))
     assert config.default_formats(tutorial_notebook) == "notebooks/tutorials///ipynb,docs/tutorials///md"
 
@@ -342,51 +340,43 @@ def test_pairing_groups_without_main_formats(tmpdir):
     assert config.default_formats(other_notebook) is None
 
 
-def test_pairing_groups_yaml(tmpdir):
-    """Test pairing groups with YAML config"""
+def test_formats_list_yaml(tmpdir):
+    """Test list-based formats with YAML config"""
     jupytext_yml = tmpdir.join("jupytext.yml")
     jupytext_yml.write("""
 formats:
-  notebooks/: ipynb
-  scripts/: py:percent
-pairing_groups:
-  tutorials:
-    notebooks/tutorials/: ipynb
+  - notebooks/tutorials/: ipynb
     docs/tutorials/: md
+  - notebooks/: ipynb
+    scripts/: py:percent
 """)
 
     config = load_jupytext_configuration_file(str(jupytext_yml))
 
-    # Main formats should be parsed correctly
-    assert config.formats == "notebooks///ipynb,scripts///py:percent"
-
-    # Pairing groups should be parsed
-    assert "tutorials" in config.pairing_groups
-    assert config.pairing_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md"
+    # Formats should be a list
+    assert isinstance(config.formats, list)
+    assert len(config.formats) == 2
 
 
-def test_pairing_groups_json(tmpdir):
-    """Test pairing groups with JSON config"""
+def test_formats_list_json(tmpdir):
+    """Test list-based formats with JSON config"""
     jupytext_json = tmpdir.join("jupytext.json")
     jupytext_json.write("""{
-  "formats": {
-    "notebooks/": "ipynb",
-    "scripts/": "py:percent"
-  },
-  "pairing_groups": {
-    "tutorials": {
+  "formats": [
+    {
       "notebooks/tutorials/": "ipynb",
       "docs/tutorials/": "md"
+    },
+    {
+      "notebooks/": "ipynb",
+      "scripts/": "py:percent"
     }
-  }
+  ]
 }
 """)
 
     config = load_jupytext_configuration_file(str(jupytext_json))
 
-    # Main formats should be parsed correctly
-    assert config.formats == "notebooks///ipynb,scripts///py:percent"
-
-    # Pairing groups should be parsed
-    assert "tutorials" in config.pairing_groups
-    assert config.pairing_groups["tutorials"] == "notebooks/tutorials///ipynb,docs/tutorials///md"
+    # Formats should be a list
+    assert isinstance(config.formats, list)
+    assert len(config.formats) == 2

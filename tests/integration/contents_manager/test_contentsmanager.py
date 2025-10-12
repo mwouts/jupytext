@@ -2027,16 +2027,17 @@ if __name__ == "__main__":
 async def test_pairing_groups_in_contents_manager(tmp_path, cm, python_notebook):
     cm.root_dir = str(tmp_path)
 
-    # With config file
+    # With config file using list-based formats
     (tmp_path / "jupytext.toml").write_text(
         """
-# Main pairing: all notebooks are paired with Python scripts
-formats = "ipynb,py:percent"
-
-# Tutorial notebooks get additional pairing to markdown docs
-[pairing_groups.tutorials]
+# Tutorial notebooks get paired to markdown docs
+[[formats]]
 "notebooks/tutorials/" = "ipynb"
 "docs/" = "md"
+
+# Main pairing: all other notebooks are paired with Python scripts  
+[[formats]]
+"" = "ipynb,py:percent"
 """
     )
     cm = jupytext.TextFileContentsManager()

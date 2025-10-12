@@ -39,60 +39,65 @@ or this `pyproject.toml` configuration:
 
 The `notebook/` prefix above is matched with the top-most parent folder of the matching name, not above the Jupytext configuration file.
 
-## Pairing groups for subset-specific pairing
+## Pairing with multiple format specifications
 
-Pairing groups allow you to define different pairing configurations for specific subsets of notebooks. This is useful when you want to apply different pairing rules to notebooks in different locations, such as generating documentation markdown files only for tutorial notebooks.
+You can define different pairing configurations for specific subsets of notebooks by using a list of format dictionaries. This is useful when you want to apply different pairing rules to notebooks in different locations, such as generating documentation markdown files only for tutorial notebooks.
 
-Here's an example that pairs all notebooks to Python scripts, but also pairs tutorial notebooks to markdown documentation files:
+The `formats` option can be a list of format dictionaries, where the first matching format is used for each notebook.
+
+Here's an example that pairs tutorial notebooks to markdown documentation files, and all other notebooks to Python scripts:
 
 ```toml
 # jupytext.toml
 
-# Main pairing: all notebooks are paired with Python scripts
-[formats]
-"notebooks/" = "ipynb"
-"scripts/" = "py:percent"
-
-# Tutorial notebooks get additional pairing to markdown docs
-[pairing_groups.tutorials]
+# Tutorial notebooks get paired to markdown docs
+[[formats]]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 "scripts/tutorials/" = "py:percent"
+
+# Default pairing: all other notebooks are paired with Python scripts
+[[formats]]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
 ```
 
 With this configuration:
-- Regular notebooks like `notebooks/hello.ipynb` are paired with `scripts/hello.py`
 - Tutorial notebooks like `notebooks/tutorials/getting_started.ipynb` are paired with:
   - `docs/tutorials/getting_started.md`
   - `scripts/tutorials/getting_started.py`
+- Regular notebooks like `notebooks/hello.ipynb` are paired with `scripts/hello.py`
 
-You can define multiple groups for different subsets:
+You can define multiple format specifications for different subsets:
 
 ```toml
-[formats]
-"notebooks/" = "ipynb"
-"scripts/" = "py:percent"
-
-[pairing_groups.tutorials]
+# Tutorial notebooks
+[[formats]]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
 
-[pairing_groups.examples]
+# Example notebooks with MyST format
+[[formats]]
 "notebooks/examples/" = "ipynb"
 "docs/examples/" = "md:myst"
+
+# Default for all other notebooks
+[[formats]]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
 ```
 
-The first pairing group that matches the notebook path is used. If a notebook path does not match any pairing group, the main formats are used.
+The first format specification that matches the notebook path is used. It's recommended to put more specific paths first and the default/catch-all formats last.
 
 In `pyproject.toml`, the configuration would be:
 ```toml
-[tool.jupytext.formats]
-"notebooks/" = "ipynb"
-"scripts/" = "py:percent"
-
-[tool.jupytext.pairing_groups.tutorials]
+[[tool.jupytext.formats]]
 "notebooks/tutorials/" = "ipynb"
 "docs/tutorials/" = "md"
+
+[[tool.jupytext.formats]]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
 ```
 
 ## Global pairing vs individual pairing

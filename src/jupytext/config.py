@@ -49,23 +49,17 @@ class JupytextConfiguration(Configurable):
     """Jupytext Configuration's options"""
 
     formats = Union(
-        [Unicode(), List(Unicode()), Dict(Unicode())],
+        [Unicode(), List(Unicode()), List(Dict(Unicode())), Dict(Unicode())],
         help="Save notebooks to these file extensions. "
         "Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R "
         "comma separated. If you want another format than the "
         "default one, append the format name to the extension, "
         "e.g. ipynb,py:percent to save the notebook to "
-        "hydrogen/spyder/vscode compatible scripts",
+        "hydrogen/spyder/vscode compatible scripts. "
+        "Can also be a list of format dictionaries for first-match pairing.",
         config=True,
     )
     default_jupytext_formats = Unicode(help="Deprecated. Use 'formats' instead", config=True)
-
-    pairing_groups = Dict(
-        help="Pairing groups for subset-specific pairing. "
-        "Each group maps prefixes to formats for specific notebook subsets. "
-        "Example: {'tutorials': {'notebooks/tutorials/': 'ipynb', 'docs/tutorials/': 'md'}}",
-        config=True,
-    )
 
     preferred_jupytext_formats_save = Unicode(
         help="Preferred format when saving notebooks as text, per extension. "
@@ -233,18 +227,30 @@ class JupytextConfiguration(Configurable):
                 FutureWarning,
             )
 
-        # First check if path matches any pairing group
-        if self.pairing_groups:
-            for group_name, group_formats in self.pairing_groups.items():
-                for fmt in long_form_multiple_formats(group_formats):
+        formats = self.formats or self.default_jupytext_formats
+        
+        # If formats is a list of format dictionaries, find the first match
+        if isinstance(formats, list) and formats and isinstance(formats[0], dict):
+            for format_dict in formats:
+                # Convert dict to format string
+                format_list = []
+                for prefix, fmt in format_dict.items():
+                    if prefix:  # Non-empty prefix
+                        format_list.append((prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt)
+                    else:  # Empty prefix - just use the format string as-is
+                        format_list.append(fmt)
+                format_str = short_form_multiple_formats(format_list)
+                
+                # Check if this format matches the path
+                for fmt in long_form_multiple_formats(format_str):
                     try:
                         base_path(path, fmt)
-                        return group_formats
+                        return format_str
                     except InconsistentPath:
                         continue
-
-        # Fall back to main formats
-        formats = self.formats or self.default_jupytext_formats
+            return None
+        
+        # Original behavior for string/dict formats
         for fmt in long_form_multiple_formats(formats):
             try:
                 base_path(path, fmt)
@@ -387,28 +393,25 @@ def load_jupytext_configuration_file(config_file, stream=None):
     """Read and validate a Jupytext configuration file, and return a JupytextConfiguration object"""
     config_dict = parse_jupytext_configuration_file(config_file, stream)
     config = validate_jupytext_configuration_file(config_file, config_dict)
-    # formats can be a dict prefix => format
-    if isinstance(config.formats, dict):
+    
+    # formats can be:
+    # 1. A dict prefix => format (single format set)
+    # 2. A list of dicts (multiple format sets with first-match)
+    # 3. A string or list of strings (simple formats)
+    
+    if isinstance(config.formats, list) and config.formats and isinstance(config.formats[0], dict):
+        # List of dicts - keep as is, will be processed in default_formats
+        pass
+    elif isinstance(config.formats, dict):
+        # Single dict - convert to format string
         config.formats = [
             (fmt if not prefix else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt)
             for prefix, fmt in config.formats.items()
         ]
-    config.formats = short_form_multiple_formats(config.formats)
-
-    # Process pairing_groups - convert dict of dicts to dict of format strings
-    if config.pairing_groups:
-        processed_groups = {}
-        for group_name, group_formats in config.pairing_groups.items():
-            if isinstance(group_formats, dict):
-                # Convert prefix => format dict to format string
-                group_format_list = [
-                    (fmt if not prefix else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt)
-                    for prefix, fmt in group_formats.items()
-                ]
-                processed_groups[group_name] = short_form_multiple_formats(group_format_list)
-            else:
-                processed_groups[group_name] = group_formats
-        config.pairing_groups = processed_groups
+        config.formats = short_form_multiple_formats(config.formats)
+    else:
+        # String or list of strings
+        config.formats = short_form_multiple_formats(config.formats)
 
     if isinstance(config.notebook_extensions, str):
         config.notebook_extensions = config.notebook_extensions.split(",")
