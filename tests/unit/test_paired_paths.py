@@ -101,7 +101,7 @@ def test_paired_paths_windows_no_subfolder():
 
 def test_paired_paths_windows_relative():
     """Test Windows pairing with relative paths and backslash as path separator, issue #1028"""
-    nb_file = "notebooks\\example.ipynb"
+    nb_file = "C:\\notebooks\\example.ipynb"
     formats = "notebooks///ipynb,scripts///py:percent"
     with mock.patch("os.path.sep", "\\"):
         # Should not raise InconsistentPath
@@ -110,8 +110,8 @@ def test_paired_paths_windows_relative():
         path_list = [p[0] for p in paths]
         assert nb_file in path_list, f"Expected {nb_file} to be in paired paths {path_list}"
         # Verify both paths use backslashes on Windows
-        assert paths[0][0] == "notebooks\\example.ipynb"
-        assert paths[1][0] == "scripts\\example.py"
+        assert paths[0][0] == "C:\\notebooks\\example.ipynb"
+        assert paths[1][0] == "C:\\scripts\\example.py"
 
 
 @pytest.mark.parametrize("os_path_sep", ["\\", "/"])
