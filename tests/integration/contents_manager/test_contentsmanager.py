@@ -1934,7 +1934,7 @@ A markdown cell
         "kernelspec",
     ], "order must be preserved"
 
-    cm.save(model=model, path="nb.md")
+    await ensure_async(cm.save(model=model, path="nb.md"))
     compare((tmp_path / "nb.md").read_text(), md)
 
 
@@ -1975,7 +1975,7 @@ A markdown cell
     model["content"]["metadata"]["jupytext"] = model["content"]["metadata"].pop("jupytext")
     assert list(model["content"]["metadata"].keys()) == ["kernelspec", "jupytext"]
 
-    cm.save(model=model, path="nb.md")
+    await ensure_async(cm.save(model=model, path="nb.md"))
     compare((tmp_path / "nb.md").read_text(), md)
 
 
@@ -2022,3 +2022,36 @@ if __name__ == "__main__":
     else:
         assert len(files_in_dir) == 1, f"Expected only 1 file, found: {[f.name for f in files_in_dir]}"
         assert files_in_dir[0] == py_file
+
+
+async def test_pairing_groups_in_contents_manager(tmp_path, cm, python_notebook):
+    cm.root_dir = str(tmp_path)
+
+    # With config file using list-based formats
+    (tmp_path / "jupytext.toml").write_text(
+        """
+# Tutorial notebooks get paired to markdown docs
+[[formats]]
+"notebooks/tutorials/" = "ipynb"
+"docs/" = "md"
+
+# Main pairing: all other notebooks are paired with Python scripts
+[[formats]]
+"" = "ipynb,py:percent"
+"""
+    )
+    cm = jupytext.TextFileContentsManager()
+    cm.root_dir = str(tmp_path)
+
+    (tmp_path / "notebooks").mkdir()
+    await ensure_async(cm.save(model=notebook_model(python_notebook), path="notebooks/notebook.ipynb"))
+    assert (tmp_path / "notebooks" / "notebook.ipynb").exists()
+    assert (tmp_path / "notebooks" / "notebook.py").exists()
+    assert not (tmp_path / "docs" / "notebook.md").exists()
+
+    # A notebook under 'tutorials' is paired to md in the docs folder
+    (tmp_path / "notebooks" / "tutorials").mkdir()
+    await ensure_async(cm.save(model=notebook_model(python_notebook), path="notebooks/tutorials/notebook.ipynb"))
+    assert (tmp_path / "notebooks" / "tutorials" / "notebook.ipynb").exists()
+    assert not (tmp_path / "notebooks" / "tutorials" / "notebook.py").exists()
+    assert (tmp_path / "docs" / "notebook.md").exists()

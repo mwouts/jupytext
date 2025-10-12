@@ -49,13 +49,14 @@ class JupytextConfiguration(Configurable):
     """Jupytext Configuration's options"""
 
     formats = Union(
-        [Unicode(), List(Unicode()), Dict(Unicode())],
+        [Unicode(), List(Unicode()), List(Dict(Unicode())), Dict(Unicode())],
         help="Save notebooks to these file extensions. "
         "Can be any of ipynb,Rmd,md,jl,py,R,nb.jl,nb.py,nb.R "
         "comma separated. If you want another format than the "
         "default one, append the format name to the extension, "
         "e.g. ipynb,py:percent to save the notebook to "
-        "hydrogen/spyder/vscode compatible scripts",
+        "hydrogen/spyder/vscode compatible scripts. "
+        "Can also be a list of format dictionaries for first-match pairing.",
         config=True,
     )
     default_jupytext_formats = Unicode(help="Deprecated. Use 'formats' instead", config=True)
@@ -226,14 +227,15 @@ class JupytextConfiguration(Configurable):
                 FutureWarning,
             )
 
-        formats = self.formats or self.default_jupytext_formats
-        for fmt in long_form_multiple_formats(formats):
-            try:
-                base_path(path, fmt)
-                return formats
-            except InconsistentPath:
-                continue
-
+        # formats is a list of paired formats - find the first match
+        for paired_formats in normalize_formats(self.formats or self.default_jupytext_formats):
+            # Check if one of the paired format matches the current path
+            for fmt in long_form_multiple_formats(paired_formats):
+                try:
+                    base_path(path, fmt)
+                    return paired_formats
+                except InconsistentPath:
+                    continue
         return None
 
     def __eq__(self, other):
@@ -364,17 +366,49 @@ def parse_jupytext_configuration_file(jupytext_config_file, stream=None):
         raise JupytextConfigurationError(f"The Jupytext configuration file {jupytext_config_file} is incorrect: {err}")
 
 
+def normalize_formats(formats) -> list[str]:
+    """Normalize the formats option into a list of string-encoded paired formats"""
+    # Process formats - can be string, dict, or list
+    if isinstance(formats, str):
+        # Split on semicolon for multiple format groups
+        formats = formats.split(";")
+    elif isinstance(formats, dict):
+        # Single dict - wrap in list for uniform processing
+        formats = [formats]
+    elif formats is None:
+        formats = []
+    elif not isinstance(formats, list):
+        raise JupytextConfigurationError(
+            f"Invalid type for 'formats': {type(formats).__name__}. Expected str, dict, list of str or dict."
+        )
+
+    # Each group of paired formats can be a string or a dict
+    string_encoded_pairing_formats = []
+
+    for paired_formats in formats:
+        if isinstance(paired_formats, str):
+            string_encoded_pairing_formats.append(paired_formats)
+        elif isinstance(paired_formats, dict):
+            # Convert dict to format string
+            paired_formats = [
+                (f if not prefix else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + f)
+                for prefix, f in paired_formats.items()
+            ]
+            string_encoded_pairing_formats.append(short_form_multiple_formats(paired_formats))
+        else:
+            raise JupytextConfigurationError(
+                f"Invalid paired formats: {paired_formats}. Expected str or dict, got {type(paired_formats).__name__}."
+            )
+
+    return string_encoded_pairing_formats
+
+
 def load_jupytext_configuration_file(config_file, stream=None):
     """Read and validate a Jupytext configuration file, and return a JupytextConfiguration object"""
     config_dict = parse_jupytext_configuration_file(config_file, stream)
     config = validate_jupytext_configuration_file(config_file, config_dict)
-    # formats can be a dict prefix => format
-    if isinstance(config.formats, dict):
-        config.formats = [
-            (fmt if not prefix else (prefix[:-1] if prefix.endswith("/") else prefix) + "///" + fmt)
-            for prefix, fmt in config.formats.items()
-        ]
-    config.formats = short_form_multiple_formats(config.formats)
+    config.formats = normalize_formats(config.formats or config.default_jupytext_formats)
+
     if isinstance(config.notebook_extensions, str):
         config.notebook_extensions = config.notebook_extensions.split(",")
     return config
