@@ -228,8 +228,8 @@ class JupytextConfiguration(Configurable):
             )
 
         formats = self.formats or self.default_jupytext_formats
-        
-        # Ensure formats is a list (handle deprecated default_jupytext_formats which could be a string)
+
+        # Convert formats to a list, if needed
         if not isinstance(formats, list):
             formats = [formats] if formats else []
 
