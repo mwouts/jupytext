@@ -11,6 +11,9 @@ The environment used to develop Jupytext is now maintained using Pixi ([#1459](h
 - We have fixed the round trip tests and made them work with Quarto 1.8.25 ([#1435](https://github.com/mwouts/jupytext/issues/1435))
 - We have fixed warnings about the cell ids like either `Cell is missing an id field` or `Additional properties are not allowed ('id' was unexpected)` when converting to some formats, including Pandoc ([#1464](https://github.com/mwouts/jupytext/pull/1464))
 
+**Added**
+We have added a new `py:marimo` format, which uses the `marimo` command line interface to convert notebooks from and to the Marimo format ([#1431](https://github.com/mwouts/jupytext/pull/1431))
+
 
 1.18.1 (2025-10-19)
 -------------------

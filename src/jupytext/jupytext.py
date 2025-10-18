@@ -43,6 +43,7 @@ from .myst import MYST_FORMAT_NAME, myst_extensions, myst_to_notebook, notebook_
 from .pandoc import md_to_notebook, notebook_to_md
 from .pep8 import pep8_lines_between_cells
 from .quarto import notebook_to_qmd, qmd_to_notebook
+from .marimo import notebook_to_marimo_py, marimo_py_to_notebook
 from .version import __version__
 
 
@@ -101,6 +102,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         if self.fmt.get("format_name") == "quarto":
             return qmd_to_notebook(s)
+
+        if self.fmt.get("format_name") == "marimo":
+            return marimo_py_to_notebook(s)
 
         if self.fmt.get("format_name") == MYST_FORMAT_NAME:
             nb = myst_to_notebook(s)
@@ -211,6 +215,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             return notebook_to_md(self.filter_notebook(nb, metadata))
         if self.fmt.get("format_name") == "quarto" or self.ext == ".qmd":
             return notebook_to_qmd(self.filter_notebook(nb, metadata))
+        if self.fmt.get("format_name") == "marimo":
+            return notebook_to_marimo_py(self.filter_notebook(nb, metadata))
         if self.fmt.get("format_name") == MYST_FORMAT_NAME or self.ext in myst_extensions(no_md=True):
             default_lexer_from_language_info = metadata.get("language_info", {}).get("pygments_lexer", None)
             default_lexer_from_jupytext_metadata = metadata.get("jupytext", {}).pop("default_lexer", None)

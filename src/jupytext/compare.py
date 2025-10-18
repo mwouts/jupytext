@@ -130,25 +130,28 @@ def compare_notebooks(
         raise_on_first_difference,
         compare_outputs=compare_outputs,
         compare_ids=compare_ids,
-        cell_metadata_filter=notebook_actual.get("jupytext", {}).get("cell_metadata_filter"),
-        allow_missing_code_cell_metadata=(allow_expected_differences and format_name == "sphinx"),
-        allow_missing_markdown_cell_metadata=(allow_expected_differences and format_name in ["sphinx", "spin"]),
+        cell_metadata_filter="-all"
+        if format_name == "marimo"
+        else notebook_actual.get("jupytext", {}).get("cell_metadata_filter"),
+        allow_missing_code_cell_metadata=(allow_expected_differences and format_name in ["sphinx", "marimo"]),
+        allow_missing_markdown_cell_metadata=(allow_expected_differences and format_name in ["sphinx", "spin", "marimo"]),
         allow_filtered_cell_metadata=allow_expected_differences,
         allow_removed_final_blank_line=allow_expected_differences,
     )
 
     # Compare notebook metadata
     modified_metadata = False
-    try:
-        ignore_kernelspec = fmt.get("extension") == ".qmd" and allow_expected_differences
-        compare(
-            filtered_notebook_metadata(notebook_actual, ignore_kernelspec),
-            filtered_notebook_metadata(notebook_expected, ignore_kernelspec),
-        )
-    except AssertionError as error:
-        if raise_on_first_difference:
-            raise NotebookDifference(f"Notebook metadata differ: {str(error)}")
-        modified_metadata = True
+    if fmt.get("format_name") != "marimo":
+        try:
+            ignore_kernelspec = fmt.get("extension") == ".qmd" and allow_expected_differences
+            compare(
+                filtered_notebook_metadata(notebook_actual, ignore_kernelspec),
+                filtered_notebook_metadata(notebook_expected, ignore_kernelspec),
+            )
+        except AssertionError as error:
+            if raise_on_first_difference:
+                raise NotebookDifference(f"Notebook metadata differ: {str(error)}")
+            modified_metadata = True
 
     error = []
     if modified_cells:
