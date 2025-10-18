@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.18.0.post1 (unreleased)
+-------------------
+
+**Changed**
+- We now use `pixi` to maintain the local Python environments used for developing and testing Jupytext.
+
+
 1.18.0 (2025-10-18)
 -------------------
 
