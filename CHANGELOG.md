@@ -1,24 +1,25 @@
 Jupytext ChangeLog
 ==================
 
-1.18.0rc0 (2025-10-12)
-----------------------
+1.18.0 (2025-10-18)
+-------------------
 
 **Added**
 - The documentation has a chapter on the [Jupytext Sync](https://jupytext.readthedocs.io/en/latest/vs-code.html) extension for VS Code ([#1395](https://github.com/mwouts/jupytext/issues/1395))
 - We have added a new option `--check-source-is-newer` to the Jupytext CLI. Use this option if you want to make sure that the file passed as argument to Jupytext is the newest of all paired files, and/or newer than the destination file.
 - We have added a section on [Jupyter Collaboration](https://jupytext.readthedocs.io/en/latest/jupyter-collaboration.html) which also provides a very useful autoreload functionality ([#406](https://github.com/mwouts/jupytext/issues/406), [#1401](https://github.com/mwouts/jupytext/issues/1401))
 - Pairing groups allow you to define different pairing configurations for specific subsets of notebooks. The `formats` configuration option now supports a list of format dictionaries for first-match pairing. Use `[[formats]]` sections in your TOML configuration to define multiple format specifications, where the first matching format is used. This allows applying different pairing rules to notebooks in different locations, such as generating documentation markdown files only for tutorial notebooks ([#1383](https://github.com/mwouts/jupytext/issues/1383))
-- We have added more tests do document the complex pairing formats, which also work on Windows ([#1028](https://github.com/mwouts/jupytext/issues/1028))
+- We have added more tests to document the complex pairing formats, which also work on Windows ([#1028](https://github.com/mwouts/jupytext/issues/1028))
 - Pairing into nested folders was fixed on Windows ([#1028](https://github.com/mwouts/jupytext/issues/1028))
 - Jupytext is now tested with Python 3.14 ([#1456](https://github.com/mwouts/jupytext/issues/1456))
 
 **Fixed**
 - The Jupytext CLI now detects if a file it has read or consulted has been modified while it was processing it. That can happen in the context of the [Jupytext Sync](https://marketplace.visualstudio.com/items?itemName=caenrigen.jupytext-sync) extension for VS Code ([#1411](https://github.com/mwouts/jupytext/issues/1411), [vscode-jupytext-sync-#12](https://github.com/caenrigen/vscode-jupytext-sync/issues/12)). When such a synchronous modification is detected, Jupytext now raises an error. Many thanks to [Anne Archibald](https://github.com/aarchiba) for reporting the issue and preparing an inspiring PR ([#1417](https://github.com/mwouts/jupytext/pull/1417)).
 - We don't import `notebook` when `jupyter_server` is available ([#1436](https://github.com/mwouts/jupytext/issues/1436))
-- Jupytext now support more characters in the cell metadata keys, to improve compatibility with `jupyterlab-slideshow` ([#1441](https://github.com/mwouts/jupytext/issues/1441)). Thanks to [Nicolas Thierry](https://github.com/nthiery) for this fix.
+- Jupytext now supports more characters in the cell metadata keys, to improve compatibility with `jupyterlab-slideshow` ([#1441](https://github.com/mwouts/jupytext/issues/1441)). Thanks to [Nicolas Thierry](https://github.com/nthiery) for this fix.
 - The function `find_jupytext_configuration_file` now works with relative directories ([#1440](https://github.com/mwouts/jupytext/issues/1440)). This fix was contributed by [Thierry Parmentelat](https://github.com/parmentelat).
 - We have fixed a parsing error for R Markdown files ([#1429](https://github.com/mwouts/jupytext/issues/1429))
+- We have fixed a parsing error when the first cell of the notebook contains a YAML header that is not a dict ([#1444](https://github.com/mwouts/jupytext/issues/1444))
 
 **Changed**
 - We have updated the pre-commit hooks. The code is now formatted using `ruff format`, and updated for Python 3.9+ using https://github.com/asottile/pyupgrade ([#1423](https://github.com/mwouts/jupytext/issues/1423))
@@ -333,7 +334,7 @@ a configuration file ([#967](https://github.com/mwouts/jupytext/issues/967))
 - Added Maxima as a supported language ([#927](https://github.com/mwouts/jupytext/issues/927)) - thanks to [Alberto Lusiani](https://github.com/alusiani) for contributing a sample Maxima notebook.
 
 **Changed**
-- The Jupytext contents manager is derived from the `LargeFileManager` imported from `jupyter_server` rathen than `notebook` ([#933](https://github.com/mwouts/jupytext/issues/933))
+- The Jupytext contents manager is derived from the `LargeFileManager` imported from `jupyter_server` rather than `notebook` ([#933](https://github.com/mwouts/jupytext/issues/933))
 - Allow for markdown-it-py v2 ([#924](https://github.com/mwouts/jupytext/issues/924))
 - We have updated the hooks used in the test pre-commits, to fix an issue on the CI ([#940](https://github.com/mwouts/jupytext/issues/940), [#942](https://github.com/mwouts/jupytext/issues/942))
 - We updated the `yarn.lock` file for the jupyter lab extension to address security vulnerabilities ([#904](https://github.com/mwouts/jupytext/issues/904), [#925](https://github.com/mwouts/jupytext/issues/925), [#935](https://github.com/mwouts/jupytext/issues/935), [#939](https://github.com/mwouts/jupytext/issues/939))
@@ -914,7 +915,7 @@ See also [What's new in Jupytext 1.3?](https://gist.github.com/mwouts/724efe5e00
 - The `--set-formats` option in Jupytext CLI also triggers `--sync`, allowing shorter commands.
 - `jupytext`'s `read` and `write` functions can be used as drop-in replacements for `nbformat`'s ones ([#262](https://github.com/mwouts/jupytext/issues/262)).
 - `jupytext --sync` will now skip unpaired notebooks ([#281](https://github.com/mwouts/jupytext/issues/281)).
-- The JupyterLab extension was updated. It now works on on text files ([#213](https://github.com/mwouts/jupytext/issues/213)) and has a new option to include
+- The JupyterLab extension was updated. It now works on text files ([#213](https://github.com/mwouts/jupytext/issues/213)) and has a new option to include
 (or not) the metadata in the text representation of the notebook.
 - Jupytext's contents manager class is derived dynamically from the default CM class for compatibility with
 `jupyter_server` ([#270](https://github.com/mwouts/jupytext/issues/270))
