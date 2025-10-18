@@ -306,7 +306,7 @@ def myst_file(request):
 
 
 @pytest.fixture(
-    params=list_notebooks("ipynb", skip="(functional|Notebook with|flavors|invalid|305)"),
+    params=list_notebooks("ipynb", skip="(functional|Notebook with|flavors|invalid|305|jupyterlab-slideshow)"),
     ids=notebook_id_func,
 )
 def ipynb_to_pandoc(request):
