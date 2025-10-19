@@ -1,8 +1,11 @@
 Jupytext ChangeLog
 ==================
 
-1.18.0.post1 (unreleased)
+1.18.1 (2025-10-19)
 -------------------
+
+**Fixed**
+- Fixed test `test_check_source_is_newer_when_using_jupytext_sync` to work reliably on systems with low filesystem timestamp resolution ([#1460](https://github.com/mwouts/jupytext/issues/1460))
 
 **Changed**
 - We now use `pixi` to maintain the local Python environments used for developing and testing Jupytext.

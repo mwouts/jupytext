@@ -2,6 +2,7 @@
 Here we test the --check-source-is-newer option of the jupytext CLI
 """
 
+import os
 from jupytext import cli
 from jupytext import write
 
@@ -45,6 +46,10 @@ def test_check_source_is_newer_when_using_jupytext_sync(tmp_path, python_noteboo
     # Running sync on the .py file works as .py is always more recent after a --sync operation
     cli.jupytext([str(tmp_py), "--sync", "--check-source-is-newer"])
 
+    # Make .ipynb slightly older again to ensure .py is newer
+    stat = os.stat(tmp_ipynb)
+    os.utime(tmp_ipynb, (stat.st_atime, stat.st_mtime - 1))
+
     # Now, trying to sync the .ipynb to .py raises an error because .ipynb is older than .py
     with pytest.raises(ValueError, match=r"Source .*notebook\.ipynb.* is older than paired file .*notebook\.py.*"):
         cli.jupytext([str(tmp_ipynb), "--sync", "--check-source-is-newer"])
@@ -52,6 +57,10 @@ def test_check_source_is_newer_when_using_jupytext_sync(tmp_path, python_noteboo
     # We modify the .ipynb file so that it is more recent than the .py file
     text = tmp_ipynb.read_text().replace("A short notebook", "A short notebook with a modification")
     tmp_ipynb.write_text(text)
+
+    # Make .py slightly older to ensure .ipynb is newer
+    stat = os.stat(tmp_py)
+    os.utime(tmp_py, (stat.st_atime, stat.st_mtime - 1))
 
     # Now, trying to sync the .py to .ipynb raises an error because the .py is older than the .ipynb
     with pytest.raises(ValueError, match=r"Source .*notebook\.py.* is older than paired file .*notebook\.ipynb.*"):
