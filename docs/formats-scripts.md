@@ -64,9 +64,17 @@ to your [`jupytext.toml` configuration file](config.md).
 
 See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.pct.py) in the `percent` format.
 
-## The `hydrogen` format
+## The `marimo` format
 
-By default, [Jupyter magics](advanced-options.md#magic-commands) are commented in the `percent` representation. If you run the percent scripts in Hydrogen, use the `hydrogen` format, a variant of the `percent` format that does not comment Jupyter magic commands.
+In Jupytext v1.19 and later, you can use the `py:marimo` format, in which text notebooks are converted to Jupyter notebooks, and back, using [Marimo](https://marimo.io/).
+
+Our [implementation](https://github.com/mwouts/jupytext/blob/main/src/jupytext/marimo.py) directly calls the `marimo` converter.
+
+Please note that:
+- The Marimo format is available only for Python notebooks
+- Marimo might rename your variables to make your notebook Marimo-compliant
+- Notebook and cell metadata (other than tags) are not supported
+
 
 ## The `light` format
 
