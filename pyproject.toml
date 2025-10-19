@@ -78,7 +78,7 @@ test-external = [
   "gitpython",
   "pre-commit",
   # Marimo notebooks
-  "marimo>=0.17",
+  "marimo>=0.16.3",
   # Interaction with other contents managers
   "jupyter-fs[fs]>=1.0"  # 1398
 ]

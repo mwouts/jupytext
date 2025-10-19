@@ -5,6 +5,7 @@ import json
 import os
 import re
 
+from jupytext.marimo import marimo_version
 from jupytext.paired_paths import full_path
 
 from .cell_metadata import _IGNORE_CELL_METADATA
@@ -373,6 +374,16 @@ def assert_conversion_same_as_mirror(nb_file, fmt, mirror_name, compare_notebook
 
     if not actual.endswith("\n"):
         actual = actual + "\n"
+
+    if fmt.get("format_name") == "marimo":
+        lines = expected.splitlines()
+        lines = [
+            # mirror files were generated with marimo 0.17.0
+            f'__generated_with = "{marimo_version()}"' if line == '__generated_with = "0.17.0"' else line
+            for line in lines
+        ]
+        expected = "\n".join(lines) + "\n"
+
     compare(actual, expected)
 
     # Compare the two notebooks

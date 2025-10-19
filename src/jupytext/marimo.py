@@ -5,13 +5,15 @@ import tempfile
 import subprocess
 import nbformat
 
+MARIMO_MIN_VERSION = "0.16.3"
+
 
 class MarimoError(OSError):
     """An error related to Marimo"""
 
 
-def is_marimo_available(min_version="0.17", max_version=None):
-    """Is Marimo>=0.17 available?"""
+def is_marimo_available(min_version=MARIMO_MIN_VERSION, max_version=None):
+    """Is Marimo available?"""
     try:
         raise_if_marimo_is_not_available(min_version=min_version, max_version=max_version)
         return True
@@ -19,7 +21,7 @@ def is_marimo_available(min_version="0.17", max_version=None):
         return False
 
 
-def raise_if_marimo_is_not_available(min_version="0.17", max_version=None):
+def raise_if_marimo_is_not_available(min_version=MARIMO_MIN_VERSION, max_version=None):
     """Raise with an informative error message if Marimo is not available"""
     version = marimo_version()
     if version == "N/A":

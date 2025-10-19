@@ -3452,8 +3452,8 @@ packages:
   timestamp: 1733599666357
 - pypi: ./
   name: jupytext
-  version: 1.18.0.post1
-  sha256: 61c3bd9afddfe68f78361bed918ff04415b50ec55f68fa60ba02de1396ec0ab0
+  version: 1.19.0.dev0
+  sha256: cbee0e195e50386c897e8f46d75cb7b2a5d90b24b9f45fd7c034388cf49bb0a5
   requires_dist:
   - markdown-it-py>=1.0
   - mdit-py-plugins
@@ -3469,7 +3469,7 @@ packages:
   - isort ; extra == 'dev'
   - jupyter-fs[fs]>=1.0 ; extra == 'dev'
   - jupyter-server!=2.11 ; extra == 'dev'
-  - marimo>=0.17 ; extra == 'dev'
+  - marimo>=0.16.3 ; extra == 'dev'
   - nbconvert ; extra == 'dev'
   - pre-commit ; extra == 'dev'
   - pytest ; extra == 'dev'
@@ -3504,7 +3504,7 @@ packages:
   - isort ; extra == 'test-external'
   - jupyter-fs[fs]>=1.0 ; extra == 'test-external'
   - jupyter-server!=2.11 ; extra == 'test-external'
-  - marimo>=0.17 ; extra == 'test-external'
+  - marimo>=0.16.3 ; extra == 'test-external'
   - nbconvert ; extra == 'test-external'
   - pre-commit ; extra == 'test-external'
   - pytest ; extra == 'test-external'
