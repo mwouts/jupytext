@@ -47,19 +47,16 @@ jobs:
           # Test with pytest
           pytest -n logical --cov --cov-report=xml
 
-      - name: Test lab extension
-        run: |
-          eval "$(pixi shell-hook)"
           # Uninstall jupyter-fs as it overrides the original browser-test.js to
           # check its own functionality (https://github.com/jpmorganchase/jupyter-fs/blob/main/jupyterfs/browser-test.js)
           # So uninstall jupyter-fs before running browser check
-          #
           pip uninstall jupyter-fs -y
 
           # Check extension
           jupyter labextension list
           jupyter labextension list 2>&1 | grep -ie "jupyterlab-jupytext.*OK"
 
+          # Test lab extension
           python -m jupyterlab.browser_check
 
       - name: Upload coverage
