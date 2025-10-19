@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.19.0.dev0 (unreleased)
+------------------------
+
+**Fixed**
+- We have fixed the round trip tests and made them work with Quarto 1.8.25 ([#1435](https://github.com/mwouts/jupytext/issues/1435))
+
+
 1.18.1 (2025-10-19)
 -------------------
 
