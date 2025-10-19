@@ -34,13 +34,13 @@ jobs:
         with:
           pixi-version: v0.55.0
           cache: true
+        env:
+          # Include the jupyterlab extension for Jupytext in build
+          HATCH_BUILD_HOOKS_ENABLE: true
 
       - name: Run tests
         run: |
           eval "$(pixi shell-hook)"
-          # Install from source
-          HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e .
-
           # Install a Jupyter Kernel
           python -m ipykernel install --name jupytext-ci --user
 
