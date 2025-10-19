@@ -12,6 +12,8 @@ import jupytext
 def test_sample_notebooks_are_normalized(any_nb_file):
     if "myst/" in any_nb_file and not jupytext.myst.is_myst_available():
         pytest.skip("myst_parser not found")
+    if "marimo/" in any_nb_file and not jupytext.marimo.is_marimo_available():
+        pytest.skip("marimo not found")
     nb = jupytext.read(any_nb_file)
 
     changes, normalized_nb = nbformat.validator.normalize(nb)

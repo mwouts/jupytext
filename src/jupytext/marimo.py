@@ -1,5 +1,6 @@
 """Jupyter notebook to Marimo py format and back, using Marimo"""
 
+import os
 from packaging.version import parse
 import tempfile
 import subprocess
@@ -25,13 +26,13 @@ def raise_if_marimo_is_not_available(min_version=MARIMO_MIN_VERSION, max_version
     """Raise with an informative error message if Marimo is not available"""
     version = marimo_version()
     if version == "N/A":
-        raise MarimoError(f"The Marimo format requires 'Marimo>={min_version}', but Marimo was not found")
+        raise MarimoError(f"The Marimo format requires 'marimo>={min_version}', but marimo was not found")
 
     if parse(version) < parse(min_version):
-        raise MarimoError(f"The Marimo format requires 'Marimo>={min_version}', but Marimo version {version} was found")
+        raise MarimoError(f"The Marimo format requires 'marimo>={min_version}', but marimo=={version} was found")
 
     if max_version and parse(version) > parse(max_version):
-        raise MarimoError(f"The Marimo format requires 'Marimo<={max_version}', but Marimo version {version} was found")
+        raise MarimoError(f"The Marimo format requires 'marimo<={max_version}', but marimo=={version} was found")
 
     return version
 
@@ -47,10 +48,18 @@ def marimo_version():
 def marimo_py_to_notebook(text):
     """Convert a Marimo script to a Jupyter notebook, using Marimo"""
     raise_if_marimo_is_not_available()
-    tmp_py_file = tempfile.NamedTemporaryFile(suffix=".py")
-    tmp_ipynb_file = tempfile.NamedTemporaryFile(suffix=".ipynb")
 
-    with open(tmp_py_file.name, "w") as fp:
+    # On Windows, NamedTemporaryFile cannot be reopened with open,
+    # so we keep the file names and close the files
+    tmp_py_file = tempfile.NamedTemporaryFile(suffix=".py")
+    tmp_py_file_name = tmp_py_file.name
+    tmp_py_file.close()
+
+    tmp_ipynb_file = tempfile.NamedTemporaryFile(suffix=".ipynb")
+    tmp_ipynb_file_name = tmp_ipynb_file.name
+    tmp_ipynb_file.close()
+
+    with open(tmp_py_file_name, "w") as fp:
         fp.write(text)
 
     marimo(
@@ -59,15 +68,15 @@ def marimo_py_to_notebook(text):
         # Keep the current order to minimize diffs on round trips
         "--sort",
         "top-down",
-        tmp_py_file.name,
+        tmp_py_file_name,
         "-o",
-        tmp_ipynb_file.name,
+        tmp_ipynb_file_name,
     )
 
-    notebook = nbformat.read(tmp_ipynb_file, as_version=4)
+    notebook = nbformat.read(tmp_ipynb_file_name, as_version=4)
 
-    tmp_ipynb_file.close()
-    tmp_py_file.close()
+    os.remove(tmp_py_file_name)
+    os.remove(tmp_ipynb_file_name)
 
     import_marimo_cell = "import marimo as mo"
     need_to_remove_import_marimo_cell = False
@@ -96,19 +105,27 @@ def marimo_py_to_notebook(text):
 def notebook_to_marimo_py(notebook):
     """Convert a notebook to its Marimo script"""
     raise_if_marimo_is_not_available()
-    tmp_py_file = tempfile.NamedTemporaryFile(suffix=".py")
-    tmp_ipynb_file = tempfile.NamedTemporaryFile(suffix=".ipynb")
 
-    with open(tmp_ipynb_file.name, "w") as fp:
+    # On Windows, NamedTemporaryFile cannot be reopened with open,
+    # so we keep the file names and close the files
+    tmp_py_file = tempfile.NamedTemporaryFile(suffix=".py", delete=False)
+    tmp_py_file_name = tmp_py_file.name
+    tmp_py_file.close()
+
+    tmp_ipynb_file = tempfile.NamedTemporaryFile(suffix=".ipynb", delete=False)
+    tmp_ipynb_file_name = tmp_ipynb_file.name
+    tmp_ipynb_file.close()
+
+    with open(tmp_ipynb_file_name, "w") as fp:
         nbformat.write(notebook, fp)
 
-    marimo("convert", tmp_ipynb_file.name, "-o", tmp_py_file.name)
+    marimo("convert", tmp_ipynb_file_name, "-o", tmp_py_file_name)
 
-    with open(tmp_py_file.name) as fp:
+    with open(tmp_py_file_name) as fp:
         text = fp.read()
 
-    tmp_ipynb_file.close()
-    tmp_py_file.close()
+    os.remove(tmp_ipynb_file_name)
+    os.remove(tmp_py_file_name)
 
     return "\n".join(text.splitlines())
 
