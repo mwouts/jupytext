@@ -56,7 +56,9 @@ def test_read_ipynb_from_stream():
    "metadata": {},
    "source": [
     "1 + 1"
-   ]
+   ],
+   "execution_count": null,
+   "outputs": []
   }
  ],
  "metadata": {},
