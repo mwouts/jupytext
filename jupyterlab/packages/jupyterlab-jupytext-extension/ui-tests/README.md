@@ -16,7 +16,7 @@ The default configuration will produce video for failing tests and an HTML repor
 
 ## Run the tests
 
-> All commands are assumed to be executed from the _main-menu_ directory
+> All commands are assumed to be executed from the _jupyterlab-jupytext-extension_ directory
 
 To run the tests, you need to:
 
