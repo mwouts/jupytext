@@ -72,7 +72,7 @@ def combine_inputs_with_outputs(nb_source, nb_outputs, fmt=None):
     if not nb_metadata.get("jupytext", {}):
         nb_metadata.pop("jupytext", {})
 
-    if format_name in ["nomarker", "sphinx"] or source_is_md_version_one:
+    if format_name in ["nomarker", "sphinx", "marimo"] or source_is_md_version_one:
         cell_metadata_filter = "-all"
     else:
         cell_metadata_filter = nb_metadata.get("jupytext", {}).get("cell_metadata_filter")

@@ -22,6 +22,11 @@
       "title": "Text Notebook as Script in Nomarker Format",
       "default": false
     },
+    "py:marimo": {
+      "type": "boolean",
+      "title": "Text Notebook as Marimo Script",
+      "default": false
+    },
     "md:myst": {
       "type": "boolean",
       "title": "MyST Markdown Notebook",

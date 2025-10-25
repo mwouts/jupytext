@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.19.0dev0 (unreleased)
+-----------------------
+
+**Added**
+We have added a new `py:marimo` format, which uses the `marimo` command line interface to convert notebooks to and from the Marimo format ([#1431](https://github.com/mwouts/jupytext/pull/1431))
+
+
 1.18.1 (2025-10-19)
 -------------------
 
