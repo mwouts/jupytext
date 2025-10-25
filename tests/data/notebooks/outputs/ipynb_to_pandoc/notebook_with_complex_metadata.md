@@ -8,7 +8,7 @@ jupyter:
   nbformat_minor: 2
 ---
 
-::: {#cell-1 .cell .code}
+::: {.cell .code}
 ``` python
 ```
 :::

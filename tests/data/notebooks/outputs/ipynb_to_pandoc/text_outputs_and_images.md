@@ -18,7 +18,7 @@ This notebook contains outputs of many different types: text, HTML, plots and er
 Using `print`, `sys.stdout` and `sys.stderr`
 :::
 
-::: {#cell-1 .cell .code}
+::: {.cell .code}
 ``` python
 import sys
 print('using print')
@@ -27,7 +27,7 @@ sys.stderr.write('using sys.stderr.write')
 ```
 :::
 
-::: {#cell-2 .cell .code}
+::: {.cell .code}
 ``` python
 import logging
 logging.debug('Debug')
@@ -43,14 +43,14 @@ logging.error('Error')
 Using `pandas`. Here we find two representations: both text and HTML.
 :::
 
-::: {#cell-3 .cell .code}
+::: {.cell .code}
 ``` python
 import pandas as pd
 pd.DataFrame([4])
 ```
 :::
 
-::: {#cell-4 .cell .code}
+::: {.cell .code}
 ``` python
 from IPython.display import display
 display(pd.DataFrame([5]))
@@ -62,13 +62,13 @@ display(pd.DataFrame([6]))
 # Images
 :::
 
-::: {#cell-5 .cell .code}
+::: {.cell .code}
 ``` python
 %matplotlib inline
 ```
 :::
 
-::: {#cell-6 .cell .code}
+::: {.cell .code}
 ``` python
 # First plot
 from matplotlib import pyplot as plt
@@ -94,7 +94,7 @@ plt.show()
 # Errors
 :::
 
-::: {#cell-7 .cell .code}
+::: {.cell .code}
 ``` python
 undefined_variable
 ```
