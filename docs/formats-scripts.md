@@ -68,13 +68,21 @@ See how our `World population.ipynb` notebook is [represented](https://github.co
 
 In Jupytext v1.19 and later, you can use the `py:marimo` format, in which text notebooks are converted to Jupyter notebooks, and back, using [Marimo](https://marimo.io/).
 
-Our [implementation](https://github.com/mwouts/jupytext/blob/main/src/jupytext/marimo.py) directly calls the `marimo` converter.
+Our [implementation](https://github.com/mwouts/jupytext/blob/main/src/jupytext/marimo.py) directly calls the `marimo` converter (this requires Marimo v1.16.3 or later)
 
 Please note that:
-- The Marimo format is available only for Python notebooks
-- Marimo might rename your variables to make your notebook Marimo-compliant
+- The Marimo format is only available for Python notebooks
+- Marimo will variables that are re-defined to make your notebook Marimo-compliant
 - Notebook and cell metadata (other than tags) are not supported
+- As of Marimo 0.17.8, empty cells are removed upon the round trip
 
+You can determine whether a given notebook is stable over a marimo round trip with
+```
+jupytext --test --to py:marimo your_notebook.ipynb
+jupytext --test --to ipynb your_marimo_script.py
+```
+
+💡 Please let us know if you notice unexpected changes in your notebook. If you can reproduce the problem using `marimo convert` and `marimo export ipynb --sort top-down`, please report it using the Marimo [issue tracker](https://github.com/marimo-team/marimo/issues). Include if possible include a ping to `@mwouts` (Jupytext's author). If you believe that the issue is Jupytext itself, please report it using the Jupytext [issue tracker](https://github.com/mwouts/jupytext/issues).
 
 ## The `light` format
 

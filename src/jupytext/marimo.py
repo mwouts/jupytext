@@ -78,6 +78,17 @@ def marimo_py_to_notebook(text):
     os.remove(tmp_py_file_name)
     os.remove(tmp_ipynb_file_name)
 
+    # In the following we revert some of the side effects of the marimo conversion
+    # to ensure stability of the round trip. Not all the side effects are reverted.
+
+    # You can test the round trip for a given document with:
+    #   jupytext --test --to py:marimo your_notebook.ipynb
+    # or with:
+    #   jupytext --test --to ipynb your_marimo_script.py
+
+    # Ideally these round trip issues should be fixed in Marimo itself - please report them at
+    # https://github.com/marimo/marimo/issues and optionally mention @mwouts (author of Jupytext)
+    # in the issue description.
     import_marimo_cell = "import marimo as mo"
     need_to_remove_import_marimo_cell = False
 
