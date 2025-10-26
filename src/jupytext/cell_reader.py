@@ -938,3 +938,72 @@ class SphinxGalleryScriptCellReader(ScriptCellReader):  # pylint: disable=W0223
         self.lines_to_next_cell = count_lines_to_next_cell(cell_end_marker, next_cell_start, len(lines), explicit_eoc)
 
         return next_cell_start
+
+
+class DatabricksCellReader(BaseCellReader):
+    """Read Databricks notebook cells"""
+
+    comment = "#"
+    default_language = "python"
+    default_comment_magics = False
+
+    def __init__(self, fmt=None, default_language="python"):
+        super().__init__(fmt, default_language)
+        self.ext = ".py"
+        self.start_code_re = re.compile(r"^# COMMAND ----------\s*$")
+
+    def metadata_and_language_from_option_line(self, line):
+        """Databricks cells don't have metadata on the separator line"""
+        # The COMMAND separator doesn't carry metadata
+        pass
+
+    def find_cell_end(self, lines):
+        """Return position of end of cell marker, and position of first line after cell"""
+
+        # Determine cell type based on first line
+        if lines and lines[0].strip().startswith("# MAGIC %md"):
+            self.cell_type = "markdown"
+        elif lines and lines[0].strip().startswith("# MAGIC %"):
+            self.cell_type = "code"
+        else:
+            self.cell_type = "code"
+
+        # Find next COMMAND separator
+        for i, line in enumerate(lines):
+            if i > 0 and line.strip() == "# COMMAND ----------":
+                return i, i, False
+
+        return len(lines), len(lines), False
+
+    def uncomment_code_and_magics(self, lines):
+        """Extract content from MAGIC-prefixed lines or return as-is for regular code"""
+        if not lines:
+            return lines
+
+        # Check if this is a markdown cell (# MAGIC %md)
+        if lines and lines[0].strip().startswith("# MAGIC %md"):
+            content_lines = []
+            for i, line in enumerate(lines):
+                stripped = line.rstrip()
+                if i == 0 and stripped.startswith("# MAGIC %md"):
+                    # Skip the first line with %md marker
+                    continue
+                elif stripped.startswith("# MAGIC "):
+                    content_lines.append(stripped[len("# MAGIC ") :])
+                elif stripped == "# MAGIC":
+                    content_lines.append("")
+            return content_lines
+
+        # Check if this is a magic command cell (# MAGIC %...)
+        elif lines and lines[0].strip().startswith("# MAGIC %"):
+            content_lines = []
+            for line in lines:
+                stripped = line.rstrip()
+                if stripped.startswith("# MAGIC "):
+                    content_lines.append(stripped[len("# MAGIC ") :])
+                elif stripped == "# MAGIC":
+                    content_lines.append("")
+            return content_lines
+
+        # Regular code cell - return as-is
+        return lines

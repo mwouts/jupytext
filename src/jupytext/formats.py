@@ -18,6 +18,7 @@ from .cell_reader import (
     RMarkdownCellReader,
     RScriptCellReader,
     SphinxGalleryScriptCellReader,
+    DatabricksCellReader,
 )
 from .cell_to_text import (
     BareScriptCellExporter,
@@ -28,6 +29,7 @@ from .cell_to_text import (
     RMarkdownCellExporter,
     RScriptCellExporter,
     SphinxGalleryCellExporter,
+    DatabricksCellExporter,
 )
 from .header import header_to_metadata_and_cell, insert_or_test_version_number
 from .languages import _COMMENT_CHARS, _SCRIPT_EXTENSIONS, same_language
@@ -194,6 +196,17 @@ JUPYTEXT_FORMATS = (
     ]
     + [
         NotebookFormatDescription(
+            format_name="databricks",
+            extension=".py",
+            header_prefix="#",
+            cell_reader_class=DatabricksCellReader,
+            cell_exporter_class=DatabricksCellExporter,
+            # Version 1.0 on 2025-10-26 - jupytext v1.19.0
+            current_version_number="1.0",
+        )
+    ]
+    + [
+        NotebookFormatDescription(
             format_name="sphinx",
             extension=".py",
             header_prefix="#",
@@ -324,6 +337,7 @@ def guess_format(text, ext):
         rspin_comment_count = 0
         vim_folding_markers_count = 0
         vscode_folding_markers_count = 0
+        databricks_marker_count = 0
 
         parser = StringParser(language="R" if ext in [".r", ".R"] else "python")
         for line in lines:
@@ -350,6 +364,13 @@ def guess_format(text, ext):
             if vscode_folding_markers_re.match(line):
                 vscode_folding_markers_count += 1
 
+            if (
+                line.startswith("# Databricks notebook source")
+                or line.startswith("# COMMAND ----------")
+                or line.startswith("# MAGIC")
+            ):
+                databricks_marker_count += 1
+
         if double_percent_count >= 1:
             if magic_command_count:
                 return "hydrogen", {}
@@ -360,6 +381,9 @@ def guess_format(text, ext):
 
         if vscode_folding_markers_count:
             return "light", {"cell_markers": "region,endregion"}
+
+        if databricks_marker_count >= 1:
+            return "databricks", {}
 
         if twenty_hash_count >= 2:
             return "sphinx", {}
@@ -785,7 +809,7 @@ def formats_with_support_for_cell_metadata():
             continue
         if fmt.format_name == "pandoc" and not is_pandoc_available():
             continue
-        if fmt.format_name not in ["sphinx", "nomarker", "spin", "quarto"]:
+        if fmt.format_name not in ["sphinx", "nomarker", "spin", "quarto", "databricks"]:
             yield f"{fmt.extension[1:]}:{fmt.format_name}"
 
 

@@ -537,3 +537,48 @@ class SphinxGalleryCellExporter(BaseCellExporter):  # pylint: disable=W0223
         return [(cell_marker if cell_marker.startswith("#" * 20) else self.default_cell_marker)] + comment_lines(
             self.source, self.comment, self.comment_suffix
         )
+
+
+class DatabricksCellExporter(BaseCellExporter):
+    """A class that represent a notebook cell as Databricks notebook"""
+
+    default_comment_magics = False
+    parse_cell_language = False
+
+    def __init__(self, *args, **kwargs):
+        BaseCellExporter.__init__(self, *args, **kwargs)
+        self.comment = "#"
+        self.ext = ".py"
+
+    def cell_to_text(self):
+        """Return the text representation for the cell"""
+        if self.cell_type == "markdown":
+            # Markdown cell with # MAGIC %md
+            lines = ["# MAGIC %md"]
+            for line in self.source:
+                if line:
+                    lines.append("# MAGIC " + line)
+                else:
+                    lines.append("# MAGIC")
+            return lines
+
+        # Code cell
+        return self.code_to_text()
+
+    def code_to_text(self):
+        """Return the text representation of a code cell"""
+        source = copy(self.source)
+
+        # Check if it's a magic command
+        if source and source[0].startswith("%"):
+            # Magic command - prefix all lines with # MAGIC
+            lines = []
+            for line in source:
+                if line:
+                    lines.append("# MAGIC " + line)
+                else:
+                    lines.append("# MAGIC")
+            return lines
+
+        # Regular code - return as-is
+        return source
