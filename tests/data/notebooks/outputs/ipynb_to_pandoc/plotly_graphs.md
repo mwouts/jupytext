@@ -20,14 +20,14 @@ This notebook contains complex outputs, including plotly javascript graphs.
 We use Plotly\'s connected mode to make the notebook lighter - when connected, the notebook downloads the `plotly.js` library from the web.
 :::
 
-::: {#cell-1 .cell .code}
+::: {.cell .code}
 ``` python
 import plotly.offline as offline
 offline.init_notebook_mode(connected=True)
 ```
 :::
 
-::: {#cell-2 .cell .code}
+::: {.cell .code}
 ``` python
 import plotly.graph_objects as go
 fig = go.Figure(

@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pytest
 from jupyter_client.kernelspec import find_kernel_specs, get_kernel_spec
+import nbformat
+from nbformat import reads as nb_reads, validate
 from nbformat.v4 import nbbase
 from nbformat.v4.nbbase import (
     new_code_cell,
@@ -30,6 +32,19 @@ jupytext.config.JUPYTEXT_CEILING_DIRECTORIES = ["/tmp/"]
 
 SAMPLE_NOTEBOOK_PATH = Path(__file__).parent / "data" / "notebooks" / "inputs"
 ROOT_PATH = Path(__file__).parent.parent
+
+
+def nbformat_reads(s, as_version, capture_validation_error=None, **kwargs):
+    """Wrapper around nbformat.reads that forces validation"""
+    nb = nb_reads(s, as_version, capture_validation_error=capture_validation_error, **kwargs)
+    validate(nb)
+    return nb
+
+
+@pytest.fixture(autouse=True)
+def force_validate_nbformat(monkeypatch):
+    """Force validation of nbformat in all tests"""
+    monkeypatch.setattr(nbformat, "reads", nbformat_reads)
 
 
 @pytest.fixture(params=["sync", "async"])
