@@ -5,7 +5,7 @@ Jupytext ChangeLog
 ------------------------
 
 **Fixed**
-- We have fixed the _Additional properties are not allowed ('id' was unexpected)_ message on some conversions. Following this change, the cell id is not included anymore in the `md:pandoc` format ([#1463](https://github.com/mwouts/jupytext/issues/1463))
+- We have fixed the round trip tests and made them work with Quarto 1.8.25 ([#1435](https://github.com/mwouts/jupytext/issues/1435))
 
 
 1.18.1 (2025-10-19)

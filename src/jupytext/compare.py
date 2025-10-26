@@ -62,7 +62,7 @@ def filtered_cell(cell, preserve_outputs, cell_metadata_filter):
     return filtered
 
 
-def filtered_notebook_metadata(notebook, ignore_display_name=False):
+def filtered_notebook_metadata(notebook, ignore_kernelspec=False):
     """Notebook metadata, filtered for metadata added by Jupytext itself"""
     metadata = filter_metadata(
         notebook.metadata,
@@ -70,9 +70,9 @@ def filtered_notebook_metadata(notebook, ignore_display_name=False):
         _DEFAULT_NOTEBOOK_METADATA,
     )
 
-    # The display name for the kernel might change (Quarto format on the CI)
-    if ignore_display_name:
-        metadata.get("kernelspec", {}).pop("display_name", None)
+    # Quarto round-trips may change the kernelspec
+    if ignore_kernelspec:
+        metadata.pop("kernelspec", None)
 
     if "jupytext" in metadata:
         del metadata["jupytext"]
@@ -140,10 +140,10 @@ def compare_notebooks(
     # Compare notebook metadata
     modified_metadata = False
     try:
-        ignore_display_name = fmt.get("extension") == ".qmd" and allow_expected_differences
+        ignore_kernelspec = fmt.get("extension") == ".qmd" and allow_expected_differences
         compare(
-            filtered_notebook_metadata(notebook_actual, ignore_display_name),
-            filtered_notebook_metadata(notebook_expected, ignore_display_name),
+            filtered_notebook_metadata(notebook_actual, ignore_kernelspec),
+            filtered_notebook_metadata(notebook_expected, ignore_kernelspec),
         )
     except AssertionError as error:
         if raise_on_first_difference:
@@ -201,9 +201,9 @@ def compare_cells(
         if ref_cell.cell_type != test_cell.cell_type:
             if raise_on_first_difference:
                 raise NotebookDifference(
-                    "Unexpected cell type '{}' for {} cell #{}:\n{}".format(
-                        test_cell.cell_type, ref_cell.cell_type, i, ref_cell.source
-                    )
+                    f"When comparing cell #{i}: "
+                    f"expecting a {ref_cell.cell_type} cell, but got a {test_cell.cell_type} cell.\n"
+                    f"Expected content:\n{ref_cell.source}\nActual content:\n{test_cell.source}"
                 )
             modified_cells.add(i)
 
