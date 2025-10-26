@@ -178,29 +178,23 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         cells = []
         for cell in nb.cells:
-            cell_metadata = filter_metadata(
+            cell_kwargs = dict(cell)
+            cell_kwargs["metadata"] = filter_metadata(
                 cell.metadata,
                 self.fmt.get("cell_metadata_filter"),
                 _IGNORE_CELL_METADATA,
                 unsupported_keys=unsupported_keys,
             )
-
-            if preserve_cell_ids and hasattr(cell, "id"):
-                id = {"id": cell.id}
-            else:
-                id = {}
-
+            if not preserve_cell_ids:
+                cell_kwargs.pop("id", None)
+            elif hasattr(cell, "id"):
+                cell_kwargs["id"] = cell.id
             if cell.cell_type == "code":
-                cells.append(new_code_cell(source=cell.source, metadata=cell_metadata, **id))
-            else:
-                cells.append(
-                    NotebookNode(
-                        source=cell.source,
-                        metadata=cell_metadata,
-                        cell_type=cell.cell_type,
-                        **id,
-                    )
-                )
+                # Drop outputs and execution count
+                cell_kwargs["outputs"] = []
+                cell_kwargs["execution_count"] = None
+
+            cells.append(NotebookNode(**cell_kwargs))
 
         _warn_on_unsupported_keys(unsupported_keys)
 

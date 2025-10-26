@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.19.0.dev0 (unreleased)
+------------------------
+
+**Fixed**
+- We have fixed the _Additional properties are not allowed ('id' was unexpected)_ message on some conversions. Following this change, the cell id is not included anymore in the `md:pandoc` format ([#1463](https://github.com/mwouts/jupytext/issues/1463))
+
+
 1.18.1 (2025-10-19)
 -------------------
 
