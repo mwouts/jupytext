@@ -11,6 +11,7 @@ from nbformat.v4.nbbase import NotebookNode, new_code_cell, new_notebook
 from nbformat.v4.rwbase import NotebookReader, NotebookWriter
 
 from .cell_metadata import _IGNORE_CELL_METADATA
+from .config import get_formats_from_notebook_and_config, load_jupytext_config
 from .formats import (
     _VALID_FORMAT_OPTIONS,
     divine_format,
@@ -56,9 +57,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         self.fmt = copy(long_form_one_format(fmt))
         self.config = config
         self.ext = self.fmt["extension"]
-        self.implementation = get_format_implementation(
-            self.ext, self.fmt.get("format_name")
-        )
+        self.implementation = get_format_implementation(self.ext, self.fmt.get("format_name"))
 
     def update_fmt_with_notebook_options(self, metadata, read=False):
         """Update format options with the values in the notebook metadata, and record those
@@ -86,9 +85,9 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         # Is this format the same as that documented in the YAML header? If so, we want to know the format version
         file_fmt = metadata.get("jupytext", {}).get("text_representation", {})
-        if self.fmt.get("extension") == file_fmt.get("extension") and self.fmt.get(
+        if self.fmt.get("extension") == file_fmt.get("extension") and self.fmt.get("format_name") == file_fmt.get(
             "format_name"
-        ) == file_fmt.get("format_name"):
+        ):
             self.fmt.update(file_fmt)
 
         # rST to md conversion should happen only once
@@ -117,14 +116,10 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             self.implementation.extension,
             self.fmt.get(
                 "root_level_metadata_as_raw_cell",
-                self.config.root_level_metadata_as_raw_cell
-                if self.config is not None
-                else True,
+                (self.config.root_level_metadata_as_raw_cell if self.config is not None else True),
             ),
         )
-        default_language = default_language_from_metadata_and_ext(
-            metadata, self.implementation.extension
-        )
+        default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension)
         self.update_fmt_with_notebook_options(metadata, read=True)
 
         if header_cell:
@@ -132,10 +127,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         lines = lines[pos:]
 
-        if (
-            self.implementation.format_name
-            and self.implementation.format_name.startswith("sphinx")
-        ):
+        if self.implementation.format_name and self.implementation.format_name.startswith("sphinx"):
             cells.append(new_code_cell(source="%matplotlib inline"))
 
         cell_metadata_json = False
@@ -146,15 +138,11 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             cells.append(cell)
             cell_metadata_json = cell_metadata_json or reader.cell_metadata_json
             if pos <= 0:
-                raise Exception(
-                    "Blocked at lines " + "\n".join(lines[:6])
-                )  # pragma: no cover
+                raise Exception("Blocked at lines " + "\n".join(lines[:6]))  # pragma: no cover
             lines = lines[pos:]
 
         custom_cell_magics = self.fmt.get("custom_cell_magics", "").split(",")
-        set_main_and_cell_language(
-            metadata, cells, self.implementation.extension, custom_cell_magics
-        )
+        set_main_and_cell_language(metadata, cells, self.implementation.extension, custom_cell_magics)
         cell_metadata = set()
         for cell in cells:
             cell_metadata.update(cell.metadata.keys())
@@ -163,10 +151,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         if cell_metadata_json:
             metadata.setdefault("jupytext", {}).setdefault("cell_metadata_json", True)
 
-        if (
-            self.implementation.format_name
-            and self.implementation.format_name.startswith("sphinx")
-        ):
+        if self.implementation.format_name and self.implementation.format_name.startswith("sphinx"):
             filtered_cells = []
             for i, cell in enumerate(cells):
                 if (
@@ -193,31 +178,23 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
         cells = []
         for cell in nb.cells:
-            cell_metadata = filter_metadata(
+            cell_kwargs = dict(cell)
+            cell_kwargs["metadata"] = filter_metadata(
                 cell.metadata,
                 self.fmt.get("cell_metadata_filter"),
                 _IGNORE_CELL_METADATA,
                 unsupported_keys=unsupported_keys,
             )
-
-            if preserve_cell_ids and hasattr(cell, "id"):
-                id = {"id": cell.id}
-            else:
-                id = {}
-
+            if not preserve_cell_ids:
+                cell_kwargs.pop("id", None)
+            elif hasattr(cell, "id"):
+                cell_kwargs["id"] = cell.id
             if cell.cell_type == "code":
-                cells.append(
-                    new_code_cell(source=cell.source, metadata=cell_metadata, **id)
-                )
-            else:
-                cells.append(
-                    NotebookNode(
-                        source=cell.source,
-                        metadata=cell_metadata,
-                        cell_type=cell.cell_type,
-                        **id,
-                    )
-                )
+                # Drop outputs and execution count
+                cell_kwargs["outputs"] = []
+                cell_kwargs["execution_count"] = None
+
+            cells.append(NotebookNode(**cell_kwargs))
 
         _warn_on_unsupported_keys(unsupported_keys)
 
@@ -231,23 +208,13 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
     def writes(self, nb, metadata=None, **kwargs):
         """Return the text representation of the notebook"""
         if self.fmt.get("format_name") == "pandoc":
-            return notebook_to_md(
-                self.filter_notebook(nb, metadata, preserve_cell_ids=True)
-            )
+            return notebook_to_md(self.filter_notebook(nb, metadata, preserve_cell_ids=True))
         if self.fmt.get("format_name") == "quarto" or self.ext == ".qmd":
             return notebook_to_qmd(self.filter_notebook(nb, metadata))
-        if self.fmt.get(
-            "format_name"
-        ) == MYST_FORMAT_NAME or self.ext in myst_extensions(no_md=True):
-            default_lexer_from_language_info = metadata.get("language_info", {}).get(
-                "pygments_lexer", None
-            )
-            default_lexer_from_jupytext_metadata = metadata.get("jupytext", {}).pop(
-                "default_lexer", None
-            )
-            default_lexer = (
-                default_lexer_from_language_info or default_lexer_from_jupytext_metadata
-            )
+        if self.fmt.get("format_name") == MYST_FORMAT_NAME or self.ext in myst_extensions(no_md=True):
+            default_lexer_from_language_info = metadata.get("language_info", {}).get("pygments_lexer", None)
+            default_lexer_from_jupytext_metadata = metadata.get("jupytext", {}).pop("default_lexer", None)
+            default_lexer = default_lexer_from_language_info or default_lexer_from_jupytext_metadata
             nb = self.filter_notebook(nb, metadata)
             nb = self.merge_frontmatter(nb)
             return notebook_to_myst(nb, default_lexer=default_lexer)
@@ -261,18 +228,11 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         )
 
         metadata = nb.metadata
-        default_language = (
-            default_language_from_metadata_and_ext(
-                metadata, self.implementation.extension, True
-            )
-            or "python"
-        )
+        default_language = default_language_from_metadata_and_ext(metadata, self.implementation.extension, True) or "python"
         self.update_fmt_with_notebook_options(nb.metadata)
         if "use_runtools" not in self.fmt:
             for cell in nb.cells:
-                if cell.metadata.get("hide_input", False) or cell.metadata.get(
-                    "hide_output", False
-                ):
+                if cell.metadata.get("hide_input", False) or cell.metadata.get("hide_output", False):
                     self.fmt["use_runtools"] = True
                     break
 
@@ -288,9 +248,8 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
         header.extend(header_content)
 
         cell_exporters = []
-        looking_for_first_markdown_cell = (
-            self.implementation.format_name
-            and self.implementation.format_name.startswith("sphinx")
+        looking_for_first_markdown_cell = self.implementation.format_name and self.implementation.format_name.startswith(
+            "sphinx"
         )
         split_at_heading = self.fmt.get("split_at_heading", False)
 
@@ -300,9 +259,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 looking_for_first_markdown_cell = False
 
             cell_exporters.append(
-                self.implementation.cell_exporter_class(
-                    cell, default_language, self.fmt, unsupported_keys=unsupported_keys
-                )
+                self.implementation.cell_exporter_class(cell, default_language, self.fmt, unsupported_keys=unsupported_keys)
             )
 
         _warn_on_unsupported_keys(unsupported_keys)
@@ -324,9 +281,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
 
             lines_to_next_cell = cell.lines_to_next_cell
             if lines_to_next_cell is None:
-                lines_to_next_cell = pep8_lines_between_cells(
-                    text, lines, self.implementation.extension
-                )
+                lines_to_next_cell = pep8_lines_between_cells(text, lines, self.implementation.extension)
 
             text.extend([""] * lines_to_next_cell)
 
@@ -337,10 +292,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                     and not cell_exporters[i + 1].is_code()
                     and not texts[i][0].startswith("<!-- #")
                     and not texts[i + 1][0].startswith("<!-- #")
-                    and (
-                        not split_at_heading
-                        or not (texts[i + 1] and texts[i + 1][0].startswith("#"))
-                    )
+                    and (not split_at_heading or not (texts[i + 1] and texts[i + 1][0].startswith("#")))
                 ):
                     text.append("")
 
@@ -352,9 +304,7 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             lines = text + lines
 
         if header_lines_to_next_cell is None:
-            header_lines_to_next_cell = pep8_lines_between_cells(
-                header_content, lines, self.implementation.extension
-            )
+            header_lines_to_next_cell = pep8_lines_between_cells(header_content, lines, self.implementation.extension)
 
         header.extend([""] * header_lines_to_next_cell)
 
@@ -427,9 +377,9 @@ def reads(text, fmt=None, as_version=nbformat.NO_CONVERT, config=None, **kwargs)
     rearrange_jupytext_metadata(notebook.metadata)
 
     if format_name and insert_or_test_version_number():
-        notebook.metadata.setdefault("jupytext", {}).setdefault(
-            "text_representation", {}
-        ).update({"extension": ext, "format_name": format_name})
+        notebook.metadata.setdefault("jupytext", {}).setdefault("text_representation", {}).update(
+            {"extension": ext, "format_name": format_name}
+        )
 
     return notebook
 
@@ -445,9 +395,7 @@ def read(fp, as_version=nbformat.NO_CONVERT, fmt=None, config=None, **kwargs):
     :return: the notebook
     """
     if as_version != nbformat.NO_CONVERT and not isinstance(as_version, int):
-        raise TypeError(
-            "Second argument 'as_version' should be either nbformat.NO_CONVERT, or an integer."
-        )
+        raise TypeError("Second argument 'as_version' should be either nbformat.NO_CONVERT, or an integer.")
 
     if fp == "-":
         text = sys.stdin.read()
@@ -489,9 +437,7 @@ def writes(notebook, fmt, version=nbformat.NO_CONVERT, config=None, **kwargs):
     """
     if version is not nbformat.NO_CONVERT:
         if not isinstance(version, int):
-            raise TypeError(
-                "The argument 'version' should be either nbformat.NO_CONVERT, or an integer."
-            )
+            raise TypeError("The argument 'version' should be either nbformat.NO_CONVERT, or an integer.")
         notebook = nbformat.convert(notebook, version)
     (version, version_minor) = nbformat.reader.get_version(notebook)
     if version < 4:
@@ -589,9 +535,7 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, config=None, **kwargs):
             write(nb, stream, version=version, fmt=fmt, config=config, **kwargs)
             return
     else:
-        assert (
-            fmt is not None
-        ), "'fmt' argument in jupytext.write is mandatory unless fp is a file name"
+        assert fmt is not None, "'fmt' argument in jupytext.write is mandatory unless fp is a file name"
 
     content = writes(nb, version=version, fmt=fmt, config=config, **kwargs)
     if isinstance(content, bytes):
@@ -606,15 +550,32 @@ def create_prefix_dir(nb_file, fmt):
     if "prefix" in fmt:
         nb_dir = os.path.dirname(nb_file) + os.path.sep
         if not os.path.isdir(nb_dir):
-            logging.log(
-                logging.WARNING, "[jupytext] creating missing directory %s", nb_dir
-            )
+            logging.log(logging.WARNING, "[jupytext] creating missing directory %s", nb_dir)
             os.makedirs(nb_dir)
 
 
 def _warn_on_unsupported_keys(unsupported_keys):
     if unsupported_keys:
-        warnings.warn(
-            f"The following metadata cannot be exported "
-            f"to the text notebook: {sorted(unsupported_keys)}"
-        )
+        warnings.warn(f"The following metadata cannot be exported to the text notebook: {sorted(unsupported_keys)}")
+
+
+def get_formats_from_notebook_path(nb_file, fmt=None):
+    """
+    Return the paired formats for a given notebook in the extended form.
+
+    Parameters
+    ----------
+    nb_file : str
+        Path to the notebook file.
+    fmt : dict or None, optional
+        The Jupytext format specification (default is None).
+
+    Returns
+    -------
+    list of dict
+        The paired formats in the 'extended form', i.e., as a list of dictionaries
+        where each dictionary fully specifies a format (including extension, format_name, etc.).
+    """
+    config = load_jupytext_config(nb_file)
+    notebook = read(nb_file, fmt=fmt, config=config)
+    return get_formats_from_notebook_and_config(notebook, config, nb_file)

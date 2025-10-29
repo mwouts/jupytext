@@ -46,17 +46,14 @@ class SetDefaultViewer(SubCommand):
         super().__init__("set-default-viewer", "Set default viewers for JupyterLab")
 
     def main(self, args):
-        LabConfig(settings_file=args.settings_file).read().set_default_viewers(
-            args.doctype
-        ).write()
+        LabConfig(settings_file=args.settings_file).read().set_default_viewers(args.doctype).write()
         return 0
 
     def fill_parser(self, subparser):
         subparser.add_argument(
             "doctype",
             nargs="*",
-            help=f"the document types to be associated with the notebook editor; "
-            f"defaults to {' '.join(LabConfig.DOCTYPES)}",
+            help=f"the document types to be associated with the notebook editor; defaults to {' '.join(LabConfig.DOCTYPES)}",
         )
 
 
@@ -65,17 +62,14 @@ class UnsetDefaultViewer(SubCommand):
         super().__init__("unset-default-viewer", "Unset default viewers for JupyterLab")
 
     def main(self, args):
-        LabConfig(settings_file=args.settings_file).read().unset_default_viewers(
-            args.doctype
-        ).write()
+        LabConfig(settings_file=args.settings_file).read().unset_default_viewers(args.doctype).write()
         return 0
 
     def fill_parser(self, subparser):
         subparser.add_argument(
             "doctype",
             nargs="*",
-            help=f"the document types for which the default viewer will be unset; "
-            f"defaults to {' '.join(LabConfig.DOCTYPES)}",
+            help=f"the document types for which the default viewer will be unset; defaults to {' '.join(LabConfig.DOCTYPES)}",
         )
 
 
@@ -91,9 +85,7 @@ def main():
     parser = ArgumentParser()
     parser.add_argument(
         "--settings-file",
-        default=Path(jupyter_core_paths.jupyter_config_dir())
-        / "labconfig"
-        / "default_setting_overrides.json",
+        default=Path(jupyter_core_paths.jupyter_config_dir()) / "labconfig" / "default_setting_overrides.json",
     )
     subparsers = parser.add_subparsers(required=True)
     for subcommand in SUBCOMMANDS:

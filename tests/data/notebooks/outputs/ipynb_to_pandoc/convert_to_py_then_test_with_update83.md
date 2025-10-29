@@ -8,7 +8,7 @@ jupyter:
   nbformat_minor: 2
 ---
 
-::: {#cell-1 .cell .code}
+::: {.cell .code}
 ``` python
 %%time
 
@@ -20,7 +20,7 @@ print('asdf')
 Thanks for jupytext!
 :::
 
-::: {#cell-2 .cell .code}
+::: {.cell .code}
 ``` python
 ```
 :::

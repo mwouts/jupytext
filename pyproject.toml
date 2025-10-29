@@ -10,7 +10,7 @@ authors = [
     { name = "Marc Wouts", email = "marc.wouts@gmail.com" },
 ]
 readme = "build/README_with_absolute_links.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
@@ -24,12 +24,12 @@ classifiers = [
     "Topic :: Text Processing :: Markup",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
     "nbformat",
@@ -69,7 +69,6 @@ test-external = [
   "jupytext[test-integration]",
   # jupytext --pipe and --check
   "autopep8",
-  "black",
   "isort",
   "flake8",
   # Sphinx gallery
@@ -79,7 +78,7 @@ test-external = [
   "gitpython",
   "pre-commit",
   # Interaction with other contents managers
-  "jupyter-fs>=1.0"
+  "jupyter-fs[fs]>=1.0"  # 1398
 ]
 # Coverage requirements
 test-cov = [
@@ -190,7 +189,7 @@ exclude = [
 ]
 # Seems like W503 is not implemented in ruff
 # ref: https://github.com/astral-sh/ruff/issues/4125
-ignore = [
+lint.ignore = [
     "E203", "E231",
 ]
 
@@ -277,3 +276,32 @@ omit = [
     "tests/*",
     "src/jupytext/version.py",
 ]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[tool.pixi.dependencies]
+python = ">=3.9,<3.14" # One test involving Black fails on the CI
+jupyterlab = ">=4.0"
+nbformat = ">=5.1.2"
+pre-commit = ">=4.3"
+nodejs = ">=20"
+pip = "*"
+
+[tool.pixi.feature.docs.dependencies]
+sphinx = "*"
+sphinx-copybutton = "*"
+sphinx-rtd-theme = "*"
+myst-parser = "*"
+
+[tool.pixi.feature.dev.dependencies]
+pandoc = ">=3.0"
+
+[tool.pixi.environments]
+default = { features = ["dev"], solve-group = "default" }
+docs = { features = ["docs"], solve-group = "default" }
+
+[tool.pixi.pypi-dependencies]
+# Note: this does not build the jupyterlab-jupytext extension
+jupytext = {path = ".", editable = true, extras=["dev"]}

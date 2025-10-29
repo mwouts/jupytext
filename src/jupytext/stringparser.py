@@ -1,5 +1,6 @@
 """A simple file parser that can tell whether the first character of a line
 is quoted or not"""
+
 from .languages import _COMMENT
 
 
@@ -28,11 +29,7 @@ class StringParser:
             return
 
         # Do not search for quotes when the line is commented out (and not quoted)
-        if (
-            not self.is_quoted()
-            and self.comment is not None
-            and line.lstrip().startswith(self.comment)
-        ):
+        if not self.is_quoted() and self.comment is not None and line.lstrip().startswith(self.comment):
             return
 
         self.triple_start = -1

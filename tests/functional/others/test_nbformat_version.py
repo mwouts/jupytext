@@ -10,13 +10,7 @@ from jupytext.jupytext import NotSupportedNBFormatVersion
 
 @pytest.fixture()
 def sample_notebook_v3():
-    return new_notebook(
-        worksheets=[
-            new_worksheet(
-                cells=[new_code_cell("1 + 1"), new_text_cell("markdown", "Hi")]
-            )
-        ]
-    )
+    return new_notebook(worksheets=[new_worksheet(cells=[new_code_cell("1 + 1"), new_text_cell("markdown", "Hi")])])
 
 
 @pytest.fixture()
@@ -43,9 +37,7 @@ def test_jupytext_can_read_nbformat_3(
 
 
 @pytest.mark.parametrize("fmt", ["py:light", "py:percent", "md"])
-def test_jupytext_gives_a_meaningful_error_when_writing_nbformat_3(
-    sample_notebook_v3, fmt
-):
+def test_jupytext_gives_a_meaningful_error_when_writing_nbformat_3(sample_notebook_v3, fmt):
     with pytest.raises(
         NotSupportedNBFormatVersion,
         match="Notebooks in nbformat version 3.0 are not supported by Jupytext",
@@ -56,9 +48,7 @@ def test_jupytext_gives_a_meaningful_error_when_writing_nbformat_3(
 
 
 @pytest.mark.parametrize("fmt", ["py:light", "py:percent", "md"])
-def test_jupytext_gives_a_meaningful_error_when_writing_nbformat_4_99(
-    sample_notebook_v4_99, fmt
-):
+def test_jupytext_gives_a_meaningful_error_when_writing_nbformat_4_99(sample_notebook_v4_99, fmt):
     with pytest.warns(
         Warning,
         match="Notebooks in nbformat version 4.99 have not been tested",

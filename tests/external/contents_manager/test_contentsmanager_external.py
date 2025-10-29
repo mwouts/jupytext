@@ -11,9 +11,7 @@ pytestmark = pytest.mark.asyncio
 
 @pytest.mark.requires_pandoc
 async def test_save_load_paired_md_pandoc_notebook(ipynb_py_R_jl_file, tmpdir, cm):
-    if re.match(
-        r".*(functional|Notebook with|flavors|invalid|305).*", ipynb_py_R_jl_file
-    ):
+    if re.match(r".*(functional|Notebook with|flavors|invalid|305|jupyterlab-slideshow).*", ipynb_py_R_jl_file):
         pytest.skip()
     tmp_ipynb = "notebook.ipynb"
     tmp_md = "notebook.md"

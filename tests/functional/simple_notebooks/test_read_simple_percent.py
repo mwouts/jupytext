@@ -48,9 +48,7 @@ def test_read_simple_file(
             cells=[
                 new_raw_cell("---\ntitle: Simple file\n---"),
                 new_markdown_cell("This is a markdown cell"),
-                new_markdown_cell(
-                    "This is also a markdown cell", metadata={"region_name": "md"}
-                ),
+                new_markdown_cell("This is also a markdown cell", metadata={"region_name": "md"}),
                 new_raw_cell("This is a raw cell"),
                 new_code_cell(
                     "# This is a sub-cell",
@@ -286,9 +284,7 @@ cell
 '''
     nb = new_notebook(
         cells=[new_markdown_cell("a\nlong\ncell")],
-        metadata={
-            "jupytext": {"cell_markers": '"""', "notebook_metadata_filter": "-all"}
-        },
+        metadata={"jupytext": {"cell_markers": '"""', "notebook_metadata_filter": "-all"}},
     )
     py = jupytext.writes(nb, "py:percent")
     compare(py, text)
@@ -447,9 +443,7 @@ cell
 
 
 @pytest.mark.asyncio
-async def test_cell_markers_in_contents_manager_does_not_impact_light_format(
-    tmpdir, cm
-):
+async def test_cell_markers_in_contents_manager_does_not_impact_light_format(tmpdir, cm):
     tmp_ipynb = tmpdir / "notebook.ipynb"
     tmp_py = tmpdir / "notebook.py"
 
@@ -526,7 +520,7 @@ def test_docstring_with_quadruple_quote(
   return df'''
             ),
         ]
-    )
+    ),
 ):
     """Reproduces https://github.com/mwouts/jupytext/issues/460"""
     py = jupytext.writes(nb, "py:percent")

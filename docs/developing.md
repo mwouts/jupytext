@@ -22,10 +22,9 @@ where `branch` is the name of the branch you want to test.
 
 ## Install and develop Jupytext locally
 
-Most of Jupytext's code is written in Python. To develop the Python part of Jupytext, you should clone Jupytext, then create a dedicated Python env:
+Most of Jupytext's code is written in Python. To develop the Python part of Jupytext, you should clone Jupytext, then create a dedicated Python environment with [Pixi](https://pixi.sh):
 ```
-conda env create --file environment.yml  # or conda env update --file ...
-conda activate jupytext-dev
+pixi shell
 ```
 
 Install the `jupytext` package in development mode with
@@ -55,14 +54,8 @@ Our extension for JupyterLab adds a series of Jupytext commands to JupyterLab. T
 
 ## Jupytext's documentation
 
-Install the documentation tools with
+You can build the HTML documentation locally with
 ```
-conda env create --file docs/environment.yml
-conda activate jupytext-docs
-cd docs
-```
-and build the HTML documentation locally with
-```
-rm -rf _build
-make html
+rm -rf docs/_build
+pixi run -e docs sphinx-build docs docs/_build
 ```

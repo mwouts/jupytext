@@ -1,4 +1,4 @@
-""" Main for Jupytext_config
+"""Main for Jupytext_config
 
 Call with (e.g.)::
 

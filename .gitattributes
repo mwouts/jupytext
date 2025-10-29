@@ -1,2 +1,4 @@
 World\ population.ipynb linguist-documentation
 .git_archival.txt  export-subst
+# SCM syntax highlighting & preventing 3-way merges
+pixi.lock merge=binary linguist-language=TOML linguist-generated=true

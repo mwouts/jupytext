@@ -9,7 +9,7 @@ or
 conda install jupytext -c conda-forge
 ```
 
-You should run either one of these commands in the Python environment from which you launch Jupyter Lab. Once you have installed Jupytext, you need to restart Jupyter to be able to use Jupytext within Jupyter.
+You should run either one of these commands in the Python environment from which you launch JupyterLab. Once you have installed Jupytext, you need to restart Jupyter to be able to use Jupytext within Jupyter.
 
 If the Python environment where the Jupyter server runs is read-only, for instance if your server is started using JupyterHub, you can still install Jupytext in user mode with:
 ```
@@ -79,7 +79,7 @@ jupyter nbextension enable --py jupytext [--user]
 ```
 
 See also [Issue #1095](https://github.com/mwouts/jupytext/issues/1095) where we discuss how to
-add a Jupytext menu to Jupyter Lab and Notebook 7.x.
+add a Jupytext menu to JupyterLab and Notebook 7.x.
 
 ## Jupytext's command line interface
 

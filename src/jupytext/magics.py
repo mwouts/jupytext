@@ -12,9 +12,7 @@ def get_comment(ext):
 
 # A magic expression is a line or cell or metakernel magic (#94, #61) escaped zero, or multiple times
 _MAGIC_RE = {
-    _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(
-        r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z]".format(get_comment(ext))
-    )
+    _SCRIPT_EXTENSIONS[ext]["language"]: re.compile(r"^\s*({0} |{0})*(%|%%|%%%)[a-zA-Z]".format(get_comment(ext)))
     for ext in _SCRIPT_EXTENSIONS
 }
 _MAGIC_FORCE_ESC_RE = {
@@ -53,8 +51,8 @@ _PYTHON_MAGIC_CMD = re.compile(
     r"^(# |#)*({})($|\s$|\s[^=,])".format(
         "|".join(
             # posix
-            ["cat", "cd", "cp", "mv", "rm", "rmdir", "mkdir"]
-            +  # noqa: W504
+            ["cat", "cd", "cp", "mv", "rm", "rmdir", "mkdir"]  # noqa: W504
+            +
             # windows
             ["copy", "ddir", "echo", "ls", "ldir", "mkdir", "ren", "rmdir"]
         )
@@ -63,9 +61,7 @@ _PYTHON_MAGIC_CMD = re.compile(
 # Python help commands end with ?
 _IPYTHON_MAGIC_HELP = re.compile(r"^\s*(# )*[^\s]*\?\s*$")
 
-_PYTHON_MAGIC_ASSIGN = re.compile(
-    r"^(# |#)*\s*([a-zA-Z_][a-zA-Z_$0-9]*)\s*=\s*(%|%%|%%%|!)[a-zA-Z](.*)"
-)
+_PYTHON_MAGIC_ASSIGN = re.compile(r"^(# |#)*\s*([a-zA-Z_][a-zA-Z_$0-9]*)\s*=\s*(%|%%|%%%|!)[a-zA-Z](.*)")
 
 _SCRIPT_LANGUAGES = [_SCRIPT_EXTENSIONS[ext]["language"] for ext in _SCRIPT_EXTENSIONS]
 
@@ -73,10 +69,7 @@ _SCRIPT_LANGUAGES = [_SCRIPT_EXTENSIONS[ext]["language"] for ext in _SCRIPT_EXTE
 def is_magic(line, language, global_escape_flag=True, explicitly_code=False):
     """Is the current line a (possibly escaped) Jupyter magic, and should it be commented?"""
     language = usual_language_name(language)
-    if (
-        language in ["octave", "matlab", "sas", "logtalk"]
-        or language not in _SCRIPT_LANGUAGES
-    ):
+    if language in ["octave", "matlab", "sas", "logtalk"] or language not in _SCRIPT_LANGUAGES:
         return False
     if _MAGIC_FORCE_ESC_RE[language].match(line):
         return True
@@ -95,35 +88,26 @@ def is_magic(line, language, global_escape_flag=True, explicitly_code=False):
     return _PYTHON_MAGIC_CMD.match(line)
 
 
-def need_explicit_marker(
-    source, language="python", global_escape_flag=True, explicitly_code=True
-):
+def need_explicit_marker(source, language="python", global_escape_flag=True, explicitly_code=True):
     """Does this code needs an explicit cell marker?"""
     if language != "python" or not global_escape_flag or not explicitly_code:
         return False
 
     parser = StringParser(language)
     for line in source:
-        if not parser.is_quoted() and is_magic(
-            line, language, global_escape_flag, explicitly_code
-        ):
+        if not parser.is_quoted() and is_magic(line, language, global_escape_flag, explicitly_code):
             if not is_magic(line, language, global_escape_flag, False):
                 return True
         parser.read_line(line)
     return False
 
 
-def comment_magic(
-    source, language="python", global_escape_flag=True, explicitly_code=True
-):
+def comment_magic(source, language="python", global_escape_flag=True, explicitly_code=True):
     """Escape Jupyter magics with '# '"""
     parser = StringParser(language)
     next_is_magic = False
     for pos, line in enumerate(source):
-        if not parser.is_quoted() and (
-            next_is_magic
-            or is_magic(line, language, global_escape_flag, explicitly_code)
-        ):
+        if not parser.is_quoted() and (next_is_magic or is_magic(line, language, global_escape_flag, explicitly_code)):
             if next_is_magic:
                 # this is the continuation line of a magic command on the previous line,
                 # so we don't want to indent the comment
@@ -150,17 +134,12 @@ def unesc(line, language):
     return line
 
 
-def uncomment_magic(
-    source, language="python", global_escape_flag=True, explicitly_code=True
-):
+def uncomment_magic(source, language="python", global_escape_flag=True, explicitly_code=True):
     """Unescape Jupyter magics"""
     parser = StringParser(language)
     next_is_magic = False
     for pos, line in enumerate(source):
-        if not parser.is_quoted() and (
-            next_is_magic
-            or is_magic(line, language, global_escape_flag, explicitly_code)
-        ):
+        if not parser.is_quoted() and (next_is_magic or is_magic(line, language, global_escape_flag, explicitly_code)):
             source[pos] = unesc(line, language)
             next_is_magic = language == "python" and _LINE_CONTINUATION_RE.match(line)
         parser.read_line(line)
@@ -173,10 +152,7 @@ _ESCAPED_CODE_START = {
     ".markdown": re.compile(r"^(# |#)*```"),
 }
 _ESCAPED_CODE_START.update(
-    {
-        ext: re.compile(r"^({0} |{0})*({0}|{0} )\+".format(get_comment(ext)))
-        for ext in _SCRIPT_EXTENSIONS
-    }
+    {ext: re.compile(r"^({0} |{0})*({0}|{0} )\+".format(get_comment(ext))) for ext in _SCRIPT_EXTENSIONS}
 )
 
 
@@ -190,9 +166,7 @@ def escape_code_start(source, ext, language="python"):
     parser = StringParser(language)
     for pos, line in enumerate(source):
         if not parser.is_quoted() and is_escaped_code_start(line, ext):
-            source[pos] = (
-                _SCRIPT_EXTENSIONS.get(ext, {}).get("comment", "#") + " " + line
-            )
+            source[pos] = _SCRIPT_EXTENSIONS.get(ext, {}).get("comment", "#") + " " + line
         parser.read_line(line)
     return source
 

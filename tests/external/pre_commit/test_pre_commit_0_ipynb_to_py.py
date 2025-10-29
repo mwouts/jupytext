@@ -8,9 +8,7 @@ from jupytext.cli import jupytext
 from jupytext.compare import compare_cells
 
 
-def test_pre_commit_hook_ipynb_to_py(
-    tmpdir, cwd_tmpdir, tmp_repo, jupytext_repo_root, jupytext_repo_rev
-):
+def test_pre_commit_hook_ipynb_to_py(tmpdir, cwd_tmpdir, tmp_repo, jupytext_repo_root, jupytext_repo_rev):
     """Here we document and test the expected behavior of the pre-commit hook in the
     directional (--to) mode. Note that here, the ipynb file is always the source for
     updates - i.e. changes on the .py file will not trigger the hook.

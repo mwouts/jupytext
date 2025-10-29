@@ -21,28 +21,31 @@ exclude: >
 repos:
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
     - id: check-json
     - id: check-yaml
     - id: end-of-file-fixer
     - id: trailing-whitespace
 
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
-    hooks:
-      # isort needs the 'black' profile when used in combination with black
-      # See https://github.com/PyCQA/isort/issues/1518
-    - id: isort
-      args: ["--profile", "black"]
-
-  - repo: https://github.com/psf/black
-    rev: 23.11.0
-    hooks:
-    - id: black
-
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.5
+    rev: v0.12.11
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: ["--fix", "--show-fixes"]
+      - id: ruff-format
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.20.0
+    hooks:
+      - id: pyupgrade
+        args: [--py39-plus]
+
+  - repo: local
+    hooks:
+      - id: pixi-install
+        name: Update pixi.lock file
+        entry: pixi install
+        language: system
+        pass_filenames: false
+        files: ^(pyproject\.toml|pixi\.toml|pixi\.lock)$

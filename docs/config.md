@@ -39,9 +39,90 @@ or this `pyproject.toml` configuration:
 
 The `notebook/` prefix above is matched with the top-most parent folder of the matching name, not above the Jupytext configuration file.
 
+## Pairing with multiple format specifications
+
+You can define different pairing configurations for specific subsets of notebooks by using a list of format dictionaries. This is useful when you want to apply different pairing rules to notebooks in different locations, such as generating documentation markdown files only for tutorial notebooks.
+
+Since Jupytext v1.18.0, the `formats` option can be a list of format dictionaries, where the first matching format is used for each notebook.
+
+Here's an example that pairs tutorial notebooks to markdown documentation files, and all other notebooks to Python scripts:
+
+```toml
+# jupytext.toml
+
+# Tutorial notebooks get paired to markdown docs
+[[formats]]
+"notebooks/tutorials/" = "ipynb"
+"docs/tutorials/" = "md"
+"scripts/tutorials/" = "py:percent"
+
+# Default pairing: all other notebooks are paired with Python scripts
+[[formats]]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+```
+
+With this configuration:
+- Tutorial notebooks like `notebooks/tutorials/getting_started.ipynb` are paired with:
+  - `docs/tutorials/getting_started.md`
+  - `scripts/tutorials/getting_started.py`
+- Regular notebooks like `notebooks/hello.ipynb` are paired with `scripts/hello.py`
+
+You can define multiple format specifications for different subsets:
+
+```toml
+# Tutorial notebooks
+[[formats]]
+"notebooks/tutorials/" = "ipynb"
+"docs/tutorials/" = "md"
+
+# Example notebooks with MyST format
+[[formats]]
+"notebooks/examples/" = "ipynb"
+"docs/examples/" = "md:myst"
+
+# Default for all other notebooks
+[[formats]]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+```
+
+The first format specification that matches the notebook path is used. It's recommended to put more specific paths first and the default/catch-all formats last.
+
+### Alternative syntaxes
+
+You can also use a semicolon-separated string for a more compact notation:
+
+```toml
+# jupytext.toml
+formats = "notebooks///ipynb,scripts///py:percent;ipynb,py:percent"
+```
+
+Or a TOML list with string format specifications:
+
+```toml
+# jupytext.toml
+formats = [
+    "notebooks///ipynb,scripts///py:percent",
+    "ipynb,py:percent"
+]
+```
+
+In `pyproject.toml`, the configuration would be:
+```toml
+[[tool.jupytext.formats]]
+"notebooks/tutorials/" = "ipynb"
+"docs/tutorials/" = "md"
+
+[[tool.jupytext.formats]]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+```
+
+
 ## Global pairing vs individual pairing
 
-Alternatively, notebooks can be paired individually using either the Jupytext commands in Jupyter Lab, or the command line interface:
+Alternatively, notebooks can be paired individually using either the Jupytext commands in JupyterLab, or the command line interface:
 
 ```bash
 jupytext --set-formats ipynb,py:percent notebook.ipynb

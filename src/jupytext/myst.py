@@ -2,6 +2,7 @@
 This module contains round-trip conversion between
 myst formatted text documents and notebooks.
 """
+
 import json
 import re
 import warnings
@@ -37,9 +38,7 @@ def is_myst_available():
 
 def raise_if_myst_is_not_available():
     if not is_myst_available():
-        raise ImportError(
-            "The MyST Markdown format requires python >= 3.6 and markdown-it-py~=1.0"
-        )
+        raise ImportError("The MyST Markdown format requires python >= 3.6 and markdown-it-py~=1.0")
 
 
 def myst_version():
@@ -118,10 +117,7 @@ def matches_mystnb(
 
     # is there at least on fenced code block with a code/raw directive language
     for token in tokens:
-        if token.type == "fence" and (
-            token.info.startswith(code_directive)
-            or token.info.startswith(raw_directive)
-        ):
+        if token.type == "fence" and (token.info.startswith(code_directive) or token.info.startswith(raw_directive)):
             return True
 
     return False
@@ -184,9 +180,7 @@ def strip_blank_lines(text):
 def read_fenced_cell(token, cell_index, cell_type):
     """Parse (and validate) the full directive text."""
     content = token.content
-    error_msg = "{} cell {} at line {} could not be read: ".format(
-        cell_type, cell_index, token.map[0] + 1
-    )
+    error_msg = f"{cell_type} cell {cell_index} at line {token.map[0] + 1} could not be read: "
 
     body_lines, options = parse_directive_options(content, error_msg)
 
@@ -239,17 +233,9 @@ def read_cell_metadata(token, cell_index):
         try:
             metadata = json.loads(token.content.strip())
         except Exception as err:
-            raise MystMetadataParsingError(
-                "Markdown cell {} at line {} could not be read: {}".format(
-                    cell_index, token.map[0] + 1, err
-                )
-            )
+            raise MystMetadataParsingError(f"Markdown cell {cell_index} at line {token.map[0] + 1} could not be read: {err}")
         if not isinstance(metadata, dict):
-            raise MystMetadataParsingError(
-                "Markdown cell {} at line {} is not a dict".format(
-                    cell_index, token.map[0] + 1
-                )
-            )
+            raise MystMetadataParsingError(f"Markdown cell {cell_index} at line {token.map[0] + 1} is not a dict")
 
     return metadata
 
@@ -303,9 +289,7 @@ def myst_to_notebook(
         meta = nbf.from_dict(md_metadata)
         if md_source:
             source_map.append(start_line)
-            notebook.cells.append(
-                nbf_version.new_markdown_cell(source=md_source, metadata=meta)
-            )
+            notebook.cells.append(nbf_version.new_markdown_cell(source=md_source, metadata=meta))
 
     # iterate through the tokens to identify notebook cells
     nesting_level = 0
@@ -327,15 +311,11 @@ def myst_to_notebook(
                 if not default_lexer:
                     default_lexer = lexer
                 elif lexer != default_lexer:
-                    warnings.warn(
-                        f"All code cells in a MyST notebook must have the same language: {lexer}!={default_lexer}"
-                    )
+                    warnings.warn(f"All code cells in a MyST notebook must have the same language: {lexer}!={default_lexer}")
 
             meta = nbf.from_dict(options)
             source_map.append(token.map[0] + 1)
-            notebook.cells.append(
-                nbf_version.new_code_cell(source="\n".join(body_lines), metadata=meta)
-            )
+            notebook.cells.append(nbf_version.new_code_cell(source="\n".join(body_lines), metadata=meta))
             md_metadata = {}
             md_start_line = token.map[1]
 
@@ -344,9 +324,7 @@ def myst_to_notebook(
             options, body_lines = read_fenced_cell(token, len(notebook.cells), "Raw")
             meta = nbf.from_dict(options)
             source_map.append(token.map[0] + 1)
-            notebook.cells.append(
-                nbf_version.new_raw_cell(source="\n".join(body_lines), metadata=meta)
-            )
+            notebook.cells.append(nbf_version.new_raw_cell(source="\n".join(body_lines), metadata=meta))
             md_metadata = {}
             md_start_line = token.map[1]
 

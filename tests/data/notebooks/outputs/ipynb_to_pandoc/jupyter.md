@@ -14,7 +14,7 @@ jupyter:
 This notebook is a simple jupyter notebook. It only has markdown and code cells. And it does not contain consecutive markdown cells. We start with an addition:
 :::
 
-::: {#cell-1 .cell .code}
+::: {.cell .code}
 ``` python
 a = 1
 b = 2
@@ -26,13 +26,13 @@ a + b
 Now we return a few tuples
 :::
 
-::: {#cell-2 .cell .code}
+::: {.cell .code}
 ``` python
 a, b
 ```
 :::
 
-::: {#cell-3 .cell .code}
+::: {.cell .code}
 ``` python
 a, b, a+b
 ```

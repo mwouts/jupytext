@@ -1,6 +1,85 @@
 Jupytext ChangeLog
 ==================
 
+1.19.0.dev0 (unreleased)
+------------------------
+
+**Fixed**
+- We have fixed the round trip tests and made them work with Quarto 1.8.25 ([#1435](https://github.com/mwouts/jupytext/issues/1435))
+
+
+1.18.1 (2025-10-19)
+-------------------
+
+**Fixed**
+- Fixed test `test_check_source_is_newer_when_using_jupytext_sync` to work reliably on systems with low filesystem timestamp resolution ([#1460](https://github.com/mwouts/jupytext/issues/1460))
+
+**Changed**
+- We now use `pixi` to maintain the local Python environments used for developing and testing Jupytext.
+
+
+1.18.0 (2025-10-18)
+-------------------
+
+**Added**
+- The documentation has a chapter on the [Jupytext Sync](https://jupytext.readthedocs.io/en/latest/vs-code.html) extension for VS Code ([#1395](https://github.com/mwouts/jupytext/issues/1395))
+- We have added a new option `--check-source-is-newer` to the Jupytext CLI. Use this option if you want to make sure that the file passed as argument to Jupytext is the newest of all paired files, and/or newer than the destination file.
+- We have added a section on [Jupyter Collaboration](https://jupytext.readthedocs.io/en/latest/jupyter-collaboration.html) which also provides a very useful autoreload functionality ([#406](https://github.com/mwouts/jupytext/issues/406), [#1401](https://github.com/mwouts/jupytext/issues/1401))
+- Pairing groups allow you to define different pairing configurations for specific subsets of notebooks. The `formats` configuration option now supports a list of format dictionaries for first-match pairing. Use `[[formats]]` sections in your TOML configuration to define multiple format specifications, where the first matching format is used. This allows applying different pairing rules to notebooks in different locations, such as generating documentation markdown files only for tutorial notebooks ([#1383](https://github.com/mwouts/jupytext/issues/1383))
+- We have added more tests to document the complex pairing formats, which also work on Windows ([#1028](https://github.com/mwouts/jupytext/issues/1028))
+- Pairing into nested folders was fixed on Windows ([#1028](https://github.com/mwouts/jupytext/issues/1028))
+- Jupytext is now tested with Python 3.14 ([#1456](https://github.com/mwouts/jupytext/issues/1456))
+
+**Fixed**
+- The Jupytext CLI now detects if a file it has read or consulted has been modified while it was processing it. That can happen in the context of the [Jupytext Sync](https://marketplace.visualstudio.com/items?itemName=caenrigen.jupytext-sync) extension for VS Code ([#1411](https://github.com/mwouts/jupytext/issues/1411), [vscode-jupytext-sync-#12](https://github.com/caenrigen/vscode-jupytext-sync/issues/12)). When such a synchronous modification is detected, Jupytext now raises an error. Many thanks to [Anne Archibald](https://github.com/aarchiba) for reporting the issue and preparing an inspiring PR ([#1417](https://github.com/mwouts/jupytext/pull/1417)).
+- We don't import `notebook` when `jupyter_server` is available ([#1436](https://github.com/mwouts/jupytext/issues/1436))
+- Jupytext now supports more characters in the cell metadata keys, to improve compatibility with `jupyterlab-slideshow` ([#1441](https://github.com/mwouts/jupytext/issues/1441)). Thanks to [Nicolas Thierry](https://github.com/nthiery) for this fix.
+- The function `find_jupytext_configuration_file` now works with relative directories ([#1440](https://github.com/mwouts/jupytext/issues/1440)). This fix was contributed by [Thierry Parmentelat](https://github.com/parmentelat).
+- We have fixed a parsing error for R Markdown files ([#1429](https://github.com/mwouts/jupytext/issues/1429))
+- We have fixed a parsing error when the first cell of the notebook contains a YAML header that is not a dict ([#1444](https://github.com/mwouts/jupytext/issues/1444))
+
+**Changed**
+- We have updated the pre-commit hooks. The code is now formatted using `ruff format`, and updated for Python 3.9+ using https://github.com/asottile/pyupgrade ([#1423](https://github.com/mwouts/jupytext/issues/1423))
+
+
+1.17.3 (2025-08-28)
+-------------------
+
+**Added**
+- All the extensions supported by Jupytext now appear in the `--to` paragraph
+of `jupytext --help` ([#433](https://github.com/mwouts/jupytext/issues/433))
+- We have added a new function `get_formats_from_notebook_path` that returns the list of paired
+formats for a given notebook ([#1419](https://github.com/mwouts/jupytext/issues/1419))
+
+**Fixed**
+- We have fixed `jupytext --sync`, and the contents manager, to make sure that a simple `.py` file (not in the percent format) will not be treated as a paired file when the Jupytext configuration file has `formats="ipynb,py:percent"` ([#1418](https://github.com/mwouts/jupytext/issues/1418))
+- A notebook can be moved in Jupyter even if that makes it unpaired ([#1414](https://github.com/mwouts/jupytext/issues/1414))
+- The test against `jupyter-fs` now installs its `fs` extra dependency ([#1398](https://github.com/mwouts/jupytext/issues/1398))
+- The `jupytext --sync` command now works correctly with symbolic links. Thanks to [mccullerlp](https://github.com/mccullerlp) for reporting ([#1407](https://github.com/mwouts/jupytext/issues/1407)) and addressing ([#1408](https://github.com/mwouts/jupytext/pull/1408)) the problem!
+- Jupytext will look for `quarto.cmd` on Windows. Thanks to [mccullerlp](https://github.com/mccullerlp) for documenting the issue ([#1406](https://github.com/mwouts/jupytext/issues/1406), [#1409](https://github.com/mwouts/jupytext/pull/1409)).
+- We have corrected the `jupytext --paired-paths` command: it will now take the Jupytext configuration file, if any, into account ([#1419](https://github.com/mwouts/jupytext/issues/1419))
+
+
+1.17.2 (2025-06-01)
+-------------------
+
+**Fixed**
+- The `--set-formats` argument takes precedence over pre-existing pairing information in the notebook ([#1386](https://github.com/mwouts/jupytext/issues/1386))
+
+**Changed**
+- We have removed Python 3.8 from the list of supported Python version, and from the CI, as it has reached its EOL
+
+**Added**
+- ROOT-flavored C++ notebooks can be paired to `.cpp` files - thanks to [Steven Gardiner](https://github.com/sjgardiner) for this contribution ([#1384](https://github.com/mwouts/jupytext/pull/1384))
+
+
+1.17.1 (2025-04-26)
+-------------------
+
+**Fixed**
+- Renaming files other than notebooks will not load their content ([#1376](https://github.com/mwouts/jupytext/issues/1376))
+
+
 1.17.0 (2025-04-05)
 -------------------
 
@@ -136,14 +215,14 @@ might now add a Markdown cell to the notebook ([#1255](https://github.com/mwouts
 -------------------
 
 **Added**
-- The Jupyter Lab extension is now compatible with the [JupyterLab RISE](https://github.com/jupyterlab-contrib/rise) extension. Many thanks to [Frédéric Collonval](https://github.com/fcollonval) for his PR ([#1126](https://github.com/mwouts/jupytext/pull/1126))!
+- The JupyterLab extension is now compatible with the [JupyterLab RISE](https://github.com/jupyterlab-contrib/rise) extension. Many thanks to [Frédéric Collonval](https://github.com/fcollonval) for his PR ([#1126](https://github.com/mwouts/jupytext/pull/1126))!
 
 
 1.15.1 (2023-08-26)
 -------------------
 
 **Added**
-- We have added a new command line interface `jupytext-config` that you can use to set Jupytext as the default viewer for text notebooks in Jupyter Lab and Jupyter Notebook 7. Thanks to [Thierry Parmentelat](https://github.com/parmentelat) for this contribution! ([#1094](https://github.com/mwouts/jupytext/pull/1094))
+- We have added a new command line interface `jupytext-config` that you can use to set Jupytext as the default viewer for text notebooks in JupyterLab and Jupyter Notebook 7. Thanks to [Thierry Parmentelat](https://github.com/parmentelat) for this contribution! ([#1094](https://github.com/mwouts/jupytext/pull/1094))
 
 
 1.15.0 (2023-07-30)
@@ -272,7 +351,7 @@ a configuration file ([#967](https://github.com/mwouts/jupytext/issues/967))
 - Added Maxima as a supported language ([#927](https://github.com/mwouts/jupytext/issues/927)) - thanks to [Alberto Lusiani](https://github.com/alusiani) for contributing a sample Maxima notebook.
 
 **Changed**
-- The Jupytext contents manager is derived from the `LargeFileManager` imported from `jupyter_server` rathen than `notebook` ([#933](https://github.com/mwouts/jupytext/issues/933))
+- The Jupytext contents manager is derived from the `LargeFileManager` imported from `jupyter_server` rather than `notebook` ([#933](https://github.com/mwouts/jupytext/issues/933))
 - Allow for markdown-it-py v2 ([#924](https://github.com/mwouts/jupytext/issues/924))
 - We have updated the hooks used in the test pre-commits, to fix an issue on the CI ([#940](https://github.com/mwouts/jupytext/issues/940), [#942](https://github.com/mwouts/jupytext/issues/942))
 - We updated the `yarn.lock` file for the jupyter lab extension to address security vulnerabilities ([#904](https://github.com/mwouts/jupytext/issues/904), [#925](https://github.com/mwouts/jupytext/issues/925), [#935](https://github.com/mwouts/jupytext/issues/935), [#939](https://github.com/mwouts/jupytext/issues/939))
@@ -336,7 +415,7 @@ a configuration file ([#967](https://github.com/mwouts/jupytext/issues/967))
 -------------------
 
 **Changed**
-- The extension for Jupyter Lab benefited from a series of improvements contributed by [Frédéric Collonval](https://github.com/fcollonval):
+- The extension for JupyterLab benefited from a series of improvements contributed by [Frédéric Collonval](https://github.com/fcollonval):
   - A new "Jupytext Notebook" factory offers the option to open text notebooks directly with the notebook view ([#803](https://github.com/mwouts/jupytext/issues/803)). To use it, follow the instructions in the [documentation](https://github.com/mwouts/jupytext/blob/main/docs/index.md#Install).
   - The ICommandPalette is optional, for compatibility with RISE within JupyterLab [RISE[#605](https://github.com/mwouts/jupytext/issues/605)](https://github.com/damianavila/RISE/pull/605)
   - Added support for translation
@@ -511,7 +590,7 @@ a configuration file ([#967](https://github.com/mwouts/jupytext/issues/967))
 ------------------
 
 **Changed**
-- The Jupytext extension for JupyterLab is compatible with Jupyter Lab 3.0, thanks to Martin Renou's awesome contribution ([#683](https://github.com/mwouts/jupytext/pull/683)).
+- The Jupytext extension for JupyterLab is compatible with JupyterLab 3.0, thanks to Martin Renou's awesome contribution ([#683](https://github.com/mwouts/jupytext/pull/683)).
 
 
 1.8.2 (2021-01-04)
@@ -753,7 +832,7 @@ See also [What's new in Jupytext 1.3?](https://gist.github.com/mwouts/724efe5e00
 **Added**
 
 - Pairing a notebook to both `.md` and `.py` is now supported. Input cells are loaded from the most recent text representation ([#290](https://github.com/mwouts/jupytext/issues/290))
-- Both the Jupyter Notebook and the Jupyter Lab extension for Jupytext were updated ([#290](https://github.com/mwouts/jupytext/issues/290))
+- Both the Jupyter Notebook and the JupyterLab extension for Jupytext were updated ([#290](https://github.com/mwouts/jupytext/issues/290))
 - Raw cells are now encoded using HTML comments (`<!-- #raw -->` and `<!-- #endraw -->`) in Markdown files ([#321](https://github.com/mwouts/jupytext/issues/321))
 - Markdown cells can be delimited with any of `<!-- #region -->`,  `<!-- #markdown -->` or `<!-- #md -->` ([#344](https://github.com/mwouts/jupytext/issues/344))
 - Code blocks from Markdown files, when they don't have an explicit language, appear in Markdown cells in Jupyter ([#321](https://github.com/mwouts/jupytext/issues/321))
@@ -853,7 +932,7 @@ See also [What's new in Jupytext 1.3?](https://gist.github.com/mwouts/724efe5e00
 - The `--set-formats` option in Jupytext CLI also triggers `--sync`, allowing shorter commands.
 - `jupytext`'s `read` and `write` functions can be used as drop-in replacements for `nbformat`'s ones ([#262](https://github.com/mwouts/jupytext/issues/262)).
 - `jupytext --sync` will now skip unpaired notebooks ([#281](https://github.com/mwouts/jupytext/issues/281)).
-- The JupyterLab extension was updated. It now works on on text files ([#213](https://github.com/mwouts/jupytext/issues/213)) and has a new option to include
+- The JupyterLab extension was updated. It now works on text files ([#213](https://github.com/mwouts/jupytext/issues/213)) and has a new option to include
 (or not) the metadata in the text representation of the notebook.
 - Jupytext's contents manager class is derived dynamically from the default CM class for compatibility with
 `jupyter_server` ([#270](https://github.com/mwouts/jupytext/issues/270))
@@ -1002,7 +1081,7 @@ with `jupyter labextension install jupyterlab-jupytext@0.19` ([#276](https://git
 **Fixed**
 
 - `notebook_metadata_filter = "all"` now works ([#196](https://github.com/mwouts/jupytext/issues/196))
-- Default pairing in subfolders fixed in Jupyter Lab ([#180](https://github.com/mwouts/jupytext/issues/180))
+- Default pairing in subfolders fixed in JupyterLab ([#180](https://github.com/mwouts/jupytext/issues/180))
 
 
 1.0.2 (2019-02-27)

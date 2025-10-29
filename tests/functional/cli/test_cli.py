@@ -32,16 +32,11 @@ def test_str2bool():
 
 
 def test_cli_single_file(ipynb_py_R_jl_file):
-    assert parse_jupytext_args([ipynb_py_R_jl_file] + ["--to", "py"]).notebooks == [
-        ipynb_py_R_jl_file
-    ]
+    assert parse_jupytext_args([ipynb_py_R_jl_file] + ["--to", "py"]).notebooks == [ipynb_py_R_jl_file]
 
 
 def test_cli_multiple_files(ipynb_py_R_jl_files):
-    assert (
-        parse_jupytext_args(ipynb_py_R_jl_files + ["--to", "py"]).notebooks
-        == ipynb_py_R_jl_files
-    )
+    assert parse_jupytext_args(ipynb_py_R_jl_files + ["--to", "py"]).notebooks == ipynb_py_R_jl_files
 
 
 def test_convert_single_file_in_place(ipynb_py_file, tmpdir):
@@ -155,9 +150,7 @@ def test_error_not_notebook_ext_input(tmpdir, capsys):
     with open(tmp_file, "w") as fp:
         fp.write("\n")
 
-    with pytest.raises(
-        InconsistentPath, match="is not a notebook. Supported extensions are"
-    ):
+    with pytest.raises(InconsistentPath, match="is not a notebook. Supported extensions are"):
         jupytext([tmp_file, "--to", "py"])
 
 
@@ -205,9 +198,7 @@ def test_error_update_not_ipynb(tmp_py):
 
 
 def test_error_multiple_input(tmp_ipynb):
-    with pytest.raises(
-        ValueError, match="Please input a single notebook when using --output"
-    ):
+    with pytest.raises(ValueError, match="Please input a single notebook when using --output"):
         jupytext([tmp_ipynb, tmp_ipynb, "--to", "py", "-o", "notebook.py"])
 
 
@@ -407,9 +398,7 @@ def test_update_metadata(python_file, tmpdir, capsys):
     nb = read(tmp_ipynb)
     assert nb.metadata["jupytext"]["formats"] == "ipynb,py:light"
 
-    jupytext(
-        ["--to", "py", tmp_ipynb, "--update-metadata", '{"jupytext":{"formats":null}}']
-    )
+    jupytext(["--to", "py", tmp_ipynb, "--update-metadata", '{"jupytext":{"formats":null}}'])
 
     nb = read(tmp_py)
     assert "formats" not in nb.metadata["jupytext"]
@@ -470,9 +459,7 @@ def test_set_kernel_with_name(python_file, tmpdir):
 def test_paired_paths(ipynb_py_file, tmpdir, capsys):
     tmp_ipynb = str(tmpdir.join("notebook.ipynb"))
     nb = read(ipynb_py_file)
-    nb.metadata.setdefault("jupytext", {})[
-        "formats"
-    ] = "ipynb,_light.py,_percent.py:percent"
+    nb.metadata.setdefault("jupytext", {})["formats"] = "ipynb,_light.py,_percent.py:percent"
     write(nb, tmp_ipynb)
 
     jupytext(["--paired-paths", tmp_ipynb])
@@ -481,9 +468,7 @@ def test_paired_paths(ipynb_py_file, tmpdir, capsys):
     assert not err
 
     formats = nb.metadata.get("jupytext", {}).get("formats")
-    assert set(out.splitlines()).union([tmp_ipynb]) == {
-        path for path, _ in paired_paths(tmp_ipynb, "ipynb", formats)
-    }
+    assert set(out.splitlines()).union([tmp_ipynb]) == {path for path, _ in paired_paths(tmp_ipynb, "ipynb", formats)}
 
 
 def test_sync(ipynb_py_file, tmpdir, cwd_tmpdir, capsys):
@@ -562,9 +547,7 @@ def test_sync_pandoc(ipynb_to_pandoc, tmpdir, cwd_tmpdir, capsys):
         assert "pandoc" in fp.read()
 
 
-def test_cli_can_infer_jupytext_format(
-    ipynb_py_R_jl_file, ipynb_py_R_jl_ext, tmpdir, cwd_tmpdir
-):
+def test_cli_can_infer_jupytext_format(ipynb_py_R_jl_file, ipynb_py_R_jl_ext, tmpdir, cwd_tmpdir):
     tmp_ipynb = "notebook.ipynb"
     tmp_text = "notebook" + ipynb_py_R_jl_ext
     nb = read(ipynb_py_R_jl_file)
@@ -664,9 +647,7 @@ def test_cli_expect_errors(tmp_ipynb):
         jupytext(["notebook.ipynb", "--from", "py:percent", "--to", "md"])
     with pytest.raises(ValueError):
         jupytext([])
-    with pytest.raises(
-        (SystemExit, TypeError)
-    ):  # SystemExit on Windows, TypeError on Linux
+    with pytest.raises((SystemExit, TypeError)):  # SystemExit on Windows, TypeError on Linux
         system("jupytext", ["notebook.ipynb", "--from", "py:percent", "--to", "md"])
 
 
@@ -772,12 +753,8 @@ formats = "examples//example/ipynb,examples//example/py:percent"
         ]
     )
 
-    assert not (
-        tmp_path / "example_notebook.py"
-    ).exists(), "Not in the 'examples' directory"
-    assert not (
-        tmp_path / "examples/folder1/utils_not_paired.ipynb"
-    ).exists(), "Not with the 'example' prefix"
+    assert not (tmp_path / "example_notebook.py").exists(), "Not in the 'examples' directory"
+    assert not (tmp_path / "examples/folder1/utils_not_paired.ipynb").exists(), "Not with the 'example' prefix"
     assert (tmp_path / "examples/folder1/example_paired.py").exists(), "Paired"
 
 
@@ -807,9 +784,7 @@ def test_remove_jupytext_metadata(tmpdir, cwd_tmpdir):
     jupytext([tmp_ipynb, "--set-formats", "ipynb,py:light"])
 
     nb2 = read(tmp_ipynb)
-    assert nb2.metadata == {
-        "jupytext": {"formats": "ipynb,py:light", "main_language": "python"}
-    }
+    assert nb2.metadata == {"jupytext": {"formats": "ipynb,py:light", "main_language": "python"}}
 
 
 @pytest.mark.parametrize("fmt", ["py:light", "py:percent", "md"])
@@ -841,18 +816,14 @@ def test_incorrect_notebook_causes_early_exit(tmpdir, cwd_tmpdir):
     incorrect_ipynb = "incorrect.ipynb"
     incorrect_md = "incorrect.md"
     with open(incorrect_ipynb, "w") as fp:
-        fp.write(
-            '{"nbformat": 4, "nbformat_minor": 2, "metadata": {INCORRECT}, "cells": []}'
-        )
+        fp.write('{"nbformat": 4, "nbformat_minor": 2, "metadata": {INCORRECT}, "cells": []}')
 
     correct_ipynb = "correct.ipynb"
     correct_md = "correct.md"
     with open(correct_ipynb, "w") as fp:
         fp.write('{"nbformat": 4, "nbformat_minor": 2, "metadata": {}, "cells": []}')
 
-    with pytest.raises(
-        nbformat.reader.NotJSONError, match="Notebook does not appear to be JSON"
-    ):
+    with pytest.raises(nbformat.reader.NotJSONError, match="Notebook does not appear to be JSON"):
         jupytext([incorrect_ipynb, correct_ipynb, "--to", "md"])
 
     assert not os.path.exists(incorrect_md)
@@ -863,9 +834,7 @@ def test_warn_only_skips_incorrect_notebook(tmpdir, cwd_tmpdir, capsys):
     incorrect_ipynb = "incorrect.ipynb"
     incorrect_md = "incorrect.md"
     with open(incorrect_ipynb, "w") as fp:
-        fp.write(
-            '{"nbformat": 4, "nbformat_minor": 2, "metadata": {INCORRECT}, "cells": []}'
-        )
+        fp.write('{"nbformat": 4, "nbformat_minor": 2, "metadata": {INCORRECT}, "cells": []}')
 
     correct_ipynb = "correct.ipynb"
     correct_md = "correct.md"
@@ -965,9 +934,7 @@ def test_create_header_with_set_formats(format_name, cwd_tmpdir, tmpdir):
 
 
 @pytest.mark.requires_user_kernel_python3
-@pytest.mark.parametrize(
-    "format_name", ["md", "md:myst", "md:pandoc", "py:light", "py:percent"]
-)
+@pytest.mark.parametrize("format_name", ["md", "md:myst", "md:pandoc", "py:light", "py:percent"])
 def test_create_header_with_set_formats_and_set_kernel(format_name, tmpdir, cwd_tmpdir):
     """Test jupytext --set-formats <format_name> --set-kernel - #485"""
 
@@ -997,9 +964,7 @@ def test_set_option_split_at_heading(tmpdir, cwd_tmpdir):
     assert "split_at_heading: true" in tmp_rmd.read()
     nb = read("notebook.Rmd")
 
-    nb_expected = new_notebook(
-        cells=[new_markdown_cell("A paragraph"), new_markdown_cell("# H1 Header")]
-    )
+    nb_expected = new_notebook(cells=[new_markdown_cell("A paragraph"), new_markdown_cell("# H1 Header")])
     compare_notebooks(nb, nb_expected)
 
 
@@ -1016,20 +981,12 @@ def test_pair_in_tree(tmpdir):
 
 
 def test_pair_in_tree_and_parent(tmpdir):
-    nb_file = (
-        tmpdir.mkdir("notebooks")
-        .mkdir("subfolder")
-        .mkdir("a")
-        .mkdir("b")
-        .join("example.ipynb")
-    )
+    nb_file = tmpdir.mkdir("notebooks").mkdir("subfolder").mkdir("a").mkdir("b").join("example.ipynb")
     py_file = tmpdir.mkdir("scripts").mkdir("subfolder").mkdir("c").join("example.py")
 
     write(new_notebook(cells=[new_markdown_cell("A markdown cell")]), str(nb_file))
 
-    jupytext(
-        ["--set-formats", "notebooks//a/b//ipynb,scripts//c//py:percent", str(nb_file)]
-    )
+    jupytext(["--set-formats", "notebooks//a/b//ipynb,scripts//c//py:percent", str(nb_file)])
 
     assert py_file.exists()
     assert "A markdown cell" in py_file.read()
@@ -1080,9 +1037,7 @@ def test_sync_script_dotdot_folder_564(tmpdir):
     py_file = tmpdir.join("colabs").mkdir("nb_python").join("rigid_object_tutorial.py")
     py_file.write("1 + 1\n")
 
-    jupytext(
-        ["--set-formats", "../nb_python//py:percent,../colabs//ipynb", str(py_file)]
-    )
+    jupytext(["--set-formats", "../nb_python//py:percent,../colabs//ipynb", str(py_file)])
 
     assert nb_file.exists()
 
@@ -1242,9 +1197,7 @@ def test_jupytext_to_ipynb_does_not_update_timestamp_if_output_not_in_pair(
 
 
 @pytest.mark.parametrize("formats", ["py:percent", "py", None])
-def test_jupytext_to_ipynb_does_not_update_timestamp_if_not_paired(
-    tmpdir, cwd_tmpdir, python_notebook, capsys, formats
-):
+def test_jupytext_to_ipynb_does_not_update_timestamp_if_not_paired(tmpdir, cwd_tmpdir, python_notebook, capsys, formats):
     # Write a text notebook
     nb = python_notebook
     if formats:
@@ -1265,9 +1218,7 @@ def test_jupytext_to_ipynb_does_not_update_timestamp_if_not_paired(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("formats", ["ipynb,py", "py:percent", "py:light", None])
-async def test_use_source_timestamp(
-    tmpdir, cwd_tmpdir, python_notebook, capsys, formats, cm
-):
+async def test_use_source_timestamp(tmpdir, cwd_tmpdir, python_notebook, capsys, formats, cm):
     # Write a text notebook
     nb = python_notebook
     if formats:
@@ -1348,9 +1299,7 @@ def test_set_shebang_with_update_metadata(tmp_path, python_notebook):
 
 @pytest.mark.parametrize("compare_ids", [False, True])
 @pytest.mark.parametrize("compare_outputs", [False, True])
-def test_set_formats_does_not_override_existing_ipynb(
-    tmp_path, notebook_with_outputs, compare_ids, compare_outputs
-):
+def test_set_formats_does_not_override_existing_ipynb(tmp_path, notebook_with_outputs, compare_ids, compare_outputs):
     tmp_py = tmp_path / "nb.py"
     tmp_ipynb = tmp_path / "nb.ipynb"
     write(notebook_with_outputs, tmp_ipynb)
@@ -1415,3 +1364,155 @@ def test_pipe_with_quiet_does_not_print(tmp_path, capsys):
     assert captured.err == ""
 
     assert tmp_py.read_text() == "# %%\n1 + 1\n"
+
+
+def test_update_formats_1386(python_notebook, tmp_path, capsys):
+    """
+    Test that we can change the formats in an already paired notebook
+    """
+    tmp_py = tmp_path / "notebook.py"
+    tmp_md = tmp_path / "notebook.md"
+    tmp_ipynb = tmp_path / "notebook.ipynb"
+    write(python_notebook, tmp_py, fmt="py:percent")
+
+    formats = "py:percent,md"
+    jupytext([str(tmp_py), "--set-formats", formats])
+
+    # We need to update all the files, not only their timestamps
+    capture = capsys.readouterr()
+    assert "Updating the timestamp" not in capture.out
+
+    # Each paired file should have the new formats
+    assert read(tmp_py)["metadata"]["jupytext"]["formats"] == formats
+    assert read(tmp_md)["metadata"]["jupytext"]["formats"] == formats
+
+    # The issue occurred when the py file was older than the md file
+    current_time = time.time()
+    os.utime(tmp_py, (current_time - 1, current_time - 1))
+    os.utime(tmp_md, (current_time, current_time))
+
+    formats = "ipynb,py:percent,md"
+    jupytext([str(tmp_py), "--set-formats", formats])
+
+    # We need to update all the files, not only their timestamps
+    capture = capsys.readouterr()
+    assert "Updating the timestamp" not in capture.out
+
+    # And each paired file should have the new formats
+    assert read(tmp_py)["metadata"]["jupytext"]["formats"] == formats
+    assert read(tmp_md)["metadata"]["jupytext"]["formats"] == formats
+    assert read(tmp_ipynb)["metadata"]["jupytext"]["formats"] == formats
+
+
+def test_paired_paths_from_notebook_metadata(tmp_path, python_notebook, capsys):
+    ipynb_notebook_path = tmp_path / "notebook.ipynb"
+    python_notebook.metadata["jupytext"] = {"formats": "ipynb,py:percent,md"}
+    write(python_notebook, ipynb_notebook_path)
+
+    jupytext([str(ipynb_notebook_path), "--paired-paths"])
+
+    capture = capsys.readouterr()
+
+    paired_paths = capture.out.strip().split("\n")
+
+    assert paired_paths == [
+        str(tmp_path / "notebook.py"),
+        str(tmp_path / "notebook.md"),
+    ], paired_paths
+
+
+def test_paired_paths_from_config(tmp_path, python_notebook, capsys):
+    ipynb_notebook_path = tmp_path / "notebook.ipynb"
+    write(python_notebook, ipynb_notebook_path)
+    (tmp_path / "jupytext.toml").write_text('''formats="ipynb,py:percent,md"''')
+
+    jupytext([str(ipynb_notebook_path), "--paired-paths"])
+
+    capture = capsys.readouterr()
+
+    paired_paths = capture.out.strip().split("\n")
+
+    assert paired_paths == [
+        str(tmp_path / "notebook.py"),
+        str(tmp_path / "notebook.md"),
+    ], paired_paths
+
+
+@pytest.mark.parametrize("with_config", [False, True])
+def test_sync_keeps_simple_python_file_unchanged(tmp_path, with_config: bool):
+    """Test that jupytext --sync on a simple Python file leaves it unchanged,
+    even if a Jupytext configuration has formats=ipynb,py:percent
+    """
+    # Create a simple Python file without jupytext metadata
+    if with_config:
+        config_file = tmp_path / "jupytext.toml"
+        config_file.write_text('formats = "ipynb,py:percent"')
+
+    py_file = tmp_path / "simple.py"
+    py_content = '''#!/usr/bin/env python3
+"""A simple Python script"""
+
+def hello():
+    print("Hello, world!")
+
+if __name__ == "__main__":
+    hello()
+'''
+    py_file.write_text(py_content)
+
+    # Record original timestamp and content
+    original_mtime = py_file.stat().st_mtime
+    original_content = py_file.read_text()
+
+    # Wait a bit to ensure timestamp would change if file was modified
+    time.sleep(0.1)
+
+    # Run jupytext --sync on the file
+    jupytext(["--sync", str(py_file)])
+
+    # Verify file is unchanged
+    final_mtime = py_file.stat().st_mtime
+    final_content = py_file.read_text()
+
+    assert final_mtime == original_mtime, "File timestamp should be unchanged"
+    assert final_content == original_content, "File content should be unchanged"
+
+    # Verify no additional files were created
+    files_in_dir = list(tmp_path.iterdir())
+    if with_config:
+        assert len(files_in_dir) == 2, f"Expected only 2 files, found: {[f.name for f in files_in_dir]}"
+        assert set(files_in_dir) == {py_file, config_file}
+    else:
+        assert len(files_in_dir) == 1, f"Expected only 1 file, found: {[f.name for f in files_in_dir]}"
+        assert files_in_dir[0] == py_file
+
+
+def test_set_formats_pairing_in_subfolders(tmp_path, python_notebook):
+    """Test that jupytext --set-formats works with subfolders, including on Windows (#1028)"""
+
+    ipynb_notebook_dir = tmp_path / "notebooks" / "subfolder"
+    ipynb_notebook_dir.mkdir(parents=True)
+    ipynb_notebook_path = ipynb_notebook_dir / "notebook.ipynb"
+
+    write(python_notebook, ipynb_notebook_path)
+
+    jupytext([str(ipynb_notebook_path), "--set-formats", "notebooks///ipynb,scripts///py:percent"])
+
+    assert (tmp_path / "scripts" / "subfolder" / "notebook.py").exists()
+
+
+def test_sync_in_subfolders(tmp_path, python_notebook):
+    """Test that jupytext --sync works with subfolders, including on Windows (#1028)"""
+    ipynb_notebook_dir = tmp_path / "notebooks" / "subfolder"
+    ipynb_notebook_dir.mkdir(parents=True)
+    ipynb_notebook_path = ipynb_notebook_dir / "notebook.ipynb"
+    write(python_notebook, ipynb_notebook_path)
+
+    (tmp_path / "jupytext.toml").write_text("""[formats]
+"notebooks/" = "ipynb"
+"scripts/" = "py:percent"
+""")
+
+    jupytext([str(ipynb_notebook_path), "--sync"])
+
+    assert (tmp_path / "scripts" / "subfolder" / "notebook.py").exists()

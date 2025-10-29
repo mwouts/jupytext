@@ -13,9 +13,7 @@ def test_jupytext_config_cli(tmp_path):
         "markdown",
     )
     assert "python" in (settings_file).read_text()
-    assert "markdown" in system(
-        "jupytext-config", "--settings-file", settings_file, "list-default-viewer"
-    )
+    assert "markdown" in system("jupytext-config", "--settings-file", settings_file, "list-default-viewer")
     system(
         "jupytext-config",
         "--settings-file",
@@ -23,8 +21,6 @@ def test_jupytext_config_cli(tmp_path):
         "unset-default-viewer",
         "markdown",
     )
-    list_viewers = system(
-        "jupytext-config", "--settings-file", settings_file, "list-default-viewer"
-    )
+    list_viewers = system("jupytext-config", "--settings-file", settings_file, "list-default-viewer")
     assert "python" in list_viewers
     assert "markdown" not in list_viewers

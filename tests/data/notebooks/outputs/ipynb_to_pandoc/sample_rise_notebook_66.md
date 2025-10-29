@@ -12,7 +12,7 @@ jupyter:
 A markdown cell
 :::
 
-::: {#cell-1 .cell .code slideshow="{\"slide_type\":\"\"}"}
+::: {.cell .code slideshow="{\"slide_type\":\"\"}"}
 ``` python
 1+1
 ```

@@ -81,9 +81,7 @@ def test_build_options_random_order(options, language, metadata):
     def split_and_strip(opt):
         {o.strip() for o in opt.split(",")}
 
-    assert split_and_strip(
-        metadata_to_rmd_options(*(language, metadata))
-    ) == split_and_strip(options)
+    assert split_and_strip(metadata_to_rmd_options(*(language, metadata))) == split_and_strip(options)
 
 
 @pytest.mark.parametrize("options", ["a={)", "name, name2", "a=}", "b=]", "c=["])
@@ -152,9 +150,7 @@ def test_simple_metadata_with_spaces(
     value=("python", {"string": "value", "number": 1.0, "array": ["a", "b"]}),
 ):
     compare(text_to_metadata(text), value)
-    assert (
-        metadata_to_text(*value) == 'python string="value" number=1.0 array=["a", "b"]'
-    )
+    assert metadata_to_text(*value) == 'python string="value" number=1.0 array=["a", "b"]'
 
 
 def test_title_and_relax_json(
@@ -162,10 +158,7 @@ def test_title_and_relax_json(
     value=("cell title", {"string": "value", "number": 1.0, "array": ["a", "b"]}),
 ):
     compare(text_to_metadata(text, allow_title=True), value)
-    assert (
-        metadata_to_text(*value)
-        == 'cell title string="value" number=1.0 array=["a", "b"]'
-    )
+    assert metadata_to_text(*value) == 'cell title string="value" number=1.0 array=["a", "b"]'
 
 
 def test_title_and_json_dict(
@@ -173,10 +166,7 @@ def test_title_and_json_dict(
     value=("cell title", {"string": "value", "number": 1.0, "array": ["a", "b"]}),
 ):
     compare(text_to_metadata(text, allow_title=True), value)
-    assert (
-        metadata_to_text(*value)
-        == 'cell title string="value" number=1.0 array=["a", "b"]'
-    )
+    assert metadata_to_text(*value) == 'cell title string="value" number=1.0 array=["a", "b"]'
 
 
 @pytest.mark.parametrize("allow_title", [True, False])
@@ -187,23 +177,17 @@ def test_attribute(allow_title):
     assert metadata_to_text(*value) == text
 
 
-def test_language_and_attribute(
-    text="python .class", value=("python", {".class": None})
-):
+def test_language_and_attribute(text="python .class", value=("python", {".class": None})):
     compare(text_to_metadata(text), value)
     assert metadata_to_text(*value) == text
 
 
-def test_title_and_attribute(
-    text="This is my title. .class", value=("This is my title.", {".class": None})
-):
+def test_title_and_attribute(text="This is my title. .class", value=("This is my title.", {".class": None})):
     compare(text_to_metadata(text, allow_title=True), value)
     assert metadata_to_text(*value) == text
 
 
-def test_values_with_equal_signs_inside(
-    text='python string="value=5"', value=("python", {"string": "value=5"})
-):
+def test_values_with_equal_signs_inside(text='python string="value=5"', value=("python", {"string": "value=5"})):
     compare(text_to_metadata(text), value)
     assert metadata_to_text(*value) == text
 
@@ -232,9 +216,7 @@ def test_parse_key_value_key():
     }
 
 
-@pytest.mark.parametrize(
-    "key", ["ok", "also.ok", "all_right_55", "not,ok", "unexpected,key"]
-)
+@pytest.mark.parametrize("key", ["ok", "also.ok", "all_right_55", "not,ok", "unexpected,key"])
 def test_is_valid_metadata_key(key):
     assert is_valid_metadata_key(key) == ("," not in key)
 
@@ -246,47 +228,35 @@ def notebook_with_unsupported_key_in_metadata(python_notebook):
     return nb
 
 
-def test_unsupported_key_in_metadata(
-    notebook_with_unsupported_key_in_metadata, fmt_with_cell_metadata
-):
+def test_unsupported_key_in_metadata(notebook_with_unsupported_key_in_metadata, fmt_with_cell_metadata):
     """Notebook metadata that can't be parsed in text notebook cannot go to the text file,
     but it should still remain available in the ipynb file for paired notebooks."""
     with pytest.warns(
         UserWarning,
         match="The following metadata cannot be exported to the text notebook",
     ):
-        text = jupytext.writes(
-            notebook_with_unsupported_key_in_metadata, fmt_with_cell_metadata
-        )
+        text = jupytext.writes(notebook_with_unsupported_key_in_metadata, fmt_with_cell_metadata)
     assert "unexpected" not in text
     nb_text = jupytext.reads(text, fmt=fmt_with_cell_metadata)
-    nb = combine_inputs_with_outputs(
-        nb_text, notebook_with_unsupported_key_in_metadata, fmt=fmt_with_cell_metadata
-    )
+    nb = combine_inputs_with_outputs(nb_text, notebook_with_unsupported_key_in_metadata, fmt=fmt_with_cell_metadata)
     assert nb.cells[-1].metadata == {"unexpected,key": True}
 
 
 @pytest.fixture()
 def notebook_with_collapsed_cell(python_notebook):
     nb = python_notebook
-    nb.cells.append(
-        new_markdown_cell("## Data", metadata={"jp-MarkdownHeadingCollapsed": True})
-    )
+    nb.cells.append(new_markdown_cell("## Data", metadata={"jp-MarkdownHeadingCollapsed": True}))
     return nb
 
 
-def test_notebook_with_collapsed_cell(
-    notebook_with_collapsed_cell, fmt_with_cell_metadata
-):
+def test_notebook_with_collapsed_cell(notebook_with_collapsed_cell, fmt_with_cell_metadata):
     text = jupytext.writes(notebook_with_collapsed_cell, fmt_with_cell_metadata)
     assert "MarkdownHeadingCollapsed" in text
     nb = jupytext.reads(text, fmt=fmt_with_cell_metadata)
     compare_notebooks(nb, notebook_with_collapsed_cell, fmt=fmt_with_cell_metadata)
 
 
-def test_empty_tags_are_not_saved_in_text_notebooks(
-    no_jupytext_version_number, python_notebook, fmt="py:percent"
-):
+def test_empty_tags_are_not_saved_in_text_notebooks(no_jupytext_version_number, python_notebook, fmt="py:percent"):
     nb = python_notebook
     nb.cells.append(new_code_cell(metadata={"tags": []}))
     text = jupytext.writes(nb, fmt=fmt)

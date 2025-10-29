@@ -55,9 +55,7 @@ def test_ipynb_to_Rmd(ipynb_file, no_jupytext_version_number):
 
 @pytest.mark.requires_myst
 def test_ipynb_to_myst(ipynb_file, no_jupytext_version_number):
-    if re.match(
-        r".*(html-demo|julia_functional_geometry|xcpp_by_quantstack).*", ipynb_file
-    ):
+    if re.match(r".*(html-demo|julia_functional_geometry|xcpp_by_quantstack).*", ipynb_file):
         pytest.skip()
     assert_conversion_same_as_mirror(ipynb_file, "md:myst", "ipynb_to_myst")
 
@@ -159,18 +157,10 @@ def test_ipynb_to_r_spin(ipynb_R_file, no_jupytext_version_number):
 
 
 @pytest.mark.parametrize("extension", ("ss", "scm"))
-def test_ipynb_to_scheme_light(
-    ipynb_scheme_file, extension, no_jupytext_version_number
-):
-    assert_conversion_same_as_mirror(
-        ipynb_scheme_file, f"{extension}:light", "ipynb_to_script"
-    )
+def test_ipynb_to_scheme_light(ipynb_scheme_file, extension, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(ipynb_scheme_file, f"{extension}:light", "ipynb_to_script")
 
 
 @pytest.mark.parametrize("extension", ("ss", "scm"))
-def test_ipynb_to_scheme_percent(
-    ipynb_scheme_file, extension, no_jupytext_version_number
-):
-    assert_conversion_same_as_mirror(
-        ipynb_scheme_file, f"{extension}:percent", "ipynb_to_percent"
-    )
+def test_ipynb_to_scheme_percent(ipynb_scheme_file, extension, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(ipynb_scheme_file, f"{extension}:percent", "ipynb_to_percent")

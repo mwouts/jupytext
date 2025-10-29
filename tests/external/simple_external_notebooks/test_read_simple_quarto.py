@@ -28,7 +28,7 @@ def test_qmd_to_ipynb(
     ),
 ):
     nb2 = jupytext.reads(qmd, "qmd")
-    compare_notebooks(nb2, nb)
+    compare_notebooks(nb2, nb, fmt="qmd")
 
     # after a round trip we do get a yaml header.
     # here we remove it to make the comparison

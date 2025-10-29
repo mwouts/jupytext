@@ -29,43 +29,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache conda
-        uses: actions/cache@v3
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.9.1
         with:
-          path: ~/conda_pkgs_dir
-          key: conda-${{ matrix.os }}-${{ hashFiles('.ci/environment-ci.yml') }}
+          pixi-version: v0.55.0
+          cache: true
 
-      - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-update-conda: true
-          activate-environment: jupytext-ci
-          environment-file: .ci/environment-ci.yml
-
-      - name: Install from source
-        run: HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e '.[test-external,test-cov]'
-
-      - name: Conda list
-        run: conda list
-
-      - name: Install a Jupyter Kernel
-        run: python -m ipykernel install --name jupytext-ci --user
-
-      - name: Test with pytest
-        run: pytest -n logical --cov --cov-report=xml
-
-      - name: Test lab extension
+      - name: Run tests
         run: |
+          eval "$(pixi shell-hook)"
+          # Install from source
+          HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e .
+
+          # Install a Jupyter Kernel
+          python -m ipykernel install --name jupytext-ci --user
+
+          # Test with pytest
+          pytest -n logical --cov --cov-report=xml
+
           # Uninstall jupyter-fs as it overrides the original browser-test.js to
           # check its own functionality (https://github.com/jpmorganchase/jupyter-fs/blob/main/jupyterfs/browser-test.js)
           # So uninstall jupyter-fs before running browser check
-          #
           pip uninstall jupyter-fs -y
 
           # Check extension
           jupyter labextension list
           jupyter labextension list 2>&1 | grep -ie "jupyterlab-jupytext.*OK"
 
+          # Test lab extension
           python -m jupyterlab.browser_check
 
       - name: Upload coverage

@@ -10,7 +10,7 @@ and you can easily edit or refactor them in the editor of your choice.
 The outputs of the notebook are not stored on disk, unless you decide to
 [pair](paired-notebooks.md) your text notebook to a regular `.ipynb` file.
 
-## How to open a text notebook in Jupyter Lab
+## How to open a text notebook in JupyterLab
 
 Once you have [installed](install.md) Jupytext, `.py` and `.md` files get a
 notebook icon in Jupyter. And you can really open and run these files as
@@ -31,7 +31,7 @@ Notes:
 ### With a double click
 
 Right clicking and the _Open With_ submenu allows you to choose among several
-ways to open a file (several **viewers**, in Jupyter Lab jargon); and when you
+ways to open a file (several **viewers**, in JupyterLab jargon); and when you
 double click instead, you open the file using **its default viewer**.
 
 The default viewer for text notebooks is by default configured to be the
@@ -53,7 +53,7 @@ means to change and inspect the default viewers configuration
 
 As of July 2023, Jupyter Notebook now comes as version 7.x - and is known in short as nb7
 
-nb7 being built on top of Jupyter Lab, the principles described above apply as
+nb7 being built on top of JupyterLab, the principles described above apply as
 well in this context; which means that
 
 * you can always right-click a file and select *Open With* → *Notebook*;
@@ -98,9 +98,9 @@ This command has more options than the one shown above; in particular:
   `jupytext-config list-default-viewer`
 * you can use `jupytext-config unset-default-viewer python` to remove some of the settings
 
-Here's an example of a session, starting from the default config of Jupyter Lab
+Here's an example of a session, starting from the default config of JupyterLab
 ```bash
-# starting from the default config of Jupyter Lab
+# starting from the default config of JupyterLab
 $ jupytext-config list-default-viewer
 # we add the default viewer for 2 doctypes
 $ jupytext-config set-default-viewer python markdown
@@ -116,9 +116,9 @@ python: Jupytext Notebook
 $
 ```
 
-### From Jupyter Lab settings dialog
+### From JupyterLab settings dialog
 
-Alternatively to using `jupytext-config`, you can also find the configuration of the default viewers from Jupyter Lab interactively; to do so, go to _Settings_, _Advanced Settings Editor_, and in the JSON view for the `Document Manager` copy-paste the following settings (or the subset that matches your use case):
+Alternatively to using `jupytext-config`, you can also find the configuration of the default viewers from JupyterLab interactively; to do so, go to _Settings_, _Advanced Settings Editor_, and in the JSON view for the `Document Manager` copy-paste the following settings (or the subset that matches your use case):
 
 ```json
 {

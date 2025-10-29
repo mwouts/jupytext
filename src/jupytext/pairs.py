@@ -12,9 +12,7 @@ class PairedFilesDiffer(ValueError):
     """An error when the two representations of a paired notebook differ"""
 
 
-def latest_inputs_and_outputs(
-    path, fmt, formats, get_timestamp, contents_manager_mode=False
-):
+def latest_inputs_and_outputs(path, fmt, formats, get_timestamp, contents_manager_mode=False):
     """Given a notebook path, its format and paired formats, and a function that
     returns the timestamp for each (or None if the file does not exist), return
     the most recent notebook for the inputs and outputs, respectively"""
@@ -31,15 +29,8 @@ def latest_inputs_and_outputs(
 
     for alt_path, alt_fmt in paired_paths(path, fmt, formats):
         # In the contents manager, we don't read another text file if the current notebook is in already in text mode
-        if (
-            contents_manager_mode
-            and alt_fmt["extension"] != ".ipynb"
-            and fmt["extension"] != ".ipynb"
-        ):
-            if any(
-                alt_fmt.get(key) != fmt.get(key)
-                for key in ["extension", "suffix", "prefix"]
-            ):
+        if contents_manager_mode and alt_fmt["extension"] != ".ipynb" and fmt["extension"] != ".ipynb":
+            if any(alt_fmt.get(key) != fmt.get(key) for key in ["extension", "suffix", "prefix"]):
                 continue
 
         timestamp = get_timestamp(alt_path)
@@ -54,11 +45,7 @@ def latest_inputs_and_outputs(
             timestamp_inputs = timestamp
             inputs_path, input_fmt = alt_path, alt_fmt
 
-    if timestamp_inputs is None or (
-        not contents_manager_mode
-        and timestamp_outputs
-        and timestamp_outputs > timestamp_inputs
-    ):
+    if timestamp_inputs is None or (not contents_manager_mode and timestamp_outputs and timestamp_outputs > timestamp_inputs):
         timestamp_inputs = timestamp_outputs
         inputs_path, input_fmt = outputs_path, output_fmt
 

@@ -1,3 +1,4 @@
 """Jupytext's version number"""
 
-__version__ = "1.17.0"
+# Must match [N!]N(.N)*[{a|b|rc}N][.postN][.devN], cf. PEP 440
+__version__ = "1.19.0.dev0"

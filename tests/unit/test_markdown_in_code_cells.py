@@ -1,4 +1,5 @@
 """Issue #712"""
+
 import pytest
 from nbformat.v4.nbbase import new_code_cell, new_notebook
 

@@ -49,19 +49,21 @@ or
 
     conda install jupytext -c conda-forge
 
-Then, restart your Jupyter Lab server, and make sure Jupytext is activated in Jupyter:  `.py` and `.md` files have a Notebook icon, and you can open them as Notebooks with a right click in Jupyter Lab.
+Then, restart your JupyterLab server, and make sure Jupytext is activated in Jupyter:  `.py` and `.md` files have a Notebook icon, and you can open them as Notebooks with a right click in JupyterLab.
 
 ![Notebook icon on text notebooks](https://github.com/mwouts/jupytext/blob/64b4be818508760116f91bf156342cb4cf724d93/docs/images/jupyterlab_right_click.png?raw=true)
 
 ## Paired Notebooks
 
-Text notebooks with a `.py` or `.md` extension are well suited for version control. They can be edited or authored conveniently in an IDE. You can open and run them as notebooks in Jupyter Lab with a right click. However, the notebook outputs are lost when the notebook is closed, as only the notebook inputs are saved in text notebooks.
+Text notebooks with a `.py` or `.md` extension are well suited for version control. They can be edited or authored conveniently in an IDE. You can open and run them as notebooks in JupyterLab with a right click. However, the notebook outputs are lost when the notebook is closed, as only the notebook inputs are saved in text notebooks.
 
 A convenient alternative to text notebooks are [paired notebooks](docs/paired-notebooks.md). These are a set of two files, say `.ipynb` and `.py`, that contain the same notebook, but in different formats.
 
 You can edit the `.py` version of the paired notebook, and get the edits back in Jupyter by selecting _reload notebook from disk_. The outputs will be reloaded from the `.ipynb` file, if it exists. The `.ipynb` version will be updated or recreated the next time you save the notebook in Jupyter.
 
-To pair a notebook in Jupyter Lab, use the command `Pair Notebook with percent Script` from the Command Palette:
+💡 **Tip:** You can automate the notebook reloading by installing the [Jupyter Collaboration](docs/jupyter-collaboration.md) extension.
+
+To pair a notebook in JupyterLab, use the command `Pair Notebook with percent Script` from the Command Palette:
 
 ![](https://github.com/mwouts/jupytext/blob/64b4be818508760116f91bf156342cb4cf724d93/docs/images/pair_commands.png?raw=true)
 
@@ -86,7 +88,7 @@ Jupytext is also available at the [command line](docs/using-cli.md). You can
 ### Notebooks under version control
 
 This is a quick how-to:
-- Open your `.ipynb` notebook in Jupyter and [pair](docs/paired-notebooks.md) it to a `.py` notebook, using either the _pair_ command in Jupyter Lab, or a global [configuration file](docs/config.md)
+- Open your `.ipynb` notebook in Jupyter and [pair](docs/paired-notebooks.md) it to a `.py` notebook, using either the _pair_ command in JupyterLab, or a global [configuration file](docs/config.md)
 - Save the notebook - this creates a `.py` notebook
 - Add this `.py` notebook to version control
 
@@ -98,7 +100,7 @@ Collaborating on Jupyter notebooks through Git becomes as easy as collaborating 
 
 Assume that you have your `.py` notebooks under version control (see above). Then,
 - Your collaborator pulls the `.py` notebook
-- They open it _as a notebook_ in Jupyter (right-click in Jupyter Lab)
+- They open it _as a notebook_ in Jupyter (right-click in JupyterLab)
 - At that stage the notebook has no outputs. They run the notebook and save it. Outputs are regenerated, and a local `.ipynb` file is created
 - They edit the notebook, and push the updated `notebook.py` file. The diff is nothing else than a standard diff on a Python script.
 - You pull the updated `notebook.py` script, and refresh your browser. The input cells are updated based on the new content of `notebook.py`. The outputs are reloaded from your local `.ipynb` file. Finally, the kernel variables are untouched, so you have the option to run only the modified cells to get the new outputs.
@@ -109,7 +111,7 @@ Once your notebook is [paired](docs/paired-notebooks.md) with a `.py` file, you 
 
 Once you are done editing the `.py` notebook, you will just have to _reload_ the notebook in Jupyter to get the latest edits there.
 
-Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the paired `.py` file. There is no obligation to do so; however, if you don't, you should be prepared to read carefully the pop-up messages. If Jupyter tries to save the notebook while the paired `.py` file has also been edited on disk since the last reload, a conflict will be detected and you will be asked to decide which version of the notebook (in memory or on disk) is the appropriate one.
+Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the paired `.py` file. There is no obligation to do so; however, if you don't, you should be prepared to read carefully the pop-up messages. If Jupyter tries to save the notebook while the paired `.py` file has also been edited on disk since the last reload, a conflict will be detected and you will be asked to decide which version of the notebook (in memory or on disk) is the appropriate one. Alternatively, the [Jupyter Collaboration](docs/jupyter-collaboration.md) extension provides an autoreload feature which simplifies this.
 
 ## More resources
 

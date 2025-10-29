@@ -90,9 +90,7 @@ async def test_raise_on_wrong_format(tmpdir, cm):
                 path=tmp_ipynb,
                 model=dict(
                     type="notebook",
-                    content=new_notebook(
-                        nbformat=4, metadata=dict(jupytext_formats=[".doc"])
-                    ),
+                    content=new_notebook(nbformat=4, metadata=dict(jupytext_formats=[".doc"])),
                 ),
             )
         )
@@ -106,11 +104,7 @@ async def test_no_rmd_on_not_notebook(tmpdir, cm):
     cm.formats = "ipynb,Rmd"
 
     with pytest.raises(HTTPError):
-        await ensure_async(
-            cm.save(
-                model=dict(type="not notebook", content=new_notebook()), path=tmp_ipynb
-            )
-        )
+        await ensure_async(cm.save(model=dict(type="not notebook", content=new_notebook()), path=tmp_ipynb))
     assert not os.path.isfile(str(tmpdir.join(tmp_rmd)))
 
 
@@ -122,8 +116,6 @@ async def test_no_rmd_on_not_v4(tmpdir, cm):
     cm.formats = "ipynb,Rmd"
 
     with pytest.raises(NotebookValidationError):
-        await ensure_async(
-            cm.save(model=notebook_model(new_notebook(nbformat=3)), path=tmp_rmd)
-        )
+        await ensure_async(cm.save(model=notebook_model(new_notebook(nbformat=3)), path=tmp_rmd))
 
     assert not os.path.isfile(str(tmpdir.join(tmp_ipynb)))
