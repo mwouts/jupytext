@@ -17,10 +17,6 @@ def test_pre_commit_hook_sync_reformat_code_and_markdown(
 ):
     """Here we sync the ipynb notebook with a py:percent file and also apply black and pandoc to reformat both
     code and markdown cells.
-
-    Note: the new cell ids introduced in nbformat 5.1.0 are not yet supported by all the programs that treat
-    ipynb files. Consequently we pin the version of nbformat to 5.0.8 in all the environments below (and you
-    will have to do the same on the environment in which you edit the notebooks).
     """
     pre_commit_config_yaml = f"""
 repos:
@@ -29,13 +25,10 @@ repos:
   hooks:
   - id: jupytext
     args: [--sync, --pipe-fmt, ipynb, --pipe, 'pandoc --from ipynb --to ipynb --markdown-headings=atx', --show-changes]
-    additional_dependencies:
-    - nbformat==5.0.8  # because pandoc 2.11.4 does not preserve yet the new cell ids
   - id: jupytext
     args: [--sync, --pipe, black, --show-changes]
     additional_dependencies:
     - black==22.3.0  # Matches black hook below
-    - nbformat==5.0.8  # for compatibility with the pandoc hook above
 
 - repo: https://github.com/psf/black
   rev: 22.3.0
@@ -75,9 +68,6 @@ And a VERY long line.
         metadata=notebook_with_outputs.metadata,
     )
 
-    # We write the notebook in version 4.4, i.e. with the equivalent of nbformat version 5.0.8
-    notebook.nbformat = 4
-    notebook.nbformat_minor = 4
     write(notebook, "test.ipynb")
 
     # try to commit it, should fail because
