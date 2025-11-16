@@ -4,6 +4,9 @@ Jupytext ChangeLog
 1.19.0.dev0 (unreleased)
 ------------------------
 
+**Changes**
+The environment used to develop Jupytext is now maintained using Pixi ([#1459](https://github.com/mwouts/jupytext/pull/1459))
+
 **Fixed**
 - We have fixed the round trip tests and made them work with Quarto 1.8.25 ([#1435](https://github.com/mwouts/jupytext/issues/1435))
 
