@@ -1,3 +1,7 @@
+# 1.4.6 (2025-10-18)
+
+We have added support for pairing notebooks to Python scripts in the Marimo format
+
 # 1.4.5 (2025-08-09)
 
 The dependencies of the JupyterLab extension were updated to address [security issues](https://github.com/mwouts/jupytext/security/dependabot):

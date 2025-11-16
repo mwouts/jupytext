@@ -5,7 +5,7 @@
 [![CI](https://github.com/mwouts/jupytext/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mwouts/jupytext/actions)
 [![Documentation Status](https://readthedocs.org/projects/jupytext/badge/?version=latest)](https://jupytext.readthedocs.io/en/latest/?badge=latest)
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=main)](https://codecov.io/gh/mwouts/jupytext/branch/main)
-[![MIT License](https://img.shields.io/github/license/mwouts/jupytext)](LICENSE)
+[![MIT License](https://img.shields.io/github/license/mwouts/jupytext)](https://github.com/mwouts/jupytext/blob/main/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![GitHub language count](https://img.shields.io/github/languages/count/mwouts/jupytext)](docs/languages.md)
 [![Conda Version](https://anaconda.org/conda-forge/jupytext/badges/version.svg)](https://anaconda.org/conda-forge/jupytext/)

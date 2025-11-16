@@ -64,9 +64,25 @@ to your [`jupytext.toml` configuration file](config.md).
 
 See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.pct.py) in the `percent` format.
 
-## The `hydrogen` format
+## The `marimo` format
 
-By default, [Jupyter magics](advanced-options.md#magic-commands) are commented in the `percent` representation. If you run the percent scripts in Hydrogen, use the `hydrogen` format, a variant of the `percent` format that does not comment Jupyter magic commands.
+Since Jupytext v1.19, you can use the `py:marimo` format, in which text notebooks are converted to Jupyter notebooks, and back, using [Marimo](https://marimo.io/).
+
+Our [implementation](https://github.com/mwouts/jupytext/blob/main/src/jupytext/marimo.py) calls Marimo's converter directly (this requires Marimo v1.16.3 or later).
+
+Please note that:
+- The format is available only for Python notebooks.
+- Marimo will add a suffix to variables that are defined multiple times, to make them compatible with its reactive evaluation.
+- Notebook and cell metadata (except tags) cannot be stored in the `py:marimo` file.
+- As of Marimo 0.17.8, empty cells are removed during round trips.
+
+You can determine whether a given notebook is stable over a Marimo round trip with
+```
+jupytext --test --to py:marimo your_notebook.ipynb
+jupytext --test --to ipynb your_marimo_script.py
+```
+
+💡 If you notice unexpected changes, and can reproduce them with `marimo convert` and `marimo export ipynb --sort top-down`, report the issue on the Marimo [tracker](https://github.com/marimo-team/marimo/issues), and ping `@mwouts`. If you believe the issue is on Jupytext’s side, use the Jupytext [issue tracker](https://github.com/mwouts/jupytext/issues).
 
 ## The `light` format
 

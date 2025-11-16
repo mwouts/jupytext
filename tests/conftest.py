@@ -25,6 +25,7 @@ from jupytext.formats import formats_with_support_for_cell_metadata
 from jupytext.myst import is_myst_available
 from jupytext.pandoc import is_pandoc_available
 from jupytext.quarto import is_quarto_available
+from jupytext.marimo import is_marimo_available
 
 # Pytest's tmpdir is in /tmp (at least for me), so this helps to avoid interferences between
 # global configuration on HOME and the test collection
@@ -237,6 +238,30 @@ def ipynb_py_file(request):
     return request.param
 
 
+@pytest.fixture(params=list_notebooks("ipynb_py", skip="(raw_cell|R_magic|metadata and long cells)"), ids=notebook_id_func)
+def marimo_compatible_ipynb(request):
+    nb = jupytext.read(SAMPLE_NOTEBOOK_PATH / request.param)
+    marimo_text = jupytext.writes(nb, "auto:marimo")
+    for line in marimo_text.splitlines():
+        if "not supported in marimo" in line:
+            pytest.skip(f"{request.param} contains features not supported in marimo: {line}")
+
+    # We'd need to get this one fixed in Marimo
+    if "flavors of raw cells" in request.param:
+        pytest.skip(f"{request.param} contains $ signs in a raw cells, not supported in marimo")
+
+    if "jupyter_again" in request.param:
+        pytest.skip(f"{request.param} contains '?help', not supported in marimo")
+
+    if "nteract_with_parameter" in request.param:
+        pytest.skip(f"{request.param} contains both tags and metadata - only tags are supported")
+
+    if "jupyterlab-slideshow_1441" in request.param:
+        pytest.skip(f"{request.param} contains a line ending with spaces, which is trimmed by marimo")
+
+    return request.param
+
+
 @pytest.fixture(params=list_notebooks("ipynb_R"), ids=notebook_id_func)
 def ipynb_R_file(request):
     return request.param
@@ -307,6 +332,11 @@ def r_file(request):
 
 @pytest.fixture(params=list_notebooks("R_spin"), ids=notebook_id_func)
 def r_spin_file(request):
+    return request.param
+
+
+@pytest.fixture(params=list_notebooks("marimo"), ids=notebook_id_func)
+def marimo_file(request):
     return request.param
 
 
@@ -384,6 +414,9 @@ def pytest_runtest_setup(item):
         if mark.name == "requires_quarto":
             if not is_quarto_available(min_version="0.2.0"):
                 pytest.skip("quarto>=0.2 is not available")
+        if mark.name == "requires_marimo":
+            if not is_marimo_available():
+                pytest.skip("marimo is not available")
         if mark.name == "requires_no_pandoc":
             if is_pandoc_available():
                 pytest.skip("Pandoc is installed")

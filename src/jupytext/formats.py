@@ -220,6 +220,15 @@ JUPYTEXT_FORMATS = (
             # cf. https://github.com/mwouts/jupytext/issues/837
             current_version_number="1.0",
         ),
+        NotebookFormatDescription(
+            format_name="marimo",
+            extension=".py",
+            header_prefix="",
+            cell_reader_class=None,
+            cell_exporter_class=None,
+            # Version 1.0 on 2025-09-07
+            current_version_number="1.0",
+        ),
     ]
     + [
         NotebookFormatDescription(
@@ -236,6 +245,7 @@ JUPYTEXT_FORMATS = (
 
 NOTEBOOK_EXTENSIONS = list(dict.fromkeys([".ipynb"] + [fmt.extension for fmt in JUPYTEXT_FORMATS]))
 EXTENSION_PREFIXES = [".lgt", ".spx", ".pct", ".hyd", ".nb"]
+FORMATS_WITH_NO_CELL_METADATA = {"sphinx", "nomarker", "spin", "quarto", "marimo"}
 
 
 def get_format_implementation(ext, format_name=None):
@@ -317,6 +327,7 @@ def guess_format(text, ext):
         nbconvert_script_re = re.compile(rf"^{comment}( <codecell>| In\[[0-9 ]*\]:?)")
         vim_folding_markers_re = re.compile(rf"^{comment}\s*" + "{{{")
         vscode_folding_markers_re = re.compile(rf"^{comment}\s*region")
+        marimo_cell_re = re.compile(r"^@app.cell.*")
 
         twenty_hash_count = 0
         double_percent_count = 0
@@ -324,6 +335,7 @@ def guess_format(text, ext):
         rspin_comment_count = 0
         vim_folding_markers_count = 0
         vscode_folding_markers_count = 0
+        marimo_app_count = 0
 
         parser = StringParser(language="R" if ext in [".r", ".R"] else "python")
         for line in lines:
@@ -350,10 +362,16 @@ def guess_format(text, ext):
             if vscode_folding_markers_re.match(line):
                 vscode_folding_markers_count += 1
 
+            if ext == ".py" and (line in {"import marimo", "app = marimo.App()"} or marimo_cell_re.match(line)):
+                marimo_app_count += 1
+
         if double_percent_count >= 1:
             if magic_command_count:
                 return "hydrogen", {}
             return "percent", {}
+
+        if marimo_app_count >= 2:
+            return "marimo", {}
 
         if vim_folding_markers_count:
             return "light", {"cell_markers": "{{{,}}}"}
@@ -555,6 +573,7 @@ def long_form_one_format(jupytext_format, metadata=None, update=None, auto_ext_r
         "notebook": "ipynb",
         "rmarkdown": "Rmd",
         "quarto": "qmd",
+        "marimo": "py",
         "markdown": "md",
         "script": "auto",
         "c++": "cpp",
@@ -785,8 +804,10 @@ def formats_with_support_for_cell_metadata():
             continue
         if fmt.format_name == "pandoc" and not is_pandoc_available():
             continue
-        if fmt.format_name not in ["sphinx", "nomarker", "spin", "quarto"]:
-            yield f"{fmt.extension[1:]}:{fmt.format_name}"
+        if fmt.format_name in FORMATS_WITH_NO_CELL_METADATA:
+            continue
+
+        yield f"{fmt.extension[1:]}:{fmt.format_name}"
 
 
 def get_formats_from_notebook_metadata(notebook):

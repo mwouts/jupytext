@@ -119,6 +119,18 @@ export const JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA = new Map<
     ],
   ],
   [
+    'py:marimo',
+    [
+      {
+        fileExt: 'py:marimo',
+        paletteLabel: 'Pair with Marimo Python script',
+        caption: 'Pair Notebook with Marimo Python script',
+        iconName: 'ui-components:text-editor',
+        separator: true,
+      },
+    ],
+  ],
+  [
     'md',
     [
       {
@@ -269,6 +281,17 @@ export const JUPYTEXT_CREATE_TEXT_NOTEBOOK_FILETYPE_DATA = new Map<
         paletteLabel: 'Nomarker Format',
         caption: 'Nomarker Format',
         launcherLabel: 'Nomarker Format',
+      },
+    ],
+  ],
+  [
+    'py:marimo',
+    [
+      {
+        fileExt: 'py:marimo',
+        paletteLabel: 'Marimo Format',
+        caption: 'Marimo Format',
+        launcherLabel: 'Marimo Format',
       },
     ],
   ],

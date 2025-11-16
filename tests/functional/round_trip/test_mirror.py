@@ -45,6 +45,15 @@ def test_ipynb_to_light(ipynb_to_light, no_jupytext_version_number):
     assert_conversion_same_as_mirror(ipynb_to_light, "auto:light", "ipynb_to_script")
 
 
+@pytest.mark.requires_marimo
+def test_ipynb_to_marimo(marimo_compatible_ipynb, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(
+        marimo_compatible_ipynb,
+        "auto:marimo",
+        "ipynb_to_marimo",
+    )
+
+
 def test_ipynb_to_md(ipynb_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(ipynb_file, "md", "ipynb_to_md")
 
@@ -81,6 +90,11 @@ def test_hydrogen_to_ipynb(hydrogen_file, no_jupytext_version_number):
 
 def test_spin_to_ipynb(r_spin_file, no_jupytext_version_number):
     assert_conversion_same_as_mirror(r_spin_file, "ipynb:spin", "script_to_ipynb")
+
+
+@pytest.mark.requires_marimo
+def test_marimo_to_ipynb(marimo_file, no_jupytext_version_number):
+    assert_conversion_same_as_mirror(marimo_file, "ipynb:marimo", "script_to_ipynb")
 
 
 def test_md_to_ipynb(md_file, no_jupytext_version_number):

@@ -34,7 +34,7 @@ Closing the notebook in Jupyter while you refactor it in another editor will hel
 
 You can simply use _Reload Notebook from disk_ to load the latest edits once you're done with the other editor. When you reload the notebook, the kernel variables are preserved (and the outputs too if the notebook is paired to an `.ipynb` file), so you can continue your work where you left it.
 
-💡 **Tip:** You can automate the notebook reloading by installing the [Jupyter Collaboration](docs/jupyter-collaboration.md) extension.
+💡 **Tip:** You can automate the notebook reloading by installing the [Jupyter Collaboration](jupyter-collaboration.md) extension.
 
 ## How do paired notebooks work?
 
