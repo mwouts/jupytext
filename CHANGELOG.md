@@ -1,7 +1,7 @@
 Jupytext ChangeLog
 ==================
 
-1.19.0.dev0 (unreleased)
+1.19.0.dev0 (2025-11-16)
 ------------------------
 
 **Changes**
