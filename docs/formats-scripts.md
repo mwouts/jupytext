@@ -66,23 +66,23 @@ See how our `World population.ipynb` notebook is [represented](https://github.co
 
 ## The `marimo` format
 
-In Jupytext v1.19 and later, you can use the `py:marimo` format, in which text notebooks are converted to Jupyter notebooks, and back, using [Marimo](https://marimo.io/).
+Since Jupytext v1.19, you can use the `py:marimo` format, in which text notebooks are converted to Jupyter notebooks, and back, using [Marimo](https://marimo.io/).
 
-Our [implementation](https://github.com/mwouts/jupytext/blob/main/src/jupytext/marimo.py) directly calls the `marimo` converter (this requires Marimo v1.16.3 or later)
+Our [implementation](https://github.com/mwouts/jupytext/blob/main/src/jupytext/marimo.py) calls Marimo's converter directly (this requires Marimo v1.16.3 or later).
 
 Please note that:
-- The Marimo format is only available for Python notebooks
-- Marimo will variables that are re-defined to make your notebook Marimo-compliant
-- Notebook and cell metadata (other than tags) are not supported
-- As of Marimo 0.17.8, empty cells are removed upon the round trip
+- The format is available only for Python notebooks.
+- Marimo will add a suffix to variables that are defined multiple times, to make them compatible with its reactive evaluation.
+- Notebook and cell metadata (except tags) cannot be stored in the `py:marimo` file.
+- As of Marimo 0.17.8, empty cells are removed during round trips.
 
-You can determine whether a given notebook is stable over a marimo round trip with
+You can determine whether a given notebook is stable over a Marimo round trip with
 ```
 jupytext --test --to py:marimo your_notebook.ipynb
 jupytext --test --to ipynb your_marimo_script.py
 ```
 
-💡 Please let us know if you notice unexpected changes in your notebook. If you can reproduce the problem using `marimo convert` and `marimo export ipynb --sort top-down`, please report it using the Marimo [issue tracker](https://github.com/marimo-team/marimo/issues). Include if possible include a ping to `@mwouts` (Jupytext's author). If you believe that the issue is Jupytext itself, please report it using the Jupytext [issue tracker](https://github.com/mwouts/jupytext/issues).
+💡 If you notice unexpected changes, and can reproduce them with `marimo convert` and `marimo export ipynb --sort top-down`, report the issue on the Marimo [tracker](https://github.com/marimo-team/marimo/issues), and ping `@mwouts`. If you believe the issue is on Jupytext’s side, use the Jupytext [issue tracker](https://github.com/mwouts/jupytext/issues).
 
 ## The `light` format
 
