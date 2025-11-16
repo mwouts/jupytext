@@ -43,9 +43,9 @@ repos:
 
   - repo: local
     hooks:
-      - id: pixi-install
+      - id: pixi-lock
         name: Update pixi.lock file
-        entry: pixi install
+        entry: pixi lock
         language: system
         pass_filenames: false
         files: ^(pyproject\.toml|pixi\.toml|pixi\.lock)$

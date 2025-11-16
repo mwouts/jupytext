@@ -15,11 +15,12 @@ permissions:
 jobs:
   test-conda:
     name: >
-      ${{ matrix.os }}
+      ${{ matrix.os }} (${{ matrix.dependency-mode }} dependencies)
     strategy:
       fail-fast: false
       matrix:
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
+        dependency-mode: [ 'locked', 'latest' ]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -32,8 +33,14 @@ jobs:
       - name: Install pixi
         uses: prefix-dev/setup-pixi@v0.9.1
         with:
-          pixi-version: v0.55.0
+          pixi-version: v0.59.0
           cache: true
+
+      - name: Update pixi environment
+        if: matrix.dependency-mode == 'latest'
+        run: |
+          eval "$(pixi shell-hook)"
+          pixi update
 
       - name: Run tests
         run: |
