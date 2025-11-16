@@ -4,17 +4,13 @@
 # Required
 version: 2
 
-# Set the version of Python and other tools you might need
+# Build the documentation using Pixi
 build:
   os: "ubuntu-24.04"
   tools:
-    python: "miniconda3-3.12-24.9"
-
-# Build documentation in the docs/ directory with Sphinx
-sphinx:
-  configuration: docs/conf.py
-
-# We recommend specifying your dependencies to enable reproducible builds:
-# https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
-conda:
-  environment: docs/environment.yml
+    python: "3.12"
+  commands:
+    - asdf plugin add pixi
+    - asdf install pixi latest
+    - asdf global pixi latest
+    - pixi run -e docs sphinx-build -b html docs ${READTHEDOCS_OUTPUT:-docs/_build}/html
