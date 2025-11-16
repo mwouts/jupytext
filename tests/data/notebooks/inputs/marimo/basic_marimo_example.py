@@ -1,12 +1,14 @@
 import marimo
 
-__generated_with = "0.17.0"
+__generated_with = "0.17.8"
 app = marimo.App()
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""This is a simple marimo notebook""")
+    mo.md(r"""
+    This is a simple marimo notebook
+    """)
     return
 
 

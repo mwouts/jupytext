@@ -1,12 +1,14 @@
 import marimo
 
-__generated_with = "0.17.0"
+__generated_with = "0.17.8"
 app = marimo.App()
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""A markdown cell""")
+    mo.md(r"""
+    A markdown cell
+    """)
     return
 
 
@@ -18,7 +20,9 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Markdown cell two""")
+    mo.md(r"""
+    Markdown cell two
+    """)
     return
 
 

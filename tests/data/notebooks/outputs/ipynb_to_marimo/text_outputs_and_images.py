@@ -1,24 +1,24 @@
 import marimo
 
-__generated_with = "0.17.0"
+__generated_with = "0.17.8"
 app = marimo.App()
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""This notebook contains outputs of many different types: text, HTML, plots and errors.""")
+    mo.md(r"""
+    This notebook contains outputs of many different types: text, HTML, plots and errors.
+    """)
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     # Text outputs
 
     Using `print`, `sys.stdout` and `sys.stderr`
-    """
-    )
+    """)
     return
 
 
@@ -43,13 +43,11 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     # HTML outputs
 
     Using `pandas`. Here we find two representations: both text and HTML.
-    """
-    )
+    """)
     return
 
 
@@ -70,7 +68,9 @@ def _(pd):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""# Images""")
+    mo.md(r"""
+    # Images
+    """)
     return
 
 
@@ -104,7 +104,9 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""# Errors""")
+    mo.md(r"""
+    # Errors
+    """)
     return
 
 

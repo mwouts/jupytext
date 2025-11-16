@@ -1,18 +1,16 @@
 import marimo
 
-__generated_with = "0.17.0"
+__generated_with = "0.17.8"
 app = marimo.App()
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     # Jupyter notebook
 
     This notebook is a simple jupyter notebook. It only has markdown and code cells. And it does not contain consecutive markdown cells. We start with an addition:
-    """
-    )
+    """)
     return
 
 
@@ -26,7 +24,9 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Now we return a few tuples""")
+    mo.md(r"""
+    Now we return a few tuples
+    """)
     return
 
 
@@ -44,7 +44,9 @@ def _(a, b):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""And this is already the end of the notebook""")
+    mo.md(r"""
+    And this is already the end of the notebook
+    """)
     return
 
 

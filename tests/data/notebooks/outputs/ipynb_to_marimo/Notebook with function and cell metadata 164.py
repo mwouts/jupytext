@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.17.0"
+__generated_with = "0.17.8"
 app = marimo.App()
 
 
@@ -12,12 +12,10 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     A markdown cell
     And below, the cell for function f has non trivial cell metadata. And the next cell as well.
-    """
-    )
+    """)
     return
 
 
@@ -34,7 +32,9 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""More text""")
+    mo.md(r"""
+    More text
+    """)
     return
 
 

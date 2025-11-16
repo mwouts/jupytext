@@ -1,19 +1,17 @@
 import marimo
 
-__generated_with = "0.17.0"
+__generated_with = "0.17.8"
 app = marimo.App()
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     ##################################################################
     This is a notebook that contains many hash signs.
     Hopefully its python representation is not recognized as a Sphinx Gallery script...
     ##################################################################
-    """
-    )
+    """)
     return
 
 
@@ -32,14 +30,12 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     ##################################################################
     This is a notebook that contains many hash signs.
     Hopefully its python representation is not recognized as a Sphinx Gallery script...
     ##################################################################
-    """
-    )
+    """)
     return
 
 

@@ -1,13 +1,12 @@
 import marimo
 
-__generated_with = "0.17.0"
+__generated_with = "0.17.8"
 app = marimo.App()
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     This cell uses no particular cell marker
 
     $$
@@ -17,15 +16,13 @@ def _(mo):
     \dot{z} & = -\beta z + xy
     \end{align}
     $$
-    """
-    )
+    """)
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     This cell uses no particular cell marker, and a single slash in the $\LaTeX$ equation
 
     $$
@@ -35,15 +32,13 @@ def _(mo):
     \dot{z} & = -\beta z + xy
     \end{align}
     $$
-    """
-    )
+    """)
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     This cell uses the triple quote cell markers introduced at https://github.com/mwouts/jupytext/issues/305
 
     $$
@@ -53,8 +48,7 @@ def _(mo):
     \dot{z} & = -\beta z + xy
     \end{align}
     $$
-    """
-    )
+    """)
     return
 
 
