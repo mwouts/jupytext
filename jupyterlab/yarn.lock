@@ -7137,7 +7137,7 @@ __metadata:
     jupyterlab-rise: ^0.43.1
     npm-run-all: ^4.1.5
     rimraf: ^6.0.1
-    typescript: ~5.8.2
+    typescript: ~5.9.2
   languageName: unknown
   linkType: soft
 
@@ -10524,11 +10524,11 @@ __metadata:
   linkType: hard
 
 "systeminformation@npm:^5.8.6":
-  version: 5.25.11
-  resolution: "systeminformation@npm:5.25.11"
+  version: 5.27.14
+  resolution: "systeminformation@npm:5.27.14"
   bin:
     systeminformation: lib/cli.js
-  checksum: 4cee19bff31456f6e777fa165eebb16623d9b911b2ce89dd8157a3eb700f356b8c746dd16fe86d9d5855c654d3f947b30c49122819a206eb8ca750d8290c1f18
+  checksum: a68728714c51a351f2d3dcd7ce26353916b137965e17b11889325bcec2df7ed618475146145c688fcb456d83b4c28a3ce90799e1515458701a6c9e7cf5123ad9
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
@@ -10906,7 +10906,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:>=3 < 6, typescript@npm:~5.8.2":
+"typescript@npm:>=3 < 6":
   version: 5.8.2
   resolution: "typescript@npm:5.8.2"
   bin:
@@ -10916,13 +10916,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@>=3 < 6#~builtin<compat/typescript>, typescript@patch:typescript@~5.8.2#~builtin<compat/typescript>":
+"typescript@npm:~5.9.2":
+  version: 5.9.3
+  resolution: "typescript@npm:5.9.3"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 0d0ffb84f2cd072c3e164c79a2e5a1a1f4f168e84cb2882ff8967b92afe1def6c2a91f6838fb58b168428f9458c57a2ba06a6737711fdd87a256bbe83e9a217f
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@>=3 < 6#~builtin<compat/typescript>":
   version: 5.8.2
   resolution: "typescript@patch:typescript@npm%3A5.8.2#~builtin<compat/typescript>::version=5.8.2&hash=5786d5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 557109f14248260656c551f1a8bf8de188d5397928a8ae6e6f00e268f25975b6e572522085ae8e06683de019b1885781f50090f07c4f0a9a34d60c459305f80d
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@~5.9.2#~builtin<compat/typescript>":
+  version: 5.9.3
+  resolution: "typescript@patch:typescript@npm%3A5.9.3#~builtin<compat/typescript>::version=5.9.3&hash=5786d5"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: a5a6dc399d3761ded54192031f11d3ad5df8001c7febe3fbbc8098efcb552cdf8f2f402b3618c56dafcd04fef63dee005f4900f608e185404caedc46480539ed
   languageName: node
   linkType: hard
 
