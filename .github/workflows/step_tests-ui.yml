@@ -16,16 +16,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Base Setup
-        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.9.1
         with:
-          python_version: 3.x
+          pixi-version: v0.59.0
+          cache: true
 
       - name: Install from source
-        run: HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e '.[test-ui]'
+        run: |
+          eval "$(pixi shell-hook)"
+          HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e '.[test-ui]'
 
       - name: Uninstall jupyter-fs
         run: |
+          eval "$(pixi shell-hook)"
           # Uninstall jupyter-fs as it overrides the original browser-test.js to
           # check its own functionality (https://github.com/jpmorganchase/jupyter-fs/blob/main/jupyterfs/browser-test.js)
           pip uninstall jupyter-fs -y
@@ -35,16 +39,20 @@ jobs:
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
         run: |
-          pip install jupyterlab
+          eval "$(pixi shell-hook)"
           jlpm install
 
       - name: Install browser
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
-        run: jlpm playwright install chromium
+        run: |
+          eval "$(pixi shell-hook)"
+          jlpm playwright install chromium
 
       - name: Integration tests
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
-        run: jlpm playwright test
+        run: |
+          eval "$(pixi shell-hook)"
+          jlpm playwright test
 
       - name: Upload UI Test artifacts
         if: failure()
