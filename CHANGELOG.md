@@ -1,18 +1,19 @@
 Jupytext ChangeLog
 ==================
 
-1.19.0.dev0 (2025-11-16)
-------------------------
+1.19.0 (2026-01-18)
+-------------------
 
 **Changes**
-The environment used to develop Jupytext is now maintained using Pixi ([#1459](https://github.com/mwouts/jupytext/pull/1459))
+- The environment used to develop Jupytext is now maintained using Pixi ([#1459](https://github.com/mwouts/jupytext/pull/1459))
 
 **Fixed**
-- We have fixed the round trip tests and made them work with Quarto 1.8.25 ([#1435](https://github.com/mwouts/jupytext/issues/1435))
+- We have restored the support for `.qmd` documents in Jupyter ([#1435](https://github.com/mwouts/jupytext/issues/1435))
 - We have fixed warnings about the cell ids like either `Cell is missing an id field` or `Additional properties are not allowed ('id' was unexpected)` when converting to some formats, including Pandoc ([#1464](https://github.com/mwouts/jupytext/pull/1464))
+- We have updated the dependencies of the Jupytext extension for JupyterLab. Many thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for his PR ([#1477](https://github.com/mwouts/jupytext/pull/1477))!
 
 **Added**
-We have added a new `py:marimo` format, which uses the `marimo` command line interface to convert notebooks to and from the Marimo format ([#1431](https://github.com/mwouts/jupytext/pull/1431))
+- We have added a new `py:marimo` format, which uses the `marimo` command line interface to convert notebooks to and from the Marimo format ([#1431](https://github.com/mwouts/jupytext/pull/1431))
 
 
 1.18.1 (2025-10-19)
