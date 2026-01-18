@@ -689,7 +689,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/application@npm:^4.0.2, @jupyterlab/application@npm:^4.5.2":
+"@jupyterlab/application@npm:^4.0.2, @jupyterlab/application@npm:^4.4.9, @jupyterlab/application@npm:^4.5.2":
   version: 4.5.2
   resolution: "@jupyterlab/application@npm:4.5.2"
   dependencies:
@@ -717,7 +717,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/apputils@npm:^4.0.2, @jupyterlab/apputils@npm:^4.6.2":
+"@jupyterlab/apputils@npm:^4.0.2, @jupyterlab/apputils@npm:^4.4.9, @jupyterlab/apputils@npm:^4.6.2":
   version: 4.6.2
   resolution: "@jupyterlab/apputils@npm:4.6.2"
   dependencies:
@@ -760,7 +760,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/builder@npm:^4.5.2":
+"@jupyterlab/builder@npm:^4.4.9":
   version: 4.5.2
   resolution: "@jupyterlab/builder@npm:4.5.2"
   dependencies:
@@ -837,7 +837,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/codeeditor@npm:^4.5.2":
+"@jupyterlab/codeeditor@npm:^4.4.9, @jupyterlab/codeeditor@npm:^4.5.2":
   version: 4.5.2
   resolution: "@jupyterlab/codeeditor@npm:4.5.2"
   dependencies:
@@ -1008,7 +1008,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/docregistry@npm:^4.0.2, @jupyterlab/docregistry@npm:^4.5.2":
+"@jupyterlab/docregistry@npm:^4.0.2, @jupyterlab/docregistry@npm:^4.4.9, @jupyterlab/docregistry@npm:^4.5.2":
   version: 4.5.2
   resolution: "@jupyterlab/docregistry@npm:4.5.2"
   dependencies:
@@ -1053,7 +1053,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/filebrowser@npm:^4.5.2":
+"@jupyterlab/filebrowser@npm:^4.4.9, @jupyterlab/filebrowser@npm:^4.5.2":
   version: 4.5.2
   resolution: "@jupyterlab/filebrowser@npm:4.5.2"
   dependencies:
@@ -1136,7 +1136,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/launcher@npm:^4.5.2":
+"@jupyterlab/launcher@npm:^4.4.9":
   version: 4.5.2
   resolution: "@jupyterlab/launcher@npm:4.5.2"
   dependencies:
@@ -1224,7 +1224,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/nbformat@npm:^3.0.0 || ^4.0.0-alpha.21 || ^4.0.0, @jupyterlab/nbformat@npm:^4.5.2":
+"@jupyterlab/nbformat@npm:^3.0.0 || ^4.0.0-alpha.21 || ^4.0.0, @jupyterlab/nbformat@npm:^4.4.9, @jupyterlab/nbformat@npm:^4.5.2":
   version: 4.5.2
   resolution: "@jupyterlab/nbformat@npm:4.5.2"
   dependencies:
@@ -1233,7 +1233,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/notebook@npm:^4.0.2, @jupyterlab/notebook@npm:^4.5.2":
+"@jupyterlab/notebook@npm:^4.0.2, @jupyterlab/notebook@npm:^4.4.9, @jupyterlab/notebook@npm:^4.5.2":
   version: 4.5.2
   resolution: "@jupyterlab/notebook@npm:4.5.2"
   dependencies:
@@ -1317,7 +1317,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/rendermime@npm:^4.5.2":
+"@jupyterlab/rendermime@npm:^4.4.9, @jupyterlab/rendermime@npm:^4.5.2":
   version: 4.5.2
   resolution: "@jupyterlab/rendermime@npm:4.5.2"
   dependencies:
@@ -1356,7 +1356,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/settingregistry@npm:^4.0.2, @jupyterlab/settingregistry@npm:^4.5.2":
+"@jupyterlab/settingregistry@npm:^4.0.2, @jupyterlab/settingregistry@npm:^4.4.9, @jupyterlab/settingregistry@npm:^4.5.2":
   version: 4.5.2
   resolution: "@jupyterlab/settingregistry@npm:4.5.2"
   dependencies:
@@ -1427,7 +1427,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/translation@npm:^4.0.2, @jupyterlab/translation@npm:^4.5.2":
+"@jupyterlab/translation@npm:^4.0.2, @jupyterlab/translation@npm:^4.4.9, @jupyterlab/translation@npm:^4.5.2":
   version: 4.5.2
   resolution: "@jupyterlab/translation@npm:4.5.2"
   dependencies:
@@ -1440,7 +1440,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/ui-components@npm:^4.0.2, @jupyterlab/ui-components@npm:^4.5.2":
+"@jupyterlab/ui-components@npm:^4.0.2, @jupyterlab/ui-components@npm:^4.4.9, @jupyterlab/ui-components@npm:^4.5.2":
   version: 4.5.2
   resolution: "@jupyterlab/ui-components@npm:4.5.2"
   dependencies:
@@ -8200,19 +8200,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "jupyterlab-jupytext@workspace:packages/jupyterlab-jupytext-extension"
   dependencies:
-    "@jupyterlab/application": ^4.5.2
-    "@jupyterlab/apputils": ^4.6.2
-    "@jupyterlab/builder": ^4.5.2
-    "@jupyterlab/codeeditor": ^4.5.2
-    "@jupyterlab/docregistry": ^4.5.2
-    "@jupyterlab/filebrowser": ^4.5.2
-    "@jupyterlab/launcher": ^4.5.2
-    "@jupyterlab/nbformat": ^4.5.2
-    "@jupyterlab/notebook": ^4.5.2
-    "@jupyterlab/rendermime": ^4.5.2
-    "@jupyterlab/settingregistry": ^4.5.2
-    "@jupyterlab/translation": ^4.5.2
-    "@jupyterlab/ui-components": ^4.5.2
+    "@jupyterlab/application": ^4.4.9
+    "@jupyterlab/apputils": ^4.4.9
+    "@jupyterlab/builder": ^4.4.9
+    "@jupyterlab/codeeditor": ^4.4.9
+    "@jupyterlab/docregistry": ^4.4.9
+    "@jupyterlab/filebrowser": ^4.4.9
+    "@jupyterlab/launcher": ^4.4.9
+    "@jupyterlab/nbformat": ^4.4.9
+    "@jupyterlab/notebook": ^4.4.9
+    "@jupyterlab/rendermime": ^4.4.9
+    "@jupyterlab/settingregistry": ^4.4.9
+    "@jupyterlab/translation": ^4.4.9
+    "@jupyterlab/ui-components": ^4.4.9
     "@lumino/commands": ^2.3.3
     "@lumino/coreutils": ^2.2.2
     "@lumino/disposable": ^2.1.5
