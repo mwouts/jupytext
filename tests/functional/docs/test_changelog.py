@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from jupytext.version import __version__
 
 
 def replace_issue_number_with_links(text):
@@ -41,3 +42,28 @@ def test_update_changelog():
     new_text = replace_issue_number_with_links(cur_text)
     if cur_text != new_text:
         changelog_file.write_text(new_text)  # pragma: no cover
+
+
+def test_version_matches_changelog():
+    root_path = Path(__file__).parent.parent.parent.parent
+    changelog_file = root_path / "CHANGELOG.md"
+
+    # Read version from version.py
+    current_version = __version__
+
+    # Read first version from CHANGELOG.md
+    changelog_text = changelog_file.read_text()
+    prev_line = ""
+    for line in changelog_text.splitlines():
+        if not line.startswith("--------"):
+            prev_line = line
+            continue
+
+        changelog_version = prev_line.split("(")[0].strip()
+        assert current_version == changelog_version, (
+            f"Version mismatch: version.py has {current_version}, but CHANGELOG.md has {changelog_version}"
+        )
+
+        return
+
+    raise ValueError("No version found in CHANGELOG.md")
