@@ -37,6 +37,11 @@
         "stylelint-config-standard": "^37.0.0",
         "stylelint-prettier": "^5.0.3"
     },
+    "resolutions": {
+        "tar": "7.5.3",
+        "glob": "10.5.0",
+        "systeminformation": "5.27.14"
+    },
     "styleModule": "packages/*/style/index.js",
     "eslintIgnore": [
         "**/*.d.ts",
