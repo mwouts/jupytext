@@ -290,6 +290,7 @@ jupyterlab = ">=4.0"
 nbformat = ">=5.1.2"
 pre-commit = ">=4.3"
 nodejs = ">=20"
+hatch = "*"
 pip = "*"
 
 [tool.pixi.feature.docs.dependencies]
