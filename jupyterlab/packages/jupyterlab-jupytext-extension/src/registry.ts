@@ -13,25 +13,25 @@ export function registerFileTypes(
   trans: TranslationBundle,
 ) {
   const mystExtensions = ['myst', 'mystnb', 'mnb'];
-  const rmdExtensions = ['Rmd']
-  const quartoExtensions = ['qmd']
+  const rmdExtensions = ['Rmd'];
+  const quartoExtensions = ['qmd'];
 
   const extensionsWithFactory = [
     ...mystExtensions,
     ...rmdExtensions,
-    ...quartoExtensions
-  ]
+    ...quartoExtensions,
+  ];
 
   // Add a catch-all file type to overrride icon which by default is derive from model type.
   // Because jupytext changes the type of all files it can handle to Notebook, we need to
   // override it. We exclude file types which have dedicated icons (handled later).
   const excludedExtensions = [
     'ipynb',
-    ...jupytextFormatsWithFileTypeData.map(f => f.fileExt),
-    ...extensionsWithFactory
+    ...jupytextFormatsWithFileTypeData.map((f) => f.fileExt),
+    ...extensionsWithFactory,
   ].join('|');
   docRegistry.addFileType({
-    name: `jupytext-notebook-file`,
+    name: 'jupytext-notebook-file',
     contentType: 'notebook',
     pattern: `^(?!.*\\.(${excludedExtensions})$).*$`,
     icon: fileIcon,
@@ -46,7 +46,9 @@ export function registerFileTypes(
         // `pattern` field gives it precedence over other file type information when resolving the icon
         pattern: `\\.${format.fileExt}$`,
         extensions: [`.${format.fileExt}`],
-        icon: format.iconName ? LabIcon.resolve({ icon: format.iconName }) : format.kernelIcon,
+        icon: format.iconName
+          ? LabIcon.resolve({ icon: format.iconName })
+          : format.kernelIcon,
       });
     }
   }
@@ -63,7 +65,9 @@ export function registerFileTypes(
             kernelFileType.paletteLabel.split('New')[1].trim(),
           ),
           extensions: [`.${kernelFileType.fileExt}`],
-          icon: kernelFileType.iconName ? LabIcon.resolve({ icon: kernelFileType.iconName }) : kernelFileType.kernelIcon,
+          icon: kernelFileType.iconName
+            ? LabIcon.resolve({ icon: kernelFileType.iconName })
+            : kernelFileType.kernelIcon,
         });
       });
     },
@@ -81,7 +85,7 @@ export function registerFileTypes(
       name: 'myst',
       contentType: 'notebook',
       displayName: trans.__('MyST Markdown Notebook'),
-      extensions: mystExtensions.map(ext => '.' + ext),
+      extensions: mystExtensions.map((ext) => '.' + ext),
       icon: markdownNotebookIcon,
     },
     ['Notebook'],
@@ -93,7 +97,7 @@ export function registerFileTypes(
       contentType: 'notebook',
       displayName: trans.__('R Markdown Notebook'),
       // Extension file are transformed to lower case...
-      extensions: rmdExtensions.map(ext => '.' + ext),
+      extensions: rmdExtensions.map((ext) => '.' + ext),
       icon: markdownNotebookIcon,
     },
     ['Notebook'],
@@ -104,8 +108,8 @@ export function registerFileTypes(
       name: 'quarto',
       contentType: 'notebook',
       displayName: trans.__('Quarto Notebook'),
-      extensions: quartoExtensions.map(ext => '.' + ext),
-      pattern: `\\.qmd$`,
+      extensions: quartoExtensions.map((ext) => '.' + ext),
+      pattern: '\\.qmd$',
       icon: markdownNotebookIcon,
     },
     ['Notebook'],

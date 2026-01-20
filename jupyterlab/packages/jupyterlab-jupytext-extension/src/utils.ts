@@ -59,7 +59,7 @@ function base64ToSvgStr(width: number, imageBase64: string): string {
  */
 async function getKernelIcon(
   specModel: KernelSpec.ISpecModel,
-  fileType: DocumentRegistry.IFileType | undefined
+  fileType: DocumentRegistry.IFileType | undefined,
 ): Promise<LabIcon> {
   // First check for logo-svg
   if (specModel.resources['logo-svg']) {
