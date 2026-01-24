@@ -12,8 +12,7 @@ The outputs of the notebook are not stored on disk, unless you decide to
 
 ## How to open a text notebook in JupyterLab
 
-Once you have [installed](install.md) Jupytext, `.py` and `.md` files get a
-notebook icon in Jupyter. And you can really open and run these files as
+Once you have [installed](install.md) Jupytext, you can open and run `.py` and `.md` files as
 notebooks.
 
 ### With a right click

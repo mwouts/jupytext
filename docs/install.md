@@ -20,14 +20,14 @@ Jupytext comes with a series of tools and plugin, which we will now briefly desc
 
 ## Jupytext's contents manager
 
-Jupytext provides a contents manager that let Jupyter open and save notebooks as text files. When Jupytext's content manager is active in Jupyter, scripts and Markdown documents have a notebook icon.
+Jupytext provides a contents manager that let Jupyter open and save notebooks as text files.
 
 Jupytext's contents manager is activated automatically by Jupytext's server extension. When you start either `jupyter lab` or `jupyter notebook`, you should see a line that looks like:
 ```bash
 [I 10:28:31.646 LabApp] [Jupytext Server Extension] Changing NotebookApp.contents_manager_class from LargeFileManager to jupytext.TextFileContentsManager
 ```
 
-If you don't have the notebook icon on text documents after a fresh restart of your Jupyter server, please enable our server extension explicitly with
+If you don't see the message above after a fresh restart of your Jupyter server, please enable our server extension explicitly with
 ```
 jupyter serverextension enable jupytext
 ```
