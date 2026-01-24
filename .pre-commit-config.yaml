@@ -45,7 +45,7 @@ repos:
     hooks:
       - id: pixi-lock
         name: Update pixi.lock file
-        entry: pixi lock
+        entry: pixi install
         language: system
         pass_filenames: false
-        files: ^(pyproject\.toml|pixi\.toml|pixi\.lock)$
+        files: ^(pyproject\.toml|pixi\.toml|pixi\.lock|src/jupytext/version\.py)$

@@ -5,14 +5,14 @@ Jupytext ChangeLog
 -------------------------
 
 **Changed**
-
 - We have bumped lodash from 4.17.21 to 4.17.23 in JupyterLab extension ([#1483](https://github.com/mwouts/jupytext/pull/1483))
+- We require `marimo<=0.19.4` in tests following a change in the location of the `marimo` import ([#1485](https://github.com/mwouts/jupytext/issues/1485))
 
 
 1.19.0 (2026-01-18)
 -------------------
 
-**Changes**
+**Changed**
 - The environment used to develop Jupytext is now maintained using Pixi ([#1459](https://github.com/mwouts/jupytext/pull/1459))
 
 **Fixed**
