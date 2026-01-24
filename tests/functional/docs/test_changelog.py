@@ -67,3 +67,8 @@ def test_version_matches_changelog():
         return
 
     raise ValueError("No version found in CHANGELOG.md")
+
+
+def test_version_pep440_compliance():
+    pep440_regex = r"^(?:(?:0|[1-9]\d*)\.){2}(?:0|[1-9]\d*)(?:[abc]|rc)?(?:\d+)?(?:\.post\d+)?(?:\.dev\d+)?$"
+    assert re.match(pep440_regex, __version__), f"Version {__version__} is not PEP 440 compliant"

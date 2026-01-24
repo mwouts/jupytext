@@ -1,6 +1,14 @@
 Jupytext ChangeLog
 ==================
 
+1.19.1.dev0 (development)
+-------------------------
+
+**Changed**
+
+- We have bumped lodash from 4.17.21 to 4.17.23 in JupyterLab extension ([#1483](https://github.com/mwouts/jupytext/pull/1483))
+
+
 1.19.0 (2026-01-18)
 -------------------
 
