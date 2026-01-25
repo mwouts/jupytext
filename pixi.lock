@@ -3905,7 +3905,7 @@ packages:
 - pypi: ./
   name: jupytext
   version: 1.19.1
-  sha256: 8c612ffc98e766a96bc6cfc64f63ee08ea107a4bb8a9c1318bb1b0a294b143f5
+  sha256: 3075ed5213ba2e38dcea206af239f344e1622d5b95bf7f02ae12e71fb404902e
   requires_dist:
   - markdown-it-py>=1.0
   - mdit-py-plugins
@@ -3921,7 +3921,7 @@ packages:
   - isort ; extra == 'dev'
   - jupyter-fs[fs]>=1.0 ; extra == 'dev'
   - jupyter-server!=2.11 ; extra == 'dev'
-  - marimo>=0.19.6 ; extra == 'dev'
+  - marimo>=0.19.6 ; python_full_version >= '3.10' and extra == 'dev'
   - nbconvert ; extra == 'dev'
   - pre-commit ; extra == 'dev'
   - pytest ; extra == 'dev'
@@ -3956,7 +3956,7 @@ packages:
   - isort ; extra == 'test-external'
   - jupyter-fs[fs]>=1.0 ; extra == 'test-external'
   - jupyter-server!=2.11 ; extra == 'test-external'
-  - marimo>=0.19.6 ; extra == 'test-external'
+  - marimo>=0.19.6 ; python_full_version >= '3.10' and extra == 'test-external'
   - nbconvert ; extra == 'test-external'
   - pre-commit ; extra == 'test-external'
   - pytest ; extra == 'test-external'
@@ -3980,7 +3980,6 @@ packages:
   - pytest-xdist ; extra == 'test-integration'
   - bash-kernel ; extra == 'test-ui'
   requires_python: '>=3.9'
-  editable: true
 - conda: https://conda.anaconda.org/conda-forge/noarch/keyring-25.7.0-pyh534df25_0.conda
   sha256: 9def5c6fb3b3b4952a4f6b55a019b5c7065b592682b84710229de5a0b73f6364
   md5: c88f9579d08eb4031159f03640714ce3
