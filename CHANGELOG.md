@@ -7,7 +7,7 @@ Jupytext ChangeLog
 **Changed**
 - Jupytext does not change the file icons anymore! Thanks to [Michał Krassowski](https://github.com/krassowski) for finally solving this long standing issue! ([#398](https://github.com/mwouts/jupytext/issues/398))
 - We have bumped lodash from 4.17.21 to 4.17.23 in JupyterLab extension ([#1483](https://github.com/mwouts/jupytext/pull/1483))
-- We require `marimo<=0.19.4` in tests following a change in the location of the `marimo` import ([#1485](https://github.com/mwouts/jupytext/issues/1485))
+- We have updated the marimo examples using `marimo==0.19.6` following a change in the location of the `marimo` import ([#1485](https://github.com/mwouts/jupytext/issues/1485))
 
 
 1.19.0 (2026-01-18)
