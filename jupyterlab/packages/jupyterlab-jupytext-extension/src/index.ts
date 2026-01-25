@@ -54,6 +54,7 @@ import {
   CommandIDs,
   IFileTypeData,
   JupytextIcon,
+  AUTO_LANGUAGE_FILETYPE_DATA,
 } from './tokens';
 
 import {
@@ -362,6 +363,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     // Get a map of available kernel languages in current widget
     const availableKernelLanguages = await getAvailableKernelLanguages(
       languages,
+      docRegistry,
       serviceManager,
     );
 
@@ -373,7 +375,15 @@ const extension: JupyterFrontEndPlugin<void> = {
       );
 
     // Register Jupytext text notebooks file types
-    registerFileTypes(availableKernelLanguages, docRegistry, trans);
+    registerFileTypes(
+      availableKernelLanguages,
+      [
+        ...[...JUPYTEXT_PAIR_COMMANDS_FILETYPE_DATA.values()].flat(),
+        ...[...AUTO_LANGUAGE_FILETYPE_DATA.values()].flat(),
+      ],
+      docRegistry,
+      trans,
+    );
 
     // Get all kernel file types to add to Jupytext factory
     const kernelLanguageNames: string[] = [];
