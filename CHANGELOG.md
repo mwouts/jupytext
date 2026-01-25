@@ -1,8 +1,8 @@
 Jupytext ChangeLog
 ==================
 
-1.19.1.dev0 (development)
--------------------------
+1.19.1 (2026-01-25)
+-------------------
 
 **Changed**
 - Jupytext does not change the file icons anymore! Thanks to [Michał Krassowski](https://github.com/krassowski) for finally solving this long standing issue! ([#398](https://github.com/mwouts/jupytext/issues/398))
