@@ -1,0 +1,121 @@
+{
+  "name": "jupyter-fs",
+  "version": "1.1.2",
+  "description": "A Filesystem-like mult-contents manager backend for Jupyter",
+  "author": "The jupyter-fs authors",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "style": "style/index.css",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "scripts": {
+    "build": "pnpm run build:lib && pnpm run build:labextension",
+    "build:labextension": "jupyter labextension build --development=True --source-map=True .",
+    "build:prod": "pnpm run build:lib && pnpm run build:labextension:prod",
+    "build:labextension:prod": "jupyter labextension build --source-map=True .",
+    "build:lib": "tsc -b",
+    "clean": "rimraf dist lib tsconfig.tsbuildinfo",
+    "clean:labextension": "rimraf ../jupyterfs/labextension",
+    "clean:slate": "pnpm run clean && pnpm run clean:labextension && rimraf node_modules",
+    "deduplicate": "pnpm dedupe",
+    "fix": "pnpm run lint --fix",
+    "integrity": "pnpm install && pnpm run deduplicate && pnpm install",
+    "lint": "eslint -c .eslintrc.js --ext .js,.ts,.tsx src/ tests/",
+    "postpack": "shx rm README.md",
+    "prepack": "shx cp ../README.md .",
+    "prepublishOnly": "pnpm run clean && pnpm run clean:labextension && pnpm run integrity && pnpm run build:prod",
+    "test": "jest --coverage",
+    "watch": "run-p watch:lib watch:labextension",
+    "watch:lib": "tsc -b -w",
+    "watch:labextension": "jupyter labextension watch ."
+  },
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+    "schema/**/*.{json,}",
+    "src/**/*",
+    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+  ],
+  "dependencies": {
+    "@jupyterlab/application": "^4.4.10",
+    "@jupyterlab/apputils": "^4.5.10",
+    "@jupyterlab/coreutils": "^6.4.10",
+    "@jupyterlab/docmanager": "^4.4.10",
+    "@jupyterlab/docregistry": "^4.4.10",
+    "@jupyterlab/filebrowser": "^4.4.10",
+    "@jupyterlab/services": "^7.4.10",
+    "@jupyterlab/settingregistry": "^4.4.10",
+    "@jupyterlab/statedb": "^4.4.10",
+    "@jupyterlab/statusbar": "^4.4.10",
+    "@jupyterlab/translation": "^4.4.10",
+    "@jupyterlab/ui-components": "^4.4.10",
+    "@lumino/algorithm": "^2.0.3",
+    "@lumino/commands": "^2.3.2",
+    "@lumino/coreutils": "^2.2.1",
+    "@lumino/disposable": "^2.1.4",
+    "@lumino/dragdrop": "^2.1.6",
+    "@lumino/messaging": "^2.0.3",
+    "@lumino/signaling": "^2.1.4",
+    "@lumino/widgets": "^2.7.1",
+    "@material-ui/core": "^4.12.4",
+    "@tree-finder/base": "^1.0.3",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "semver": "^7.7.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@jupyterlab/builder": "^4.4.10",
+    "@rjsf/utils": "^5.24.13",
+    "@types/file-saver": "^2.0.7",
+    "@types/jest": "^29.5.14",
+    "@types/jszip": "^3.4.1",
+    "@types/react": "^18.3.26",
+    "@types/react-dom": "^18.3.7",
+    "@types/semver": "^7.7.1",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsdoc": "^50.8.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-unicorn": "^56.0.1",
+    "isomorphic-fetch": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "jest-raw-loader": "^1.0.1",
+    "mkdirp": "^3.0.1",
+    "rimraf": "^6.1.0",
+    "shx": "^0.4.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
+  },
+  "sideEffects": [
+    "style/**/*.css",
+    "style/index.js"
+  ],
+  "styleModule": "style/index.js",
+  "jupyterlab": {
+    "discovery": {
+      "server": {
+        "managers": [
+          "pip"
+        ],
+        "base": {
+          "name": "jupyter-fs"
+        }
+      }
+    },
+    "extension": "lib/index.js",
+    "outputDir": "../jupyterfs/labextension",
+    "schemaDir": "schema"
+  }
+}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Jupyter Notebook - Consoles</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="Description" content="WASM powered Jupyter running in the browser." />
+    <link rel="manifest" href="../manifest.webmanifest" />
+    <link
+      id="jupyter-lite-main"
+      rel="preload"
+      href="../build/consoles/bundle.js?_=776439a"
+      main="index"
+      as="script"
+    />
+    <script
+      id="jupyter-config-data"
+      type="application/json"
+      data-jupyter-lite-root=".."
+    >
+      {}
+    </script>
+    <script>
+      (async function () {
+        const { pathname, origin, search, hash } = window.location;
+        if (pathname.match(/(index.html|\/?)$/) == null) {
+          window.location.href = `${origin}${pathname}/${search}${hash}`;
+          return;
+        }
+        await import(
+          '../config-utils.js?_=776439a'
+        );
+      }.call(this));
+    </script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        transition: background-color 0.3s ease;
+      }
+
+      body {
+        background-color: #fff;
+        color: #000;
+      }
+
+      body.jp-mod-dark {
+        background-color: #111;
+        color: #fff;
+      }
+
+      #jupyterlite-loading-indicator {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 1000;
+        opacity: 0; /* Hidden by default */
+        transition: opacity 0.5s ease-out;
+        display: none; /* Hidden by default */
+      }
+
+      #jupyterlite-loading-indicator.hidden {
+        animation: fadeOut 0.5s ease-out forwards;
+        pointer-events: none;
+      }
+
+      /* Show the indicator when needed */
+      #jupyterlite-loading-indicator:not(.hidden) {
+        opacity: 1;
+        display: block;
+      }
+
+      .jupyterlite-loading-indicator-spinner {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 20px;
+        border: 6px solid rgba(0, 0, 0, 0.1);
+        border-top: 6px solid #FFDC00; /* Bright yellow color */
+        border-radius: 50%;
+        animation: jupyter-spin 1s linear infinite;
+      }
+
+      body.jp-mod-dark .jupyterlite-loading-indicator-spinner {
+        border: 6px solid rgba(255, 255, 255, 0.1);
+        border-top: 6px solid #FFDC00;
+      }
+
+      .jupyterlite-loading-indicator-text {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        font-size: 16px;
+      }
+
+      /* Adjust text color based on theme */
+      body.jp-mod-light .jupyterlite-loading-indicator-text {
+        color: #000000;
+      }
+
+      body.jp-mod-dark .jupyterlite-loading-indicator-text {
+        color: #ffffff;
+      }
+
+      @keyframes jupyter-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      @keyframes fadeOut {
+        0% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+    </style>
+  </head>
+  <body class="jp-ThemedContainer" data-notebook="consoles">
+    <div id="jupyterlite-loading-indicator" class="hidden">
+      <div class="jupyterlite-loading-indicator-spinner"></div>
+      <div class="jupyterlite-loading-indicator-text">Loading JupyterLite...</div>
+    </div>
+    <noscript>
+      <div style="text-align: center; padding: 20px;">
+          JupyterLite requires JavaScript to be enabled in your browser.
+      </div>
+    </noscript>
+  </body>
+</html>

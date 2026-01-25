@@ -1,0 +1,413 @@
+{
+  "jupyter-config-data": {
+    "appName": "Jupytext + JupyterLite Demo",
+    "appUrl": "./lab",
+    "appVersion": "1.0.0",
+    "baseUrl": "./",
+    "defaultKernelName": "python",
+    "faviconUrl": "./lab/favicon.ico",
+    "federated_extensions": [
+      {
+        "extension": "./extension",
+        "load": "static/remoteEntry.8ff53948efcc56e245e7.js",
+        "name": "jupyter-fs",
+        "style": "./style"
+      },
+      {
+        "extension": "./extension",
+        "load": "static/remoteEntry.69bbb1ca1bcb37bd1aad.js",
+        "name": "jupyterlab-jupytext"
+      },
+      {
+        "extension": "./extension",
+        "load": "static/remoteEntry.5cbb9d2323598fbda535.js",
+        "name": "jupyterlab_pygments",
+        "style": "./style"
+      }
+    ],
+    "fileTypes": {
+      "avi": {
+        "extensions": [
+          ".avi"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "video/x-msvideo"
+        ],
+        "name": "avi"
+      },
+      "css": {
+        "extensions": [
+          ".css"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "text/css"
+        ],
+        "name": "css"
+      },
+      "csv": {
+        "extensions": [
+          ".csv"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "text/csv"
+        ],
+        "name": "csv"
+      },
+      "fasta": {
+        "extensions": [
+          ".fasta"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "text/plain"
+        ],
+        "name": "fasta"
+      },
+      "flac": {
+        "extensions": [
+          ".flac"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "audio/flac"
+        ],
+        "name": "flac"
+      },
+      "geojson": {
+        "extensions": [
+          ".geojson"
+        ],
+        "fileFormat": "json",
+        "mimeTypes": [
+          "application/geo+json"
+        ],
+        "name": "geojson"
+      },
+      "gzip": {
+        "extensions": [
+          ".tgz",
+          ".gz",
+          ".gzip"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "application/gzip"
+        ],
+        "name": "gzip"
+      },
+      "html": {
+        "extensions": [
+          ".html"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "text/html"
+        ],
+        "name": "html"
+      },
+      "ical": {
+        "extensions": [
+          ".ical",
+          ".ics",
+          ".ifb",
+          ".icalendar"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "text/calendar"
+        ],
+        "name": "ical"
+      },
+      "ico": {
+        "extensions": [
+          ".ico"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "image/x-icon"
+        ],
+        "name": "ico"
+      },
+      "ipynb": {
+        "extensions": [
+          ".ipynb"
+        ],
+        "fileFormat": "json",
+        "mimeTypes": [
+          "application/x-ipynb+json"
+        ],
+        "name": "ipynb"
+      },
+      "jpeg": {
+        "extensions": [
+          ".jpeg",
+          ".jpg"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "image/jpeg"
+        ],
+        "name": "jpeg"
+      },
+      "js": {
+        "extensions": [
+          ".js",
+          ".mjs"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "application/javascript"
+        ],
+        "name": "js"
+      },
+      "jsmap": {
+        "extensions": [
+          ".map"
+        ],
+        "fileFormat": "json",
+        "mimeTypes": [
+          "application/json"
+        ],
+        "name": "jsmap"
+      },
+      "json": {
+        "extensions": [
+          ".json"
+        ],
+        "fileFormat": "json",
+        "mimeTypes": [
+          "application/json"
+        ],
+        "name": "json"
+      },
+      "jupyterlab_workspace": {
+        "extensions": [
+          ".jupyterlab-workspace"
+        ],
+        "fileFormat": "json",
+        "mimeTypes": [
+          "application/json"
+        ],
+        "name": "jupyterlab_workspace"
+      },
+      "manifest": {
+        "extensions": [
+          ".manifest"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "text/cache-manifest"
+        ],
+        "name": "manifest"
+      },
+      "md": {
+        "extensions": [
+          ".md",
+          ".markdown"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "text/markdown"
+        ],
+        "name": "md"
+      },
+      "mkv": {
+        "extensions": [
+          ".mkv"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "video/x-matroska"
+        ],
+        "name": "mkv"
+      },
+      "mov": {
+        "extensions": [
+          ".mov"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "video/quicktime"
+        ],
+        "name": "mov"
+      },
+      "mp3": {
+        "extensions": [
+          ".mp3"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "audio/mpeg"
+        ],
+        "name": "mp3"
+      },
+      "mp4": {
+        "extensions": [
+          ".mp4"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "video/mp4"
+        ],
+        "name": "mp4"
+      },
+      "ogg": {
+        "extensions": [
+          ".ogg"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "audio/ogg"
+        ],
+        "name": "ogg"
+      },
+      "pdf": {
+        "extensions": [
+          ".pdf"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "application/pdf"
+        ],
+        "name": "pdf"
+      },
+      "plain": {
+        "extensions": [
+          ".txt"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "text/plain"
+        ],
+        "name": "plain"
+      },
+      "png": {
+        "extensions": [
+          ".png"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "image/png"
+        ],
+        "name": "png"
+      },
+      "py": {
+        "extensions": [
+          ".py"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "text/x-python",
+          "application/x-python-code"
+        ],
+        "name": "py"
+      },
+      "svg": {
+        "extensions": [
+          ".svg"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "image/svg+xml"
+        ],
+        "name": "svg"
+      },
+      "toml": {
+        "extensions": [
+          ".toml"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "application/toml"
+        ],
+        "name": "toml"
+      },
+      "vue": {
+        "extensions": [
+          ".vue"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "text/plain"
+        ],
+        "name": "vue"
+      },
+      "wasm": {
+        "extensions": [
+          ".wasm"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "application/wasm"
+        ],
+        "name": "wasm"
+      },
+      "wav": {
+        "extensions": [
+          ".wav"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "audio/wav"
+        ],
+        "name": "wav"
+      },
+      "webm": {
+        "extensions": [
+          ".webm"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "video/webm"
+        ],
+        "name": "webm"
+      },
+      "wheel": {
+        "extensions": [
+          ".whl"
+        ],
+        "fileFormat": "base64",
+        "mimeTypes": [
+          "octet/stream",
+          "application/x-wheel+zip"
+        ],
+        "name": "wheel"
+      },
+      "xml": {
+        "extensions": [
+          ".xml"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "application/xml"
+        ],
+        "name": "xml"
+      },
+      "yaml": {
+        "extensions": [
+          ".yaml",
+          ".yml"
+        ],
+        "fileFormat": "text",
+        "mimeTypes": [
+          "application/x-yaml"
+        ],
+        "name": "yaml"
+      }
+    },
+    "fullLabextensionsUrl": "./extensions",
+    "fullStaticUrl": "./build",
+    "licensesUrl": "./lab/api/licenses",
+    "litePluginSettings": {
+      "@jupyterlite/jupytext-extension": {
+        "autoConvert": true,
+        "defaultFormat": "py:percent",
+        "enabled": true
+      }
+    }
+  },
+  "jupyter-lite-schema-version": 0
+}

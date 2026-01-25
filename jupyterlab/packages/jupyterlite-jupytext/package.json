@@ -1,0 +1,55 @@
+{
+  "name": "jupyterlite-jupytext",
+  "version": "1.4.6",
+  "description": "Jupytext extension for JupyterLite - converts between notebooks and text formats in the browser",
+  "keywords": [
+    "jupyter",
+    "jupytext",
+    "jupyterlite",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "homepage": "https://github.com/mwouts/jupytext",
+  "bugs": {
+    "url": "https://github.com/mwouts/jupytext/issues"
+  },
+  "license": "MIT",
+  "author": "Marc Wouts",
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mwouts/jupytext.git"
+  },
+  "scripts": {
+    "build": "jlpm run build:lib",
+    "build:lib": "tsc",
+    "build:prod": "jlpm run build:lib",
+    "clean": "jlpm run clean:lib",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^4.4.9",
+    "@jupyterlab/apputils": "^4.4.9",
+    "@jupyterlab/docregistry": "^4.4.9",
+    "@jupyterlab/filebrowser": "^4.4.9",
+    "@jupyterlab/notebook": "^4.4.9",
+    "@jupyterlab/services": "^7.4.9",
+    "@jupyterlab/translation": "^4.4.9",
+    "@lumino/coreutils": "^2.2.2",
+    "@lumino/disposable": "^2.1.5"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "typescript": "~5.9.3"
+  },
+  "jupyterlab": {
+    "extension": true,
+    "schemaDir": "schema"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "jupyter-lite-schema-version": 0,
+  "jupyter-config-data": {
+    "appUrl": "/tree",
+    "notebookPage": "tree",
+    "fullStaticUrl": "../build",
+    "settingsUrl": "../build/schemas",
+    "themesUrl": "./build/themes"
+  }
+}

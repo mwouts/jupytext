@@ -47,6 +47,10 @@ Homepage = "https://github.com/mwouts/jupytext"
 Documentation = "https://jupytext.readthedocs.io"
 
 [project.optional-dependencies]
+# JupyterLite support (browser-based Jupyter)
+jupyterlite = [
+  "jupyterlite-core>=0.2.0",
+]
 # Test related dependencies
 test = [
   "pytest",
@@ -102,6 +106,7 @@ docs = [
     "sphinx-copybutton",
     "sphinx-rtd-theme",
     "myst-parser",
+    "jupyterlite-sphinx>=0.17.1",
 ]
 
 [project.scripts]
@@ -302,10 +307,22 @@ myst-parser = "*"
 [tool.pixi.feature.dev.dependencies]
 pandoc = ">=3.0"
 
+[tool.pixi.feature.jupyterlite.dependencies]
+jupyterlite-core = ">=0.2.0"
+
 [tool.pixi.environments]
 default = { features = ["dev"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
+jupyterlite = { features = ["jupyterlite"], solve-group = "default" }
+
+[tool.pixi.tasks]
+build-jupyterlite = { cmd = "bash demo/jupyterlite-example/build.sh", cwd = ".", env = { PIXI_PROJECT_ROOT = "." } }
+serve-jupyterlite = { cmd = "jupyter lite serve", cwd = "demo/jupyterlite-example" }
+
+[tool.pixi.feature.jupyterlite.pypi-dependencies]
+# Install jupytext with jupyterlite extra from local source
+jupytext = {path = ".", editable = true, extras=["jupyterlite"]}
 
 [tool.pixi.pypi-dependencies]
 # Note: this does not build the jupyterlab-jupytext extension
-jupytext = {path = ".", editable = true, extras=["dev"]}
+jupytext = {path = ".", editable = true, extras=["dev", "jupyterlite"]}

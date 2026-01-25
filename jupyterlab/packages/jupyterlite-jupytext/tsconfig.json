@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.eslint.json",
+  "compilerOptions": {
+    "outDir": "lib",
+    "rootDir": "src",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "incremental": true,
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "preserveWatchOutput": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true
+  },
+  "include": ["src/*"]
+}

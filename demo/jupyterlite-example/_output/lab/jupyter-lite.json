@@ -1,0 +1,10 @@
+{
+  "jupyter-lite-schema-version": 0,
+  "jupyter-config-data": {
+    "appUrl": "/lab",
+    "settingsUrl": "../build/schemas",
+    "showLoadingIndicator": true,
+    "themesUrl": "./build/themes",
+    "mode": "multiple-document"
+  }
+}

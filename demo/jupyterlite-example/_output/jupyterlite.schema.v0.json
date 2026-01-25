@@ -1,0 +1,325 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://jupyterlite.readthedocs.org/en/latest/reference/schema-v0.html#",
+  "title": "JupyterLite Schema v0",
+  "description": "a schema for user-serviceable customizaton of a JupyterLite",
+  "$ref": "#/definitions/top",
+  "definitions": {
+    "top": {
+      "title": "JupyterLite Configuration",
+      "description": "a user-serviceable file for customizing a JupyterLite site",
+      "properties": {
+        "jupyter-lite-schema-version": {
+          "type": "integer",
+          "description": "version of the schema to which the instance conforms",
+          "enum": [0]
+        },
+        "jupyter-config-data": {
+          "$ref": "#/definitions/jupyter-config-data"
+        }
+      }
+    },
+    "jupyterlab-settings-overrides": {
+      "title": "JupyterLab Settings Overrides",
+      "description": "A map of config objects keyed by `@org/pkg:plugin` which override the default settings. See https://jupyterlab.readthedocs.io/en/stable/user/directories.html#overridesjson",
+      "type": "object",
+      "patternProperties": {
+        "^(@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*:(.*)$": {
+          "description": "A valid configuration which must conform to the plugin's defined schema",
+          "type": "object"
+        }
+      }
+    },
+    "jupyter-config-data": {
+      "title": "Jupyter Config Data",
+      "description": "contents of a jupyter-config-data `<script>`, as read by `PageConfig`. These well-known values may be augmented by other extensions.",
+      "properties": {
+        "appName": {
+          "description": "The application name, as would appear in a Help menu",
+          "type": "string"
+        },
+        "appVersion": {
+          "description": "The version of the application",
+          "type": "string"
+        },
+        "baseUrl": {
+          "description": "base URL of this JupyterLite, must end in `/`, will be expanded by `config-utils.js` to include a leading `/`",
+          "type": "string",
+          "format": "uri",
+          "default": "./",
+          "pattern": ".*/$"
+        },
+        "appUrl": {
+          "description": "default app to load",
+          "default": "./lab",
+          "$ref": "#/definitions/non-trailing-slash-uri"
+        },
+        "defaultKernelName": {
+          "description": "The name of the default kernel. If not available, the first kernel (by alphabetic ordering) will be chosen.",
+          "default": "python",
+          "type": "string"
+        },
+        "faviconUrl": {
+          "description": "browser tab icon to show",
+          "type": "string",
+          "format": "uri",
+          "default": "./lab/favicon.ico"
+        },
+        "settingsOverrides": {
+          "$ref": "#/definitions/jupyterlab-settings-overrides"
+        },
+        "federated_extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/federated-extension"
+          },
+          "default": []
+        },
+        "fileTypes": {
+          "description": "JupyterLab-compatible file types for serving and storing",
+          "additionalProperties": {
+            "$ref": "#/definitions/file-type"
+          }
+        },
+        "fullLabextensionsUrl": {
+          "description": "path to federated extensions, a folder organized by `({:org}/){package}`",
+          "default": "./extensions",
+          "$ref": "#/definitions/non-trailing-slash-uri"
+        },
+        "workspacesApiUrl": {
+          "description": "path to workspaces",
+          "default": "./api/workspaces",
+          "$ref": "#/definitions/non-trailing-slash-uri"
+        },
+        "fullStaticUrl": {
+          "description": "relative path to built static assets",
+          "default": "./build",
+          "$ref": "#/definitions/non-trailing-slash-uri"
+        },
+        "enableMemoryStorage": {
+          "description": "enable memory storage fallback which can lose data if the page is reloaded",
+          "type": "boolean",
+          "default": false
+        },
+        "contentsStorageDrivers": {
+          "description": "names of the localforage driver for contents, or `null` for the best available",
+          "$ref": "#/definitions/localforage-driver-set"
+        },
+        "contentsStorageName": {
+          "description": "Name used to store Jupyter contents in the browser. The baseUrl is appended to the default value",
+          "type": "string",
+          "default": "JupyterLite Storage"
+        },
+        "workspacesStorageDrivers": {
+          "description": "names of the localforage driver for workspaces, or `null` for the best available",
+          "$ref": "#/definitions/localforage-driver-set"
+        },
+        "workspacesStorageName": {
+          "description": "Name used to store Jupyter workspaces in the browser. The baseUrl is appended to the default value",
+          "type": "string",
+          "default": "JupyterLite Storage"
+        },
+        "showLoadingIndicator": {
+          "description": "Whether to show the loading indicator during app initialization",
+          "type": "boolean",
+          "default": false
+        },
+        "settingsStorageDrivers": {
+          "description": "names of the localforage driver for settings, or `null` for the best available",
+          "$ref": "#/definitions/localforage-driver-set"
+        },
+        "settingsStorageName": {
+          "description": "Name used to store Jupyter settings in the browser. The baseUrl is appended to the default value",
+          "type": "string",
+          "default": "JupyterLite Storage"
+        },
+        "settingsUrl": {
+          "description": "relative path to bundled schemas",
+          "default": "./build/schemas",
+          "$ref": "#/definitions/non-trailing-slash-uri"
+        },
+        "themesUrl": {
+          "description": "relative path to bundled themes",
+          "default": "./build/themes",
+          "$ref": "#/definitions/non-trailing-slash-uri"
+        },
+        "licensesUrl": {
+          "description": "relative path to bundled licenses",
+          "default": "./lab/api/licenses",
+          "$ref": "#/definitions/non-trailing-slash-uri"
+        },
+        "disabledExtensions": {
+          "description": "Lab extensions (or specific plugins) to disable",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/npm-package-name"
+              },
+              {
+                "$ref": "#/definitions/lab-extension-plugin-name"
+              }
+            ]
+          }
+        },
+        "litePluginSettings": {
+          "description": "Additional configuration options for jupyterlite plugins, keyed by npm-compatible name",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "notebookPage": {
+          "description": "The page corresponding the named Notebook Classic UI section",
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "an unknown notebook page"
+            },
+            {
+              "type": "string",
+              "enum": ["consoles", "notebooks", "edit", "tree"],
+              "description": "a well-known notebook page"
+            }
+          ]
+        },
+        "exposeAppInBrowser": {
+          "description": "Whether to make the top-level Application instance available as ``window.jupyterapp``",
+          "type": "boolean",
+          "default": false
+        },
+        "enableServiceWorkerCache": {
+          "description": "Whether to enable the service worker cache",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "non-trailing-slash-uri": {
+      "title": "A URI what doesn't end in /",
+      "type": "string",
+      "format": "uri",
+      "pattern": ".*[^/]$"
+    },
+    "federated-extension": {
+      "title": "A Federated Extension",
+      "type": "object",
+      "required": ["name", "load"],
+      "properties": {
+        "extension": {
+          "type": "string",
+          "format": "uri",
+          "description": "path to the extension module to load, relative to the extension's `package.json`"
+        },
+        "mimeExtension": {
+          "type": "string",
+          "format": "uri",
+          "description": "path to the mime extension module to load, relative to the extension's `package.json`"
+        },
+        "load": {
+          "type": "string",
+          "format": "uri",
+          "description": "path to the WebPack 5-compatible `remoteEntry*.js` file describing the bundle"
+        },
+        "name": {
+          "$ref": "#/definitions/npm-package-name"
+        },
+        "style": {
+          "type": "string",
+          "format": "uri",
+          "description": "path to the optional style module provided by the extension"
+        }
+      }
+    },
+    "file-type": {
+      "type": "object",
+      "description": "description of a named contents file format, with extensions and mime types.",
+      "required": ["name", "mimeTypes", "extensions", "fileFormat"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "mimeTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^\\..+"
+          }
+        },
+        "fileFormat": {
+          "type": "string",
+          "enum": ["base64", "text", "json"]
+        }
+      }
+    },
+    "npm-package-name": {
+      "title": "An NPM Package Name",
+      "type": "string",
+      "description": "package.json-compatible extension name, with an optional organization prefix. See https://github.com/dword-design/package-name-regex/blob/master/src/index.js",
+      "pattern": "^(@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*$"
+    },
+    "lab-extension-plugin-name": {
+      "title": "A JupyterLab Plugin",
+      "type": "string",
+      "description": "a package.json-compatible extension name followed by a colon (:) and a specific plugin name",
+      "pattern": "^(@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*:(.*)$"
+    },
+    "localforage-driver-set": {
+      "title": "A LocalForage Driver Set",
+      "anyOf": [
+        {
+          "type": "null",
+          "title": "detect",
+          "description": "choose the best available driver"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/localforage-driver"
+          }
+        }
+      ]
+    },
+    "localforage-driver": {
+      "title": "A LocalForage Driver",
+      "description": "choose a storage driver from any number of localForage drivers",
+      "anyOf": [
+        {
+          "type": "string",
+          "title": "custom",
+          "description": "use a custom driver added by a third-party plugin"
+        },
+        {
+          "title": "IndexedDB",
+          "description": "use the broadly-compatible IndexedDB key/value persistent store",
+          "type": "string",
+          "enum": ["asyncStorage"]
+        },
+        {
+          "title": "WebSQL",
+          "description": "use the WebSQL persistent store",
+          "type": "string",
+          "enum": ["webSQLStorage"]
+        },
+        {
+          "title": "localStorage",
+          "description": "use the localStorage persistent store",
+          "type": "string",
+          "enum": ["localStorageWrapper"]
+        },
+        {
+          "title": "memory",
+          "description": "use the memory-based, volatile store: must be enabled with enableMemoryStorage",
+          "type": "string",
+          "enum": ["memoryStorageDriver"]
+        }
+      ]
+    }
+  }
+}

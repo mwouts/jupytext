@@ -1,0 +1,32 @@
+{
+  "short_name": "JupyterLite",
+  "name": "JupyterLite",
+  "description": "WASM powered JupyterLite app",
+  "icons": [
+    {
+      "src": "./icon-120x120.png",
+      "type": "image/png",
+      "sizes": "120x120"
+    }, {
+      "src": "./icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./",
+  "background_color": "#fff",
+  "display": "standalone",
+  "scope": "./",
+  "shortcuts" : [
+    {
+      "name": "JupyterLite",
+      "url": "/lab",
+      "description": "The main JupyterLite application"
+    },
+    {
+      "name": "Replite",
+      "url": "/repl?toolbar=1",
+      "description": "A single-cell interface for JupyterLite"
+    }
+  ]
+}

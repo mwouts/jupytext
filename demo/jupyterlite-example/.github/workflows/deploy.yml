@@ -1,0 +1,68 @@
+name: Deploy JupyterLite with Jupytext
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node.js (for building extension)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install jlpm (Yarn)
+        run: npm install -g yarn
+
+      - name: Install Jupytext with JupyterLite support
+        run: |
+          python -m pip install --upgrade pip
+          # Install from local source with jupyterlite extra
+          pip install -e ../../[jupyterlite]
+
+      - name: Build Jupytext JupyterLite extension
+        run: |
+          cd ../../jupyterlab/packages/jupyterlite-jupytext
+          jlpm install
+          jlpm build
+          cd -
+
+      - name: Build JupyterLite site
+        run: |
+          jupyter lite build --contents notebooks/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_output
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

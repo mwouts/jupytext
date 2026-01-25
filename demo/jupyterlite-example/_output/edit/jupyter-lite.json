@@ -1,0 +1,11 @@
+{
+  "jupyter-lite-schema-version": 0,
+  "jupyter-config-data": {
+    "appUrl": "/edit",
+    "notebookPage": "edit",
+    "faviconUrl": "./favicon.ico",
+    "fullStaticUrl": "../build",
+    "settingsUrl": "../build/schemas",
+    "themesUrl": "./build/themes"
+  }
+}

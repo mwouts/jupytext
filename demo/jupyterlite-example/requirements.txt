@@ -1,0 +1,5 @@
+# Note: When using pixi, dependencies are managed by pyproject.toml
+# This file is kept for users not using pixi
+
+# Install jupytext with JupyterLite support (uses local source)
+-e ../../[jupyterlite]

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      // Handle workspace URLs by extracting the workspace name and redirecting to lab with query parameter
+      (function () {
+        const pathname = window.location.pathname;
+        const workspaceMatch = pathname.match(/\/lab\/workspaces\/([^\/]+)/);
+
+        if (workspaceMatch) {
+          // Extract workspace name from URL
+          const workspaceName = workspaceMatch[1];
+          const baseUrl = window.location.origin + window.location.pathname.replace(/\/workspaces\/[^\/]+.*$/, '');
+          const redirectUrl = `${baseUrl}/lab/index.html?workspace=${encodeURIComponent(workspaceName)}`;
+
+          console.log('Workspace redirect:', redirectUrl);
+          window.location.href = redirectUrl;
+        } else {
+          // Fallback: redirect to /lab by default
+          window.location.href = window.location.href.replace(
+            /(\/|\/index.html)?$/,
+            '/../index.html'
+          );
+        }
+      }.call(this));
+    </script>
+  </head>
+</html>

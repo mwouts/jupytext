@@ -1,0 +1,14 @@
+{
+  "jupyter-lite-schema-version": 0,
+  "jupyter-config-data": {
+    "appName": "Jupytext + JupyterLite Demo",
+    "appVersion": "1.0.0",
+    "litePluginSettings": {
+      "@jupyterlite/jupytext-extension": {
+        "enabled": true,
+        "defaultFormat": "py:percent",
+        "autoConvert": true
+      }
+    }
+  }
+}

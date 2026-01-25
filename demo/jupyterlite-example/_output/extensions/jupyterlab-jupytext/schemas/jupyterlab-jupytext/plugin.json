@@ -1,0 +1,57 @@
+{
+  "title": "Jupytext",
+  "description": "List of Jupytext Text Notebook formats that will be added to launcher and jupytext menu.",
+  "properties": {
+    "auto:percent": {
+      "type": "boolean",
+      "title": "Text Notebook as Script in Percent Format",
+      "default": true
+    },
+    "auto:light": {
+      "type": "boolean",
+      "title": "Text Notebook as Script in Light Format",
+      "default": false
+    },
+    "auto:hydrogen": {
+      "type": "boolean",
+      "title": "Text Notebook as Script in Hydrogen Format",
+      "default": false
+    },
+    "auto:nomarker": {
+      "type": "boolean",
+      "title": "Text Notebook as Script in Nomarker Format",
+      "default": false
+    },
+    "py:marimo": {
+      "type": "boolean",
+      "title": "Text Notebook as Marimo Script",
+      "default": false
+    },
+    "md:myst": {
+      "type": "boolean",
+      "title": "MyST Markdown Notebook",
+      "default": true
+    },
+    "md": {
+      "type": "boolean",
+      "title": "Markdown Notebook",
+      "default": false
+    },
+    "Rmd": {
+      "type": "boolean",
+      "title": "R Markdown Notebook",
+      "default": false
+    },
+    "qmd": {
+      "type": "boolean",
+      "title": "Quarto Markdown Notebook",
+      "default": false
+    },
+    "NOTE": {
+      "description": "Refresh the current browser tab for the changes to take effect.",
+      "type": "null"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object"
+}
