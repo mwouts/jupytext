@@ -25,6 +25,9 @@ demo/get_started.ipynb
 .ipynb_checkpoints
 .jupyter_ystore.db*
 
+# Marimo
+__marimo__
+
 # Test related files
 .coverage
 .pytest_cache
