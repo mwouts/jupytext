@@ -320,10 +320,20 @@ class MarkdownCellReader(BaseCellReader):
         self.split_at_heading = (fmt or {}).get("split_at_heading", False)
         self.in_region = False
         self.in_raw = False
+        custom_language_magics = (fmt or {}).get("custom_language_magics", [])
+        if isinstance(custom_language_magics, str):
+            custom_language_magics = [m for m in custom_language_magics.split(",") if m]
+        # Store the set of custom language magics (including upper-case variants) for matching
+        self.custom_language_magics = set(custom_language_magics) | {lang.upper() for lang in custom_language_magics}
         if self.format_version in ["1.0", "1.1"] and self.ext != ".Rmd":
             # Restore the pattern used in Markdown <= 1.1
             self.start_code_re = re.compile(r"^```(.*)")
             self.non_jupyter_code_re = re.compile(r"^```\{")
+        elif self.custom_language_magics:
+            all_languages = _JUPYTER_LANGUAGES_LOWER_AND_UPPER | self.custom_language_magics
+            self.start_code_re = re.compile(
+                r"^```(`*)(\s*)({})($|\s.*$)".format("|".join(all_languages).replace("+", "\\+"))
+            )
 
     def metadata_and_language_from_option_line(self, line):
         match_region = self.start_region_re.match(line)
@@ -352,7 +362,13 @@ class MarkdownCellReader(BaseCellReader):
 
     def options_to_metadata(self, options):
         if isinstance(options, tuple):
-            self.end_code_re = re.compile("```" + options[0])
+            # The start_code_re groups are: (extra_backticks, space, language, rest)
+            extra_backticks, _space, language, rest = options
+            self.end_code_re = re.compile("```" + extra_backticks)
+            if language in self.custom_language_magics:
+                self.cell_metadata_json = self.cell_metadata_json or is_json_metadata(rest)
+                _title, meta = text_to_metadata(rest)
+                return language, meta
             options = " ".join(options[1:])
         else:
             self.end_code_re = re.compile(r"^```\s*$")
@@ -398,7 +414,10 @@ class MarkdownCellReader(BaseCellReader):
                     language, metadata = self.options_to_metadata(self.start_code_re.findall(line)[0])
                     # Cells with a .noeval attribute are markdown cells #347
                     # R Markdown notebooks can have bibliography and index blocks, cf #1161 and #1429
-                    if language not in _JUPYTER_LANGUAGES_LOWER_AND_UPPER or metadata.get(".noeval", "") is None:
+                    if (
+                        language not in _JUPYTER_LANGUAGES_LOWER_AND_UPPER
+                        and language not in self.custom_language_magics
+                    ) or metadata.get(".noeval", "") is None:
                         in_explicit_code_block = True
                         prev_blank = 0
                         continue
