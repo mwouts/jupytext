@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.19.2.dev (unreleased)
+-----------------------
+
+**Fixed**
+- We have added `setuptools` to the `test-external` dependency group, in order to fix the failures of the `jupyter-fs` tests in recent Python environments ([#1509](https://github.com/mwouts/jupytext/issues/1509))
+
+
 1.19.1 (2026-01-25)
 -------------------
 
