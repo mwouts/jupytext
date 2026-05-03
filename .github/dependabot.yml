@@ -20,19 +20,17 @@ updates:
   #         - "*"
 
   - package-ecosystem: "npm" # See documentation for possible values
-    directory: "jupyterlab/packages/jupyterlab-jupytext-extension" # Location of package manifests
+    directories: # Location of package manifests
+      - "jupyterlab/packages/jupyterlab-jupytext-extension"
+      - "jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests"
     schedule:
       interval: "weekly"
     groups:
       jupytext-extension-dependencies:
+        applies-to: "version-updates"
         patterns:
           - "*"
-
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests" # Location of package manifests
-    schedule:
-      interval: "weekly"
-    groups:
-      jupytext-extension-ui-tests-dependencies:
+      jupytext-extension-security-updates:
+        applies-to: "security-updates"
         patterns:
           - "*"
