@@ -6,6 +6,11 @@ Jupytext ChangeLog
 
 **Changed**
 - We have skipped the tests that involve `jupyterfs` on Python 3.12+ as they started failing on the CI with no obvious way to fix them ([#1509](https://github.com/mwouts/jupytext/issues/1509))
+- We have changed the configuration of Dependabot to get grouped dependency updates for our JupyterLab extension.
+
+
+**Fixed**
+- We have fixed the homepage link in `package.json`. Thanks to [Michał Krassowski](https://github.com/krassowski) for making this PR ([#1494](https://github.com/mwouts/jupytext/pull/1494))
 
 
 1.19.1 (2026-01-25)
