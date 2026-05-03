@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.19.2.dev0 (unreleased)
+------------------------
+
+**Changed**
+- We have skipped the tests that involve `jupyterfs` on Python 3.12+ as they started failing on the CI with no obvious way to fix them ([#1509](https://github.com/mwouts/jupytext/issues/1509))
+
+
 1.19.1 (2026-01-25)
 -------------------
 
