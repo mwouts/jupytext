@@ -164,7 +164,7 @@ async def test_paired_files_and_symbolic_links(tmpdir, cm):
     # Reload and make sure that we get the updated notebook
     model = await ensure_async(cm.get("link_to_notebooks/notebook.ipynb"))
     nb = model["content"]
-    compare_cells(nb.cells, [new_code_cell("3 + 3")], compare_ids=False)
+    compare_cells(nb.cells, [new_code_cell("3 + 3")], compare_ids=False, allow_filtered_cell_metadata=True)
 
 
 async def test_metadata_filter_from_config_has_precedence_over_notebook_metadata(tmpdir, cwd_tmpdir, cm, python_notebook):

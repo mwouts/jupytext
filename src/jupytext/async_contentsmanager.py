@@ -410,6 +410,21 @@ to your jupytext.toml file
             if not outputs.timestamp:
                 set_kernelspec_from_language(model["content"])
 
+            # When combining a trusted ipynb with inputs from a text file, re-sign the
+            # combined notebook so that the trusted outputs remain trusted. See #1397.
+            if (
+                outputs.path
+                and outputs.path != inputs.path
+                and outputs.path.endswith(".ipynb")
+                and all(
+                    cell.metadata.get("trusted", True)
+                    for cell in model["content"].cells
+                    if cell.cell_type == "code"
+                )
+            ):
+                self.check_and_sign(model["content"], path)
+                self.mark_trusted_cells(model["content"], path)
+
             return model
 
         async def new_untitled(self, path="", type="", ext=""):
