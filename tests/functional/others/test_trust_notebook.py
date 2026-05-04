@@ -211,7 +211,6 @@ async def test_paired_notebook_with_outputs_is_not_trusted_941(tmp_path, python_
     assert not cm.notary.check_signature(nb)
 
 
-# This test started failing on Windows on 2025-04-26
 @pytest.mark.skip_on_windows
 async def test_trusted_paired_notebook_remains_trusted_after_py_file_edited_1397(tmp_path, cm):
     """When a trusted paired ipynb+py notebook is modified through just the py file,
