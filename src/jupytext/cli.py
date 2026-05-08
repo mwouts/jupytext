@@ -13,6 +13,8 @@ from copy import copy
 from tempfile import NamedTemporaryFile
 from typing import Optional
 
+from nbformat.sign import NotebookNotary
+
 from .combine import combine_inputs_with_outputs
 from .compare import NotebookDifference, compare, test_round_trip_conversion
 from .config import load_jupytext_config, notebook_formats
@@ -339,9 +341,11 @@ def parse_jupytext_args(args=None):
     return parser.parse_args(args)
 
 
-def jupytext(args=None):
+def jupytext(args=None, *, notary=None):
     """Entry point for the jupytext script"""
     args = parse_jupytext_args(args)
+    if notary is None:
+        notary = NotebookNotary()
 
     def log(text):
         if not args.quiet:
@@ -489,17 +493,17 @@ def jupytext(args=None):
     exit_code = 0
     for nb_file in notebooks:
         if not args.warn_only:
-            exit_code += jupytext_single_file(nb_file, args, log)
+            exit_code += jupytext_single_file(nb_file, args, log, notary=notary)
         else:
             try:
-                exit_code += jupytext_single_file(nb_file, args, log)
+                exit_code += jupytext_single_file(nb_file, args, log, notary=notary)
             except Exception as err:
                 sys.stderr.write(f"[jupytext] Error: {str(err)}\n")
 
     return exit_code
 
 
-def jupytext_single_file(nb_file, args, log):
+def jupytext_single_file(nb_file, args, log, notary):
     """Apply the jupytext command, with given arguments, to a single file"""
     if nb_file == "-" and args.sync:
         msg = "Missing notebook path."
@@ -530,6 +534,20 @@ def jupytext_single_file(nb_file, args, log):
 
     config = load_jupytext_config(os.path.abspath(nb_file))
 
+    def _read(path, fmt=None):
+        """Read a notebook; mark cells trusted when the signature is valid."""
+        nb = read(path, fmt=fmt, config=config)
+        if notary.check_signature(nb):
+            notary.mark_cells(nb, True)
+        return nb
+
+    def _writes(nb, fmt):
+        """Serialize a notebook; sign the result when every cell is trusted."""
+        content = writes(nb, fmt=fmt, config=config)
+        if len(nb.cells) and all(cell.get("metadata", {}).get("trusted", False) for cell in nb.cells):
+            notary.sign(reads(content, fmt=fmt, config=config))
+        return content
+
     # Just acting on metadata / pipe => save in place
     save_in_place = not nb_dest and not args.sync
     if save_in_place:
@@ -555,7 +573,8 @@ def jupytext_single_file(nb_file, args, log):
 
     timestamp_checker = TimestampChecker(pre_commit_mode=args.pre_commit_mode)
     timestamp_checker.get_and_check_timestamp(nb_file)
-    notebook = read(nb_file, fmt=fmt, config=config)
+    notebook = _read(nb_file, fmt=fmt)
+
     if "extension" in fmt and "format_name" not in fmt:
         text_representation = notebook.metadata.get("jupytext", {}).get("text_representation", {})
         if text_representation.get("extension") == fmt["extension"]:
@@ -600,6 +619,7 @@ def jupytext_single_file(nb_file, args, log):
 
     # Read paired notebooks
     nb_files = [nb_file, nb_dest]
+    outputs_nb_file = None
     if args.sync:
         # If we are also setting the formats, we take the information
         # from the --set-formats option
@@ -608,9 +628,18 @@ def jupytext_single_file(nb_file, args, log):
         else:
             formats = notebook_formats(notebook, config, nb_file, fallback_on_current_fmt=False)
         set_prefix_and_suffix(fmt, formats, nb_file)
+
         try:
             notebook, inputs_nb_file, outputs_nb_file = load_paired_notebook(
-                notebook, fmt, config, formats, nb_file, log, args.pre_commit_mode, timestamp_checker
+                notebook,
+                fmt,
+                config,
+                formats,
+                nb_file,
+                log,
+                args.pre_commit_mode,
+                timestamp_checker,
+                read_func=_read,
             )
             nb_files = [inputs_nb_file, outputs_nb_file]
         except NotAPairedNotebook as err:
@@ -796,7 +825,7 @@ def jupytext_single_file(nb_file, args, log):
             _, ext = os.path.splitext(path)
             fmt = copy(fmt or {})
             fmt = long_form_one_format(fmt, update={"extension": ext})
-            new_content = writes(notebook, fmt=fmt, config=config)
+            new_content = _writes(notebook, fmt=fmt)
             diff = None
             if not new_content.endswith("\n"):
                 new_content += "\n"
@@ -1158,7 +1187,15 @@ _callback_on_lazy_write = None
 
 
 def load_paired_notebook(
-    notebook, fmt, config, formats, nb_file, log, pre_commit_mode: bool, timestamp_checker: TimestampChecker
+    notebook,
+    fmt,
+    config,
+    formats,
+    nb_file,
+    log,
+    pre_commit_mode: bool,
+    timestamp_checker: TimestampChecker,
+    read_func,
 ):
     """Update the notebook with the inputs and outputs of the most recent paired files"""
     if not formats:
@@ -1174,7 +1211,7 @@ def load_paired_notebook(
 
         log(f"[jupytext] Loading {shlex.quote(path)}")
         timestamp_checker.get_and_check_timestamp(path)
-        return read(path, fmt=fmt, config=config)
+        return read_func(path, fmt=fmt)
 
     if pre_commit_mode and file_in_git_index(nb_file):
         # We raise an error if two representations of this notebook in the git index are inconsistent
