@@ -10,7 +10,9 @@ Jupytext ChangeLog
 
 
 **Fixed**
+- Trusted notebooks remain trusted after `jupytext --sync` ([#1505](https://github.com/mwouts/jupytext/issues/1505))
 - We have fixed the homepage link in `package.json`. Thanks to [Michał Krassowski](https://github.com/krassowski) for making this PR ([#1494](https://github.com/mwouts/jupytext/pull/1494))
+- Thanks to [Brigitta Sipőcz](https://github.com/bsipocz) for fixing a broken link in our CLI ([#1428](https://github.com/mwouts/jupytext/pull/1428))
 
 
 1.19.1 (2026-01-25)

@@ -17,6 +17,8 @@ from nbformat.v4.nbbase import (
     new_notebook,
     new_output,
 )
+from nbformat.sign import NotebookNotary
+
 
 import jupytext
 from jupytext.cell_reader import rst2md
@@ -48,12 +50,27 @@ def force_validate_nbformat(monkeypatch):
     monkeypatch.setattr(nbformat, "reads", nbformat_reads)
 
 
+@pytest.fixture
+def fresh_notary(tmp_path):
+    return NotebookNotary(
+        db_file=":memory:",
+        secret=b"test-secret",
+    )
+
+
 @pytest.fixture(params=["sync", "async"])
-def cm(request):
+def cm(request, fresh_notary):
     if request.param == "sync":
-        return jupytext.TextFileContentsManager()
+        cm = jupytext.TextFileContentsManager()
     else:
-        return jupytext.AsyncTextFileContentsManager()
+        cm = jupytext.AsyncTextFileContentsManager()
+
+    # We use a fresh notary for each test,
+    # to make sure that the trust status of
+    # notebooks is not shared between tests
+    cm.notary = fresh_notary
+
+    return cm
 
 
 @pytest.fixture
