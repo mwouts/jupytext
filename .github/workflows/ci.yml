@@ -30,35 +30,33 @@ jobs:
     uses: ./.github/workflows/step_pre-commit.yml
 
   static-analysis:
-    needs: [ pre-commit ]
     uses: ./.github/workflows/step_static-analysis.yml
     permissions:
       contents: read
       security-events: write
 
+  coverage:
+    uses: ./.github/workflows/step_coverage.yml
+    if: github.event_name != 'schedule'
+
   test-pip:
-    needs: [ pre-commit ]
+    needs: [ coverage ]
     uses: ./.github/workflows/step_tests-pip.yml
     with:
       coverage: ${{ github.event_name != 'schedule' }}
 
-  coverage:
-    needs: [ test-pip ]
-    uses: ./.github/workflows/step_coverage.yml
-    if: github.event_name != 'schedule'
-
   test-conda:
-    needs: [ pre-commit ]
+    needs: [ coverage ]
     uses: ./.github/workflows/step_tests-conda.yml
     with:
       coverage: ${{ github.event_name != 'schedule' }}
 
   test-ui:
-    needs: [ test-pip ]
+    needs: [ coverage ]
     uses: ./.github/workflows/step_tests-ui.yml
 
   build:
-    needs: [ test-pip, test-conda, test-ui ]
+    needs: [ coverage ]
     uses: ./.github/workflows/step_build.yml
     with:
       upload: ${{ inputs.upload-build-artifacts || false }}
