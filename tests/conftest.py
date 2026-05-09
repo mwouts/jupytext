@@ -52,10 +52,13 @@ def force_validate_nbformat(monkeypatch):
 
 @pytest.fixture
 def fresh_notary(tmp_path):
-    return NotebookNotary(
+    notary = NotebookNotary(
         db_file=":memory:",
         secret=b"test-secret",
     )
+    yield notary
+    # Close the SQLite database connection to avoid ResourceWarnings on Python 3.13+
+    notary.store.close()
 
 
 @pytest.fixture(params=["sync", "async"])
@@ -70,7 +73,11 @@ def cm(request, fresh_notary):
     # notebooks is not shared between tests
     cm.notary = fresh_notary
 
-    return cm
+    yield cm
+    # Clean up any resources in the contents manager
+    with contextlib.suppress(Exception):
+        if hasattr(cm, "close"):
+            cm.close()
 
 
 @pytest.fixture

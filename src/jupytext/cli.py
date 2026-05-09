@@ -344,8 +344,6 @@ def parse_jupytext_args(args=None):
 def jupytext(args=None, *, notary=None):
     """Entry point for the jupytext script"""
     args = parse_jupytext_args(args)
-    if notary is None:
-        notary = NotebookNotary()
 
     def log(text):
         if not args.quiet:
@@ -370,6 +368,17 @@ def jupytext(args=None, *, notary=None):
         for nb_file in args.notebooks:
             log(nb_file)
 
+    # Only wrap and manage notary lifetime if we create it here
+    if notary is None:
+        notary = NotebookNotary()
+
+        def close_notary_store_if_managed():
+            notary.store.close()
+    else:
+
+        def close_notary_store_if_managed():
+            pass
+
     # Read notebook from stdin
     if not args.notebooks:
         if not args.pre_commit:
@@ -384,6 +393,7 @@ def jupytext(args=None, *, notary=None):
         if len(args.notebooks) != 1:
             raise ValueError("--paired-paths applies to a single notebook")
         print_paired_paths(args.notebooks[0], args.input_format)
+        close_notary_store_if_managed()
         return 1
 
     if args.run_path:
@@ -449,6 +459,7 @@ def jupytext(args=None, *, notary=None):
         )
         sys.stdout.write(diff)
 
+        close_notary_store_if_managed()
         return
 
     if args.output and len(args.notebooks) != 1:
@@ -500,6 +511,7 @@ def jupytext(args=None, *, notary=None):
             except Exception as err:
                 sys.stderr.write(f"[jupytext] Error: {str(err)}\n")
 
+    close_notary_store_if_managed()
     return exit_code
 
 
