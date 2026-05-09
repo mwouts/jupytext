@@ -7,6 +7,7 @@ Jupytext ChangeLog
 **Changed**
 - We have skipped the tests that involve `jupyterfs` on Python 3.12+ as they started failing on the CI with no obvious way to fix them ([#1509](https://github.com/mwouts/jupytext/issues/1509))
 - We have changed the configuration of Dependabot to get grouped dependency updates for our JupyterLab extension.
+- The CI workflow has been restructured to maximize parallelization. All test suites (pip, conda, UI) and the build step now run concurrently after pre-commit checks, instead of sequentially, reducing CI times ([#1527](https://github.com/mwouts/jupytext/pull/1527))
 
 
 **Fixed**
