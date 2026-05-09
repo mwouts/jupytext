@@ -1374,6 +1374,7 @@ def test_quiet_does_not_print_when_creating_missing_directory(cwd_tmp_path, caps
     output_dir = cwd_tmp_path / "jupyter_execute"
     assert not output_dir.exists()
 
+    # The double slash in './jupyter_execute//ipynb' is the jupytext syntax for a prefix directory
     jupytext(["--quiet", "script.py", "--to", "./jupyter_execute//ipynb"])
     captured = capsys.readouterr()
     assert captured.out == ""
