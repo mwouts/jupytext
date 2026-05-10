@@ -2,8 +2,8 @@
   "compilerOptions": {
     "declaration": true,
     "lib": ["es2018", "dom"],
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "noEmitOnError": true,
     "noUnusedLocals": true,
     "outDir": "lib",
