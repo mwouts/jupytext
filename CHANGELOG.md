@@ -11,6 +11,7 @@ Jupytext ChangeLog
 
 
 **Fixed**
+- The `--quiet` flag now suppresses the `creating missing directory` warning when writing to a path that includes a prefix ([#1533](https://github.com/mwouts/jupytext/pull/1533))
 - Trusted notebooks remain trusted after `jupytext --sync` ([#1505](https://github.com/mwouts/jupytext/issues/1505))
 - We have fixed the homepage link in `package.json`. Thanks to [Michał Krassowski](https://github.com/krassowski) for making this PR ([#1494](https://github.com/mwouts/jupytext/pull/1494))
 - Thanks to [Brigitta Sipőcz](https://github.com/bsipocz) for fixing a broken link in our CLI ([#1428](https://github.com/mwouts/jupytext/pull/1428))

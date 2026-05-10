@@ -862,7 +862,7 @@ def jupytext_single_file(nb_file, args, log, notary):
         tmp_path = path
         if modified:
             # The text representation of the notebook has changed, we write it on disk
-            create_prefix_dir(path, fmt)
+            create_prefix_dir(path, fmt, log)
             # Create a temporary file in the same directory as path. Later on we will move
             # that temporary file back to path (os.replace is atomic on most OS)
             name, ext = os.path.splitext(path)
