@@ -535,7 +535,7 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, config=None, **kwargs):
         _, ext = os.path.splitext(fp)
         fmt = copy(fmt or {})
         fmt = long_form_one_format(fmt, update={"extension": ext})
-        create_prefix_dir(fp, fmt)
+        create_prefix_dir(fp, fmt, None)
 
         with open(fp, "w", encoding="utf-8") as stream:
             write(nb, stream, version=version, fmt=fmt, config=config, **kwargs)
@@ -551,7 +551,7 @@ def write(nb, fp, version=nbformat.NO_CONVERT, fmt=None, config=None, **kwargs):
         fp.write("\n")
 
 
-def create_prefix_dir(nb_file, fmt, log=None):
+def create_prefix_dir(nb_file, fmt, log):
     """Create directory if fmt has a prefix"""
     if "prefix" in fmt:
         nb_dir = os.path.dirname(nb_file) + os.path.sep
