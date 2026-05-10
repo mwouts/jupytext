@@ -7,9 +7,7 @@ Call with (e.g.)::
 
 import sys
 
-from nbformat.sign import NotebookNotary
-
 from .cli import jupytext
 
 if __name__ == "__main__":
-    sys.exit(jupytext(notary=NotebookNotary()))
+    sys.exit(jupytext())

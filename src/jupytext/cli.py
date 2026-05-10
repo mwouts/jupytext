@@ -368,17 +368,6 @@ def jupytext(args=None, *, notary=None):
         for nb_file in args.notebooks:
             log(nb_file)
 
-    # Only wrap and manage notary lifetime if we create it here
-    if notary is None:
-        notary = NotebookNotary()
-
-        def close_notary_store_if_managed():
-            notary.store.close()
-    else:
-
-        def close_notary_store_if_managed():
-            pass
-
     # Read notebook from stdin
     if not args.notebooks:
         if not args.pre_commit:
@@ -393,7 +382,6 @@ def jupytext(args=None, *, notary=None):
         if len(args.notebooks) != 1:
             raise ValueError("--paired-paths applies to a single notebook")
         print_paired_paths(args.notebooks[0], args.input_format)
-        close_notary_store_if_managed()
         return 1
 
     if args.run_path:
@@ -459,7 +447,6 @@ def jupytext(args=None, *, notary=None):
         )
         sys.stdout.write(diff)
 
-        close_notary_store_if_managed()
         return
 
     if args.output and len(args.notebooks) != 1:
@@ -502,17 +489,25 @@ def jupytext(args=None, *, notary=None):
 
     # Count how many files have round-trip issues when testing
     exit_code = 0
-    for nb_file in notebooks:
-        if not args.warn_only:
-            exit_code += jupytext_single_file(nb_file, args, log, notary=notary)
-        else:
-            try:
-                exit_code += jupytext_single_file(nb_file, args, log, notary=notary)
-            except Exception as err:
-                sys.stderr.write(f"[jupytext] Error: {str(err)}\n")
 
-    close_notary_store_if_managed()
-    return exit_code
+    notary_to_close = None
+    if notary is None:
+        notary = notary_to_close = NotebookNotary()
+
+    try:
+        for nb_file in notebooks:
+            if not args.warn_only:
+                exit_code += jupytext_single_file(nb_file, args, log, notary=notary)
+            else:
+                try:
+                    exit_code += jupytext_single_file(nb_file, args, log, notary=notary)
+                except Exception as err:
+                    sys.stderr.write(f"[jupytext] Error: {str(err)}\n")
+
+        return exit_code
+    finally:
+        if notary_to_close:
+            notary_to_close.store.close()
 
 
 def jupytext_single_file(nb_file, args, log, notary):
