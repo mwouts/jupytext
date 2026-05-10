@@ -1,20 +1,21 @@
 Jupytext ChangeLog
 ==================
 
-1.19.2.dev0 (unreleased)
-------------------------
-
-**Changed**
-- We have skipped the tests that involve `jupyterfs` on Python 3.12+ as they started failing on the CI with no obvious way to fix them ([#1509](https://github.com/mwouts/jupytext/issues/1509))
-- We have changed the configuration of Dependabot to get grouped dependency updates for our JupyterLab extension.
-- The CI workflow has been restructured to maximize parallelization. All test suites (pip, conda, UI) and the build step now run concurrently after pre-commit checks, instead of sequentially, reducing CI times ([#1527](https://github.com/mwouts/jupytext/pull/1527))
-
+1.19.2 (2026-05-10)
+-------------------
 
 **Fixed**
-- The `--quiet` flag now suppresses the `creating missing directory` warning when writing to a path that includes a prefix ([#1533](https://github.com/mwouts/jupytext/pull/1533))
 - Trusted notebooks remain trusted after `jupytext --sync` ([#1505](https://github.com/mwouts/jupytext/issues/1505))
 - We have fixed the homepage link in `package.json`. Thanks to [Michał Krassowski](https://github.com/krassowski) for making this PR ([#1494](https://github.com/mwouts/jupytext/pull/1494))
 - Thanks to [Brigitta Sipőcz](https://github.com/bsipocz) for fixing a broken link in our CLI ([#1428](https://github.com/mwouts/jupytext/pull/1428))
+- The `--quiet` flag now suppresses the `creating missing directory` warning when writing to a path that includes a prefix ([#1533](https://github.com/mwouts/jupytext/pull/1533))
+
+
+**Changed**
+- The CI workflow has been restructured to maximize parallelization. All test suites (pip, conda, UI) and the build step now run concurrently after pre-commit checks, instead of sequentially, reducing CI times ([#1527](https://github.com/mwouts/jupytext/pull/1527))
+- We have skipped the tests that involve `jupyterfs` on Python 3.12+ as they started failing on the CI with no obvious way to fix them ([#1509](https://github.com/mwouts/jupytext/issues/1509))
+- We have changed the configuration of Dependabot to get grouped dependency updates for our JupyterLab extension.
+- We have merged a series of Dependabot security updates: [#1516](https://github.com/mwouts/jupytext/pull/1516), [#1517](https://github.com/mwouts/jupytext/pull/1517), [#1519](https://github.com/mwouts/jupytext/pull/1519), [#1520](https://github.com/mwouts/jupytext/pull/1520), [#1522](https://github.com/mwouts/jupytext/pull/1522), [#1524](https://github.com/mwouts/jupytext/pull/1524)
 
 
 1.19.1 (2026-01-25)
