@@ -1366,12 +1366,13 @@ def test_pipe_with_quiet_does_not_print(tmp_path, capsys):
     assert tmp_py.read_text() == "# %%\n1 + 1\n"
 
 
-def test_quiet_does_not_print_when_creating_missing_directory(cwd_tmp_path, capsys):
+def test_quiet_does_not_print_when_creating_missing_directory(tmp_path, monkeypatch, capsys):
     """In quiet mode, jupytext should not print a warning when creating a missing directory (#1285)"""
-    tmp_py = cwd_tmp_path / "script.py"
+    monkeypatch.chdir(tmp_path)
+    tmp_py = tmp_path / "script.py"
     tmp_py.write_text("# %%\n1+1\n")
 
-    output_dir = cwd_tmp_path / "jupyter_execute"
+    output_dir = tmp_path / "jupyter_execute"
     assert not output_dir.exists()
 
     # The double slash in './jupyter_execute//ipynb' is the jupytext syntax for a prefix directory
