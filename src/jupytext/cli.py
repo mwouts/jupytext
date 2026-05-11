@@ -551,8 +551,10 @@ def jupytext_single_file(nb_file, args, log, notary):
     def _writes(nb, fmt):
         """Serialize a notebook; sign the result when every cell is trusted."""
         content = writes(nb, fmt=fmt, config=config)
-        if len(nb.cells) and all(cell.get("metadata", {}).get("trusted", False) for cell in nb.cells):
+        if notary.check_cells(nb):
             notary.sign(reads(content, fmt=fmt, config=config))
+        else:
+            log("[jupytext] Warning: Notebook is not trusted")
         return content
 
     # Just acting on metadata / pipe => save in place

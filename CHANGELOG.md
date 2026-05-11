@@ -1,6 +1,11 @@
 Jupytext ChangeLog
 ==================
 
+1.19.3.dev0 (wip)
+-----------------
+- The Jupytext CLI issues a warning when a notebook is not trusted. Also, trust is preserved when empty outputs are added (follow-up on [#1505](https://github.com/mwouts/jupytext/issues/1505))
+
+
 1.19.2 (2026-05-10)
 -------------------
 
