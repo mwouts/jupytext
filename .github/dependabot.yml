@@ -6,7 +6,9 @@
 version: 2
 updates:
   - package-ecosystem: "npm" # See documentation for possible values
-    directory: "jupyterlab" # Location of package manifests
+    directories: # Location of package manifests
+      - "jupyterlab"
+      - "jupyterlab/packages/jupyterlab-jupytext-extension"
     schedule:
       interval: "weekly"
     # Ignore devDependencies
