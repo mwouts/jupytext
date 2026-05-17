@@ -10,6 +10,7 @@ Jupytext ChangeLog
 **Changed**
 - The dependabot config has been updated to correctly bump extension packages, now allowing only production updates and ignoring dev dependencies ([#1532](https://github.com/mwouts/jupytext/pull/1532)). Thanks to [Mahendra Paipuri](https://github.com/mahendrapaipuri) for this PR!
 - Removed deprecated stylelint packages (`stylelint-config-prettier` and `stylelint-prettier`) from the JupyterLab extension dependencies ([#1530](https://github.com/mwouts/jupytext/pull/1530))
+- We have removed Python 3.9 testing from the CI (Python 3.9 reached EOL in October 2025)
 
 
 1.19.2 (2026-05-10)
