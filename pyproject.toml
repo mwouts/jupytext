@@ -285,7 +285,7 @@ channels = ["conda-forge"]
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [tool.pixi.dependencies]
-python = ">=3.9,<3.14" # One test involving Black fails on the CI
+python = "3.13.13.*" # One test involving Black fails on the CI
 jupyterlab = ">=4.0"
 nbformat = ">=5.1.2"
 pre-commit = ">=4.3"

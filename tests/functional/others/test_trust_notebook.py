@@ -285,10 +285,24 @@ async def test_notebook_remains_trusted_after_jupytext_sync(tmp_path, cm, nb_was
 
     # And check that the updated notebook is still trusted
     nb = (await ensure_async(cm.get("test.ipynb")))["content"]
-    print(nb)
     assert nb.cells[0].metadata["trusted"] is nb_was_originally_trusted, (
         f"Cell should keep trusted={nb_was_originally_trusted} after jupytext sync"
     )
+
+    # We add a new cell to the notebook
+    modified_text = modified_text + "\n\n# %%\n# New cell\nprint('This is a new cell')"
+    py_file.write_text(modified_text)
+
+    # We run 'jupytext --sync test.ipynb' again
+    ipynb_file = tmp_path / "test.ipynb"
+    jupytext_cli(["--sync", str(ipynb_file)], notary=cm.notary)
+
+    # And check that the updated notebook is still trusted
+    nb = (await ensure_async(cm.get("test.ipynb")))["content"]
+    for cell in nb.cells:
+        assert cell.metadata["trusted"] is nb_was_originally_trusted, (
+            f"All cells should keep trusted={nb_was_originally_trusted} after jupytext sync with new cell"
+        )
 
 
 @pytest.mark.requires_myst
