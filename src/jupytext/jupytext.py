@@ -34,6 +34,7 @@ from .header import (
     metadata_to_metadata_and_cell,
 )
 from .languages import (
+    _JUPYTER_LANGUAGES_LOWER_AND_UPPER,
     _SCRIPT_EXTENSIONS,
     default_language_from_metadata_and_ext,
     set_main_and_cell_language,
@@ -146,7 +147,10 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
             lines = lines[pos:]
 
         custom_cell_magics = self.fmt.get("custom_cell_magics", "").split(",")
-        set_main_and_cell_language(metadata, cells, self.implementation.extension, custom_cell_magics)
+        custom_language_magics = self.fmt.get("custom_language_magics", [])
+        if isinstance(custom_language_magics, str):
+            custom_language_magics = [m for m in custom_language_magics.split(",") if m]
+        set_main_and_cell_language(metadata, cells, self.implementation.extension, custom_cell_magics + list(custom_language_magics))
         cell_metadata = set()
         for cell in cells:
             cell_metadata.update(cell.metadata.keys())
@@ -241,6 +245,24 @@ class TextNotebookConverter(NotebookReader, NotebookWriter):
                 if cell.metadata.get("hide_input", False) or cell.metadata.get("hide_output", False):
                     self.fmt["use_runtools"] = True
                     break
+
+        # Auto-detect non-standard language magics and record them in custom_language_magics
+        if self.ext in [".md", ".markdown", ".Rmd"]:
+            custom_cell_magics_list = self.fmt.get("custom_cell_magics", "").split(",")
+            existing_custom_language_magics = self.fmt.get("custom_language_magics", [])
+            if isinstance(existing_custom_language_magics, str):
+                existing_custom_language_magics = [m for m in existing_custom_language_magics.split(",") if m]
+            detected_magics = set(existing_custom_language_magics)
+            for cell in nb.cells:
+                if cell.cell_type == "code" and cell.source:
+                    first_line = cell.source.split("\n")[0]
+                    if first_line.startswith("%%"):
+                        lang = first_line[2:].split(" ")[0].strip()
+                        if lang and lang not in _JUPYTER_LANGUAGES_LOWER_AND_UPPER and lang not in custom_cell_magics_list:
+                            detected_magics.add(lang)
+            if detected_magics != set(existing_custom_language_magics):
+                self.fmt["custom_language_magics"] = sorted(detected_magics)
+                metadata.setdefault("jupytext", {})["custom_language_magics"] = self.fmt["custom_language_magics"]
 
         header = encoding_and_executable(nb, metadata, self.ext)
         unsupported_keys = set()
