@@ -160,3 +160,40 @@ In Pandoc Markdown, all cells are marked with pandoc divs (`:::`). The format is
 See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.pandoc.md#) in the `md:pandoc` format.
 
 If you wish to use that format, please install `pandoc` in version 2.7.2 or above, with e.g. `conda install pandoc -c conda-forge`.
+
+## Org Mode
+
+[Org mode](https://orgmode.org/) is a major mode for Emacs widely used for note-taking and literate programming.
+Jupytext can read and write Jupyter notebooks as Org-mode (`.org`) files using Pandoc as a conversion backend.
+
+
+Code cells are represented as `#+BEGIN_SRC ... #+END_SRC` blocks. The kernel metadata are recorded as top-level `#+PROPERTY: header-args` lines in the Org output, e.g.
+
+```org
+#+JUPYTER_KERNEL_DISPLAY_NAME: Python 3
+#+PROPERTY: header-args:jupyter-python :kernel python3
+#+PROPERTY: header-args:jupyter-python+ :session python3
+```
+
+Additional Org Babel header arguments are synchronized with notebook metadata under `jupyter.org_babel` in Markdown-like formats, which corresponds to the `org_babel` entry in the notebook metadata:
+
+```yaml
+jupyter:
+  org_babel:
+    header_args:
+      jupyter-python:
+        session: python3
+```
+
+Current limitations:
+- Cell metadata is not preserved in the Org representation.
+- Consecutive Markdown cells are concatenated on round-trip, since Org prose has no native cell-boundary markers.
+- Raw cells are not preserved by the current Pandoc-based conversion path.
+- Only the kernel metadata and Org Babel header arguments are serialized in Org headers; other notebook metadata remain subject to Jupytext's metadata filtering and are not represented directly in the `.org` file.
+
+To use the Org format, install `pandoc` in version 2.7.2 or above, then convert with:
+
+```bash
+jupytext --to org notebook.ipynb
+jupytext --to ipynb notebook.org
+```
