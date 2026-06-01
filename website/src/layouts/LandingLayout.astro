@@ -1,0 +1,96 @@
+---
+import '../styles/landing.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = 'Jupytext — Jupyter notebooks as plain text',
+	description = 'Jupytext turns Jupyter notebooks into plain text files you can edit in any IDE, version control with clean diffs, and refactor with AI assistants.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og/jupytext-card.png', Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="canonical" href={canonical} />
+
+		<!-- Open Graph / social -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImage} />
+		<meta name="twitter:card" content="summary_large_image" />
+
+		<!-- Respect the theme the visitor picked in the docs (Starlight stores it
+		     under `starlight-theme`); fall back to the OS preference. Inline + early
+		     to avoid a flash of the wrong theme. -->
+		<script is:inline>
+			(() => {
+				const stored = localStorage.getItem('starlight-theme');
+				const theme =
+					stored === 'light' || stored === 'dark'
+						? stored
+						: window.matchMedia('(prefers-color-scheme: light)').matches
+							? 'light'
+							: 'dark';
+				document.documentElement.dataset.theme = theme;
+			})();
+		</script>
+
+	</head>
+	<body class="lp">
+		<slot />
+
+		<script is:inline>
+			// Theme toggle + persistence (shared key with Starlight docs).
+			document.addEventListener('click', (e) => {
+				const btn = e.target.closest('[data-theme-toggle]');
+				if (!btn) return;
+				const next =
+					document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+				document.documentElement.dataset.theme = next;
+				try {
+					localStorage.setItem('starlight-theme', next);
+				} catch {}
+			});
+
+			// Copy-to-clipboard buttons.
+			document.addEventListener('click', async (e) => {
+				const btn = e.target.closest('[data-copy]');
+				if (!btn) return;
+				try {
+					await navigator.clipboard.writeText(btn.dataset.copy);
+					const prev = btn.textContent;
+					btn.textContent = 'Copied!';
+					setTimeout(() => (btn.textContent = prev), 1400);
+				} catch {}
+			});
+
+			// Lightweight tabs (used by Quickstart + Formats).
+			document.querySelectorAll('[data-tabs]').forEach((group) => {
+				const tabs = [...group.querySelectorAll('[role="tab"]')];
+				const panels = [...group.querySelectorAll('[role="tabpanel"]')];
+				tabs.forEach((tab, i) => {
+					tab.addEventListener('click', () => {
+						tabs.forEach((t) => t.setAttribute('aria-selected', 'false'));
+						panels.forEach((p) => (p.hidden = true));
+						tab.setAttribute('aria-selected', 'true');
+						panels[i].hidden = false;
+					});
+				});
+			});
+		</script>
+	</body>
+</html>

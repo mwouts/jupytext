@@ -7,7 +7,7 @@
 [![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=main)](https://codecov.io/gh/mwouts/jupytext/branch/main)
 [![MIT License](https://img.shields.io/github/license/mwouts/jupytext)](https://github.com/mwouts/jupytext/blob/main/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![GitHub language count](https://img.shields.io/github/languages/count/mwouts/jupytext)](docs/languages.md)
+[![GitHub language count](https://img.shields.io/github/languages/count/mwouts/jupytext)](https://jupytext.org/formats/languages/)
 [![Conda Version](https://anaconda.org/conda-forge/jupytext/badges/version.svg)](https://anaconda.org/conda-forge/jupytext/)
 [![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
@@ -115,7 +115,7 @@ Note: It is simpler to close the `.ipynb` notebook in Jupyter when you edit the 
 
 ## More resources
 
-Read more about Jupytext in the [documentation](https://jupytext.readthedocs.io).
+Read more about Jupytext in the [documentation](https://jupytext.org).
 
 If you're new to Jupytext, you may want to start with the [FAQ](docs/faq.md) or with the [Tutorials](docs/tutorials.md).
 
