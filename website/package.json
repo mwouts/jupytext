@@ -1,5 +1,5 @@
 {
-  "name": "jupytext-website",
+  "name": "jupytext-org",
   "type": "module",
   "version": "0.1.0",
   "description": "Source for the jupytext.org website (Astro + Starlight).",
