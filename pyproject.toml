@@ -44,7 +44,7 @@ dynamic = ["version"]
 [project.urls]
 Homepage = "https://github.com/mwouts/jupytext"
 "Source Code" = "https://github.com/mwouts/jupytext"
-Documentation = "https://jupytext.readthedocs.io"
+Documentation = "https://jupytext.org"
 
 [project.optional-dependencies]
 # Test related dependencies

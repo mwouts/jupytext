@@ -123,7 +123,7 @@ def parse_jupytext_args(args=None):
             "notebooks and text documents in a roundtrip. Use the "
             "--test and and --test-strict commands to test the roundtrip on your files. "
             "Read more about the available formats at "
-            "https://jupytext.readthedocs.io/en/latest/formats-scripts.html "
+            "https://jupytext.org/formats/scripts/ "
             "NB: in addition to the extensions listed above, you can also use these: '{}'".format(
                 "', '".join(
                     sorted(

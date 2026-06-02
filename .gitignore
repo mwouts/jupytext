@@ -6,6 +6,8 @@
 build
 /dist
 docs/_build
+website/dist
+website/.astro
 
 # Will be created by postBuild
 demo/get_started.ipynb
