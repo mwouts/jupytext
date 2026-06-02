@@ -1,6 +1,13 @@
 Jupytext ChangeLog
 ==================
 
+1.19.4 (unreleased)
+-------------------
+
+**Changed**
+- Jupytext's documentation is now at https://jupytext.org! ([#1538](https://github.com/mwouts/jupytext/pull/1538))
+
+
 1.19.3 (2026-05-17)
 -------------------
 
