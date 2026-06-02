@@ -26,5 +26,5 @@ jobs:
             ```
             HATCH_BUILD_HOOKS_ENABLE=true pip install git+${{ github.event.pull_request.head.repo.clone_url }}@${{ github.event.pull_request.head.ref }}
             ```
-            (this requires `nodejs`, see more at [Developing Jupytext](https://jupytext.readthedocs.io/en/latest/developing.html))
+            (this requires `nodejs`, see more at [Developing Jupytext](https://jupytext.org/reference/developing/))
           comment_tag: binder_link

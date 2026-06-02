@@ -295,6 +295,7 @@ pip = "*"
 
 [tool.pixi.feature.docs.dependencies]
 sphinx = "*"
+sphinx-reredirects = "*"
 sphinx-copybutton = "*"
 sphinx-rtd-theme = "*"
 myst-parser = "*"

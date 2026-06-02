@@ -289,7 +289,7 @@ const extension: JupyterFrontEndPlugin<void> = {
         }
       },
       execute: () => {
-        window.open('https://jupytext.readthedocs.io/en/latest/faq.html');
+        window.open('https://jupytext.org/reference/faq/');
       },
     });
     palette?.addItem({
@@ -313,7 +313,7 @@ const extension: JupyterFrontEndPlugin<void> = {
         }
       },
       execute: () => {
-        window.open('https://jupytext.readthedocs.io/en/latest/');
+        window.open('https://jupytext.org/');
       },
     });
     palette?.addItem({
