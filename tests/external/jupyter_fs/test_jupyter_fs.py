@@ -30,6 +30,11 @@ def cm_from_fs_meta_manager(tmpdir, request):
             "url": f"osfs://{tmpdir}",
         }
     )
+
+    managers = [h for h in getattr(cm, "_managers", {}) if h != ""]
+    if not managers:
+        pytest.skip("jupyterfs osfs resource could not be initialized; optional dependency may be missing")
+
     return cm
 
 
