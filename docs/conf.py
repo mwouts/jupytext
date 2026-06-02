@@ -4,7 +4,9 @@
 
 project = "Jupytext"
 
-extensions = ["sphinx_reredirects"]
+extensions = ["myst_parser", "sphinx_reredirects"]
+source_suffix = {".md": "markdown"}
+root_doc = "index"
 
 redirects = {
     "index": "https://jupytext.org/",
