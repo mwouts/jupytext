@@ -24,7 +24,7 @@ const benefits = [
 	{
 		icon: '♻️',
 		title: 'Reuse your code',
-		body: 'A text notebook is a valid module. Import functions from it, or run it as a script. Copy, move and restructure your code easily.',
+		body: 'A text notebook is a valid module. Import functions from it, or run it as a script. Copy, move, and restructure your code at will.',
 	},
 	{
 		icon: '🔗',
@@ -64,53 +64,9 @@ df = pd.read_csv("data.csv")
 df.describe()`,
 	},
 	{
-		id: 'md',
-		label: 'Markdown',
-		best: 'Best for documentation-first notebooks — code lives in fenced blocks.',
-		code: `# Analysis
-
-A quick look at the data.
-
-\`\`\`python
-import pandas as pd
-df = pd.read_csv("data.csv")
-df.describe()
-\`\`\``,
-	},
-	{
-		id: 'myst',
-		label: 'MyST',
-		best: 'Best for rich technical docs & Jupyter Book — directives, cross-refs and more.',
-		code: `# Analysis
-
-A quick look at the data.
-
-\`\`\`{code-cell} ipython3
-import pandas as pd
-df = pd.read_csv("data.csv")
-df.describe()
-\`\`\``,
-	},
-	{
-		id: 'quarto',
-		label: 'Quarto',
-		best: 'Best for publishing — pairs with the Quarto scientific publishing system.',
-		code: `---
-title: Analysis
----
-
-A quick look at the data.
-
-\`\`\`{python}
-import pandas as pd
-df = pd.read_csv("data.csv")
-df.describe()
-\`\`\``,
-	},
-	{
 		id: 'marimo',
-		label: 'Marimo',
-		best: 'Marimo notebooks are also supported',
+		label: 'py:marimo',
+		best: 'Notebooks as Marimo apps',
 		code: `import marimo
 
 __generated_with = "0.23.8"
@@ -143,6 +99,74 @@ def _():
 
 if __name__ == "__main__":
     app.run()`,
+	},
+	{
+		id: 'md',
+		label: 'Markdown',
+		best: 'Best for documentation-first notebooks, GitHub Markdown syntax.',
+		code: `# Analysis
+
+A quick look at the data.
+
+\`\`\`python
+import pandas as pd
+df = pd.read_csv("data.csv")
+df.describe()
+\`\`\``,
+	},
+	{
+		id: 'myst',
+		label: 'MyST',
+		best: 'Best for rich technical docs & Jupyter Book — directives, cross-refs and more.',
+		code: `# Analysis
+
+A quick look at the data.
+
+\`\`\`{code-cell} ipython3
+import pandas as pd
+df = pd.read_csv("data.csv")
+df.describe()
+\`\`\``,
+	},
+	{
+		id: 'quarto',
+		label: 'Quarto',
+		best: 'The Quarto format gives you access to the Quarto scientific publishing system.',
+		code: `---
+title: Analysis
+---
+
+A quick look at the data.
+
+\`\`\`{python}
+import pandas as pd
+df = pd.read_csv("data.csv")
+df.describe()
+\`\`\``,
+	},
+	{
+		id: 'pandoc',
+		label: 'Pandoc',
+		best: `Pandoc's implementation of text notebooks`,
+		code: `---
+jupyter:
+  nbformat: 4
+  nbformat_minor: 5
+---
+
+::: {#7e0ae658 .cell .markdown}
+# Analysis
+
+A quick look at the data.
+:::
+
+::: {#756f3401 .cell .code}
+\`\`\` python
+import pandas as pd
+df = pd.read_csv("data.csv")
+df.describe()
+\`\`\`
+:::`
 	},
 ];
 
@@ -180,13 +204,12 @@ const quickstart = [
 ];
 
 const integrations = [
-	{ name: 'JupyterLab', desc: 'Pair & open text notebooks with a right click.', href: '/integrations/jupyterlab/' },
-	{ name: 'Jupyter Notebook', desc: 'Works in Notebook 7 and classic.', href: '/getting-started/text-notebooks/' },
-	{ name: 'VS Code', desc: 'Edit paired notebooks as cells.', href: '/integrations/vs-code/' },
-	{ name: 'VS Code Extension', desc: 'jupytext-sync by Victor Negîrneac — sync notebooks from the editor.', href: 'https://marketplace.visualstudio.com/items?itemName=caenrigen.jupytext-sync' },
-	{ name: 'pre-commit', desc: 'Keep pairs in sync on every commit.', href: '/using/pre-commit/' },
+	{ name: 'JupyterLab', desc: 'Pair & open text notebooks with a right click.', href: '/getting-started/text-notebooks/#how-to-open-a-text-notebook-in-jupyterlab' },
+	{ name: 'Jupyter Notebook', desc: 'Works in Notebook 7 and classic.', href: '/getting-started/text-notebooks/#how-to-open-a-text-notebook-in-jupyter-notebook-nb7' },
+	{ name: 'VS Code Extension', desc: 'Jupytext-Sync by Victor Negîrneac.', href: '/integrations/vs-code/' },
 	{ name: 'Real-time collab', desc: 'Jupyter Collaboration support.', href: '/integrations/jupyter-collaboration/' },
-	{ name: 'Python API', desc: 'read / write notebooks in code.', href: '/getting-started/install/' },
+	{ name: 'pre-commit', desc: 'Keep pairs in sync on every commit.', href: '/using/pre-commit/' },
+	{ name: 'Python API', desc: 'read / write notebooks in code.', href: '/getting-started/install/#jupytext-as-a-python-library' },
 ];
 ---
 
@@ -415,7 +438,7 @@ df.groupby("region").margin.sum().plot.bar()</code></pre>
 			<div class="section-head">
 				<span class="eyebrow">Formats</span>
 				<h2>Same notebook, your choice of text</h2>
-				<p>The cell below is the same content in each format. Pick whichever suits the notebook.</p>
+				<p>The cell below is the same content in each format. Pick whichever suits your needs.</p>
 			</div>
 			<div class="lp-tabs" data-tabs>
 				<div class="lp-tablist" role="tablist">
