@@ -28,7 +28,7 @@ const benefits = [
 	},
 	{
 		icon: '🔗',
-		title: 'Round-trip safe',
+		title: 'Rich outputs are preserved',
 		body: 'Pair the text file with an .ipynb and keep your rich outputs. Inputs come from the text, outputs from the notebook.',
 	},
 	{
@@ -42,7 +42,7 @@ const formats = [
 	{
 		id: 'percent',
 		label: 'py:percent',
-		best: 'Best for code-heavy notebooks — cell markers understood by VS Code, PyCharm, Spyder & Hydrogen.',
+		best: 'The most portable format — cell markers understood by VS Code, PyCharm, Spyder, etc., across Python, R, Julia and more.',
 		code: `# %% [markdown]
 # # Analysis
 # A quick look at the data.
@@ -66,7 +66,7 @@ df.describe()`,
 	{
 		id: 'marimo',
 		label: 'py:marimo',
-		best: 'Notebooks as Marimo apps',
+		best: 'Each cell is a function in the Marimo format',
 		code: `import marimo
 
 __generated_with = "0.23.8"
@@ -131,7 +131,7 @@ df.describe()
 	{
 		id: 'quarto',
 		label: 'Quarto',
-		best: 'The Quarto format gives you access to the Quarto scientific publishing system.',
+		best: 'For multi-language scientific publishing — Python, R, Julia and more, rendered by the Quarto system.',
 		code: `---
 title: Analysis
 ---
@@ -147,7 +147,7 @@ df.describe()
 	{
 		id: 'pandoc',
 		label: 'Pandoc',
-		best: `Pandoc's implementation of text notebooks`,
+		best: `Pandoc's own Markdown format for notebooks — cells as fenced divs, readable as plain Markdown.`,
 		code: `---
 jupyter:
   nbformat: 4
@@ -276,7 +276,7 @@ df.groupby("region").margin.sum().plot.bar()</code></pre>
 				<span class="eyebrow">The challenge</span>
 				<h2>Keeps the focus on what you write</h2>
 				<p>
-					A one-line code change comes with execution counts, base64 image outputs, and cell
+					A one-line code change in a .ipynb notebook comes with execution counts, base64 image outputs, and cell
 					metadata in the diff. Jupytext gives you a text file that
 					contains only the source — the part you actually write and review.
 				</p>
@@ -349,6 +349,7 @@ df.groupby("region").margin.sum().plot.bar()</code></pre>
 					<li><span class="tick">✓</span> Ask an agent to refactor a cell — it edits the .py file, you reload in Jupyter.</li>
 					<li><span class="tick">✓</span> Reviews and AI suggestions land as clean, minimal diffs.</li>
 					<li><span class="tick">✓</span> Outputs stay safe in the paired .ipynb while the text gets edited.</li>
+					<li><span class="tick">✓</span> Text notebooks are very concise, often 1,000x lighter than .ipynb, allowing your AI to ingest an entire collection of notebooks at once.</li>
 				</ul>
 			</div>
 			<div class="lp-card">
@@ -375,7 +376,8 @@ df.groupby("region").margin.sum().plot.bar()</code></pre>
 				<h2>Paired notebooks: the best of both worlds</h2>
 				<p>
 					Keep a rich <code>.ipynb</code> (with outputs) alongside a clean <code>.py</code> or
-					<code>.md</code>. Jupytext keeps them in sync — commit only the text file.
+					<code>.md</code>. </br>
+					Jupytext keeps them in sync — commit only the text file.
 				</p>
 			</div>
 			<div class="lp-steps">
@@ -495,24 +497,23 @@ df.groupby("region").margin.sum().plot.bar()</code></pre>
 			<a class="lp-stat" href="https://pypistats.org/packages/jupytext" target="_blank" rel="noopener noreferrer"><div class="num">3M+</div><div class="lab">Downloads / month</div></a>
 			<a class="lp-stat" href="/formats/languages/"><div class="num">30+</div><div class="lab">Languages supported</div></a>
 			<a class="lp-stat" href="https://github.com/mwouts/jupytext/graphs/contributors" target="_blank" rel="noopener noreferrer"><div class="num">100+</div><div class="lab">Contributors</div></a>
-			<div class="lp-stat"><div class="num">MIT</div><div class="lab">Open source</div></div>
+			<a class="lp-stat" href="https://github.com/mwouts/jupytext/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><div class="num">MIT</div><div class="lab">Open source</div></a>
 		</div>
 	</section>
 
-	<!-- Final CTA -->
-	<section class="lp-cta">
-		<div class="lp-container">
-			<h2>Give your notebooks a clean text life</h2>
-			<p>Install Jupytext, pair a notebook, and enjoy reviewable diffs, IDE editing and AI-ready files.</p>
-			<div class="lp-hero-cta" style="justify-content:center">
-				<a class="lp-btn lp-btn-primary" href="/getting-started/install/">Read the docs →</a>
-				<a class="lp-btn lp-btn-secondary" href={GH} target="_blank" rel="noopener">View on GitHub</a>
-			</div>
-			<div class="lp-install" style="margin-top:1.6rem">
-				<span class="prompt">$</span>
-				<span>conda install jupytext -c conda-forge</span>
-				<button class="lp-copy" data-copy="conda install jupytext -c conda-forge">Copy</button>
-			</div>
+	<!-- About -->
+	<section style="border-top:1px solid var(--lp-border)">
+		<div class="lp-container" style="max-width:44rem;text-align:center">
+			<p style="color:var(--lp-text-dim);line-height:1.7">
+				Jupytext was created by <a href="https://www.linkedin.com/in/marc-wouts" target="_blank" rel="noopener">Marc Wouts</a>.
+				Follow Marc on LinkedIn for updates on Jupytext, his other open-source projects, and the occasional random topic.
+			</p>
+			<p style="color:var(--lp-text-dim);line-height:1.7">
+				Jupytext is completely free and open source under the <strong>MIT license</strong>. What keeps us going is
+				the excitement of learning through interactions with users and experts, and the satisfaction of sharing solutions with the community.
+				<br /><br />
+				Have a question, a bug report, or an idea? Feel free to open an issue or start a discussion on <a href={GH} target="_blank" rel="noopener">GitHub</a>.
+			</p>
 		</div>
 	</section>
 

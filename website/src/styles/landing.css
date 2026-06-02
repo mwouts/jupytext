@@ -202,10 +202,7 @@
 	font-weight: 800;
 }
 .lp-hero .grad {
-	background: linear-gradient(120deg, var(--jt-orange), var(--jt-green));
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
+	color: var(--jt-orange);
 }
 .lp-hero p.lede {
 	color: var(--lp-text-dim);
@@ -377,7 +374,7 @@
 	place-items: center;
 	font-size: 1.3rem;
 	margin-bottom: 1rem;
-	background: linear-gradient(135deg, rgba(255, 85, 0, 0.18), rgba(118, 192, 67, 0.18));
+	background: color-mix(in srgb, var(--jt-orange) 16%, transparent);
 }
 .lp-feature h3 {
 	font-size: 1.15rem;
@@ -561,10 +558,7 @@
 .lp-stat .num {
 	font-size: clamp(1.8rem, 4vw, 2.6rem);
 	font-weight: 800;
-	background: linear-gradient(120deg, var(--jt-orange), var(--jt-green));
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
+	color: var(--jt-orange);
 }
 .lp-stat .lab {
 	color: var(--lp-text-dim);

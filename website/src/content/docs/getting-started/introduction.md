@@ -43,15 +43,17 @@ Install Jupytext:
 ```bash
 pip install jupytext
 ```
+and **restart** your Jupyter server.
 
 Convert a notebook to a text file (and back):
 
 ```bash
-jupytext --to py:percent notebook.ipynb   # notebook.ipynb -> notebook.py
-jupytext --to notebook notebook.py        # notebook.py    -> notebook.ipynb
+jupytext --to py:percent notebook.ipynb      # notebook.ipynb -> notebook.py
+jupytext --to notebook notebook.py           # notebook.py    -> notebook.ipynb
+jupytext --to notebook notebook.py --update  # preserve existing outputs
 ```
 
-Pair a notebook so both representations stay in sync on every save:
+Pair one notebook so both representations stay in sync on every save:
 
 ```bash
 jupytext --set-formats ipynb,py:percent notebook.ipynb
@@ -62,6 +64,15 @@ Or pair every notebook in your project by adding a [`jupytext.toml`](/using/conf
 ```toml
 formats = "ipynb,py:percent"
 ```
+
+## When does synchronization happen?
+
+Synchronization is triggered in three situations:
+
+1. **Jupyter** — inputs are loaded from the text notebook and combined (in memory) with outputs from the `.ipynb` notebook. Both files are updated on save.
+2. **`jupytext --sync`** — both files are updated using inputs from the most recently modified file (outputs always come from the `.ipynb` notebook).
+3. **VS Code** with the [Jupytext Sync](https://marketplace.visualstudio.com/items?itemName=caenrigen.jupytext-sync) extension — both files are updated on every save.
+
 
 ## Where to next
 
