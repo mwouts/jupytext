@@ -37,19 +37,14 @@ jobs:
 
   coverage:
     uses: ./.github/workflows/step_coverage.yml
-    if: github.event_name != 'schedule'
 
   test-pip:
     needs: [ coverage ]
     uses: ./.github/workflows/step_tests-pip.yml
-    with:
-      coverage: ${{ github.event_name != 'schedule' }}
 
   test-conda:
     needs: [ coverage ]
     uses: ./.github/workflows/step_tests-conda.yml
-    with:
-      coverage: ${{ github.event_name != 'schedule' }}
 
   test-ui:
     needs: [ coverage ]
