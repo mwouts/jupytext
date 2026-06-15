@@ -17,7 +17,7 @@ jupytext:
   text_representation:
     extension: .md
     format_name: myst
-    format_version: 0.13
+    format_version: '0.13'
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -45,7 +45,7 @@ jupytext:
   text_representation:
     extension: .md
     format_name: myst
-    format_version: 0.13
+    format_version: '0.13'
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
