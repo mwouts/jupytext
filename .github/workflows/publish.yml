@@ -26,7 +26,8 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
-
+        with:
+          persist-credentials: false
 
       - name: Install pixi
         uses: prefix-dev/setup-pixi@v0.9.6
