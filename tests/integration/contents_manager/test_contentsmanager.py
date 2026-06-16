@@ -1914,7 +1914,7 @@ jupytext:
   text_representation:
     extension: .md
     format_name: myst
-    format_version: '0.13'
+    format_version: 0.13
 kernelspec:
   display_name: itables
   language: python
@@ -1951,7 +1951,7 @@ jupytext:
   text_representation:
     extension: .md
     format_name: myst
-    format_version: '0.13'
+    format_version: 0.13
 kernelspec:
   display_name: itables
   language: python
