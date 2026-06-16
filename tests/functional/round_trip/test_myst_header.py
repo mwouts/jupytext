@@ -124,7 +124,7 @@ jupytext:
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
-  name: àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ
+  name: àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸőűŐŰçÇßØøÅåÆæœ
 mystnb:
   execution_mode: 'off'
 settings:
