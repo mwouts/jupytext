@@ -4,6 +4,9 @@ Jupytext ChangeLog
 1.19.4.dev0 (wip)
 -----------------
 
+**Fixed**
+- fix: Support unicode characters while dumping YAML ([#1542](https://github.com/mwouts/jupytext/pull/1542))
+
 **Changed**
 - Jupytext's documentation is now at https://jupytext.org! ([#1538](https://github.com/mwouts/jupytext/pull/1538))
 - We require `pandoc<3.10` on the CI as pandoc converts the "3.10" string to a float, which then causes issues in Jupytext ([#1545](https://github.com/mwouts/jupytext/issues/1545))
