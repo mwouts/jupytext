@@ -22,9 +22,11 @@ jobs:
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
         dependency-mode: [ 'locked', 'latest' ]
     runs-on: ${{ matrix.os }}
+    # We still need to run pixi bash as we need it for Windows. Ensure to prefix
+    # command with pixi so that we can pixi environment
     defaults:
       run:
-        shell: bash -el {0}
+        shell: pixi run bash -el {0}
 
     steps:
       - name: Checkout
@@ -35,16 +37,17 @@ jobs:
         with:
           pixi-version: v0.68.0
           cache: true
+          activate-environment: true
 
       - name: Update pixi environment
         if: matrix.dependency-mode == 'latest'
-        run: |
-          eval "$(pixi shell-hook)"
-          pixi update
+        run: pixi update
 
       - name: Run tests
         run: |
+          # Seems like without this command, MacOS cannot activate environment
           eval "$(pixi shell-hook)"
+
           # Install from source
           HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e .
 
