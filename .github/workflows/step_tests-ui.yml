@@ -32,7 +32,7 @@ jobs:
         run: |
           eval "$(pixi shell-hook)"
           HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e '.[test-ui]'
-          sleep 300000
+          pip freeze
 
       - name: Uninstall jupyter-fs
         run: |
@@ -40,6 +40,7 @@ jobs:
           # Uninstall jupyter-fs as it overrides the original browser-test.js to
           # check its own functionality (https://github.com/jpmorganchase/jupyter-fs/blob/main/jupyterfs/browser-test.js)
           pip uninstall jupyter-fs -y
+          pip freeze
 
       - name: Install galata
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
@@ -59,6 +60,7 @@ jobs:
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
         run: |
           eval "$(pixi shell-hook)"
+          pip freeze
           jlpm playwright test
 
       - name: Upload UI Test artifacts
