@@ -33,11 +33,10 @@ jobs:
         with:
           pixi-version: v0.68.0
           cache: true
+          activate-environment: true
 
       - name: Build package
-        run: |
-          eval "$(pixi shell-hook)"
-          HATCH_BUILD_HOOKS_ENABLE=true hatch build
+        run: HATCH_BUILD_HOOKS_ENABLE=true hatch build
 
       - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1

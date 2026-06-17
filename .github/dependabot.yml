@@ -23,3 +23,12 @@ updates:
         applies-to: "security-updates"
         patterns:
           - "*"
+
+  - package-ecosystem: "github-actions" # See documentation for possible values
+    directory: "/" # Workflow files stored in the default location of `.github/workflows`
+    schedule:
+      interval: "weekly"
+    groups:
+      actions-dependencies:
+        patterns:
+          - "*"
