@@ -35,16 +35,14 @@ jobs:
         with:
           pixi-version: v0.68.0
           cache: true
+          activate-environment: true
 
       - name: Update pixi environment
         if: matrix.dependency-mode == 'latest'
-        run: |
-          eval "$(pixi shell-hook)"
-          pixi update
+        run: pixi update
 
       - name: Run tests
         run: |
-          eval "$(pixi shell-hook)"
           # Install from source
           HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e .
 

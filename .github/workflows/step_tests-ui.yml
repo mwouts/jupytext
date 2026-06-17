@@ -23,23 +23,15 @@ jobs:
           cache: true
           activate-environment: true
 
-      - name: Setup upterm session
-        uses: owenthereal/action-upterm@v1
-        with:
-          limit-access-to-actor: true # Restrict to the user who triggered the workflow
-          detached: true
-
       - name: Install from source
         run: |
           HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e '.[test-ui]'
-          pip freeze
 
       - name: Uninstall jupyter-fs
         run: |
           # Uninstall jupyter-fs as it overrides the original browser-test.js to
           # check its own functionality (https://github.com/jpmorganchase/jupyter-fs/blob/main/jupyterfs/browser-test.js)
           pip uninstall jupyter-fs -y
-          pip freeze
 
       - name: Install galata
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
@@ -49,14 +41,11 @@ jobs:
 
       - name: Install browser
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
-        run: |
-          jlpm playwright install chromium
+        run: jlpm playwright install chromium
 
       - name: Integration tests
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
-        run: |
-          pip freeze
-          jlpm playwright test
+        run: jlpm playwright test
 
       - name: Upload UI Test artifacts
         if: failure()
