@@ -21,6 +21,7 @@ jobs:
         with:
           pixi-version: v0.68.0
           cache: true
+          activate-environment: true
 
       - name: Setup upterm session
         uses: owenthereal/action-upterm@v1
@@ -30,13 +31,11 @@ jobs:
 
       - name: Install from source
         run: |
-          eval "$(pixi shell-hook)"
           HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e '.[test-ui]'
           pip freeze
 
       - name: Uninstall jupyter-fs
         run: |
-          eval "$(pixi shell-hook)"
           # Uninstall jupyter-fs as it overrides the original browser-test.js to
           # check its own functionality (https://github.com/jpmorganchase/jupyter-fs/blob/main/jupyterfs/browser-test.js)
           pip uninstall jupyter-fs -y
@@ -46,20 +45,16 @@ jobs:
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-        run: |
-          eval "$(pixi shell-hook)"
-          jlpm install
+        run: jlpm install
 
       - name: Install browser
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
         run: |
-          eval "$(pixi shell-hook)"
           jlpm playwright install chromium
 
       - name: Integration tests
         working-directory: jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests
         run: |
-          eval "$(pixi shell-hook)"
           pip freeze
           jlpm playwright test
 
