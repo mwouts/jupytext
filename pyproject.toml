@@ -301,7 +301,7 @@ sphinx-rtd-theme = "*"
 myst-parser = "*"
 
 [tool.pixi.feature.dev.dependencies]
-pandoc = ">=3.0"
+pandoc = ">=3.0,<3.10"  # 1545
 
 [tool.pixi.environments]
 default = { features = ["dev"], solve-group = "default" }
