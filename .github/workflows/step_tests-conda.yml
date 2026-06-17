@@ -45,6 +45,9 @@ jobs:
 
       - name: Run tests
         run: |
+          # Seems like without this command, MacOS cannot activate environment
+          eval "$(pixi shell-hook)"
+
           # Install from source
           HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e .
 
