@@ -16,22 +16,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup upterm session
-        uses: owenthereal/action-upterm@v1
-        with:
-          limit-access-to-actor: true # Restrict to the user who triggered the workflow
-          detached: true
-
       - name: Install pixi
         uses: prefix-dev/setup-pixi@v0.9.1
         with:
           pixi-version: v0.68.0
           cache: true
 
+      - name: Setup upterm session
+        uses: owenthereal/action-upterm@v1
+        with:
+          limit-access-to-actor: true # Restrict to the user who triggered the workflow
+          detached: true
+
       - name: Install from source
         run: |
           eval "$(pixi shell-hook)"
           HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e '.[test-ui]'
+          sleep 300000
 
       - name: Uninstall jupyter-fs
         run: |
