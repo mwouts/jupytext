@@ -4,6 +4,9 @@ Jupytext ChangeLog
 1.19.4.dev0 (wip)
 -----------------
 
+**Fixed**
+- fix: Support unicode characters while dumping YAML ([#1542](https://github.com/mwouts/jupytext/pull/1542))
+
 **Changed**
 - Jupytext's documentation is now at https://jupytext.org! ([#1538](https://github.com/mwouts/jupytext/pull/1538))
 
