@@ -9,6 +9,9 @@ Jupytext ChangeLog
 
 **Changed**
 - Jupytext's documentation is now at https://jupytext.org! ([#1538](https://github.com/mwouts/jupytext/pull/1538))
+- Fixed the RTD website and updated remaining references from `jupytext.readthedocs.io` to `jupytext.org` ([#1540](https://github.com/mwouts/jupytext/pull/1540))
+- Fixed the CI so that tests also run on scheduled runs, and so that `jupyterfs` tests are skipped when their initialization fails ([#1539](https://github.com/mwouts/jupytext/pull/1539))
+- Updated the JupyterLab extension production dependencies (12 patch updates) ([#1541](https://github.com/mwouts/jupytext/pull/1541))
 - We require `pandoc<3.10` on the CI as pandoc converts the "3.10" string to a float, which then causes issues in Jupytext ([#1545](https://github.com/mwouts/jupytext/issues/1545))
 
 **Security**
