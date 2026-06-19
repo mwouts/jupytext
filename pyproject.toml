@@ -303,9 +303,24 @@ myst-parser = "*"
 [tool.pixi.feature.dev.dependencies]
 pandoc = ">=3.0,<3.10"  # 1545
 
+# Dedicated environment for building the JupyterLab extension.
+# Uses pip-installed jupyterlab to get a working jlpm, avoiding the
+# conda-forge version whose jlpm wrapper references jupyterlab.jlpmapp
+# which was removed in recent jupyterlab releases.
+[tool.pixi.feature.build.dependencies]
+python = "3.13.*"
+nodejs = ">=20"
+
+[tool.pixi.feature.build.pypi-dependencies]
+jupyterlab = ">=4.0"
+
+[tool.pixi.feature.build.tasks]
+build-labextension = { cmd = "jlpm install && jlpm run build:prod", cwd = "jupyterlab" }
+
 [tool.pixi.environments]
 default = { features = ["dev"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
+build = { features = ["build"] }
 
 [tool.pixi.pypi-dependencies]
 # Note: this does not build the jupyterlab-jupytext extension
