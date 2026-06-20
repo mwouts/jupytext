@@ -329,9 +329,7 @@ class MarkdownCellReader(BaseCellReader):
             self.non_jupyter_code_re = re.compile(r"^```\{")
         elif self.custom_language_magics:
             all_languages = _JUPYTER_LANGUAGES_LOWER_AND_UPPER | self.custom_language_magics
-            self.start_code_re = re.compile(
-                r"^```(`*)(\s*)({})($|\s.*$)".format("|".join(map(re.escape, all_languages)))
-            )
+            self.start_code_re = re.compile(r"^```(`*)(\s*)({})($|\s.*$)".format("|".join(map(re.escape, all_languages))))
 
     def metadata_and_language_from_option_line(self, line):
         match_region = self.start_region_re.match(line)
@@ -413,8 +411,7 @@ class MarkdownCellReader(BaseCellReader):
                     # Cells with a .noeval attribute are markdown cells #347
                     # R Markdown notebooks can have bibliography and index blocks, cf #1161 and #1429
                     if (
-                        language not in _JUPYTER_LANGUAGES_LOWER_AND_UPPER
-                        and language not in self.custom_language_magics
+                        language not in _JUPYTER_LANGUAGES_LOWER_AND_UPPER and language not in self.custom_language_magics
                     ) or metadata.get(".noeval", "") is None:
                         in_explicit_code_block = True
                         prev_blank = 0
