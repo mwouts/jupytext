@@ -23,7 +23,7 @@ jobs:
         with:
           pixi-version: v0.68.0
           cache: true
-          activate-environment: true
+          activate-environment: default
           environments: "default build"
 
       - name: Build JupyterLab extension
