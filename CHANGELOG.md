@@ -7,6 +7,9 @@ Jupytext ChangeLog
 **Fixed**
 - We now support unicode characters while dumping YAML ([#1542](https://github.com/mwouts/jupytext/pull/1542))
 
+**Added**
+- A new `custom_language_magics` option is available ([#1491](https://github.com/mwouts/jupytext/issues/1491)). Thanks to [steovd](https://github.com/steovd) for making the PR!
+
 **Changed**
 - Jupytext's documentation is now at https://jupytext.org! ([#1538](https://github.com/mwouts/jupytext/pull/1538))
 - Updated the JupyterLab extension production dependencies (12 patch updates) ([#1541](https://github.com/mwouts/jupytext/pull/1541))
