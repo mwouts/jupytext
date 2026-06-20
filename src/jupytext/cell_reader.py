@@ -327,7 +327,7 @@ class MarkdownCellReader(BaseCellReader):
             # Restore the pattern used in Markdown <= 1.1
             self.start_code_re = re.compile(r"^```(.*)")
             self.non_jupyter_code_re = re.compile(r"^```\{")
-        elif self.custom_language_magics:
+        elif self.custom_language_magics and self.ext != ".Rmd":
             all_languages = _JUPYTER_LANGUAGES_LOWER_AND_UPPER | self.custom_language_magics
             self.start_code_re = re.compile(r"^```(`*)(\s*)({})($|\s.*$)".format("|".join(map(re.escape, all_languages))))
 
