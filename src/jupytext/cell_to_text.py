@@ -65,10 +65,8 @@ class BaseCellExporter:
         )
         if self.parse_cell_language:
             custom_cell_magics = self.fmt.get("custom_cell_magics", "").split(",")
-            custom_language_magics = self.fmt.get("custom_language_magics", [])
-            if isinstance(custom_language_magics, str):
-                custom_language_magics = [m for m in custom_language_magics.split(",") if m]
-            self.language, magic_args = cell_language(self.source, default_language, custom_cell_magics + list(custom_language_magics))
+            custom_language_magics = self.fmt.get("custom_language_magics", "").split(",")
+            self.language, magic_args = cell_language(self.source, default_language, custom_cell_magics + custom_language_magics)
 
             if magic_args:
                 self.metadata["magic_args"] = magic_args

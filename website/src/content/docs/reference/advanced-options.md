@@ -42,10 +42,10 @@ In the `percent` and `light` script formats, magic commands (Jupyter commands pr
 
 In Markdown and R Markdown notebooks, code blocks in languages with built-in Jupyter magic support (e.g. `javascript`, `bash`, `sql`) are automatically converted to code cells using the corresponding `%%language` magic. However, code blocks in languages not covered by built-in magics (e.g. `jsx`) remain as Markdown cells by default.
 
-If you have written custom Jupyter magics for additional languages, you can tell Jupytext about them using the `custom_language_magics` option. For example, if you have a custom `%%jsx` magic, add the following to your [`jupytext.toml`](config.md) file:
+If you have written custom Jupyter magics for additional languages, you can tell Jupytext about them using the `custom_language_magics` option. For example, if you have custom `%%jsx` and `%%tsx` magics, add the following to your [`jupytext.toml`](config.md) file:
 
 ```toml
-custom_language_magics = ["jsx"]
+custom_language_magics = "jsx,tsx"
 ```
 
 With this option set, Markdown code blocks like:

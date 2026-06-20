@@ -173,8 +173,7 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
-    custom_language_magics = List(
-        Unicode(),
+    custom_language_magics = Unicode(
         help="A list of additional language magics. Use e.g. "
         'custom_language_magics = ["jsx", "tsx"] if you have custom magics for those languages '
         "and want Markdown code blocks in those languages to be converted to code cells "

@@ -21,7 +21,7 @@ print("hello")
 const Hello = () => (Hello);
 ```
 """
-    nb = jupytext.reads(md, fmt={"extension": ".md", "custom_language_magics": ["jsx"]})
+    nb = jupytext.reads(md, fmt={"extension": ".md", "custom_language_magics": "jsx"})
     assert len(nb.cells) == 2
     assert nb.cells[0].cell_type == "code"
     assert nb.cells[0].source == 'print("hello")'
@@ -40,7 +40,7 @@ def test_custom_language_magics_ipynb_to_md(tmpdir):
         ]
     )
 
-    md = jupytext.writes(nb, fmt={"extension": ".md", "custom_language_magics": ["jsx"]})
+    md = jupytext.writes(nb, fmt={"extension": ".md", "custom_language_magics": "jsx"})
     assert "custom_language_magics:" in md
     assert "jsx" in md
     assert "```jsx" in md
@@ -58,11 +58,11 @@ def test_custom_language_magics_roundtrip(tmpdir):
     )
 
     # ipynb -> md
-    md = jupytext.writes(nb, fmt={"extension": ".md", "custom_language_magics": ["jsx"]})
+    md = jupytext.writes(nb, fmt={"extension": ".md", "custom_language_magics": "jsx"})
     assert "```jsx" in md
 
     # md -> ipynb
-    nb2 = jupytext.reads(md, fmt={"extension": ".md", "custom_language_magics": ["jsx"]})
+    nb2 = jupytext.reads(md, fmt={"extension": ".md", "custom_language_magics": "jsx"})
     assert len(nb2.cells) == 2
     assert nb2.cells[1].cell_type == "code"
     assert nb2.cells[1].source == "%%jsx\nconst Hello = () => (<b>Hello</b>);"
@@ -73,7 +73,7 @@ def test_custom_language_magics_config_file(tmpdir):
     assert "jsx" not in _JUPYTER_LANGUAGES_LOWER_AND_UPPER
 
     cfg_file = tmpdir.join("jupytext.toml")
-    cfg_file.write('custom_language_magics = ["jsx"]')
+    cfg_file.write('custom_language_magics = "jsx"')
 
     md_file = tmpdir.join("notebook.md")
     nb_file = tmpdir.join("notebook.ipynb")

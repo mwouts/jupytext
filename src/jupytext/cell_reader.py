@@ -320,9 +320,7 @@ class MarkdownCellReader(BaseCellReader):
         self.split_at_heading = (fmt or {}).get("split_at_heading", False)
         self.in_region = False
         self.in_raw = False
-        custom_language_magics = (fmt or {}).get("custom_language_magics", [])
-        if isinstance(custom_language_magics, str):
-            custom_language_magics = [m for m in custom_language_magics.split(",") if m]
+        custom_language_magics = (fmt or {}).get("custom_language_magics", "").split(",")
         # Store the set of custom language magics (including upper-case variants) for matching
         self.custom_language_magics = set(custom_language_magics) | {lang.upper() for lang in custom_language_magics}
         if self.format_version in ["1.0", "1.1"] and self.ext != ".Rmd":
