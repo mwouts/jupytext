@@ -307,7 +307,7 @@ class MarkdownCellReader(BaseCellReader):
 
     comment = ""
     start_code_re = re.compile(
-        r"^```(`*)(\s*)({})($|\s.*$)".format("|".join(_JUPYTER_LANGUAGES_LOWER_AND_UPPER).replace("+", "\\+"))
+        r"^```(`*)(\s*)({})($|\s.*$)".format("|".join(map(re.escape, _JUPYTER_LANGUAGES_LOWER_AND_UPPER)))
     )
     non_jupyter_code_re = re.compile(r"^```")
     end_code_re = re.compile(r"^```\s*$")
@@ -330,7 +330,7 @@ class MarkdownCellReader(BaseCellReader):
         elif self.custom_language_magics:
             all_languages = _JUPYTER_LANGUAGES_LOWER_AND_UPPER | self.custom_language_magics
             self.start_code_re = re.compile(
-                r"^```(`*)(\s*)({})($|\s.*$)".format("|".join(all_languages).replace("+", "\\+"))
+                r"^```(`*)(\s*)({})($|\s.*$)".format("|".join(map(re.escape, all_languages)))
             )
 
     def metadata_and_language_from_option_line(self, line):
