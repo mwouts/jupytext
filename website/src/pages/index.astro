@@ -42,7 +42,7 @@ const formats = [
 	{
 		id: 'percent',
 		label: 'py:percent',
-		best: 'The most portable format — cell markers understood by VS Code, PyCharm, Spyder, etc., across Python, R, Julia and more.',
+		best: 'Explicit cell markers understood by VS Code, PyCharm, Spyder, etc., available in 30+ languages.',
 		code: `# %% [markdown]
 # # Analysis
 # A quick look at the data.
@@ -55,7 +55,7 @@ df.describe()`,
 	{
 		id: 'light',
 		label: 'py:light',
-		best: 'Best when you want a script that barely looks like a notebook — minimal cell markers.',
+		best: 'Minimal cell markers (use py:normarker for no cell markers at all)',
 		code: `# # Analysis
 # A quick look at the data.
 
@@ -66,7 +66,7 @@ df.describe()`,
 	{
 		id: 'marimo',
 		label: 'py:marimo',
-		best: 'Each cell is a function in the Marimo format',
+		best: 'Save your Jupyter notebooks as Marimo apps',
 		code: `import marimo
 
 __generated_with = "0.23.8"
@@ -103,7 +103,7 @@ if __name__ == "__main__":
 	{
 		id: 'md',
 		label: 'Markdown',
-		best: 'Best for documentation-first notebooks, GitHub Markdown syntax.',
+		best: 'Plain Markdown, works well with GitHub',
 		code: `# Analysis
 
 A quick look at the data.
@@ -116,8 +116,8 @@ df.describe()
 	},
 	{
 		id: 'myst',
-		label: 'MyST',
-		best: 'Best for rich technical docs & Jupyter Book — directives, cross-refs and more.',
+		label: 'MyST Markdown',
+		best: 'Publication grade notebooks that work well with Jupyter Book',
 		code: `# Analysis
 
 A quick look at the data.
@@ -221,7 +221,7 @@ const integrations = [
 			<nav class="lp-nav-links">
 				<a class="nav-hide-sm" href="/getting-started/introduction/">Docs</a>
 				<a class="nav-hide-sm" href="/getting-started/install/">Get started</a>
-				<a href={GH} target="_blank" rel="noopener">GitHub</a>
+				<a href={GH} target="_blank" rel="noopener">GitHub<span id="gh-stars" class="gh-stars"></span></a>
 				<button class="lp-theme-toggle" data-theme-toggle aria-label="Toggle theme">◑</button>
 			</nav>
 		</div>
@@ -231,40 +231,47 @@ const integrations = [
 	<section class="lp-hero">
 		<div class="lp-container">
 			<div>
-				<h1>Have you always wished Jupyter notebooks were <span class="grad">plain text</span>?</h1>
+				<h1>Your notebooks, as plain <span class="grad">text.</span></h1>
 				<p class="lede">
-					Jupytext saves your notebooks as <code>.py</code> or <code>.md</code> files — easy to edit
+					Jupytext saves Jupyter notebooks as <code>.py</code> or <code>.md</code> files — easy to edit
 					in any IDE, friendly to version control, and trivial for AI assistants to read and refactor.
 				</p>
-				<div class="lp-hero-cta">
-					<a class="lp-btn lp-btn-primary" href="/getting-started/introduction/">Get started →</a>
-					<a class="lp-btn lp-btn-secondary" href={GH} target="_blank" rel="noopener">★ Star on GitHub</a>
-				</div>
-				<div class="lp-install">
+				<div class="lp-install" style="margin-top:0">
 					<span class="prompt">$</span>
 					<span>pip install jupytext</span>
 					<button class="lp-copy" data-copy="pip install jupytext">Copy</button>
 				</div>
 			</div>
+		</div>
+	</section>
 
-			<div class="lp-hero-visual">
-				<div class="lp-card">
-					<div class="lp-card-bar">
-						<span class="dot"></span><span class="dot"></span><span class="dot"></span>
-						<span class="fname">git diff — notebook.py</span>
-					</div>
-					<pre class="lp-code"><code><span class="cmt"># %% [markdown]</span>
-<span class="cmt"># # Sales report</span>
-<span class="del">- df = df.dropna()</span>
-<span class="add">+ df = df.dropna().reset_index(drop=True)</span>
-<span class="add">+ df["margin"] = df.revenue - df.cost</span>
-
-<span class="pct"># %%</span>
-df.groupby("region").margin.sum().plot.bar()</code></pre>
+	<!-- Notebook examples -->
+	<section>
+		<div class="lp-container">
+			<div class="lp-tabs" data-tabs>
+				<div class="lp-tablist" role="tablist">
+					{
+						formats.map((f, i) => (
+							<button class="lp-tab" role="tab" aria-selected={i === 0 ? 'true' : 'false'}>
+								{f.label}
+							</button>
+						))
+					}
 				</div>
-				<p style="text-align:center;color:var(--lp-text-dim);font-size:.85rem;margin-top:.9rem">
-					The same notebook — as a diff your team can actually read.
-				</p>
+				{
+					formats.map((f, i) => (
+						<div class="lp-tabpanel" role="tabpanel" hidden={i !== 0}>
+							<div class="lp-card">
+								<div class="lp-card-bar">
+									<span class="dot"></span><span class="dot"></span><span class="dot"></span>
+									<span class="fname">{f.label}</span>
+								</div>
+								<pre class="lp-code"><code>{f.code}</code></pre>
+							</div>
+							<p class="note">{f.best}</p>
+						</div>
+					))
+				}
 			</div>
 		</div>
 	</section>
@@ -427,42 +434,6 @@ df.groupby("region").margin.sum().plot.bar()</code></pre>
 								</div>
 								<pre class="lp-code"><code>{t.code}</code></pre>
 							</div>
-						</div>
-					))
-				}
-			</div>
-		</div>
-	</section>
-
-	<!-- Formats -->
-	<section style="background:var(--lp-bg-soft);border-block:1px solid var(--lp-border)">
-		<div class="lp-container">
-			<div class="section-head">
-				<span class="eyebrow">Formats</span>
-				<h2>Same notebook, your choice of text</h2>
-				<p>The cell below is the same content in each format. Pick whichever suits your needs.</p>
-			</div>
-			<div class="lp-tabs" data-tabs>
-				<div class="lp-tablist" role="tablist">
-					{
-						formats.map((f, i) => (
-							<button class="lp-tab" role="tab" aria-selected={i === 0 ? 'true' : 'false'}>
-								{f.label}
-							</button>
-						))
-					}
-				</div>
-				{
-					formats.map((f, i) => (
-						<div class="lp-tabpanel" role="tabpanel" hidden={i !== 0}>
-							<div class="lp-card">
-								<div class="lp-card-bar">
-									<span class="dot"></span><span class="dot"></span><span class="dot"></span>
-									<span class="fname">{f.label}</span>
-								</div>
-								<pre class="lp-code"><code>{f.code}</code></pre>
-							</div>
-							<p class="note">{f.best}</p>
 						</div>
 					))
 				}

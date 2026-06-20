@@ -78,6 +78,17 @@ const ogImage = new URL('/og/jupytext-card.png', Astro.site);
 				} catch {}
 			});
 
+			// GitHub stars badge.
+			fetch('https://api.github.com/repos/mwouts/jupytext')
+				.then(r => r.json())
+				.then(d => {
+					const n = d.stargazers_count;
+					if (!n) return;
+					const label = n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+					document.getElementById('gh-stars').textContent = ' ★ ' + label;
+				})
+				.catch(() => {});
+
 			// Lightweight tabs (used by Quickstart + Formats).
 			document.querySelectorAll('[data-tabs]').forEach((group) => {
 				const tabs = [...group.querySelectorAll('[role="tab"]')];
