@@ -30,7 +30,7 @@ const Hello = () => (Hello);
 
 
 def test_custom_language_magics_ipynb_to_md(tmpdir):
-    """When writing to markdown with non-standard magic, custom_language_magics is auto-detected"""
+    """Code cells with custom language magics are converted to code blocks in those languages"""
     assert "jsx" not in _JUPYTER_LANGUAGES_LOWER_AND_UPPER
 
     nb = new_notebook(
@@ -40,7 +40,7 @@ def test_custom_language_magics_ipynb_to_md(tmpdir):
         ]
     )
 
-    md = jupytext.writes(nb, fmt="md")
+    md = jupytext.writes(nb, fmt={"extension": ".md", "custom_language_magics": ["jsx"]})
     assert "custom_language_magics:" in md
     assert "jsx" in md
     assert "```jsx" in md
@@ -58,11 +58,11 @@ def test_custom_language_magics_roundtrip(tmpdir):
     )
 
     # ipynb -> md
-    md = jupytext.writes(nb, fmt="md")
+    md = jupytext.writes(nb, fmt={"extension": ".md", "custom_language_magics": ["jsx"]})
     assert "```jsx" in md
 
     # md -> ipynb
-    nb2 = jupytext.reads(md, fmt="md")
+    nb2 = jupytext.reads(md, fmt={"extension": ".md", "custom_language_magics": ["jsx"]})
     assert len(nb2.cells) == 2
     assert nb2.cells[1].cell_type == "code"
     assert nb2.cells[1].source == "%%jsx\nconst Hello = () => (<b>Hello</b>);"

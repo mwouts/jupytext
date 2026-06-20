@@ -63,8 +63,6 @@ will be converted to code cells with the `%%jsx` magic:
 const Hello = () => (<b>Hello</b>);
 ```
 
-When converting a notebook (`.ipynb`) to Markdown, Jupytext automatically detects cells using non-standard language magics and records them in the `custom_language_magics` notebook metadata, ensuring that the round-trip conversion (`.ipynb` → `.md` → `.ipynb`) preserves such cells correctly.
-
 ## Active and inactive cells
 
 You might want to make some cell active only when the notebook is run in Jupyter, or active only when the `.py` file is interpreted by Python. To do so, add an `active-ipynb` tag to the cells that should only be executed in the `.ipynb` file, and an `active-py` tag to the cells that should be executed only in the Python script.
