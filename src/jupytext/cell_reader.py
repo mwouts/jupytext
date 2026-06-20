@@ -321,6 +321,7 @@ class MarkdownCellReader(BaseCellReader):
         self.in_region = False
         self.in_raw = False
         custom_language_magics = (fmt or {}).get("custom_language_magics", "").split(",")
+        custom_language_magics = list(filter(None, custom_language_magics))
         # Store the set of custom language magics (including upper-case variants) for matching
         self.custom_language_magics = set(custom_language_magics) | {lang.upper() for lang in custom_language_magics}
         if self.format_version in ["1.0", "1.1"] and self.ext != ".Rmd":
