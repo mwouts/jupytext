@@ -39,18 +39,23 @@ jobs:
         with:
           pixi-version: v0.68.0
           cache: true
-          activate-environment: true
+          activate-environment: default
+          environments: "default build"
 
       - name: Update pixi environment
         if: matrix.dependency-mode == 'latest'
         run: pixi update
+
+      - name: Build JupyterLab extension
+        run: pixi run -e build build-labextension
 
       - name: Run tests
         run: |
           # Seems like without this command, MacOS cannot activate environment
           eval "$(pixi shell-hook)"
 
-          # Install from source
+          # Install from source. The hatch-jupyter-builder hook has skip-if-exists set
+          # on the already-built labextension assets, so jlpm is not invoked again.
           HATCH_BUILD_HOOKS_ENABLE=true python -m pip install -e .
 
           # Install a Jupyter Kernel

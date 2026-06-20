@@ -23,7 +23,17 @@ jobs:
         with:
           pixi-version: v0.68.0
           cache: true
-          activate-environment: true
+          activate-environment: default
+          environments: "default build"
+
+      - name: Build JupyterLab extension
+        run: pixi run -e build build-labextension
+
+      - name: Fix jlpm (use build env's pip-installed version)
+        run: |
+          mkdir -p ~/.local/bin
+          ln -sf "${{ github.workspace }}/.pixi/envs/build/bin/jlpm" ~/.local/bin/jlpm
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install from source
         run: |
