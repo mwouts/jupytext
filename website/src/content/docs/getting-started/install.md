@@ -83,7 +83,7 @@ jupyter nbextension install --py jupytext [--user]
 jupyter nbextension enable --py jupytext [--user]
 ```
 
-See also [Issue #1095](https://github.com/mwouts/jupytext/issues/1095) where we discuss how to
+See also [Issue #1095](https://github.com/jupytext/jupytext/issues/1095) where we discuss how to
 add a Jupytext menu to JupyterLab and Notebook 7.x.
 
 ## Jupytext's command line interface

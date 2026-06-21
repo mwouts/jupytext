@@ -64,7 +64,7 @@ This is a markdown cell with metadata
 This is a new markdown cell with no metadata
 ```
 
-See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.myst.md#) in the `myst` format.
+See for instance how our `World population.ipynb` notebook is [represented](https://github.com/jupytext/jupytext/blob/main/demo/World%20population.myst.md#) in the `myst` format.
 
 **Note**: The `myst` format requires Python >= 3.6
 
@@ -94,9 +94,9 @@ Jupytext's implementation of R Markdown is very similar to that of the Markdown 
     param = 5
     ```
 
-Python and R notebooks represented in the R Markdown format can run both in Jupyter and RStudio. Note that you can change the default Python environment in RStudio with `RETICULATE_PYTHON` in a `.Renviron` file, see [here](https://github.com/mwouts/jupytext/issues/267#issuecomment-506994930).
+Python and R notebooks represented in the R Markdown format can run both in Jupyter and RStudio. Note that you can change the default Python environment in RStudio with `RETICULATE_PYTHON` in a `.Renviron` file, see [here](https://github.com/jupytext/jupytext/issues/267#issuecomment-506994930).
 
-See how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/main/demo) is represented in [R Markdown](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.Rmd).
+See how our `World population.ipynb` notebook in the [demo folder](https://github.com/jupytext/jupytext/tree/main/demo) is represented in [R Markdown](https://github.com/jupytext/jupytext/blob/main/demo/World%20population.Rmd).
 
 ## Jupytext Markdown
 
@@ -154,7 +154,7 @@ Raw cells are delimited with HTML comments, and accept cell metadata in the same
 
 Markdown cells can also have explicit markers: use one of `<!-- #md -->` or `<!-- #markdown -->` or `<!-- #region -->` and the corresponding `<!-- #end... -->` counterpart. Note that the `<!-- #region -->` and `<!-- #endregion -->` cells markers are [foldable](https://code.visualstudio.com/docs/editor/codebasics#_folding) in VS Code, and that you can also insert a title there, e.g. `<!-- #region This is a title for my protected cell -->`. Cell metadata are accepted in the format `key="value"` (`"value"` being encoded in JSON) as for the other cell types.
 
-For a concrete example, see how our `World population.ipynb` notebook in the [demo folder](https://github.com/mwouts/jupytext/tree/main/demo) is represented in [Markdown](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.md#).
+For a concrete example, see how our `World population.ipynb` notebook in the [demo folder](https://github.com/jupytext/jupytext/tree/main/demo) is represented in [Markdown](https://github.com/jupytext/jupytext/blob/main/demo/World%20population.md#).
 
 ## Pandoc Markdown
 
@@ -162,6 +162,6 @@ Pandoc, the _Universal document converter_,  can read and write Jupyter notebook
 
 In Pandoc Markdown, all cells are marked with pandoc divs (`:::`). The format is therefore slightly more verbose than the Jupytext Markdown format.
 
-See for instance how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.pandoc.md#) in the `md:pandoc` format.
+See for instance how our `World population.ipynb` notebook is [represented](https://github.com/jupytext/jupytext/blob/main/demo/World%20population.pandoc.md#) in the `md:pandoc` format.
 
 If you wish to use that format, please install `pandoc` in version 2.7.2 or above, with e.g. `conda install pandoc -c conda-forge`.

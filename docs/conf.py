@@ -27,5 +27,5 @@ redirects = {
     "faq": "https://jupytext.org/reference/faq/",
     "contributing": "https://jupytext.org/reference/contributing/",
     "developing": "https://jupytext.org/reference/developing/",
-    "changelog": "https://github.com/mwouts/jupytext/blob/main/CHANGELOG.md",
+    "changelog": "https://github.com/jupytext/jupytext/blob/main/CHANGELOG.md",
 }

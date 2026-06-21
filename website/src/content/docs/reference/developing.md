@@ -9,7 +9,7 @@ sidebar:
 
 If you want to test a feature that has been integrated in `main` but not delivered yet to `pip` or `conda`, use
 ```
-HATCH_BUILD_HOOKS_ENABLE=true pip install git+https://github.com/mwouts/jupytext.git
+HATCH_BUILD_HOOKS_ENABLE=true pip install git+https://github.com/jupytext/jupytext.git
 ```
 
 The above requires `node`. You can install it with e.g.
@@ -21,7 +21,7 @@ Alternatively you can build only Jupytext core (e.g. skip the JupyterLab extensi
 
 Finally, if you want to test a development branch, use
 ```
-HATCH_BUILD_HOOKS_ENABLE=true pip install git+https://github.com/mwouts/jupytext.git@branch
+HATCH_BUILD_HOOKS_ENABLE=true pip install git+https://github.com/jupytext/jupytext.git@branch
 ```
 where `branch` is the name of the branch you want to test.
 

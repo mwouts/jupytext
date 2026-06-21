@@ -42,8 +42,8 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-Homepage = "https://github.com/mwouts/jupytext"
-"Source Code" = "https://github.com/mwouts/jupytext"
+Homepage = "https://github.com/jupytext/jupytext"
+"Source Code" = "https://github.com/jupytext/jupytext"
 Documentation = "https://jupytext.org"
 
 [project.optional-dependencies]
