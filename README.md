@@ -1,4 +1,4 @@
-![](https://github.com/jupytext/jupytext/blob/17aea37c612f33a4e27eeee4b81966f1506920fd/docs/images/logo_large.png?raw=true)
+[![](https://github.com/jupytext/jupytext/blob/17aea37c612f33a4e27eeee4b81966f1506920fd/docs/images/logo_large.png?raw=true)](https://jupytext.org)
 
 <!-- INDEX-START -->
 
@@ -119,3 +119,7 @@ Read more about Jupytext in the [documentation](https://jupytext.org).
 If you're new to Jupytext, you may want to start with the [FAQ](docs/faq.md) or with the [Tutorials](docs/tutorials.md).
 
 There is also this short introduction to Jupytext: [![](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48).
+
+## Community
+
+Have a question, a bug report, or an idea? Join us on [Discord](https://discord.gg/VfdAsYyn) or open an issue or discussion on [GitHub](https://github.com/jupytext/jupytext).
