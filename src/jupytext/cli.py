@@ -357,7 +357,7 @@ def jupytext(args=None, *, notary=None):
         warnings.warn(
             "The --pre-commit argument is deprecated. "
             "Please consider switching to the pre-commit.com framework "
-            "(let us know at https://github.com/mwouts/jupytext/issues "
+            "(let us know at https://github.com/jupytext/jupytext/issues "
             "if that is an issue for you)",
             DeprecationWarning,
         )

@@ -11,7 +11,7 @@ import rawMd from '../../../tests/unit/data/landing_page/notebook.md?raw';
 import rawMyst from '../../../tests/unit/data/landing_page/notebook.myst.md?raw';
 import rawQmd from '../../../tests/unit/data/landing_page/notebook.qmd?raw';
 
-const GH = 'https://github.com/mwouts/jupytext';
+const GH = 'https://github.com/jupytext/jupytext';
 
 const formats = [
 	{
@@ -67,7 +67,7 @@ let ghContributors = '100+';
 let pypiDownloads = '3M+';
 
 try {
-	const ghRes = await fetch('https://api.github.com/repos/mwouts/jupytext');
+	const ghRes = await fetch('https://api.github.com/repos/jupytext/jupytext');
 	if (ghRes.ok) {
 		const gh = await ghRes.json();
 		const n = gh.stargazers_count;
@@ -365,11 +365,11 @@ formats = <span class="str">"ipynb,md:myst"</span></pre>
 	<!-- Stats -->
 	<section class="lp-stats">
 		<div class="lp-container">
-			<a class="lp-stat" href="https://github.com/mwouts/jupytext" target="_blank" rel="noopener noreferrer"><div class="num">{ghStars}</div><div class="lab">GitHub stars</div></a>
+			<a class="lp-stat" href="https://github.com/jupytext/jupytext" target="_blank" rel="noopener noreferrer"><div class="num">{ghStars}</div><div class="lab">GitHub stars</div></a>
 			<a class="lp-stat" href="https://pypistats.org/packages/jupytext" target="_blank" rel="noopener noreferrer"><div class="num">{pypiDownloads}</div><div class="lab">Downloads / month</div></a>
 			<a class="lp-stat" href="/formats/languages/"><div class="num">30+</div><div class="lab">Languages supported</div></a>
-			<a class="lp-stat" href="https://github.com/mwouts/jupytext/graphs/contributors" target="_blank" rel="noopener noreferrer"><div class="num">{ghContributors}</div><div class="lab">Contributors</div></a>
-			<a class="lp-stat" href="https://github.com/mwouts/jupytext/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><div class="num">MIT</div><div class="lab">Open source</div></a>
+			<a class="lp-stat" href="https://github.com/jupytext/jupytext/graphs/contributors" target="_blank" rel="noopener noreferrer"><div class="num">{ghContributors}</div><div class="lab">Contributors</div></a>
+			<a class="lp-stat" href="https://github.com/jupytext/jupytext/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><div class="num">MIT</div><div class="lab">Open source</div></a>
 		</div>
 	</section>
 

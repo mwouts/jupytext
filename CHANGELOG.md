@@ -1,27 +1,28 @@
 Jupytext ChangeLog
 ==================
 
-1.19.4.dev0 (wip)
------------------
-
-**Fixed**
-- We now support unicode characters while dumping YAML ([#1542](https://github.com/mwouts/jupytext/pull/1542))
-
-**Added**
-- A new `custom_language_magics` option is available ([#1491](https://github.com/mwouts/jupytext/issues/1491)). Thanks to [steovd](https://github.com/steovd) for making the PR!
+1.19.4 (2026-06-21)
+-------------------
 
 **Changed**
-- Jupytext's documentation is now at https://jupytext.org! ([#1538](https://github.com/mwouts/jupytext/pull/1538))
-- Updated the JupyterLab extension production dependencies (12 patch updates) ([#1541](https://github.com/mwouts/jupytext/pull/1541))
-- We require `pandoc<3.10` on the CI as pandoc converts the "3.10" string to a float, which then causes issues in Jupytext ([#1545](https://github.com/mwouts/jupytext/issues/1545))
-- Fixed the CI so that tests also run on scheduled runs, and so that `jupyterfs` tests are skipped when their initialization fails ([#1539](https://github.com/mwouts/jupytext/pull/1539))
+- Jupytext's documentation is now at https://jupytext.org! ([#1538](https://github.com/jupytext/jupytext/pull/1538))
+- We have moved Jupytext to its own Jupytext organization ([#1546](https://github.com/jupytext/jupytext/issues/1546))
+- Updated the JupyterLab extension production dependencies (12 patch updates) ([#1541](https://github.com/jupytext/jupytext/pull/1541))
+- We require `pandoc<3.10` on the CI as pandoc converts the "3.10" string to a float, which then causes issues in Jupytext ([#1545](https://github.com/jupytext/jupytext/issues/1545))
+- Fixed the CI so that tests also run on scheduled runs, and so that `jupyterfs` tests are skipped when their initialization fails ([#1539](https://github.com/jupytext/jupytext/pull/1539))
 - In the CI, the extension is build using a dedicated `build` pixi environment.
 
+**Fixed**
+- We now support unicode characters while dumping YAML ([#1542](https://github.com/jupytext/jupytext/pull/1542))
+
+**Added**
+- A new `custom_language_magics` option is available ([#1491](https://github.com/jupytext/jupytext/issues/1491)). Thanks to [steovd](https://github.com/steovd) for making the PR!
+
 **Security**
-- Fixed [GHSA-m22c-4q2m-m5wr](https://github.com/mwouts/jupytext/security/advisories/GHSA-m22c-4q2m-m5wr): the `update-playwright-snapshots` workflow was
+- Fixed [GHSA-m22c-4q2m-m5wr](https://github.com/jupytext/jupytext/security/advisories/GHSA-m22c-4q2m-m5wr): the `update-playwright-snapshots` workflow was
   triggerable by any user via an `issue_comment` event. It now checks that the
   comment author is an OWNER, MEMBER, or COLLABORATOR before running
-  ([#1535](https://github.com/mwouts/jupytext/pull/1535))
+  ([#1535](https://github.com/jupytext/jupytext/pull/1535))
 - Set `persist-credentials: false` on all workflow checkout steps as
   defense-in-depth, preventing a live `GITHUB_TOKEN` from being left in
   `.git/config` where attacker-controlled build hooks could read it. This is

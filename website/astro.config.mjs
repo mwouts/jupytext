@@ -21,10 +21,10 @@ export default defineConfig({
 			favicon: '/favicon.svg',
 			customCss: ['./src/styles/custom.css'],
 			social: [
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/mwouts/jupytext' },
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/jupytext/jupytext' },
 			],
 			editLink: {
-				baseUrl: 'https://github.com/mwouts/jupytext/edit/main/website/',
+				baseUrl: 'https://github.com/jupytext/jupytext/edit/main/website/',
 			},
 			sidebar: [
 				{ label: 'Getting Started', items: [{ autogenerate: { directory: 'getting-started' } }] },

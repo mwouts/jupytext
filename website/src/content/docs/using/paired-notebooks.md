@@ -36,6 +36,6 @@ It is possible (and convenient) to leave the notebook open in Jupyter while you 
 
 In case you forgot to reload, and saved the Jupyter notebook while the text representation had changed, no worries: Jupyter will ask you which version you want to keep:
 
-![](https://github.com/mwouts/jupytext-screenshots/raw/master/JupytextDocumentation/NotebookChanged.png)
+![](https://github.com/jupytext/jupytext-screenshots/raw/master/JupytextDocumentation/NotebookChanged.png)
 
 If that happens, simply select the version that has the most recent changes (or: make a copy of the `.py` notebook on disk, click on _overwrite_ in Jupyter, and reconcile manually the two `.py` files).

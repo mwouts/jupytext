@@ -8,9 +8,9 @@
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://github.com/mwouts/jupytext/tree/main/jupyterlab/packages/jupyterlab-jupytext-extension",
+  "homepage": "https://github.com/jupytext/jupytext/tree/main/jupyterlab/packages/jupyterlab-jupytext-extension",
   "bugs": {
-    "url": "https://github.com/mwouts/jupytext/issues"
+    "url": "https://github.com/jupytext/jupytext/issues"
   },
   "license": "MIT",
   "author": "Marc Wouts",
@@ -22,7 +22,7 @@
   "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mwouts/jupytext.git"
+    "url": "https://github.com/jupytext/jupytext.git"
   },
   "workspaces": [
     "ui-tests"

@@ -7,7 +7,7 @@ sidebar:
 
 ## The `percent` format
 
-The `percent` format is a representation of Jupyter notebooks as scripts, in which all cells are explicitly delimited with a commented double percent sign `# %%`. The `percent` format is currently available for these [languages](https://github.com/mwouts/jupytext/blob/main/src/jupytext/languages.py).
+The `percent` format is a representation of Jupyter notebooks as scripts, in which all cells are explicitly delimited with a commented double percent sign `# %%`. The `percent` format is currently available for these [languages](https://github.com/jupytext/jupytext/blob/main/src/jupytext/languages.py).
 
 The format was introduced by Spyder in 2013, and is now supported by many editors, including
 - [Spyder IDE](https://docs.spyder-ide.org/editor.html#defining-code-cells),
@@ -67,13 +67,13 @@ cell_markers = '"""'
 ```
 to your [`jupytext.toml` configuration file](/using/config/).
 
-See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.pct.py) in the `percent` format.
+See how our `World population.ipynb` notebook is [represented](https://github.com/jupytext/jupytext/blob/main/demo/World%20population.pct.py) in the `percent` format.
 
 ## The `marimo` format
 
 Since Jupytext v1.19, you can use the `py:marimo` format, in which text notebooks are converted to Jupyter notebooks, and back, using [Marimo](https://marimo.io/).
 
-Our [implementation](https://github.com/mwouts/jupytext/blob/main/src/jupytext/marimo.py) calls Marimo's converter directly (this requires Marimo v1.16.3 or later).
+Our [implementation](https://github.com/jupytext/jupytext/blob/main/src/jupytext/marimo.py) calls Marimo's converter directly (this requires Marimo v1.16.3 or later).
 
 Please note that:
 - The format is available only for Python notebooks.
@@ -87,11 +87,11 @@ jupytext --test --to py:marimo your_notebook.ipynb
 jupytext --test --to ipynb your_marimo_script.py
 ```
 
-💡 If you notice unexpected changes, and can reproduce them with `marimo convert` and `marimo export ipynb --sort top-down`, report the issue on the Marimo [tracker](https://github.com/marimo-team/marimo/issues), and ping `@mwouts`. If you believe the issue is on Jupytext’s side, use the Jupytext [issue tracker](https://github.com/mwouts/jupytext/issues).
+💡 If you notice unexpected changes, and can reproduce them with `marimo convert` and `marimo export ipynb --sort top-down`, report the issue on the Marimo [tracker](https://github.com/marimo-team/marimo/issues), and ping `@mwouts`. If you believe the issue is on Jupytext’s side, use the Jupytext [issue tracker](https://github.com/jupytext/jupytext/issues).
 
 ## The `light` format
 
-The `light` format was introduced by Jupytext. That format can represent any script in one of these [languages](https://github.com/mwouts/jupytext/blob/main/src/jupytext/languages.py) as a Jupyter notebook.
+The `light` format was introduced by Jupytext. That format can represent any script in one of these [languages](https://github.com/jupytext/jupytext/blob/main/src/jupytext/languages.py) as a Jupyter notebook.
 
 When a script in the `light` format is converted to a notebook, Jupytext code paragraphs are turned into code cells, and comments that are not adjacent to code are converted to Markdown cells. Cell breaks occurs on blank lines outside of functions, classes or multiline comments.
 
@@ -143,7 +143,7 @@ cell_markers = "{{{,}}}"           # Use Vim region folding delimiters
 ```
 to your [`jupytext.toml` configuration file](/using/config/).
 
-See how our `World population.ipynb` notebook is [represented](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.lgt.py) in that format.
+See how our `World population.ipynb` notebook is [represented](https://github.com/jupytext/jupytext/blob/main/demo/World%20population.lgt.py) in that format.
 
 ## The `nomarker` format
 
@@ -163,4 +163,4 @@ preferred_jupytext_formats_read = "py:sphinx"
 sphinx_convert_rst2md = true
 ```
 
-Our sample notebook is also represented in `sphinx` format [here](https://github.com/mwouts/jupytext/blob/main/demo/World%20population.spx.py).
+Our sample notebook is also represented in `sphinx` format [here](https://github.com/jupytext/jupytext/blob/main/demo/World%20population.spx.py).

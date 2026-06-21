@@ -27,7 +27,7 @@ Saving notebooks as scripts is an appropriate choice when you want to act on the
 
 ## Can I see a sample of each format?
 
-Go to [our demo folder](https://github.com/mwouts/jupytext/tree/main/demo) and see how our sample `World population` notebook is represented in each format.
+Go to [our demo folder](https://github.com/jupytext/jupytext/tree/main/demo) and see how our sample `World population` notebook is represented in each format.
 
 ## Can I edit the paired text file?
 
@@ -73,7 +73,7 @@ That's possible! See how to [activate or deactivate cells](/reference/advanced-o
 
 Unless you want to version the outputs, you should version *only the text representation*. The paired `.ipynb` file can safely be deleted. It will be recreated locally the next time you open the notebook (from the text file) and save it.
 
-Note that if you version both the `.md` and `.ipynb` files, you can configure `git diff` to [ignore the diffs on the `.ipynb` files](https://github.com/mwouts/jupytext/issues/251).
+Note that if you version both the `.md` and `.ipynb` files, you can configure `git diff` to [ignore the diffs on the `.ipynb` files](https://github.com/jupytext/jupytext/issues/251).
 
 ## I have modified a text file, but git reports no diff for the paired `.ipynb` file
 

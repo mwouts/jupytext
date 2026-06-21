@@ -55,7 +55,7 @@ const ogImage = new URL('/og/jupytext-card.png', Astro.site);
 			});
 
 			// GitHub stars badge.
-			fetch('https://api.github.com/repos/mwouts/jupytext')
+			fetch('https://api.github.com/repos/jupytext/jupytext')
 				.then(r => r.json())
 				.then(d => {
 					const n = d.stargazers_count;

@@ -19,8 +19,8 @@ Currently, the real-time collaboration feature can be used:
 - in the notebook editor when opening `.ipynb` notebooks
 - in the text editor when opening `.py` or `.md` files
 
-However, it does not yet work on `.py` and `.md` files opened as notebooks. If you want to collaborate on text notebooks, we recommend that you collaborate on paired notebooks (see [#1432](https://github.com/mwouts/jupytext/issues/1432)).
+However, it does not yet work on `.py` and `.md` files opened as notebooks. If you want to collaborate on text notebooks, we recommend that you collaborate on paired notebooks (see [#1432](https://github.com/jupytext/jupytext/issues/1432)).
 
 ## Known issues
 
-While using Jupytext and Jupyter Collaboration together mostly works, we have noticed a few side effects. Please review the list of [known issues](https://github.com/mwouts/jupytext/issues?q=state%3Aopen%20label%3A%22jupyter-collaboration%22) and make sure that you are comfortable with these.
+While using Jupytext and Jupyter Collaboration together mostly works, we have noticed a few side effects. Please review the list of [known issues](https://github.com/jupytext/jupytext/issues?q=state%3Aopen%20label%3A%22jupyter-collaboration%22) and make sure that you are comfortable with these.

@@ -11,7 +11,7 @@ class AbsoluteLinksInReadme(MetadataHookInterface):
         """Process README.md when metadata is being prepared."""
         readme_src_path = Path("README.md")
         readme_output_path = Path("build/README_with_absolute_links.md")
-        base_url = "https://github.com/mwouts/jupytext/blob/main/"
+        base_url = "https://github.com/jupytext/jupytext/blob/main/"
 
         # Ensure the dist directory exists
         readme_output_path.parent.mkdir(exist_ok=True)

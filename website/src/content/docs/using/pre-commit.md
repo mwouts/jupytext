@@ -41,7 +41,7 @@ Jupyter keeps paired `.py` and `.ipynb` files in sync, but the synchronization h
 Jupytext's pre-commit hook can enforce this synchronization on commits:
 ```yaml
 repos:
--   repo: https://github.com/mwouts/jupytext
+-   repo: https://github.com/jupytext/jupytext
     rev: v1.14.7  # CURRENT_TAG/COMMIT_HASH
     hooks:
     - id: jupytext
@@ -52,7 +52,7 @@ If you combine Jupytext with other pre-commit hooks, you must ensure that all ho
 
 ```yaml
 repos:
--   repo: https://github.com/mwouts/jupytext
+-   repo: https://github.com/jupytext/jupytext
     rev: v1.14.7  # CURRENT_TAG/COMMIT_HASH
     hooks:
     - id: jupytext
@@ -67,5 +67,5 @@ repos:
       language_version: python3
 ```
 
-Tested examples of how to use the pre-commit hook are available in our [tests](https://github.com/mwouts/jupytext/tree/main/tests/external/pre_commit) -
-see for instance [test_pre_commit_1_sync_with_config.py](https://github.com/mwouts/jupytext/blob/main/tests/external/pre_commit/test_pre_commit_1_sync_with_config.py).
+Tested examples of how to use the pre-commit hook are available in our [tests](https://github.com/jupytext/jupytext/tree/main/tests/external/pre_commit) -
+see for instance [test_pre_commit_1_sync_with_config.py](https://github.com/jupytext/jupytext/blob/main/tests/external/pre_commit/test_pre_commit_1_sync_with_config.py).

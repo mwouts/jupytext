@@ -73,7 +73,7 @@ By default, notebook classic opens scripts and Markdown documents as notebooks.
 If you want to open them with the text editor, select the document and click on
 _edit_:
 
-![](https://github.com/mwouts/jupytext-screenshots/raw/master/JupytextDocumentation/OpenAsText.png)
+![](https://github.com/jupytext/jupytext-screenshots/raw/master/JupytextDocumentation/OpenAsText.png)
 
 
 ## How to decide which extensions are notebooks

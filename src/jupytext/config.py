@@ -133,7 +133,7 @@ class JupytextConfiguration(Configurable):
 
     doxygen_equation_markers = Bool(
         False,
-        help="Should equation markers use the DOxygen format? (see https://github.com/mwouts/jupytext/issues/517)",
+        help="Should equation markers use the DOxygen format? (see https://github.com/jupytext/jupytext/issues/517)",
         config=True,
     )
 

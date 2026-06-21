@@ -138,7 +138,7 @@ The individual pairing takes precedence over the global pairing. You can disable
 jupytext --set-formats ipynb notebook.ipynb
 ```
 
-Please note that, while Jupytext is Jupyter acts accordingly to both local or global Jupytext configuration files, the Jupyter commands in JupyterLab and the Jupytext menu in Jupyter only display the pairing information set in the notebooks itself and are not aware of the global configuration ([#177](https://github.com/mwouts/jupytext/issues/177)).
+Please note that, while Jupytext is Jupyter acts accordingly to both local or global Jupytext configuration files, the Jupyter commands in JupyterLab and the Jupytext menu in Jupyter only display the pairing information set in the notebooks itself and are not aware of the global configuration ([#177](https://github.com/jupytext/jupytext/issues/177)).
 
 ## Possible locations for the Jupytext configuration files
 

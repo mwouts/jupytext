@@ -1,17 +1,17 @@
-![](https://github.com/mwouts/jupytext/blob/17aea37c612f33a4e27eeee4b81966f1506920fd/docs/images/logo_large.png?raw=true)
+![](https://github.com/jupytext/jupytext/blob/17aea37c612f33a4e27eeee4b81966f1506920fd/docs/images/logo_large.png?raw=true)
 
 <!-- INDEX-START -->
 
-[![CI](https://github.com/mwouts/jupytext/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mwouts/jupytext/actions)
-[![codecov.io](https://codecov.io/github/mwouts/jupytext/coverage.svg?branch=main)](https://codecov.io/gh/mwouts/jupytext/branch/main)
-[![MIT License](https://img.shields.io/github/license/mwouts/jupytext)](https://github.com/mwouts/jupytext/blob/main/LICENSE)
+[![CI](https://github.com/jupytext/jupytext/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jupytext/jupytext/actions)
+[![codecov.io](https://codecov.io/github/jupytext/jupytext/coverage.svg?branch=main)](https://codecov.io/gh/jupytext/jupytext/branch/main)
+[![MIT License](https://img.shields.io/github/license/jupytext/jupytext)](https://github.com/jupytext/jupytext/blob/main/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![GitHub language count](https://img.shields.io/github/languages/count/mwouts/jupytext)](https://jupytext.org/formats/languages/)
+[![GitHub language count](https://img.shields.io/github/languages/count/jupytext/jupytext)](https://jupytext.org/formats/languages/)
 [![Conda Version](https://anaconda.org/conda-forge/jupytext/badges/version.svg)](https://anaconda.org/conda-forge/jupytext/)
 [![Pypi](https://img.shields.io/pypi/v/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
 [![pyversions](https://img.shields.io/pypi/pyversions/jupytext.svg)](https://pypi.python.org/pypi/jupytext)
-[![Binder:lab](https://img.shields.io/badge/binder-jupyterlab-0172B2.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
-[![Binder:notebook](https://img.shields.io/badge/binder-notebook-0172B2.svg)](https://mybinder.org/v2/gh/mwouts/jupytext/main?filepath=demo)
+[![Binder:lab](https://img.shields.io/badge/binder-jupyterlab-0172B2.svg)](https://mybinder.org/v2/gh/jupytext/jupytext/main?urlpath=lab/tree/demo/get_started.ipynb)
+[![Binder:notebook](https://img.shields.io/badge/binder-notebook-0172B2.svg)](https://mybinder.org/v2/gh/jupytext/jupytext/main?filepath=demo)
 [![launch - renku](https://renkulab.io/renku-badge.svg)](https://renkulab.io/projects/best-practices/jupytext/sessions/new?autostart=1)
 [![Jupyter Con 2020](https://img.shields.io/badge/YouTube-JupyterCon%202020-red.svg)](https://www.youtube.com/watch?v=SDYdeVfMh48)
 
@@ -50,7 +50,7 @@ or
 
 Then, restart your JupyterLab server, and make sure Jupytext is activated in Jupyter:  `.py` and `.md` files have a Notebook icon, and you can open them as Notebooks with a right click in JupyterLab.
 
-![Notebook icon on text notebooks](https://github.com/mwouts/jupytext/blob/64b4be818508760116f91bf156342cb4cf724d93/docs/images/jupyterlab_right_click.png?raw=true)
+![Notebook icon on text notebooks](https://github.com/jupytext/jupytext/blob/64b4be818508760116f91bf156342cb4cf724d93/docs/images/jupyterlab_right_click.png?raw=true)
 
 ## Paired Notebooks
 
@@ -64,7 +64,7 @@ You can edit the `.py` version of the paired notebook, and get the edits back in
 
 To pair a notebook in JupyterLab, use the command `Pair Notebook with percent Script` from the Command Palette:
 
-![](https://github.com/mwouts/jupytext/blob/64b4be818508760116f91bf156342cb4cf724d93/docs/images/pair_commands.png?raw=true)
+![](https://github.com/jupytext/jupytext/blob/64b4be818508760116f91bf156342cb4cf724d93/docs/images/pair_commands.png?raw=true)
 
 To pair all the notebooks in a certain directory, create a [configuration file](docs/config.md) with this content:
 
