@@ -36,14 +36,6 @@
 	--lp-code-yellow: #c9a26b;
 }
 
-:root[data-theme='dark'] {
-	--lp-bg: #0d0e16;
-	--lp-bg-soft: #141622;
-	--lp-panel: #1a1c2b;
-	--lp-border: rgba(255, 255, 255, 0.1);
-	--lp-text: #e9ecf5;
-	--lp-text-dim: #a3a8bd;
-}
 
 .lp {
 	font-family: var(--lp-font);
@@ -69,8 +61,7 @@
 .lp section {
 	padding-block: clamp(3.5rem, 8vw, 6.5rem);
 }
-.lp-hero { padding-bottom: clamp(1.5rem, 3vw, 2.5rem); }
-.lp-demo-section { padding-top: clamp(1rem, 2vw, 1.5rem); }
+.lp-demo-section { padding-top: 0; }
 
 .lp h1,
 .lp h2,
@@ -195,40 +186,27 @@
 }
 
 /* ---------- Hero ---------- */
-.lp-hero {
-	position: relative;
-	overflow: hidden;
+.lp-hero-eyebrow {
+	font-family: var(--lp-mono);
+	font-size: 0.81rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: #d9621a;
+	margin-bottom: 1rem;
 }
-.lp-hero::before {
-	content: '';
-	position: absolute;
-	inset: 0;
-	background: radial-gradient(60% 50% at 20% 0%, rgba(243, 119, 38, 0.10), transparent 70%),
-		radial-gradient(50% 50% at 90% 20%, rgba(118, 192, 67, 0.08), transparent 70%);
-	pointer-events: none;
-}
-.lp-hero .lp-container {
-	position: relative;
-	max-width: 56rem;
-}
-.lp-hero h1 {
+.lp h1 {
 	font-size: clamp(2.1rem, 5vw, 3.4rem);
 	font-weight: 800;
 }
-.lp-hero .grad {
+.grad {
 	color: var(--jt-orange);
 }
-.lp-hero p.lede {
+p.lede {
 	color: var(--lp-text-dim);
 	font-size: 1.2rem;
-	margin: 1.4rem 0 2rem;
+	margin: 1.4rem auto 0;
 	max-width: 34rem;
-}
-.lp-hero-cta {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.9rem;
-	align-items: center;
 }
 .lp-install {
 	margin-top: 1.6rem;
@@ -520,6 +498,31 @@
 	margin-top: 0.8rem;
 }
 
+/* ---------- Works-with strip ---------- */
+.lp-works-strip {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	flex-wrap: wrap;
+	justify-content: center;
+	background: var(--lp-bg-soft);
+	border-radius: var(--lp-radius);
+	padding: 18px 28px;
+}
+.lp-works-label {
+	font-family: var(--lp-mono);
+	font-size: 0.8rem;
+	color: var(--lp-text-dim);
+}
+.lp-works-strip a {
+	font-weight: 600;
+	font-size: 0.95rem;
+	color: var(--lp-text);
+	text-decoration: none;
+}
+.lp-works-strip a:hover { color: var(--jt-orange); }
+.lp-works-dot { color: var(--lp-border); }
+
 /* ---------- Integrations ---------- */
 .lp-int {
 	display: grid;
@@ -609,53 +612,52 @@
 	gap: 1.2rem;
 }
 
-/* ---------- Demo card (vertical sidebar + panels) ---------- */
+/* ---------- Demo card (horizontal grouped tabs) ---------- */
 .lp-demo-card {
 	background: var(--lp-code-bg);
 	border: 1px solid var(--lp-code-border);
 	border-radius: var(--lp-radius);
 	overflow: hidden;
 	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
-	display: grid;
-	grid-template-columns: 168px 1fr;
-}
-.lp-demo-sidebar {
-	background: var(--lp-code-bar);
-	border-right: 1px solid var(--lp-code-border);
 	display: flex;
 	flex-direction: column;
-	padding: 10px 0 12px;
 }
-.lp-demo-group {
-	padding: 14px 12px 4px;
+.lp-demo-tabbar {
+	background: var(--lp-code-bar);
+	border-bottom: 1px solid var(--lp-code-border);
+	display: flex;
+}
+.lp-demo-group-cluster {
+	display: flex;
+	flex-direction: column;
+	border-right: 1px solid var(--lp-code-border);
+}
+.lp-demo-group-cluster:last-child { border-right: 0; }
+.lp-demo-group-lbl {
+	padding: 7px 13px 2px;
 	font-family: var(--lp-mono);
-	font-size: 0.67rem;
+	font-size: 0.62rem;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
 	color: #4a4640;
 }
-.lp-demo-group:first-child { padding-top: 8px; }
+.lp-demo-group-tabs { display: flex; }
 .lp-demo-tab {
-	display: block;
-	width: 100%;
-	text-align: left;
 	background: transparent;
 	border: 0;
-	padding: 6px 12px 6px 16px;
+	border-bottom: 2px solid transparent;
+	padding: 6px 13px 8px;
 	font-family: var(--lp-mono);
 	font-size: 0.8rem;
 	color: #8a857b;
 	cursor: pointer;
 	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
 	transition: color 0.1s;
 }
 .lp-demo-tab:hover { color: #cfc9bd; }
 .lp-demo-tab[aria-selected='true'] {
-	background: #2e2a25;
 	color: #fff;
-	box-shadow: inset 2px 0 0 var(--jt-orange);
+	border-bottom-color: var(--jt-orange);
 }
 .lp-demo-tab--featured { color: #a8a29a; }
 .lp-demo-tab--featured[aria-selected='true'] { color: #fff; }

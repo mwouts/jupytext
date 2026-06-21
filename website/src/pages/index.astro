@@ -162,38 +162,6 @@ df.groupby("region")["revenue"].sum().plot.bar()
 	},
 ];
 
-const quickstart = [
-	{
-		id: 'convert',
-		label: 'Convert',
-		desc: 'Turn a notebook into a text file (or back again).',
-		code: 'jupytext --to py:percent notebook.ipynb',
-	},
-	{
-		id: 'pair',
-		label: 'Pair',
-		desc: 'Link an .ipynb to a .py so both stay in sync on save.',
-		code: 'jupytext --set-formats ipynb,py:percent notebook.ipynb',
-	},
-	{
-		id: 'sync',
-		label: 'Sync',
-		desc: 'Update every file in a pair from the most recent one.',
-		code: 'jupytext --sync notebook.ipynb',
-	},
-	{
-		id: 'pipe',
-		label: 'Format',
-		desc: 'Pipe the notebook through black (or any tool) and save.',
-		code: 'jupytext --pipe black notebook.ipynb',
-	},
-	{
-		id: 'config',
-		label: 'Config',
-		desc: 'Pair every notebook in your project — drop this in jupytext.toml.',
-		code: '# jupytext.toml\nformats = "ipynb,py:percent"',
-	},
-];
 
 const k = (s: string) => `<span class="key">${s}</span>`;
 const v = (s: string) => `<span class="str">${s}</span>`;
@@ -242,50 +210,56 @@ const integrations = [
 				<a class="nav-hide-sm" href="/getting-started/introduction/">Docs</a>
 				<a class="nav-hide-sm" href="/getting-started/install/">Get started</a>
 				<a href={GH} target="_blank" rel="noopener">GitHub<span id="gh-stars" class="gh-stars"></span></a>
-				<button class="lp-theme-toggle" data-theme-toggle aria-label="Toggle theme">◑</button>
 			</nav>
 		</div>
 	</header>
 
 	<!-- Hero -->
-	<section class="lp-hero">
+	<section>
 		<div class="lp-container">
-			<div>
-				<h1>Your notebooks, as plain <span class="grad">text.</span></h1>
+			<div class="section-head">
+				<div class="lp-hero-eyebrow">Jupyter ecosystem · open source</div>
+				<h1>Your notebooks,<br>as plain <span class="grad">text.</span></h1>
 				<p class="lede">
 					Jupytext saves Jupyter notebooks as <code>.py</code> or <code>.md</code> files — easy to edit
 					in any IDE, friendly to version control, and trivial for AI assistants to read and refactor.
 				</p>
 			</div>
 		</div>
-	</section>
-
-	<!-- Notebook examples -->
-	<section class="lp-demo-section">
-		<div class="lp-container">
+		<div class="lp-container" style="margin-top: 2.5rem">
 			<div class="lp-demo-card" data-tabs>
-				<!-- Vertical sidebar -->
-				<div class="lp-demo-sidebar">
-					<div class="lp-demo-group">Jupyter</div>
-					<button class="lp-demo-tab" role="tab" aria-selected="false">▶ Notebook</button>
-					<button class="lp-demo-tab" role="tab" aria-selected="false">notebook.ipynb</button>
-
-					<div class="lp-demo-group">Scripts</div>
-					{formats.slice(0, 3).map((f) => (
-						<button class:list={['lp-demo-tab', f.featured && 'lp-demo-tab--featured']} role="tab" aria-selected={f.id === 'percent' ? 'true' : 'false'}>
-							{f.label}{f.featured && <span class="lp-demo-dot" aria-hidden="true"></span>}
-						</button>
-					))}
-
-					<div class="lp-demo-group">Markdown</div>
-					{formats.slice(3).map((f) => (
-						<button class:list={['lp-demo-tab', f.featured && 'lp-demo-tab--featured']} role="tab" aria-selected="false">
-							{f.label}{f.featured && <span class="lp-demo-dot" aria-hidden="true"></span>}
-						</button>
-					))}
+				<!-- Horizontal grouped tab bar -->
+				<div class="lp-demo-tabbar">
+					<div class="lp-demo-group-cluster">
+						<span class="lp-demo-group-lbl">Jupyter formats</span>
+						<div class="lp-demo-group-tabs">
+							<button class="lp-demo-tab" role="tab" aria-selected="false">▶ Notebook</button>
+							<button class="lp-demo-tab" role="tab" aria-selected="false">notebook.ipynb<span class="lp-demo-dot" aria-hidden="true"></span></button>
+						</div>
+					</div>
+					<div class="lp-demo-group-cluster">
+						<span class="lp-demo-group-lbl">Script formats</span>
+						<div class="lp-demo-group-tabs">
+							{formats.slice(0, 3).map((f) => (
+								<button class:list={['lp-demo-tab', f.featured && 'lp-demo-tab--featured']} role="tab" aria-selected={f.id === 'percent' ? 'true' : 'false'}>
+									{f.label}{f.featured && <span class="lp-demo-dot" aria-hidden="true"></span>}
+								</button>
+							))}
+						</div>
+					</div>
+					<div class="lp-demo-group-cluster">
+						<span class="lp-demo-group-lbl">Markdown formats</span>
+						<div class="lp-demo-group-tabs">
+							{formats.slice(3).map((f) => (
+								<button class:list={['lp-demo-tab', f.featured && 'lp-demo-tab--featured']} role="tab" aria-selected="false">
+									{f.label}{f.featured && <span class="lp-demo-dot" aria-hidden="true"></span>}
+								</button>
+							))}
+						</div>
+					</div>
 				</div>
 
-				<!-- Panels (right column) -->
+				<!-- Panels -->
 				<div class="lp-demo-panels">
 					<!-- Panel 1: rendered notebook -->
 					<div role="tabpanel" hidden class="lp-nb-render">
@@ -323,6 +297,7 @@ df = pd.read_csv("sales.csv")</pre>
 					<!-- Panel 2: notebook.ipynb JSON -->
 					<div role="tabpanel" hidden>
 						<pre class="lp-demo-pre" set:html={ipynbHtml}></pre>
+						<p class="lp-demo-note">JSON format · requires Jupyter or VS Code · not well suited to manual edits or version control</p>
 					</div>
 
 					<!-- Panels: text formats -->
@@ -337,67 +312,61 @@ df = pd.read_csv("sales.csv")</pre>
 		</div>
 	</section>
 
-	<!-- Problem -->
+	<!-- What Jupytext enables -->
 	<section>
 		<div class="lp-container">
 			<div class="section-head">
-				<span class="eyebrow">The challenge</span>
-				<h2>Keeps the focus on what you write</h2>
-				<p>
-					A one-line code change in a .ipynb notebook comes with execution counts, base64 image outputs, and cell
-					metadata in the diff. Jupytext gives you a text file that
-					contains only the source — the part you actually write and review.
-				</p>
-			</div>
-			<div class="lp-compare">
-				<div>
-					<div class="label bad">A change to <code>notebook.ipynb</code></div>
-					<div class="lp-card">
-						<pre class="lp-code"><code><span class="del">-   "execution_count": 12,</span>
-<span class="del">-   "outputs": [&#123;"data": &#123;"image/png":</span>
-<span class="del">-   "iVBORw0KGgoAAAANSUhEUg..."&#125;&#125;],</span>
-<span class="del">-   "metadata": &#123;"id": "a1b2c3"&#125;,</span>
-<span class="del">-   "source": ["df = df.dropna()"]</span>
-<span class="add">+   "execution_count": 47,</span>
-<span class="add">+   "outputs": [&#123;"data": &#123;"image/png":</span>
-<span class="add">+   "iVBORw0KGgoAAAANSUhEUg..."&#125;&#125;],</span></code></pre>
-					</div>
-				</div>
-				<div>
-					<div class="label good">The same change to <code>notebook.py</code></div>
-					<div class="lp-card">
-						<pre class="lp-code"><code>  <span class="pct"># %%</span>
-<span class="del">- df = df.dropna()</span>
-<span class="add">+ df = df.dropna().reset_index(drop=True)</span>
-
-
-
-
-</code></pre>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<!-- Benefits -->
-	<section>
-		<div class="lp-container">
-			<div class="section-head">
-				<span class="eyebrow">Why Jupytext</span>
-				<h2>One small tool, a lot less friction</h2>
-				<p>Keep the interactive notebook you love. Gain everything that plain text gives you.</p>
+				<span class="eyebrow">What Jupytext enables</span>
+				<h2>Change one thing — the file format — and everything else gets easier.</h2>
 			</div>
 			<div class="lp-grid">
-				{
-					benefits.map((b) => (
-						<article class="lp-feature">
-							<div class="ico">{b.icon}</div>
-							<h3>{b.title}</h3>
-							<p>{b.body}</p>
-						</article>
-					))
-				}
+				<article class="lp-feature">
+					<div class="ico">±</div>
+					<h3>Clean git diffs</h3>
+					<p>See what changed in your code — not a wall of JSON, metadata and base64 outputs.</p>
+				</article>
+				<article class="lp-feature">
+					<div class="ico">&lt;/&gt;</div>
+					<h3>Edit anywhere</h3>
+					<p>Open notebooks in VS Code, PyCharm, Vim — any editor, with full language tooling.</p>
+				</article>
+				<article class="lp-feature">
+					<div class="ico">✓</div>
+					<h3>Lint &amp; refactor</h3>
+					<p>Run black, isort, flake8 and pre-commit hooks across your notebooks like normal code.</p>
+				</article>
+				<article class="lp-feature">
+					<div class="ico">⇄</div>
+					<h3>Two-way sync</h3>
+					<p>Pair an .ipynb with a .py or .md — edits in either stay in sync automatically.</p>
+				</article>
+				<article class="lp-feature">
+					<div class="ico">PR</div>
+					<h3>Review like code</h3>
+					<p>Notebooks become readable diffs your team can actually review in a pull request.</p>
+				</article>
+				<article class="lp-feature">
+					<div class="ico">✦</div>
+					<h3>Ready for AI</h3>
+					<p>Coding agents read and edit the clean text form — so AI can refactor, explain and extend your notebooks.</p>
+				</article>
+			</div>
+		</div>
+
+		<div class="lp-container" style="margin-top: 2rem">
+			<div class="lp-works-strip">
+				<span class="lp-works-label">works with</span>
+				<a href="/getting-started/install/#jupytext-commands-in-jupyterlab">JupyterLab</a>
+				<span class="lp-works-dot">·</span>
+				<a href="/getting-started/install/#jupytext-menu-in-jupyter-notebook">Jupyter Notebook</a>
+				<span class="lp-works-dot">·</span>
+				<a href="/formats/markdown/#myst-markdown">Jupyter Book</a>
+				<span class="lp-works-dot">·</span>
+				<a href="/integrations/vs-code/">VS Code</a>
+				<span class="lp-works-dot">·</span>
+				<a href="/formats/markdown/#quarto">Quarto</a>
+				<span class="lp-works-dot">·</span>
+				<a href="/using/pre-commit/">pre-commit</a>
 			</div>
 		</div>
 	</section>
@@ -436,91 +405,6 @@ df = pd.read_csv("sales.csv")</pre>
 		</div>
 	</section>
 
-	<!-- How it works -->
-	<section>
-		<div class="lp-container">
-			<div class="section-head">
-				<span class="eyebrow">How it works</span>
-				<h2>Paired notebooks: the best of both worlds</h2>
-				<p>
-					Keep a rich <code>.ipynb</code> (with outputs) alongside a clean <code>.py</code> or
-					<code>.md</code>. </br>
-					Jupytext keeps them in sync — commit only the text file.
-				</p>
-			</div>
-			<div class="lp-steps">
-				<div class="lp-step">
-					<h3>Pair</h3>
-					<p>Tell Jupytext to pair your notebook with a text format — once, or for the whole project via <code>jupytext.toml</code>.</p>
-				</div>
-				<div class="lp-step">
-					<h3>Edit anywhere</h3>
-					<p>Edit the <code>.py</code> in your IDE or with an AI assistant, or run the notebook in Jupyter. Reload to pick up changes.</p>
-				</div>
-				<div class="lp-step">
-					<h3>Sync &amp; commit</h3>
-					<p>On save (or with <code>jupytext --sync</code>) both files update. Version-control the text; outputs stay in the <code>.ipynb</code>.</p>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<!-- Quickstart -->
-	<section>
-		<div class="lp-container">
-			<div class="section-head">
-				<span class="eyebrow">Quickstart</span>
-				<h2>Five commands you'll actually use</h2>
-			</div>
-			<div class="lp-tabs" data-tabs>
-				<div class="lp-tablist" role="tablist">
-					{
-						quickstart.map((t, i) => (
-							<button
-								class="lp-tab"
-								role="tab"
-								aria-selected={i === 0 ? 'true' : 'false'}
-							>
-								{t.label}
-							</button>
-						))
-					}
-				</div>
-				{
-					quickstart.map((t, i) => (
-						<div class="lp-tabpanel" role="tabpanel" hidden={i !== 0}>
-							<div class="lp-card">
-								<div class="lp-card-bar">
-									<span class="fname">{t.desc}</span>
-								</div>
-								<pre class="lp-code"><code>{t.code}</code></pre>
-							</div>
-						</div>
-					))
-				}
-			</div>
-		</div>
-	</section>
-
-	<!-- Integrations -->
-	<section>
-		<div class="lp-container">
-			<div class="section-head">
-				<span class="eyebrow">Integrations</span>
-				<h2>Fits the tools you already use</h2>
-			</div>
-			<div class="lp-int">
-				{
-					integrations.map((i) => (
-						<a href={i.href}>
-							<strong>{i.name}</strong>
-							<span>{i.desc}</span>
-						</a>
-					))
-				}
-			</div>
-		</div>
-	</section>
 
 	<!-- Stats -->
 	<section class="lp-stats">
@@ -533,20 +417,12 @@ df = pd.read_csv("sales.csv")</pre>
 		</div>
 	</section>
 
-	<!-- Final CTA -->
-	<section class="lp-cta">
-		<div class="lp-container">
-			<h2>Give your notebooks a clean text life</h2>
-			<p>Install Jupytext, pair a notebook, and enjoy reviewable diffs, IDE editing and AI-ready files.</p>
-			<div class="lp-hero-cta" style="justify-content:center">
-				<a class="lp-btn lp-btn-primary" href="/getting-started/introduction/">Get started →</a>
-				<a class="lp-btn lp-btn-secondary" href={GH} target="_blank" rel="noopener">View on GitHub</a>
-			</div>
-	</section>
-
 	<!-- About -->
 	<section style="border-top:1px solid var(--lp-border)">
 		<div class="lp-container" style="max-width:44rem;text-align:center">
+			<div class="section-head">
+				<h2>Keeping in touch</h2>
+			</div>
 			<p style="color:var(--lp-text-dim);line-height:1.7">
 				Jupytext was created by <a href="https://www.linkedin.com/in/marc-wouts" target="_blank" rel="noopener">Marc Wouts</a>.
 				Follow Marc on LinkedIn for updates on Jupytext, his other open-source projects, and the occasional random topic.
@@ -555,7 +431,8 @@ df = pd.read_csv("sales.csv")</pre>
 				Jupytext is completely free and open source under the <strong>MIT license</strong>. What keeps us going is
 				the excitement of learning through interactions with users and experts, and the satisfaction of sharing solutions with the community.
 				<br /><br />
-				Have a question, a bug report, or an idea? Feel free to open an issue or start a discussion on <a href={GH} target="_blank" rel="noopener">GitHub</a>.
+				Have a question, a bug report, or an idea? Join us on <a href="https://discord.gg/VfdAsYyn" target="_blank" rel="noopener">Discord</a>,
+				or open an issue or start a discussion on <a href={GH} target="_blank" rel="noopener">GitHub</a>.
 			</p>
 		</div>
 	</section>

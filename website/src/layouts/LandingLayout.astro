@@ -36,39 +36,12 @@ const ogImage = new URL('/og/jupytext-card.png', Astro.site);
 		<meta property="og:image" content={ogImage} />
 		<meta name="twitter:card" content="summary_large_image" />
 
-		<!-- Respect the theme the visitor picked in the docs (Starlight stores it
-		     under `starlight-theme`); fall back to the OS preference. Inline + early
-		     to avoid a flash of the wrong theme. -->
-		<script is:inline>
-			(() => {
-				const stored = localStorage.getItem('starlight-theme');
-				const theme =
-					stored === 'light' || stored === 'dark'
-						? stored
-						: window.matchMedia('(prefers-color-scheme: dark)').matches
-							? 'dark'
-							: 'light';
-				document.documentElement.dataset.theme = theme;
-			})();
-		</script>
 
-	</head>
+</head>
 	<body class="lp">
 		<slot />
 
 		<script is:inline>
-			// Theme toggle + persistence (shared key with Starlight docs).
-			document.addEventListener('click', (e) => {
-				const btn = e.target.closest('[data-theme-toggle]');
-				if (!btn) return;
-				const next =
-					document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-				document.documentElement.dataset.theme = next;
-				try {
-					localStorage.setItem('starlight-theme', next);
-				} catch {}
-			});
-
 			// Copy-to-clipboard buttons.
 			document.addEventListener('click', async (e) => {
 				const btn = e.target.closest('[data-copy]');
