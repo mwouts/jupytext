@@ -90,6 +90,7 @@ def test_notebook_runs(tmp_path):
 @pytest.mark.parametrize("fmt,snapshot", list(FORMATS.items()))
 def test_conversion(fmt, snapshot, update_snapshots):
     """Conversion to each landing page format matches the snapshot file."""
+    from jupytext.marimo import is_marimo_available
     from jupytext.myst import is_myst_available
     from jupytext.quarto import is_quarto_available
 
@@ -97,6 +98,8 @@ def test_conversion(fmt, snapshot, update_snapshots):
         pytest.skip("quarto not available")
     if fmt == "md:myst" and not is_myst_available():
         pytest.skip("myst-parser not available")
+    if fmt == "py:marimo" and not is_marimo_available():
+        pytest.skip("marimo not available")
 
     nb = make_notebook()
     text = jupytext.writes(nb, fmt=fmt)
