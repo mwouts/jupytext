@@ -15,6 +15,7 @@ exclude: >
     (?x)^(
       demo/.*|
       tests/data/notebooks/.*|
+      tests/unit/data/landing_page/.*|
       src/jupytext/sync_pairs.py|
       src/jupytext/sync_contentsmanager.py|
     )$

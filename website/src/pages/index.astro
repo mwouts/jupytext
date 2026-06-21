@@ -3,6 +3,14 @@ import { Image } from 'astro:assets';
 import LandingLayout from '../layouts/LandingLayout.astro';
 import logo from '../assets/logo.png';
 
+import rawIpynb from '../../../tests/unit/data/landing_page/notebook.ipynb?raw';
+import rawPercent from '../../../tests/unit/data/landing_page/notebook_percent.py?raw';
+import rawLight from '../../../tests/unit/data/landing_page/notebook_light.py?raw';
+import rawMarimo from '../../../tests/unit/data/landing_page/notebook_marimo.py?raw';
+import rawMd from '../../../tests/unit/data/landing_page/notebook.md?raw';
+import rawMyst from '../../../tests/unit/data/landing_page/notebook.myst.md?raw';
+import rawQmd from '../../../tests/unit/data/landing_page/notebook.qmd?raw';
+
 const GH = 'https://github.com/mwouts/jupytext';
 
 const formats = [
@@ -12,83 +20,28 @@ const formats = [
 		filename: 'notebook.py',
 		featured: true,
 		best: 'Explicit # %% cell markers — understood by VS Code, PyCharm, Spyder, supported in 30+ languages.',
-		code: `# %% [markdown]
-# # Quarterly Sales
-# A look at Q4 revenue by region.
-
-# %%
-import pandas as pd
-df = pd.read_csv("sales.csv")
-
-# %%
-df.groupby("region")["revenue"].sum().plot.bar()`,
+		code: rawPercent.trimEnd(),
 	},
 	{
 		id: 'light',
 		label: 'py:light',
 		filename: 'notebook.py',
 		best: 'Minimal markers — barely looks different from a regular script. Use py:nomarker to drop them entirely.',
-		code: `# # Quarterly Sales
-# A look at Q4 revenue by region.
-
-import pandas as pd
-df = pd.read_csv("sales.csv")
-
-# %%
-df.groupby("region")["revenue"].sum().plot.bar()`,
+		code: rawLight.trimEnd(),
 	},
 	{
 		id: 'marimo',
 		label: 'py:marimo',
 		filename: 'notebook.py',
 		best: 'Each cell becomes a reactive function — open the file directly in Marimo.',
-		code: `import marimo
-
-app = marimo.App()
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    # Quarterly Sales
-    A look at Q4 revenue by region.
-    """)
-    return
-
-
-@app.cell
-def _():
-    import pandas as pd
-    df = pd.read_csv("sales.csv")
-    return df, pd
-
-
-@app.cell
-def _(df):
-    df.groupby("region")["revenue"].sum().plot.bar()
-    return
-
-
-if __name__ == "__main__":
-    app.run()`,
+		code: rawMarimo.replace(/^__generated_with = ".*"\n/m, '').trimEnd(),
 	},
 	{
 		id: 'md',
 		label: 'md',
 		filename: 'notebook.md',
 		best: 'Plain GitHub Markdown — prose-first, readable everywhere.',
-		code: `# Quarterly Sales
-
-A look at Q4 revenue by region.
-
-\`\`\`python
-import pandas as pd
-df = pd.read_csv("sales.csv")
-\`\`\`
-
-\`\`\`python
-df.groupby("region")["revenue"].sum().plot.bar()
-\`\`\``,
+		code: rawMd.trimEnd(),
 	},
 	{
 		id: 'myst',
@@ -96,67 +49,17 @@ df.groupby("region")["revenue"].sum().plot.bar()
 		filename: 'notebook.myst.md',
 		featured: true,
 		best: 'Rich directives and cross-references for Jupyter Book and technical publishing.',
-		code: `# Quarterly Sales
-
-A look at Q4 revenue by region.
-
-\`\`\`{code-cell} ipython3
-import pandas as pd
-df = pd.read_csv("sales.csv")
-\`\`\`
-
-\`\`\`{code-cell} ipython3
-df.groupby("region")["revenue"].sum().plot.bar()
-\`\`\``,
+		code: rawMyst.trimEnd(),
 	},
 	{
 		id: 'quarto',
 		label: 'qmd',
 		filename: 'notebook.qmd',
 		best: 'Multi-language scientific publishing — Python, R, Julia and more via the Quarto system.',
-		code: `# Quarterly Sales
-
-A look at Q4 revenue by region.
-
-\`\`\`{python}
-import pandas as pd
-df = pd.read_csv("sales.csv")
-\`\`\`
-
-\`\`\`{python}
-df.groupby("region")["revenue"].sum().plot.bar()
-\`\`\``,
+		code: rawQmd.trimEnd(),
 	},
 ];
 
-
-const k = (s: string) => `<span class="key">${s}</span>`;
-const v = (s: string) => `<span class="str">${s}</span>`;
-const ipynbHtml = [
-	'{',
-	` ${k('"cells"')}: [`,
-	'  {',
-	`   ${k('"cell_type"')}: ${v('"markdown"')},`,
-	`   ${k('"source"')}: [${v('"# Quarterly Sales\\n"')}, ${v('"\\n"')}, ${v('"A look at Q4 revenue by region."')}]`,
-	'  },',
-	'  {',
-	`   ${k('"cell_type"')}: ${v('"code"')},`,
-	`   ${k('"execution_count"')}: 1,`,
-	`   ${k('"outputs"')}: [],`,
-	`   ${k('"source"')}: [${v('"import pandas as pd\\n"')}, ${v('"df = pd.read_csv(\\"sales.csv\\")"')}]`,
-	'  },',
-	'  {',
-	`   ${k('"cell_type"')}: ${v('"code"')},`,
-	`   ${k('"execution_count"')}: 2,`,
-	`   ${k('"outputs"')}: [{${k('"data"')}: {${k('"image/png"')}: ${v('"iVBORw0KGgo..."')}}, ${k('"output_type"')}: ${v('"display_data"')}}],`,
-	`   ${k('"source"')}: [${v('"df.groupby(\\"region\\")[\\"revenue\\"].sum().plot.bar()"')}]`,
-	'  }',
-	' ],',
-	` ${k('"metadata"')}: {${k('"kernelspec"')}: {${k('"display_name"')}: ${v('"Python 3"')}, ${k('"language"')}: ${v('"python"')}, ${k('"name"')}: ${v('"python3"')}}},`,
-	` ${k('"nbformat"')}: 4,`,
-	` ${k('"nbformat_minor"')}: 5`,
-	'}',
-].join('\n');
 
 // Fetch live stats at build time
 let ghStars = '7k+';
@@ -278,7 +181,7 @@ df = pd.read_csv("sales.csv")</pre>
 
 					<!-- Panel 2: notebook.ipynb JSON -->
 					<div role="tabpanel" hidden>
-						<pre class="lp-demo-pre" set:html={ipynbHtml}></pre>
+						<pre class="lp-demo-pre">{rawIpynb.trimEnd()}</pre>
 						<p class="lp-demo-note">JSON format · requires Jupyter or VS Code · not well suited to manual edits or version control</p>
 					</div>
 
