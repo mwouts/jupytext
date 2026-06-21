@@ -5,39 +5,6 @@ import logo from '../assets/logo.png';
 
 const GH = 'https://github.com/mwouts/jupytext';
 
-const benefits = [
-	{
-		icon: '🔍',
-		title: 'Clean, reviewable diffs',
-		body: 'No more unreadable JSON blobs. Text notebooks produce line-by-line diffs you can actually review in a pull request.',
-	},
-	{
-		icon: '✏️',
-		title: 'Edit in any IDE',
-		body: 'Open your notebooks in VS Code, PyCharm, Spyder, vim — anywhere. No JSON, no merge nightmares, full editor superpowers.',
-	},
-	{
-		icon: '🧹',
-		title: 'Refactor, lint & format',
-		body: 'Run black, ruff, isort or flake8 over your notebooks like ordinary scripts. Pipe them through any tool from the CLI.',
-	},
-	{
-		icon: '♻️',
-		title: 'Reuse your code',
-		body: 'A text notebook is a valid module. Import functions from it, or run it as a script. Copy, move, and restructure your code at will.',
-	},
-	{
-		icon: '🔗',
-		title: 'Rich outputs are preserved',
-		body: 'Pair the text file with an .ipynb and keep your rich outputs. Inputs come from the text, outputs from the notebook.',
-	},
-	{
-		icon: '🌐',
-		title: 'Many languages & formats',
-		body: 'Python, R, Julia and more — as percent scripts, Markdown, MyST, Quarto or Pandoc. Pick what fits each notebook.',
-	},
-];
-
 const formats = [
 	{
 		id: 'percent',
@@ -107,7 +74,7 @@ if __name__ == "__main__":
 	},
 	{
 		id: 'md',
-		label: 'Markdown',
+		label: 'md',
 		filename: 'notebook.md',
 		best: 'Plain GitHub Markdown — prose-first, readable everywhere.',
 		code: `# Quarterly Sales
@@ -125,7 +92,7 @@ df.groupby("region")["revenue"].sum().plot.bar()
 	},
 	{
 		id: 'myst',
-		label: 'MyST Markdown',
+		label: 'md:myst',
 		filename: 'notebook.myst.md',
 		featured: true,
 		best: 'Rich directives and cross-references for Jupyter Book and technical publishing.',
@@ -144,7 +111,7 @@ df.groupby("region")["revenue"].sum().plot.bar()
 	},
 	{
 		id: 'quarto',
-		label: 'Quarto',
+		label: 'qmd',
 		filename: 'notebook.qmd',
 		best: 'Multi-language scientific publishing — Python, R, Julia and more via the Quarto system.',
 		code: `# Quarterly Sales
@@ -191,14 +158,29 @@ const ipynbHtml = [
 	'}',
 ].join('\n');
 
-const integrations = [
-	{ name: 'JupyterLab', desc: 'Pair & open text notebooks with a right click.', href: '/getting-started/text-notebooks/#how-to-open-a-text-notebook-in-jupyterlab' },
-	{ name: 'Jupyter Notebook', desc: 'Works in Notebook 7 and classic.', href: '/getting-started/text-notebooks/#how-to-open-a-text-notebook-in-jupyter-notebook-nb7' },
-	{ name: 'VS Code Extension', desc: 'Jupytext-Sync by Victor Negîrneac.', href: '/integrations/vs-code/' },
-	{ name: 'Real-time collab', desc: 'Jupyter Collaboration support.', href: '/integrations/jupyter-collaboration/' },
-	{ name: 'pre-commit', desc: 'Keep pairs in sync on every commit.', href: '/using/pre-commit/' },
-	{ name: 'Python API', desc: 'read / write notebooks in code.', href: '/getting-started/install/#jupytext-as-a-python-library' },
-];
+// Fetch live stats at build time
+let ghStars = '7k+';
+let ghContributors = '100+';
+let pypiDownloads = '3M+';
+
+try {
+	const ghRes = await fetch('https://api.github.com/repos/mwouts/jupytext');
+	if (ghRes.ok) {
+		const gh = await ghRes.json();
+		const n = gh.stargazers_count;
+		if (n) ghStars = n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+	}
+} catch {}
+
+
+try {
+	const pypiRes = await fetch('https://pypistats.org/api/packages/jupytext/recent');
+	if (pypiRes.ok) {
+		const pypi = await pypiRes.json();
+		const n = pypi.data?.last_month;
+		if (n) pypiDownloads = n >= 1_000_000 ? (n / 1_000_000).toFixed(1) + 'M' : n >= 1000 ? Math.round(n / 1000) + 'k' : String(n);
+	}
+} catch {}
 ---
 
 <LandingLayout>
@@ -317,28 +299,28 @@ df = pd.read_csv("sales.csv")</pre>
 		<div class="lp-container">
 			<div class="section-head">
 				<span class="eyebrow">What Jupytext enables</span>
-				<h2>Change one thing — the file format — and everything else gets easier.</h2>
+				<h2>Get more done with text notebooks</h2>
 			</div>
 			<div class="lp-grid">
-				<article class="lp-feature">
-					<div class="ico">±</div>
-					<h3>Clean git diffs</h3>
-					<p>See what changed in your code — not a wall of JSON, metadata and base64 outputs.</p>
-				</article>
 				<article class="lp-feature">
 					<div class="ico">&lt;/&gt;</div>
 					<h3>Edit anywhere</h3>
 					<p>Open notebooks in VS Code, PyCharm, Vim — any editor, with full language tooling.</p>
 				</article>
 				<article class="lp-feature">
-					<div class="ico">✓</div>
-					<h3>Lint &amp; refactor</h3>
-					<p>Run black, isort, flake8 and pre-commit hooks across your notebooks like normal code.</p>
+					<div class="ico">✦</div>
+					<h3>Ready for AI</h3>
+					<p>Coding agents read and edit the clean text form — so AI can refactor, explain and extend your notebooks.</p>
 				</article>
 				<article class="lp-feature">
-					<div class="ico">⇄</div>
-					<h3>Two-way sync</h3>
-					<p>Pair an .ipynb with a .py or .md — edits in either stay in sync automatically.</p>
+					<div class="ico">✓</div>
+					<h3>Lint &amp; refactor</h3>
+					<p>Run black, isort, flake8 across your notebooks like normal code.</p>
+				</article>
+				<article class="lp-feature">
+					<div class="ico">±</div>
+					<h3>Clean git diffs</h3>
+					<p>See what changed in your code — not a wall of JSON, metadata and base64 outputs.</p>
 				</article>
 				<article class="lp-feature">
 					<div class="ico">PR</div>
@@ -346,27 +328,108 @@ df = pd.read_csv("sales.csv")</pre>
 					<p>Notebooks become readable diffs your team can actually review in a pull request.</p>
 				</article>
 				<article class="lp-feature">
-					<div class="ico">✦</div>
-					<h3>Ready for AI</h3>
-					<p>Coding agents read and edit the clean text form — so AI can refactor, explain and extend your notebooks.</p>
+					<div class="ico">↑</div>
+					<h3>Raise the quality bar</h3>
+					<p>One pre-commit hook — <code>ruff check</code> and <code>ruff format</code> — and every notebook commit meets the same standard as your production code.</p>
 				</article>
-			</div>
+				</div>
 		</div>
 
-		<div class="lp-container" style="margin-top: 2rem">
-			<div class="lp-works-strip">
-				<span class="lp-works-label">works with</span>
-				<a href="/getting-started/install/#jupytext-commands-in-jupyterlab">JupyterLab</a>
-				<span class="lp-works-dot">·</span>
-				<a href="/getting-started/install/#jupytext-menu-in-jupyter-notebook">Jupyter Notebook</a>
-				<span class="lp-works-dot">·</span>
-				<a href="/formats/markdown/#myst-markdown">Jupyter Book</a>
-				<span class="lp-works-dot">·</span>
-				<a href="/integrations/vs-code/">VS Code</a>
-				<span class="lp-works-dot">·</span>
-				<a href="/formats/markdown/#quarto">Quarto</a>
-				<span class="lp-works-dot">·</span>
-				<a href="/using/pre-commit/">pre-commit</a>
+	</section>
+
+	<!-- Getting started: install & open -->
+	<section>
+		<div class="lp-container">
+			<div class="section-head">
+				<span class="eyebrow">Getting started</span>
+				<h2>Create your first text notebook</h2>
+			</div>
+			<div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;margin-bottom:2.5rem">
+				<div class="lp-install">
+					<span class="prompt">$</span>
+					<span>pip install jupytext</span>
+					<button class="lp-copy" data-copy="pip install jupytext">copy</button>
+				</div>
+				<p class="lp-install-note">Then restart your Jupyter server to activate the extension.</p>
+			</div>
+			<div class="lp-grid">
+				<article class="lp-feature">
+					<div class="ico">+</div>
+					<h3>New text notebook</h3>
+					<p>In JupyterLab, use <strong>File → New Text Notebook</strong> to start fresh with a <code>.py</code> or <code>.md</code> file — or ask your AI assistant to write one.</p>
+				</article>
+				<article class="lp-feature">
+					<div class="ico">↗</div>
+					<h3>Open as a notebook</h3>
+					<p>Right-click any <code>.py</code>, <code>.md</code>, or <code>.qmd</code> file in the JupyterLab file browser and choose <strong>Open With → Notebook</strong>.</p>
+				</article>
+			</div>
+			<div class="lp-callout">
+				<span class="lp-callout-icon">!</span>
+				<p><strong>Auto-reload isn't universal.</strong> In Jupyter, use <strong>File → Reload Notebook from Disk</strong> to pick up changes made to the <code>.py</code> file in another editor.</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- Getting started: paired notebooks -->
+	<section>
+		<div class="lp-container">
+			<div class="section-head">
+				<span class="eyebrow">Paired notebooks</span>
+				<h2>Best of both worlds</h2>
+				<p>Text notebooks don't store outputs. Pair them with an <code>.ipynb</code> and Jupytext keeps both in sync on every save — commit the text, keep the outputs. The text file always has precedence, and Jupytext raises an error if the <code>.ipynb</code> was modified outside of Jupyter.</p>
+			</div>
+			<div class="lp-steps">
+				<div class="lp-step">
+					<h3>Menu</h3>
+					<p>In JupyterLab open the notebook, then use:</p>
+					<p class="lp-menu-path"><strong>File → Jupytext → Pair Notebook with percent Script</strong></p>
+					<p class="lp-or">or</p>
+					<p class="lp-menu-path"><strong>File → Jupytext → Pair Notebook with MyST Markdown</strong></p>
+					<p>No terminal needed.</p>
+				</div>
+				<div class="lp-step">
+					<h3>jupytext.toml</h3>
+					<p>Drop a config file at your project root to pair all notebooks at once:</p>
+					<pre class="lp-mini-code"><span class="cmt"># jupytext.toml</span>
+formats = <span class="str">"ipynb,py:percent"</span></pre>
+					<p class="lp-or">or</p>
+					<pre class="lp-mini-code"><span class="cmt"># jupytext.toml</span>
+formats = <span class="str">"ipynb,md:myst"</span></pre>
+				</div>
+				<div class="lp-step">
+					<h3>pyproject.toml</h3>
+					<p>Or add a <code>[tool.jupytext]</code> section to your existing config:</p>
+					<pre class="lp-mini-code"><span class="cmt">[tool.jupytext]</span>
+formats = <span class="str">"ipynb,py:percent"</span></pre>
+					<p class="lp-or">or</p>
+					<pre class="lp-mini-code"><span class="cmt">[tool.jupytext]</span>
+formats = <span class="str">"ipynb,md:myst"</span></pre>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Sync -->
+	<section>
+		<div class="lp-container">
+			<div class="section-head">
+				<span class="eyebrow">Keeping in sync</span>
+				<h2>Syncs wherever you work</h2>
+			</div>
+			<div class="lp-steps">
+				<div class="lp-step">
+					<h3>In Jupyter</h3>
+					<p>Sync happens automatically on save — both files are written together. On load, inputs come from the text file, outputs from the <code>.ipynb</code>.</p>
+				</div>
+				<div class="lp-step">
+					<h3>VS Code</h3>
+					<p>The <a href="/integrations/vs-code/">Jupytext-Sync extension</a> by Victor Negîrneac syncs both files whenever either one is saved — no terminal needed.</p>
+				</div>
+				<div class="lp-step">
+					<h3>pre-commit</h3>
+					<p>Wire <code>jupytext --sync</code> into a <a href="/using/pre-commit/">pre-commit hook</a> to keep pairs in sync on every commit.</p>
+				</div>
 			</div>
 		</div>
 	</section>
@@ -389,18 +452,22 @@ df = pd.read_csv("sales.csv")</pre>
 					<li><span class="tick">✓</span> Text notebooks are very concise, often 1,000x lighter than .ipynb, allowing your AI to ingest an entire collection of notebooks at once.</li>
 				</ul>
 			</div>
-			<div class="lp-card">
-				<div class="lp-card-bar">
-					<span class="dot"></span><span class="dot"></span><span class="dot"></span>
-					<span class="fname">assistant editing analysis.py</span>
+			<div class="lp-demo-card">
+				<div class="lp-demo-tabbar">
+					<div class="lp-demo-group-cluster" style="border-right:0">
+						<span class="lp-demo-group-lbl">Script formats</span>
+						<div class="lp-demo-group-tabs">
+							<span class="lp-demo-tab" style="border-bottom-color:var(--jt-orange);color:#fff;">analysis.py</span>
+						</div>
+					</div>
 				</div>
-				<pre class="lp-code"><code><span class="cmt"># %% [markdown]</span>
+				<pre class="lp-demo-pre"><span class="cmt"># %% [markdown]</span>
 <span class="cmt"># ### Refactor: vectorize the loop 🤖</span>
 
 <span class="del">- totals = []</span>
 <span class="del">- for r in regions:</span>
 <span class="del">-     totals.append(df[df.region==r].sales.sum())</span>
-<span class="add">+ totals = df.groupby("region").sales.sum()</span></code></pre>
+<span class="add">+ totals = df.groupby("region").sales.sum()</span></pre>
 			</div>
 		</div>
 	</section>
@@ -409,10 +476,10 @@ df = pd.read_csv("sales.csv")</pre>
 	<!-- Stats -->
 	<section class="lp-stats">
 		<div class="lp-container">
-			<a class="lp-stat" href="https://github.com/mwouts/jupytext" target="_blank" rel="noopener noreferrer"><div class="num">7k+</div><div class="lab">GitHub stars</div></a>
-			<a class="lp-stat" href="https://pypistats.org/packages/jupytext" target="_blank" rel="noopener noreferrer"><div class="num">3M+</div><div class="lab">Downloads / month</div></a>
+			<a class="lp-stat" href="https://github.com/mwouts/jupytext" target="_blank" rel="noopener noreferrer"><div class="num">{ghStars}</div><div class="lab">GitHub stars</div></a>
+			<a class="lp-stat" href="https://pypistats.org/packages/jupytext" target="_blank" rel="noopener noreferrer"><div class="num">{pypiDownloads}</div><div class="lab">Downloads / month</div></a>
 			<a class="lp-stat" href="/formats/languages/"><div class="num">30+</div><div class="lab">Languages supported</div></a>
-			<a class="lp-stat" href="https://github.com/mwouts/jupytext/graphs/contributors" target="_blank" rel="noopener noreferrer"><div class="num">100+</div><div class="lab">Contributors</div></a>
+			<a class="lp-stat" href="https://github.com/mwouts/jupytext/graphs/contributors" target="_blank" rel="noopener noreferrer"><div class="num">{ghContributors}</div><div class="lab">Contributors</div></a>
 			<a class="lp-stat" href="https://github.com/mwouts/jupytext/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><div class="num">MIT</div><div class="lab">Open source</div></a>
 		</div>
 	</section>

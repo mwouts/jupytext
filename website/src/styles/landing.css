@@ -237,6 +237,12 @@ p.lede {
 	color: var(--lp-text);
 	background: var(--lp-bg-soft);
 }
+.lp-install-note {
+	margin: 0.6rem 0 0;
+	font-size: 0.85rem;
+	color: var(--lp-text-dim);
+	text-align: center;
+}
 
 
 /* ---------- Code / diff card (always dark) ---------- */
@@ -498,6 +504,70 @@ p.lede {
 	margin-top: 0.8rem;
 }
 
+/* ---------- Mini dark code block (inside light cards) ---------- */
+.lp-mini-code {
+	margin-top: 0.75rem;
+	background: var(--lp-code-bg);
+	border: 1px solid var(--lp-code-border);
+	border-radius: 8px;
+	padding: 10px 14px;
+	font-family: var(--lp-mono);
+	font-size: 0.8rem;
+	line-height: 1.6;
+	color: var(--lp-code-text);
+	white-space: pre;
+	overflow-x: auto;
+}
+.lp-mini-code .cmt { color: var(--lp-code-dim); }
+.lp-mini-code .str { color: var(--lp-code-green); }
+.lp-or {
+	margin: 0.4rem 0;
+	font-size: 0.78rem;
+	color: var(--lp-text-dim);
+	text-align: center;
+}
+.lp-step .lp-menu-path {
+	margin: 0.75rem 0;
+	background: var(--lp-panel);
+	border: 1px solid var(--lp-border);
+	border-radius: 8px;
+	padding: 7px 12px;
+	font-size: 0.85rem;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* ---------- Callout / warning box ---------- */
+.lp-callout {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin-top: 1.5rem;
+	background: color-mix(in srgb, var(--jt-orange) 7%, var(--lp-bg-soft));
+	border: 1px solid color-mix(in srgb, var(--jt-orange) 28%, var(--lp-border));
+	border-radius: 11px;
+	padding: 14px 18px;
+}
+.lp-callout-icon {
+	color: var(--jt-orange);
+	font-weight: 700;
+	font-size: 1rem;
+	flex: none;
+	line-height: 1.55;
+}
+.lp-callout p {
+	margin: 0;
+	font-size: 0.9rem;
+	line-height: 1.55;
+	color: var(--lp-text);
+}
+.lp-callout code {
+	font-family: var(--lp-mono);
+	font-size: 0.85em;
+	background: var(--lp-bg);
+	padding: 0.1em 0.35em;
+	border-radius: 4px;
+}
+
 /* ---------- Works-with strip ---------- */
 .lp-works-strip {
 	display: flex;
@@ -737,6 +807,8 @@ p.lede {
 .lp-demo-pre .pct { color: var(--lp-code-orange); font-weight: 600; }
 .lp-demo-pre .str { color: var(--lp-code-green); }
 .lp-demo-pre .key { color: var(--lp-code-yellow); }
+.lp-demo-pre .add { display: block; background: rgba(118,192,67,0.14); margin-inline: -26px; padding-inline: 26px; }
+.lp-demo-pre .del { display: block; background: rgba(243,119,38,0.14); color: var(--lp-code-dim); margin-inline: -26px; padding-inline: 26px; }
 .lp-demo-note {
 	padding: 8px 26px 18px;
 	font-size: 0.85rem;
