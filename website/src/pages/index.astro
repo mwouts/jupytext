@@ -204,7 +204,7 @@ df = pd.read_csv("sales.csv")</pre>
 				<span class="eyebrow">What Jupytext enables</span>
 				<h2>Get more done with text notebooks</h2>
 			</div>
-			<div class="lp-grid">
+			<div class="lp-grid" style="grid-template-columns: repeat(2, 1fr)">
 				<article class="lp-feature">
 					<div class="ico">&lt;/&gt;</div>
 					<h3>Edit anywhere</h3>
@@ -216,19 +216,9 @@ df = pd.read_csv("sales.csv")</pre>
 					<p>Coding agents read and edit the clean text form — so AI can refactor, explain and extend your notebooks.</p>
 				</article>
 				<article class="lp-feature">
-					<div class="ico">✓</div>
-					<h3>Lint &amp; refactor</h3>
-					<p>Run black, isort, flake8 across your notebooks like normal code.</p>
-				</article>
-				<article class="lp-feature">
-					<div class="ico">±</div>
-					<h3>Clean git diffs</h3>
-					<p>See what changed in your code — not a wall of JSON, metadata and base64 outputs.</p>
-				</article>
-				<article class="lp-feature">
 					<div class="ico">PR</div>
 					<h3>Review like code</h3>
-					<p>Notebooks become readable diffs your team can actually review in a pull request.</p>
+					<p>No outputs, no base64 blobs — just clean diffs your team can actually review in a pull request.</p>
 				</article>
 				<article class="lp-feature">
 					<div class="ico">↑</div>
@@ -285,11 +275,11 @@ df = pd.read_csv("sales.csv")</pre>
 			<div class="lp-steps">
 				<div class="lp-step">
 					<h3>Menu</h3>
-					<p>In JupyterLab open the notebook, then use:</p>
+					<p>In JupyterLab open the <code>.ipynb</code> notebook, then use:</p>
 					<p class="lp-menu-path"><strong>File → Jupytext → Pair Notebook with percent Script</strong></p>
 					<p class="lp-or">or</p>
 					<p class="lp-menu-path"><strong>File → Jupytext → Pair Notebook with MyST Markdown</strong></p>
-					<p>No terminal needed.</p>
+					<p>And if you opened the text notebook as a notebook, the same menu lets you pair it with an <code>.ipynb</code>. No terminal needed.</p>
 				</div>
 				<div class="lp-step">
 					<h3>jupytext.toml</h3>
@@ -319,6 +309,7 @@ formats = <span class="str">"ipynb,md:myst"</span></pre>
 			<div class="section-head">
 				<span class="eyebrow">Keeping in sync</span>
 				<h2>Syncs wherever you work</h2>
+				<p>Pair a text notebook with an <code>.ipynb</code> and Jupytext keeps both in sync automatically.</p>
 			</div>
 			<div class="lp-steps">
 				<div class="lp-step">
@@ -342,23 +333,18 @@ formats = <span class="str">"ipynb,md:myst"</span></pre>
 		<div class="lp-container">
 			<div>
 				<span class="eyebrow">New superpower</span>
-				<h2>Notebooks your AI assistant can actually read</h2>
-				<p>
-					Coding assistants like Claude, GitHub Copilot and Cursor work in plain text. Pair your
-					notebooks with Jupytext and they can read, edit and refactor them directly — no JSON
-					wrangling, no broken outputs, no special tooling.
-				</p>
+				<h2>Notebooks your AI assistant can actually work with</h2>
+				<p>AI assistants are right at home with scripts and Markdown files. As a text notebook is just that, they read, edit and refactor it as fluently as any other source file — no JSON wrangling, no special tooling.</p>
 				<ul>
 					<li><span class="tick">✓</span> Ask an agent to refactor a cell — it edits the .py file, you reload in Jupyter.</li>
-					<li><span class="tick">✓</span> Reviews and AI suggestions land as clean, minimal diffs.</li>
 					<li><span class="tick">✓</span> Outputs stay safe in the paired .ipynb while the text gets edited.</li>
-					<li><span class="tick">✓</span> Text notebooks are very concise, often 1,000x lighter than .ipynb, allowing your AI to ingest an entire collection of notebooks at once.</li>
+					<li><span class="tick">✓</span> Easily 1,000x more concise than .ipynb — so your AI grasps not just one notebook, but your whole collection at once.</li>
 				</ul>
 			</div>
 			<div class="lp-demo-card">
 				<div class="lp-demo-tabbar">
 					<div class="lp-demo-group-cluster" style="border-right:0">
-						<span class="lp-demo-group-lbl">Script formats</span>
+						<span class="lp-demo-group-lbl">Edit with AI</span>
 						<div class="lp-demo-group-tabs">
 							<span class="lp-demo-tab" style="border-bottom-color:var(--jt-orange);color:#fff;">analysis.py</span>
 						</div>
