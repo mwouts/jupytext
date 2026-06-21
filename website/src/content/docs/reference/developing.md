@@ -59,15 +59,10 @@ Our extension for JupyterLab adds a series of Jupytext commands to JupyterLab. T
 
 ## Jupytext's website
 
-You can build the website locally with:
+You can start a local dev server with:
 ```bash
+pixi shell
 cd website
 npm install
-npm run build
-```
-
-Or start a dev server with:
-```bash
-cd website
 npm run dev
 ```
