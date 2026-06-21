@@ -173,6 +173,14 @@ class JupytextConfiguration(Configurable):
         config=True,
     )
 
+    custom_language_magics = Unicode(
+        help="A comma separated list of additional language magics. Use e.g. "
+        'custom_language_magics = "jsx,tsx" if you have custom magics for those languages '
+        "and want Markdown code blocks in those languages to be converted to code cells "
+        "with the appropriate cell magic.",
+        config=True,
+    )
+
     def set_default_format_options(self, format_options, read=False):
         """Set default format option"""
         if self.default_notebook_metadata_filter:
@@ -216,6 +224,8 @@ class JupytextConfiguration(Configurable):
             format_options.setdefault("rst2md", self.sphinx_convert_rst2md)
         if self.custom_cell_magics:
             format_options.setdefault("custom_cell_magics", self.custom_cell_magics)
+        if self.custom_language_magics:
+            format_options.setdefault("custom_language_magics", self.custom_language_magics)
 
     def default_formats(self, path):
         """Return the default formats, if they apply to the current path #157"""
