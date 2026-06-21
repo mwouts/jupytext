@@ -23,6 +23,9 @@ const ogImage = new URL('/og/jupytext-card.png', Astro.site);
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 		<link rel="canonical" href={canonical} />
 
 		<!-- Open Graph / social -->
@@ -42,9 +45,9 @@ const ogImage = new URL('/og/jupytext-card.png', Astro.site);
 				const theme =
 					stored === 'light' || stored === 'dark'
 						? stored
-						: window.matchMedia('(prefers-color-scheme: light)').matches
-							? 'light'
-							: 'dark';
+						: window.matchMedia('(prefers-color-scheme: dark)').matches
+							? 'dark'
+							: 'light';
 				document.documentElement.dataset.theme = theme;
 			})();
 		</script>
@@ -89,7 +92,7 @@ const ogImage = new URL('/og/jupytext-card.png', Astro.site);
 				})
 				.catch(() => {});
 
-			// Lightweight tabs (used by Quickstart + Formats).
+			// Lightweight tabs (quickstart, demo, etc.)
 			document.querySelectorAll('[data-tabs]').forEach((group) => {
 				const tabs = [...group.querySelectorAll('[role="tab"]')];
 				const panels = [...group.querySelectorAll('[role="tabpanel"]')];
@@ -100,6 +103,21 @@ const ogImage = new URL('/og/jupytext-card.png', Astro.site);
 						tab.setAttribute('aria-selected', 'true');
 						panels[i].hidden = false;
 					});
+				});
+			});
+
+			// Demo card copy button — copies text of the visible panel's <pre>.
+			document.querySelectorAll('[data-demo-copy]').forEach((btn) => {
+				btn.addEventListener('click', () => {
+					const card = btn.closest('[data-tabs]');
+					const panel = card && card.querySelector('[role="tabpanel"]:not([hidden])');
+					const pre = panel && panel.querySelector('pre');
+					const text = pre ? pre.innerText : '';
+					if (!text) return;
+					navigator.clipboard.writeText(text).catch(() => {});
+					const prev = btn.textContent;
+					btn.textContent = 'copied ✓';
+					setTimeout(() => (btn.textContent = prev), 1400);
 				});
 			});
 		</script>

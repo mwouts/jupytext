@@ -42,49 +42,49 @@ const formats = [
 	{
 		id: 'percent',
 		label: 'py:percent',
-		best: 'Explicit cell markers understood by VS Code, PyCharm, Spyder, etc., available in 30+ languages.',
+		filename: 'notebook.py',
+		featured: true,
+		best: 'Explicit # %% cell markers — understood by VS Code, PyCharm, Spyder, supported in 30+ languages.',
 		code: `# %% [markdown]
-# # Analysis
-# A quick look at the data.
+# # Quarterly Sales
+# A look at Q4 revenue by region.
 
 # %%
 import pandas as pd
-df = pd.read_csv("data.csv")
-df.describe()`,
+df = pd.read_csv("sales.csv")
+
+# %%
+df.groupby("region")["revenue"].sum().plot.bar()`,
 	},
 	{
 		id: 'light',
 		label: 'py:light',
-		best: 'Minimal cell markers (use py:normarker for no cell markers at all)',
-		code: `# # Analysis
-# A quick look at the data.
+		filename: 'notebook.py',
+		best: 'Minimal markers — barely looks different from a regular script. Use py:nomarker to drop them entirely.',
+		code: `# # Quarterly Sales
+# A look at Q4 revenue by region.
 
 import pandas as pd
-df = pd.read_csv("data.csv")
-df.describe()`,
+df = pd.read_csv("sales.csv")
+
+# %%
+df.groupby("region")["revenue"].sum().plot.bar()`,
 	},
 	{
 		id: 'marimo',
 		label: 'py:marimo',
-		best: 'Save your Jupyter notebooks as Marimo apps',
+		filename: 'notebook.py',
+		best: 'Each cell becomes a reactive function — open the file directly in Marimo.',
 		code: `import marimo
 
-__generated_with = "0.23.8"
 app = marimo.App()
-
-
-@app.cell
-def _():
-    import marimo as mo
-
-    return (mo,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    # Analysis
-    A quick look at the data.
+    # Quarterly Sales
+    A look at Q4 revenue by region.
     """)
     return
 
@@ -92,8 +92,13 @@ def _(mo):
 @app.cell
 def _():
     import pandas as pd
-    df = pd.read_csv("data.csv")
-    df.describe()
+    df = pd.read_csv("sales.csv")
+    return df, pd
+
+
+@app.cell
+def _(df):
+    df.groupby("region")["revenue"].sum().plot.bar()
     return
 
 
@@ -103,70 +108,57 @@ if __name__ == "__main__":
 	{
 		id: 'md',
 		label: 'Markdown',
-		best: 'Plain Markdown, works well with GitHub',
-		code: `# Analysis
+		filename: 'notebook.md',
+		best: 'Plain GitHub Markdown — prose-first, readable everywhere.',
+		code: `# Quarterly Sales
 
-A quick look at the data.
+A look at Q4 revenue by region.
 
 \`\`\`python
 import pandas as pd
-df = pd.read_csv("data.csv")
-df.describe()
+df = pd.read_csv("sales.csv")
+\`\`\`
+
+\`\`\`python
+df.groupby("region")["revenue"].sum().plot.bar()
 \`\`\``,
 	},
 	{
 		id: 'myst',
 		label: 'MyST Markdown',
-		best: 'Publication grade notebooks that work well with Jupyter Book',
-		code: `# Analysis
+		filename: 'notebook.myst.md',
+		featured: true,
+		best: 'Rich directives and cross-references for Jupyter Book and technical publishing.',
+		code: `# Quarterly Sales
 
-A quick look at the data.
+A look at Q4 revenue by region.
 
 \`\`\`{code-cell} ipython3
 import pandas as pd
-df = pd.read_csv("data.csv")
-df.describe()
+df = pd.read_csv("sales.csv")
+\`\`\`
+
+\`\`\`{code-cell} ipython3
+df.groupby("region")["revenue"].sum().plot.bar()
 \`\`\``,
 	},
 	{
 		id: 'quarto',
 		label: 'Quarto',
-		best: 'For multi-language scientific publishing — Python, R, Julia and more, rendered by the Quarto system.',
-		code: `---
-title: Analysis
----
+		filename: 'notebook.qmd',
+		best: 'Multi-language scientific publishing — Python, R, Julia and more via the Quarto system.',
+		code: `# Quarterly Sales
 
-A quick look at the data.
+A look at Q4 revenue by region.
 
 \`\`\`{python}
 import pandas as pd
-df = pd.read_csv("data.csv")
-df.describe()
-\`\`\``,
-	},
-	{
-		id: 'pandoc',
-		label: 'Pandoc',
-		best: `Pandoc's own Markdown format for notebooks — cells as fenced divs, readable as plain Markdown.`,
-		code: `---
-jupyter:
-  nbformat: 4
-  nbformat_minor: 5
----
-
-::: {#7e0ae658 .cell .markdown}
-# Analysis
-
-A quick look at the data.
-:::
-
-::: {#756f3401 .cell .code}
-\`\`\` python
-import pandas as pd
-df = pd.read_csv("data.csv")
-df.describe()
+df = pd.read_csv("sales.csv")
 \`\`\`
-:::`
+
+\`\`\`{python}
+df.groupby("region")["revenue"].sum().plot.bar()
+\`\`\``,
 	},
 ];
 
@@ -203,6 +195,34 @@ const quickstart = [
 	},
 ];
 
+const k = (s: string) => `<span class="key">${s}</span>`;
+const v = (s: string) => `<span class="str">${s}</span>`;
+const ipynbHtml = [
+	'{',
+	` ${k('"cells"')}: [`,
+	'  {',
+	`   ${k('"cell_type"')}: ${v('"markdown"')},`,
+	`   ${k('"source"')}: [${v('"# Quarterly Sales\\n"')}, ${v('"\\n"')}, ${v('"A look at Q4 revenue by region."')}]`,
+	'  },',
+	'  {',
+	`   ${k('"cell_type"')}: ${v('"code"')},`,
+	`   ${k('"execution_count"')}: 1,`,
+	`   ${k('"outputs"')}: [],`,
+	`   ${k('"source"')}: [${v('"import pandas as pd\\n"')}, ${v('"df = pd.read_csv(\\"sales.csv\\")"')}]`,
+	'  },',
+	'  {',
+	`   ${k('"cell_type"')}: ${v('"code"')},`,
+	`   ${k('"execution_count"')}: 2,`,
+	`   ${k('"outputs"')}: [{${k('"data"')}: {${k('"image/png"')}: ${v('"iVBORw0KGgo..."')}}, ${k('"output_type"')}: ${v('"display_data"')}}],`,
+	`   ${k('"source"')}: [${v('"df.groupby(\\"region\\")[\\"revenue\\"].sum().plot.bar()"')}]`,
+	'  }',
+	' ],',
+	` ${k('"metadata"')}: {${k('"kernelspec"')}: {${k('"display_name"')}: ${v('"Python 3"')}, ${k('"language"')}: ${v('"python"')}, ${k('"name"')}: ${v('"python3"')}}},`,
+	` ${k('"nbformat"')}: 4,`,
+	` ${k('"nbformat_minor"')}: 5`,
+	'}',
+].join('\n');
+
 const integrations = [
 	{ name: 'JupyterLab', desc: 'Pair & open text notebooks with a right click.', href: '/getting-started/text-notebooks/#how-to-open-a-text-notebook-in-jupyterlab' },
 	{ name: 'Jupyter Notebook', desc: 'Works in Notebook 7 and classic.', href: '/getting-started/text-notebooks/#how-to-open-a-text-notebook-in-jupyter-notebook-nb7' },
@@ -236,42 +256,83 @@ const integrations = [
 					Jupytext saves Jupyter notebooks as <code>.py</code> or <code>.md</code> files — easy to edit
 					in any IDE, friendly to version control, and trivial for AI assistants to read and refactor.
 				</p>
-				<div class="lp-install" style="margin-top:0">
-					<span class="prompt">$</span>
-					<span>pip install jupytext</span>
-					<button class="lp-copy" data-copy="pip install jupytext">Copy</button>
-				</div>
 			</div>
 		</div>
 	</section>
 
 	<!-- Notebook examples -->
-	<section>
+	<section class="lp-demo-section">
 		<div class="lp-container">
-			<div class="lp-tabs" data-tabs>
-				<div class="lp-tablist" role="tablist">
-					{
-						formats.map((f, i) => (
-							<button class="lp-tab" role="tab" aria-selected={i === 0 ? 'true' : 'false'}>
-								{f.label}
-							</button>
-						))
-					}
+			<div class="lp-demo-card" data-tabs>
+				<!-- Vertical sidebar -->
+				<div class="lp-demo-sidebar">
+					<div class="lp-demo-group">Jupyter</div>
+					<button class="lp-demo-tab" role="tab" aria-selected="false">▶ Notebook</button>
+					<button class="lp-demo-tab" role="tab" aria-selected="false">notebook.ipynb</button>
+
+					<div class="lp-demo-group">Scripts</div>
+					{formats.slice(0, 3).map((f) => (
+						<button class:list={['lp-demo-tab', f.featured && 'lp-demo-tab--featured']} role="tab" aria-selected={f.id === 'percent' ? 'true' : 'false'}>
+							{f.label}{f.featured && <span class="lp-demo-dot" aria-hidden="true"></span>}
+						</button>
+					))}
+
+					<div class="lp-demo-group">Markdown</div>
+					{formats.slice(3).map((f) => (
+						<button class:list={['lp-demo-tab', f.featured && 'lp-demo-tab--featured']} role="tab" aria-selected="false">
+							{f.label}{f.featured && <span class="lp-demo-dot" aria-hidden="true"></span>}
+						</button>
+					))}
 				</div>
-				{
-					formats.map((f, i) => (
-						<div class="lp-tabpanel" role="tabpanel" hidden={i !== 0}>
-							<div class="lp-card">
-								<div class="lp-card-bar">
-									<span class="dot"></span><span class="dot"></span><span class="dot"></span>
-									<span class="fname">{f.label}</span>
-								</div>
-								<pre class="lp-code"><code>{f.code}</code></pre>
-							</div>
-							<p class="note">{f.best}</p>
+
+				<!-- Panels (right column) -->
+				<div class="lp-demo-panels">
+					<!-- Panel 1: rendered notebook -->
+					<div role="tabpanel" hidden class="lp-nb-render">
+						<div class="lp-nb-md">
+							<h2>Quarterly Sales</h2>
+							<p>A look at Q4 revenue by region.</p>
 						</div>
-					))
-				}
+						<div class="lp-nb-cell">
+							<span class="lp-nb-prompt">[1]:</span>
+							<pre class="lp-nb-code">import pandas as pd
+df = pd.read_csv("sales.csv")</pre>
+						</div>
+						<div class="lp-nb-cell">
+							<span class="lp-nb-prompt">[2]:</span>
+							<div class="lp-nb-output">
+								<pre class="lp-nb-code">df.groupby("region")["revenue"].sum().plot.bar()</pre>
+								<div class="lp-nb-chart">
+									<div class="lp-nb-bars">
+										<div class="lp-nb-bar" style="height:62px"></div>
+										<div class="lp-nb-bar" style="height:85px"></div>
+										<div class="lp-nb-bar" style="height:44px"></div>
+										<div class="lp-nb-bar" style="height:73px"></div>
+									</div>
+									<div class="lp-nb-labels">
+										<span class="lp-nb-label">North</span>
+										<span class="lp-nb-label">South</span>
+										<span class="lp-nb-label">East</span>
+										<span class="lp-nb-label">West</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Panel 2: notebook.ipynb JSON -->
+					<div role="tabpanel" hidden>
+						<pre class="lp-demo-pre" set:html={ipynbHtml}></pre>
+					</div>
+
+					<!-- Panels: text formats -->
+					{formats.map((f) => (
+						<div role="tabpanel" hidden={f.id !== 'percent'}>
+							<pre class="lp-demo-pre">{f.code}</pre>
+							{f.best && <p class="lp-demo-note">{f.best}</p>}
+						</div>
+					))}
+				</div>
 			</div>
 		</div>
 	</section>
