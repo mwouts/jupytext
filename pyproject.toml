@@ -312,10 +312,15 @@ jupyterlab = ">=4.0"
 [tool.pixi.feature.build.tasks]
 build-labextension = { cmd = "jlpm install && jlpm run build:prod", cwd = "jupyterlab" }
 
+# Quarto is only available on linux-64, osx-64, and osx-arm64
+[tool.pixi.feature.quarto.dependencies]
+quarto = ">=1.9.38,<2"
+
 [tool.pixi.environments]
 default = { features = ["dev"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
 build = { features = ["build"] }
+quarto = { features = ["dev", "quarto"], solve-group = "default" }
 
 [tool.pixi.pypi-dependencies]
 # Note: this does not build the jupyterlab-jupytext extension
