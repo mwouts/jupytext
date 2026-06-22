@@ -95,12 +95,27 @@ try {
 				<a class="nav-hide-sm" href="/getting-started/introduction/">Docs</a>
 				<a class="nav-hide-sm" href="/getting-started/install/">Get started</a>
 				<a href={GH} target="_blank" rel="noopener">GitHub<span id="gh-stars" class="gh-stars"> ★ {ghStars}</span></a>
+				<button class="lp-hamburger" id="lp-hamburger" aria-label="Open menu" aria-expanded="false">
+					<span></span><span></span><span></span>
+				</button>
 			</nav>
 		</div>
 	</header>
+	<div class="lp-mobile-menu" id="lp-mobile-menu" hidden>
+		<a href="#formats">Formats</a>
+		<a href="#features">Features</a>
+		<a href="#get-started">Get started</a>
+		<a href="#paired">Paired notebooks</a>
+		<a href="#sync">Synchronization</a>
+		<a href="#ai">Works with AI</a>
+		<a href="#about">About</a>
+		<div class="lp-mobile-menu-sep"></div>
+		<a href="/getting-started/introduction/">Docs</a>
+		<a href={GH} target="_blank" rel="noopener">GitHub</a>
+	</div>
 
 	<!-- Hero -->
-	<section>
+	<section id="formats">
 		<div class="lp-container">
 			<div class="section-head">
 				<div class="lp-hero-eyebrow">Jupyter ecosystem · open source</div>
@@ -112,42 +127,54 @@ try {
 			</div>
 		</div>
 		<div class="lp-container" style="margin-top: 2.5rem">
-			<div class="lp-demo-card" data-tabs>
-				<!-- Horizontal grouped tab bar -->
-				<div class="lp-demo-tabbar">
-					<div class="lp-demo-group-cluster">
-						<span class="lp-demo-group-lbl">Jupyter formats</span>
-						<div class="lp-demo-group-tabs">
-							<button class="lp-demo-tab" role="tab" aria-selected="false">▶ Notebook</button>
-							<button class="lp-demo-tab" role="tab" aria-selected="false">notebook.ipynb<span class="lp-demo-dot" aria-hidden="true"></span></button>
+			<div class="lp-demo-split">
+				<!-- Left: tabbed text format viewer -->
+				<div class="lp-demo-card" data-tabs>
+					<div class="lp-demo-tabbar">
+						<div class="lp-demo-group-cluster">
+							<span class="lp-demo-group-lbl">Script formats</span>
+							<div class="lp-demo-group-tabs">
+								{formats.slice(0, 3).map((f) => (
+									<button class:list={['lp-demo-tab', f.featured && 'lp-demo-tab--featured']} role="tab" aria-selected={f.id === 'percent' ? 'true' : 'false'}>
+										{f.label}{f.featured && <span class="lp-demo-dot" aria-hidden="true"></span>}
+									</button>
+								))}
+							</div>
+						</div>
+						<div class="lp-demo-group-cluster">
+							<span class="lp-demo-group-lbl">Markdown formats</span>
+							<div class="lp-demo-group-tabs">
+								{formats.slice(3).map((f) => (
+									<button class:list={['lp-demo-tab', f.featured && 'lp-demo-tab--featured']} role="tab" aria-selected="false">
+										{f.label}{f.featured && <span class="lp-demo-dot" aria-hidden="true"></span>}
+									</button>
+								))}
+							</div>
+						</div>
+						<div class="lp-demo-group-cluster" style="border-right:0">
+							<span class="lp-demo-group-lbl">Jupyter</span>
+							<div class="lp-demo-group-tabs">
+								<button class="lp-demo-tab" role="tab" aria-selected="false">ipynb</button>
+							</div>
 						</div>
 					</div>
-					<div class="lp-demo-group-cluster">
-						<span class="lp-demo-group-lbl">Script formats</span>
-						<div class="lp-demo-group-tabs">
-							{formats.slice(0, 3).map((f) => (
-								<button class:list={['lp-demo-tab', f.featured && 'lp-demo-tab--featured']} role="tab" aria-selected={f.id === 'percent' ? 'true' : 'false'}>
-									{f.label}{f.featured && <span class="lp-demo-dot" aria-hidden="true"></span>}
-								</button>
-							))}
-						</div>
-					</div>
-					<div class="lp-demo-group-cluster">
-						<span class="lp-demo-group-lbl">Markdown formats</span>
-						<div class="lp-demo-group-tabs">
-							{formats.slice(3).map((f) => (
-								<button class:list={['lp-demo-tab', f.featured && 'lp-demo-tab--featured']} role="tab" aria-selected="false">
-									{f.label}{f.featured && <span class="lp-demo-dot" aria-hidden="true"></span>}
-								</button>
-							))}
+					<div class="lp-demo-panels">
+						{formats.map((f) => (
+							<div role="tabpanel" hidden={f.id !== 'percent'}>
+								<pre class="lp-demo-pre">{f.code}</pre>
+								{f.best && <p class="lp-demo-note">{f.best}</p>}
+							</div>
+						))}
+						<div role="tabpanel" hidden>
+							<pre class="lp-demo-pre">{rawIpynb.trimEnd()}</pre>
+							<p class="lp-demo-note">JSON format · contains outputs and metadata, but not well suited to manual edits or version control</p>
 						</div>
 					</div>
 				</div>
 
-				<!-- Panels -->
-				<div class="lp-demo-panels">
-					<!-- Panel 1: rendered notebook -->
-					<div role="tabpanel" hidden class="lp-nb-render">
+				<!-- Right: always-visible rendered notebook -->
+				<div class="lp-demo-rendered">
+					<div class="lp-nb-render">
 						<div class="lp-nb-md">
 							<h2>Quarterly Sales</h2>
 							<p>A look at Q4 revenue by region.</p>
@@ -178,27 +205,14 @@ df = pd.read_csv("sales.csv")</pre>
 							</div>
 						</div>
 					</div>
-
-					<!-- Panel 2: notebook.ipynb JSON -->
-					<div role="tabpanel" hidden>
-						<pre class="lp-demo-pre">{rawIpynb.trimEnd()}</pre>
-						<p class="lp-demo-note">JSON format · requires Jupyter or VS Code · not well suited to manual edits or version control</p>
-					</div>
-
-					<!-- Panels: text formats -->
-					{formats.map((f) => (
-						<div role="tabpanel" hidden={f.id !== 'percent'}>
-							<pre class="lp-demo-pre">{f.code}</pre>
-							{f.best && <p class="lp-demo-note">{f.best}</p>}
-						</div>
-					))}
+					<p class="lp-demo-note">Text notebooks render exactly the same in Jupyter. Outputs are not saved — <a href="#paired">pair with an .ipynb</a> to keep them.</p>
 				</div>
 			</div>
 		</div>
 	</section>
 
 	<!-- What Jupytext enables -->
-	<section>
+	<section id="features">
 		<div class="lp-container">
 			<div class="section-head">
 				<span class="eyebrow">What Jupytext enables</span>
@@ -231,7 +245,7 @@ df = pd.read_csv("sales.csv")</pre>
 	</section>
 
 	<!-- Getting started: install & open -->
-	<section>
+	<section id="get-started">
 		<div class="lp-container">
 			<div class="section-head">
 				<span class="eyebrow">Getting started</span>
@@ -265,7 +279,7 @@ df = pd.read_csv("sales.csv")</pre>
 	</section>
 
 	<!-- Getting started: paired notebooks -->
-	<section>
+	<section id="paired">
 		<div class="lp-container">
 			<div class="section-head">
 				<span class="eyebrow">Paired notebooks</span>
@@ -304,7 +318,7 @@ formats = <span class="str">"ipynb,md:myst"</span></pre>
 	</section>
 
 	<!-- Sync -->
-	<section>
+	<section id="sync">
 		<div class="lp-container">
 			<div class="section-head">
 				<span class="eyebrow">Keeping in sync</span>
@@ -329,7 +343,7 @@ formats = <span class="str">"ipynb,md:myst"</span></pre>
 	</section>
 
 	<!-- AI band -->
-	<section class="lp-ai">
+	<section id="ai" class="lp-ai">
 		<div class="lp-container">
 			<div>
 				<span class="eyebrow">New superpower</span>
@@ -374,7 +388,7 @@ formats = <span class="str">"ipynb,md:myst"</span></pre>
 	</section>
 
 	<!-- About -->
-	<section style="border-top:1px solid var(--lp-border)">
+	<section id="about" style="border-top:1px solid var(--lp-border)">
 		<div class="lp-container" style="max-width:44rem;text-align:center">
 			<div class="section-head">
 				<h2>Keeping in touch</h2>

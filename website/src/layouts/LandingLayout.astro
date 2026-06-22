@@ -93,6 +93,23 @@ const ogImage = new URL('/og/jupytext-card.png', Astro.site);
 					setTimeout(() => (btn.textContent = prev), 1400);
 				});
 			});
+
+			// Hamburger menu toggle.
+			const hamburger = document.getElementById('lp-hamburger');
+			const mobileMenu = document.getElementById('lp-mobile-menu');
+			if (hamburger && mobileMenu) {
+				hamburger.addEventListener('click', () => {
+					const open = !mobileMenu.hidden;
+					mobileMenu.hidden = open;
+					hamburger.setAttribute('aria-expanded', String(!open));
+				});
+				mobileMenu.querySelectorAll('a').forEach(a => {
+					a.addEventListener('click', () => {
+						mobileMenu.hidden = true;
+						hamburger.setAttribute('aria-expanded', 'false');
+					});
+				});
+			}
 		</script>
 	</body>
 </html>
