@@ -747,10 +747,15 @@ p.lede {
 	display: flex;
 	flex-direction: column;
 	color: #1c1a17;
+	overflow-x: auto;
+	min-width: 0;
+	scrollbar-width: none;
 }
+.lp-demo-rendered::-webkit-scrollbar { display: none; }
 .lp-demo-rendered .lp-nb-render {
 	flex: 1;
 	min-height: unset;
+	min-width: max-content;
 	box-shadow: none;
 	border-radius: 0;
 	border: 0;
@@ -772,19 +777,25 @@ p.lede {
 	background: var(--lp-code-bg);
 	border: 0;
 	border-radius: 0;
-	overflow: hidden;
 	display: flex;
 	flex-direction: column;
+	min-width: 0;
+	overflow-x: auto;
+	scrollbar-width: none;
 }
+.lp-demo-card::-webkit-scrollbar { display: none; }
 .lp-demo-tabbar {
 	background: var(--lp-code-bar);
 	border-bottom: 1px solid var(--lp-code-border);
 	display: flex;
+	width: max-content;
+	min-width: 100%;
 }
 .lp-demo-group-cluster {
 	display: flex;
 	flex-direction: column;
 	border-right: 1px solid var(--lp-code-border);
+	flex-shrink: 0;
 }
 .lp-demo-group-cluster:last-child { border-right: 0; }
 .lp-demo-group-lbl {
