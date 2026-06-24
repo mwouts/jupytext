@@ -8,38 +8,52 @@ permissions:
   contents: read
 
 jobs:
+  zizmor:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      with:
+        persist-credentials: false
+
+    - name: Run zizmor 🌈
+      uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
+
   pre-commit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.x"
 
       - name: Install pixi
-        uses: prefix-dev/setup-pixi@v0.9.6
+        uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
         with:
           pixi-version: v0.68.0
           cache: true
           activate-environment: true
 
-      - uses: pre-commit/action@v3.0.1
+      - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
   lint-extension:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           persist-credentials: false
 
       - name: Base Setup
-        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@95d85449e4f3f352e261221f6529f8ed307f5728 # v1
         with:
           python_version: "3.x"
 
