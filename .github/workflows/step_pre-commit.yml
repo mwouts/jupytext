@@ -4,24 +4,7 @@ run-name: Run pre-commit tests
 on:
   workflow_call:
 
-permissions:
-  contents: read
-
 jobs:
-  zizmor:
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      with:
-        persist-credentials: false
-
-    - name: Run zizmor 🌈
-      uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
-
   pre-commit:
     runs-on: ubuntu-latest
     steps:
