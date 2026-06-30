@@ -24,6 +24,8 @@ updates:
         applies-to: "security-updates"
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/" # Workflow files stored in the default location of `.github/workflows`
@@ -33,3 +35,5 @@ updates:
       actions-dependencies:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
