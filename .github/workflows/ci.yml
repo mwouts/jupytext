@@ -28,6 +28,9 @@ concurrency:
 jobs:
   zizmor:
     uses: ./.github/workflows/step_zizmor.yml
+    permissions:
+      contents: read
+      security-events: write
 
   pre-commit:
     uses: ./.github/workflows/step_pre-commit.yml

@@ -11,6 +11,7 @@ Jupytext ChangeLog
 - We require `pandoc<3.10` on the CI as pandoc converts the "3.10" string to a float, which then causes issues in Jupytext ([#1545](https://github.com/jupytext/jupytext/issues/1545))
 - Fixed the CI so that tests also run on scheduled runs, and so that `jupyterfs` tests are skipped when their initialization fails ([#1539](https://github.com/jupytext/jupytext/pull/1539))
 - In the CI, the extension is build using a dedicated `build` pixi environment.
+- Harden the github action ([#1569](https://github.com/jupytext/jupytext/pull/1569))
 
 **Fixed**
 - We now support unicode characters while dumping YAML ([#1542](https://github.com/jupytext/jupytext/pull/1542))
