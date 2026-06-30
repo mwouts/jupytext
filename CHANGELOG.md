@@ -1,6 +1,12 @@
 Jupytext ChangeLog
 ==================
 
+1.19.5.dev0 (2026-mm-dd)
+-------------------
+
+**Changed**
+- Harden the github action ([#1569](https://github.com/jupytext/jupytext/pull/1569)). Thanks to [Peyton Murray](https://github.com/peytondmurray) for this PR!
+
 1.19.4 (2026-06-21)
 -------------------
 
