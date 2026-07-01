@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - "website/**"
+      - ".github/workflows/deploy-webiste.yml"
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 # Allow one concurrent deployment; don't cancel an in-progress one.
@@ -24,13 +27,14 @@ jobs:
         uses: withastro/action@b7d53628f8b666036b0238aadb0b984a2a489f26 # v6
         with:
           path: website
-          node-version: 22
+          node-version: 24
         # Builds with npm and uploads dist/ as a Pages artifact.
         # website/public/CNAME is copied into dist/ so the custom domain
         # is preserved on every deploy.
 
   deploy:
     needs: build
+    if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
     permissions:
       pages: write
       id-token: write
