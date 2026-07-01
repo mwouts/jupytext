@@ -215,6 +215,17 @@ def test_question_is_not_magic():
     assert not is_magic("# question: float?", "python", explicitly_code=True)
 
 
+def test_whitespace_line_is_not_magic_and_is_fast():
+    # A whitespace-only line is not a magic, and detecting that must not take
+    # quadratic time (see the _PYTHON_HELP_OR_BASH_CMD regex)
+    import time
+
+    line = " \t" * 100_000
+    start = time.perf_counter()
+    assert not is_magic(line, "python")
+    assert time.perf_counter() - start < 2
+
+
 def test_multiline_python_magic(no_jupytext_version_number):
     nb = new_notebook(
         cells=[

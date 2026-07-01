@@ -44,7 +44,10 @@ _MAGIC_FORCE_ESC_RE["csharp"] = re.compile(r"^(// |//)*#![a-zA-Z](.*)//\s*noesca
 _MAGIC_RE["go"] = re.compile(r"^(// |//)*(!|!\*|%|%%|%%%)[a-zA-Z]")
 
 # Commands starting with a question or exclamation mark have to be escaped
-_PYTHON_HELP_OR_BASH_CMD = re.compile(r"^\s*(# |#)*\s*(\?|!)\s*[A-Za-z\.\~\$\\\/\{\}]")
+# The comment prefixes are grouped with the trailing whitespace so that a
+# whitespace-only line does not trigger quadratic backtracking (two \s* runs
+# around a nullable group)
+_PYTHON_HELP_OR_BASH_CMD = re.compile(r"^\s*(?:(?:# |#)+\s*)?(\?|!)\s*[A-Za-z\.\~\$\\\/\{\}]")
 
 # A bash command not followed by an equal sign or a parenthesis is a magic command
 _PYTHON_MAGIC_CMD = re.compile(
